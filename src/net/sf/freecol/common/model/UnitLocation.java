@@ -23,12 +23,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 import org.w3c.dom.Element;
@@ -215,12 +217,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      *     <code>Location</code>.
      */
     public int getTotalUnitCount() {
-        int result = 0;
-        for (Unit unit : getUnitList()) {
-            result++;
-            result += unit.getUnitCount();
-        }
-        return result;
+        return getUnitList().stream()
+            .mapToInt(u -> 1 + u.getUnitCount()).sum();
     }
 
     /**
@@ -232,12 +230,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @see Unit#isCarrier
      */
     public boolean hasCarrierWithSpace(int space) {
-        for (Unit u : getUnitList()) {
-            if (u.isCarrier()
-                && !u.isDamaged()
-                && u.getSpaceLeft() >= space) return true;
-        }
-        return false;
+        return any(getUnitList(),
+            u -> u.isCarrier() && !u.isDamaged() && u.getSpaceLeft() >= space);
     }
 
     /**
@@ -246,11 +240,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return A list of naval <code>Unit</code>s present.
      */
     public List<Unit> getNavalUnits() {
-        List<Unit> shipList = new ArrayList<>();
-        for (Unit u : getUnitList()) {
-            if (u.isNaval()) shipList.add(u);
-        }
-        return shipList;
+        return getUnitList().stream()
+            .filter(Unit::isNaval).collect(Collectors.toList());
     }
 
     /**
@@ -297,6 +288,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     // Interface Location
     // Inheriting
     //   FreeColObject.getId()
+    // Does not implement getRank()
 
     /**
      * {@inheritDoc}
@@ -467,9 +459,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The sum of the space taken by the units in this location.
      */
     public int getSpaceTaken() {
-        int space = 0;
-        for (Unit u : getUnitList()) space += u.getSpaceTaken();
-        return space;
+        return getUnitList().stream()
+            .mapToInt(u -> u.getSpaceTaken()).sum();
     }
 
     /**
@@ -555,7 +546,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     // Serialization
-
 
     /**
      * {@inheritDoc}

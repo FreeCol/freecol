@@ -278,7 +278,7 @@ public class ColonyPlanTest extends FreeColTestCase {
 
         Colony colony = getStandardColony();
         game.setCurrentPlayer(colony.getOwner());
-        Player dutch = getGame().getPlayer("model.nation.dutch");
+        Player dutch = getGame().getPlayerByNationId("model.nation.dutch");
         List<Unit> units = new ArrayList<>();
         Unit servant = new ServerUnit(getGame(), colony.getTile(),
                                       dutch, servantType);

@@ -38,6 +38,8 @@ public class AbstractGoodsLabel extends JLabel {
 
     private boolean partialChosen = false;
 
+    private boolean fullChosen = false;
+
 
     /**
      * Initializes this JLabel with the given goods data.
@@ -70,6 +72,24 @@ public class AbstractGoodsLabel extends JLabel {
      */
     public void setPartialChosen(boolean partialChosen) {
         this.partialChosen = partialChosen;
+    }
+
+    /**
+     * Has full amount been selected?
+     *
+     * @return True if a full amount has been selected.
+     */
+    public boolean isFullChosen() {
+        return fullChosen;
+    }
+
+    /**
+     * Set the full amount state.
+     *
+     * @param fullChosen The new full amount state.
+     */
+    public void setFullChosen(boolean fullChosen) {
+        this.fullChosen = fullChosen;
     }
 
     /**

@@ -94,7 +94,7 @@ public final class ColopediaPanel extends FreeColPanel
 
         add(okButton, "newline 20, span, tag ok");
 
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
         tree = buildTree();
 
@@ -140,7 +140,7 @@ public final class ColopediaPanel extends FreeColPanel
                 @Override
                 public Dimension getPreferredSize() {
                     return new Dimension(
-                        (int)(200 * getImageLibrary().getScalingFactor()),
+                        (int)(200 * getImageLibrary().getScaleFactor()),
                         super.getPreferredSize().height);
                 }
             };
@@ -160,16 +160,18 @@ public final class ColopediaPanel extends FreeColPanel
     }
 
     /**
-     * This function analyzes a tree selection event and calls the right methods to take care
-     * of building the requested unit's details.
+     * This function analyzes a tree selection event and calls the
+     * right methods to take care of building the requested unit's
+     * details.
      *
-     * @param event The incoming TreeSelectionEvent.
+     * @param event The incoming <code>TreeSelectionEvent</code>.
      */
     @Override
     public void valueChanged(TreeSelectionEvent event) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node
+            = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
         if (node != null) {
-            showDetails((ColopediaTreeItem) node.getUserObject());
+            showDetails((ColopediaTreeItem)node.getUserObject());
         }
     }
 
@@ -221,8 +223,8 @@ public final class ColopediaPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
             getGUI().removeFromCanvas(this);
         } else {

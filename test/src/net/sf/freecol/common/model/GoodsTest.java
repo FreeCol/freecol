@@ -227,7 +227,7 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public Player dutch(){
-        return getGame().getPlayer("model.nation.dutch");
+        return getGame().getPlayerByNationId("model.nation.dutch");
     }
 
     public void testAdjustAmount() {

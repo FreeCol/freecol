@@ -20,18 +20,19 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -77,9 +78,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         if (!Messages.containsKey(hdrKey)) {
             hdrKey = "monarchDialog.default";
         }
-        JTextArea header = Utility.localizedTextArea(hdrKey);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.MEDIUM));
+        JLabel header = Utility.localizedHeaderLabel(hdrKey,
+            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 2, insets 10",
                                                     "[]20[]"));
@@ -87,11 +87,8 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
         if (action == MonarchAction.RAISE_TAX_ACT
             || action == MonarchAction.RAISE_TAX_WAR) {
             JButton helpButton = Utility.localizedButton("help");
-            helpButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        getGUI().showColopediaPanel("colopedia.concepts.taxes");
-                    }
+            helpButton.addActionListener((ActionEvent ae) -> {
+                    getGUI().showColopediaPanel("colopedia.concepts.taxes");
                 });
             panel.add(helpButton, "tag help");
         }

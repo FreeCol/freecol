@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -233,7 +234,7 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);//-vis(owner,this),-til
         }
-        if (this instanceof Colony && !tile.hasRoad()) {
+        if (!tile.hasRoad()) {
             TileImprovement road = tile.addRoad();
             road.setTurnsToComplete(0);
             road.setVirtual(true);
@@ -298,10 +299,8 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement is connected to the high seas.
      */
     public boolean isConnectedPort() {
-        for (Tile t : getTile().getSurroundingTiles(1)) {
-            if (!t.isLand() && t.isHighSeasConnected()) return true;
-        }
-        return false;
+        return any(getTile().getSurroundingTiles(1, 1),
+            t -> !t.isLand() && t.isHighSeasConnected());
     }
 
     /**
@@ -329,11 +328,8 @@ public abstract class Settlement extends GoodsLocation
      * @return an <code>int</code> value
      */
     public int getConsumptionOf(GoodsType goodsType) {
-        int result = 0;
-        for (Unit unit : getUnitList()) {
-            result += unit.getType().getConsumptionOf(goodsType);
-        }
-        return Math.max(0, result);
+        return Math.max(0, getUnitList().stream()
+                .mapToInt(u -> u.getType().getConsumptionOf(goodsType)).sum());
     }
 
     /**
@@ -344,13 +340,9 @@ public abstract class Settlement extends GoodsLocation
      * @return an <code>int</code> value
      */
     public int getConsumptionOf(List<GoodsType> goodsTypes) {
-        int result = 0;
-        if (goodsTypes != null) {
-            for (GoodsType goodsType : goodsTypes) {
-                result += getConsumptionOf(goodsType);
-            }
-        }
-        return result;
+        return (goodsTypes == null) ? 0
+            : goodsTypes.stream()
+                .mapToInt(gt -> getConsumptionOf(gt)).sum();
     }
 
     /**
@@ -371,16 +363,14 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement can provide the equipment.
      */
     public boolean canProvideGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            int available = getGoodsCount(ag.getType());
-
-            int breedingNumber = ag.getType().getBreedingNumber();
-            if (breedingNumber != GoodsType.INFINITY) {
-                available -= breedingNumber;
-            }
-            if (available < ag.getAmount()) return false;
-        }
-        return true;
+        return all(goods, ag -> {
+                int available = getGoodsCount(ag.getType());
+                int breedingNumber = ag.getType().getBreedingNumber();
+                if (breedingNumber != GoodsType.INFINITY) {
+                    available -= breedingNumber;
+                }
+                return available >= ag.getAmount();
+            });
     }
 
     /**
@@ -423,12 +413,20 @@ public abstract class Settlement extends GoodsLocation
 
         // To succeed, there must exist an available role for the unit
         // where the extra equipment for the role is present.
-        for (Role r : unit.getAvailableRoles(military)) {
-            if (canProvideGoods(unit.getGoodsDifference(r, 1))) return r;
-        }
-        return null;
+        return find(unit.getAvailableRoles(military),
+            r -> canProvideGoods(unit.getGoodsDifference(r, 1)));
     }
 
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (player == getOwner()) ? this : getTile();
+    }
 
     // Override FreeColObject
 
@@ -540,6 +538,15 @@ public abstract class Settlement extends GoodsLocation
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int getRank() {
+        return Location.getRank(getTile());
+    }
+
+
     // Interface UnitLocation
     // Inherits
     //   UnitLocation.getSpaceTaken
@@ -571,10 +578,9 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public int priceGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            if (getGoodsCount(ag.getType()) < ag.getAmount()) return -1;
-        }
-        return 0;
+        return (any(goods,
+                ag -> getGoodsCount(ag.getType()) < ag.getAmount())) ? -1
+            : 0;
     }
 
     /**
@@ -634,7 +640,7 @@ public abstract class Settlement extends GoodsLocation
      *
      * @return A ratio of defence power to settlement size.
      */
-    public abstract float getDefenceRatio();
+    public abstract double getDefenceRatio();
 
     /**
      * Is this settlement insufficiently defended?

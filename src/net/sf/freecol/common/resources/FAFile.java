@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -111,7 +112,7 @@ public class FAFile {
         if (fn != null) {
             return fn.points;
         }
-        ArrayList<Point> points = new ArrayList<>();
+        List<Point> points = new ArrayList<>();
         int x = 0;
         for (int i=0; i<text.length(); i++) {
             FALetter fl = getLetter(text.charAt(i));

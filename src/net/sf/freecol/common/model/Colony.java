@@ -26,11 +26,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -38,7 +39,9 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Stance;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
+
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -215,10 +218,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The corresponding <code>ColonyTile</code>, or null if not found.
      */
     public ColonyTile getColonyTile(Tile t) {
-        for (ColonyTile c : colonyTiles) {
-            if (c.getWorkTile() == t) return c;
-        }
-        return null;
+        return find(colonyTiles, ct -> ct.getWorkTile() == t);
     }
 
     /**
@@ -504,14 +504,23 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // WorkLocations, Buildings, ColonyTiles
 
     /**
+     * Get a stream of all the possible work locations for this colony.
+     *
+     * @return A suitable <code>Stream</code>.
+     */
+    private Stream<WorkLocation> getAllWorkLocationsStream() {
+        return Stream.concat(colonyTiles.stream(),
+                             buildingMap.values().stream());
+    }
+    
+    /**
      * Gets a list of every work location in this colony.
      *
      * @return The list of work locations.
      */
     public List<WorkLocation> getAllWorkLocations() {
-        List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
-        result.addAll(buildingMap.values());
-        return result;
+        return getAllWorkLocationsStream()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -521,16 +530,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of available <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getAvailableWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this
-                || getOwner().canClaimForSettlement(tile)) {
-                result.add(ct);
-            }
-        }
-        return result;
+        return getAllWorkLocationsStream()
+            .filter(WorkLocation::isAvailable)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -539,28 +541,30 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of current <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getCurrentWorkLocations() {
-        List<WorkLocation> result
-            = new ArrayList<WorkLocation>(buildingMap.values());
-        for (ColonyTile ct : colonyTiles) {
-            Tile tile = ct.getWorkTile();
-            if (tile.getOwningSettlement() == this) result.add(ct);
-        }
-        return result;
+        return getAllWorkLocationsStream()
+            .filter(WorkLocation::isCurrent)
+            .collect(Collectors.toList());
     }
 
     /**
      * Add a Building to this Colony.
      *
+     * Lower level routine, do not use directly in-game (use buildBuilding).
+     * Used for serialization and public for the test suite.
+     *
      * -til: Could change the tile appearance if the building is
      * stockade-type
      *
-     * @param building a <code>Building</code> value
+     * @param building The <code>Building</code> to build.
+     * @return True if the building was added.
      */
-    public void addBuilding(final Building building) {
-        BuildingType buildingType = building.getType().getFirstLevel();
+    public boolean addBuilding(final Building building) {
+        if (building == null || building.getType() == null) return false;
+        final BuildingType buildingType = building.getType().getFirstLevel();
+        if (buildingType == null || buildingType.getId() == null) return false;
         buildingMap.put(buildingType.getId(), building);
         addFeatures(building.getType());
-        invalidateCache();
+        return true;
     }
 
     /**
@@ -572,14 +576,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param building The <code>Building</code> to remove.
      * @return True if the building was removed.
      */
-    public boolean removeBuilding(final Building building) {
-        BuildingType buildingType = building.getType().getFirstLevel();
-        boolean result = buildingMap.remove(buildingType.getId()) != null;
-        if (result) {
-            removeFeatures(building.getType());
-            invalidateCache();
-        }
-        return result;
+    protected boolean removeBuilding(final Building building) {
+        final BuildingType buildingType = building.getType().getFirstLevel();
+        if (buildingMap.remove(buildingType.getId()) == null) return false;
+        removeFeatures(building.getType());
+        return true;
     }
 
     /**
@@ -591,10 +592,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Building getBuildingForProducing(final GoodsType goodsType) {
         for (Building b : buildingMap.values()) {
-            for (AbstractGoods ag : b.getOutputs()) {
-                if (ag.getType() == goodsType)
-                    return b;
-            }
+            if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
+                return b;
         }
         return null;
     }
@@ -623,13 +622,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public <T extends WorkLocation> T getWorkLocationWithAbility(String ability,
         Class<T> returnClass) {
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            if (wl.hasAbility(ability)) {
-                try {
-                    return returnClass.cast(wl);
-                } catch (ClassCastException cce) {}
-            }
-        }
+        WorkLocation wl = getWorkLocationWithAbility(ability);
+        if (wl != null) try { return returnClass.cast(wl); } catch (ClassCastException cce) {};
         return null;
     }
 
@@ -657,13 +651,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public <T extends WorkLocation> T getWorkLocationWithModifier(String modifier,
         Class<T> returnClass) {
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            if (wl.hasModifier(modifier)) {
-                try {
-                    return returnClass.cast(wl);
-                } catch (ClassCastException cce) {}
-            }
-        }
+        WorkLocation wl = getWorkLocationWithModifier(modifier);
+        if (wl != null) try { return returnClass.cast(wl); } catch (ClassCastException cce) {}
         return null;
     }
     
@@ -675,13 +664,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            for (AbstractGoods input : wl.getInputs()) {
-                if (input.getType() == goodsType) result.add(wl);
-            }
-        }
-        return result;
+        return getCurrentWorkLocations().stream()
+            .filter(wl -> any(wl.getInputs(), ag -> ag.getType() == goodsType))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -692,13 +677,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        List<WorkLocation> result = new ArrayList<>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            for (AbstractGoods ag : wl.getOutputs()) {
-                if (ag.getType() == goodsType) result.add(wl);
-            }
-        }
-        return result;
+        return getCurrentWorkLocations().stream()
+            .filter(wl -> any(wl.getOutputs(), ag -> ag.getType() == goodsType))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -828,14 +809,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of buildable <code>UnitType</code>s.
      */
     public List<UnitType> getBuildableUnits() {
-        ArrayList<UnitType> buildableUnits = new ArrayList<>();
-        List<UnitType> unitTypes = getSpecification().getUnitTypeList();
-        for (UnitType unitType : unitTypes) {
-            if (unitType.needsGoodsToBuild() && canBuild(unitType)) {
-                buildableUnits.add(unitType);
-            }
-        }
-        return buildableUnits;
+        return getSpecification().getUnitTypeList().stream()
+            .filter(ut -> ut.needsGoodsToBuild() && canBuild(ut))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -977,18 +953,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && !getTile().isCoastland()) {
             return NoBuildReason.COASTAL;
         } else {
-            for (Entry<String, Boolean> entry
-                     : buildableType.getRequiredAbilities().entrySet()) {
-                if (hasAbility(entry.getKey()) != entry.getValue()) {
-                    return NoBuildReason.MISSING_ABILITY;
-                }
+            if (!all(buildableType.getRequiredAbilities().entrySet(),
+                    e -> e.getValue() == hasAbility(e.getKey()))) {
+                return NoBuildReason.MISSING_ABILITY;
             }
-            if (buildableType.getLimits() != null) {
-                for (Limit limit : buildableType.getLimits()) {
-                    if (!limit.evaluate(this)) {
-                        return NoBuildReason.LIMIT_EXCEEDED;
-                    }
-                }
+            if (!all(buildableType.getLimits(), l -> l.evaluate(this))) {
+                return NoBuildReason.LIMIT_EXCEEDED;
             }
         }
         if (assumeBuilt == null) {
@@ -1015,15 +985,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility(Ability.PERSON)) {
-                boolean ok = hasAbility(Ability.BUILD, buildableType);
-                if (!ok) {
-                    for (BuildableType bt : assumeBuilt) {
-                        ok = bt.hasAbility(Ability.BUILD, buildableType);
-                        if (ok) break;
-                    }
-                }
-                if (!ok) return NoBuildReason.MISSING_BUILD_ABILITY;
+            // Non-person units need a BUILD ability, present or assumed.
+            if (!buildableType.hasAbility(Ability.PERSON)
+                && !hasAbility(Ability.BUILD, buildableType)
+                && none(assumeBuilt, bt -> bt.hasAbility(Ability.BUILD,
+                        buildableType))) {
+                return NoBuildReason.MISSING_BUILD_ABILITY;
             }
         }
         return NoBuildReason.NONE;
@@ -1060,16 +1027,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public int priceGoodsForBuilding(List<AbstractGoods> required) {
         final Market market = getOwner().getMarket();
-        int price = 0;
-        for (AbstractGoods ag : required) {
-            final GoodsType goodsType = ag.getType();
-            final int amount = ag.getAmount();
-            // FIXME: magic number!
-            price += (goodsType.isStorable())
-                ? (market.getBidPrice(goodsType, amount) * 110) / 100
-                : goodsType.getPrice() * amount;
-        }
-        return price;
+        // FIXME: magic number!
+        return required.stream().mapToInt(ag -> (ag.getType().isStorable())
+            ? (market.getBidPrice(ag.getType(), ag.getAmount()) * 110) / 100
+            : ag.getType().getPrice() * ag.getAmount()).sum();
     }
 
     /**
@@ -1105,8 +1066,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of required abstract goods.
      */
     public List<AbstractGoods> getFullRequiredGoods(BuildableType buildable) {
+        if (buildable == null) return Collections.<AbstractGoods>emptyList();
+
         List<AbstractGoods> required = new ArrayList<>();
-        if (buildable == null) return required;
         for (AbstractGoods ag : buildable.getRequiredGoods()) {
             int amount = ag.getAmount();
             GoodsType type = ag.getType();
@@ -1356,22 +1318,21 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public StringTemplate getReducePopulationMessage() {
         if (canReducePopulation()) return null;
         Set<Modifier> modifierSet = getModifiers(Modifier.MINIMUM_COLONY_SIZE);
-        for (Modifier modifier : modifierSet) {
-            FreeColObject source = modifier.getSource();
-            if (source instanceof BuildingType) {
-                // If the modifier source is a building type, use the
-                // building in the colony, which may be of a different
-                // level to the modifier source.
-                // This prevents the stockade modifier from matching a
-                // colony-fort, and thus the message attributing the
-                // failure to reduce population to a non-existing
-                // stockade, BR#3522055.
-                source = getBuilding((BuildingType)source).getType();
-            }
-            return StringTemplate.template("model.colony.minimumColonySize")
-                .addName("%object%", source);
+        if (modifierSet.isEmpty()) return null;
+        Modifier modifier = modifierSet.iterator().next();
+        FreeColObject source = modifier.getSource();
+        if (source instanceof BuildingType) {
+            // If the modifier source is a building type, use the
+            // building in the colony, which may be of a different
+            // level to the modifier source.
+            // This prevents the stockade modifier from matching a
+            // colony-fort, and thus the message attributing the
+            // failure to reduce population to a non-existing
+            // stockade, BR#3522055.
+            source = getBuilding((BuildingType)source).getType();
         }
-        return null;
+        return StringTemplate.template("model.colony.minimumColonySize")
+            .addName("%object%", source);
     }
 
     /**
@@ -1637,15 +1598,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The total defence power.
      */
-    public float getTotalDefencePower() {
-        CombatModel cm = getGame().getCombatModel();
-        float defence = 0.0f;
-        for (Unit unit : getTile().getUnitList()) {
-            if (unit.isDefensiveUnit()) {
-                defence += cm.getDefencePower(null, unit);
-            }
-        }
-        return defence;
+    public double getTotalDefencePower() {
+        final CombatModel cm = getGame().getCombatModel();
+        return getTile().getUnitList().stream()
+            .filter(Unit::isDefensiveUnit)
+            .mapToDouble(u -> cm.getDefencePower(null, u)).sum();
     }
 
     /**
@@ -1684,11 +1641,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of burnable buildings.
      */
     public List<Building> getBurnableBuildings() {
-        List<Building> buildingList = new ArrayList<>();
-        for (Building building : getBuildings()) {
-            if (building.canBeDamaged()) buildingList.add(building);
-        }
-        return buildingList;
+        return getBuildings().stream()
+            .filter(Building::canBeDamaged).collect(Collectors.toList());
     }
 
     /**
@@ -1698,11 +1652,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of lootable goods in this colony.
      */
     public List<Goods> getLootableGoodsList() {
-        List<Goods> goodsList = new ArrayList<>();
-        for (Goods goods : getGoodsContainer().getGoods()) {
-            if (goods.getType().isStorable()) goodsList.add(goods);
-        }
-        return goodsList;
+        return getGoodsContainer().getGoods().stream()
+            .filter(g -> g.getType().isStorable())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1747,23 +1699,19 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && player.getNumberOfSettlements() < 5) {// FIXME: magic#
             return Integer.MIN_VALUE;
         }
-        int result = 0;
+        int result;
         if (player.owns(this)) {
-            for (WorkLocation wl : getAvailableWorkLocations()) {
-                result += wl.evaluateFor(player);
-            }
-            for (Unit u : getTile().getUnitList()) {
-                result += u.evaluateFor(player);
-            }
-            for (Goods g : getCompactGoods()) {
-                result += g.evaluateFor(player);
-            }
+            result = getAvailableWorkLocations().stream()
+                    .mapToInt(wl -> wl.evaluateFor(player)).sum()
+                + getTile().getUnitList().stream()
+                    .mapToInt(u -> u.evaluateFor(player)).sum()
+                + getCompactGoods().stream()
+                    .mapToInt(g -> g.evaluateFor(player)).sum();
         } else { // Much guesswork
-            result += getDisplayUnitCount() * 1000;
-            result += 500; // Some useful goods?
-            for (Tile t : getTile().getSurroundingTiles(1)) {
-                if (t.getOwningSettlement() == this) result += 200;
-            }
+            result = getDisplayUnitCount() * 1000
+                + 500 // Some useful goods?
+                + 200 * (int)getTile().getSurroundingTiles(0, 1).stream()
+                    .filter(t -> t.getOwningSettlement() == this).count();
             Building stockade = getStockade();
             if (stockade != null) result *= stockade.getLevel();
         }
@@ -1796,16 +1744,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return <code>true</code> if this unit type could be added.
      */
     public boolean canTrain(UnitType unitType) {
-        if (!hasAbility(Ability.TEACH)) {
-            return false;
-        }
-
-        for (Building building : buildingMap.values()) {
-            if (building.canTeach() && building.canAddType(unitType)) {
-                return true;
-            }
-        }
-        return false;
+        return hasAbility(Ability.TEACH)
+            && any(buildingMap.values(),
+                b -> b.canTeach() && b.canAddType(unitType));
     }
 
     /**
@@ -1949,11 +1890,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return an <code>int</code> value
      */
     public int getFoodProduction() {
-        int result = 0;
-        for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getTotalProductionOf(foodType);
-        }
-        return result;
+        return getSpecification().getFoodGoodsTypeList().stream()
+            .mapToInt(ft -> getTotalProductionOf(ft)).sum();
     }
 
     /**
@@ -2043,8 +1981,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                                                          populationQueue }) {
             ProductionInfo info = productionCache.getProductionInfo(queue);
             if (info != null) {
-                AbstractGoods goods = AbstractGoods.findByType(goodsType, info.getConsumption());
-                if (goods != null) result += goods.getAmount();
+                result += AbstractGoods.getCount(goodsType,
+                    info.getConsumption());
             }
         }
         return result;
@@ -2084,21 +2022,18 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return True if the goods can be produced.
      */
     public boolean canProduce(GoodsType goodsType) {
-        if (getNetProductionOf(goodsType) > 0) return true; // Obviously:-)
+        return (getNetProductionOf(goodsType) > 0)
+            ? true // Obviously:-)
 
-        if (goodsType.isBreedable()) {
-            return getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
-        }
+            // Breeding requires the breedable number to be present
+            : (goodsType.isBreedable())
+            ? getGoodsCount(goodsType) >= goodsType.getBreedingNumber()
 
-        // Is there a work location that can produce the goods, with
-        // satisfied inputs and positive generic production potential?
-        outer: for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            for (AbstractGoods ag : wl.getInputs()) {
-                if (!canProduce(ag.getType())) continue outer;
-            }
-            if (wl.getGenericPotential(goodsType) > 0) return true;
-        }
-        return false;
+            // Is there a work location that can produce the goods, with
+            // positive generic production potential and all inputs satisfied?
+            : any(getWorkLocationsForProducing(goodsType),
+                wl -> wl.getGenericPotential(goodsType) > 0
+                    && all(wl.getInputs(),ag -> canProduce(ag.getType())));
     }
 
   
@@ -2255,19 +2190,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<StringTemplate> result = new ArrayList<>();
         final int amount = getGoodsCount(goodsType);
         final int production = getNetProductionOf(goodsType);
-
-        if (goodsType.isFoodType() && goodsType.isStorable()) {
-            // Food is never wasted -> new settler is produced
-            if (amount + production < 0) {
-                result.add(StringTemplate
-                    .template("model.colony.famineFeared")
-                    .addName("%colony%", getName())
-                    .addAmount("%number%", 0));
-            }
-        } else {
-            int waste = (amount + production - getWarehouseCapacity());
-            if (waste > 0 && !getExportData(goodsType).getExported()
-                && !goodsType.limitIgnored()) {
+        int waste;
+        
+        if (goodsType.isStorable()) {
+            if (goodsType.limitIgnored()) {
+                if (goodsType.isFoodType()) {
+                    int starve = getStarvationTurns();
+                    if (starve == 0) {
+                        result.add(StringTemplate
+                            .template("model.colony.starving")
+                            .addName("%colony%", getName()));
+                    } else if (starve <= Colony.FAMINE_TURNS) {
+                        result.add(StringTemplate
+                            .template("model.colony.famineFeared")
+                            .addName("%colony%", getName())
+                            .addAmount("%number%", starve));
+                    }
+                }
+            } else if (!getExportData(goodsType).getExported()
+                && (waste = amount + production - getWarehouseCapacity()) > 0) {
                 result.add(StringTemplate
                     .template("model.building.warehouseSoonFull")
                     .addNamed("%goods%", goodsType)
@@ -2329,13 +2270,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         List<AbstractGoods> input = info.getConsumptionDeficit();
         if (input.isEmpty()) return null;
-
+        StringTemplate label = StringTemplate.label(", ");
+        for (AbstractGoods ag : input) label.addStringTemplate(ag.getLabel());
+        
         return StringTemplate.template("model.colony.insufficientProduction")
             .addName("%colony%", getName())
             .addNamed("%outputType%", deficit.getType())
             .addAmount("%outputAmount%", deficit.getAmount())
-            .addNamed("%inputType%", input.get(0).getType())
-            .addAmount("%inputAmount%", input.get(0).getAmount());
+            .addStringTemplate("%consumptionDeficit%", label);
     }
 
     /**
@@ -2533,10 +2475,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            for (WorkLocation wl : getAvailableWorkLocations()) {
-                if (wl.contains(locatable)) return true;
-            }
-            return false;
+            return any(getAvailableWorkLocations(),
+                wl -> wl.contains(locatable));
         }
         return super.contains(locatable);
     }
@@ -2546,11 +2486,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUnitCount() {
-        int n = 0;
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            n += wl.getUnitCount();
-        }
-        return n;
+        return getCurrentWorkLocations().stream()
+            .mapToInt(wl -> wl.getUnitCount()).sum();
     }
 
     /**
@@ -2668,9 +2605,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<Unit> unitList = getUnitList();
 
         Unit defender = null;
-        float defencePower = -1.0f;
+        double defencePower = -1.0;
         for (Unit nextUnit : unitList) {
-            float unitPower = getGame().getCombatModel()
+            double unitPower = getGame().getCombatModel()
                 .getDefencePower(attacker, nextUnit);
             if (Unit.betterDefender(defender, defencePower,
                     nextUnit, unitPower)) {
@@ -2689,7 +2626,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public float getDefenceRatio() {
+    public double getDefenceRatio() {
         return getTotalDefencePower() / (1 + getUnitCount());
     }
 
@@ -2698,7 +2635,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public boolean isBadlyDefended() {
-        return getTotalDefencePower() < 0.95f * getUnitCount() - 2.5f;
+        return getTotalDefencePower() < 0.95 * getUnitCount() - 2.5;
     }
 
     /**
@@ -2727,11 +2664,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUpkeep() {
-        int upkeep = 0;
-        for (Building building : buildingMap.values()) {
-            upkeep += building.getType().getUpkeep();
-        }
-        return upkeep;
+        return buildingMap.values().stream()
+            .mapToInt(b -> b.getType().getUpkeep()).sum();
     }
 
     /**
@@ -2739,11 +2673,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getTotalProductionOf(GoodsType goodsType) {
-        int amount = 0;
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            amount += workLocation.getTotalProductionOf(goodsType);
-        }
-        return amount;
+        return getCurrentWorkLocations().stream()
+            .mapToInt(wl -> wl.getTotalProductionOf(goodsType)).sum();
     }
 
     /**
@@ -2788,7 +2719,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public StringTemplate getAlarmLevelLabel(Player player) {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("model.colony." + stance.getKey())
-            .addStringTemplate("%nation%", getOwner().getNationName());
+            .addStringTemplate("%nation%", getOwner().getNationLabel());
     }
 
 

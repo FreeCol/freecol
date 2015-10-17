@@ -143,6 +143,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         this.completionAction = newCompletionAction;
     }
 
+
     // Interface Consumer
 
     /**

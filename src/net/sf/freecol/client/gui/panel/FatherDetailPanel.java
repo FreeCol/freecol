@@ -29,6 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
@@ -40,6 +41,7 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -64,33 +66,33 @@ public class FatherDetailPanel
     }
 
 
+    // Implelement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode parent =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        final Specification spec = getSpecification();
+        DefaultMutableTreeNode parent
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                    getName(), null));
 
-        EnumMap<FoundingFatherType, List<FoundingFather>> fathersByType =
-            new EnumMap<>(FoundingFatherType.class);
+        EnumMap<FoundingFatherType, List<FoundingFather>> fathersByType
+            = new EnumMap<>(FoundingFatherType.class);
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             fathersByType.put(fatherType, new ArrayList<FoundingFather>());
         }
-        for (FoundingFather foundingFather : getSpecification().getFoundingFathers()) {
+        for (FoundingFather foundingFather : spec.getFoundingFathers()) {
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
         ImageIcon icon = new ImageIcon(ImageLibrary.getMiscImage(ImageLibrary.BELLS, ImageLibrary.ICON_SIZE));
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
             String id = FoundingFather.getTypeKey(fatherType);
             String typeName = Messages.message(id);
-            DefaultMutableTreeNode node =
-                new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, typeName, null));
-
+            DefaultMutableTreeNode node
+                = new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,
+                        typeName, null));
             parent.add(node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
                 node.add(buildItem(father, icon));
@@ -100,11 +102,7 @@ public class FatherDetailPanel
     }
 
     /**
-     * Builds the details panel for the FoundingFather with the given
-     * identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
@@ -114,15 +112,16 @@ public class FatherDetailPanel
         } catch (IllegalArgumentException e) {
             // this is not a founding father
             panel.setLayout(new MigLayout("wrap 1, align center", "align center"));
-            JLabel header = Utility.localizedLabel(Messages.nameKey(id));
-            header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                FontLibrary.FontSize.SMALL));
-            panel.add(header, "align center, wrap 20");
             if (getId().equals(id)) {
+                JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
+                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
+                panel.add(header, "align center, wrap 20");
                 panel.add(Utility.localizedTextArea("colopedia.foundingFather.description", 40));
             } else {
+                JLabel header = Utility.localizedHeaderLabel(Messages.message(id),
+                    SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
+                panel.add(header, "align center, wrap 20");
                 Image image = ResourceManager.getImage("image.flavor." + id);
-                header.setText(Messages.message(id));
                 panel.add(new JLabel(new ImageIcon(image)));
             }
         }
@@ -139,9 +138,10 @@ public class FatherDetailPanel
 
         String name = Messages.getName(father);
         String type = Messages.message(father.getTypeKey());
-        JLabel header = new JLabel(name + " (" + type + ")");
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        String text = name + " (" + type + ")";
+        JLabel header = new JLabel(text);
+        header.setFont(FontLibrary.createCompatibleFont(text,
+            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
 
         Image image = ImageLibrary.getFoundingFatherImage(father, false);
         JLabel label = new JLabel(new ImageIcon(image));

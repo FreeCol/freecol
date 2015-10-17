@@ -66,7 +66,7 @@ public class DebugAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         if (shouldBeEnabled()) {
             igc().setInDebugMode();
             getConnectController().reconnect();

@@ -173,10 +173,8 @@ public class ColonyTile extends WorkLocation {
         } else {
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                int amount = 0;
-                for (Unit u : getUnitList()) {
-                    amount += getUnitProduction(u, goodsType);
-                }
+                int amount = getUnitList().stream()
+                    .mapToInt(u -> getUnitProduction(u, goodsType)).sum();
                 if (amount > 0) {
                     pi.addProduction(new AbstractGoods(goodsType, amount));
                 }
@@ -210,25 +208,28 @@ public class ColonyTile extends WorkLocation {
 
         // Unattended production is the hard case.
         if (productionType.getUnattended()) {
-            if (newType != null) { // Tile type change
-                final List<AbstractGoods> newProd
-                    = newType.getPossibleProduction(true);
-                int food = 0;
-                // Get the current food production.  Otherwise for
-                // goods that are being passively produced and
-                // consumed, check if production remains in surplus
-                // following a negative change.
-                for (AbstractGoods ag : getProduction()) {
-                    final GoodsType goodsType = ag.getType();
-                    if (goodsType.isFoodType()) {
-                        food -= ag.getAmount();
-                        continue;
-                    }                        
-                    if (!colony.isConsuming(goodsType)) continue;
-                    int change = -ag.getAmount();
-                    AbstractGoods ng
-                        = AbstractGoods.findByType(goodsType, newProd);
-                    change += (ng == null) ? 0 : ng.getAmount();
+            if (newType == null) {
+                // Tile type stays the same, return the sum of any food bonues.
+                return getSpecification().getFoodGoodsTypeList().stream()
+                    .mapToInt(gt -> ti.getBonus(gt)).sum();
+            }
+
+            // Tile type change.
+            final List<AbstractGoods> newProd
+                = newType.getPossibleProduction(true);
+            int food = newProd.stream()
+                .filter(ag -> ag.getType().isFoodType())
+                .mapToInt(AbstractGoods::getAmount).sum();
+            // Get the current food production.  Otherwise for goods
+            // that are being passively produced and consumed, check
+            // if production remains in surplus following a negative change.
+            for (AbstractGoods ag : getProduction()) {
+                final GoodsType goodsType = ag.getType();
+                if (goodsType.isFoodType()) {
+                    food -= ag.getAmount();
+                } else if (colony.isConsuming(goodsType)) {
+                    int change = -ag.getAmount()
+                        + AbstractGoods.getCount(goodsType, newProd);
                     if (change < 0
                         && change + colony.getNetProductionOf(goodsType) < 0) {
                         // The change drives the net production (more?)
@@ -236,45 +237,24 @@ public class ColonyTile extends WorkLocation {
                         return change;
                     }
                 }
-                // No production showstoppers found
-                // Would the passive food production be improved?
-                for (AbstractGoods ag : newProd) {
-                    if (ag.getType().isFoodType()) food += ag.getAmount();
-                }
-                return food;
             }
-
-            // Tile type stays the same, return the sum of any food bonues.
-            int bonus = 0;
-            for (GoodsType gt : getSpecification().getFoodGoodsTypeList()) {
-                bonus += ti.getBonus(gt);
-            }
-            return bonus;
+            return food;
         }
 
-        // Units are at work here.  Find out what work is being done.
-        GoodsType work = null;
-        UnitType type = null;
-        for (Unit u : getUnitList()) {
-            if (u != null && (type = u.getType()) != null
-                && (work = u.getWorkType()) != null) break;
-        }
-        if (work == null) return 0; // No work, no reason to improve.
-            
-        if (newType != null) { // Tile type change
-            // Return the production impact on the work being done.
-            int diff = newType.getPotentialProduction(work, type);
-            if (resource == null) {
-                diff -= oldType.getPotentialProduction(work, type);
-            } else {
-                diff -= resource.applyBonus(work, type,
-                    oldType.getPotentialProduction(work, type));
-            }
-            return diff;
-        }
-
-        // Otherwise return any new bonus that impacts the current work.
-        return ti.getBonus(work);
+        // Units are present, see what the change would do to their work.
+        final GoodsType work = getCurrentWorkType();
+        final UnitType unitType = getFirstUnit().getType();
+        return (work == null) // No work, improvement does nothing
+            ? 0
+            : (newType == null) // No tile change, but return the new bonus
+            ? ti.getBonus(work)
+            : (resource == null) // The tile change impact on the work
+            ? newType.getPotentialProduction(work, unitType)
+                - oldType.getPotentialProduction(work, unitType)
+            // The production impact with the new resource in place
+            : newType.getPotentialProduction(work, unitType)
+                - resource.applyBonus(work, unitType,
+                    oldType.getPotentialProduction(work, unitType));
     }
         
     /**
@@ -285,11 +265,9 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (AbstractGoods ag :getProductionInfo().getProduction()) {
-            result += ag.evaluateFor(player);
-        }
-        return result + super.evaluateFor(player);
+        return super.evaluateFor(player)
+            + getProductionInfo().getProduction().stream()
+                .mapToInt(ag -> ag.evaluateFor(player)).sum();
     }
 
 
@@ -307,6 +285,7 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.getGoodsContainer
     //   final WorkLocation getSettlement
     //   final WorkLocation getColony
+    //   final int getRank
 
     /**
      * {@inheritDoc}
@@ -371,6 +350,22 @@ public class ColonyTile extends WorkLocation {
         return (workTile == null) ? null : workTile.getLabel();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAvailable() {
+        return isCurrent() || getOwner().canClaimForSettlement(getWorkTile());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCurrent() {
+        return getWorkTile().getOwningSettlement() == getColony();
+    }
+    
     /**
      * {@inheritDoc}
      */

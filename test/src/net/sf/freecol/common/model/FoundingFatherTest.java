@@ -48,7 +48,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testFeatures() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
         FoundingFather father1 = new FoundingFather("father1", spec());
         father1.setType(FoundingFatherType.TRADE);
@@ -109,7 +109,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         int[] expectedValues = new int[] { 40, 161, 241, 321, 401 };
 
         Game game = getGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         //assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
         assertEquals(40, spec().getInteger(GameOptions.FOUNDING_FATHER_FACTOR));
 
@@ -132,8 +132,8 @@ public class FoundingFatherTest extends FreeColTestCase {
             }
         }
 
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         FoundingFather newFather = new FoundingFather("father", spec());
         newFather.setType(FoundingFatherType.TRADE);
 

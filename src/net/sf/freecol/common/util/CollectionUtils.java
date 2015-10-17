@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -36,40 +42,27 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
-    /** Useful comparators for mapEntriesBy* */
-    public static final Comparator<Integer> descendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i2 - i1;
-            }
-        };
-    public static final Comparator<Integer> ascendingIntegerComparator
-        = new Comparator<Integer>() {
-            public int compare(Integer i1, Integer i2) {
-                return i1 - i2;
-            }
-        };
-    public static final Comparator<Double> descendingDoubleComparator
-        = new Comparator<Double>() {
-            public int compare(Double d1, Double d2) {
-                return (d2 > d1) ? 1 : (d2 < d1) ? -1 : 0;
-            }
-        };
-    public static final Comparator<Double> ascendingDoubleComparator
-        = new Comparator<Double>() {
-            public int compare(Double d1, Double d2) {
-                return (d1 > d2) ? 1 : (d1 < d2) ? -1 : 0;
-            }
-        };
+    /** Trivial integer accumulator. */
+    public static final BinaryOperator<Integer> integerAccumulator
+        = (i1, i2) -> i1 + i2;
 
-    /** Comparator to order lists by decreasing length. */
-    public static final Comparator<List<?>> listLengthComparator
-        = new Comparator<List<?>>() {
-            @Override
-            public int compare(List<?> l1, List<?> l2) {
-                return l2.size() - l1.size();
-            }
-        };
+    /** Trivial double accumulator. */
+    public static final BinaryOperator<Double> doubleAccumulator
+        = (d1, d2) -> d1 + d2;
+
+    /** Useful comparators for mapEntriesBy* */
+    public static final Comparator<Integer> ascendingIntegerComparator
+        = Comparator.comparingInt(i -> i);
+    public static final Comparator<Integer> descendingIntegerComparator
+        = ascendingIntegerComparator.reversed();
+    public static final Comparator<Double> ascendingDoubleComparator
+        = Comparator.comparingDouble(d -> d);
+    public static final Comparator<Double> descendingDoubleComparator
+        = ascendingDoubleComparator.reversed();
+    public static final Comparator<List<?>> ascendingListLengthComparator
+        = Comparator.comparingInt(l -> l.size());
+    public static final Comparator<List<?>> descendingListLengthComparator
+        = ascendingListLengthComparator.reversed();
 
     /**
      * Make an unmodifiable set with specified members.
@@ -116,36 +109,17 @@ public class CollectionUtils {
         }
     }
 
-    public abstract static class Accumulator<T> {
-        public abstract T accumulate(T t1, T t2);
-    };
-
-    /** Trivial integer accumulator. */
-    public static Accumulator<Integer> integerAccumulator
-        = new Accumulator<Integer>() {
-            public Integer accumulate(Integer i1, Integer i2) {
-                return i1 + i2;
-            }
-        };
-    /** Trivial double accumulator. */
-    public static Accumulator<Double> doubleAccumulator
-        = new Accumulator<Double>() {
-            public Double accumulate(Double d1, Double d2) {
-                return d1 + d2;
-            }
-        };
-
     public static <K,V> void accumulateToMap(Map<K,V> map, K key, V value,
-                                             Accumulator<V> accumulator) {
+                                             BinaryOperator<V> accumulator) {
         if (map.containsKey(key)) {
-            map.put(key, accumulator.accumulate(map.get(key), value));
+            map.put(key, accumulator.apply(map.get(key), value));
         } else {
             map.put(key, value);
         }
     }
 
     public static <K,V> void accumulateMap(Map<K,V> map1, Map<K,V> map2,
-                                           Accumulator<V> accumulator) {
+                                           BinaryOperator<V> accumulator) {
         for (Entry<K,V> e : map2.entrySet()) {
             accumulateToMap(map1, e.getKey(), e.getValue(), accumulator);
         }
@@ -311,14 +285,9 @@ public class CollectionUtils {
      */
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return e1.getKey().compareTo(e2.getKey());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -330,14 +299,9 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return comparator.compare(e1.getKey(), e2.getKey());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> comparator.compare(e1.getKey(), e2.getKey()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -348,14 +312,9 @@ public class CollectionUtils {
      */
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return e1.getValue().compareTo(e2.getValue());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -367,13 +326,145 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
-        List<Entry<K,V>> result = new ArrayList<>();
-        result.addAll(map.entrySet());
-        Collections.sort(result, new Comparator<Entry<K,V>>() {
-                public int compare(Entry<K,V> e1, Entry<K,V> e2) {
-                    return comparator.compare(e1.getValue(), e2.getValue());
-                }
-            });
-        return result;
+        return map.entrySet().stream()
+            .sorted((e1, e2) -> comparator.compare(e1.getValue(), e2.getValue()))
+            .collect(Collectors.toList());
+    }
+
+    public static <T> boolean all(T[] array, Predicate<T> predicate) {
+        return all(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean any(T[] array, Predicate<T> predicate) {
+        return any(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean none(T[] array, Predicate<T> predicate) {
+        return none(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean all(Collection<T> collection,
+                                  Predicate<T> predicate) {
+        return all(collection.stream(), predicate);
+    }
+
+    public static <T> boolean any(Collection<T> collection,
+                                  Predicate<T> predicate) {
+        return any(collection.stream(), predicate);
+    }
+
+    public static <T> boolean none(Collection<T> collection,
+                                   Predicate<T> predicate) {
+        return none(collection.stream(), predicate);
+    }
+
+    public static <T> boolean all(Stream<T> stream,
+                                  Predicate<T> predicate) {
+        return stream.allMatch(predicate);
+    }
+
+    public static <T> boolean any(Stream<T> stream,
+                                  Predicate<T> predicate) {
+        return stream.anyMatch(predicate);
+    }
+
+    public static <T> boolean none(Stream<T> stream,
+                                   Predicate<T> predicate) {
+        return stream.noneMatch(predicate);
+    }
+
+    /**
+     * Does a collection contain at least one element that matches a predicate?
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return True if the predicate ever succeeds.
+     */
+    public static <T> boolean contains(Collection<T> collection,
+                                       Predicate<T> predicate) {
+        return collection.stream().filter(predicate).findFirst().isPresent();
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param array The array to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(T[] array, Predicate<T> predicate, T fail) {
+        return find(Arrays.stream(array), predicate, fail);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Collection<T> collection, Predicate<T> predicate) {
+        return find(collection, predicate, (T)null);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param fail The value to return if nothing is found.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Collection<T> collection, Predicate<T> predicate,
+                             T fail) {
+        return find(collection.stream(), predicate, fail);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param stream A <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or null if not found.
+     */
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate) {
+        return find(stream, predicate, null);
+    }
+
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param stream A <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param fail The value to return if nothing is found.
+     * @return The item found, or fail if not found.
+     */
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate,
+                             T fail) {
+        return stream.filter(predicate).findFirst().orElse(fail);
+    }
+
+    /**
+     * Create a stream from an array and an immediate mapping transform.
+     *
+     * @param array The array to search.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T,R> Stream<R> map(T[] array,
+        Function<? super T,? extends R> mapper) {
+        return Arrays.stream(array).map(mapper);
+    }
+
+    /**
+     * Create a stream from a collection and an immediate mapping transform.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T,R> Stream<R> map(Collection<T> collection,
+        Function<? super T,? extends R> mapper) {
+        return collection.stream().map(mapper);
     }
 }

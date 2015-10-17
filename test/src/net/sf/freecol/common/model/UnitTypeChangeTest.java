@@ -48,8 +48,8 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
     public void testAbilityScope() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player inca = game.getPlayer("model.nation.inca");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
 
         UnitType gardener = new UnitType("gardener", spec());
 
@@ -84,7 +84,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
     public void testCreation() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
 
         UnitType gardener = new UnitType("gardener", spec());
 

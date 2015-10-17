@@ -9,7 +9,7 @@
         the metaserver, distribution packages, running tests
         and creating documentation.
     </description>
-    <property name="java.target.version" value="1.7"/>
+    <property name="java.target.version" value="1.8"/>
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
@@ -43,8 +43,8 @@
         <!-- Cortado Video Applet -->
         <pathelement location="${basedir}/${cortado.jar}"/>
         <!-- JOgg/JOrbis libraries -->
-        <pathelement location="${basedir}/jars/jogg-0.0.7.jar"/>
-        <pathelement location="${basedir}/jars/jorbis-0.0.15.jar"/>
+        <pathelement location="${basedir}/jars/jogg-0.0.17.jar"/>
+        <pathelement location="${basedir}/jars/jorbis-0.0.17.jar"/>
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
@@ -182,7 +182,7 @@
         <jar jarfile="${freecol.jar.file}"
              basedir="${freecol.build.dir}"
              manifest="${basedir}/src/MANIFEST.MF"
-             includes="net/**, org/**"
+             includes="net/**, splash.jpg"
              excludes="**/metaserver/**"/>
     </target>
 
@@ -251,10 +251,11 @@
                addproperty="freecol.version" defaultvalue="git-${DSTAMP}" />
     </target>
 
-    <target name="prepareManual" depends="initDist,print-manual">
+    <target name="prepareManual" depends="initDist,print-manuals">
         <mkdir dir="${freecol.release.dir}/manual/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/manual/${freecol.name}">
             <fileset dir="${freecol.doc.dir}" includes="FreeCol.pdf"/>
+            <fileset dir="${freecol.doc.dir}" includes="developer.pdf"/>
         </copy>
     </target>
 
@@ -337,7 +338,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.7</javaversion>
+                        <javaversion>1.8</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">
@@ -475,7 +476,7 @@
                     mainclass="net.sf.freecol.FreeCol"
                     version="${freecol.version}"
                     vmoptions="-Xmx256M -Dapple.awt.fakefullscreen=true"
-                    jvmversion="1.7+"
+                    jvmversion="1.8+"
                     arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
                     stubfile="${freecol.build.dir}/skeletons/FreeCol"
                     icon="${freecol.packaging.dir}/icons/FreeCol.icns">
@@ -632,7 +633,7 @@
              export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
         -->
         <junit printsummary="on" errorProperty="error.junit"
-               failureProperty="error.junit" fork="yes" maxmemory="64M">
+               failureProperty="error.junit" fork="yes" maxmemory="96M">
             <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
 
@@ -706,6 +707,25 @@
         <property name="print.manual.is.up.to.date" value="true" />
     </target>
 
+    <target name="print-devmanual" unless="print.devmanual.is.up.to.date"
+            description="Creates the printable user guide.">
+        <delete file="doc/developer.ind" />
+        <exec executable="pdflatex" dir="doc" >
+            <arg file="doc/developer.tex"/>
+        </exec>
+        <exec executable="makeindex" dir="doc" >
+            <arg file="doc/developer.idx"/>
+        </exec>
+        <exec executable="pdflatex" dir="doc" >
+            <arg file="doc/developer.tex"/>
+        </exec>
+        <property name="print.devmanual.is.up.to.date" value="true" />
+    </target>
+
+    <target name="print-manuals" depends="print-manual,print-devmanual"
+            description="Creates the printable user and developer guides.">
+    </target>
+
     <target name="online-manual" unless="online.manual.is.up.to.date"
             description="Creates the online user guide.">
         <delete file="doc/FreeCol.ind" />
@@ -724,8 +744,38 @@
         <property name="online.manual.is.up.to.date" value="true" />
     </target>
 
+    <target name="online-devmanual" unless="online.devmanual.is.up.to.date"
+            description="Creates the online user guide.">
+        <delete file="doc/developer.ind" />
+        <exec executable="htlatex" dir="doc" >
+            <arg file="doc/developer.tex"/>
+        </exec>
+        <exec executable="tex" dir="doc">
+            <arg line="\def\filename{{developer}{idx}{4dx}{ind}} \input  idxmake.4ht" />
+        </exec>
+        <exec executable="makeindex" dir="doc" >
+            <arg file="doc/developer.4dx"/>
+        </exec>
+        <exec executable="htlatex" dir="doc" >
+            <arg file="doc/developer.tex"/>
+        </exec>
+        <property name="online.devmanual.is.up.to.date" value="true" />
+    </target>
+
+    <target name="online-manuals" depends="online-manual,online-devmanual"
+            description="Creates the online user and developer guides.">
+    </target>
+
     <target name="manual" depends="print-manual,online-manual"
             description="Creates the printable and online user guides.">
+    </target>
+
+    <target name="devmanual" depends="print-devmanual,online-devmanual"
+            description="Creates the printable and online developer guides.">
+    </target>
+
+    <target name="manuals" depends="manual,devmanual"
+            description="Creates the printable and online user and developer guides.">
     </target>
 
     <target name="fixTabsWindows">

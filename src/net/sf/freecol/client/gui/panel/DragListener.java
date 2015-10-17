@@ -29,7 +29,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -89,7 +89,7 @@ public final class DragListener extends MouseAdapter {
                 menu.remove(lastIdx);
             if (menu.getComponentCount() <= 0) return;
 
-            final GUI gui = freeColClient.getGUI();
+            final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
             boolean windows = System.getProperty("os.name").startsWith("Windows");
             boolean small = Toolkit.getDefaultToolkit()
                 .getScreenSize().getHeight() < 768;
@@ -112,6 +112,8 @@ public final class DragListener extends MouseAdapter {
                 AbstractGoodsLabel label = (AbstractGoodsLabel)comp;
                 if (e.isShiftDown()) {
                     label.setPartialChosen(true);
+                } else if (e.isControlDown()) {
+                    label.setFullChosen(true);
                 } else {
                     label.setPartialChosen(false);
                     label.setDefaultAmount();

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -245,10 +247,8 @@ public class ColonyPlan {
      * @return The best current <code>BuildableType</code>.
      */
     public BuildableType getBestBuildableType() {
-        for (BuildPlan b : buildPlans) {
-            if (colony.canBuild(b.type)) return b.type;
-        }
-        return null;
+        BuildPlan bp = find(buildPlans, p -> colony.canBuild(p.type));
+        return (bp == null) ? null : bp.type;
     }
 
     /**
@@ -270,12 +270,10 @@ public class ColonyPlan {
      * @return A list of food producing plans.
      */
     public List<WorkLocationPlan> getFoodPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<>();
-        for (WorkLocationPlan wlp : workPlans) {
-            if (wlp.isFoodPlan()
-                && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
-        }
-        return plans;
+        return workPlans.stream()
+            .filter(wp -> wp.isFoodPlan()
+                && !wp.getWorkLocation().canAutoProduce())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -285,12 +283,10 @@ public class ColonyPlan {
      * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
-        List<WorkLocationPlan> plans = new ArrayList<>();
-        for (WorkLocationPlan wlp : workPlans) {
-            if (!wlp.isFoodPlan()
-                && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
-        }
-        return plans;
+        return workPlans.stream()
+            .filter(wp -> !wp.isFoodPlan()
+                && !wp.getWorkLocation().canAutoProduce())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -372,8 +368,7 @@ public class ColonyPlan {
      */
     public void update() {
         // Update the profile type.
-        profileType = ProfileType
-            .getProfileTypeFromSize(colony.getUnitCount());
+        profileType = ProfileType.getProfileTypeFromSize(colony.getUnitCount());
 
         // Build the total map of all possible production with standard units.
         Map<GoodsType, Map<WorkLocation, Integer>> production
@@ -505,11 +500,8 @@ public class ColonyPlan {
         List<GoodsType> rawMaterials = new ArrayList<>(rawLuxuryGoodsTypes);
         rawMaterials.addAll(otherRawGoodsTypes);
         for (GoodsType g : rawMaterials) {
-            int value = 0;
-            for (Entry<WorkLocation, Integer> e
-                     : production.get(g).entrySet()) {
-                value += e.getValue();
-            }
+            int value = production.get(g).entrySet().stream()
+                .mapToInt(e -> e.getValue()).sum();
             if (value <= LOW_PRODUCTION_THRESHOLD) {
                 production.remove(g);
                 continue;
@@ -603,10 +595,7 @@ public class ColonyPlan {
      * @return A <code>BuildPlan</code> with this type, or null if not found.
      */
     private BuildPlan findBuildPlan(BuildableType type) {
-        for (BuildPlan bp : buildPlans) {
-            if (bp.type == type) return bp;
-        }
-        return null;
+        return find(buildPlans, bp -> bp.type == type);
     }
 
     /**
@@ -828,18 +817,16 @@ public class ColonyPlan {
 
         // Weight by lower required goods.
         for (BuildPlan bp : buildPlans) {
-            double difficulty = 0.0f;
-            for (AbstractGoods ag : bp.type.getRequiredGoods()) {
-                GoodsType g = ag.getType();
-                int need = ag.getAmount() - colony.getGoodsCount(g);
-                if (need > 0) {
-                    // Penalize building with type that can not be
-                    // made locally.
-                    double f = (produce.contains(g.getInputType())) ? 1.0
-                        : 5.0;
-                    difficulty += need * f;
-                }
-            }
+            double difficulty = bp.type.getRequiredGoods().stream()
+                .filter(ag -> ag.getAmount() > colony.getGoodsCount(ag.getType()))
+                .mapToDouble(ag -> {
+                        final GoodsType type = ag.getType();
+                        return (ag.getAmount() - colony.getGoodsCount(type))
+                            // Penalize building with type that can not be
+                            // made locally.
+                            * ((produce.contains(type.getInputType())) ? 1.0
+                                : 5.0);
+                    }).sum();
             bp.difficulty = Math.max(1.0f, Math.sqrt(difficulty));
         }
 
@@ -921,14 +908,10 @@ public class ColonyPlan {
             = new Comparator<GoodsType>() {
                 @Override
                 public int compare(GoodsType g1, GoodsType g2) {
-                    int p1 = 0;
-                    for (Integer i : production.get(g1).values()) {
-                        p1 += i;
-                    }
-                    int p2 = 0;
-                    for (Integer i : production.get(g2).values()) {
-                        p2 += i;
-                    }
+                    int p1 = production.get(g1).values().stream()
+                        .mapToInt(Integer::intValue).sum();
+                    int p2 = production.get(g2).values().stream()
+                        .mapToInt(Integer::intValue).sum();
                     return p2 - p1;
                 }
             };
@@ -1043,10 +1026,7 @@ public class ColonyPlan {
      */
     private WorkLocationPlan findPlan(GoodsType goodsType,
                                       List<WorkLocationPlan> plans) {
-        for (WorkLocationPlan wlp : plans) {
-            if (wlp.getGoodsType() == goodsType) return wlp;
-        }
-        return null;
+        return find(plans, wlp -> wlp.getGoodsType() == goodsType);
     }
 
     /**
@@ -1398,10 +1378,9 @@ public class ColonyPlan {
                 // what is needed for a building--- e.g. prevent
                 // musket production from hogging the tools.
                 GoodsType raw = goodsType.getInputType();
-                int rawNeeded = 0;
-                for (AbstractGoods ag : buildGoods) {
-                    if (raw == ag.getType()) rawNeeded += ag.getAmount();
-                }
+                int rawNeeded = buildGoods.stream()
+                    .filter(ag -> ag.getType() == raw)
+                    .mapToInt(AbstractGoods::getAmount).sum();
                 if (raw == null
                     || col.getAdjustedNetProductionOf(raw) >= 0
                     || (((col.getGoodsCount(raw) - rawNeeded)

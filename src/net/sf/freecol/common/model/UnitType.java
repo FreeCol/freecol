@@ -23,12 +23,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -176,7 +178,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The offence value.
      */
-    public float getOffence() {
+    public double getOffence() {
         return applyModifiers(offence, null, Modifier.OFFENCE);
     }
 
@@ -203,7 +205,7 @@ public final class UnitType extends BuildableType implements Consumer {
      *
      * @return The defence value.
      */
-    public float getDefence() {
+    public double getDefence() {
         return applyModifiers(defence, null, Modifier.DEFENCE);
     }
 
@@ -395,13 +397,9 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return a list of expert roles
      */
     public List<Role> getExpertRoles() {
-        List<Role> result = new ArrayList<>();
-        for (Role role : getSpecification().getRoles()) {
-            if (role.getExpertUnit() == this) {
-                result.add(role);
-            }
-        }
-        return result;
+        return getSpecification().getRoles().stream()
+            .filter(r -> r.getExpertUnit() == this)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -440,9 +438,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @param change The <code>UnitTypeChange</code> to add.
      */
     private void addTypeChange(UnitTypeChange change) {
-        if (typeChanges == null) {
-            typeChanges = new ArrayList<>();
-        }
+        if (typeChanges == null) typeChanges = new ArrayList<>();
         typeChanges.add(change);
     }
 
@@ -468,13 +464,9 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public UnitTypeChange getUnitTypeChange(ChangeType changeType,
                                             Player player) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.asResultOf(changeType) && change.appliesTo(player)) {
-                UnitType result = change.getNewUnitType();
-                if (result.isAvailableTo(player)) return change;
-            }
-        }
-        return null;
+        return find(getTypeChanges(),
+            c -> c.asResultOf(changeType) && c.appliesTo(player)
+                && c.getNewUnitType().isAvailableTo(player));
     }
 
     /**
@@ -484,10 +476,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The type change, or null if impossible.
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.getNewUnitType() == newType) return change;
-        }
-        return null;
+        return find(getTypeChanges(), c -> c.getNewUnitType() == newType);
     }
 
     /**
@@ -504,13 +493,9 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return True if this unit type can learn.
      */
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if ((newType == null || newType == change.getNewUnitType())
-                && change.getProbability(changeType) > 0) {
-                return true;
-            }
-        }
-        return false;
+        return any(getTypeChanges(),
+            c -> (newType == null || newType == c.getNewUnitType())
+                && c.getProbability(changeType) > 0);
     }
 
     /**
@@ -537,15 +522,10 @@ public final class UnitType extends BuildableType implements Consumer {
      *     maximum.
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.canBeTaught()) {
-                UnitType unitType = change.getNewUnitType();
-                if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
-                    return unitType;
-                }
-            }
-        }
-        return null;
+        return find(getTypeChanges().stream()
+                .filter(c -> c.canBeTaught())
+                .map(UnitTypeChange::getNewUnitType),
+            ut -> ut.hasSkill() && ut.getSkill() <= maximumSkill, null);
     }
 
     /**
@@ -556,14 +536,10 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The number of turns, or UNDEFINED if impossible.
      */
     public int getEducationTurns(UnitType unitType) {
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.asResultOf(UnitTypeChange.ChangeType.EDUCATION)) {
-                if (unitType == change.getNewUnitType()) {
-                    return change.getTurnsToLearn();
-                }
-            }
-        }
-        return UNDEFINED;
+        UnitTypeChange utc = find(getTypeChanges(),
+            c -> c.asResultOf(UnitTypeChange.ChangeType.EDUCATION)
+                && unitType == c.getNewUnitType());
+        return (utc == null) ? UNDEFINED : utc.getTurnsToLearn();
     }
 
     /**
@@ -941,16 +917,12 @@ public final class UnitType extends BuildableType implements Consumer {
             defaultRole = parent.defaultRole;
 
             if (parent.typeChanges != null) {
-                if (typeChanges == null) {
-                    typeChanges = new ArrayList<>();
-                }
+                if (typeChanges == null) typeChanges = new ArrayList<>();
                 typeChanges.addAll(parent.typeChanges);
             }
 
             if (parent.consumption != null) {
-                if (consumption == null) {
-                    consumption = new TypeCountMap<>();
-                }
+                if (consumption == null) consumption = new TypeCountMap<>();
                 consumption.putAll(parent.consumption);
             }
 

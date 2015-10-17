@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -424,18 +425,13 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // Check for free buildings
-        boolean found = false;
         for (BuildingType buildingType : spec.getBuildingTypeList()) {
             if (isAutomaticBuild(buildingType)) {
-                if (buildingType.isDefenceType()) {
-                    getTile().cacheUnseen();//+til
-                }
-                addBuilding(new ServerBuilding(getGame(), this,
-                                               buildingType));//-til
-                found = true;
+                buildBuilding(new ServerBuilding(getGame(), this,
+                                                 buildingType));//-til
             }
         }
-        if (found) checkBuildQueueIntegrity(true);
+        checkBuildQueueIntegrity(true);
 
         // If a build queue is empty, check that we are not producing
         // any goods types useful for BuildableTypes, except if that
@@ -517,14 +513,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         List<BuildableType> buildables = new ArrayList<>();
         buildables.addAll(spec.getBuildingTypeList());
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
-        for (BuildableType bt : buildables) {
-            if (canBuild(bt)) {
-                AbstractGoods ag = AbstractGoods.findByType(goodsType,
-                    bt.getRequiredGoods());
-                if (ag != null) return true;
-            }
-        }
-        return false;
+        return any(buildables, bt -> canBuild(bt)
+            && AbstractGoods.containsType(goodsType, bt.getRequiredGoods()));
     }
 
     /**
@@ -602,18 +592,14 @@ public class ServerColony extends Colony implements ServerModelObject {
         BuildingType from = type.getUpgradesFrom();
         boolean success;
         if (from == null) {
-            addBuilding(new ServerBuilding(getGame(), this, type));//-til
-            success = true;
-            if (type.isDefenceType()) getTile().cacheUnseen(copied);//+til
+            success = buildBuilding(new ServerBuilding(getGame(), this, type));//-til
         } else {
             Building building = getBuilding(from);
             List<Unit> eject = building.upgrade();//-til
             success = eject != null;
             if (success) {
                 ejectUnits(building, eject);//-til
-                if (!eject.isEmpty() || type.isDefenceType()) {
-                    getTile().cacheUnseen(copied);//+til
-                }
+                if (!eject.isEmpty()) getTile().cacheUnseen(copied);//+til
             } else {
                 cs.addMessage(See.only((ServerPlayer)owner),
                               getUnbuildableMessage(type));
@@ -778,14 +764,29 @@ public class ServerColony extends Colony implements ServerModelObject {
     public void csFreeBuilding(BuildingType type, ChangeSet cs) {
         if (canBuild(type)) {
             final ServerPlayer owner = (ServerPlayer)getOwner();
-            if (type.isDefenceType()) getTile().cacheUnseen();//+til
-            addBuilding(new ServerBuilding(getGame(), this, type));//-til
-            getBuildQueue().remove(type);
+            buildBuilding(new ServerBuilding(getGame(), this, type));//-til
+            checkBuildQueueIntegrity(true);
             cs.add(See.only(owner), this);
             if (owner.isAI()) {
                 firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
             }
         }
+    }
+
+    /**
+     * Build a new building in this colony.
+     *
+     * @param building The <code>Building</code> to build.
+     * @return True if the building was built.
+     */
+    public boolean buildBuilding(Building building) {
+net.sf.freecol.common.debug.FreeColDebugger.debugLog("BUILD " + building + "\n" +net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        Tile copied = (building.getType().isDefenceType())
+            ? getTile().getTileToCache() : null;
+        if (!addBuilding(building)) return false;
+        getTile().cacheUnseen(copied);
+        invalidateCache();
+        return true;
     }
 
     /**
@@ -829,7 +830,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             brave.setState(Unit.UnitState.ACTIVE);
             cs.addDisappear(newOwner, tile, brave);
             cs.add(See.only(newOwner), getTile());
-            StringTemplate nation = oldOwner.getNationName();
+            StringTemplate nation = oldOwner.getNationLabel();
             cs.addMessage(See.only(newOwner),
                 new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                 "model.colony.newConvert", brave)
@@ -838,6 +839,22 @@ public class ServerColony extends Colony implements ServerModelObject {
             newOwner.invalidateCanSeeTiles();//+vis(other)
             logger.fine("Convert at " + getName() + " for " + getName());
         }
+    }
+
+    /**
+     * Destroy an existing building in this colony.
+     *
+     * @param building The <code>Building</code> to destroy.
+     * @return True if the building was destroyed.
+     */
+    public boolean destroyBuilding(Building building) {
+        Tile copied = (building.getType().isDefenceType())
+            ? getTile().getTileToCache() : null;
+        if (!removeBuilding(building)) return false;
+        getTile().cacheUnseen(copied);
+        invalidateCache();
+        checkBuildQueueIntegrity(true);
+        return true;
     }
 
 

@@ -48,7 +48,7 @@ public class RenameAction extends UnitAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         igc().rename(getGUI().getActiveUnit());
     }
 }

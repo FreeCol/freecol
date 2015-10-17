@@ -24,7 +24,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +46,7 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -100,7 +100,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent ae) {
             agreement.remove(item);
             updateDialog();
         }
@@ -193,8 +193,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addColonyTradeItem(source,
@@ -273,8 +273,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     int amount = ((Integer)spinner.getValue());
@@ -400,8 +400,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addGoodsTradeItem(source,
@@ -432,7 +432,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
                 Player value, int index, boolean isSelected,
                 boolean cellHasFocus) {
                 setText((value == null) ? ""
-                    : Messages.message(value.getNationName()));
+                    : Messages.message(value.getNationLabel()));
                 return this;
             }
         }
@@ -519,8 +519,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     Player victim = (Player)victimBox.getSelectedItem();
@@ -641,8 +641,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     Stance stance = (Stance)stanceBox.getSelectedItem();
@@ -761,8 +761,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent event) {
-            final String command = event.getActionCommand();
+        public void actionPerformed(ActionEvent ae) {
+            final String command = ae.getActionCommand();
             if (null != command) switch (command) {
                 case ADD:
                     NegotiationDialog.this.addUnitTradeItem(source,
@@ -836,8 +836,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         this.agreement = agreement;
         this.comment = comment;
 
-        StringTemplate nation = player.getNationName(),
-            otherNation = otherPlayer.getNationName();
+        StringTemplate nation = player.getNationLabel(),
+            otherNation = otherPlayer.getNationLabel();
         this.demand = StringTemplate.template("negotiationDialog.demand")
             .addStringTemplate("%nation%", nation)
             .addStringTemplate("%otherNation%", otherNation);
@@ -929,7 +929,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         JTextArea labelDemandMessage = Utility.localizedTextArea(this.demand);
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL, 
                 FontLibrary.FontSize.TINY, Font.BOLD,
-                getImageLibrary().getScalingFactor());
+                getImageLibrary().getScaleFactor());
         labelDemandMessage.setFont(font);
         panel.add(labelDemandMessage);
         JTextArea blank = new JTextArea(" ");

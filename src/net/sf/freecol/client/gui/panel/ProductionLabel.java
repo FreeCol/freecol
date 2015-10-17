@@ -145,8 +145,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             logger.warning("Bad production label (no type)\n"
                 + FreeColDebugger.stackTraceToString());
         } else if (getAmount() == 0 && stockNumber < 0) {
-            logger.warning("Bad production label (bad amount)\n"
-                + FreeColDebugger.stackTraceToString());
+            logger.warning("Bad production label: " + ag
+                + " stock=" + stockNumber
+                + "\n" + FreeColDebugger.stackTraceToString());
         }
 
         this.maximumProduction = maximumProduction;
@@ -166,7 +167,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
             : this.goodsIcon.getIconWidth() * 2;
 
         setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor()));
+            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor()));
         setForeground((getAmount() < 0) ? Color.RED : Color.WHITE);
         setToolTipText((getType() == null || getAmount() == 0) ? null
             : Messages.message(getAbstractGoods().getLabel()));

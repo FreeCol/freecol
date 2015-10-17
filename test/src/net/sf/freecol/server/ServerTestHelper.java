@@ -30,7 +30,6 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.Controller;
@@ -93,7 +92,7 @@ public final class ServerTestHelper {
             // FIXME: Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
                                        spec, port, name);
-        } catch (IOException|NoRouteToServerException ex) {
+        } catch (IOException ex) {
             fail(ex.getMessage());
         }
         assertNotNull(server);

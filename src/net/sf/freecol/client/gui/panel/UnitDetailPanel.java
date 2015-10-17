@@ -23,6 +23,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,8 +47,10 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -56,12 +59,12 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
-    // layout of production modifier panel
+    /** Layout of production modifier panel. */
     private static final int MODIFIERS_PER_ROW = 5;
 
 
     /**
-     * Creates a new instance of this ColopediaDetailPanel.
+     * Creates a new instance of this colopedia subpanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param colopediaPanel The parent ColopediaPanel.
@@ -72,49 +75,29 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        List<UnitType> units = new ArrayList<>();
-        List<UnitType> skills = new ArrayList<>();
-        for (UnitType u : getSpecification().getUnitTypeList()) {
-            if (u.getSkill() <= 0 || u.hasAbility(Ability.EXPERT_SOLDIER)) {
-                units.add(u);
-            } else {
-                skills.add(u);
-            }
-        }
-        super.addSubTrees(root, "colopediaAction." + PanelType.UNITS.getKey(),
-                          units);
-        super.addSubTrees(root, "colopediaAction." + PanelType.SKILLS.getKey(),
-                          skills);
+        super.addSubTrees(root, getId(),
+            new ArrayList<>(getSpecification().getUnitTypeList()));
     }
 
     /**
-     * Builds the details panel for the UnitType with the given identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)
-            || ("colopediaAction." + PanelType.SKILLS.getKey()).equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
-        UnitType type = getSpecification().getUnitType(id);
+        final Specification spec = getSpecification();
+        UnitType type = spec.getUnitType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
-        JLabel name = Utility.localizedLabel(type);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(type, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.unit.offensivePower"));
@@ -152,8 +135,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
             List<BuildingType> schools = new ArrayList<>();
-            for (final BuildingType buildingType : getSpecification().getBuildingTypeList()) {
-                if (buildingType.hasAbility(Ability.TEACH) && buildingType.canAdd(type)) {
+            for (BuildingType buildingType : spec.getBuildingTypeList()) {
+                if (buildingType.hasAbility(Ability.TEACH)
+                    && buildingType.canAdd(type)) {
                     schools.add(buildingType);
                 }
             }
@@ -172,14 +156,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 }
             }
 
-            List<IndianNationType> nations = new ArrayList<>();
-            for (IndianNationType nation : getSpecification().getIndianNationTypes()) {
-                for (RandomChoice<UnitType> choice : nation.getSkills()) {
-                    if (choice.getObject() == type) {
-                        nations.add(nation);
-                    }
-                }
-            }
+            List<IndianNationType> nations = spec.getIndianNationTypes().stream()
+                .filter(nt -> any(nt.getSkills(), ut -> ut.getObject() == type))
+                .collect(Collectors.toList());
             if (!nations.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.natives"), "newline");
                 int count = 0;
@@ -211,7 +190,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         }
 
         List<Modifier> bonusList = new ArrayList<>();
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
             bonusList.addAll(type.getModifiers(goodsType.getId()));
         }
         int bonusNumber = bonusList.size();
@@ -223,7 +202,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
-                GoodsType goodsType = getSpecification().getGoodsType(productionBonus.getId());
+                GoodsType goodsType = spec.getGoodsType(productionBonus.getId());
                 String bonus = ModifierFormat.getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus));
             }

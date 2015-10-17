@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitLabelType;
 import net.sf.freecol.common.model.UnitType;
@@ -402,11 +401,13 @@ public class MessagesTest extends FreeColTestCase {
         // Unit.getDescription/getFullDescription are just wrappers around
         // Messages.getTemplate/getFullTemplate.
         Game game = getStandardGame();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game
+            .getPlayerByNationId("model.nation.dutch");
         Nation refNation = dutch.getNation().getREFNation();
         ServerPlayer dutchREF = new ServerPlayer(game, false, refNation, 
                                                  null, null);
-        ServerPlayer sioux = (ServerPlayer)game.getPlayer("model.nation.sioux");
+        ServerPlayer sioux = (ServerPlayer)game
+            .getPlayerByNationId("model.nation.sioux");
         Unit unit;
 
         // King's regulars

@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -41,14 +40,13 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
@@ -73,8 +71,9 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
-import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
@@ -196,13 +195,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         Unit up = (unit.getType().canBeUpgraded(sk,
                                 ChangeType.NATIVES)) ? unit : null;
                         if (unit.isCarrier()) {
-                            for (Unit u : unit.getUnitList()) {
-                                if (u.getType().canBeUpgraded(sk,
-                                        ChangeType.NATIVES)) {
-                                    up = u;
-                                    break;
-                                }
-                            }
+                            up = find(unit.getUnitList(),
+                                u -> u.getType().canBeUpgraded(sk, ChangeType.NATIVES));
                         }
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");
@@ -387,12 +381,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         String omcb = Messages.message("selectDestinationDialog.onlyMyColonies");
         this.onlyMyColoniesBox = new JCheckBox(omcb, showOnlyMyColonies);
-        this.onlyMyColoniesBox.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent event) {
-                    showOnlyMyColonies = onlyMyColoniesBox.isSelected();
-                    updateDestinationList();
-                }
+        this.onlyMyColoniesBox.addChangeListener((ChangeEvent event) -> {
+                showOnlyMyColonies = onlyMyColoniesBox.isSelected();
+                updateDestinationList();
             });
 
         this.comparatorBox = new JComboBox<>(new String[] {
@@ -400,14 +391,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 Messages.message("selectDestinationDialog.sortByName"),
                 Messages.message("selectDestinationDialog.sortByDistance")
             });
-        this.comparatorBox.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent event) {
-                    updateDestinationComparator();
-                    Collections.sort(SelectDestinationDialog.this.destinations,
-                        SelectDestinationDialog.this.destinationComparator);
-                    updateDestinationList();
-                }
+        this.comparatorBox.addItemListener((ItemEvent event) -> {
+                updateDestinationComparator();
+                Collections.sort(SelectDestinationDialog.this.destinations,
+                    SelectDestinationDialog.this.destinationComparator);
+                updateDestinationList();
             });
         this.comparatorBox.setSelectedIndex(
             (this.destinationComparator instanceof NameComparator) ? 1

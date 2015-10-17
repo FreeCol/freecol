@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -144,10 +145,8 @@ public class Tension implements Named {
      * @return The current level.
      */
     public final Level getLevel() {
-        for (Level level : Level.values()) {
-            if (value <= level.getLimit()) return level;
-        }
-        return Level.HATEFUL;
+        return find(Level.values(), level -> value <= level.getLimit(),
+            Level.HATEFUL);
     }
 
     /**

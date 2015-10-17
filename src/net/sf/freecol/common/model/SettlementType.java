@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -212,16 +213,8 @@ public class SettlementType extends FreeColGameObjectType {
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunderRange(Unit unit) {
-        if (plunder == null) return null;
-
-        for (RandomRange range : plunder) {
-            List<Scope> scopes = range.getScopes();
-            if (scopes.isEmpty()) return range;
-            for (Scope scope : scopes) {
-                if (scope.appliesTo(unit)) return range;
-            }
-        }
-        return null;
+        return (plunder == null) ? null
+            : find(plunder, p -> p.appliesTo(unit));
     }
 
     /**
@@ -231,16 +224,8 @@ public class SettlementType extends FreeColGameObjectType {
      * @return A range of gifts, or null if none applicable.
      */
     public final RandomRange getGifts(Unit unit) {
-        if (gifts == null) return null;
-
-        for (RandomRange range : gifts) {
-            List<Scope> scopes = range.getScopes();
-            if (scopes.isEmpty()) return range;
-            for (Scope scope : scopes) {
-                if (scope.appliesTo(unit)) return range;
-            }
-        }
-        return null;
+        return (gifts == null) ? null
+            : find(gifts, g -> g.appliesTo(unit));
     }
 
 

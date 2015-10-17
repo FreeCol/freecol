@@ -89,8 +89,7 @@ public class WorkProductionPanel extends FreeColPanel {
             final TileType tileType = tile.getType();
             shortName = Messages.getName(tileType);
             longName = Messages.message(colonyTile.getLabel());
-            image = getGUI().getColonyTileMapViewer()
-                .createColonyTileImage(tile, colony);
+            image = getGUI().createColonyTileImage(tile, colony);
 
         } else if (wl instanceof Building) {
             final Building building = (Building)wl;
@@ -119,7 +118,7 @@ public class WorkProductionPanel extends FreeColPanel {
         }
 
         Font bigFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScalingFactor());
+            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor());
         JLabel finalLabel = Utility.localizedLabel("finalResult");
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");

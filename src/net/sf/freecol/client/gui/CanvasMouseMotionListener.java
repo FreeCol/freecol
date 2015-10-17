@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
@@ -40,8 +41,6 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     /** Number of pixels that must be moved before a goto is enabled. */
     private static final int DRAG_THRESHOLD = 16;
 
-    private Canvas canvas;
-
     /**
      * Temporary variable for checking if we need to recalculate the
      * path when dragging units.
@@ -54,9 +53,8 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient, Canvas canvas, MapViewer mapViewer) {
-        super(freeColClient, mapViewer);
-        this.canvas = canvas;
+    public CanvasMouseMotionListener(FreeColClient freeColClient, Canvas canvas) {
+        super(freeColClient, canvas);
     }
 
 
@@ -72,15 +70,15 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
         }
 
         if (canvas.isGotoStarted()) {
-            if (mapViewer.getActiveUnit() == null) {
+            if (canvas.getActiveUnit() == null) {
                 canvas.stopGoto();
             }
 
-            Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+            Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
 
             if (tile != null) {
                 if (lastTile != tile) {
-                    Unit active = mapViewer.getActiveUnit();
+                    Unit active = canvas.getActiveUnit();
                     lastTile = tile;
                     if (active != null && active.getTile() != tile) {
                         PathNode dragPath = active.findPath(tile);
@@ -103,13 +101,13 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
 
         performDragScrollIfActive(e);
 
-        Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+        Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
         if (tile != null
             && ((e.getModifiers() & MouseEvent.BUTTON1_MASK)
                 == MouseEvent.BUTTON1_MASK)) {
             // only perform the goto for the left mouse button
             if (canvas.isGotoStarted()) {
-                Unit active = mapViewer.getActiveUnit();
+                Unit active = canvas.getActiveUnit();
                 if (active == null) {
                     canvas.stopGoto();
                 } else if (lastTile != tile) {
@@ -119,8 +117,9 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
                 }
             } else {
                 // Only start a goto if the drag is 16 pixels or more
-                int deltaX = Math.abs(e.getX() - mapViewer.getDragPoint().x);
-                int deltaY = Math.abs(e.getY() - mapViewer.getDragPoint().y);
+                Point dragPoint = canvas.getDragPoint();
+                int deltaX = Math.abs(e.getX() - dragPoint.x);
+                int deltaY = Math.abs(e.getY() - dragPoint.y);
                 if (deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD) {
                     canvas.startGoto();
                 }

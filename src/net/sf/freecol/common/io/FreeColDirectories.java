@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -432,52 +434,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Copy files/directories from one path to another.
-     *
-     * FIXME: Use Java7 copyFile and copyDirectory routines
-     *
-     * @param src The source directory.
-     * @param dst The destination directory.
-     * @return True if the copy succeeded.
-     */
-    private static boolean copyDir(File src, File dst) {
-        if (!dst.mkdir()) return false;
-        for (String f : src.list()) {
-            File srcFile = new File(src, f);
-            File dstFile = new File(dst, f);
-            if (srcFile.isDirectory()) {
-                if (!copyDir(srcFile, dstFile)) return false;
-            } else if (srcFile.isFile()) {
-                if (!copyFile(srcFile, dstFile)) return false;
-            } else {
-                // do not copy other objects
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Copy a file.
-     *
-     * @param src The source <code>File</code>.
-     * @param dst The destination <code>File</code>.
-     * @return True if the copy succeeded.
-     */
-    private static boolean copyFile(File src, File dst) {
-        byte[] buf = new byte[16384];
-        int len;
-    		try (
-            FileInputStream in = new FileInputStream(src);
-            FileOutputStream out = new FileOutputStream(dst);
-        ) {
-            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
-        } catch (IOException ioe) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Copy directory with given name under an old directory to a new
      * directory.
      *
@@ -489,7 +445,13 @@ public class FreeColDirectories {
         File src = new File(oldDir, name);
         File dst = new File(newDir, name);
         if (src.exists() && src.isDirectory() && !dst.exists()) {
-            copyDir(src, dst);
+            try {
+                Files.copy(src.toPath(), dst.toPath(),
+                    StandardCopyOption.COPY_ATTRIBUTES);
+            } catch (IOException ioe) {
+                System.err.println("Could not copy " + src.toString() + " to "
+                    + dst.toString() + ": " + ioe.getMessage());
+            }
         }
     }
 
@@ -515,6 +477,16 @@ public class FreeColDirectories {
         }
     }
 
+    /**
+     * Derive the directory for the autosave files from the save directory.
+     */
+    private static void deriveAutosaveDirectory() {
+        if (autosaveDirectory == null && saveDirectory != null) {
+            autosaveDirectory = new File(saveDirectory, AUTOSAVE_DIRECTORY);
+            if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+        }
+    }
+        
 
     // Main initialization/bootstrap routines.
     // These need to be called early before the subsidiary directory
@@ -630,9 +602,7 @@ public class FreeColDirectories {
             saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
         }
-
-        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+        deriveAutosaveDirectory();
 
         userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
@@ -643,7 +613,6 @@ public class FreeColDirectories {
             : (onWindows()) ? "main.userDir.windows"
             : null;
     }
-
 
     // Directory accessors.
     // Where there are supported command line arguments there will also
@@ -804,30 +773,12 @@ public class FreeColDirectories {
     }
 
     /**
-     * Set the directory where the saved games should be put.
-     *
-     * @param dir The new saved games directory.
-     */
-    public static void setSaveDirectory(File dir) {
-        saveDirectory = dir;
-    }
-
-    /**
      * Gets the save game file.
      *
      * @return The save game file.
      */
     public static File getSavegameFile() {
         return savegameFile;
-    }
-
-    /**
-     * Sets the save game file.
-     *
-     * @param file The new save game file.
-     */
-    public static void setSavegameFile(File file) {
-        savegameFile = file;
     }
 
     /**
@@ -842,10 +793,11 @@ public class FreeColDirectories {
             file = new File(getSaveDirectory(), path);
             if (!file.exists() || !file.isFile() || !file.canRead()) return false;
         }
-        setSavegameFile(file);
-        setSaveDirectory(file.getParentFile());
-        File autoDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (insistDirectory(autoDirectory)) autosaveDirectory = autoDirectory;
+        savegameFile = file;
+        File parent = file.getParentFile();
+        if (parent == null) parent = new File(".");
+        saveDirectory = parent;
+        deriveAutosaveDirectory();
         return true;
     }
 
@@ -861,7 +813,7 @@ public class FreeColDirectories {
         for (File directory : new File[] {
                 FreeColDirectories.getSaveDirectory(),
                 FreeColDirectories.getAutosaveDirectory() }) {
-            for (File savegame : directory.listFiles(FreeCol.freeColSaveFileFilter)) {
+            for (File savegame : directory.listFiles(FreeColSavegameFile.getFileFilter())) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
                     lastSave = savegame;

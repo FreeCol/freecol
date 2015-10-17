@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -182,10 +183,8 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return The <code>AbstractGoods</code> found, or null if not.
      */
     public static AbstractGoods findByType(GoodsType type,
-                                           Collection<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            if (ag.getType() == type) return ag;
-        }
+        Collection<? extends AbstractGoods> goods) {
+        for (AbstractGoods ag : goods) if (ag.getType() == type) return ag;
         return null;
     }
 
@@ -198,9 +197,21 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return The goods count found, or zero if not found.
      */
     public static int getCount(GoodsType type,
-                               Collection<AbstractGoods> goods) {
+        Collection<? extends AbstractGoods> goods) {
         AbstractGoods ag = findByType(type, goods);
         return (ag == null) ? 0 : ag.getAmount();
+    }
+
+    /**
+     * Does a goods collection contain an element with a given type?
+     *
+     * @param goods The <code>Goods<code> collection to search.
+     * @param type The <code>GoodsType</code> to search for.
+     * @return True if the goods type was found.
+     */
+    public static boolean containsType(GoodsType type,
+        Collection<? extends AbstractGoods> goods) {
+        return contains(goods, ag -> ag.getType() == type);
     }
 
     /**

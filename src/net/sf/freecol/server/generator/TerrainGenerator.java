@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.generator;
 
-import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -27,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.model.ServerRegion;
@@ -85,8 +86,8 @@ public class TerrainGenerator {
     private final Specification spec;
 
     /** The cached land and ocean tile types. */
-    private ArrayList<TileType> landTileTypes = null;
-    private ArrayList<TileType> oceanTileTypes = null;
+    private List<TileType> landTileTypes = null;
+    private List<TileType> oceanTileTypes = null;
 
 
     /**
@@ -151,15 +152,11 @@ public class TerrainGenerator {
      */
     private TileType getRandomLandTileType(int latitude) {
         if (landTileTypes == null) {
-            landTileTypes = new ArrayList<>();
-            for (TileType type : spec.getTileTypeList()) {
-                if (type.isElevation() || type.isWater()) {
-                    // do not generate elevated and water tiles at this time
-                    // they are created separately
-                    continue;
-                }
-                landTileTypes.add(type);
-            }
+            // Do not generate elevated and water tiles at this time
+            // they are created elsewhere.
+            landTileTypes = spec.getTileTypeList().stream()
+                .filter(t -> !t.isElevation() && !t.isWater())
+                .collect(Collectors.toList());
         }
         return getRandomTileType(landTileTypes, latitude);
     }
@@ -172,14 +169,11 @@ public class TerrainGenerator {
      */
     private TileType getRandomOceanTileType(int latitude) {
         if (oceanTileTypes == null) {
-            oceanTileTypes = new ArrayList<>();
-            for (TileType type : spec.getTileTypeList()) {
-                if (type.isWater()
-                    && type.isHighSeasConnected()
-                    && !type.isDirectlyHighSeasConnected()) {
-                    oceanTileTypes.add(type);
-                }
-            }
+            oceanTileTypes = spec.getTileTypeList().stream()
+                .filter(t -> t.isWater()
+                    && t.isHighSeasConnected()
+                    && !t.isDirectlyHighSeasConnected())
+                .collect(Collectors.toList());
         }
         return getRandomTileType(oceanTileTypes, latitude);
     }
@@ -479,30 +473,23 @@ public class TerrainGenerator {
     private Tile getGoodMountainTile(Map map) {
         final TileType hills = spec.getTileType("model.tile.hills");
         final TileType mountains = spec.getTileType("model.tile.mountains");
-        Tile t = null;
-        nextTry: for (;;) {
-            if ((t = map.getRandomLandTile(random)) == null) break;
-            
-            if (t.getType() == hills || t.getType() == mountains) {
-                continue; // Already on high ground
-            }
+        Tile tile = null;
+        while ((tile = map.getRandomLandTile(random)) != null) {
+            // Can not be high ground already
+            if (tile.getType() != hills && tile.getType() != mountains
+                
+                // Not too close to a mountain range as this would
+                // defeat the purpose of adding random hills
+                && none(tile.getSurroundingTiles(1, 3), t -> t.getType() == mountains)
 
-            // Do not add hills too close to a mountain range
-            // this would defeat the purpose of adding random hills.
-            for (Tile tile : t.getSurroundingTiles(3)) {
-                if (tile.getType() == mountains) continue nextTry;
+                // Do not add hills too close to the ocean/lake, as
+                // this helps with good locations for building
+                // colonies on shore.
+                && none(tile.getSurroundingTiles(1, 1), t -> !t.isLand())) {
+                return tile;
             }
-
-            // Do not add hills too close to the ocean/lake this
-            // helps with good locations for building colonies on
-            // shore.
-            for (Tile tile : t.getSurroundingTiles(1)) {
-                if (!tile.isLand()) continue nextTry;
-            }
-
-            break; // OK, good tile found.
         }
-        return t;
+        return null;
     }
 
     /**
@@ -623,9 +610,9 @@ public class TerrainGenerator {
                 if (!riverType.isTileTypeAllowed(tile.getType())) continue;
 
                 // check the river source/spring is not too close to the ocean
-                for (Tile neighborTile : tile.getSurroundingTiles(2)) {
-                    if (!neighborTile.isLand()) continue;
-                }
+                if (!all(tile.getSurroundingTiles(1, 2),
+                        Tile::isLand)) continue;
+
                 if (riverMap.get(tile) == null) {
                     // no river here yet
                     ServerRegion riverRegion = new ServerRegion(game, RegionType.RIVER);
@@ -647,11 +634,8 @@ public class TerrainGenerator {
 
         for (River river : rivers) {
             ServerRegion region = river.getRegion();
-            int scoreValue = 0;
-            for (RiverSection section : river.getSections()) {
-                scoreValue += section.getSize();
-            }
-            scoreValue *= 2;
+            int scoreValue = 2 * river.getSections().stream()
+                .mapToInt(rs -> rs.getSize()).sum();
             region.setScoreValue(scoreValue);
             lb.add("Created river region (length ", river.getLength(),
                 ", score value ", scoreValue, ").\n");

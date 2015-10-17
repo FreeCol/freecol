@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -330,14 +331,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public boolean hasReachedCapacity(int amount) {
         synchronized (storedGoods) {
-            for (GoodsType goodsType : storedGoods.keySet()) {
-                if (goodsType.isStorable() && !goodsType.limitIgnored()
-                    && storedGoods.get(goodsType) > amount) {
-                    return true;
-                }
-            }
+            return any(storedGoods.keySet(), gt -> gt.isStorable()
+                && !gt.limitIgnored() && storedGoods.get(gt) > amount);
         }
-        return false;
     }
 
     /**
@@ -347,17 +343,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return The amount of space taken by this containers goods.
      */
     public int getSpaceTaken() {
-        int count = 0;
         synchronized (storedGoods) {
-            for (Integer amount : storedGoods.values()) {
-                if (amount % CARGO_SIZE == 0) {
-                    count += amount/CARGO_SIZE;
-                } else {
-                    count += amount/CARGO_SIZE + 1;
-                }
-            }
+            return storedGoods.values().stream()
+                .mapToInt(amount -> (amount % CARGO_SIZE == 0)
+                    ? amount/CARGO_SIZE
+                    : amount/CARGO_SIZE + 1).sum();
         }
-        return count;
     }
 
     /**
@@ -446,26 +437,27 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return True if the contents have changed.
      */
     public boolean hasChanged() {
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            int oldCount = getOldGoodsCount(type);
-            int newCount = getGoodsCount(type);
-            if (oldCount != newCount) return true;
-        }
-        return false;
+        return any(getSpecification().getGoodsTypeList(),
+            gt -> getOldGoodsCount(gt) != getGoodsCount(gt));
     }
 
     /**
      * Fire property changes for all goods that have seen level changes
      * since the last saveState().
+     *
+     * @return True if something changed.
      */
-    public void fireChanges() {
+    public boolean fireChanges() {
+        boolean ret = false;
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             int oldCount = getOldGoodsCount(type);
             int newCount = getGoodsCount(type);
             if (oldCount != newCount) {
                 firePropertyChange(type.getId(), oldCount, newCount);
+                ret = true;
             }
         }
+        return ret;
     }
 
     // Interface Ownable

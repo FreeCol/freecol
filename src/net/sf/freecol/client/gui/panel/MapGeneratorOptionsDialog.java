@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -37,7 +36,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
@@ -81,7 +79,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
             // FIXME: The update should be solved by PropertyEvent.
             File mapDirectory = FreeColDirectories.getMapsDirectory();
             if (mapDirectory.isDirectory()) {
-                File[] files = mapDirectory.listFiles(FreeCol.freeColSaveFileFilter);
+                File[] files = mapDirectory.listFiles(FreeColSavegameFile.getFileFilter());
                 Arrays.sort(files, new Comparator<File>() {
                         @Override
                         public int compare(File f1, File f2) {
@@ -92,11 +90,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 for (final File file : files) {
                     JButton mapButton = makeMapButton(file);
                     if (mapButton == null) continue;
-                    mapButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                updateFile(file);
-                            }
+                    mapButton.addActionListener((ActionEvent ae) -> {
+                            updateFile(file);
                         });
                     mapPanel.add(mapButton);
                 }

@@ -21,10 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
-import javax.swing.JTextArea;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -119,10 +120,10 @@ public final class RecruitPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         } else {
             try {
                 int index = Integer.parseInt(command);

@@ -42,7 +42,7 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.Flag.Background;
 import net.sf.freecol.client.gui.panel.Flag.Decoration;
 import net.sf.freecol.client.gui.panel.Flag.UnionPosition;
@@ -271,7 +271,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
         StringTemplate nation = StringTemplate
             .template("confirmDeclarationDialog.defaultNation")
-            .addStringTemplate("%nation%", player.getNationName());
+            .addStringTemplate("%nation%", player.getNationLabel());
         this.nationField = new JTextField(Messages.message(nation), 20);
 
         this.label = new JLabel();
@@ -392,8 +392,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        ColorButton button = (ColorButton)e.getSource();
+    public void actionPerformed(ActionEvent ae) {
+        ColorButton button = (ColorButton)ae.getSource();
         Color color = JColorChooser.showDialog(this, this.label.getText(),
                                                button.getBackground());
         button.setColor(color);

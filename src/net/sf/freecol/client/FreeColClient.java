@@ -22,6 +22,7 @@ package net.sf.freecol.client;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -132,21 +133,21 @@ public final class FreeColClient {
     private final boolean headless;
 
 
-    public FreeColClient(final String splashFilename,
+    public FreeColClient(final InputStream splashStream,
                          final String fontName) {
-        this(splashFilename, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
+        this(splashStream, fontName, FreeCol.GUI_SCALE_DEFAULT, true);
     }
 
     /**
      * Creates a new <code>FreeColClient</code>.  Creates the control
      * objects.
      *
-     * @param splashFilename The name of the splash image.
+     * @param splashStream A stream to read the splash image from.
      * @param fontName An optional override of the main font.
      * @param scale The scale factor for gui elements.
      * @param headless Run in headless mode.
      */
-    public FreeColClient(final String splashFilename, final String fontName,
+    public FreeColClient(final InputStream splashStream, final String fontName,
                          final float scale, boolean headless) {
         mapEditor = false;
         this.headless = headless
@@ -161,7 +162,7 @@ public final class FreeColClient {
         // Get the splash screen up early on to show activity.
         gui = (this.headless) ? new GUI(this, scale)
                               : new SwingGUI(this, scale);
-        gui.displaySplashScreen(splashFilename);
+        gui.displaySplashScreen(splashStream);
 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
@@ -215,8 +216,6 @@ public final class FreeColClient {
         } catch (IOException e) {
             fatal(Messages.message("client.classic") + "\n" + e.getMessage());
         }
-        actionManager = new ActionManager(this);
-        actionManager.initializeActions(inGameController, connectController);
 
         if (!this.headless) {
             // Swing system and look-and-feel initialization.
@@ -226,6 +225,8 @@ public final class FreeColClient {
                 fatal(Messages.message("client.laf") + "\n" + e.getMessage());
             }
         }
+        actionManager = new ActionManager(this);
+        actionManager.initializeActions(inGameController, connectController);
     }
 
     /**
@@ -281,40 +282,26 @@ public final class FreeColClient {
         //     NewPanel to a call to the connect controller to start a game)
         if (savedGame != null) {
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!connectController.startSavedGame(savedGame,
-                                                              userMsg)) {
-                            gui.showMainPanel(userMsg);
-                        }
+            SwingUtilities.invokeLater(() -> {
+                    if (!connectController.startSavedGame(savedGame, userMsg)) {
+                        gui.showMainPanel(userMsg);
                     }
                 });
         } else if (spec != null) { // Debug or fast start
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!connectController.startSinglePlayerGame(spec,
-                                                                     true)) {
-                            gui.showMainPanel(userMsg);
-                        }
+            SwingUtilities.invokeLater(() -> {
+                    if (!connectController.startSinglePlayerGame(spec, true)) {
+                        gui.showMainPanel(userMsg);
                     }
                 });
         } else if (showOpeningVideo) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gui.showOpeningVideo(userMsg);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                    gui.showOpeningVideo(userMsg);
                 });
         } else {
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        gui.showMainPanel(userMsg);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                    gui.showMainPanel(userMsg);
                 });
         }
 
@@ -706,6 +693,19 @@ public final class FreeColClient {
     }
 
     /**
+     * Common utility routine to retrieve animation speed.
+     *
+     * @param player The <code>Player</code> to be animated.
+     * @return The animation speed.
+     */
+    public int getAnimationSpeed(Player player) {
+        String key = (getMyPlayer() == player)
+            ? ClientOptions.MOVE_ANIMATION_SPEED
+            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        return getClientOptions().getInteger(key);
+    }
+
+    /**
      * Get a list of the player colonies.
      *
      * @return The players colonies sorted according to the chosen comparator.
@@ -733,14 +733,17 @@ public final class FreeColClient {
      *
      * When the game is clear, show the new game panel.
      *
-     * Called from the New action, often from the button on the MainPanel.
+     * Called from the New action, often from the button on the MainPanel,
+     * and IGC.victory()
+     *
+     * @param prompt If true, prompt to confirm stopping the game.
      */
-    public void newGame() {
+    public void newGame(boolean prompt) {
         Specification specification = null;
         if (getGame() != null) {
             if (isMapEditor()) {
                 specification = getGame().getSpecification();
-            } else if (gui.confirmStopGame()) {
+            } else if (!prompt || gui.confirmStopGame()) {
                 getConnectController().quitGame(true);
                 FreeColSeed.incrementFreeColSeed();
             } else {
@@ -807,7 +810,7 @@ public final class FreeColClient {
             if (validPeriod != 0L && autoSave != null
                 && (flist = autoSave.list()) != null) {
                 for (String f : flist) {
-                    if (!f.endsWith(FreeCol.FREECOL_SAVE_EXTENSION)) continue;
+                    if (!f.endsWith("." + FreeCol.FREECOL_SAVE_EXTENSION)) continue;
                     // delete files which are older than user option allows
                     File saveGameFile = new File(autoSave, f);
                     if (saveGameFile.lastModified() + validPeriod < timeNow) {

@@ -258,13 +258,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Random aiRandom = getAIRandom();
         // Find a representative offensive land unit to use to search
         // for the initial target.
-        AIUnit aiUnit = null;
-        for (AIUnit aiu : getAIUnits()) {
-            if (!aiu.getUnit().isNaval() && aiu.getUnit().isOffensiveUnit()) {
-                aiUnit = aiu;
-                break;
-            }
-        }
+        AIUnit aiUnit = find(getAIUnits(), aiu -> !aiu.getUnit().isNaval()
+            && aiu.getUnit().isOffensiveUnit());
         if (aiUnit == null) {
             logger.warning("REF has no army?!?");
             return false;
@@ -437,8 +432,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         // Attack naval targets.
-        Comparator<Unit> militaryStrength
-            = Unit.getMilitaryStrengthComparator(getGame().getCombatModel());
+        final Comparator<Unit> militaryStrength
+            = getGame().getCombatModel().getMilitaryStrengthComparator();
         Collections.sort(rebelNavy, militaryStrength);
         Iterator<Unit> ui = rebelNavy.iterator();
         List<Tile> entries = new ArrayList<>();
@@ -660,16 +655,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
 
             // Go defend the nearest colony needing defence
-            int bestValue = Integer.MAX_VALUE;
-            Colony best = null;
-            for (AIColony aic : getBadlyDefended()) {
-                Colony c = aic.getColony();
-                int value = u.getTurnsToReach(c);
-                if (value >= 0 && value < bestValue) {
-                    bestValue = value;
-                    best = c;
-                }
-            }
+            Colony best = u.getClosestColony(getBadlyDefended().stream()
+                .map(AIColony::getColony));
             if (best != null
                 && (m = getDefendSettlementMission(aiu, best)) != null) {
                 lb.add(" GO-DEFEND-", best.getName(), " " , m);
@@ -796,9 +783,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 // Are there more idle units waiting here?
                 if (!e.getValue().isEmpty()) {
                     idlePorts.add(key);
-                    for (AIUnit aiu : e.getValue()) {
-                        space += aiu.getUnit().getSpaceTaken();
-                    }
+                    space += e.getValue().stream()
+                        .mapToInt(aiu -> aiu.getUnit().getSpaceTaken()).sum();
                 }
             }
 
@@ -826,11 +812,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 boolean bad = false;
                 while (!bad && !todo.isEmpty()) {
                     for (Location l : idlePorts) {
-                        int bestValue = INFINITY;
+                        int bestValue = Unit.MANY_TURNS;
                         AIUnit best = null;
                         for (AIUnit aiu : todo) {
                             int value = aiu.getUnit().getTurnsToReach(l);
-                            if (value >= 0 && value < bestValue) {
+                            if (bestValue > value) {
                                 bestValue = value;
                                 best = aiu;
                             }
@@ -921,14 +907,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         return Integer.MIN_VALUE;
                     }
                     // Do not chase the same unit!
-                    for (AIUnit au : getAIUnits()) {
-                        Mission m = au.getMission(UnitSeekAndDestroyMission.class);
-                        Location loc;
-                        if (m != null
-                            && (loc = m.getTarget()) != null
-                            && loc instanceof Unit
-                            && loc == target) return Integer.MIN_VALUE;
-                    }
+                    if (any(getAIUnits().stream()
+                            .filter(aiu -> aiu != aiUnit)
+                            .map(aiu -> aiu.getMission(UnitSeekAndDestroyMission.class)),
+                            m -> m != null
+                                && m.getTarget() instanceof Unit
+                                && (Unit)m.getTarget() == target))
+                        return Integer.MIN_VALUE;
                     // The REF is more interested in colonies.
                     value /= 2;
                 }

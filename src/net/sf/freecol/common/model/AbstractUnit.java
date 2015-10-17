@@ -166,7 +166,7 @@ public class AbstractUnit extends FreeColObject {
      * @param spec A <code>Specification</code> to look up.
      * @return The approximate offence power.
      */
-    public float getOffence(Specification spec) {
+    public double getOffence(Specification spec) {
         int n = getNumber();
         Role role = getRole(spec);
         UnitType type = spec.getUnitType(getId());
@@ -182,9 +182,7 @@ public class AbstractUnit extends FreeColObject {
      */
     public static double calculateStrength(Specification spec,
                                            List<AbstractUnit> units) { 
-        float result = 0;
-        for (AbstractUnit au : units) result += au.getOffence(spec);
-        return result;
+        return units.stream().mapToDouble(au -> au.getOffence(spec)).sum();
     }
 
     /**

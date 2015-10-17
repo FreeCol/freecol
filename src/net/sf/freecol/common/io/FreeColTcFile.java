@@ -20,14 +20,10 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileFilter;
 import java.io.IOException;
 
-import java.util.Set;
-
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.resources.ResourceMapping;
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -35,8 +31,9 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class FreeColTcFile extends FreeColModFile {
 
-    private static final Set<String> FILE_ENDINGS
-        = makeUnmodifiableSet(".ftc", ".zip");
+    /** A file filter to select TCs. */
+    private static final FileFilter fileFilter
+        = makeFileFilter(MOD_DESCRIPTOR_FILE, "ftc", ZIP_FILE_EXTENSION);
 
 
     /**
@@ -59,22 +56,6 @@ public class FreeColTcFile extends FreeColModFile {
         super(new File(FreeColDirectories.getRulesDirectory(), id));
     }
 
-
-    /**
-     * Gets the Specification of this TC.
-     *
-     * @return The <code>Specification</code> in this TC, or null if
-     *     none present.
-     * @exception IOException if an error occurs reading the specification.
-     */
-    public Specification getSpecification() throws IOException {
-        Specification specification;
-        try (InputStream si = getSpecificationInputStream()) {
-            if (si == null) return null;
-            specification = new Specification(si);
-        }
-        return specification;
-    }
 
     /**
      * {@inheritDoc}
@@ -100,11 +81,11 @@ public class FreeColTcFile extends FreeColModFile {
     }
 
     /**
-     * File endings that are supported for this type of data file.
+     * Get the file filter to select TC files.
      *
-     * @return A set: ".ftc" and ".zip".
+     * @return The TC file filter.
      */
-    protected static Set<String> getFileEndings() {
-        return FILE_ENDINGS;
+    public static FileFilter getFileFilter() {
+        return fileFilter;
     }
 }

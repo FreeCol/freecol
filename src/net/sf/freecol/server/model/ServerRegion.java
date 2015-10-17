@@ -26,7 +26,6 @@ import java.util.Queue;
 
 import java.awt.Rectangle;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -36,7 +35,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.common.util.LogBuilder;
@@ -227,7 +225,7 @@ public class ServerRegion extends Region {
         for (Region r : discover(player, turn)) cs.add(See.all(), r);
         HistoryEvent h = new HistoryEvent(turn,
             HistoryEvent.HistoryEventType.DISCOVER_REGION, player)
-                .addStringTemplate("%nation%", player.getNationName())
+                .addStringTemplate("%nation%", player.getNationLabel())
                 .addName("%region%", newName);
         h.setScore(score);
         cs.addGlobalHistory(getGame(), h);

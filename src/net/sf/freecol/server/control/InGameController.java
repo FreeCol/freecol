@@ -39,9 +39,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
@@ -118,8 +118,10 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
@@ -486,7 +488,7 @@ public final class InGameController extends Controller {
             });
         DOMMessage reply;
         try {
-            boolean single = getFreeColServer().isSinglePlayer();
+            boolean single = getFreeColServer().getSinglePlayer();
             reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
         } catch (TimeoutException te) {
             serverPlayer.send(new ChangeSet()
@@ -612,14 +614,8 @@ public final class InGameController extends Controller {
             // Are there humans left?
             // FIXME: see if this can be relaxed so we can run large
             // AI-only simulations.
-            boolean human = false;
-            for (ServerPlayer sp : game.getConnectedPlayers()) {
-                if (!sp.isAI()) {
-                    human = true;
-                    break;
-                }
-            }
-            if (!human) {
+            boolean onlyAI = all(game.getConnectedPlayers(), Player::isAI);
+            if (onlyAI) {
                 logger.info("No human player left.");
                 if (debugOnlyAITurns > 0) { // Complete debug runs
                     FreeColDebugger.signalEndDebugRun();
@@ -636,7 +632,7 @@ public final class InGameController extends Controller {
             // Do not end single player games where an AI has won,
             // that would stop revenge mode.
             if (winner == player
-                && !(freeColServer.isSinglePlayer() && winner.isAI())) {
+                && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
                 cs.addTrivial(See.all(), "gameEnded",
@@ -698,7 +694,7 @@ public final class InGameController extends Controller {
             // current player which requested the end-of-turn, unless
             // it is doing a debug run.
             boolean debugSkip = !player.isAI()
-                && freeColServer.isSinglePlayer()
+                && freeColServer.getSinglePlayer()
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
                 game.sendToOthers(player, cs);
@@ -794,7 +790,7 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "giveIndependence.announce", independent)
-            .addStringTemplate("%ref%", serverPlayer.getNationName()));
+            .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
 
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<>();
@@ -824,8 +820,8 @@ public final class InGameController extends Controller {
         cs.addMessage(See.all().except(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "giveIndependence.otherAnnounce", independent)
-                .addStringTemplate("%nation%", independent.getNationName())
-                .addStringTemplate("%ref%", serverPlayer.getNationName()));
+                .addStringTemplate("%nation%", independent.getNationLabel())
+                .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
         cs.add(See.only(independent), independent);
 
         // Reveal the map on independence.
@@ -948,7 +944,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action, StringTemplate
                     .template(messageId)
-                    .addStringTemplate("%nation%", friend.getNationName()),
+                    .addStringTemplate("%nation%", friend.getNationLabel()),
                     monarchKey));
             break;
         case DECLARE_WAR:
@@ -978,7 +974,7 @@ public final class InGameController extends Controller {
                 new MonarchActionMessage(action, StringTemplate
                     .template((warSupport.isEmpty()) ? messageId
                         : "model.monarch.action.declareWarSupported.text")
-                        .addStringTemplate("%nation%", enemy.getNationName())
+                        .addStringTemplate("%nation%", enemy.getNationLabel())
                         .addStringTemplate("%force%",
                             AbstractUnit.getListLabel(", ", warSupport))
                         .addAmount("%gold%", warGold),
@@ -1077,7 +1073,7 @@ public final class InGameController extends Controller {
     public Element continuePlaying(ServerPlayer serverPlayer) {
         final ServerGame game = getGame();
         Element reply = null;
-        if (!getFreeColServer().isSinglePlayer()) {
+        if (!getFreeColServer().getSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
         } else if (serverPlayer != game.checkForWinner()) {
             logger.warning("Can not continue playing, as "
@@ -1137,7 +1133,7 @@ public final class InGameController extends Controller {
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer)
                 .addAmount("%amount%", fullAmount)
-                .addStringTemplate("%nation%", serverPlayer.getNationName()));
+                .addStringTemplate("%nation%", serverPlayer.getNationLabel()));
 
         // Dispose of the unit, only visible to the owner.
         cs.add(See.only(serverPlayer), (FreeColGameObject)unit.getLocation());
@@ -1165,7 +1161,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         // Cross the Rubicon
-        StringTemplate oldNation = serverPlayer.getNationName();
+        StringTemplate oldNation = serverPlayer.getNationLabel();
         serverPlayer.setIndependentNationName(nationName);
         serverPlayer.setNewLandName(countryName);
         serverPlayer.changePlayerType(PlayerType.REBEL);
@@ -1284,23 +1280,22 @@ public final class InGameController extends Controller {
         // declare peace on you and war on the REF.  If they are the
         // same nation, go to the next most hostile nation that may
         // already be at war.
-        List<Player> natives = new ArrayList<>();
-        for (Player p : game.getLiveNativePlayers(null)) {
-            if (p.hasContacted(serverPlayer)) natives.add(p);
-        }
-        if (!natives.isEmpty()) {
-            Collections.sort(natives, new Comparator<Player>() {
+        List<Player> natives = game.getLiveNativePlayers(null).stream()
+            .filter(p -> p.hasContacted(serverPlayer))
+            .sorted(new Comparator<Player>() {
                     public int compare(Player p1, Player p2) {
                         return p1.getTension(serverPlayer).getValue()
                             - p2.getTension(serverPlayer).getValue();
                     }
-                });
+                })
+            .collect(Collectors.toList());
+        if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)natives.get(0);
             logger.info("Native ally following independence: " + good);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "declareIndependence.nativeSupport", good)
-                    .addStringTemplate("%nation%", good.getNationName())
+                    .addStringTemplate("%nation%", good.getNationLabel())
                     .add("%ruler%", serverPlayer.getRulerNameKey())
                           );
             int delta;
@@ -1344,7 +1339,7 @@ public final class InGameController extends Controller {
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                      "declareIndependence.nativeHostile", bad)
-                        .addStringTemplate("%nation%", bad.getNationName()));
+                        .addStringTemplate("%nation%", bad.getNationLabel()));
                 if (delta != 0) bad.csModifyTension(serverPlayer, delta, cs);
                 Player.makeContact(bad, refPlayer);
                 bad.csModifyTension(refPlayer,
@@ -1367,7 +1362,7 @@ public final class InGameController extends Controller {
                              "declareIndependence.announce",
                              serverPlayer)
                 .addStringTemplate("%oldNation%", oldNation)
-                .addStringTemplate("%newNation%", serverPlayer.getNationName())
+                .addStringTemplate("%newNation%", serverPlayer.getNationLabel())
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
@@ -2272,15 +2267,15 @@ public final class InGameController extends Controller {
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.noDenounce",
                              serverPlayer, unit)
-                .addStringTemplate("%nation%", owner.getNationName()));
+                .addStringTemplate("%nation%", owner.getNationLabel()));
         cs.addMessage(See.only(enemy),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.enemyDenounce",
                              enemy, settlement)
-                .addStringTemplate("%enemy%", serverPlayer.getNationName())
+                .addStringTemplate("%enemy%", serverPlayer.getNationLabel())
                 .addStringTemplate("%settlement%",
                     settlement.getLocationLabelFor(enemy))
-                .addStringTemplate("%nation%", owner.getNationName()));
+                .addStringTemplate("%nation%", owner.getNationLabel()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
         cs.addRemove(See.perhaps().always(serverPlayer),
@@ -2332,7 +2327,7 @@ public final class InGameController extends Controller {
         }
 
         // Add the descriptive message.
-        final StringTemplate nation = settlement.getOwner().getNationName();
+        final StringTemplate nation = settlement.getOwner().getNationLabel();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission." + tension.getKey(),
@@ -2383,7 +2378,7 @@ public final class InGameController extends Controller {
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                  "indianSettlement.inciteGoldFail",
                                  serverPlayer, settlement)
-                    .addStringTemplate("%player%", enemyPlayer.getNationName())
+                    .addStringTemplate("%player%", enemyPlayer.getNationLabel())
                     .addAmount("%amount%", goldToPay));
             cs.addAttribute(See.only(serverPlayer), "gold", "0");
             unit.setMovesLeft(0);
@@ -2617,7 +2612,7 @@ public final class InGameController extends Controller {
         ModelMessage m = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
                                           "deliverGift.goods",
                                           settlement, goods.getType())
-            .addStringTemplate("%player%", serverPlayer.getNationName())
+            .addStringTemplate("%player%", serverPlayer.getNationLabel())
             .addNamed("%type%", goods)
             .addAmount("%amount%", goods.getAmount())
             .addName("%settlement%", settlement.getName());
@@ -2816,7 +2811,7 @@ public final class InGameController extends Controller {
             name = serverPlayer.getSettlementName(random);
         }
         if (serverPlayer.isEuropean()) {
-            StringTemplate nation = serverPlayer.getNationName();
+            StringTemplate nation = serverPlayer.getNationLabel();
             settlement = new ServerColony(game, serverPlayer, name, tile);
             for (Tile t : tile.getSurroundingTiles(settlement.getRadius())) {
                 t.cacheUnseen();//+til
@@ -3121,9 +3116,22 @@ public final class InGameController extends Controller {
                 }
             }
             ServerPlayer victim = (ServerPlayer)tradeItem.getVictim();
-            if (victim != null
-                && !source.csChangeStance(Stance.WAR, victim, true, cs)) {
-                logger.warning("Incite trade failure: " + victim);
+            if (victim != null) {
+                if (source.csChangeStance(Stance.WAR, victim, true, cs)) {
+                    // Have to add in an explicit stance change and
+                    // message because the player does not normally
+                    // have visibility of stance changes between other nations.
+                    cs.addStance(See.only(dest), source, Stance.WAR, victim);
+                    cs.addMessage(See.only(dest),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            Stance.WAR.getOtherStanceChangeKey(), source)
+                            .addStringTemplate("%attacker%",
+                                source.getNationLabel())
+                            .addStringTemplate("%defender%",
+                                victim.getNationLabel()));
+                } else {
+                    logger.warning("Incite trade failure: " + victim);
+                }
             }                
             ServerUnit newUnit = (ServerUnit)tradeItem.getUnit();
             if (newUnit != null && settlement != null) {
@@ -4190,7 +4198,7 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element enterRevengeMode(ServerPlayer serverPlayer) {
-        if (!getFreeColServer().isSinglePlayer()) {
+        if (!getFreeColServer().getSinglePlayer()) {
             return DOMMessage.clientError("Can not enter revenge mode,"
                 + " as this is not a single player game.");
         }

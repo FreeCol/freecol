@@ -314,7 +314,7 @@ public class LostCityRumour extends TileItem {
      */
     @Override
     public final int getZIndex() {
-        return RUMOUR_ZINDEX;
+        return Tile.RUMOUR_ZINDEX;
     }
 
     /**

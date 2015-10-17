@@ -25,11 +25,12 @@ import java.util.List;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Tile;
@@ -48,6 +49,8 @@ import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class ServerUnitTest extends FreeColTestCase {
 
+    private static final BuildingType carpenterHouseType
+        = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType townHallType
         = spec().getBuildingType("model.building.townHall");
 
@@ -55,6 +58,8 @@ public class ServerUnitTest extends FreeColTestCase {
         = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType lumberType
+        = spec().getGoodsType("model.goods.lumber");
 
     private static final TileImprovementType road
         = spec().getTileImprovementType("model.improvement.road");
@@ -105,7 +110,7 @@ public class ServerUnitTest extends FreeColTestCase {
     public void testToggleHorses() {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
 
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = game.getMap().getTile(5, 8);
         tile1.setExplored(dutch, true);
         ServerUnit scout = new ServerUnit(game, tile1, dutch, colonistType);
@@ -135,7 +140,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile plain = game.getMap().getTile(5, 8);
         plain.setExplored(dutch, true);
         plain.setOwner(dutch);
@@ -179,7 +184,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         map.getTile(5, 8).setExplored(dutch, true);
         map.getTile(6, 8).setExplored(dutch, true);
@@ -263,7 +268,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         map.getTile(5, 8).setExplored(dutch, true);
@@ -423,7 +428,7 @@ public class ServerUnitTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         tile.setOwner(dutch);
@@ -460,5 +465,58 @@ public class ServerUnitTest extends FreeColTestCase {
         // Verify clearing succeeded and has revealed a resource
         assertEquals(savannah, tile.getType());
         assertTrue(tile.hasResource());
+    }
+
+    public void testUnitLumberDelivery() {
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
+        InGameController igc = ServerTestHelper.getInGameController();
+        Colony colony = getStandardColony(3);
+        ServerPlayer player = (ServerPlayer)colony.getOwner();
+        Tile tile = colony.getTile();
+        
+        // Set up a hardy pioneer to clear the colony tile
+        Role pioneerRole = spec().getRole("model.role.pioneer");
+        ServerUnit hardyPioneer = new ServerUnit(game, tile, player,
+                                                 pioneerType, pioneerRole);
+        igc.changeWorkImprovementType(player, hardyPioneer, clear);
+
+        // Verify initial state
+        assertEquals(8, hardyPioneer.getWorkLeft());
+        assertEquals(savannahForest, tile.getType());
+        assertEquals(colony, tile.getOwningSettlement());
+        
+        // Almost finish clearing
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+
+        // Lumber should be delivered on this turn
+        int lumber = colony.getGoodsCount(lumberType);
+        ServerTestHelper.newTurn();
+        assertEquals("Lumber delivery with hardy pioneer", lumber + 20 * 2,
+                     colony.getGoodsCount(lumberType));
+
+        // Upgrade to lumber mill
+        assertEquals(0,
+            colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION).size());
+        colony.getBuilding(carpenterHouseType).upgrade();
+        assertEquals(1,
+            colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION).size());
+
+        // Almost clear another tile
+        Tile tile2 = tile.getNeighbourOrNull(Direction.N);
+        assertEquals(colony, tile2.getOwningSettlement());
+        hardyPioneer.setLocation(tile2);
+        hardyPioneer.setMovesLeft(1);
+        igc.changeWorkImprovementType(player, hardyPioneer, clear);
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+
+        // Lumber should be delivered on this turn
+        lumber = colony.getGoodsCount(lumberType);
+        ServerTestHelper.newTurn();
+        assertEquals("Lumber delivered with hardy pioneer and mill",
+                     lumber + 20 * 2 * 3, colony.getGoodsCount(lumberType));
     }
 }

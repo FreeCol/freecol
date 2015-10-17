@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -29,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -321,15 +319,12 @@ public class Operand extends Scope {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o instanceof Operand) {
-            Operand op = (Operand)o;
-            return operandType == op.operandType
-                && scopeLevel == op.scopeLevel
-                && Utils.equals(value, op.value)
-                && super.equals(o);
-        }
-        return false;
+        return this == o
+            || (o instanceof Operand
+                && operandType == ((Operand)o).operandType
+                && scopeLevel == ((Operand)o).scopeLevel
+                && Utils.equals(value, ((Operand)o).value)
+                && super.equals(o));
     }
 
 

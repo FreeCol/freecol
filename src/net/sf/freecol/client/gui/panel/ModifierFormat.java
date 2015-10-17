@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 
@@ -99,12 +101,8 @@ public class ModifierFormat {
                                              FreeColGameObjectType fcgot,
                                              Turn turn) {
         String sourceName = getSourceName(modifier.getSource());
-        if (fcgot != null) {
-            for (Scope scope : modifier.getScopes()) {
-                if (scope.appliesTo(fcgot)) {
-                    sourceName += " (" + Messages.getName(fcgot) + ")";
-                }
-            }
+        if (fcgot != null && modifier.appliesTo(fcgot)) {
+            sourceName += " (" + Messages.getName(fcgot) + ")";
         }
         float value = modifier.getValue(turn);
         String[] bonus = getModifierStrings(value, modifier.getType());
@@ -116,33 +114,22 @@ public class ModifierFormat {
     }
 
     public static String getFeatureAsString(Feature feature) {
-        String label = Messages.getName(feature) + ":";
-        if (feature.hasScope()) {
-            for (Scope scope : feature.getScopes()) {
-                String key = null;
-                if (scope.getType() != null) {
-                    key = scope.getType();
-                } else if (scope.getAbilityId() != null) {
-                    key = scope.getAbilityId();
-                } else if (scope.getMethodName() != null) {
-                    key = "model.scope." + scope.getMethodName();
-                }
-                if (key != null) {
-                    label += (scope.isMatchNegated() ? " !" : " ")
-                        + Messages.getName(key) + ",";
-                }
-            }
-        }
-        return label.substring(0, label.length() - 1);
+        return Messages.getName(feature) + ":"
+            + ((!feature.hasScope()) ? ""
+                : feature.getScopes().stream().map(scope -> {
+                        String k = scope.getKey();
+                        if (k == null) {
+                            k = "";
+                        } else {
+                            k = Messages.getName(k);
+                            if (scope.isMatchNegated()) k = "!" + k;
+                        }
+                        return k;
+                    }).collect(Collectors.joining()));
     }
 
     public static String getModifierAsString(Modifier modifier) {
-        String result = "";
-        for (String string : getModifierStrings(modifier)) {
-            if (string != null) {
-                result += string;
-            }
-        }
-        return result;
+        return Arrays.stream(getModifierStrings(modifier))
+            .filter(s -> s != null).collect(Collectors.joining());
     }
 }

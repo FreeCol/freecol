@@ -21,17 +21,22 @@ package net.sf.freecol;
 
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.JarURLConnection;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -39,7 +44,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -48,9 +52,8 @@ import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 import org.apache.commons.cli.CommandLine;
@@ -74,7 +77,7 @@ public final class FreeCol {
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
     /** The FreeCol release version number. */
-    private static final String FREECOL_VERSION = "0.11.5";
+    private static final String FREECOL_VERSION = "0.11.6";
 
     /** The difficulty levels. */
     public static final String[] DIFFICULTIES = {
@@ -82,7 +85,7 @@ public final class FreeCol {
     };
 
     /** The extension for FreeCol saved games. */
-    public static final String  FREECOL_SAVE_EXTENSION = ".fsg";
+    public static final String  FREECOL_SAVE_EXTENSION = "fsg";
 
     /** The Java version. */
     private static final String JAVA_VERSION
@@ -90,17 +93,6 @@ public final class FreeCol {
 
     /** The maximum available memory. */
     private static final long MEMORY_MAX = Runtime.getRuntime().maxMemory();
-
-    /** A file filter to select the saved game files. */
-    public static final FileFilter freeColSaveFileFilter
-        = new FileFilter() {
-                @Override
-                public boolean accept(File f) {
-                    return f.isFile()
-                        && f.getName().endsWith(FREECOL_SAVE_EXTENSION)
-                        && f.getName().length() > FREECOL_SAVE_EXTENSION.length();
-                }
-            };
 
     public static final String  CLIENT_THREAD = "FreeColClient:";
     public static final String  SERVER_THREAD = "FreeColServer:";
@@ -122,10 +114,10 @@ public final class FreeCol {
     private static final int    EUROPEANS_DEFAULT = 4;
     private static final int    EUROPEANS_MIN = 1;
     private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
-    private static final String JAVA_VERSION_MIN = "1.7";
+    private static final String JAVA_VERSION_MIN = "1.8";
     private static final int    MEMORY_MIN = 128; // Mbytes
     private static final int    PORT_DEFAULT = 3541;
-    private static final String SPLASH_FILE_DEFAULT = "splash.jpg";
+    private static final String SPLASH_DEFAULT = "splash.jpg";
     private static final String TC_DEFAULT = "freecol";
     public static final int     TIMEOUT_DEFAULT = 60; // 1 minute
     public static final int     TIMEOUT_MIN = 10; // 10s
@@ -174,8 +166,8 @@ public final class FreeCol {
     private static int serverPort = -1;
     private static String serverName = null;
 
-    /** Where the splash file lives. */
-    private static String splashFilename = SPLASH_FILE_DEFAULT;
+    /** A stream to get the splash image from. */
+    private static InputStream splashStream;
 
     /** The TotalConversion / ruleset in play, defaults to "freecol". */
     private static String tc = null;
@@ -202,13 +194,30 @@ public final class FreeCol {
      */
     public static void main(String[] args) {
         freeColRevision = FREECOL_VERSION;
+        JarURLConnection juc;
         try {
-            String revision = readVersion(FreeCol.class);
-            if (revision != null) {
-                freeColRevision += " (Revision: " + revision + ")";
+            juc = getJarURLConnection(FreeCol.class);
+        } catch (IOException ioe) {
+            juc = null;
+            System.err.println("Unable to open class jar: "
+                + ioe.getMessage());
+        }
+        if (juc != null) {
+            try {
+                String revision = readVersion(juc);
+                if (revision != null) {
+                    freeColRevision += " (Revision: " + revision + ")";
+                }
+            } catch (Exception e) {
+                System.err.println("Unable to load Manifest: "
+                    + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Unable to load Manifest: " + e.getMessage());
+            try {
+                splashStream = getDefaultSplashStream(juc);
+            } catch (Exception e) {
+                System.err.println("Unable to open default splash: "
+                    + e.getMessage());
+            }
         }
 
         // Java bug #7075600 causes BR#2554.  The workaround is to set
@@ -271,11 +280,8 @@ public final class FreeCol {
                 + e.getMessage());
             e.printStackTrace();
         }
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable e) {
-                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
-                }
+        Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
+                baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
             });
 
         // Now we can find the client options, allow the options
@@ -316,18 +322,43 @@ public final class FreeCol {
 
 
     /**
-     * Extract the package version from the class.
+     * Get the JarURLConnection from a class.
      *
-     * @param c The <code>Class</code> to extract from.
-     * @return A value of the package version attribute.
+     * @return The <code>JarURLConnection</code>.
      */
-    private static String readVersion(Class c) throws IOException {
+    private static JarURLConnection getJarURLConnection(Class c) throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
-        Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
-        return mf.getMainAttributes().getValue("Package-Version");
+        return (JarURLConnection)url.openConnection();
+    }
+        
+    /**
+     * Extract the package version from the class.
+     *
+     * @param juc The <code>JarURLConnection</code> to extract from.
+     * @return A value of the package version attribute.
+     */
+    private static String readVersion(JarURLConnection juc) throws IOException {
+        Manifest mf = juc.getManifest();
+        return (mf == null) ? null
+            : mf.getMainAttributes().getValue("Package-Version");
     }
 
+    /**
+     * Get a stream for the default splash file.
+     *
+     * Note: Not bothering to check for nulls as this is called in try
+     * block that ignores all exceptions.
+     *
+     * @param juc The <code>JarURLConnection</code> to extract from.
+     * @return A suitable <code>InputStream</code>, or null on error.
+     */
+    private static InputStream getDefaultSplashStream(JarURLConnection juc) throws IOException {
+        JarFile jf = juc.getJarFile();
+        ZipEntry ze = jf.getEntry(SPLASH_DEFAULT);
+        return jf.getInputStream(ze);
+    }
+            
     /**
      * Exit printing fatal error message.
      *
@@ -517,6 +548,9 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("no-sound")
                           .withDescription(Messages.message("cli.no-sound"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("no-splash")
+                          .withDescription(Messages.message("cli.no-splash"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("private")
                           .withDescription(Messages.message("cli.private"))
                           .create());
@@ -527,12 +561,15 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server")
                           .withDescription(Messages.message("cli.server"))
-                          .withArgName(Messages.message("cli.arg.port"))
-                          .hasOptionalArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server-name")
                           .withDescription(Messages.message("cli.server-name"))
                           .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("server-port")
+                          .withDescription(Messages.message("cli.server-port"))
+                          .withArgName(Messages.message("cli.arg.port"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("splash")
@@ -722,21 +759,26 @@ public final class FreeCol {
             if (line.hasOption("no-sound")) {
                 sound = false;
             }
+            if (line.hasOption("no-splash")) {
+                splashStream = null;
+            }
 
             if (line.hasOption("private")) {
                 publicServer = false;
             }
 
             if (line.hasOption("server")) {
-                String arg = line.getOptionValue("server");
-                if (!setServerPort(arg)) {
-                    fatal(StringTemplate.template("cli.error.serverPort")
-                        .addName("%string%", arg));
-                }
                 standAloneServer = true;
             }
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
+            }
+            if (line.hasOption("server-port")) {
+                String arg = line.getOptionValue("server-port");
+                if (!setServerPort(arg)) {
+                    fatal(StringTemplate.template("cli.error.serverPort")
+                        .addName("%string%", arg));
+                }
             }
 
             if (line.hasOption("seed")) {
@@ -744,7 +786,14 @@ public final class FreeCol {
             }
 
             if (line.hasOption("splash")) {
-                splashFilename = line.getOptionValue("splash");
+                String splash = line.getOptionValue("splash");
+                try {
+                    FileInputStream fis = new FileInputStream(splash);
+                    splashStream = fis;
+                } catch (FileNotFoundException fnfe) {
+                    gripe(StringTemplate.template("cli.error.splash")
+                        .addName("%name%", splash));
+                }
             }
 
             if (line.hasOption("tc")) {
@@ -876,14 +925,10 @@ public final class FreeCol {
      * @return The type of advantages set, or null if none.
      */
     private static Advantages selectAdvantages(String advantages) {
-        for (Advantages a : Advantages.values()) {
-            String msg = Messages.getName(a);
-            if (msg.equals(advantages)) {
-                setAdvantages(a);
-                return a;
-            }
-        }
-        return null;
+        Advantages adv = find(Advantages.values(),
+            a -> Messages.getName(a).equals(advantages), null);
+        if (adv != null) setAdvantages(adv);
+        return adv;
     }
 
     /**
@@ -901,11 +946,8 @@ public final class FreeCol {
      * @return A list of advantage types.
      */
     private static String getValidAdvantages() {
-        String ret = "";
-        for (Advantages a : Advantages.values()) {
-            ret += "," + Messages.getName(a);
-        }
-        return ret.substring(1);
+        return Arrays.stream(Advantages.values())
+            .map(a -> Messages.getName(a)).collect(Collectors.joining(","));
     }
 
     /**
@@ -924,15 +966,10 @@ public final class FreeCol {
      * @return The name of the selected difficulty, or null if none.
      */
     public static String selectDifficulty(String arg) {
-        for (String d : DIFFICULTIES) {
-            String key = "model.difficulty." + d;
-            String value = Messages.getName(key);
-            if (value.equals(arg)) {
-                setDifficulty(key);
-                return key;
-            }
-        }
-        return null;
+        String difficulty = find(map(DIFFICULTIES, d -> "model.difficulty."+d),
+            k -> Messages.getName(k).equals(arg), null);
+        if (difficulty != null) setDifficulty(difficulty);
+        return difficulty;
     }
 
     /**
@@ -960,13 +997,9 @@ public final class FreeCol {
      * @return The valid difficulty levels, comma separated.
      */
     public static String getValidDifficulties() {
-        String s = "";
-        for (String d : DIFFICULTIES) {
-            String key = "model.difficulty." + d;
-            String value = Messages.getName(key);
-            s += "," + value;
-        }
-        return s.substring(1);
+        return Arrays.stream(DIFFICULTIES)
+            .map(d -> Messages.getName("model.difficulty." + d))
+            .collect(Collectors.joining(","));
     }
 
     /**
@@ -1312,7 +1345,7 @@ public final class FreeCol {
             // savegame was specified on command line
         }
         final FreeColClient freeColClient
-            = new FreeColClient(splashFilename, fontName, guiScale, headless);
+            = new FreeColClient(splashStream, fontName, guiScale, headless);
         freeColClient.startClient(windowSize, userMsg, sound, introVideo,
                                   savegame, spec);
     }
@@ -1348,13 +1381,14 @@ public final class FreeCol {
             try {
                 freeColServer = new FreeColServer(publicServer, false, spec,
                                                   serverPort, serverName);
-            } catch (NoRouteToServerException nrtse) {
-                fatal(Messages.message("server.noRouteToServer"));
-                return;
             } catch (Exception e) {
                 fatal(Messages.message("server.initialize")
                     + ": " + e.getMessage());
                 return;
+            }
+            if (publicServer && freeColServer != null
+                && !freeColServer.getPublicServer()) {
+                gripe(Messages.message("server.noRouteToServer"));
             }
         }
 

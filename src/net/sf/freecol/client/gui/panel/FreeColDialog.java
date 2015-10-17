@@ -37,17 +37,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColOptionPaneUI;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -141,11 +145,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return An array of enabled options.
      */
     private Object[] selectOptions() {
-        List<ChoiceItem<T>> actual = new ArrayList<>();
-        for (ChoiceItem<T> c : this.options) {
-            if (c.isEnabled()) actual.add(c);
-        }
-        return actual.toArray();
+        return this.options.stream().filter(ChoiceItem::isEnabled).toArray();
     }
 
     /**
@@ -173,11 +173,14 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         int def = selectDefault(options);
         ChoiceItem<T> ci = (def >= 0) ? options.get(def) : null;
         if (obj instanceof StringTemplate) {
-            obj = Messages.message((StringTemplate)obj);
+            obj = Utility.localizedTextArea((StringTemplate)obj);
+        } else if(obj instanceof String) {
+            obj = Utility.getDefaultTextArea((String)obj);
         }
         this.pane = new JOptionPane(obj, paneType, JOptionPane.DEFAULT_OPTION,
                                     icon, selectOptions(), ci);
         this.pane.setBorder(Utility.DIALOG_BORDER);
+        this.pane.setOpaque(false);
         this.pane.setName("FreeColDialog");
         this.pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
         this.pane.addPropertyChangeListener(this);
@@ -190,6 +193,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         setResizable(false);
         setUndecorated(true);
         setModal(modal);
+
+        setSubcomponentsNotOpaque(this.pane);
         try { // Layout failures might not get logged.
             pack();
         } catch (Exception e) {
@@ -257,6 +262,36 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
             });
     }
 
+    public static void setSubcomponentsNotOpaque(JComponent j) {
+        synchronized(j.getTreeLock()) {
+            iterateOverOpaqueLayersComponents(j);
+        }
+    }
+
+    private static void iterateOverOpaqueLayersComponents(JComponent j){   
+        if (j instanceof JPanel || j instanceof JOptionPane) {            
+           Component[] componentes = j.getComponents();            
+           for (Component componente : componentes) {
+               setOpaqueLayerRecursive(componente);
+           }
+        }    
+    }
+
+    private static void setOpaqueLayerRecursive(Component opaqueComponent) {
+        if (opaqueComponent instanceof JTextArea ||
+            opaqueComponent instanceof JLabel) {
+            if (opaqueComponent.isOpaque()) {
+                ((JComponent) opaqueComponent).setOpaque(false);
+            }
+        } else if (opaqueComponent instanceof JPanel) {
+            JComponent panel = (JComponent)opaqueComponent;
+            if (panel.isOpaque()) {
+                panel.setOpaque(false);
+            }
+            iterateOverOpaqueLayersComponents(panel);
+        }
+    }
+
     /**
      * Get the FreeColClient.
      *
@@ -271,8 +306,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      *
      * @return The <code>GUI</code>.
      */
-    protected GUI getGUI() {
-        return freeColClient.getGUI();
+    protected SwingGUI getGUI() {
+        return (SwingGUI)freeColClient.getGUI();
     }
 
     /**
@@ -428,7 +463,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     public void removeNotify() {
         super.removeNotify();
 
-        freeColClient.getGUI().dialogRemove(FreeColDialog.this);
+        getGUI().dialogRemove(FreeColDialog.this);
 
         removeAll();
         if (this.pane != null) {

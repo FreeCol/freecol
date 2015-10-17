@@ -17,18 +17,14 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common.networking;
+package net.sf.freecol.client.gui;
 
 
 /**
- * Thrown if there is no route to a server.
+ * The interface for non-modal dialog handlers.
  */
-public class NoRouteToServerException extends Exception {
-    
-    /**
-     * The constructor to use.
-     */
-    public NoRouteToServerException() {
-        super();
-    }
-}
+public interface DialogHandler<T> {
+
+    void handle(T response);
+
+};

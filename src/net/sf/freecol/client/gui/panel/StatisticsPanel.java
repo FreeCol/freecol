@@ -23,9 +23,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -40,6 +38,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -158,7 +157,8 @@ public final class StatisticsPanel extends FreeColPanel {
 
         // Retrieve the client and server data
         Map<String, String> serverStatistics = igc().getServerStatistics();
-        Map<String, String> clientStatistics = igc().getClientStatistics();
+        Map<String, String> clientStatistics = freeColClient.getGame()
+            .getStatistics();
 
         // Title
         JPanel header = new JPanel();

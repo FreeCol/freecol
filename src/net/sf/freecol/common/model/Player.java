@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,11 +42,11 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.OptionGroup;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -213,10 +214,9 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private final void update() {
             units.clear();
-            for (Unit u : owner.getUnits()) {
-                if (predicate.obtains(u)) units.add(u);
-            }
-            Collections.sort(units, xyComparator);
+            units.addAll(owner.getUnits().stream()
+                .filter(u -> predicate.obtains(u))
+                .sorted(Unit.locComparator).collect(Collectors.toList()));
         }
 
         /**
@@ -300,24 +300,6 @@ public class Player extends FreeColGameObject implements Nameable {
     //
     // Constants
     //
-
-    /**
-     * A comparator to compare units by position, top to bottom,
-     * left to right.
-     */
-    private static final Comparator<Unit> xyComparator
-        = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit unit1, Unit unit2) {
-                Tile tile1 = unit1.getTile();
-                Tile tile2 = unit2.getTile();
-                int cmp = ((tile1 == null) ? 0 : tile1.getY())
-                    - ((tile2 == null) ? 0 : tile2.getY());
-                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
-                    : (tile1.getX() - tile2.getX());
-            }
-        };
-
 
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
@@ -597,7 +579,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return StringTemplate.label("")
             .add(getRulerNameKey())
             .addName(" (")
-            .addStringTemplate(getNationName())
+            .addStringTemplate(getNationLabel())
             .addName(")");
     }
 
@@ -675,11 +657,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a name key for the nation name.
+     * Gets a resource key for the nation name.
      *
-     * @return A nation name key.
+     * @return A nation resource key.
      */
-    public String getNationNameKey() {
+    public String getNationResourceKey() {
         return lastPart(nationId, ".").toUpperCase(Locale.US);
     }
 
@@ -688,11 +670,24 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return A template for this nation name.
      */
-    public StringTemplate getNationName() {
+    public StringTemplate getNationLabel() {
         return (playerType == PlayerType.REBEL
                 || playerType == PlayerType.INDEPENDENT)
             ? StringTemplate.name(independentNationName)
             : StringTemplate.key(Messages.nameKey(nationId));
+    }
+
+    /**
+     * Get a template for this players country.
+     *
+     * @return A template for this country.
+     */
+    public StringTemplate getCountryLabel() {
+        return (playerType == PlayerType.REBEL
+                || playerType == PlayerType.INDEPENDENT)
+            ? StringTemplate.name(independentNationName)
+            : StringTemplate.template("countryName")
+                .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**
@@ -702,7 +697,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate getForcesLabel() {
         return StringTemplate.template("model.player.forces")
-            .addStringTemplate("%nation%", getNationName());
+            .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**
@@ -712,7 +707,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public StringTemplate getWaitingLabel() {
         return StringTemplate.template("model.player.waitingFor")
-            .addStringTemplate("%nation%", getNationName());
+            .addStringTemplate("%nation%", getNationLabel());
     }
 
     /**
@@ -913,6 +908,41 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Is this player currently on good terms with a given player, and thus
+     * a suitable candidate for a random monarch war declaration?
+     *
+     * @param player The <code>Player</code> to possibly declare war on.
+     * @return True if this player is a potential enemy.
+     */
+    public boolean isPotentialEnemy(Player player) {
+        if (!hasAbility(Ability.IGNORE_EUROPEAN_WARS)
+            && player.getREFPlayer() != this) {
+            switch (getStance(player)) {
+            case PEACE: case CEASE_FIRE: return true;
+            default: break;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Is this player currently on bad terms with a given player, and thus
+     * a suitable candidate for a random monarch peace declaration?
+     *
+     * @param player The <code>Player</code> to possibly declare peace with.
+     * @return True if this player is a potential friend.
+     */
+    public boolean isPotentialFriend(Player player) {
+        if (player.getREFPlayer() != this) {
+            switch (getStance(player)) {
+            case WAR: case CEASE_FIRE: return true;
+            default: break;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the nation type of this player.
      *
      * @return The <code>NationType</code> of this player.
@@ -1092,10 +1122,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *     world or a nation is in rebellion against us.
      */
     public boolean isWorkForREF() {
-        for (Unit u : getUnits()) { // Work to do if unit in the new world
-            if (u.hasTile()) return true;
-        }
-        return !getRebels().isEmpty();
+        return (any(getUnits(), Unit::hasTile))
+            ? true // Work to do still if there exists a unit in the new world
+            : !getRebels().isEmpty();
     }
 
     /**
@@ -1104,12 +1133,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of nations in rebellion against us.
      */
     public List<Player> getRebels() {
-        List<Player> rebels = new ArrayList<>();
-        for (Player p : getGame().getLiveEuropeanPlayers(this)) {
-            if (p.getREFPlayer() == this
-                && (p.isRebel() || p.isUndead())) rebels.add(p);
-        }
-        return rebels;
+        return getGame().getLiveEuropeanPlayers(this).stream()
+            .filter(p -> p.getREFPlayer() == this
+                && (p.isRebel() || p.isUndead()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1121,7 +1148,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Player getREFPlayer() {
         Nation ref = getNation().getREFNation();
-        return (ref == null) ? null : getGame().getPlayer(ref.getId());
+        return (ref == null) ? null : getGame().getPlayerByNation(ref);
     }
 
     /**
@@ -1359,13 +1386,11 @@ public class Player extends FreeColGameObject implements Nameable {
         
         final List<GoodsType> immigrationGoodsTypes = getSpecification()
             .getImmigrationGoodsTypeList();
-        int production = 0;
-        for (Colony colony : getColonies()) {
-            for (GoodsType goodsType : immigrationGoodsTypes) {
-                production += colony.getTotalProductionOf(goodsType);
-            }
-        }
-        Europe europe = getEurope();
+        int production = getColonies().stream()
+            .mapToInt(c -> immigrationGoodsTypes.stream()
+                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
+            .sum();
+        final Europe europe = getEurope();
         if (europe != null) production += europe.getImmigration(production);
         return production;
     }
@@ -1449,13 +1474,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Colony</code>s will make next turn.
      */
     public int getLibertyProductionNextTurn() {
-        int nextTurn = 0;
-        for (Colony colony : getColonies()) {
-            for (GoodsType libertyGoods : getSpecification()
-                     .getLibertyGoodsTypeList()) {
-                nextTurn += colony.getTotalProductionOf(libertyGoods);
-            }
-        }
+        final Specification spec = getSpecification();
+        int nextTurn = getColonies().stream()
+            .mapToInt(c -> spec.getLibertyGoodsTypeList().stream()
+                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
+            .sum();
         return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
                                    Modifier.LIBERTY);
     }
@@ -1466,13 +1489,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The total percentage of rebels in all this player's colonies.
      */
     public int getSoL() {
-        int sum = 0;
-        int number = 0;
-        for (Colony c : getColonies()) {
-            sum += c.getSoL();
-            number++;
-        }
-        return (number > 0) ? sum / number : 0;
+        final List<Colony> colonies = getColonies();
+        return (colonies.isEmpty()) ? 0
+            : colonies.stream().mapToInt(c -> c.getSoL()).sum()
+                / colonies.size();
     }
 
     /**
@@ -1618,16 +1638,13 @@ public class Player extends FreeColGameObject implements Nameable {
     public StringTemplate checkDeclareIndependence() {
         if (getPlayerType() != PlayerType.COLONIAL)
             return StringTemplate.template("model.player.colonialIndependence");
-        Event event = getSpecification()
+        final Event event = getSpecification()
             .getEvent("model.event.declareIndependence");
-        for (Limit limit : event.getLimits()) {
-            if (!limit.evaluate(this)) {
-                return StringTemplate.template(limit.getDescriptionKey())
-                    .addAmount("%limit%",
-                        limit.getRightHandSide().getValue(getGame()));
-            }
-        }
-        return null;
+        Limit limit = find(event.getLimits(), l -> !l.evaluate(this));
+        return (limit == null) ? null
+            : StringTemplate.template(limit.getDescriptionKey())
+                .addAmount("%limit%", limit.getRightHandSide()
+                    .getValue(getGame()));
     }
 
     /**
@@ -1638,13 +1655,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int calculateStrength(boolean naval) {
         final CombatModel cm = getGame().getCombatModel();
-        int s = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.isNaval() == naval) {
-                s += cm.getOffencePower(unit, null);
-            }
-        }
-        return s;
+        return (int)getUnits().stream()
+            .filter(u -> u.isNaval() == naval)
+            .mapToDouble(u -> cm.getOffencePower(u, null)).sum();
     }
 
     /**
@@ -1765,22 +1778,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if type of goods can be traded.
      */
     public boolean canTrade(GoodsType type, Market.Access access) {
-        if (getMarket().getArrears(type) == 0) return true;
-
-        if (access == Market.Access.CUSTOM_HOUSE) {
-            if (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
-                return true;
-            }
-            if (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)) {
-                for (Player other : getGame().getLiveEuropeanPlayers(this)) {
-                    if (getStance(other) == Stance.PEACE
-                        || getStance(other) == Stance.ALLIANCE) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return getMarket().getArrears(type) == 0
+            || (access == Market.Access.CUSTOM_HOUSE
+                && (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
+                    || (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)
+                        && any(getGame().getLiveEuropeanPlayers(this),
+                            p -> getStance(p) == Stance.PEACE
+                                || getStance(p) == Stance.ALLIANCE))));
     }
 
     /**
@@ -1934,18 +1938,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getPrice(AbstractUnit au) {
         final Specification spec = getSpecification();
-        UnitType unitType = au.getType(spec);
-        Role role = au.getRole(spec);
-        if (unitType.hasPrice()) {
-            int price = getEurope().getUnitPrice(unitType);
-            for (AbstractGoods goods : role.getRequiredGoods()) {
-                int amount = goods.getAmount() * role.getMaximumCount();
-                price += getMarket().getBidPrice(goods.getType(), amount);
-            }
-            return price * au.getNumber();
-        } else {
-            return INFINITY;
-        }
+        final UnitType unitType = au.getType(spec);
+        if (!unitType.hasPrice()) return INFINITY;
+
+        return au.getNumber() * (getEurope().getUnitPrice(unitType)
+            + au.getRole(spec).getRequiredGoodsPrice(getMarket()));
     }
 
     /**
@@ -2001,11 +1998,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param name The name of the unit.
      * @return The unit with the given name, or null if none found.
      */
-    public Unit getUnit(String name) {
-        for (Unit u : units) {
-            if (name.equals(u.getName())) return u;
-        }
-        return null;
+    public Unit getUnitByName(String name) {
+        return find(units, u -> name.equals(u.getName()));
     }
 
     /**
@@ -2067,11 +2061,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        List<Unit> ul = new ArrayList<>();
-        for (Unit u : getUnits()) {
-            if (u.couldCarry(unit)) ul.add(u);
-        }
-        return ul;
+        return getUnits().stream()
+            .filter(u -> u.couldCarry(unit))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2081,11 +2073,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units.
      */
     public int getUnitCount(boolean naval) {
-        int ret = 0;
-        for (Unit u : getUnits()) {
-            if (u.isNaval() == naval) ret++;
-        }
-        return ret;
+        return (int)getUnits().stream()
+            .filter(u -> u.isNaval() == naval)
+            .count();
     }
         
     /**
@@ -2094,16 +2084,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units
      */
     public int getNumberOfKingLandUnits() {
-        int n = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.hasAbility(Ability.REF_UNIT) && !unit.isNaval()) {
-                n++;
-            }
-        }
-        return n;
+        return (int)getUnits().stream()
+            .filter(u -> u.hasAbility(Ability.REF_UNIT) && !u.isNaval())
+            .count();
     }
-
- 
 
     /**
      * Checks if this player has at least one of a given unit type.
@@ -2112,10 +2096,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player owns at least one of the specified unit type.
      */
     public boolean hasUnitType(String typeId) {
-        for (Unit u : getUnits()) {
-            if (typeId.equals(u.getType().getId())) return true;
-        }
-        return false;
+        return any(getUnits(), u -> typeId.equals(u.getType().getId()));
     }
 
     /**
@@ -2215,11 +2196,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param name The trade route name.
      */
-    public TradeRoute getTradeRoute(String name) {
-        for (TradeRoute t : tradeRoutes) {
-            if (t.getName().equals(name)) return t;
-        }
-        return null;
+    public TradeRoute getTradeRouteByName(String name) {
+        return find(tradeRoutes, t -> t.getName().equals(name));
     }
 
     /**
@@ -2308,12 +2286,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of port <code>Colony</code>s.
      */
     public List<Colony> getPorts() {
-        if (!isEuropean()) return Collections.<Colony>emptyList();
-        List<Colony> result = new ArrayList<>();
-        for (Colony colony : getColonies()) {
-            if (colony.isConnectedPort()) result.add(colony);
-        }
-        return result;
+        return (!isEuropean())
+            ? Collections.<Colony>emptyList()
+            : getColonies().stream()
+                .filter(Colony::isConnectedPort)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -2360,9 +2337,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The sum of the units currently working in the colonies.
      */
     public int getColoniesPopulation() {
-        int i = 0;
-        for (Colony c : getColonies()) i += c.getUnitCount();
-        return i;
+        return getColonies().stream()
+            .mapToInt(c -> c.getUnitCount()).sum();
     }
 
     /**
@@ -2373,10 +2349,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     not found.
      */
     public Colony getColonyByName(String name) {
-        for (Colony colony : getColonies()) {
-            if (colony.getName().equals(name)) return colony;
-        }
-        return null;
+        return find(getColonies(), c -> c.getName().equals(name));
     }
 
     /**
@@ -2387,10 +2360,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     or null if not found.
      */
     public IndianSettlement getIndianSettlementByName(String name) {
-        for (IndianSettlement settlement : getIndianSettlements()) {
-            if (settlement.getName().equals(name)) return settlement;
-        }
-        return null;
+        return find(getIndianSettlements(), is -> is.getName().equals(name));
     }
 
     /**
@@ -2494,11 +2464,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
-        List<ModelMessage> out = new ArrayList<>();
-        for (ModelMessage m : getModelMessages()) {
-            if (!m.hasBeenDisplayed()) out.add(m); // preserve message order
+        synchronized (modelMessages) {
+            return modelMessages.stream()
+                .filter(m -> !m.hasBeenDisplayed())
+                .collect(Collectors.toList());
         }
-        return out;
     }
 
     /**
@@ -2582,12 +2552,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add the tutorial message for the start of the game.
      */
     public void addStartGameMessage() {
-        Direction sailDirection = (getNation().startsOnEastCoast())
-            ? Direction.W
-            : Direction.E;
+        Tile tile = getEntryLocation().getTile();
+        String sailTag = (tile == null) ? "unknown"
+            : (tile.getX() < tile.getMap().getWidth() / 2) ? "east"
+            : "west";
         addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                          "model.player.startGame", this)
-            .addNamed("%direction%", sailDirection));
+            .add("%direction%", sailTag));
     }
 
     /**
@@ -2633,6 +2604,21 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setEntryLocation(Location entryLocation) {
         this.entryLocation = entryLocation;
+    }
+
+    /**
+     * Get a default tile to display at the start of the player turn should
+     * there not be any active units.
+     *
+     * Favour the first settlement, followed by the entry tile.
+     * 
+     * @return A suitable <code>Tile</code>.
+     */
+    public Tile getFallbackTile() {
+        List<Settlement> settlements = getSettlements();
+        return (!settlements.isEmpty())
+            ? settlements.get(0).getTile()
+            : getEntryLocation().getTile();
     }
 
     /**
@@ -2971,10 +2957,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is at war with any other.
      */
     public boolean isAtWar() {
-        for (Player player : getGame().getLivePlayers(null)) {
-            if (atWarWith(player)) return true;
-        }
-        return false;
+        return any(getGame().getLivePlayers(null), p -> atWarWith(p));
     }
 
     /**
@@ -2993,10 +2976,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any Europeans.
      */
     public boolean hasContactedEuropeans() {
-        for (Player other : getGame().getLiveEuropeanPlayers(this)) {
-            if (hasContacted(other)) return true;
-        }
-        return false;
+        return any(getGame().getLiveEuropeanPlayers(this),
+            p -> hasContacted(p));
     }
 
     /**
@@ -3005,10 +2986,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this <code>Player</code> has contacted any natives.
      */
     public boolean hasContactedIndians() {
-        for (Player other : getGame().getLiveNativePlayers(this)) {
-            if (hasContacted(other)) return true;
-        }
-        return false;
+        return any(getGame().getLiveNativePlayers(this),
+            p -> hasContacted(p));
     }
 
     /**
@@ -3036,7 +3015,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getLandPrice(Tile tile) {
         final Specification spec = getSpecification();
         Player nationOwner = tile.getOwner();
-        int price = 0;
 
         if (nationOwner == null || nationOwner == this) {
             return 0; // Freely available
@@ -3050,15 +3028,12 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
-        for (GoodsType type : spec.getGoodsTypeList()) {
-            if (type == spec.getPrimaryFoodType()) {
+        int price = spec.getInteger(GameOptions.LAND_PRICE_FACTOR)
+            * spec.getGoodsTypeList().stream()
                 // Only consider specific food types, not the aggregation.
-                continue;
-            }
-            price += tile.getPotentialProduction(type, null);
-        }
-        price *= spec.getInteger(GameOptions.LAND_PRICE_FACTOR);
-        price += 100;
+                .filter(gt -> gt != spec.getPrimaryFoodType())
+                .mapToInt(gt -> tile.getPotentialProduction(gt, null)).sum()
+            + 100;
         return (int)applyModifiers(price, getGame().getTurn(),
                                    Modifier.LAND_PAYMENT_MODIFIER);
     }
@@ -3181,13 +3156,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The reason why/not the tile can be owned by this player.
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
-        for (Unit u : tile.getUnitList()) {
-            Player owner = u.getOwner();
-            if (owner == this) break; // Not hostile
-            // If the unit is military, the tile is held against us.
-            if (u.isOffensiveUnit()) return NoClaimReason.OCCUPIED;
-        }
-        return (isEuropean())
+        return (any(tile.getUnitList(),
+                u -> u.getOwner() != this && u.isOffensiveUnit()))
+            ? NoClaimReason.OCCUPIED // The tile is held against us
+            : (isEuropean())
             ? ((tile.hasLostCityRumour())
                 ? NoClaimReason.RUMOUR
                 : NoClaimReason.NONE)
@@ -3780,10 +3752,8 @@ public class Player extends FreeColGameObject implements Nameable {
             Specification spec = getSpecification();
             for (UnitType unitType : spec.getUnitTypeList()) {
                 if (unitType.isAvailableTo(this)) {
-                    int foodConsumption = 0;
-                    for (GoodsType foodType : spec.getFoodGoodsTypeList()) {
-                        foodConsumption += unitType.getConsumptionOf(foodType);
-                    }
+                    int foodConsumption = spec.getFoodGoodsTypeList().stream()
+                        .mapToInt(ft -> unitType.getConsumptionOf(ft)).sum();
                     if (foodConsumption > maximumFoodConsumption) {
                         maximumFoodConsumption = foodConsumption;
                     }

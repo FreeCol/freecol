@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.miginfocom.swing.MigLayout;
@@ -60,13 +61,8 @@ public class ConceptDetailPanel extends FreeColPanel
     };
 
     private static final Comparator<DefaultMutableTreeNode> nodeComparator
-        = new Comparator<DefaultMutableTreeNode>() {
-        @Override
-        public int compare(DefaultMutableTreeNode node1, DefaultMutableTreeNode node2) {
-            return ((ColopediaTreeItem) node1.getUserObject()).getText()
-            .compareTo(((ColopediaTreeItem) node2.getUserObject()).getText());
-        }
-    };
+        = Comparator.comparing(tn ->
+            ((ColopediaTreeItem)tn.getUserObject()).getText());
 
     private ColopediaPanel colopediaPanel;
 
@@ -89,22 +85,22 @@ public class ConceptDetailPanel extends FreeColPanel
         return Messages.getName(id);
     }
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode node =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, id, getName(), null));
+        DefaultMutableTreeNode node
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,
+                    getName(), null));
         List<DefaultMutableTreeNode> nodes = new ArrayList<>();
         for (String concept : concepts) {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.getName(nodeId);
-            nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this, nodeId, nodeName, null)));
+            nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this,
+                        nodeId, nodeName, null)));
         }
         Collections.sort(nodes, nodeComparator);
         for (DefaultMutableTreeNode n : nodes) {
@@ -114,25 +110,20 @@ public class ConceptDetailPanel extends FreeColPanel
     }
 
     /**
-     * Builds the details panel for the given identifier.
-     *
-     * @param id The object identifier to display.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (ConceptDetailPanel.id.equals(id)) {
-            return;
-        }
+        if (this.id.equals(id)) return;
 
         panel.setLayout(new MigLayout("wrap 1, center"));
 
-        JLabel header = Utility.localizedLabel(Messages.nameKey(id));
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel header = Utility.localizedHeaderLabel(Messages.nameKey(id),
+            SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
         panel.add(header, "align center, wrap 20");
 
-        JEditorPane editorPane = new JEditorPane("text/html", Messages.getDescription(id)) {
+        JEditorPane editorPane = new JEditorPane("text/html",
+            Messages.getDescription(id)) {
 
             @Override
             public void paintComponent(Graphics g) {
@@ -145,11 +136,9 @@ public class ConceptDetailPanel extends FreeColPanel
                 graphics2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
                                             RenderingHints.VALUE_FRACTIONALMETRICS_ON);
                 */
-
                 super.paintComponent(graphics2d);
             }
         };
-
         editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
                                      Boolean.TRUE);
         editorPane.setFont(panel.getFont());
@@ -158,19 +147,5 @@ public class ConceptDetailPanel extends FreeColPanel
         editorPane.addHyperlinkListener(colopediaPanel);
 
         panel.add(editorPane, "width 95%");
-
-    }
-
-    // Override Component
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
-
-        removeAll();
-        colopediaPanel = null;
     }
 }

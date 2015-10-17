@@ -48,7 +48,7 @@ public class LimitTest extends FreeColTestCase {
     public void testWagonTrainLimit() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
@@ -78,7 +78,7 @@ public class LimitTest extends FreeColTestCase {
 
     public void testIndependenceLimits() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 
@@ -135,16 +135,17 @@ public class LimitTest extends FreeColTestCase {
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
 
-        IntegerOption option = spec().getIntegerOption(GameOptions.LAST_COLONIAL_YEAR);
+        IntegerOption option = spec()
+            .getIntegerOption(GameOptions.LAST_COLONIAL_YEAR);
+        option.setMinimumValue(1300);
         option.setValue(1300);
         assertFalse(yearLimit.evaluate(dutch));
-
     }
 
     public void testSuccessionLimits() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 

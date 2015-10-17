@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -276,12 +277,9 @@ public class FoundingFather extends FreeColGameObjectType {
      * @return True if the father is available.
      */
     public boolean isAvailableTo(Player player) {
-        if (!player.isEuropean()) return false;
-        if (scopes == null) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(player)) return true;
-        }
-        return false;
+        return (!player.isEuropean()) ? false
+            : (scopes == null) ? true
+            : any(scopes, s -> s.appliesTo(player));
     }
 
 

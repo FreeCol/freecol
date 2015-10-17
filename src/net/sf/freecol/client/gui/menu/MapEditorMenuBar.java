@@ -20,8 +20,8 @@
 package net.sf.freecol.client.gui.menu;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
@@ -31,7 +31,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.Utility;
@@ -62,12 +61,13 @@ public class MapEditorMenuBar extends FreeColMenuBar {
      * all of the submenus and items.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param listener An optional mouse motion listener.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient, MapViewer mapViewer) {
+    public MapEditorMenuBar(final FreeColClient freeColClient, MouseMotionListener listener) {
         super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient, mapViewer));
+        this.addMouseMotionListener(listener);
         reset();
     }
 
@@ -101,24 +101,20 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
         JMenuItem playItem = Utility.localizedMenuItem("startGame");
-        playItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File startFile = FreeColDirectories.getStartMapFile();
-                    freeColClient.getMapEditorController()
-                        .saveGame(startFile);
-                    OptionGroup options = freeColClient.getGame()
-                        .getMapGeneratorOptions();
-                    FileOption fileOption = (FileOption)options
-                        .getOption(MapGeneratorOptions.IMPORT_FILE);
-                    fileOption.setValue(startFile);
-                    File mapOptionsFile = FreeColDirectories
-                        .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-                    try {
-                        options.save(mapOptionsFile);
-                    } catch (FileNotFoundException fnfe) {}
-                    freeColClient.newGame();
-                }
+        playItem.addActionListener((ActionEvent ae) -> {
+                File startFile = FreeColDirectories.getStartMapFile();
+                freeColClient.getMapEditorController().saveGame(startFile);
+                OptionGroup options = freeColClient.getGame()
+                    .getMapGeneratorOptions();
+                FileOption fileOption = (FileOption)options
+                    .getOption(MapGeneratorOptions.IMPORT_FILE);
+                fileOption.setValue(startFile);
+                File mapOptionsFile = FreeColDirectories
+                    .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
+                try {
+                    options.save(mapOptionsFile);
+                } catch (FileNotFoundException fnfe) {}
+                freeColClient.newGame(true);
             });
         menu.add(playItem);
         menu.addSeparator();

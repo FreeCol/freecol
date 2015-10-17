@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -100,9 +101,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @param settlementType The <code>SettlementType</code> to add.
      */
     private void addSettlementType(SettlementType settlementType) {
-        if (settlementTypes == null) {
-            settlementTypes = new ArrayList<>();
-        }
+        if (settlementTypes == null) settlementTypes = new ArrayList<>();
         settlementTypes.add(settlementType);
     }
 
@@ -112,9 +111,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @param types A list of <code>SettlementType</code>s to add.
      */
     private void addSettlementTypes(List<SettlementType> types) {
-        if (settlementTypes == null) {
-            settlementTypes = new ArrayList<>();
-        }
+        if (settlementTypes == null) settlementTypes = new ArrayList<>();
         settlementTypes.addAll(types);
     }
 
@@ -134,12 +131,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @return The settlement type.
      */
     public SettlementType getSettlementType(boolean isCapital) {
-        for (SettlementType settlementType : getSettlementTypes()) {
-            if (settlementType.isCapital() == isCapital) {
-                return settlementType;
-            }
-        }
-        return null;
+        return find(getSettlementTypes(), s -> s.isCapital() == isCapital);
     }
 
     /**
@@ -149,10 +141,7 @@ public abstract class NationType extends FreeColGameObjectType {
      * @return The settlement type.
      */
     public SettlementType getSettlementType(String id) {
-        for (SettlementType settlementType : getSettlementTypes()) {
-            if (id.equals(settlementType.getId())) return settlementType;
-        }
-        return null;
+        return find(getSettlementTypes(), s -> id.equals(s.getId()));
     }
 
     /**

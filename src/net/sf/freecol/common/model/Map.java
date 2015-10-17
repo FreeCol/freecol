@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 // @compat 0.10.x
 import net.sf.freecol.server.generator.TerrainGenerator;
@@ -119,14 +120,10 @@ public class Map extends FreeColGameObject implements Location {
          * @param direction An optional <code>Direction</code> to step.
          */
         public Position(Position start, Direction direction) {
-            int xx = start.x, yy = start.y;
-            if (direction != null) {
-                Position step = direction.step(xx, yy);
-                xx = step.x;
-                yy = step.y;
-            }
-            this.x = xx;
-            this.y = yy;
+            Position step = (direction == null) ? start
+                : direction.step(start.x, start.y);
+            this.x = step.x;
+            this.y = step.y;
         }
 
 
@@ -205,11 +202,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return The <code>Direction</code>, or null if not adjacent.
          */
         public Direction getDirection(Position other) {
-            for (Direction d : Direction.values()) {
-                Position step = d.step(x, y);
-                if (step.x == other.x && step.y == other.y) return d;
-            }
-            return null;
+            return find(Direction.values(),
+                d -> new Position(this, d).equals(other), null);
         }
 
         // Override Object
@@ -394,7 +388,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The width of this map.
      */
     public int getWidth() {
-        return (tiles == null) ? 0 : tiles.length;
+        return tiles.length;
     }
 
     /**
@@ -403,7 +397,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The height of this map.
      */
     public int getHeight() {
-        return (tiles == null) ? 0 : tiles[0].length;
+        return tiles[0].length;
     }
 
     public final Layer getLayer() {
@@ -506,11 +500,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The region with the given name key, or null if not found.
      */
     public Region getRegionByKey(final String key) {
-        if (key == null) return null;
-        for (Region r : regions) {
-            if (key.equals(r.getKey())) return r;
-        }
-        return null;
+        return (key == null) ? null
+            : find(getRegions(), r -> key.equals(r.getKey()));
     }
 
     /**
@@ -521,11 +512,8 @@ public class Map extends FreeColGameObject implements Location {
      *     not found.
      */
     public Region getRegionByName(final String name) {
-        if (name == null) return null;
-        for (Region r : regions) {
-            if (name.equals(r.getName())) return r;
-        }
-        return null;
+        return (name == null) ? null
+            : find(getRegions(), r -> name.equals(r.getName()));
     }
 
     /**
@@ -591,12 +579,8 @@ public class Map extends FreeColGameObject implements Location {
      *      specified tiles are not neighbours.
      */
     public Direction getDirection(Tile t1, Tile t2) {
-        for (Direction d : Direction.values()) {
-            Position step = d.step(t1.getX(), t1.getY());
-            if (step.x == t2.getX()
-                && step.y == t2.getY()) return d;
-        }
-        return null;
+        return (t1 == null || t2 == null) ? null
+            : new Position(t1).getDirection(new Position(t2));
     }
 
     /**
@@ -626,8 +610,7 @@ public class Map extends FreeColGameObject implements Location {
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
-        Position step = direction.step(x, y);
-        return getTile(step.x, step.y);
+        return getTile(direction.step(x, y));
     }
 
     /**
@@ -706,7 +689,7 @@ public class Map extends FreeColGameObject implements Location {
      * Simple interface to supply a heuristic to the A* routine.
      */
     private interface SearchHeuristic {
-        public int getValue(Tile tile);
+        int getValue(Tile tile);
     }
 
     /**
@@ -715,14 +698,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param endTile The <code>Tile</code> to aim for.
      * @return A new <code>SearchHeuristic</code> aiming for the end tile.
      */
-    private SearchHeuristic getManhattenHeuristic(final Tile endTile) {
-        return new SearchHeuristic() {
-            // Manhatten distance to the end tile.
-            @Override
-            public int getValue(Tile tile) {
-                return tile.getDistanceTo(endTile);
-            }
-        };
+    private SearchHeuristic getManhattenHeuristic(Tile endTile) {
+        return (Tile tile) -> tile.getDistanceTo(endTile);
     }
 
     /**
@@ -1961,6 +1938,42 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Iterates through a rectangular subpart of the Map.
+     * Intentionally avoids calling methods doing redundant checks,
+     * which would slow down map display.
+     * 
+     * @param x X-component of the position of first tile.
+     * @param y Y-component of the position of first tile.
+     * @param w Width of the rectangle.
+     * @param h Height of the rectangle.
+     * @param consumer Provides a function to call for each tile.
+     */
+    public void forSubMap(int x, int y, int w, int h,
+                          java.util.function.Consumer<Tile> consumer) {
+        if (x < 0) {
+            w += x;
+            x = 0;
+        }
+        if (y < 0) {
+            h += y;
+            y = 0;
+        }
+        if (w <= 0 || h <= 0)
+            return;
+        int width = getWidth();
+        int height = getHeight();
+        if (x > width || y > height)
+            return;
+        if (x+w > width)
+            w = width - x;
+        if (y+h > height)
+            h = height - y;
+        for (int yi = y; yi < y+h; ++yi)
+            for (int xi = x; xi < x+w; ++xi)
+                consumer.accept(tiles[xi][yi]);
+    }
+
+    /**
      * Flood fills from a given <code>Position</code> p, based on
      * connectivity information encoded in boolmap
      *
@@ -2408,6 +2421,14 @@ public class Map extends FreeColGameObject implements Location {
     @Override
     public Location up() {
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getRank() {
+        return Location.LOCATION_RANK_NOWHERE;
     }
 
     /**

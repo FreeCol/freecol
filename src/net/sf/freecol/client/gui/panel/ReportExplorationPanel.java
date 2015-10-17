@@ -78,7 +78,7 @@ public final class ReportExplorationPanel extends ReportPanel {
          * Header Row
          */
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, getImageLibrary().getScalingFactor());
+            FontLibrary.FontSize.TINY, Font.BOLD, getImageLibrary().getScaleFactor());
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
         nameOfRegion.setFont(font);
         reportPanel.add(nameOfRegion);
@@ -106,7 +106,7 @@ public final class ReportExplorationPanel extends ReportPanel {
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()
                     .getLabel()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredBy()
-                    .getNationName()));
+                    .getCountryLabel()));
             reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));
         }
     }

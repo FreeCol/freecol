@@ -31,17 +31,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe;
@@ -51,10 +49,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -75,16 +71,16 @@ import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
+
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -446,7 +442,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void cheat(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
-        if (!aiMain.getFreeColServer().isSinglePlayer()) return;
+        if (!aiMain.getFreeColServer().getSinglePlayer()) return;
 
         final Player player = getPlayer();
         if (player.getPlayerType() != PlayerType.COLONIAL) return;
@@ -459,9 +455,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Random air = getAIRandom();
         final List<GoodsType> arrears = new ArrayList<>();
         if (market != null) {
-            for (GoodsType gt : spec.getGoodsTypeList()) {
-                if (market.getArrears(gt) > 0) arrears.add(gt);
-            }
+            arrears.addAll(spec.getGoodsTypeList().stream()
+                .filter(gt -> market.getArrears(gt) > 0)
+                .collect(Collectors.toList()));
         }
         final int nCheats = arrears.size() + 6; // 6 cheats + arrears
         int[] randoms = randomInts(logger, "cheats", air, 100, nCheats);
@@ -1081,7 +1077,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             TransportableAIObject t = w.getTransportable();
             if (t != null && t.getTransport() == null
                 && t.getTransportDestination() != null) {
-                Location loc = upLoc(t.getTransportDestination());
+                Location loc = Location.upLoc(t.getTransportDestination());
                 appendToMapList(transportDemand, loc, w);
             }
         }
@@ -1202,7 +1198,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A list of <code>WorkerWish</code>es.
      */
     public List<WorkerWish> getWorkerWishesAt(Location loc, UnitType type) {
-        List<Wish> demand = transportDemand.get(upLoc(loc));
+        List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         if (demand == null) return Collections.<WorkerWish>emptyList();
         List<WorkerWish> result = new ArrayList<>();
         for (Wish w : demand) {
@@ -1222,7 +1218,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A list of <code>GoodsWish</code>es.
      */
     public List<GoodsWish> getGoodsWishesAt(Location loc, GoodsType type) {
-        List<Wish> demand = transportDemand.get(upLoc(loc));
+        List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         if (demand == null) return Collections.<GoodsWish>emptyList();
         List<GoodsWish> result = new ArrayList<>();
         for (Wish w : demand) {
@@ -1246,35 +1242,24 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (wishes == null) return null;
 
         final Unit carrier = aiUnit.getUnit();
-        WorkerWish nonTransported = null;
-        WorkerWish transported = null;
-        float bestNonTransportedValue = -1.0f;
-        float bestTransportedValue = -1.0f;
+        WorkerWish carried = null;
+        WorkerWish other = null;
+        double bestCarriedValue = -1.0, bestOtherValue = -1.0;
         for (WorkerWish w : wishes) {
-            int turns;
-            try {
-                turns = carrier.getTurnsToReach(w.getDestination());
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Bogus wish destination for "
-                    + aiUnit + ": " + w.getDestination()
-                    + " for wish: " + w, e);
-                continue;
-            }
-            if (turns == INFINITY) {
-                if (bestTransportedValue < w.getValue()) {
-                    bestTransportedValue = w.getValue();
-                    transported = w;
+            int turns = carrier.getTurnsToReach(w.getDestination());
+            if (turns < Unit.MANY_TURNS) {
+                if (bestCarriedValue < (double)w.getValue() / turns) {
+                    bestCarriedValue = (double)w.getValue() / turns;
+                    carried = w;
                 }
             } else {
-                if (bestNonTransportedValue < (float)w.getValue() / turns) {
-                    bestNonTransportedValue = (float)w.getValue() / turns;
-                    nonTransported = w;
+                if (bestOtherValue < w.getValue()) {
+                    bestOtherValue = w.getValue();
+                    other = w;
                 }
             }
         }
-        return (nonTransported != null) ? nonTransported
-            : (transported != null) ? transported
-            : null;
+        return (carried != null) ? carried : (other != null) ? other : null;
     }
 
     /**
@@ -1289,14 +1274,14 @@ public class EuropeanAIPlayer extends AIPlayer {
         if (wishes == null) return null;
 
         final Unit carrier = aiUnit.getUnit();
-        float bestValue = 0.0f;
+        double bestValue = 0.0f;
         GoodsWish best = null;
         for (GoodsWish w : wishes) {
             int turns = carrier.getTurnsToReach(carrier.getLocation(),
                                                 w.getDestination());
-            if (turns == INFINITY) continue;
-            float value = (float)w.getValue() / turns;
-            if (bestValue > value) {
+            if (turns >= Unit.MANY_TURNS) continue;
+            double value = (double)w.getValue() / turns;
+            if (bestValue < value) {
                 bestValue = value;
                 best = w;
             }
@@ -2142,7 +2127,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int ttr = 1 + unit.getTurnsToReach(loc, colony.getTile(),
                     unit.getCarrier(),
                     ((relaxed) ? CostDeciders.numberOfTiles() : null));
-                if (ttr < 0) continue;
+                if (ttr >= Unit.MANY_TURNS) continue;
                 double value = colony.getDefenceRatio() * 100.0 / ttr;
                 if (worstValue > value) {
                     worstValue = value;
@@ -2784,17 +2769,14 @@ public class EuropeanAIPlayer extends AIPlayer {
             lb.add(((ret) ? "accepted" : "rejected"),
                    ": special-goods-in-turn-", turn, ".");
         } else {
-            int averageIncome = 0;
-            int numberOfGoods = 0;
             // FIXME: consider the amount of goods produced. If we
             // depend on shipping huge amounts of cheap goods, we
             // don't want these goods to be boycotted.
-            List<GoodsType> goodsTypes = getSpecification().getStorableGoodsTypeList();
-            for (GoodsType type : goodsTypes) {
-                averageIncome += getPlayer().getIncomeAfterTaxes(type);
-                numberOfGoods++;
-            }
-            averageIncome /= numberOfGoods;
+            final List<GoodsType> goodsTypes = getSpecification()
+                .getStorableGoodsTypeList();
+            int averageIncome = goodsTypes.stream()
+                .mapToInt(gt -> getPlayer().getIncomeAfterTaxes(gt)).sum()
+                / goodsTypes.size();
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
             ret = income <= 0 || income > averageIncome;
             lb.add(((ret) ? "accepted" : "rejected"),

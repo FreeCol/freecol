@@ -166,8 +166,8 @@ public class TransportMission extends Mission {
                                 other.getOwner()) != null) return false;
         final Unit carrier = getUnit();
         final CombatModel cm = getGame().getCombatModel();
-        float offence = cm.getOffencePower(carrier, other)
-            * ((carrier.hasCargo()) ? 0.3f : 0.80f);
+        double offence = cm.getOffencePower(carrier, other)
+            * ((carrier.hasCargo()) ? 0.3 : 0.80);
         return offence > cm.getOffencePower(other, carrier);
     }
 
@@ -183,11 +183,9 @@ public class TransportMission extends Mission {
      * @return A copy of the list of cargoes.
      */
     private List<Cargo> tCopy() {
-        List<Cargo> nxt;
         synchronized (cargoes) {
-            nxt = new ArrayList<>(cargoes);
+            return new ArrayList<>(cargoes);
         }
-        return nxt;
     }
 
     /**
@@ -245,16 +243,9 @@ public class TransportMission extends Mission {
      * @return The <code>Cargo</code> found, or null if none found.
      */
     private Cargo tFind(TransportableAIObject t) {
-        Cargo result = null;
         synchronized (cargoes) {
-            for (Cargo cargo : cargoes) {
-                if (cargo.getTransportable() == t) {
-                    result = cargo;
-                    break;
-                }
-            }
+            return find(cargoes, c -> c.getTransportable() == t);
         }
-        return result;
     }
 
     /**
@@ -263,16 +254,9 @@ public class TransportMission extends Mission {
      * @return The first valid cargo, or null if none found.
      */
     private Cargo tFirst() {
-        Cargo cargo = null;
         synchronized (cargoes) {
-            for (Cargo c : cargoes) {
-                if (c.isValid()) {
-                    cargo = c;
-                    break;
-                }
-            }
+            return find(cargoes, Cargo::isValid);
         }
-        return cargo;
     }
 
     /**
@@ -342,17 +326,12 @@ public class TransportMission extends Mission {
      * Reset the carrier target after a change to the first cargo.
      */
     private void tRetarget() {
-        Location next = null;
+        Cargo c;
         synchronized (cargoes) {
-            for (Cargo cargo : cargoes) {
-                if (cargo.isValid()) {
-                    next = cargo.getCarrierTarget();
-                    break;
-                }
-            }
-            if (next == null) next = getAIUnit().getTrivialTarget();
+            c = find(cargoes, Cargo::isValid);
         }
-        setTarget(upLoc(next));
+        setTarget(Location.upLoc((c == null) ? getAIUnit().getTrivialTarget()
+                : c.getCarrierTarget()));
     }
 
     // Medium-level cargo and target manipulation, should be kept
@@ -831,7 +810,8 @@ public class TransportMission extends Mission {
                     try {
                         Cargo cargo = Cargo.newCargo(t, carrier, end, false);
                         boolean result = queueCargo(cargo, false, lb);
-                        lb.add(" to drop at ", upLoc(end), "=", result);
+                        lb.add(" to drop at ", Location.upLoc(end),
+                            "=", result);
                     } catch (FreeColException fce) {
                         lb.add(" ", t, " drop-fail(", fce.getMessage(), ")");
                     }
@@ -1114,7 +1094,7 @@ public class TransportMission extends Mission {
 
         for (Cargo cargo : order) {
             int turns = carrier.getTurnsToReach(now, cargo.getCarrierTarget());
-            totalTurns += turns; // Might be INFINITY!
+            totalTurns += turns; // Might be MANY_TURNS!
             totalHoldTurns += holds * turns * favourEarly;
             holds += cargo.getNewSpace();
             if (holds < 0 || holds > maxHolds) return -1.0f;

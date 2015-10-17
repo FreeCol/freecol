@@ -30,15 +30,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
@@ -51,6 +51,10 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 public final class Tile extends UnitLocation implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
+
+    /** Comparator to sort tiles by increasing distance from the edge. */
+    public static final Comparator<Tile> edgeDistanceComparator
+        = Comparator.comparingInt(Tile::getEdgeDistance);
 
     /**
      * Information that is internal to the native settlements, and only
@@ -122,6 +126,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public static final int NEAR_RADIUS = 8;
 
+    public static final int OVERLAY_ZINDEX = 100;
+    public static final int FOREST_ZINDEX = 200;
+    public static final int RESOURCE_ZINDEX = 400;
+    public static final int RUMOUR_ZINDEX = 500;
+
     /**
      * The type of the tile.
      * Beware: this may appear to be null in the client when the tile is
@@ -192,6 +201,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * null in clients.
      */
     private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
+
+    /** A comparator to sort for best defence value. */
+    private final Comparator<Tile> defenceValueComparator
+        = new Comparator<Tile>() {
+                public int compare(Tile t1, Tile t2) {
+                    double f = t2.getDefenceValue() - t1.getDefenceValue();
+                    return (f < 0.0) ? -1 : (f > 0.0) ? 1 : 0;
+                }
+            };
 
 
     /**
@@ -496,10 +514,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a river corner.
      */
     public boolean isRiverCorner() {
-        List<Tile> tiles = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isOnRiver()) tiles.add(t);
-        }
+        List<Tile> tiles = getSurroundingTiles(0, 1).stream()
+            .filter(Tile::isOnRiver).collect(Collectors.toList());
         switch (tiles.size()) {
         case 0: case 1:
             return false;
@@ -515,6 +531,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return true;
     }
 
+    /**
+     * Get the minimum distance in tiles from this tile to the map edge.
+     *
+     * @return The distance to the edge.
+     */
+    private int getEdgeDistance() {
+        final Map map = getMap();
+        final int x = getX(), y = getY();
+        return Math.min(Math.min(x, map.getWidth() - x),
+                        Math.min(y, map.getHeight() - y));
+    }
 
     /**
      * Get the style value.
@@ -997,11 +1024,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getLabel() {
         StringTemplate label = StringTemplate.key(type);
         if (tileItemContainer != null) {
-            List<Named> keys = new ArrayList<>();
-            for (TileItem item : tileItemContainer.getTileItems()) {
-                if (!item.isComplete()) continue;
-                keys.add(item);
-            }
+            List<Named> keys = tileItemContainer.getTileItems().stream()
+                .filter(TileItem::isComplete).collect(Collectors.toList());
             if (!keys.isEmpty()) {
                 label = StringTemplate.label("/").addNamed(type);
                 for (Named key : keys) label.addNamed(key);
@@ -1101,8 +1125,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         StringTemplate t = StringTemplate.template("model.tile.nameLocation");
         if (ct == this) {
             t.addStringTemplate("%location%",
-                // TODO-post-0.11.4-release: add message
-                StringTemplate.key("colopedia.terrain.colonyCenterTile"));
+                StringTemplate.key("colonyCenter"));
         } else {
             Direction d = getMap().getDirection(ct, this);
             if (d == null) return null;
@@ -1162,7 +1185,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Tile</code>.
      */
     public boolean isAdjacent(Tile tile) {
-        return (tile == null) ? false : this.getDistanceTo(tile) == 1;
+        return (tile == null) ? false
+            : any(getSurroundingTiles(1, 1), t -> t == tile);
     }
 
     /**
@@ -1180,11 +1204,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if land locked.
      */
     public boolean isLandLocked() {
-        if (!isLand()) return false;
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isLand()) return false;
-        }
-        return true;
+        return (!isLand()) ? false
+            : all(getSurroundingTiles(1, 1), Tile::isLand);
     }
 
     /**
@@ -1197,10 +1218,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this <code>Tile</code> is on the shore.
      */
     public boolean isShore() {
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isLand() != this.isLand()) return true;
-        }
-        return false;
+        return any(getSurroundingTiles(1, 1), t -> t.isLand() != this.isLand());
     }
 
 
@@ -1256,10 +1274,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     unexplored.
      */
     public boolean hasUnexploredAdjacent() {
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isExplored()) return true;
-        }
-        return false;
+        return any(getSurroundingTiles(1, 1), t -> !t.isExplored());
     }
 
     /**
@@ -1348,9 +1363,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return The defence value.
      */
-    public float getDefenceValue() {
+    public double getDefenceValue() {
         final TileType type = getType();
-        return (type == null) ? 0.0f
+        return (type == null) ? 0.0
             : applyModifiers(1.0f, null, type.getDefenceModifiers());
     }
 
@@ -1374,21 +1389,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        List<Tile> tiles = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.isLand()
-                && (!t.hasSettlement() || player.owns(t.getSettlement()))) {
-                tiles.add(t);
-            }
-        }
-        Collections.sort(tiles, new Comparator<Tile>() {
-                @Override
-                public int compare(Tile t1, Tile t2) {
-                    float f = t2.getDefenceValue() - t1.getDefenceValue();
-                    return (f < 0.0f) ? -1 : (f > 0.0f) ? 1 : 0;
-                }
-            });
-        return tiles;
+        return getSurroundingTiles(0, 1).stream()
+            .filter(t -> t.isLand()
+                && (!t.hasSettlement() || player.owns(t.getSettlement())))
+            .sorted(defenceValueComparator).collect(Collectors.toList());
     }
                     
     /**
@@ -1400,10 +1404,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The most defensible adjacent land <code>Tile</code>.
      */
     public Tile getBestDisembarkTile(Player player) {
-        for (Tile t : getSafestSurroundingLandTiles(player)) {
-            if (t.isHighSeasConnected()) return t;
-        }
-        return null;
+        return find(getSafestSurroundingLandTiles(player),
+            Tile::isHighSeasConnected);
     }
 
     /**
@@ -1415,15 +1417,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isDangerousToShip(Unit ship) {
         final Player player = ship.getOwner();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.hasSettlement()) continue;
-            Settlement settlement = t.getSettlement();
-            if (!player.owns(settlement)
-                && settlement.canBombardEnemyShip()
-                && (player.atWarWith(settlement.getOwner())
-                    || ship.hasAbility(Ability.PIRACY))) return true;
-        }
-        return false;
+        return any(getSurroundingTiles(0, 1).stream()
+            .filter(Tile::hasSettlement),
+            t -> {
+                Settlement settlement = t.getSettlement();
+                return !player.owns(settlement)
+                    && settlement.canBombardEnemyShip()
+                    && (player.atWarWith(settlement.getOwner())
+                        || ship.hasAbility(Ability.PIRACY));
+            });
     }
 
     /**
@@ -1435,12 +1437,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of suitable <code>Tile</code>s.
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
-        List<Tile> result = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (!t.isLand() && t.isHighSeasConnected()
-                && !t.isDangerousToShip(unit)) result.add(t);
-        }
-        return result;
+        return getSurroundingTiles(0, 1).stream()
+            .filter(t -> !t.isLand() && t.isHighSeasConnected()
+                && !t.isDangerousToShip(unit))
+            .collect(Collectors.toList());
     }
                 
 
@@ -1577,17 +1577,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        int food = 0;
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (entry.getKey().isFoodType()) {
-                food += entry.getValue();
-            }
-        }
-
         StringTemplate ret = StringTemplate.label("\n");
         if (landLocked) {
             ret.add("warning.landLocked");
         }
+        int food = goodsMap.entrySet().stream()
+            .filter(e -> e.getKey().isFoodType())
+            .mapToInt(e -> e.getValue()).sum();
         if (food < 8) {
             ret.add("warning.noFood");
         }
@@ -1761,23 +1757,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Get a comparator to order a list of goods by potential sale value
-     * in a market.
-     *
-     * @param market The <code>Market</code> to evaluate against.
-     * @return A comparator.
-     */
-    public Comparator<AbstractGoods> getMarketGoodsComparator(final Market market) {
-        return new Comparator<AbstractGoods>() {
-            @Override
-            public int compare(AbstractGoods o, AbstractGoods p) {
-                return market.getSalePrice(p.getType(), p.getAmount())
-                    - market.getSalePrice(o.getType(), o.getAmount());
-            }
-        };
-    }
-
-    /**
      * Sort possible goods types according to potential.
      *
      * @param unitType The <code>UnitType</code> to do the work.
@@ -1801,7 +1780,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             Collections.sort(goodsTypeList,
                 (owner == null || owner.getMarket() == null)
                 ? AbstractGoods.abstractGoodsComparator
-                : getMarketGoodsComparator(owner.getMarket()));
+                : owner.getMarket().getSalePriceComparator());
         }
         return goodsTypeList;
     }
@@ -2046,8 +2025,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Unit getDefendingUnit(Unit attacker) {
         CombatModel cm = getGame().getCombatModel();
         Unit defender = null;
-        float defenderPower = -1.0f;
-        float power;
+        double defenderPower = -1.0, power;
 
         // Check the units on the tile...
         for (Unit u : getUnitList()) {
@@ -2109,13 +2087,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (getOwningSettlement() != null) {
             owner = getOwningSettlement().getOwner();
         }
-        if (owner != null && unit != null && unit.getOwner() != owner
-            && unit.getOwner().atWarWith(owner)) {
-            for (Unit enemyUnit : getUnitList()) {
-                if (enemyUnit.isOffensiveUnit()) return enemyUnit;
-            }
-        }
-        return null;
+        return (owner != null && unit != null && unit.getOwner() != owner
+            && unit.getOwner().atWarWith(owner))
+            ? find(getUnitList(), Unit::isOffensiveUnit)
+            : null;
     }
 
     /**
@@ -2258,6 +2233,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return getX() + getY() * getMap().getWidth();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
         TileType type = getType();
@@ -2326,6 +2309,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             tileItemContainer = null;
         }
         super.disposeResources();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return this;
     }
 
     /**

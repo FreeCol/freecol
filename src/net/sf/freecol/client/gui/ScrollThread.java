@@ -39,8 +39,8 @@ public class ScrollThread extends Thread {
     /** Delay between scroll steps. */
     private static final int SCROLL_DELAY = 100; // ms
 
-    /** The map viewer to scroll. */
-    private final MapViewer mapViewer;
+    /** The Canvas containing the map to scroll. */
+    private final Canvas canvas;
 
     /** The direction to scroll in. */
     private Direction direction = null;
@@ -49,12 +49,11 @@ public class ScrollThread extends Thread {
     /**
      * The constructor to use.
      * 
-     * @param mapViewer The GUI that holds information such as screen
-     *            resolution.
+     * @param canvas The Canvas containing the map to scroll.
      */
-    public ScrollThread(MapViewer mapViewer) {
+    public ScrollThread(Canvas canvas) {
         super(FreeCol.CLIENT_THREAD + "Mouse scroller");
-        this.mapViewer = mapViewer;
+        this.canvas = canvas;
     }
 
     /**
@@ -75,14 +74,9 @@ public class ScrollThread extends Thread {
     public void run() {
         while (direction != null) {
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!mapViewer.scrollMap(direction)) {
-                            direction = null;
-                        }
-                    }
-                });
+                SwingUtilities.invokeAndWait(() -> {
+                        if (!canvas.scrollMap(direction)) direction = null;
+                    });
             } catch (InvocationTargetException e) {
                 logger.log(Level.WARNING, "Scroll thread caught error", e);
                 break;

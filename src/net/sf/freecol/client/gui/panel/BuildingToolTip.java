@@ -72,7 +72,7 @@ public class BuildingToolTip extends JToolTip {
         if (arrow == null) {
             arrow = new JLabel(ResourceManager.getString("arrow.E"));
             arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
+                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
         }
 
         String columns = "[align center]";
@@ -86,42 +86,46 @@ public class BuildingToolTip extends JToolTip {
 
         JLabel buildingName = new JLabel(Messages.getName(building));
         buildingName.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScalingFactor()));
+            FontLibrary.FontSize.SMALLER, Font.BOLD, lib.getScaleFactor()));
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();
-        if (info == null || info.getProduction().isEmpty()) {
+        AbstractGoods production
+            = (info == null || info.getProduction().isEmpty()) ? null
+            : info.getProduction().get(0);
+        AbstractGoods consumption
+            = (info == null || info.getConsumption().isEmpty()) ? null
+            : info.getConsumption().get(0);
+        if (production == null || production.getAmount() <= 0) {
             add(new JLabel(), "span");
         } else {
-            AbstractGoods production = info.getProduction().get(0);
+            AbstractGoods maxProduction = (info == null
+                || info.getMaximumProduction().isEmpty()) ? null
+                : info.getMaximumProduction().get(0);
             ProductionLabel productionOutput
                 = new ProductionLabel(freeColClient, production,
-                    ((info.getMaximumProduction().isEmpty())
-                        ? production
-                        : info.getMaximumProduction().get(0))
-                    .getAmount());
-            if (info.getConsumption().isEmpty()) {
+                    ((maxProduction == null) ? production
+                        : maxProduction).getAmount());
+            if (consumption == null) {
                 add(productionOutput, "span");
+            } else if (consumption.getAmount() > 0) {
+                AbstractGoods maxConsumption = (info == null
+                    || info.getMaximumConsumption().isEmpty()) ? null
+                    : info.getMaximumConsumption().get(0);
+                ProductionLabel productionInput
+                    = new ProductionLabel(freeColClient, consumption,
+                        ((maxConsumption == null) ? consumption
+                            : maxConsumption).getAmount());
+                add(productionInput, "span, split 3");
+                add(arrow);
+                add(productionOutput);
             } else {
-                AbstractGoods consumption = info.getConsumption().get(0);
-                if (consumption.getAmount() > 0) {
-                    ProductionLabel productionInput
-                        = new ProductionLabel(freeColClient, consumption,
-                            ((info.getMaximumConsumption().isEmpty())
-                                ? consumption
-                                : info.getMaximumConsumption().get(0))
-                            .getAmount());
-                    add(productionInput, "span, split 3");
-                    add(arrow);
-                    add(productionOutput);
-                } else {
-                    add(new JLabel(new ImageIcon(
-                            lib.getIconImage(consumption.getType()))),
-                        "span, split 3");
-                    add(arrow);
-                    add(new JLabel(new ImageIcon(
-                            lib.getIconImage(production.getType()))));
-                }
+                add(new JLabel(new ImageIcon(lib
+                            .getIconImage(consumption.getType()))),
+                    "span, split 3");
+                add(arrow);
+                add(new JLabel(new ImageIcon(lib
+                            .getIconImage(production.getType()))));
             }
         }
 
@@ -129,11 +133,11 @@ public class BuildingToolTip extends JToolTip {
 
         for (Unit unit : building.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
-            int production = building.getUnitProduction(unit, output);
-            if (production > 0) {
+            int amount = building.getUnitProduction(unit, output);
+            if (amount > 0) {
                 add(unitLabel);
                 JLabel pLabel = new ProductionLabel(freeColClient,
-                    new AbstractGoods(output, production));
+                    new AbstractGoods(output, amount));
                 add(pLabel, "split 2");
                 add(new JLabel());
             } else if (building.canTeach() && unit.getStudent() != null) {

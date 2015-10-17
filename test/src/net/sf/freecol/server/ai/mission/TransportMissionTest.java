@@ -83,7 +83,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         AIPlayer aiPlayer = aiMain.getAIPlayer(dutch);
 
         // Create a ship at sea carrying a colonist
@@ -99,7 +99,7 @@ public class TransportMissionTest extends FreeColTestCase {
         assertTrue(colonist.getLocation()==galleon);
 
         // Create the attacker, also at sea
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
         Tile tile2 = map.getTile(11, 9);
         Unit privateer = new ServerUnit(game, tile2, french, privateerType);
 
@@ -129,7 +129,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         dutch.exploreMap(true);
         
         // create a ship carrying a colonist
@@ -162,7 +162,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         dutch.exploreMap(true);
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
@@ -189,8 +189,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // Test
         assertNotNull("Unit should have a destination", dest);
         assertEquals("Destination should be Europe", europe, dest);
-        assertFalse("Unit should have a path", 
-                    galleon.getTurnsToReach(dest) == FreeColObject.INFINITY);
+        assertTrue("Unit should have a path", 
+            galleon.getTurnsToReach(dest) < Unit.MANY_TURNS);
     }
 
     public void testGetNextStopIsColony() {
@@ -200,7 +200,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 
@@ -239,7 +239,7 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         dutch.exploreMap(true);
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);

@@ -173,13 +173,13 @@ public final class ReportLabourPanel extends ReportPanel {
         }
         Action selectAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     showDetails();
                 }
             };
         Action quitAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     getGUI().removeFromCanvas(ReportLabourPanel.this);
                 }
             };
@@ -223,10 +223,10 @@ public final class ReportLabourPanel extends ReportPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         } else {
             UnitType unitType = getSpecification().getUnitType(command);
             getGUI().showReportLabourDetailPanel(unitType, this.data,

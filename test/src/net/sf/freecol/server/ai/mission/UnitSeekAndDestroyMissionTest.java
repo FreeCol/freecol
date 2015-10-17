@@ -57,7 +57,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
         // Create attacking player and unit
         ServerPlayer player1
-            = (ServerPlayer)game.getPlayer("model.nation.dutch");
+            = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
@@ -65,7 +65,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 
         // Create defending player and unit
         ServerPlayer player2
-            = (ServerPlayer)game.getPlayer("model.nation.french");
+            = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
         Role soldierRole = spec().getRole("model.role.soldier");
         Unit defender = new ServerUnit(game, tile2, player2,
@@ -96,14 +96,14 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create attacking player and unit
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer player1 = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
 
         // Create defending player and unit
-        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer player2 = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
         Tile defenderTile = map.getTile(2, 1);
         Role soldierRole = spec().getRole("model.role.soldier");
         Unit defender = new ServerUnit(game, defenderTile, player2, veteranType, soldierRole);

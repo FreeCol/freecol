@@ -14,7 +14,7 @@ VI.  About
 I.   Requirements
 =================================
 The program is written in Java. It can be ran with any Java
-Runtime Environment (JRE) that is at least version 1.7.
+Runtime Environment (JRE) that is at least version 1.8.
 The JRE (or JVM) can be downloaded from:
 http://java.sun.com/getjava/download.html
 

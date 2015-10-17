@@ -24,6 +24,8 @@ import java.text.DateFormat;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -72,8 +74,8 @@ public final class ReportHighScoresPanel extends ReportPanel {
             StringTemplate template = StringTemplate.template(messageId)
                 .addName("%name%", highScore.getPlayerName())
                 .addName("%nation%", highScore.getNewLandName());
-            JLabel headline = Utility.localizedLabel(template);
-            headline.setFont(font);
+            JLabel headline = Utility.localizedHeaderLabel(template,
+                SwingConstants.LEADING, FontLibrary.FontSize.SMALL);
             reportPanel.add(headline,
                             "span, wrap 10");
 
@@ -102,7 +104,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             reportPanel.add(Utility.localizedLabel("report.highScores.nation"),
                             "skip");
             reportPanel.add(Utility.localizedLabel((highScore.getIndependenceTurn() > 0)
-                    ? StringTemplate.name(highScore.getNationName())
+                    ? StringTemplate.name(highScore.getNationLabel())
                     : StringTemplate.key(highScore.getOldNationNameKey())));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.nationType"),

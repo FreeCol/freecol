@@ -109,7 +109,7 @@ public class Cargo {
                 && (destination = t.getTransportDestination()) == null) {
                 return "invalid-null-destination";
             }
-            this.tdst = AIObject.upLoc(destination);
+            this.tdst = Location.upLoc(destination);
             final Location src = t.getLocation();
             final boolean carrying = src == carrier;
             if (!carrying && src instanceof Unit) {
@@ -139,14 +139,14 @@ public class Cargo {
             if (carrying) {
                 this.twait = this.cwait = null;
             } else {
-                this.cwait = AIObject.upLoc(pick.getLocation());
+                this.cwait = Location.upLoc(pick.getLocation());
                 // If there is a previous non-carrier move on the delivery
                 // path, that is where the transportable should wait.
                 // This will be true for units moving directly from land
                 // to a naval carrier, but usually false when collection
                 // occurs in a colony (as for goods).
                 PathNode prev = (pick.previous == null) ? pick : pick.previous;
-                this.twait = AIObject.upLoc(prev.getLocation());
+                this.twait = Location.upLoc(prev.getLocation());
             }
 
             // Can the carrier reach the pickup point?  If already
@@ -168,10 +168,10 @@ public class Cargo {
                     + " " + pick.fullPathToString()
                     + " " + drop);
             }
-            this.cdst = AIObject.upLoc(drop.previous.getLocation());
+            this.cdst = Location.upLoc(drop.previous.getLocation());
 
             // The transportable ends up at the end of the delivery path.
-            this.tdst = AIObject.upLoc(deliver.getLastNode().getLocation());
+            this.tdst = Location.upLoc(deliver.getLastNode().getLocation());
 
             // Total turns is just that of the delivery path if the
             // transportable has been collected.  Otherwise, it is the
@@ -469,7 +469,7 @@ public class Cargo {
         ret += (getMode().isCollection()) ? getTransportable().getSpaceTaken()
             : -getTransportable().getSpaceTaken();
         if (hasWrapped()) {
-            for (Cargo t : wrapped) ret += t.getNewSpace();
+            ret += wrapped.stream().mapToInt(c -> c.getNewSpace()).sum();
         }
         return ret;
     }

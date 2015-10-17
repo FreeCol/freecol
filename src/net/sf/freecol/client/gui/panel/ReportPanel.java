@@ -31,17 +31,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -52,20 +50,6 @@ import net.sf.freecol.common.model.UnitType;
 public class ReportPanel extends FreeColPanel {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
-
-    private static final Comparator<Unit> unitTypeComparator
-        = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit unit1, Unit unit2) {
-                int deltaType = unit2.getType().compareTo(unit1.getType());
-                if (deltaType == 0) {
-                    return (unit2.getRole() == null) ? -1
-                        : unit2.getRole().getId().compareTo(unit1.getRole().getId());
-                } else {
-                    return deltaType;
-                }
-            }
-        };
 
     protected final JPanel reportPanel;
 
@@ -98,7 +82,7 @@ public class ReportPanel extends FreeColPanel {
         add(scrollPane, "cell 0 1, height 100%, width 100%");
         add(okButton, "cell 0 2, tag ok");
 
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
     }
 
@@ -109,15 +93,6 @@ public class ReportPanel extends FreeColPanel {
     public void initialize() {
         reportPanel.removeAll();
         reportPanel.doLayout();
-    }
-
-    /**
-     * Returns a unit type comparator.
-     *
-     * @return A unit type comparator.
-     */
-    public static Comparator<Unit> getUnitTypeComparator() {
-        return unitTypeComparator;
     }
 
     private Border createBorder() {
@@ -162,8 +137,8 @@ public class ReportPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
             getGUI().removeFromCanvas(this);
         } else {

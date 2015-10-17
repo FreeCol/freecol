@@ -27,7 +27,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -87,7 +86,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         String layoutConstraints = "insets 0, gap 0 0";
         String columnConstraints = "[25%!, fill]["
-            + Math.round(lib.getScalingFactor()
+            + Math.round(lib.getScaleFactor()
                 * (ImageLibrary.ICON_SIZE.width * 1.25f))
             + "!, fill]";
         String rowConstraints = "[fill]";
@@ -176,6 +175,13 @@ public final class ReportTradePanel extends ReportPanel {
                     : Utility.CELLBORDER);
                 goodsLabel.setForeground(GoodsLabel.getColor(goodsType, amount,
                                                              colony));
+                ExportData ed = colony.getExportData(goodsType);
+                if (ed.getExported()) {
+                    goodsLabel.setToolTipText(Messages.message(StringTemplate
+                            .template("report.trade.export")
+                            .addNamed("%goods%", goodsType)
+                            .addAmount("%amount%", ed.getExportLevel())));
+                }
                 reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
                 int production = colony.getNetProductionOf(goodsType);
@@ -216,7 +222,7 @@ public final class ReportTradePanel extends ReportPanel {
     }
 
     private JLabel createLeftLabel(String key) {
-        JLabel result = Utility.localizedLabel(key, JLabel.LEADING);
+        JLabel result = Utility.localizedLabel(key);
         result.setBorder(Utility.LEFTCELLBORDER);
         return result;
     }

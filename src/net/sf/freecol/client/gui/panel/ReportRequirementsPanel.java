@@ -32,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -43,7 +44,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -190,20 +190,16 @@ public final class ReportRequirementsPanel extends ReportPanel {
         List<TileImprovementSuggestion> tileSuggestions
             = colony.getTileImprovementSuggestions();
         for (TileImprovementSuggestion tis : tileSuggestions) {
-            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-            String key = (tis.isExploration())
-                ? "report.requirements.exploreTile"
-                : ("model.improvement.plow".equals(tis.tileImprovementType.getId()))
-                ? ((tis.tile == colony.getTile())
-                    ? "report.requirements.plowCenter"
-                    : "report.requirements.plowTile")
-                : ("model.improvement.clearForest".equals(tis.tileImprovementType.getId()))
-                ? "report.requirements.clearTile"
-                : ("model.improvement.road".equals(tis.tileImprovementType.getId()))
-                ? "report.requirements.roadTile"
-                : null;
-            // end temporary hack
-            addTileWarning(doc, colony, key, tis.tile);
+            if (tis.tileImprovementType == null) {
+                addTileWarning(doc, colony, "report.requirements.exploreTile",
+                               tis.tile);
+            } else {
+                String key = "report.requirements.tile."
+                    + tis.tileImprovementType.getSuffix();
+                if (Messages.containsKey(key)) {
+                    addTileWarning(doc, colony, key, tis.tile);
+                }
+            }
         }
 
         if (tileSuggestions.isEmpty()
@@ -223,12 +219,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
     private void addTileWarning(StyledDocument doc, Colony colony,
                                 String messageId, Tile tile) {
         if (messageId == null || !Messages.containsKey(messageId)) return;
-        // TODO-post-0.11.4-release: migrate to using Tile.getColonyTileLocationLabel()
-        Direction direction = colony.getTile().getDirection(tile);
         StringTemplate t = StringTemplate.template(messageId)
-            .addNamed("%type%", tile.getType())
-            .addName("%colony%", colony.getName());
-        if (direction != null) t.addNamed("%direction%", direction);
+            .addStringTemplate("%location%",
+                tile.getColonyTileLocationLabel(colony));
         try {
             doc.insertString(doc.getLength(), "\n\n" + Messages.message(t),
                              doc.getStyle("regular"));
@@ -237,7 +230,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private void addBadAssignmentWarning(StyledDocument doc, Colony colony, Unit expert, Unit nonExpert) {
+    private void addBadAssignmentWarning(StyledDocument doc, Colony colony,
+                                         Unit expert, Unit nonExpert) {
         GoodsType expertGoods = expert.getWorkType();
         GoodsType nonExpertGoods = nonExpert.getWorkType();
         String colonyName = colony.getName();
@@ -260,7 +254,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private void addExpertWarning(StyledDocument doc, Colony c, GoodsType goodsType, UnitType workType) {
+    private void addExpertWarning(StyledDocument doc, Colony c,
+                                  GoodsType goodsType, UnitType workType) {
         String newMessage = Messages.message(StringTemplate
             .template("report.requirements.noExpert")
             .addName("%colony%", c.getName())
@@ -391,11 +386,11 @@ public final class ReportRequirementsPanel extends ReportPanel {
     }
 
     private JButton createColonyButton(Colony colony, String info, boolean headline) {
-        JButton button = Utility.getLinkButton(colony.getName() + info, null,
-            colony.getId());
+        String text = colony.getName() + info;
+        JButton button = Utility.getLinkButton(text, null, colony.getId());
         if (headline) {
-            button.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                FontLibrary.FontSize.SMALL));
+            button.setFont(FontLibrary.createCompatibleFont(text,
+                FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL));
         }
         button.addActionListener(this);
         return button;

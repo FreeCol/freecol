@@ -173,10 +173,8 @@ public class Nation extends FreeColGameObjectType {
      * @return The rebel <code>Nation</code>, or null if not applicable.
      */
     public final Nation getRebelNation() {
-        for (Nation n : getSpecification().getEuropeanNations()) {
-            if (n.getREFNation() == this) return n;
-        }
-        return null;
+        return find(getSpecification().getEuropeanNations(),
+            n -> n.getREFNation() == this);
     }
 
     /**
@@ -261,7 +259,7 @@ public class Nation extends FreeColGameObjectType {
         for (int index = 0; index < nations; index++) {
             String nationId = "model.nation."
                 + EUROPEAN_NATIONS.get((start + index) % nations);
-            if (game.getPlayer(nationId) == null) {
+            if (game.getPlayerByNationId(nationId) == null) {
                 return Messages.nameKey(nationId);
             }
         }

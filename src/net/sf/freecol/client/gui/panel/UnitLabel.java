@@ -36,8 +36,8 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -47,12 +47,10 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
-import static net.sf.freecol.common.util.StringUtils.*;
+import static net.sf.freecol.common.util.StringUtils.lastPart;
 
 
 /**
@@ -83,7 +81,7 @@ public final class UnitLabel extends JLabel
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final Unit unit;
 
@@ -93,7 +91,7 @@ public final class UnitLabel extends JLabel
 
     private boolean ignoreLocation;
     
-    private boolean useMapImageLibrary;
+    private boolean useTileImageLibrary;
 
 
     /**
@@ -140,20 +138,20 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
-     * @param useMapImageLibrary If false use ImageLibrary in gui.
-     *              If true use ImageLibrary in gui.getColonyTileMapViewer().
+     * @param useTileImageLibrary If false use ImageLibrary in GUI.
+     *              If true use tileImageLibrary in SwingGUI.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation,
-                     boolean useMapImageLibrary) {
+                     boolean useTileImageLibrary) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.unit = unit;
 
         selected = false;
         this.isSmall = isSmall;
         this.ignoreLocation = ignoreLocation;
-        this.useMapImageLibrary = useMapImageLibrary;
+        this.useTileImageLibrary = useTileImageLibrary;
 
         updateIcon();
     }
@@ -194,8 +192,8 @@ public final class UnitLabel extends JLabel
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        final ImageLibrary lib = useMapImageLibrary
-            ? gui.getColonyTileMapViewer().getImageLibrary()
+        final ImageLibrary lib = useTileImageLibrary
+            ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (isSmall) {
             ImageIcon imageIcon = new ImageIcon(lib.getSmallUnitImage(unit));
@@ -210,12 +208,10 @@ public final class UnitLabel extends JLabel
             ImageIcon imageIcon = new ImageIcon(lib.getUnitImage(unit));
             ImageIcon disabledImageIcon = new ImageIcon(lib.getUnitImage(unit, true));
             if (unit.getLocation() instanceof ColonyTile) {
-                final Tile tile = unit.getLocation().getTile();
-                final TileType tileType = tile.getType();
-                final Image image = lib.getTerrainImage(tileType, tile.getX(),
-                                                        tile.getY());
-                setSize(new Dimension(image.getWidth(null) / 2,
-                                      imageIcon.getIconHeight()));
+                Dimension tileSize = lib.scaleDimension(ImageLibrary.TILE_SIZE);
+                tileSize.width /= 2;
+                tileSize.height = imageIcon.getIconHeight();
+                setSize(tileSize);
             } else {
                 setPreferredSize(null);
             }
@@ -261,8 +257,8 @@ public final class UnitLabel extends JLabel
     @Override
     public void paintComponent(Graphics g) {
         final Player player = freeColClient.getMyPlayer();
-        final ImageLibrary lib = useMapImageLibrary
-            ? gui.getColonyTileMapViewer().getImageLibrary()
+        final ImageLibrary lib = useTileImageLibrary
+            ? gui.getTileImageLibrary()
             : gui.getImageLibrary();
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
@@ -301,7 +297,7 @@ public final class UnitLabel extends JLabel
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                    FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                    FontLibrary.FontSize.TINY, lib.getScaleFactor());
                 Image repairImage1 = lib.getStringImage(g, underRepair1, Color.RED, font);
                 Image repairImage2 = lib.getStringImage(g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
@@ -370,11 +366,11 @@ public final class UnitLabel extends JLabel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final Game game = freeColClient.getGame();
         final Specification spec = game.getSpecification();
         final InGameController igc = freeColClient.getInGameController();
-        String[] args = event.getActionCommand().split("/");
+        String[] args = ae.getActionCommand().split("/");
         GoodsType gt;
         switch (Enum.valueOf(UnitAction.class,
                              args[0].toUpperCase(Locale.US))) {

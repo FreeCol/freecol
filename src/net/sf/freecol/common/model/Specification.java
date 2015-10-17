@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,20 +33,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -58,7 +59,7 @@ import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -145,6 +146,22 @@ public final class Specification {
         = new Source("model.source.shipTradePenalty");
     public static final Source SOL_MODIFIER_SOURCE
         = new Source("model.source.solModifier");
+    /** All the special static sources. */
+    private static final Source[] sources = new Source[] {
+        MOVEMENT_PENALTY_SOURCE,
+        ARTILLERY_PENALTY_SOURCE,
+        ATTACK_BONUS_SOURCE,
+        FORTIFICATION_BONUS_SOURCE,
+        INDIAN_RAID_BONUS_SOURCE,
+        AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
+        BASE_OFFENCE_SOURCE,
+        BASE_DEFENCE_SOURCE,
+        CARGO_PENALTY_SOURCE,
+        AMBUSH_BONUS_SOURCE,
+        COLONY_GOODS_PARTY_SOURCE,
+        SHIP_TRADE_PENALTY_SOURCE,
+        SOL_MODIFIER_SOURCE
+    };
 
 
     /** A map from specification element to a reader for that element. */
@@ -253,23 +270,7 @@ public final class Specification {
      */
     public Specification() {
         logger.fine("Initializing Specification");
-        for (Source source : new Source[] {
-                MOVEMENT_PENALTY_SOURCE,
-                ARTILLERY_PENALTY_SOURCE,
-                ATTACK_BONUS_SOURCE,
-                FORTIFICATION_BONUS_SOURCE,
-                INDIAN_RAID_BONUS_SOURCE,
-                AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
-                BASE_OFFENCE_SOURCE,
-                BASE_DEFENCE_SOURCE,
-                CARGO_PENALTY_SOURCE,
-                AMBUSH_BONUS_SOURCE,
-                COLONY_GOODS_PARTY_SOURCE,
-                SHIP_TRADE_PENALTY_SOURCE,
-                SOL_MODIFIER_SOURCE
-            }) {
-            allTypes.put(source.getId(), source);
-        }
+        for (Source source : sources) allTypes.put(source.getId(), source);
 
         readerMap.put(BUILDING_TYPES_TAG,
                       new TypeReader<>(BuildingType.class, buildingTypeList));
@@ -1304,22 +1305,18 @@ public final class Specification {
      * @return The free colonist unit type.
      */
     public UnitType getDefaultUnitType(NationType nationType) {
-        for (UnitType ut : defaultUnitTypes) {
-            if (nationType == null) { // European is default
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else if (nationType.isIndian()) {
-                if (ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else if (nationType.isREF()) {
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && ut.hasAbility(Ability.REF_UNIT)) return ut;
-            } else { // European
-                if (!ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-                    && !ut.hasAbility(Ability.REF_UNIT)) return ut;
-            }
-        }
-        return getDefaultUnitType();
+        Predicate<UnitType> p = (nationType == null)
+            ? ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT)
+            : (nationType.isIndian())
+            ? ut -> ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT)
+            : (nationType.isREF())
+            ? ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && ut.hasAbility(Ability.REF_UNIT)
+            : ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+                && !ut.hasAbility(Ability.REF_UNIT);
+        return find(defaultUnitTypes, p, getDefaultUnitType());
     }
     
     /**
@@ -1412,11 +1409,9 @@ public final class Specification {
      * @param naval If true, choose naval units, if not, land units.
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
-        List<UnitType> types = new ArrayList<>();
-        for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
-            if (naval == ut.isNaval()) types.add(ut);
-        }
-        return types;
+        return getUnitTypesWithAbility(Ability.REF_UNIT).stream()
+            .filter(ut -> ut.isNaval() == naval)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1548,12 +1543,11 @@ public final class Specification {
      */
     public List<Role> getMilitaryRoles() {
         if (militaryRoles == null) {
-            List<Role> mr = new ArrayList<>();
-            for (Role role : roles) {
-                if (role.isOffensive()) mr.add(role);
-            }
-            Collections.sort(mr, Role.militaryComparator);
-            this.militaryRoles = Collections.<Role>unmodifiableList(mr);
+            this.militaryRoles
+                = Collections.<Role>unmodifiableList(roles.stream()
+                    .filter(Role::isOffensive)
+                    .sorted(Role.militaryComparator)
+                    .collect(Collectors.toList()));
         }
         return militaryRoles;
     }
@@ -1568,11 +1562,7 @@ public final class Specification {
      *     ability, or null if none found.
      */
     public Role getRoleWithAbility(String id, List<Role> roles) {
-        if (roles == null) roles = getRoles();
-        for (Role r : roles) {
-            if (r.hasAbility(id)) return r;
-        }
-        return null;
+        return find(getRoles(), r -> r.hasAbility(id));
     }
 
     /**
@@ -1608,15 +1598,11 @@ public final class Specification {
      * @param naval If true, choose roles for naval units, if not, land units.
      */
     public List<Role> getREFRoles(boolean naval) {
-        List<Role> roles = new ArrayList<>();
-        if (naval) {
-            roles.add(getDefaultRole());
-        } else {
-            for (Role r : getMilitaryRoles()) {
-                if (r.requiresAbility(Ability.REF_UNIT)) roles.add(r);
-            }
-        }
-        return roles;
+        return ((naval)
+            ? Stream.of(getDefaultRole())
+            : getMilitaryRoles().stream()
+                .filter(r -> r.requiresAbility(Ability.REF_UNIT)))
+            .collect(Collectors.toList());
     }
 
 
@@ -1855,18 +1841,11 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithAbility(Class<T> resultType,
                                           String... abilities) {
-        List<T> result = new ArrayList<>();
-        for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) {
-                        result.add(resultType.cast(type));
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
+        return allTypes.values().stream()
+            .filter(type -> resultType.isInstance(type)
+                && any(abilities, a -> type.hasAbility(a)))
+            .map(type -> resultType.cast(type))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1879,16 +1858,11 @@ public final class Specification {
     public <T extends FreeColGameObjectType> List<T>
                       getTypesWithoutAbility(Class<T> resultType,
                                              String... abilities) {
-        List<T> result = new ArrayList<>();
-        type: for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) continue type;
-                }
-                result.add(resultType.cast(type));
-            }
-        }
-        return result;
+        return allTypes.values().stream()
+            .filter(type -> resultType.isInstance(type)
+                && none(abilities, a -> type.hasAbility(a)))
+            .map(type -> resultType.cast(type))
+            .collect(Collectors.toList());
     }
 
 
@@ -1931,10 +1905,11 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to load remedial roles.", e);
             return;
         }
-        List<String> roles = new ArrayList<>();
-        for (Role r : getRoles()) roles.add(r.getId());
+
         logger.info("Loading role backward compatibility fragment: "
-            + ROLES_COMPAT_FILE_NAME + " with roles: " + join(" ", roles));
+            + ROLES_COMPAT_FILE_NAME + " with roles: "
+            + getRoles().stream()
+                .map(Role::getId).collect(Collectors.joining()));
     }
     // end @compat 0.10.x
 
@@ -1964,10 +1939,11 @@ public final class Specification {
             }
         }
 
-        // Coronado gained an ability
+        // Coronado gained an ability in freecol
         FoundingFather coronado
             = getFoundingFather("model.foundingFather.franciscoDeCoronado");
-        if (!coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
+        if ("freecol".equals(getId())
+            && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
         }
@@ -2019,8 +1995,7 @@ public final class Specification {
         }
 
         // Fix all other UnitListOptions
-        List<Option> todo = new ArrayList<>();
-        for (OptionGroup og : getDifficultyLevels()) todo.add(og);
+        List<Option> todo = new ArrayList<>(getDifficultyLevels());
         while (!todo.isEmpty()) {
             Option o = todo.remove(0);
             if (o instanceof OptionGroup) {
@@ -2252,7 +2227,26 @@ public final class Specification {
             }
         }
         // end @compat 0.11.3
-        
+
+        // @compat 0.11.5
+        // Added a modifier to hardy pioneer
+        UnitType hardyPioneer = getUnitType("model.unit.hardyPioneer");
+        if (hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)
+            .isEmpty()) {
+            Modifier m = new Modifier(Modifier.TILE_TYPE_CHANGE_PRODUCTION,
+                2.0f, Modifier.ModifierType.MULTIPLICATIVE);
+            Scope scope = new Scope();
+            scope.setType("model.goods.lumber");
+            m.addScope(scope);
+            hardyPioneer.addModifier(m);
+        }
+
+        // Added modifier to Coronado
+        if (!coronado.hasModifier(Modifier.EXPOSED_TILES_RADIUS)) {
+            coronado.addModifier(new Modifier(Modifier.EXPOSED_TILES_RADIUS,
+                    3.0f, Modifier.ModifierType.ADDITIVE, coronado, 0));
+        }
+        // end @compat 0.11.5
     }
 
     /**
@@ -2546,7 +2540,7 @@ public final class Specification {
             Option op = level.getOption(gr);
             if (op instanceof OptionGroup) {
                 OptionGroup og = (OptionGroup)op;
-                if ((op = og.getOption(id)) != null) return null;
+                if (og.getOption(id) instanceof UnitListOption) continue;
                 if (ulo == null) ulo = new UnitListOption(id, this);
                 og.add(ulo);
             }

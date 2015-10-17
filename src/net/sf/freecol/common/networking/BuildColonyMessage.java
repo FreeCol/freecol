@@ -99,7 +99,7 @@ public class BuildColonyMessage extends DOMMessage {
             return DOMMessage.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
-        } else if (game.getSettlement(colonyName) != null) {
+        } else if (game.getSettlementByName(colonyName) != null) {
             return DOMMessage.clientError("Non-unique colony name "
                 + colonyName);
         }

@@ -109,7 +109,7 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Pick the closest carrier and queue this unit.
         final Location here = unit.getLocation();
-        int turns = INFINITY;
+        int turns = Unit.MANY_TURNS;
         Unit closest = null;
         for (Unit c : carriers) {
             int t = c.getTurnsToReach(here);
@@ -259,8 +259,8 @@ public class CashInTreasureTrainMission extends Mission {
                                       boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                                     range*3, deferOK));
+            : Location.upLoc(findCircleTarget(aiUnit,
+                    getGoalDecider(aiUnit, deferOK), range*3, deferOK));
     }
 
     /**

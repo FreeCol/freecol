@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -131,11 +132,8 @@ public class Effect extends FreeColGameObjectType {
      * @return True if this effect applies.
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (scopes == null || scopes.isEmpty()) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(objectType)) return true;
-        }
-        return false;
+        return (scopes == null || scopes.isEmpty()) ? true
+            : any(scopes, s -> s.appliesTo(objectType));
     }
 
 

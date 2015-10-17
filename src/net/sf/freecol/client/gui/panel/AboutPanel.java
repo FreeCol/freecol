@@ -38,7 +38,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -72,13 +71,15 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class AboutPanel extends FreeColPanel {
 
-    private static final Logger logger = Logger
-            .getLogger(AboutPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
     public static final String SITE_URL
         = "http://www.freecol.org";
     public static final String PROJECT_URL
         = "http://sourceforge.net/projects/freecol/";
+    private static final String MANUAL_URL
+        = "http://www.freecol.org/documentation/freecol-user-manual.html";
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -99,9 +100,9 @@ public final class AboutPanel extends FreeColPanel {
         // Create available Font choices
         Font fontBold = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
-            getImageLibrary().getScalingFactor());
+            getImageLibrary().getScaleFactor());
         Font fontNormal = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, getImageLibrary().getScalingFactor());
+            FontLibrary.FontSize.TINY, getImageLibrary().getScaleFactor());
         
         // Version
         JLabel apVersion = Utility.localizedLabel("aboutPanel.version");
@@ -131,6 +132,15 @@ public final class AboutPanel extends FreeColPanel {
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");
 
+        // Manual
+        JLabel apManual = Utility.localizedLabel("aboutPanel.manual");
+        apManual.setFont(fontBold);
+        add(apManual, "newline 10");
+        JButton apManualURL = Utility.getLinkButton(MANUAL_URL, null,
+                                                    MANUAL_URL);
+        apManualURL.addActionListener(this);
+        add(apManualURL, "newline");
+        
         // License Disclaimer
         JTextArea apLegal
             = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
@@ -149,12 +159,12 @@ public final class AboutPanel extends FreeColPanel {
 
     /**
      * {@inheritDoc}
-     * @param event
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        String url = event.getActionCommand();
-        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)) {
+    public void actionPerformed(ActionEvent ae) {
+        final String url = ae.getActionCommand();
+        if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
+            || MANUAL_URL.equals(url)) {
             String os = System.getProperty("os.name");
             // FIXME: move this to OS utilities
             String[] cmd = null;
@@ -181,7 +191,7 @@ public final class AboutPanel extends FreeColPanel {
                 // couldn't start browser
             }
         } else {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         }
     }
 }

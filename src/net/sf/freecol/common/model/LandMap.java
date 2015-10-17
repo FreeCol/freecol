@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -284,15 +286,11 @@ public class LandMap {
      * @param y The y coordinate to check.
      */
     private boolean isSingleTile(int x, int y) {
-        Position p = new Position(x, y);
-
-        for (Direction direction : Direction.values()) {
-            Position n = new Position(p, direction);
-            if (n.isValid(width, height) && map[n.getX()][n.getY()]) {
-                return false;
-            }
-        }
-        return true;
+        final Position p = new Position(x, y);
+        return none(Direction.values(), d -> {
+                Position n = new Position(p, d);
+                return n.isValid(width, height) && map[n.getX()][n.getY()];
+            });
     }
 
     /**

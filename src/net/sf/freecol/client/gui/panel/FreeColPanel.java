@@ -39,8 +39,8 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -128,8 +128,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      *
      * @return The current <code>GUI</code>.
      */
-    protected GUI getGUI() {
-        return freeColClient.getGUI();
+    protected SwingGUI getGUI() {
+        return (SwingGUI)freeColClient.getGUI();
     }
 
     /**
@@ -220,6 +220,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
                 public void propertyChange(PropertyChangeEvent e) {
                     if ("closing".equals(e.getPropertyName())) {
                         runnable.run();
+                        // Lambda unsuitable due to use of "this"
                         FreeColPanel.this.removePropertyChangeListener(this);
                     }
                 }
@@ -232,8 +233,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (OK.equals(command)) {
             getGUI().removeFromCanvas(this);
         } else {

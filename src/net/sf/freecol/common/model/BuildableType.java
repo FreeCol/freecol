@@ -20,17 +20,20 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -132,18 +135,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return True if the buildable is available.
      */
     public boolean isAvailableTo(FreeColObject... fco) {
-        if (requiredAbilities != null) {
-            FreeColObject[] objects = fco;
-            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                boolean found = false;
-                for (FreeColObject object : objects) {
-                    found = object.hasAbility(entry.getKey());
-                    if (found) break;
-                }
-                if (found != entry.getValue()) return false;
-            }
-        }
-        return true;
+        return (requiredAbilities == null) ? true
+            : all(requiredAbilities.entrySet(),
+                e -> e.getValue() == any(fco, o -> o.hasAbility(e.getKey())));
     }
 
     /**
@@ -180,9 +174,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @param ag The required <code>AbstractGoods</code> to add.
      */
     private void addRequiredGoods(AbstractGoods ag) {
-        if (requiredGoods == null) {
-            requiredGoods = new ArrayList<>();
-        }
+        if (requiredGoods == null) requiredGoods = new ArrayList<>();
         requiredGoods.add(ag);
     }
 

@@ -31,17 +31,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BinaryOperator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+
 import net.miginfocom.swing.MigLayout;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -51,20 +51,15 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -75,7 +70,6 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import net.sf.freecol.common.util.CollectionUtils.Accumulator;
 
 
 /**
@@ -101,21 +95,18 @@ public final class ReportCompactColonyPanel extends ReportPanel
             CONSUMPTION, // Positive production but could consume more
         };
 
-        public static Accumulator<GoodsProduction> goodsProductionAccumulator
-            = new Accumulator<GoodsProduction>() {
-                    public GoodsProduction accumulate(GoodsProduction g1,
-                                                      GoodsProduction g2) {
-                        g1.amount += g2.amount;
-                        g1.status = (g1.status == ProductionStatus.NONE
-                            && g2.status == ProductionStatus.NONE)
-                            ? ProductionStatus.NONE
-                            : (g1.amount < 0) ? ProductionStatus.BAD
-                            : (g1.amount > 0) ? ProductionStatus.GOOD
-                            : ProductionStatus.ZERO;
-                        g1.extra = 0;
-                        return g1;
-                    }
-                };
+        public static BinaryOperator<GoodsProduction> goodsProductionAccumulator
+            = (g1, g2) -> {
+                g1.amount += g2.amount;
+                g1.status = (g1.status == ProductionStatus.NONE
+                        && g2.status == ProductionStatus.NONE)
+                    ? ProductionStatus.NONE
+                    : (g1.amount < 0) ? ProductionStatus.BAD
+                    : (g1.amount > 0) ? ProductionStatus.GOOD
+                    : ProductionStatus.ZERO;
+                g1.extra = 0;
+                return g1;
+            };
 
         /** Container class for goods production. */
         public static class GoodsProduction {
@@ -125,7 +116,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             public int extra;
 
             public GoodsProduction(int amount, ProductionStatus status,
-                int extra) {
+                                   int extra) {
                 this.amount = amount;
                 this.status = status;
                 this.extra = extra;
@@ -472,7 +463,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     }
 
     private JLabel newLabel(String h, ImageIcon i, Color c, StringTemplate t) {
-        h = (h != null && Messages.containsKey(h)) ? Messages.message(h) : "";
+        if (h != null && Messages.containsKey(h)) h = Messages.message(h);
         JLabel l = newLabel(h, i, c);
         if (t != null) Utility.localizeToolTip(l, t);
         return l;
@@ -508,6 +499,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
      */
     private void updateColony(ColonySummary s) {
         final String cac = s.colony.getId();
+        final UnitType defaultUnitType
+            = spec.getDefaultUnitType(s.colony.getOwner());
         List<JComponent> buttons = new ArrayList<>();
         JButton b;
         Color c;
@@ -580,17 +573,27 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
             if (n > 0) {
                 c = cAlarm;
-                // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-                String key = ("model.improvement.plow".equals(ti.getId())
-                    || "model.improvement.clearForest".equals(ti.getId()))
-                    ? "report.colony.plowing"
-                    : ("model.improvement.road".equals(ti.getId()))
-                    ? "report.colony.roadBuilding"
-                    : null;
-                t = (key == null) ? null : stpld(key)
-                    .addName("%colony%", s.colony.getName())
-                    .addAmount("%amount%", n);
-                // end temporary hack
+                if (n == 1) {
+                    TileImprovementSuggestion tis = s.tileSuggestions.get(0);
+                    for (Unit u : tis.tile.getUnitList()) {
+                        if (u.getState() == Unit.UnitState.IMPROVING
+                            && u.getWorkImprovement() != null
+                            && u.getWorkImprovement().getType()
+                                == tis.tileImprovementType) {
+                            c = cWarn; // Work is underway
+                            break;
+                        }
+                    }
+                    t = stpld("report.colony.tile." + ti.getSuffix()
+                              + ".specific")
+                        .addName("%colony%", s.colony.getName())
+                        .addStringTemplate("%location%",
+                            tis.tile.getColonyTileLocationLabel(s.colony));
+                } else {
+                    t = stpld("report.colony.tile." + ti.getSuffix())
+                        .addName("%colony%", s.colony.getName())
+                        .addAmount("%amount%", n);
+                }
                 b = newButton(cac, Integer.toString(n), null, c, t);
                 if (center) b.setFont(b.getFont().deriveFont(Font.BOLD));
             } else {
@@ -667,17 +670,19 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 break;
             case PRODUCTION:
                 c = cWarn;
-                t = stpld("report.colony.production")
+                t = stpld("report.colony.production.maxProduction")
                         .addName("%colony%", s.colony.getName())
                         .addNamed("%goods%", gt)
-                        .addAmount("%amount%", gp.amount);
+                        .addAmount("%amount%", gp.amount)
+                        .addAmount("%more%", gp.extra);
                 break;
             case CONSUMPTION:
                 c = cWarn;
-                t = stpld("report.colony.production")
+                t = stpld("report.colony.production.maxConsumption")
                         .addName("%colony%", s.colony.getName())
                         .addNamed("%goods%", gt)
-                        .addAmount("%amount%", gp.amount);
+                        .addAmount("%amount%", gp.amount)
+                        .addAmount("%more%", gp.extra);
                 break;
             default:
                 throw new IllegalStateException("Bogus status: " + gp.status);
@@ -692,8 +697,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         if (s.newColonist > 0) {
             t = stpld("report.colony.arriving")
                     .addName("%colony%", s.colony.getName())
-                    .addNamed("%unit%",
-                        spec.getDefaultUnitType(s.colony.getOwner()))
+                    .addNamed("%unit%", defaultUnitType)
                     .addAmount("%turns%", s.newColonist);
             b = newButton(cac, Integer.toString(s.newColonist), null,
                           cGood, t);
@@ -747,8 +751,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             buttons.add(b);
         }
 
-        // Field: What is being trained.
+        // Field: What is being trained, including shadow units for vacant
+        // places.
         // Colour: cAlarm if completion is blocked, otherwise cPlain.
+        int empty = 0;
+        Building school = s.colony.getWorkLocationWithAbility(Ability.TEACH,
+                                                              Building.class);
+        if (school != null) empty = school.getType().getWorkPlaces();
         for (Entry<Unit, Integer> e
                  : mapEntriesByValue(s.teachers, descendingIntegerComparator)) {
             Unit u = e.getKey();
@@ -770,6 +779,18 @@ public final class ReportCompactColonyPanel extends ReportPanel
                               cPlain, t);
             }
             buttons.add(b);
+            empty--;
+        }
+
+        if (empty > 0) {
+            final ImageIcon emptyIcon
+                = new ImageIcon(this.lib.getTinyUnitImage(defaultUnitType, true));
+            t = stpld("report.colony.making.educationVacancy")
+                    .addName("%colony%", s.colony.getName())
+                    .addAmount("%number%", empty);
+            for (; empty > 0; empty--) {
+                buttons.add(newButton(cac, "", emptyIcon, cPlain, t));
+            }
         }
         addTogether(buttons);
 
@@ -814,12 +835,16 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 ? stpld("report.colony.wanting")
                     .addName("%colony%", colony.getName())
                     .addNamed("%unit%", type)
+                    .addStringTemplate("%location%",
+                        suggestion.workLocation.getLabel())
                     .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount)
                 : stpld("report.colony.improving")
                     .addName("%colony%", colony.getName())
                     .addNamed("%oldUnit%", suggestion.oldType)
                     .addNamed("%unit%", type)
+                    .addStringTemplate("%location%",
+                        suggestion.workLocation.getLabel())
                     .addNamed("%goods%", suggestion.goodsType)
                     .addAmount("%amount%", suggestion.amount);
             JButton b = newButton(cac, label, icon,
@@ -891,13 +916,15 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Colour: Plain
         t = mapEntriesByValue(rRegionMap, descendingIntegerComparator)
             .get(0).getKey().getLabel();
-        reportPanel.add(newLabel(Messages.message(t), null, cPlain, null),
+        reportPanel.add(newLabel(Messages.message(t), null, cPlain,
+                                 stpld("report.colony.name.summary")),
                         "newline");
 
         // Field: The total of the size change field.
         // Colour: cGood if efficient/cAlarm if inefficient.
         reportPanel.add(newLabel(Integer.toString(rSizeChange), null,
-                                 (rSizeChange < 0) ? cAlarm : cGood, null));
+                                 (rSizeChange < 0) ? cAlarm : cGood,
+                                 stpld("report.colony.growing.summary")));
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -909,7 +936,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             }
         }
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
-            : newLabel(Integer.toString(tiles.size()), null, cAlarm, null));
+            : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                       stpld("report.colony.exploring.summary")));
 
         // Fields: The number of existing colony tiles that would
         // benefit from improvements.
@@ -924,7 +952,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 }
             }
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
-                : newLabel(Integer.toString(tiles.size()), null, cAlarm, null));
+                : newLabel(Integer.toString(tiles.size()), null, cAlarm,
+                           stpld("report.colony.tile." + ti.getSuffix()
+                               + ".summary")));
         }
 
         // Fields: The net production of each storable+non-trade-goods
@@ -950,13 +980,16 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 throw new IllegalStateException("Bogus status: " + gp.status);
             }
             reportPanel.add((c == null) ? new JLabel()
-                : newLabel(Integer.toString(gp.amount), null, c, null));
+                : newLabel(Integer.toString(gp.amount), null, c,
+                    stpld("report.colony.production.summary")
+                        .addNamed("%goods%", gt)));
         }
 
         // Field: New colonist arrival or famine warning.
         // Colour: cWarn if negative, else cGood
         reportPanel.add(newLabel(Integer.toString((int)rNewColonist), null,
-                                 (rNewColonist < 0) ? cWarn : cGood, null));
+                                 (rNewColonist < 0) ? cWarn : cGood,
+                                 stpld("report.colony.arriving.summary")));
 
         // Field: The required goods rates.
         // Colour: cPlain
@@ -965,18 +998,22 @@ public final class ReportCompactColonyPanel extends ReportPanel
                  : mapEntriesByValue(rNeeded, descendingDoubleComparator)) {
             labels.add(newLabel(String.format("%4.1f %s", e.getValue(),
                                               Messages.getName(e.getKey())),
-                                null, cPlain, null));
+                                null, cPlain,
+                                stpld("report.colony.making.summary")
+                                    .addNamed("%goods%", e.getKey())));
         }
 
         // Field: What is being trained (attached to previous)
         // Colour: cPlain.
         teacherLen = Math.max(3, teacherLen); // Always some room here
-        labels.addAll(unitTypeLabels(rTeachers, teacherLen, null));
+        labels.addAll(unitTypeLabels(rTeachers, teacherLen,
+                stpld("report.colony.making.educating.summary")));
         addTogether(labels);
 
         // Field: The units that could be upgraded, followed by the units
         // that could be added.
-        addTogether(unitTypeLabels(rImprove, improveLen, null));
+        addTogether(unitTypeLabels(rImprove, improveLen,
+                stpld("report.colony.improving.summary")));
     }
 
     private List<JLabel> unitTypeLabels(Map<UnitType, Integer> unitTypeMap,
@@ -988,7 +1025,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             ImageIcon icon
                 = new ImageIcon(this.lib.getTinyUnitImage(e.getKey(), false));
             result.add(newLabel(Integer.toString(e.getValue()), icon,
-                                                 cPlain, t));
+                                cPlain, t));
             if (++n >= maxSize) break;
         }
         
@@ -1014,13 +1051,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                  stpld("report.colony.explore")));
         for (TileImprovementType ti : this.spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
-            // TODO-post-0.11.4-release: temporary hack until 0.11.4-release
-            String key = (("model.improvement.plow".equals(ti.getId()))
-                ? "report.colony.plow"
-                : ("model.improvement.road".equals(ti.getId()))
-                ? "report.colony.road"
-                : null) + ".header";
-            // end temporary hack
+            String key = "report.colony.tile." + ti.getSuffix() + ".header";
             reportPanel.add(newLabel(key, null, null, stpld(key)));
         }
         for (GoodsType gt : this.goodsTypes) {
@@ -1082,34 +1113,24 @@ public final class ReportCompactColonyPanel extends ReportPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final Game game = getGame();
-        String command = event.getActionCommand();
+        String command = ae.getActionCommand();
         if (command.startsWith(BUILDQUEUE)) {
             command = command.substring(BUILDQUEUE.length());
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showBuildQueuePanel(colony, new Runnable() {
-                        @Override
-                        public void run() {
-                            update();
-                        }
-                    });
+                getGUI().showBuildQueuePanel(colony, () -> { update(); });
                 return;
             }
         } else {
             Colony colony = game.getFreeColGameObject(command, Colony.class);
             if (colony != null) {
-                getGUI().showColonyPanel(colony, null)
-                    .addClosingCallback(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
+                getGUI().showColonyPanel2(colony, null)
+                    .addClosingCallback(() -> { update(); });
                 return;
             }
         }
-        super.actionPerformed(event);
+        super.actionPerformed(ae);
     }
 }

@@ -87,7 +87,7 @@ public class SerializationTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(true));
 
         Colony colony = getStandardColony(6);
-        Player player = game.getPlayer("model.nation.dutch");
+        Player player = game.getPlayerByNationId("model.nation.dutch");
 
         ServerTestHelper.newTurn();
         ServerTestHelper.newTurn();
@@ -138,7 +138,7 @@ public class SerializationTest extends FreeColTestCase {
             .addStringTemplate("%goods%", t1);
 
         Game game = getGame();
-        Player player = game.getPlayer("model.nation.dutch");
+        Player player = game.getPlayerByNationId("model.nation.dutch");
 
         try {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");

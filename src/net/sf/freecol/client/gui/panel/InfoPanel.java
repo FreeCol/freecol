@@ -44,21 +44,20 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
-import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-import static net.sf.freecol.common.util.StringUtils.*;
+
+import static net.sf.freecol.common.util.StringUtils.splitText;
 
 
 /**
@@ -88,10 +87,9 @@ public final class InfoPanel extends FreeColPanel {
         public EndTurnPanel() {
             super(new MigLayout("wrap 1, center", "[center]", ""));
 
-            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
-                .getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
 
             String labelString = Messages.message("infoPanel.endTurn");
             for (String s : splitText(labelString, " /",
@@ -144,18 +142,12 @@ public final class InfoPanel extends FreeColPanel {
 
             removeAll();
 
-            final MapViewer mapViewer = getGUI().getColonyTileMapViewer();
-            final ImageLibrary lib = mapViewer.getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
-            if (tile != null && tile.getType() != null) {
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
+            if (tile != null) {
                 final int width = getWidth() - SLACK;
-                List<AbstractGoods> production = tile.getType()
-                    .getPossibleProduction(true);
-                if (production.size() > PRODUCTION) {
-                    production = production.subList(0, PRODUCTION);
-                }
-                BufferedImage image = mapViewer.createTileImageWithBeachBorderAndItems(tile);
+                BufferedImage image = getGUI().createTileImageWithBeachBorderAndItems(tile);
                 if (tile.isExplored()) {
                     String text = Messages.message(tile.getLabel());
                     for (String s : splitText(text, " /",
@@ -168,8 +160,10 @@ public final class InfoPanel extends FreeColPanel {
                     add(new JLabel(new ImageIcon(image)), "spany");
 
                     final Player owner = tile.getOwner();
-                    if (owner != null) {
-                        StringTemplate t = owner.getNationName();
+                    if (owner == null) {
+                        add(new JLabel(), "span " + PRODUCTION);
+                    } else {
+                        StringTemplate t = owner.getNationLabel();
                         add(Utility.localizedLabel(t), "span " + PRODUCTION);
                     }
 
@@ -187,16 +181,21 @@ public final class InfoPanel extends FreeColPanel {
 
                     List<AbstractGoods> produce = tile.getType()
                         .getPossibleProduction(true);
-                    Collections.sort(produce,
-                                     AbstractGoods.abstractGoodsComparator);
-                    for (AbstractGoods goods : produce) {
-                        JLabel goodsLabel = new JLabel(
-                            String.valueOf(tile.getPotentialProduction(goods.getType(), null)),
-                            new ImageIcon(lib.getSmallIconImage(goods.getType())),
-                            JLabel.RIGHT);
-                        goodsLabel.setToolTipText(Messages.getName(goods.getType()));
-                        goodsLabel.setFont(font);
-                        add(goodsLabel);
+                    if (produce.isEmpty()) {
+                        add(new JLabel(), "span " + PRODUCTION);
+                    } else {
+                        Collections.sort(produce,
+                            AbstractGoods.abstractGoodsComparator);
+                        for (AbstractGoods ag : produce) {
+                            GoodsType type = ag.getType();
+                            int n = tile.getPotentialProduction(type, null);
+                            JLabel label = new JLabel(String.valueOf(n),
+                                new ImageIcon(lib.getSmallIconImage(type)),
+                                JLabel.RIGHT);
+                            label.setToolTipText(Messages.getName(type));
+                            label.setFont(font);
+                            add(label);
+                        }
                     }
                 } else {
                     add(Utility.localizedLabel("unexplored"),
@@ -234,7 +233,7 @@ public final class InfoPanel extends FreeColPanel {
          * Create a new unit information panel.
          */
         public UnitInfoPanel() {
-            super(new MigLayout("wrap 6, fill, gap 0 0", "", ""));
+            super(new MigLayout("wrap 5, fill, gap 0 0", "", ""));
 
             setSize(260, 130);
             setOpaque(false);
@@ -267,9 +266,17 @@ public final class InfoPanel extends FreeColPanel {
                     GoodsContainer gc = unit.getGoodsContainer();
                     if (gc != null) gc.addPropertyChangeListener(this);
                 }
+                logger.info("Switching UnitInfoPanel from " +
+                    (this.unit == null ? "null" :
+                        (this.unit.getId() + " " + this.unit.getDescription() +
+                        " " + this.unit.getMovesAsString())) +
+                     " to " +
+                    (unit == null ? "null" :
+                        (unit.getId() + " " + unit.getDescription() +
+                        " " + unit.getMovesAsString())));
                 this.unit = unit;
-                update();
             }
+            update();
         }
 
         /**
@@ -278,10 +285,9 @@ public final class InfoPanel extends FreeColPanel {
         public void update() {
             removeAll();
 
-            final ImageLibrary lib = getGUI().getColonyTileMapViewer()
-                .getImageLibrary();
+            final ImageLibrary lib = getGUI().getTileImageLibrary();
             Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-                FontLibrary.FontSize.TINY, lib.getScalingFactor());
+                FontLibrary.FontSize.TINY, lib.getScaleFactor());
             String text;
             JLabel textLabel;
             if (unit != null) {
@@ -309,8 +315,17 @@ public final class InfoPanel extends FreeColPanel {
                     ImageIcon icon;
                     JLabel label;
                     for (Goods goods : unit.getGoodsList()) {
-                        icon = new ImageIcon(lib.getSmallIconImage(goods.getType()));
-                        label = new JLabel(icon);
+                        int amount = goods.getAmount();
+                        GoodsType gt = goods.getType();
+                        // FIXME: Get size of full stack from appropriate place.
+                        if(amount == 100) {
+                            icon = new ImageIcon(lib.getIconImage(gt));
+                            label = new JLabel(icon);
+                        } else {
+                            icon = new ImageIcon(lib.getSmallIconImage(gt));
+                            label = new JLabel(String.valueOf(amount),
+                                               icon, JLabel.RIGHT);
+                        }
                         text = Messages.message(goods.getLabel(true));
                         label.setFont(font);
                         label.setToolTipText(text);
@@ -434,17 +449,15 @@ public final class InfoPanel extends FreeColPanel {
      * @return The panel mode.
      */
     private InfoPanelMode getMode() {
-        Player player;
         return (getFreeColClient().isMapEditor())
             ? InfoPanelMode.MAP
             : (getGUI().getViewMode() == GUI.VIEW_TERRAIN_MODE)
             ? InfoPanelMode.TILE
             : (unitInfoPanel.hasUnit())
             ? InfoPanelMode.UNIT
-            : ((player = getFreeColClient().getMyPlayer()) != null
-                && !player.hasNextActiveUnit())
-            ? InfoPanelMode.END
-            : InfoPanelMode.NONE;
+            : (getFreeColClient().getMyPlayer() == null)
+            ? InfoPanelMode.NONE
+            : InfoPanelMode.END;
     }
 
     /**
@@ -496,7 +509,13 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update() {
         InfoPanelMode newMode = getMode();
+        if(newMode == InfoPanelMode.END &&
+           getFreeColClient().getMyPlayer().hasNextActiveUnit()) {
+            logger.warning("Inconsistent InfoPanel status");
+        }
         if (this.mode != newMode) {
+            logger.info("Switching InfoPanel mode from " + mode +
+                        " to " + newMode);
             switch (this.mode = newMode) {
             case END:
                 this.mapEditorPanel.setVisible(false);

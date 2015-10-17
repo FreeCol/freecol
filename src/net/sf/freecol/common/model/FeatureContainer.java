@@ -30,6 +30,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
@@ -106,11 +108,9 @@ public final class FeatureContainer {
      * @return True if the ability set is `satisfied'.
      */
     public static boolean hasAbility(Set<Ability> abilitySet) {
-        if (abilitySet == null || abilitySet.isEmpty()) return false;
-        for (Ability ability : abilitySet) {
-            if (!ability.getValue()) return false;
-        }
-        return true;
+        return (abilitySet == null || abilitySet.isEmpty())
+            ? false
+            : all(abilitySet, Ability::getValue);
     }
 
     /**

@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -326,6 +327,27 @@ public class FreeColTestCase extends TestCase {
         return ret;
     }
 
+    /**
+     * Useful utility to make sure a work location is empty before doing
+     * some test that implicates it.
+     *
+     * @param wl The <code>WorkLocation</code> to clear.
+     * @return True if the work location is clear, false if there was a problem
+     *     removing a unit.
+     */
+    public boolean clearWorkLocation(WorkLocation wl) {
+        for (Unit u : wl.getUnitList()) {
+            for (WorkLocation w : wl.getColony().getCurrentWorkLocations()) {
+                if (w == wl) continue;
+                if (w.canAdd(u)) {
+                    u.setLocation(w);
+                    if (u.getLocation() == w) break;
+                }
+            }
+        }
+        return wl.isEmpty();
+    }
+
     public static class MapBuilder{
 
         // Required parameter
@@ -545,8 +567,8 @@ public class FreeColTestCase extends TestCase {
             }
 
             // indianPlayer not set, get default
-            if(indianPlayer == null){
-                indianPlayer = game.getPlayer(defaultIndianPlayer);
+            if (indianPlayer == null) {
+                indianPlayer = game.getPlayerByNationId(defaultIndianPlayer);
                 if(indianPlayer == null){
                     throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
                 }
@@ -630,20 +652,20 @@ public class FreeColTestCase extends TestCase {
                                                FreeColGameObject defender)
     {
         List<CombatResult> crs;
-        final float delta = 0.02f;
+        final double delta = 0.02;
         CombatModel combatModel = getGame().getCombatModel();
         CombatOdds combatOdds = combatModel.calculateCombatOdds(attacker, defender);
-        float f = combatOdds.win;
+        double p = combatOdds.win;
         MockPseudoRandom mr = new MockPseudoRandom();
         List<Integer> number = new ArrayList<>();
         number.add(-1);
         do {
-            f += (result == CombatResult.WIN) ? -delta : delta;
-            if (f < 0.0f || f >= 1.0f) {
+            p += (result == CombatResult.WIN) ? -delta : delta;
+            if (p < 0.0 || p >= 1.0) {
                 throw new IllegalStateException("f out of range: "
-                                                + Float.toString(f));
+                                                + Double.toString(p));
             }
-            number.set(0, (int)(Integer.MAX_VALUE * f));
+            number.set(0, (int)(Integer.MAX_VALUE * p));
             mr.setNextNumbers(number, true);
             crs = combatModel.generateAttackResult(mr, attacker, defender);
         } while (crs.get(0) != result);

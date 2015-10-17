@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Tension;
+
 import static net.sf.freecol.common.util.StringUtils.*;
 
 

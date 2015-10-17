@@ -223,8 +223,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final InGameController igc = ServerTestHelper.getInGameController();
 
         // Setup
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         int initialTensionValue = 500;
         dutch.setStance(french, Stance.PEACE);
         french.setStance(dutch, Stance.PEACE);
@@ -269,8 +269,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         ServerIndianSettlement camp = (ServerIndianSettlement)builder.build();
@@ -307,7 +307,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(1, 1);
         Unit privateer = new ServerUnit(game, tile, dutch, privateerType);
         assertEquals("Privateer should not carry anything",
@@ -341,7 +341,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile tile = map.getTile(10, 4);
         Unit ship = new ServerUnit(game, tile, dutch, galleonType);
         Unit treasure = new ServerUnit(game, tile, dutch, treasureTrainType);
@@ -408,7 +408,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile landTile = map.getTile(9, 9);
         Tile seaTile = map.getTile(10, 9);
         ServerUnit colonist = new ServerUnit(game, landTile, dutch, colonistType);
@@ -449,7 +449,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Unit unit = new ServerUnit(game, map.getTile(5, 8), dutch,
                                    hardyPioneerType);
         assertTrue("Unit should be a hardy pioneer",
@@ -486,8 +486,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(french, Stance.WAR, dutch, true);
         assertEquals("Dutch should be at war with french",
                      dutch.getStance(french), Stance.WAR);
@@ -541,8 +541,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(french, Stance.WAR, dutch, true);
 
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
@@ -610,8 +610,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(french, Stance.WAR, dutch, true);
         Colony colony = getStandardColony();
 
@@ -727,8 +727,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
         igc.changeStance(dutch, Stance.WAR, inca, true);
         Colony colony = getStandardColony(1, 5, 8);
 
@@ -943,8 +943,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
         igc.changeStance(dutch, Stance.WAR, inca, true);
         Colony colony = getStandardColony();
 
@@ -990,8 +990,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
         tile1.setExplored(dutch, true);
         tile1.setExplored(french, true);
@@ -1018,8 +1018,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
         
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1051,8 +1051,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         // UnitType promotion
@@ -1165,8 +1165,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1206,8 +1206,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1256,8 +1256,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1333,8 +1333,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
         igc.changeStance(dutch, Stance.WAR, inca, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1415,8 +1415,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1447,8 +1447,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1500,8 +1500,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         igc.changeStance(dutch, Stance.WAR, french, true);
 
         Tile tile1 = map.getTile(5, 8);
@@ -1544,8 +1544,8 @@ public class InGameControllerTest extends FreeColTestCase {
     private void setPlayersAt(Stance stance,Tension tension) {
         final Game game = getGame();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
 
         // Setup
         dutch.setStance(french, stance);
@@ -1591,8 +1591,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
         Stance initialStance = Stance.WAR;
         Stance newStance =  Stance.PEACE;
@@ -1624,8 +1624,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
         Stance initialStance = Stance.CEASE_FIRE;
         Stance newStance =  Stance.PEACE;
@@ -1660,8 +1660,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         Tension hateful = new Tension(Tension.Level.HATEFUL.getLimit());
         Stance initialStance = Stance.WAR;
         Stance newStance =  Stance.CEASE_FIRE;
@@ -1689,8 +1689,8 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer inca = (ServerPlayer)game.getPlayer("model.nation.inca");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer inca = (ServerPlayer)game.getPlayerByNationId("model.nation.inca");
         Player.makeContact(inca, dutch);
 
         FreeColTestCase.IndianSettlementBuilder builder
@@ -1818,7 +1818,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap());
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         assertTrue(dutch.getUnits().isEmpty());
         List<AbstractUnit> units = new ArrayList<>();
         units.add(new AbstractUnit(colonistType, Specification.DEFAULT_ROLE_ID, 1));
@@ -1946,7 +1946,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap(true));
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         FoundingFather father = new FoundingFather("father", spec());
         father.setType(FoundingFatherType.TRADE);
         Modifier priceBonus = new Modifier(Modifier.BUILDING_PRICE_BONUS,
@@ -1969,7 +1969,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Map map = game.getMap();
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony(1);
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
@@ -1992,7 +1992,7 @@ public class InGameControllerTest extends FreeColTestCase {
         game = ServerTestHelper.startServerGame(getTestMap(tileType));
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Tile tile = game.getMap().getTile(3, 3);
         assertEquals(tile.getType(), tileType);
 
@@ -2097,7 +2097,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final Game game = ServerTestHelper.startServerGame(getTestMap(true));
         final InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Colony colony = getStandardColony();
 
         UnitType gardenerType = new UnitType("gardener", spec());

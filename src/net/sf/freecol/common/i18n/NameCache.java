@@ -32,8 +32,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -423,7 +423,7 @@ public class NameCache {
         synchronized (regionNameLock) {
             index = regionIndex.get(prefix);
         }
-        StringTemplate nn = player.getNationName();
+        StringTemplate nn = player.getNationLabel();
         do {
             name = Messages.message(StringTemplate.label(" ")
                 .addStringTemplate(nn)
@@ -478,7 +478,7 @@ public class NameCache {
             List<String> names = settlementNames.get(player);
             while (!names.isEmpty()) {
                 String name = names.remove(0);
-                if (game.getSettlement(name) == null) return name;
+                if (game.getSettlementByName(name) == null) return name;
             }
         }
 
@@ -486,7 +486,7 @@ public class NameCache {
         final String base = getFallbackSettlementName(player);
         int i = player.getSettlements().size() + 1;
         String name = null;
-        while (game.getSettlement(name = base + i++) != null);
+        while (game.getSettlementByName(name = base + i++) != null);
         return name;
     }           
 
@@ -514,10 +514,10 @@ public class NameCache {
      */
     public static String getTradeRouteName(Player player) {
         String base = Messages.message("nameCache.base.tradeRoute");
-        if (player.getTradeRoute(base) == null) return base;
+        if (player.getTradeRouteByName(base) == null) return base;
         String name;
         int i = 1;
-        while (player.getTradeRoute(name = base + i++) != null);
+        while (player.getTradeRouteByName(name = base + i++) != null);
         return name;
     }
 
@@ -543,14 +543,14 @@ public class NameCache {
             List<String> names = shipNames.get(player);
             while (!names.isEmpty()) {
                 name = names.remove(0);
-                if (player.getUnit(name) == null) return name;
+                if (player.getUnitByName(name) == null) return name;
             }
         }
 
         // Get a fallback ship name
         final String base = Messages.message("nameCache.base.ship") + "-";
         int i = 1;
-        while (player.getUnit(name = base + i++) != null);
+        while (player.getUnitByName(name = base + i++) != null);
         return name;
     }
 }

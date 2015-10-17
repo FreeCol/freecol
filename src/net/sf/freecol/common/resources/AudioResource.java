@@ -43,7 +43,7 @@ public class AudioResource extends Resource {
      * Do not use directly.
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
-     * @throws Assorted exceptions from the underlying audio components
+     * @throws Exception of assorted types from the underlying audio components
      */
     public AudioResource(URI resourceLocator) throws Exception {
         super(resourceLocator);

@@ -320,7 +320,7 @@ final class ReceivingThread extends Thread {
                 bis.reset();
                 connection.handleAndSendReply(bis);
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO error", ioe);
+                logger.log(Level.WARNING, "IO error for " + tag, ioe);
             }
         }
 

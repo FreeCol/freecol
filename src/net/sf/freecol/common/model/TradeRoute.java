@@ -24,11 +24,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -224,11 +226,9 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned <code>Unit</code>s.
      */
     public List<Unit> getAssignedUnits() {
-        List<Unit> list = new ArrayList<>();
-        for (Unit unit : owner.getUnits()) {
-            if (unit.getTradeRoute() == this) list.add(unit);
-        }
-        return list;
+        return owner.getUnits().stream()
+            .filter(u -> u.getTradeRoute() == this)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -265,12 +265,10 @@ public class TradeRoute extends FreeColGameObject
         }
 
         // Check that the name is unique
-        for (TradeRoute route : owner.getTradeRoutes()) {
-            if (route == this) continue;
-            if (route.getName().equals(name)) {
-                return StringTemplate.template("model.tradeRoute.duplicateName")
-                    .addName("%name%", name);
-            }
+        if (any(owner.getTradeRoutes(),
+                tr -> tr != this && tr.getName().equals(name))) {
+            return StringTemplate.template("model.tradeRoute.duplicateName")
+                .addName("%name%", name);
         }
 
         // Verify that it has at least two stops

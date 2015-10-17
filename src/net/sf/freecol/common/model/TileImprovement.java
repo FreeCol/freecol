@@ -489,7 +489,12 @@ public class TileImprovement extends TileItem implements Named {
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (goodsType != null) {
-            Modifier modifier = getProductionModifier(goodsType);
+            boolean disableUnattended = !isNatural()
+                && unitType == null                
+                && !goodsType.isFoodType()
+                && getSpecification().getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS);
+            Modifier modifier = (disableUnattended) ? null
+                : getProductionModifier(goodsType);
             if (modifier != null && isComplete()) {
                 List<Modifier> result = new ArrayList<>();
                 result.add(modifier);

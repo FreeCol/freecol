@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
@@ -30,10 +31,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.client.gui.action.*;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
-import net.sf.freecol.client.gui.menu.DebugMenu;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -61,9 +60,10 @@ public class InGameMenuBar extends FreeColMenuBar {
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
      *
-     * @param f The main controller.
+     * @param freeColClient The main controller.
+     * @param listener An optional mouse motion listener.
      */
-    public InGameMenuBar(FreeColClient f, MapViewer mapViewer) {
+    public InGameMenuBar(FreeColClient freeColClient, MouseMotionListener listener) {
         // FIXME: FreeColClient should not have to be passed in to
         // this class.  This is only a menu bar, it doesn't need a
         // reference to the main controller.  The only reason it has
@@ -79,11 +79,11 @@ public class InGameMenuBar extends FreeColMenuBar {
         // Okay, I lied.. the update() and paintComponent() methods in
         // this MenuBar use freeColClient, too. But so what.  Move
         // those to another class too. :)
-        super(f);
+        super(freeColClient);
 
         // Add a mouse listener so that autoscrolling can happen in
         // this menubar
-        this.addMouseMotionListener(new MenuMouseMotionListener(f, mapViewer));
+        this.addMouseMotionListener(listener);
         
         reset();
     }
@@ -277,7 +277,7 @@ public class InGameMenuBar extends FreeColMenuBar {
                         freeColClient.getGame().getTurn().getLabel()));
             Rectangle2D displayStringBounds
                 = g2d.getFontMetrics().getStringBounds(displayString, g);
-            int y = Math.round(12f*freeColClient.getGUI().getImageLibrary().getScalingFactor())
+            int y = Math.round(12f*freeColClient.getGUI().getImageLibrary().getScaleFactor())
                   + 3 + getInsets().top;
             g2d.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);
         }

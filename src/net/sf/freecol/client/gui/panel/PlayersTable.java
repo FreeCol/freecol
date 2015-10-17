@@ -46,6 +46,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
@@ -209,12 +210,9 @@ public final class PlayersTable extends JTable {
             = new JComboBox<>(NationState.values());
         private JComboBox activeBox;
 
-        private final ActionListener listener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    stopCellEditing();
-                }
-            };
+        private final ActionListener listener = (ActionEvent ae) -> {
+            stopCellEditing();
+        };
 
 
         public AvailableCellEditor() {
@@ -319,9 +317,10 @@ public final class PlayersTable extends JTable {
             Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
             Nation nation = (Nation) value;
-            setText(Messages.getName(nation));
-            setIcon(new ImageIcon(
-                gui.getImageLibrary().getSmallerMiscIconImage(nation)));
+            setText(Messages.message(StringTemplate.template("countryName")
+                    .add("%nation%", Messages.nameKey(nation.getId()))));
+            setIcon(new ImageIcon(gui.getImageLibrary()
+                    .getSmallerMiscIconImage(nation)));
             return this;
         }
     }
@@ -393,11 +392,8 @@ public final class PlayersTable extends JTable {
 
 
         public PlayerCellEditor() {
-            button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        fireEditingStopped();
-                    }
+            button.addActionListener((ActionEvent ae) -> {
+                    fireEditingStopped();
                 });
         }
 
@@ -666,20 +662,14 @@ public final class PlayersTable extends JTable {
         setRowHeight(47);
 
         JButton nationButton = Utility.localizedButton("nation");
-        nationButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATIONS.getKey());
-                }
+        nationButton.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(PanelType.NATIONS.getKey());
             });
 
         JLabel availabilityLabel = Utility.localizedLabel("playersTable.availability");
         JButton advantageButton = Utility.localizedButton("playersTable.advantage");
-        advantageButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    gui.showColopediaPanel(PanelType.NATION_TYPES.getKey());
-                }
+        advantageButton.addActionListener((ActionEvent ae) -> {
+                gui.showColopediaPanel(PanelType.NATION_TYPES.getKey());
             });
 
         JLabel colorLabel = Utility.localizedLabel("color");
@@ -693,17 +683,19 @@ public final class PlayersTable extends JTable {
         JTableHeader header = getTableHeader();
         header.addMouseListener(new HeaderListener(header, renderer));
 
-        TableColumn nationColumn = getColumnModel().getColumn(NATION_COLUMN);
+        final TableColumnModel tcm = getColumnModel();
+        
+        TableColumn nationColumn = tcm.getColumn(NATION_COLUMN);
         nationColumn.setCellRenderer(new NationCellRenderer());
         nationColumn.setHeaderRenderer(renderer);
+        nationColumn.setPreferredWidth(2 * tcm.getTotalColumnWidth()
+            / tcm.getColumnCount());
 
-        TableColumn availableColumn
-            = getColumnModel().getColumn(AVAILABILITY_COLUMN);
+        TableColumn availableColumn = tcm.getColumn(AVAILABILITY_COLUMN);
         availableColumn.setCellRenderer(new AvailableCellRenderer());
         availableColumn.setCellEditor(new AvailableCellEditor());
 
-        TableColumn advantagesColumn
-            = getColumnModel().getColumn(ADVANTAGE_COLUMN);
+        TableColumn advantagesColumn = tcm.getColumn(ADVANTAGE_COLUMN);
         switch (nationOptions.getNationalAdvantages()) {
         case SELECTABLE:
             advantagesColumn.setCellEditor(new AdvantageCellEditor(spec
@@ -720,11 +712,11 @@ public final class PlayersTable extends JTable {
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
         advantagesColumn.setHeaderRenderer(renderer);
 
-        TableColumn colorsColumn = getColumnModel().getColumn(COLOR_COLUMN);
+        TableColumn colorsColumn = tcm.getColumn(COLOR_COLUMN);
         colorsColumn.setCellRenderer(new ColorCellRenderer(true));
         colorsColumn.setCellEditor(new ColorCellEditor(freeColClient));
 
-        TableColumn playerColumn = getColumnModel().getColumn(PLAYER_COLUMN);
+        TableColumn playerColumn = tcm.getColumn(PLAYER_COLUMN);
         playerColumn.setCellEditor(new PlayerCellEditor());
         playerColumn.setCellRenderer(new PlayerCellRenderer());
     }

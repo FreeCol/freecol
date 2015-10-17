@@ -216,6 +216,21 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
+     * Get a suitable game object to use as a clickable link in messages
+     * to a player.
+     *
+     * Objects do not have links by default, hence the null return
+     * here.  However, for example, a player's colony should return
+     * itself as a link target.
+     *
+     * @param player The <code>Player</code> to make a link for.
+     * @return A suitable link target if available, although usually null.
+     */
+    public FreeColGameObject getLinkTarget(Player player) {
+        return null;
+    }
+
+    /**
      * Checks the integrity of this game object.
      *
      * To be overridden by subclasses where this is meaningful.

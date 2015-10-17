@@ -24,8 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Player;
@@ -129,11 +131,10 @@ public class FreeColDebugger {
      * @return A string containing the modes as csv.
      */
     public static String getDebugModes() {
-        String ret = "";
-        for (DebugMode mode : DebugMode.values()) {
-            if (isInDebugMode(mode)) ret += "," + mode;
-        }
-        return (ret.isEmpty()) ? ret : ret.substring(1, ret.length());
+        return Arrays.stream(DebugMode.values())
+            .filter(m -> isInDebugMode(m))
+            .map(m -> m.toString())
+            .collect(Collectors.joining(","));
     }
 
     /**

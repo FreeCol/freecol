@@ -49,8 +49,6 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
     private final Canvas canvas;
 
-    private final MapViewer mapViewer;
-
     private final Timer doubleClickTimer = new Timer(doubleClickDelay,this);
 
     private int centerX, centerY;
@@ -61,14 +59,10 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      *
      * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param canvas The component this object gets created for.
-     * @param mapViewer The GUI that holds information such as screen
-     *     resolution.
      */
-    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas,
-                               MapViewer mapViewer) {
+    public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas) {
         this.freeColClient = freeColClient;
         this.canvas = canvas;
-        this.mapViewer = mapViewer;
     }
 
     /**
@@ -80,7 +74,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
-                Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+                Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
                 Colony colony = tile.getColony();
                 if (colony != null) {
                     if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
@@ -128,19 +122,19 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
 
         int me = e.getButton();
         if (e.isPopupTrigger()) me = MouseEvent.BUTTON3;
-        Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
+        Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
 
         switch (me) {
         case MouseEvent.BUTTON1:
             // Record initial click point for purposes of dragging
-            mapViewer.setDragPoint(e.getX(), e.getY());
+            canvas.setDragPoint(e.getX(), e.getY());
             if (canvas.isGotoStarted()) {
                 PathNode path = canvas.getGotoPath();
                 if (path != null) {
                     canvas.stopGoto();
                     // Move the unit
                     freeColClient.getInGameController()
-                        .goToTile(mapViewer.getActiveUnit(),
+                        .goToTile(canvas.getActiveUnit(),
                             path.getLastNode().getTile());
                 }
             } else if (doubleClickTimer.isRunning()) {
@@ -154,7 +148,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
             break;
         case MouseEvent.BUTTON2:
             if (tile != null) {
-                Unit unit = mapViewer.getActiveUnit();
+                Unit unit = canvas.getActiveUnit();
                 if (unit != null && unit.getTile() != tile) {
                     PathNode dragPath = unit.findPath(tile);
                     canvas.startGoto();
@@ -185,7 +179,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 canvas.stopGoto();
 
                 freeColClient.getInGameController()
-                    .goToTile(mapViewer.getActiveUnit(),
+                    .goToTile(canvas.getActiveUnit(),
                               temp.getLastNode().getTile());
 
             } else if (canvas.isGotoStarted()) {
@@ -203,9 +197,22 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         doubleClickTimer.stop();
-        mapViewer.setSelectedTile(mapViewer.convertToMapTile(centerX, centerY),
-            true);
+        Tile tile=canvas.convertToMapTile(centerX, centerY);
+        if(canvas.getViewMode() == GUI.MOVE_UNITS_MODE) {
+            // Clear goto order when active unit is on the tile
+            Unit unit=canvas.getActiveUnit();
+            if(unit != null && unit.getTile() == tile) {
+                freeColClient.getInGameController().clearGotoOrders(unit);
+                canvas.updateCurrentPathForActiveUnit();
+            } else {
+                if (tile != null && tile.hasSettlement()) {
+                    freeColClient.getGUI().showSettlement(tile.getSettlement());
+                    return;
+                }
+            }
+        }
+        freeColClient.getGUI().setSelectedTile(tile);
     }
 }

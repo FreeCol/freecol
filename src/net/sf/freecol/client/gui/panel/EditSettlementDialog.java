@@ -37,7 +37,8 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -151,11 +153,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     }
 
     private Player getOwnerPlayer() {
-        Nation n = getOwnerNation();
-        for (Player player : settlement.getGame().getLivePlayers(null)) {
-            if (player.getNationId().equals(n.getId())) return player;
-        }
-        return null;
+        final Nation n = getOwnerNation();
+        return find(settlement.getGame().getLivePlayers(null),
+            p -> p.getNationId().equals(n.getId()));
     }
 
     private SettlementType getSettlementType() {
@@ -205,7 +205,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();
-        final GUI gui = freeColClient.getGUI();
+        final SwingGUI gui = getGUI();
         IndianSettlement ret = null;
         Set<Tile> tiles = settlement.getOwnedTiles();
         Object value = getValue();
@@ -263,8 +263,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             ret = settlement;
 
         } else if (options.get(1).equals(value)) {
-            if (!getGUI().confirm("editSettlementDialog.removeSettlement.text", 
-                                  "ok", "cancel")) {
+            if (!gui.confirm("editSettlementDialog.removeSettlement.text", 
+                             "ok", "cancel")) {
                 return settlement;
             }
             // Dispose of units and settlement on tile

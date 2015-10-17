@@ -32,6 +32,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,7 +86,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.UnitType;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -164,10 +165,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
-                for (DataFlavor myFlavor : supportedFlavors) {
-                    if (myFlavor.equals(flavor)) return true;
-                }
-                return false;
+                return any(supportedFlavors, f -> f.equals(flavor));
             }
         }
 
@@ -338,11 +336,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
-            if (flavors == null) return false;
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(BUILD_LIST_FLAVOR)) return true;
-            }
-            return false;
+            return flavors != null
+                && any(flavors, f -> f.equals(BUILD_LIST_FLAVOR));
         }
 
         /**
@@ -552,15 +547,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         BuildQueueMouseAdapter adapter = new BuildQueueMouseAdapter(true);
         Action addAction = new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     JList<BuildableType> bql
                         = BuildQueuePanel.this.buildQueueList;
                     DefaultListModel<BuildableType> model
                         = (DefaultListModel<BuildableType>)bql.getModel();
                     JList<? extends BuildableType> btl
-                        = (e.getSource() == BuildQueuePanel.this.unitList)
+                        = (ae.getSource() == BuildQueuePanel.this.unitList)
                         ? BuildQueuePanel.this.unitList
-                        : (e.getSource() == BuildQueuePanel.this.buildingList)
+                        : (ae.getSource() == BuildQueuePanel.this.buildingList)
                         ? BuildQueuePanel.this.buildingList
                         : null;
                     if (btl != null) {
@@ -575,12 +570,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         // Create Font choice
         Font fontSubHead = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
                 FontLibrary.FontSize.SMALLER, Font.BOLD,
-                getImageLibrary().getScalingFactor());
+                getImageLibrary().getScaleFactor());
         
         // Create the components
-        JLabel header = Utility.localizedLabel("buildQueuePanel.buildQueue");
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.BIG));
+        JLabel header = Utility.localizedHeaderLabel(
+            "buildQueuePanel.buildQueue",
+            SwingConstants.LEADING, FontLibrary.FontSize.BIG);
         
         // JLabel SubHeads
         JLabel bqpUnits = Utility.localizedLabel("buildQueuePanel.units");
@@ -619,7 +614,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.buildQueueList.getActionMap().put("delete",
             new AbstractAction() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent ae) {
                     JList<BuildableType> bql = BuildQueuePanel.
                             this.buildQueueList;
                     for (BuildableType bt : bql.getSelectedValuesList()) {
@@ -946,18 +941,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         return result;
     }
 
-    private List<BuildableType> getBuildableTypes(Object[] objects) {
-        List<BuildableType> result = new ArrayList<>();
-        if (objects != null) {
-            for (Object object : objects) {
-                if (object instanceof BuildableType) {
-                    result.add((BuildableType) object);
-                }
-            }
-        }
-        return result;
-    }
-
     private int getMinimumIndex(BuildableType buildableType) {
         ListModel<BuildableType> buildQueue = this.buildQueueList.getModel();
         if (buildableType instanceof UnitType) {
@@ -1073,10 +1056,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
+    public void actionPerformed(ActionEvent ae) {
         final String FAIL = "FAIL";
         if (this.colony.getOwner() == getMyPlayer()) {
-            String command = event.getActionCommand();
+            String command = ae.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(this
                     .buildQueueList);
             while (!buildables.isEmpty()
@@ -1098,7 +1081,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     igc().payForBuilding(this.colony);
                     break;
                 default:
-                    super.actionPerformed(event);
+                    super.actionPerformed(ae);
                     break;
             }
         }

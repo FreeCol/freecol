@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
-import net.sf.freecol.client.gui.MapViewer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -465,12 +464,16 @@ public class TileTest extends FreeColTestCase {
         assertFalse(tile1.canProduce(lumber, null));
         assertFalse(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
                                  river1.getType()));
-        // Hills can not produce sugar, but can produce ore.
+        // Hills can not produce sugar, but can produce ore.  They do not
+        // get a road bonus for unattended ore production, but do get if
+        // if attended.
         assertFalse(tile2.canProduce(sugar, null));
         assertFalse(hasBonusFrom(tile2.getProductionModifiers(sugar, null),
                                  road2.getType()));
         assertTrue(tile2.canProduce(ore, null));
-        assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, null),
+        assertFalse(hasBonusFrom(tile2.getProductionModifiers(ore, null),
+                                 road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, colonistType),
                                 road2.getType()));
 
         // Add a sugar resource, there should now be two sugar bonuses
@@ -510,7 +513,9 @@ public class TileTest extends FreeColTestCase {
             + (int)FeatureContainer.applyModifiers(0f, turn,
                 road2.getProductionModifiers(silver, null)));
         assertTrue(tile2.canProduce(silver, null));
-        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+        assertFalse(hasBonusFrom(tile2.getProductionModifiers(silver, null),
+                                 road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, colonistType),
                                 road2.getType()));
         assertTrue(hasBonusFrom(tile2.getProductionModifiers(silver, null),
                                 mineralsResource));
@@ -710,13 +715,13 @@ public class TileTest extends FreeColTestCase {
     }
 
     public void testZIndex() {
-        assertTrue(MapViewer.OVERLAY_INDEX < MapViewer.FOREST_INDEX);
-        assertTrue(MapViewer.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);
-        assertTrue(TileItem.RESOURCE_ZINDEX < TileItem.RUMOUR_ZINDEX);
+        assertTrue(Tile.OVERLAY_ZINDEX < Tile.FOREST_ZINDEX);
+        assertTrue(Tile.FOREST_ZINDEX < Tile.RESOURCE_ZINDEX);
+        assertTrue(Tile.RESOURCE_ZINDEX < Tile.RUMOUR_ZINDEX);
         assertTrue(plow.getZIndex() < river.getZIndex());
         assertTrue(river.getZIndex() < road.getZIndex());
-        assertTrue(MapViewer.FOREST_INDEX < road.getZIndex());
-        assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
+        assertTrue(Tile.FOREST_ZINDEX < road.getZIndex());
+        assertTrue(road.getZIndex() < Tile.RESOURCE_ZINDEX);
     }
 
     public void testCopy() {
@@ -747,7 +752,7 @@ public class TileTest extends FreeColTestCase {
         Map map = getCoastTestMap(plains, true);
         game.setMap(map);
 
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Tile settlementTile = map.getTile(9, 2);
         FreeColTestUtils.getColonyBuilder().player(dutch)
             .colonyTile(settlementTile).build();

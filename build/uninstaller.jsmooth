@@ -19,7 +19,7 @@
     <mainClassName>com.izforge.izpack.uninstaller.Uninstaller</mainClassName>
     <maximumMemoryHeap>-1</maximumMemoryHeap>
     <maximumVersion></maximumVersion>
-    <minimumVersion>1.7</minimumVersion>
+    <minimumVersion>1.8</minimumVersion>
     <skeletonName>Windowed Wrapper</skeletonName>
     <skeletonProperties>
         <key>Message</key>

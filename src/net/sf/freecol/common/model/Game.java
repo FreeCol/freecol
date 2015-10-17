@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -490,19 +492,37 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get a <code>Player</code> identified by its nation.
+     *
+     * @param nation The <code>Nation</code> to search for.
+     * @return The <code>Player</code> of the given nation, or null if
+     *     not found.
+     */
+    public Player getPlayerByNation(Nation nation) {
+        return getPlayerByNationId(nation.getId());
+    }
+
+    /**
+     * Get a <code>Player</code> identified by its nation identifier.
+     *
+     * @param nationId The nation identifier to search for.
+     * @return The <code>Player</code> of the given nation, or null if
+     *     not found.
+     */
+    public Player getPlayerByNationId(String nationId) {
+        return find(players, p -> p.getNationId().equals(nationId));
+    }
+
+    /**
      * Get live players in the game.
      *
      * @param other An optional <code>Player</code> to omit.
      * @return The list of live <code>Player</code>s.
      */
     public List<Player> getLivePlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || player == other) continue;
-            result.add(player);
-        }
-        return result;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -524,13 +544,10 @@ public class Game extends FreeColGameObject {
      * @return A list of live European <code>Player</code>s in this game.
      */
     public List<Player> getLiveEuropeanPlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || !player.isEuropean() || player == other) continue;
-            result.add(player);
-        }
-        return result;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other
+                && p.isEuropean())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -540,27 +557,10 @@ public class Game extends FreeColGameObject {
      * @return A list of live native <code>Player</code>s in this game.
      */
     public List<Player> getLiveNativePlayers(Player other) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players) {
-            if (player.isUnknownEnemy() || player.isDead()
-                || !player.isIndian() || player == other) continue;
-            result.add(player);
-        }
-        return result;
-    }
-
-    /**
-     * Get a <code>Player</code> identified by its nation identifier.
-     *
-     * @param nationId The nation identifier to search for.
-     * @return The <code>Player</code> of the given nation, or null if
-     *     not found.
-     */
-    public Player getPlayer(String nationId) {
-        for (Player player : players) {
-            if (player.getNationId().equals(nationId)) return player;
-        }
-        return null;
+        return players.stream()
+            .filter(p -> !p.isUnknownEnemy() && !p.isDead() && p != other
+                && p.isIndian())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -611,10 +611,7 @@ public class Game extends FreeColGameObject {
      * @return The <code>Player</code> or null if none found.
      */
     public Player getPlayerByName(String name) {
-        for (Player player : players) {
-            if (player.getName().equals(name)) return player;
-        }
-        return null;
+        return find(players, p -> p.getName().equals(name));
     }
 
     /**
@@ -624,10 +621,7 @@ public class Game extends FreeColGameObject {
      * @return True if the name is already in use.
      */
     public boolean playerNameInUse(String name) {
-        for (Player player : players) {
-            if (player.getName().equals(name)) return true;
-        }
-        return false;
+        return getPlayerByName(name) != null;
     }
 
     /**
@@ -717,6 +711,15 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Is this game in revenge mode?
+     *
+     * @return True if an undead player is present.
+     */
+    public boolean isInRevengeMode() {
+        return contains(getPlayers(), Player::isUndead);
+    }
+
+    /**
      * Gets the current player.
      *
      * @return The current player.
@@ -784,13 +787,10 @@ public class Game extends FreeColGameObject {
      * @return A vacant <code>Nation</code> or null if none found.
      */
     public Nation getVacantNation() {
-        for (Entry<Nation, NationState> entry
-                 : nationOptions.getNations().entrySet()) {
-            if (entry.getValue() == NationState.AVAILABLE) {
-                return entry.getKey();
-            }
-        }
-        return null;
+        Entry<Nation,NationState> entry
+            = find(nationOptions.getNations().entrySet(),
+                e -> e.getValue() == NationState.AVAILABLE, null);
+        return (entry == null) ? null : entry.getKey();
     }
 
     /**
@@ -957,10 +957,7 @@ public class Game extends FreeColGameObject {
      * @return True if all players are ready to launch.
      */
     public boolean allPlayersReadyToLaunch() {
-        for (Player player : getLivePlayers(null)) {
-            if (!player.isReady()) return false;
-        }
-        return true;
+        return all(getLivePlayers(null), Player::isReady);
     }
 
     /**
@@ -971,7 +968,7 @@ public class Game extends FreeColGameObject {
      *     if there is no known <code>Settlement</code> with the
      *     specified name (the settlement might not be visible to a client).
      */
-    public Settlement getSettlement(String name) {
+    public Settlement getSettlementByName(String name) {
         for (Player p : getLivePlayers(null)) {
             for (Settlement s : p.getSettlements()) {
                 if (name.equals(s.getName())) return s;
@@ -1135,15 +1132,19 @@ public class Game extends FreeColGameObject {
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fcgo = iterator.next();
-            if (fcgo.isUninitialized()) {
+            if (fcgo == null) {
+                lb.add(" null-fcgo");
+            } else if (fcgo.isUninitialized()) {
                 lb.add(" ", fcgo.getId(),
                     "(", lastPart(fcgo.getClass().getName(), "."), ")");
-                if (fix) {
-                    iterator.remove();
-                    result = Math.min(result, 0);
-                } else {
-                    result = -1;
-                }
+            } else {
+                continue;
+            }
+            if (fix) {
+                iterator.remove();
+                result = Math.min(result, 0);
+            } else {
+                result = -1;
             }
         }
         if (lb.grew()) {
@@ -1318,7 +1319,12 @@ public class Game extends FreeColGameObject {
         //logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
-            NameCache.addCityOfCibola(xr.readId());
+            String cibola = xr.readId();
+            // @compat 0.11.3
+            final String oldPrefix = "lostCityRumour.cityName";
+            if (cibola.startsWith(oldPrefix)) cibola = "nameCache." + cibola;
+            // end @compat 0.11.3
+            NameCache.addCityOfCibola(cibola);
             xr.closeTag(CIBOLA_TAG);
 
         } else if (Map.getXMLElementTagName().equals(tag)) {

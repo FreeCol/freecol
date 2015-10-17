@@ -32,9 +32,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 public abstract class TileItem extends FreeColGameObject
     implements Locatable, Named {
 
-    public static final int RESOURCE_ZINDEX = 400;
-    public static final int RUMOUR_ZINDEX = 500;
-
     /** The tile where the tile item is. */
     protected Tile tile;
 

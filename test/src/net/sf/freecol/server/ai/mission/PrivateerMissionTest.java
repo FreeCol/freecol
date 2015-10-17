@@ -60,8 +60,8 @@ public class PrivateerMissionTest extends FreeColTestCase {
         Map map = game.getMap();
 
         // Create player and unit
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
 
         Tile colonyTile = map.getTile(9, 9);
         Tile privateerTile = map.getTile(10, 9);

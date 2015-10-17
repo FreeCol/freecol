@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Map;
 
@@ -95,12 +96,9 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         panel.add(heightPanel);
         panel.setSize(panel.getPreferredSize());
 
-        final ActionListener al = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    ScaleMapSizeDialog.this.checkFields();
-                }
-            };
+        final ActionListener al = (ActionEvent ae) -> {
+            ScaleMapSizeDialog.this.checkFields();
+        };
 
         inputWidth.addActionListener(al);
         inputHeight.addActionListener(al);

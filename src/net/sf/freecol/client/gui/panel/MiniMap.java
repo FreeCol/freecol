@@ -21,9 +21,9 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -349,12 +349,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
         if (getParent() != null) {
-            TileType tileType = freeColClient.getGame().getSpecification().getTileTypeList().get(0);
             int miniRectX = (gui.getFocus().getX() - firstColumn) * tileSize;
             int miniRectY = (gui.getFocus().getY() - firstRow) * tileSize / 4;
-            Image image = library.getTerrainImage(tileType, 0, 0);
-            int miniRectWidth = (getParent().getWidth() / image.getWidth(null) + 1) * tileSize;
-            int miniRectHeight = (getParent().getHeight() / image.getHeight(null) + 1) * tileSize / 2;
+            Dimension mapTileSize = library.scaleDimension(ImageLibrary.TILE_SIZE);
+            int miniRectWidth = (getParent().getWidth() / mapTileSize.width + 1) * tileSize;
+            int miniRectHeight = (getParent().getHeight() / mapTileSize.height + 1) * tileSize / 2;
             if (miniRectX + miniRectWidth / 2 > width) {
                 miniRectX = width - miniRectWidth / 2 - 1;
             } else if (miniRectX - miniRectWidth / 2 < 0) {

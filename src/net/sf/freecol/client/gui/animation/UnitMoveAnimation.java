@@ -24,8 +24,9 @@ import java.awt.Rectangle;
 
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.OutForAnimationCallback;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -41,23 +42,22 @@ final class UnitMoveAnimation {
      */
     private static final int ANIMATION_DELAY = 33;
 
+    private final FreeColClient freeColClient;
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
 
-    private final GUI gui;
-
     /**
      * Constructor
      *
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
      * @param unit The <code>Unit</code> to be animated.
      * @param sourceTile The <code>Tile</code> the unit is moving from.
      * @param destinationTile The <code>Tile</code> the unit is moving to.
      */
-    public UnitMoveAnimation(GUI gui, Unit unit,
+    public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile) {
-        this.gui = gui;
+        this.freeColClient = freeColClient;
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
@@ -68,7 +68,9 @@ final class UnitMoveAnimation {
      * Do the animation.
      */
     public void animate() {
-        final int movementSpeed = gui.getAnimationSpeed(unit);
+        final int movementSpeed
+            = freeColClient.getAnimationSpeed(unit.getOwner());
+        final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         
@@ -81,58 +83,55 @@ final class UnitMoveAnimation {
         final Rectangle bounds = r1.union(r2);
 
         gui.executeWithUnitOutForAnimation(unit, sourceTile,
-            new OutForAnimationCallback() {
-                @Override
-                public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
-                    final Point srcPoint
-                        = gui.calculateUnitLabelPositionInTile(unitLabel, srcP);
-                    final Point dstPoint
-                        = gui.calculateUnitLabelPositionInTile(unitLabel, dstP);
-                    final double xratio = gui.getTileWidthHeightRatio();
-                    final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
-                        : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
-                    final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
-                        : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
-                    
-                    // Painting the whole screen once to get rid of
-                    // disposed dialog-boxes.
-                    gui.paintImmediatelyCanvasInItsBounds();
-                    
-                    int dropFrames = 0;
-                    Point point = srcPoint;
-                    while (!point.equals(dstPoint)) {
-                        long time = System.currentTimeMillis();
-                        
-                        point.x += stepX * xratio * movementRatio;
-                        point.y += stepY * movementRatio;
-                        if ((stepX < 0 && point.x < dstPoint.x)
-                            || (stepX > 0 && point.x > dstPoint.x)) {
-                            point.x = dstPoint.x;
-                        }
-                        if ((stepY < 0 && point.y < dstPoint.y)
-                            || (stepY > 0 && point.y > dstPoint.y)) {
-                            point.y = dstPoint.y;
-                        }
-                        if (dropFrames <= 0) {
-                            unitLabel.setLocation(point);
-                            gui.paintImmediatelyCanvasIn(bounds);
+            (JLabel unitLabel) -> {
+                final int labelWidth = unitLabel.getWidth();
+                final int labelHeight = unitLabel.getHeight();
+                final Point srcPoint = gui.calculateUnitLabelPositionInTile(labelWidth, labelHeight, srcP);
+                final Point dstPoint = gui.calculateUnitLabelPositionInTile(labelWidth, labelHeight, dstP);
+                final double xratio = ImageLibrary.TILE_SIZE.width
+                    / (double)ImageLibrary.TILE_SIZE.height;
+                final int stepX = (srcPoint.getX() == dstPoint.getX()) ? 0
+                    : (srcPoint.getX() > dstPoint.getX()) ? -1 : 1;
+                final int stepY = (srcPoint.getY() == dstPoint.getY()) ? 0
+                    : (srcPoint.getY() > dstPoint.getY()) ? -1 : 1;
+
+                // Painting the whole screen once to get rid of
+                // disposed dialog-boxes.
+                gui.paintImmediatelyCanvasInItsBounds();
+
+                int dropFrames = 0;
+                Point point = srcPoint;
+                while (!point.equals(dstPoint)) {
+                    long time = System.currentTimeMillis();
+
+                    point.x += stepX * xratio * movementRatio;
+                    point.y += stepY * movementRatio;
+                    if ((stepX < 0 && point.x < dstPoint.x)
+                        || (stepX > 0 && point.x > dstPoint.x)) {
+                        point.x = dstPoint.x;
+                    }
+                    if ((stepY < 0 && point.y < dstPoint.y)
+                        || (stepY > 0 && point.y > dstPoint.y)) {
+                        point.y = dstPoint.y;
+                    }
+                    if (dropFrames <= 0) {
+                        unitLabel.setLocation(point);
+                        gui.paintImmediatelyCanvasIn(bounds);
                             
-                            int timeTaken = (int)(System.currentTimeMillis()
-                                - time);
-                            final int waitTime = ANIMATION_DELAY - timeTaken;
-                            if (waitTime > 0) {
-                                try {
-                                    Thread.sleep(waitTime);
-                                } catch (InterruptedException ex) {
-                                    //ignore
-                                }
-                                dropFrames = 0;
-                            } else {
-                                dropFrames = timeTaken / ANIMATION_DELAY - 1;
+                        int timeTaken = (int)(System.currentTimeMillis() - time);
+                        final int waitTime = ANIMATION_DELAY - timeTaken;
+                        if (waitTime > 0) {
+                            try {
+                                Thread.sleep(waitTime);
+                            } catch (InterruptedException ex) {
+                                //ignore
                             }
+                            dropFrames = 0;
                         } else {
-                            dropFrames--;
+                            dropFrames = timeTaken / ANIMATION_DELAY - 1;
                         }
+                    } else {
+                            dropFrames--;
                     }
                 }
             });

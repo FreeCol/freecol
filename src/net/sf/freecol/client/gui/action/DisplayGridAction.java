@@ -51,8 +51,8 @@ public class DisplayGridAction extends SelectableAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        setSelected(((JCheckBoxMenuItem)e.getSource()).isSelected());
+    public void actionPerformed(ActionEvent ae) {
+        setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());
         setOption(isSelected());
         getGUI().refresh();
     }

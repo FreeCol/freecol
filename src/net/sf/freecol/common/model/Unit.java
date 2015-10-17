@@ -25,6 +25,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -65,20 +68,22 @@ public class Unit extends GoodsLocation
      */
     public static final int MANY_TURNS = 10000;
 
-    /** A comparator to order units by skill level. */
-    private static final Comparator<Unit> skillLevelComp
-        = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit u1, Unit u2) {
-                return u1.getSkillLevel() - u2.getSkillLevel();
-            }
-        };
-
-
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
+    /**
+     * A comparator to compare units by position, top to bottom,
+     * left to right.
+     */
+    public static final Comparator<Unit> locComparator
+        = Comparator.comparingInt(u -> Location.getRank(u));
+
+    /** A comparator to compare units by type then role. */
+    public static final Comparator<Unit> typeRoleComparator
+        = Comparator.comparing(Unit::getType)
+            .thenComparing(Comparator.comparing(Unit::getRole));
+    
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -102,7 +107,6 @@ public class Unit extends GoodsLocation
             return "unitState." + getEnumKey(this);
         }
     }
-
 
     /** The individual name of this unit, not of the unit type. */
     protected String name = null;
@@ -267,7 +271,7 @@ public class Unit extends GoodsLocation
     public StringTemplate getApparentOwnerName() {
         Player own = (hasAbility(Ability.PIRACY)) ? getGame().getUnknownEnemy()
             : owner;
-        return own.getNationName();
+        return own.getNationLabel();
     }
 
     /** What type of unit label do we want? */
@@ -855,11 +859,8 @@ public class Unit extends GoodsLocation
      */
     public List<Role> getAvailableRoles(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRoles();
-        List<Role> result = new ArrayList<>();
-        for (Role role : roles) {
-            if (roleIsAvailable(role)) result.add(role);
-        }
-        return result;
+        return roles.stream()
+            .filter(r -> roleIsAvailable(r)).collect(Collectors.toList());
     }
 
     /**
@@ -1307,14 +1308,12 @@ public class Unit extends GoodsLocation
      * Gets the number of turns this unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
      *
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @param typeStudent the student <code>UnitType</code>.
      * @return The turns of training needed to teach its current type
      *     to a free colonist or to promote an indentured servant or a
      *     petty criminal.
      * @see #getTurnsOfTraining
-     *
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @param typeStudent the student <code>UnitType</code>.
-     * @return The number of turns.
      */
     public int getNeededTurnsOfTraining(UnitType typeTeacher,
                                         UnitType typeStudent) {
@@ -1843,8 +1842,8 @@ public class Unit extends GoodsLocation
      * @param otherPower Its defence power.
      * @return True if the other unit should be preferred.
      */
-    public static boolean betterDefender(Unit defender, float defenderPower,
-                                         Unit other, float otherPower) {
+    public static boolean betterDefender(Unit defender, double defenderPower,
+                                         Unit other, double otherPower) {
         if (defender == null) {
             return true;
         } else if (defender.isPerson() && other.isPerson()
@@ -1864,48 +1863,17 @@ public class Unit extends GoodsLocation
 
     /**
      * Finds the closest <code>Location</code> to this tile where
-     * this ship can be repaired.
+     * this ship can be repaired, excluding the current colony.
      *
      * @return The closest <code>Location</code> where a ship can be
      *     repaired.
      */
     public Location getRepairLocation() {
         final Player player = getOwner();
-        final Tile tile = getTile();
-        Location bestLocation = null;
-        int bestTurns = INFINITY;
-        for (Colony colony : player.getColonies()) {
-            int turns;
-            if (colony != null && colony != tile.getColony()
-                && colony.hasAbility(Ability.REPAIR_UNITS)
-                && (turns = getTurnsToReach(colony)) >= 0
-                && turns < bestTurns) {
-                // Tile.getDistanceTo(Tile) doesn't care about
-                // connectivity, so we need to check for an available
-                // path to target colony instead
-                bestTurns = turns;
-                bestLocation = colony;
-            }
-        }
-        if (bestLocation == null) bestLocation = player.getEurope();
-        return bestLocation;
-    }
-
-    /**
-     * Get a comparator to order units by military strength.
-     *
-     * @param cm The <code>CombatModel</code> to assess strength with.
-     * @return A suitable <code>Comparator</code>.
-     */
-    public static final Comparator<Unit> getMilitaryStrengthComparator(final CombatModel cm) {
-        return new Comparator<Unit>() {
-                @Override
-                public int compare(Unit u1, Unit u2) {
-                    float cmp = cm.calculateCombatOdds(u1, u2).win
-                        - cm.calculateCombatOdds(u2, u1).win;
-                    return (cmp < 0.5f) ? -1 : (cmp > 0.5f) ? 1 : 0;
-                }
-            };
+        final Colony notHere = getTile().getColony();
+        Location best = getClosestColony(player.getColonies().stream()
+            .filter(c -> c != notHere && c.hasAbility(Ability.REPAIR_UNITS)));
+        return (best != null) ? best : player.getEurope();
     }
 
 
@@ -2251,13 +2219,11 @@ public class Unit extends GoodsLocation
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
         } else { // moving to sea, check for embarkation
-            if (defender == null || !getOwner().owns(defender)) {
-                return MoveType.MOVE_NO_ACCESS_EMBARK;
-            }
-            for (Unit u : target.getUnitList()) {
-                if (u.canAdd(this)) return MoveType.EMBARK;
-            }
-            return MoveType.MOVE_NO_ACCESS_FULL;
+            return (defender == null || !getOwner().owns(defender))
+                ? MoveType.MOVE_NO_ACCESS_EMBARK
+                : (any(target.getUnitList(), u -> u.canAdd(this)))
+                ? MoveType.EMBARK
+                : MoveType.MOVE_NO_ACCESS_FULL;
         }
     }
 
@@ -2435,14 +2401,12 @@ public class Unit extends GoodsLocation
      *      seas or can make a move to a neighbouring high seas tile.
      */
     public boolean hasHighSeasMove() {
-        if (canMoveToHighSeas()) return true;
-        if (hasTile() && getMovesLeft() > 0) {
-            for (Tile t : getTile().getSurroundingTiles(1)) {
-                if (t.isDirectlyHighSeasConnected()
-                    && getMoveType(t).isLegal()) return true;
-            }
-        }
-        return false;
+        return (canMoveToHighSeas())
+            ? true
+            : (hasTile() && getMovesLeft() > 0)
+            ? any(getTile().getSurroundingTiles(1, 1),
+                Tile::isDirectlyHighSeasConnected)
+            : false;
     }
 
     /**
@@ -2745,7 +2709,7 @@ public class Unit extends GoodsLocation
      *
      * @param end The destination <code>Location</code>.
      * @return The number of turns it will take to reach the destination,
-     *         or <code>INFINITY</code> if no path can be found.
+     *         or <code>MANY_TURNS</code> if no path can be found.
      */
     public int getTurnsToReach(Location end) {
         return getTurnsToReach(getLocation(), end);
@@ -2759,7 +2723,7 @@ public class Unit extends GoodsLocation
      * @param start The <code>Location</code> to start the search from.
      * @param end The destination <code>Location</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>INFINITY</code> if no path can be found.
+     *         or <code>MANY_TURNS</code> if no path can be found.
      */
     public int getTurnsToReach(Location start, Location end) {
         return getTurnsToReach(start, end, getCarrier(),
@@ -2785,6 +2749,32 @@ public class Unit extends GoodsLocation
         return (path == null) ? MANY_TURNS : path.getTotalTurns();
     }
 
+    /**
+     * Get the colony that can be reached by this unit in the least number
+     * of turns.
+     *
+     * @param colonies A list of <code>Colony</code>s.
+     * @return The nearest <code>Colony</code>, or null if none found.
+     */
+    public Colony getClosestColony(List<Colony> colonies) {
+        return getClosestColony(colonies.stream());
+    }
+    
+    /**
+     * Get the colony that can be reached by this unit in the least number
+     * of turns.
+     *
+     * @param colonies A stream of <code>Colony</code>s.
+     * @return The nearest <code>Colony</code>, or null if none found.
+     */
+    public Colony getClosestColony(Stream<Colony> colonies) {
+        ToIntFunction<Colony> closeness = c -> (c == null) ? MANY_TURNS-1
+            : this.getTurnsToReach(c);
+        return Stream.concat(Stream.of((Colony)null), colonies)
+            .collect(Collectors.minBy(Comparator.comparingInt(closeness)))
+            .orElse(null);
+    }
+    
     /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
@@ -3229,11 +3219,9 @@ public class Unit extends GoodsLocation
      * @return The number of cargo slots occupied by units.
      */
     public int getUnitSpaceTaken() {
-        int space = 0;
-        if (canCarryUnits()) {
-            for (Unit u : getUnitList()) space += u.getSpaceTaken();
-        }
-        return space;
+        return (canCarryUnits())
+            ? getUnitList().stream().mapToInt(u -> u.getSpaceTaken()).sum()
+            : 0;
     }
 
     /**
@@ -3407,9 +3395,10 @@ public class Unit extends GoodsLocation
         }
         if (loc.getColony() != null) {
             // Cash in if at a colony which has connectivity to Europe
-            // if the player does not have a suitable carrier.
+            // unless the player has a suitable carrier and no free transport.
             return loc.getColony().isConnectedPort()
-                && getOwner().getCarriersForUnit(this).isEmpty();
+                && (getOwner().getCarriersForUnit(this).isEmpty()
+                    || getTransportFee() == 0);
         }
         // Otherwise, cash in if in Europe.
         return loc instanceof Europe
@@ -3452,15 +3441,6 @@ public class Unit extends GoodsLocation
      */
     public static int getSkillLevel(UnitType unitType) {
         return (unitType.hasSkill()) ? unitType.getSkill() : 0;
-    }
-
-    /**
-     * Get a Comparator that compares the skill levels of given units.
-     *
-     * @return skill Comparator
-     */
-    public static Comparator<Unit> getSkillLevelComparator() {
-        return skillLevelComp;
     }
 
     /**
@@ -3944,6 +3924,14 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
+    public int getRank() {
+        return Location.getRank(getLocation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append(getId()).append("-").append(getType().getSuffix());
@@ -4050,6 +4038,15 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
+    public FreeColGameObject getLinkTarget(Player player) {
+        return (hasTile()) ? (FreeColGameObject)getTile().up()
+            : player.getEurope();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
         if (this.role == null) {
@@ -4060,6 +4057,20 @@ public class Unit extends GoodsLocation
             } else {
                 logger.warning("Missing role for: " + getId());
                 result = -1;
+            }
+        }
+        if (this.destination != null) {
+            if (((FreeColGameObject)this.destination).isUninitialized()) {
+                if (fix) {
+                    this.destination = null;
+                    logger.warning("Cleared uninitialized destination for: "
+                        + getId());
+                    result = Math.min(result, 0);
+                } else {
+                    logger.warning("Uninitialized destination for: "
+                        + getId());
+                    result = -1;
+                }
             }
         }
         return result;

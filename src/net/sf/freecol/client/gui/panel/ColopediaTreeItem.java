@@ -28,22 +28,24 @@ import javax.swing.ImageIcon;
  */
 class ColopediaTreeItem {
 
-    private final ColopediaDetailPanel panelType;
+    private final ColopediaDetailPanel detailPanel;
     private final String id;
     private final String text;
     private final ImageIcon icon;
+
 
     /**
      * The default constructor for a ColopediaTreeItem that
      * corresponds to a leaf node.
      *
-     * @param panelType a <code>ColopediaDetailPanel</code> value
+     * @param detailPanel A <code>ColopediaDetailPanel</code> value.
      * @param id The object identifier.
      * @param text a <code>String</code> value
      * @param icon an <code>ImageIcon</code> value
      */
-    ColopediaTreeItem(ColopediaDetailPanel panelType, String id, String text, ImageIcon icon) {
-        this.panelType = panelType;
+    ColopediaTreeItem(ColopediaDetailPanel detailPanel, String id, String text,
+                      ImageIcon icon) {
+        this.detailPanel = detailPanel;
         this.id = id;
         this.text = text;
         this.icon = icon;
@@ -55,7 +57,7 @@ class ColopediaTreeItem {
      * @return the panel type this item belongs to.
      */
     public ColopediaDetailPanel getPanelType() {
-        return panelType;
+        return detailPanel;
     }
 
     public String getId() {

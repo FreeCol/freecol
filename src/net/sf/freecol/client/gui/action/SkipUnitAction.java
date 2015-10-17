@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -50,7 +51,7 @@ public class SkipUnitAction extends UnitAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        igc().skipUnit(getGUI().getActiveUnit());
+    public void actionPerformed(ActionEvent ae) {
+        igc().changeState(getGUI().getActiveUnit(), Unit.UnitState.SKIPPED);
     }
 }

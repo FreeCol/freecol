@@ -33,7 +33,7 @@ public class MarketTest extends FreeColTestCase {
 
         Game g = getStandardGame();
 
-        Player p = g.getPlayer("model.nation.dutch");
+        Player p = g.getPlayerByNationId("model.nation.dutch");
 
         Market dm = p.getMarket();
 

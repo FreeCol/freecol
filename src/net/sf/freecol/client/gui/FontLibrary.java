@@ -137,6 +137,18 @@ public class FontLibrary {
         return createFont(fontType, fontSize, style, scaleFactor);
     }
 
+    public Font createCompatibleScaledFont(String string, FontType fontType,
+                                           FontSize fontSize) {
+        return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
+                                    scaleFactor);
+    }
+
+    public Font createCompatibleScaledFont(String string, FontType fontType,
+                                           FontSize fontSize, int style) {
+        return createCompatibleFont(string, fontType, fontSize, style,
+                                    scaleFactor);
+    }
+
     public static Font createFont(FontType fontType, FontSize fontSize) {
         return createFont(fontType, fontSize, Font.PLAIN, 1f);
     }
@@ -163,6 +175,23 @@ public class FontLibrary {
         return createFont(fontType, fontSize, Font.PLAIN, scaleFactor);
     }
 
+    public static Font createCompatibleFont(String string, FontType fontType,
+                                            FontSize fontSize) {
+        return createCompatibleFont(string, fontType, fontSize, Font.PLAIN, 1f);
+    }
+
+    public static Font createCompatibleFont(String string, FontType fontType,
+                                            FontSize fontSize, int style) {
+        return createCompatibleFont(string, fontType, fontSize, style, 1f);
+    }
+
+    public static Font createCompatibleFont(String string, FontType fontType,
+                                            FontSize fontSize,
+                                            float scaleFactor) {
+        return createCompatibleFont(string, fontType, fontSize, Font.PLAIN,
+                                    scaleFactor);
+    }
+
     /**
      * Create a scaled <code>Font</code> where the scale factor is provided
      * explicitly in the parameter.
@@ -179,19 +208,54 @@ public class FontLibrary {
      */
     public static Font createFont(FontType fontType, FontSize fontSize,
                                   int style, float scaleFactor) {
-        String fontName;
-        switch(fontType) {
-            default:
-                logger.warning("Unknown FontType");
-            case NORMAL:
-                fontName = (mainFont != null) ? null : "normal";
-                break;
-            case SIMPLE:
-                fontName = "simple";
-                break;
-            case HEADER:
-                fontName = "header";
+        float scaledSize = calcScaledSize(fontSize, scaleFactor);
+        String fontKey = getFontKey(fontType);
+        Font font = (fontKey == null)
+            ? mainFont
+            : ResourceManager.getFont(fontKey);
+        font = font.deriveFont(style, scaledSize);
+        return font;
+    }
+
+    /**
+     * Create a scaled <code>Font</code> which can display all characters
+     * inside the given text string.
+     * This is mostly necessary for the header font. Thats because the currently
+     * used ShadowedBlack is missing support for CJK and others. Even some
+     * special glyphs for European languages like the triple-dot are missing.
+     * 
+     * @param string The text to find a compatible font for.
+     * @param fontType How the font should look like.
+     * @param fontSize Its relative size.
+     * @param style The font style for choosing plain, bold or italic.
+     * @param scaleFactor The applied scale factor.
+     * @return The created Font.
+     */
+    public static Font createCompatibleFont(String string, FontType fontType,
+                                            FontSize fontSize,
+                                            int style, float scaleFactor) {
+        // TODO: Consider testing the normal font for compatibility and try
+        //       some or all other available fonts for complete/longest match:
+        //       header/simple->main->normal->simple/header->emergency
+        float scaledSize = calcScaledSize(fontSize, scaleFactor);
+        String fontKey = getFontKey(fontType);
+        Font font = null;
+        if(fontType != FontType.NORMAL) {
+            font = ResourceManager.getFont(fontKey);
+            if(font.canDisplayUpTo(string) != -1)
+                font = null;
         }
+        if(font == null) {
+            fontKey = getFontKey(FontType.NORMAL);
+            font = (fontKey == null)
+                ? mainFont
+                : ResourceManager.getFont(fontKey);
+        }
+        font = font.deriveFont(style, scaledSize);
+        return font;
+    }
+
+    private static float calcScaledSize(FontSize fontSize, float scaleFactor) {
         float pixelSize;
         switch(fontSize) {
             default:
@@ -211,12 +275,24 @@ public class FontLibrary {
             case BIG:
                 pixelSize = 48f;
         }
-        float scaledSize = pixelSize * scaleFactor;
-        Font font = (fontName == null)
-            ? mainFont
-            : ResourceManager.getFont("font." + fontName);
-        font = font.deriveFont(style, scaledSize);
-        return font;
+        return pixelSize * scaleFactor;
+    }
+
+    private static String getFontKey(FontType fontType) {
+        String fontName;
+        switch(fontType) {
+            default:
+                logger.warning("Unknown FontType");
+            case NORMAL:
+                fontName = (mainFont != null) ? null : "font.normal";
+                break;
+            case SIMPLE:
+                fontName = "font.simple";
+                break;
+            case HEADER:
+                fontName = "font.header";
+        }
+        return fontName;
     }
 
 }

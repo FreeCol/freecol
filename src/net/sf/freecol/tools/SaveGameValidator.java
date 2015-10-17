@@ -30,8 +30,8 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -49,7 +49,7 @@ public class SaveGameValidator {
         Validator saveGameValidator = schema.newValidator();
 
         List<File> allFiles = new ArrayList<>();
-        FileFilter ff = FreeCol.freeColSaveFileFilter;
+        FileFilter ff = FreeColSavegameFile.getFileFilter();
         for (String name : args) {
             File file = new File(name);
             if (file.exists()) {

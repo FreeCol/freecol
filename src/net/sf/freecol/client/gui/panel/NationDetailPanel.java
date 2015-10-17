@@ -56,12 +56,10 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
     }
 
 
+    // Implement ColopediaDetailPanel
+    
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
@@ -72,10 +70,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
     }
 
     /**
-     * Builds the details panel for the Nation with the given identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
@@ -92,9 +87,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedLabel(nation);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(nation, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         JLabel artLabel = new JLabel(new ImageIcon(ImageLibrary.getMonarchImage(nation)));

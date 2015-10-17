@@ -118,7 +118,8 @@ public class IdleAtSettlementMission extends Mission {
 
         final Unit unit = getAIUnit().getUnit();
         PathNode path = unit.findOurNearestOtherSettlement();
-        return (path == null) ? null : upLoc(path.getLastNode().getLocation());
+        return (path == null) ? null
+            : Location.upLoc(path.getLastNode().getLocation());
     }
 
     /**

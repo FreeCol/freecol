@@ -25,12 +25,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -64,42 +64,8 @@ public class Role extends BuildableType {
      * effectiveness.
      */
     public static final Comparator<Role> militaryComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                float amount1 = role1.getOffence() + role1.getDefence();
-                float amount2 = role2.getOffence() + role2.getDefence();
-                return (amount1 < amount2) ? 1
-                    : (amount1 > amount2) ? -1
-                    : 0;
-            }
-        };
-
-    /** A comparator to sort roles by descending defensive power. */
-    public static final Comparator<Role> defensiveComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                float defence1 = role1.getDefence();
-                float defence2 = role2.getDefence();
-                return (defence1 > defence2) ? 1
-                    : (defence1 < defence2) ? -1
-                    : 0;
-            }
-        };
-
-    /** A comparator to sort roles by descending offensive power. */
-    public static final Comparator<Role> offensiveComparator
-        = new Comparator<Role>() {
-            @Override
-            public int compare(Role role1, Role role2) {
-                float offence1 = role1.getOffence();
-                float offence2 = role2.getOffence();
-                return (offence1 > offence2) ? 1
-                    : (offence1 < offence2) ? -1
-                    : 0;
-            }
-        };
+        = Comparator.comparingDouble((Role r) ->
+            r.getOffence() + r.getDefence()).reversed();
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to
@@ -259,6 +225,18 @@ public class Role extends BuildableType {
     }
 
     /**
+     * Get the price of the required goods in a given market.
+     *
+     * @param market The <code>Market</code> to evaluate in.
+     * @return The price of the goods for this role.
+     */
+    public int getRequiredGoodsPrice(Market market) {
+        return getRequiredGoods().stream()
+            .mapToInt(ag -> market.getBidPrice(ag.getType(),
+                    ag.getAmount() * getMaximumCount())).sum();
+    }
+        
+    /**
      * Get the role changes that can allow a unit to assume this role.
      *
      * @return A list of <code>RoleChange</code>s.
@@ -284,8 +262,8 @@ public class Role extends BuildableType {
      *
      * @return The offense value.
      */
-    public float getOffence() {
-        return applyModifiers(0f, null, Modifier.OFFENCE);
+    public double getOffence() {
+        return applyModifiers(0.0f, null, Modifier.OFFENCE);
     }
 
     /**
@@ -302,8 +280,8 @@ public class Role extends BuildableType {
      *
      * @return The defence value.
      */
-    private float getDefence() {
-        return applyModifiers(0f, null, Modifier.DEFENCE);
+    private double getDefence() {
+        return applyModifiers(0.0f, null, Modifier.DEFENCE);
     }
 
     /**
@@ -374,7 +352,7 @@ public class Role extends BuildableType {
                 }
             }
             for (AbstractGoods ag : fromGoods) {
-                if (AbstractGoods.findByType(ag.getType(), toGoods) == null) {
+                if (!AbstractGoods.containsType(ag.getType(), toGoods)) {
                     result.add(new AbstractGoods(ag.getType(), -ag.getAmount()));
                 }
             }
@@ -402,11 +380,9 @@ public class Role extends BuildableType {
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {
-        List<Role> result = new ArrayList<>();
-        for (Role r : roles) {
-            if (r.isAvailableTo(player, type)) result.add(r);
-        }
-        return result;
+        return roles.stream()
+            .filter(r -> r.isAvailableTo(player, type))
+            .collect(Collectors.toList());
     }
 
     /**

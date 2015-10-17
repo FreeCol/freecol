@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -29,13 +28,14 @@ import javax.swing.JFrame;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.io.FreeColFileFilter;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -50,9 +50,8 @@ public final class DifficultyDialog extends OptionsDialog
 
     private static final Logger logger = Logger.getLogger(DifficultyDialog.class.getName());
 
-    private static final FileFilter[] filters = {
-        FreeColFileFilter.freeColXMLFilter
-    };
+    /** File filters array to filter for XML files. */
+    private static final FileFilter[] filters = { null };
 
     /** The currently selected subgroup. */
     private OptionGroup selected;
@@ -126,11 +125,8 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addResetAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    getOptionUI().reset();
-                }
+        button.addActionListener((ActionEvent ae) -> {
+                getOptionUI().reset();
             });
     }
 
@@ -140,16 +136,14 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addLoadAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File dir = FreeColDirectories.getOptionsDirectory();
-                    File file = getGUI().showLoadDialog(dir, filters);
-                    if (file != null && load(file)) {
-                        invalidate();
-                        validate();
-                        repaint();
-                    }
+        initializeFilters();
+        button.addActionListener((ActionEvent ae) -> {
+                File dir = FreeColDirectories.getOptionsDirectory();
+                File file = getGUI().showLoadDialog(dir, filters);
+                if (file != null && load(file)) {
+                    invalidate();
+                    validate();
+                    repaint();
                 }
             });
     }
@@ -160,18 +154,28 @@ public final class DifficultyDialog extends OptionsDialog
      * @param button The <code>JButton</code> to add the action to.
      */
     private void addSaveAction(JButton button) {
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    File dir = FreeColDirectories.getOptionsDirectory();
-                    File file = getGUI().showSaveDialog(dir, filters,
-                        getDefaultFileName(), ".xml");
-                    if (file != null) {
-                        getOptionUI().updateOption();
-                        save(file);
-                    }
+        initializeFilters();
+        button.addActionListener((ActionEvent ae) -> {
+                File dir = FreeColDirectories.getOptionsDirectory();
+                File file = getGUI().showSaveDialog(dir, filters,
+                                                    getDefaultFileName());
+                if (file != null) {
+                    getOptionUI().updateOption();
+                    save(file);
                 }
             });
+    }
+
+    /**
+     * Initialize the XML file filter.
+     */
+    private void initializeFilters() {
+        synchronized (filters) {
+            if (filters[0] == null) {
+                String desc = Messages.message("filter.xml");
+                filters[0] = new FileNameExtensionFilter(desc, "xml");
+            }
+        }
     }
 
 

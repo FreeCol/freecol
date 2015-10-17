@@ -19,9 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
@@ -38,6 +38,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
@@ -50,12 +51,10 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -124,15 +123,14 @@ public final class ReportTurnPanel extends ReportPanel {
                 FreeColGameObject messageSource = game.getMessageSource(message);
                 if (messageSource != source) {
                     source = messageSource;
-                    reportPanel.add(getHeadline(source), "newline 20, skip");
+                    reportPanel.add(getHeadline(messageSource), "newline 20, skip");
                 }
                 break;
             case ClientOptions.MESSAGES_GROUP_BY_TYPE:
                 if (message.getMessageType() != type) {
                     type = message.getMessageType();
-                    JLabel headline = Utility.localizedLabel(message.getMessageType());
-                    headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-                        FontLibrary.FontSize.SMALL));
+                    JLabel headline = Utility.localizedHeaderLabel(
+                        message.getMessageType(), FontLibrary.FontSize.SMALL);
                     reportPanel.add(headline, "newline 20, skip, span");
                 }
                 break;
@@ -142,19 +140,19 @@ public final class ReportTurnPanel extends ReportPanel {
             
             JComponent component = new JLabel();
             FreeColObject messageDisplay = game.getMessageDisplay(message);
+            final ImageLibrary lib = getImageLibrary();
             if (messageDisplay != null) {
-                Image image = getImageLibrary().getObjectImage(messageDisplay, 1f);
+                Image image = lib.getObjectImage(messageDisplay, 1f);
                 ImageIcon icon = (image == null) ? null : new ImageIcon(image);
-
                 if (messageDisplay instanceof Colony
                     || messageDisplay instanceof Europe) {
                     JButton button = Utility.getLinkButton(null, icon,
-                                                       messageDisplay.getId());
+                        messageDisplay.getId());
                     button.addActionListener(this);
                     component = button;
                 } else if (messageDisplay instanceof Unit) {
                     JButton button = Utility.getLinkButton(null, icon,
-                        upLoc(((Unit)messageDisplay).getLocation()).getId());
+                        ((Unit)messageDisplay).up().getId());
                     button.addActionListener(this);
                     component = button;
                 } else { // includes Player
@@ -165,8 +163,12 @@ public final class ReportTurnPanel extends ReportPanel {
             reportPanel.add(component, "newline");
             
             final JTextPane textPane = Utility.getDefaultTextPane();
-            insertMessage(textPane.getStyledDocument(), message,
-                          getMyPlayer());
+            try {
+                insertMessage(textPane.getStyledDocument(), message,
+                              getMyPlayer());
+            } catch (BadLocationException ble) {
+                logger.log(Level.WARNING, "message insert fail", ble);
+            }
             reportPanel.add(textPane);
 
             boolean ignore = false;
@@ -177,14 +179,11 @@ public final class ReportTurnPanel extends ReportPanel {
                 Utility.localizeToolTip(ignoreButton, 
                     StringTemplate.copy("report.turn.ignore", message));
                 final ModelMessage m = message;
-                ignoreButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            boolean flag = label.isEnabled();
-                            igc().ignoreMessage(m, flag);
-                            textPane.setEnabled(!flag);
-                            label.setEnabled(!flag);
-                        }
+                ignoreButton.addActionListener((ActionEvent ae) -> {
+                        boolean flag = label.isEnabled();
+                        igc().ignoreMessage(m, flag);
+                        textPane.setEnabled(!flag);
+                        label.setEnabled(!flag);
                     });
                 reportPanel.add(ignoreButton);
                 ignore = true;
@@ -214,18 +213,12 @@ public final class ReportTurnPanel extends ReportPanel {
                     .template("report.turn.filter")
                     .addNamed("%type%", message.getMessageType()));
                 final ModelMessage m = message;
-                filterButton.addActionListener(new ActionListener() {
-                        
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            boolean flag = filterOption.getValue();
-                            filterOption.setValue(!flag);
-                            //textPane.setEnabled(!flag);
-                            //label.setEnabled(!flag);
-                            
-                            setEnabledByType(m.getMessageType(), !flag);
-                        }
-                        
+                filterButton.addActionListener((ActionEvent ae) -> {
+                        boolean flag = filterOption.getValue();
+                        filterOption.setValue(!flag);
+                        //textPane.setEnabled(!flag);
+                        //label.setEnabled(!flag);
+                        setEnabledByType(m.getMessageType(), !flag);
                     });
                 if (ignore) {
                     reportPanel.add(filterButton);
@@ -250,184 +243,77 @@ public final class ReportTurnPanel extends ReportPanel {
         }
     }
 
-    private JComponent getHeadline(Object source) {
-        JComponent headline;
+    private JComponent getHeadline(FreeColGameObject source) {
+        String text;
+        String commandId = null;
         if (source == null) {
-            return new JLabel();
+            text = "";
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = Utility.localizedLabel(StringTemplate
+            StringTemplate template = StringTemplate
                 .template("report.turn.playerNation")
                 .addName("%player%", player.getName())
-                .addStringTemplate("%nation%", player.getNationName()));
+                .addStringTemplate("%nation%", player.getNationLabel());
+            text = Messages.message(template);
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
-            JButton button = new JButton(Messages.getName(europe));
-            button.addActionListener(this);
-            button.setActionCommand(europe.getId());
-            headline = button;
+            text = Messages.getName(europe);
+            commandId = europe.getId();
         } else if (source instanceof Market) {
             Market market = (Market) source;
-            JButton button = Utility.localizedButton(market.getOwner().getMarketName());
-            button.addActionListener(this);
-            button.setActionCommand(getMyPlayer().getEurope().getId());
-            headline = button;
+            StringTemplate template = market.getOwner().getMarketName();
+            text = Messages.message(template);
+            commandId = getMyPlayer().getEurope().getId();
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
-            JButton button = new JButton(colony.getName());
-            button.addActionListener(this);
-            button.setActionCommand(colony.getId());
-            headline = button;
+            text = colony.getName();
+            commandId = colony.getId();
         } else if (source instanceof Unit) {
             final Unit unit = (Unit) source;
-            JButton button
-                = new JButton(unit.getDescription(Unit.UnitLabelType.NATIONAL));
-            button.addActionListener(this);
-            button.setActionCommand(unit.getLocation().getId());
-            headline = button;
+            text = unit.getDescription(Unit.UnitLabelType.NATIONAL);
+            commandId = unit.getLocation().getId();
         } else if (source instanceof Tile) {
             final Tile tile = (Tile) source;
-            JButton button = Utility.localizedButton(tile.getLocationLabelFor(getMyPlayer()));
-            button.addActionListener(this);
-            button.setActionCommand(tile.getId());
-            headline = button;
+            StringTemplate template = tile.getLocationLabelFor(getMyPlayer());
+            text = Messages.message(template);
+            commandId = tile.getId();
         } else if (source instanceof Nameable) {
-            headline = new JLabel(((Nameable) source).getName());
+            text = ((Nameable) source).getName();
         } else {
-            headline = new JLabel(source.toString());
+            text = source.toString();
         }
 
-        headline.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        Font font = FontLibrary.createCompatibleFont(text,
+            FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL);
+        JComponent headline;
+        if(commandId != null) {
+            JButton button = new JButton(text);
+            button.addActionListener(this);
+            button.setActionCommand(commandId);
+            headline = button;
+            headline.setForeground(Utility.LINK_COLOR);
+        } else {
+            headline = new JLabel(text);
+        }
+        headline.setFont(font);
         headline.setOpaque(false);
-        headline.setForeground(Utility.LINK_COLOR);
         headline.setBorder(Utility.blankBorder(5, 0, 0, 0));
         return headline;
     }
 
     private void insertMessage(StyledDocument document, ModelMessage message,
-                               Player player) {
-        try {
-            String input = null;
-            String id = message.getId();
-            if (id == null || id.equals(input = Messages.message(id))) {
-                // id not present, fallback to default
-                input = Messages.message(message.getDefaultId());
+                               Player player) throws BadLocationException {
+        for (Object o : message.splitLinks(player)) {
+            if (o instanceof String) {
+                document.insertString(document.getLength(), (String)o,
+                                      document.getStyle("regular"));
+            } else if (o instanceof JButton) {
+                JButton b = (JButton)o;
+                b.addActionListener(this);
+                StyleConstants.setComponent(document.getStyle("button"), b);
+                document.insertString(document.getLength(), " ",
+                                      document.getStyle("button"));
             }
-            int start = input.indexOf('%');
-            if (start == -1) {
-                // no variables present
-                insertText(document, input);
-                return;
-            } else if (start > 0) {
-                // output any string before the first occurrence of '%'
-                insertText(document, input.substring(0, start));
-            }
-
-            int end;
-            while ((end = input.indexOf('%', start + 1)) >= 0) {
-                String var = input.substring(start, end + 1);
-                String item = Messages.message(message.getReplacement(var));
-                FreeColGameObject messageSource = getFreeColClient().getGame()
-                    .getMessageSource(message);
-                if (item != null) {
-                    // found variable to replace
-                    if ("%colony%".equals(var) || var.endsWith("Colony%")) {
-                        Colony colony = player.getColonyByName(item);
-                        if (colony != null) {
-                            insertLinkButton(document, colony, item);
-                        } else if (messageSource instanceof Tile) {
-                            insertLinkButton(document, messageSource, item);
-                        } else {
-                            insertText(document, item);
-                        }
-                    } else if ("%europe%".equals(var)
-                        || ("%market%".equals(var) && player.isColonial())) {
-                        insertLinkButton(document, player.getEurope(),
-                            Messages.getName(player.getEurope()));
-                    } else if ("%unit%".equals(var)
-                        || var.endsWith("Unit%")
-                        || "%newName%".equals(var)) {
-                        Tile tile = null;
-                        if (messageSource instanceof Unit) {
-                            tile = ((Unit)messageSource).getTile();
-                        } else if (messageSource instanceof Tile) {
-                            tile = (Tile)messageSource;
-                        }
-                        if (tile != null) {
-                            Settlement settlement = tile.getSettlement();
-                            if (settlement != null) {
-                                insertLinkButton(document, settlement, item);
-                            } else {
-                                insertLinkButton(document, tile, item);
-                            }
-                        } else {
-                            insertText(document, item);
-                        }
-                    } else if ("%location%".equals(var)
-                        || var.endsWith("Location%")) {
-                        if (messageSource instanceof Europe) {
-                            insertLinkButton(document, player.getEurope(),
-                                Messages.getName(player.getEurope()));
-                        } else if (messageSource instanceof Location) {
-                            Location loc = upLoc((Location)messageSource);
-                            insertLinkButton(document, (FreeColGameObject)loc,
-                                             item);
-                        } else {
-                            insertText(document, item);
-                        }
-                    } else {
-                        insertText(document, item);
-                    }
-                    start = end + 1;
-                } else {
-                    // found no variable to replace: either a single '%', or
-                    // some unnecessary variable
-                    insertText(document, input.substring(start, end));
-                    start = end;
-                }
-            }
-
-            // output any string after the last occurrence of '%'
-            if (start < input.length()) {
-                insertText(document, input.substring(start));
-            }
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Insert fail: " + message, e);
         }
-    }
-
-    private void insertText(StyledDocument document, String text)
-        throws BadLocationException {
-        document.insertString(document.getLength(), text,
-                              document.getStyle("regular"));
-    }
-
-    private void insertLinkButton(StyledDocument document,
-                                  FreeColGameObject object, String name)
-        throws BadLocationException {
-        JButton button = Utility.getLinkButton(name, null, object.getId());
-        button.addActionListener(this);
-        StyleConstants.setComponent(document.getStyle("button"), button);
-        document.insertString(document.getLength(), " ",
-                              document.getStyle("button"));
-    }
-    
-    public static Location upLoc(Location loc) {
-        if (loc instanceof Unit) loc = ((Unit)loc).getLocation();
-        return (loc == null) ? null
-            : (loc.getSettlement() != null) ? loc.getSettlement()
-            : loc;
-    }
-
-    // Interface ActionListener
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        super.actionPerformed(event);
     }
 }

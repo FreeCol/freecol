@@ -52,7 +52,7 @@ public class REFTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         // Create player
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer player1 = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         List<AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
             .getExpeditionaryForce().getUnits();
         int soldiersBeforeIndependence = 0;

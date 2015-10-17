@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -59,6 +58,10 @@ import org.w3c.dom.NamedNodeMap;
  * Changes to be sent to the client.
  */
 public class ChangeSet {
+
+    /** Compare changes by ascending priority. */
+    private static final Comparator<Change> changeComparator
+        = Comparator.comparingInt(Change::getPriority);
 
     // Convenient way to specify the relative priorities of the fixed
     // change types in one place.
@@ -87,13 +90,6 @@ public class ChangeSet {
 
     private final ArrayList<Change> changes;
 
-    private static final Comparator<Change> changeComparator
-        = new Comparator<Change>() {
-            @Override
-            public int compare(final Change c1, final Change c2) {
-                return c1.getPriority() - c2.getPriority();
-            }
-        };
 
     /**
      * Class to control the visibility of a change.
@@ -324,6 +320,8 @@ public class ChangeSet {
         private final Unit attacker;
         private final Unit defender;
         private final boolean success;
+        private final boolean defenderInSettlement;
+
 
         /**
          * Build a new AttackChange.
@@ -335,6 +333,10 @@ public class ChangeSet {
          * information is serialized when a unit is inside a
          * settlement, but if unscoped too much is disclosed.  So we
          * make a copy and neuter it.
+         *
+         * We have to remember if the defender was in a settlement
+         * because by the time serialization occurs the settlement
+         * might have been destroyed.
          *
          * We just have to accept that combat animation is an
          * exception to the normal visibility rules.
@@ -348,6 +350,7 @@ public class ChangeSet {
                             boolean success) {
             super(see);
             Game game = attacker.getGame();
+            this.defenderInSettlement = defender.getTile().hasSettlement();
             this.attacker = attacker.copy(game, Unit.class);
             this.attacker.setLocationNoUpdate(this.attacker.getTile());
             this.defender = defender.copy(game, Unit.class);
@@ -405,7 +408,8 @@ public class ChangeSet {
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
-            if (!canSeeUnit(serverPlayer, defender)) {
+            if (!canSeeUnit(serverPlayer, defender)
+                || this.defenderInSettlement) {
                 defender.setWorkType(null);
                 element.appendChild(defender.toXMLElement(doc));
             }

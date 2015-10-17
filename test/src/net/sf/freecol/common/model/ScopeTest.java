@@ -203,7 +203,7 @@ public class ScopeTest extends FreeColTestCase {
 
     public void testGameObjects() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
         Map map = getTestMap();
         game.setMap(map);
 

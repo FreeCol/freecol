@@ -299,7 +299,7 @@ public final class GoalDeciders {
      */
     public static GoalDecider getDisembarkGoalDecider(final Tile target) {
         return new GoalDecider() {
-            private float bestScore = -1.0f;
+            private double bestScore = -1.0;
             private boolean goalDangerous = true;
             private PathNode goal = null;
 
@@ -339,9 +339,9 @@ public final class GoalDeciders {
                     }
                 }
                 if (found) {
-                    float distance = 1.0f + u.getGame().getMap()
+                    double distance = 1.0 + u.getGame().getMap()
                         .getDistance(target, tile);
-                    float score = tile.getDefenceValue() / distance;
+                    double score = tile.getDefenceValue() / distance;
                     if (bestScore < score) {
                         bestScore = score;
                         goal = pathNode;

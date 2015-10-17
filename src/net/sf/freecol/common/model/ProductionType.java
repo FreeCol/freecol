@@ -289,12 +289,8 @@ public class ProductionType extends FreeColObject {
      */
     public static boolean canProduce(GoodsType goodsType,
                                      Collection<ProductionType> types) {
-        for (ProductionType productionType : types) {
-            AbstractGoods output = AbstractGoods.findByType(goodsType,
-                productionType.getOutputs());
-            if (output != null) return true;
-        }
-        return false;
+        return any(types, pt -> AbstractGoods.containsType(goodsType,
+                pt.getOutputs()));
     }
 
     /**
@@ -311,12 +307,9 @@ public class ProductionType extends FreeColObject {
         ProductionType best = null;
         int bestSum = 0;
         for (ProductionType pt : types) {
-            int sum = 0;
-            for (AbstractGoods output : pt.getOutputs()) {
-                if (goodsType == null || goodsType == output.getType()) {
-                    sum += output.getAmount();
-                }
-            }
+            int sum = pt.getOutputs().stream()
+                .filter(o -> goodsType == null || goodsType == o.getType())
+                .mapToInt(AbstractGoods::getAmount).sum();
             if (bestSum < sum) {
                 bestSum = sum;
                 best = pt;

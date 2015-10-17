@@ -32,7 +32,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -70,7 +69,7 @@ public class MapConverter {
                     System.out.println("Saved updated savegame.");
                     server.shutdown();
                     System.out.println("Shut down server.");
-                } catch (IOException | XMLStreamException | FreeColException | NoRouteToServerException e) {
+                } catch (IOException | XMLStreamException | FreeColException e) {
                     System.out.println(e);
                 }
             }

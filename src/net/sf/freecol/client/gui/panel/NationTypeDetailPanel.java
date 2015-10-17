@@ -68,17 +68,16 @@ public class NationTypeDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+    
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode parent =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        DefaultMutableTreeNode parent
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                    getName(), null));
 
         List<NationType> nations = new ArrayList<>();
         nations.addAll(getSpecification().getEuropeanNationTypes());
@@ -92,22 +91,17 @@ public class NationTypeDetailPanel
     }
 
     /**
-     * Builds the details panel for the NationType with the given identifier.
-     *
-     * @param id The object identifier to display.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         NationType nationType = getSpecification().getNationType(id);
         if (nationType instanceof EuropeanNationType) {
-            buildEuropeanNationTypeDetail((EuropeanNationType) nationType, panel);
+            buildEuropeanNationTypeDetail((EuropeanNationType)nationType, panel);
         } else if (nationType instanceof IndianNationType) {
-            buildIndianNationTypeDetail((IndianNationType) nationType, panel);
+            buildIndianNationTypeDetail((IndianNationType)nationType, panel);
         }
     }
 
@@ -118,8 +112,8 @@ public class NationTypeDetailPanel
      * @param nationType - the EuropeanNationType
      * @param panel the panel to use
      */
-    private void buildEuropeanNationTypeDetail(EuropeanNationType nationType, JPanel panel) {
-
+    private void buildEuropeanNationTypeDetail(EuropeanNationType nationType,
+                                               JPanel panel) {
         Font boldFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.SMALLER, Font.BOLD);
 
@@ -128,9 +122,7 @@ public class NationTypeDetailPanel
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
-        JLabel label = Utility.localizedLabel(nationType);
-        label.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel label = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
         panel.add(label, "span, align center, wrap 40");
 
         label = Utility.localizedLabel("colopedia.nationType.units");
@@ -171,25 +163,22 @@ public class NationTypeDetailPanel
         }
     }
 
-
     /**
      * Builds the details panel for the given nation type.
      *
      * @param nationType - the IndianNationType
      * @param panel the panel to use
      */
-    private void buildIndianNationTypeDetail(IndianNationType nationType, JPanel panel) {
-
+    private void buildIndianNationTypeDetail(IndianNationType nationType,
+                                             JPanel panel) {
         List<RandomChoice<UnitType>> skills = nationType.getSkills();
 
         panel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedLabel(nationType);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
-        panel.add(Utility.localizedLabel("colopedia.nationType.aggressionLevel"));
+        panel.add(Utility.localizedLabel("colopedia.nationType.aggression"));
         panel.add(Utility.localizedLabel("colopedia.nationType."
                 + nationType.getAggression().getKey()));
 

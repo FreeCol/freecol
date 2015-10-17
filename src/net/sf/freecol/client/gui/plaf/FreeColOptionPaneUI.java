@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -40,7 +39,7 @@ import javax.swing.plaf.basic.BasicOptionPaneUI;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MigPanel;
 import net.sf.freecol.common.i18n.Messages;
 
@@ -170,15 +169,11 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         if (0 <= initialIndex && initialIndex < buttons.length) {
             JButton b = newButtons[initialIndex];
             this.initialFocusComponent = b;
-            b.addHierarchyListener(new HierarchyListener() {
-                    @Override
-                    public void hierarchyChanged(HierarchyEvent e) {
-                        if ((e.getChangeFlags()
-                                & HierarchyEvent.PARENT_CHANGED) != 0) {
-                            JButton b = (JButton)e.getComponent();
-                            JRootPane root = SwingUtilities.getRootPane(b);
-                            if (root != null) root.setDefaultButton(b);
-                        }
+            b.addHierarchyListener((HierarchyEvent e) -> {
+                    if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
+                        JButton button = (JButton)e.getComponent();
+                        JRootPane root = SwingUtilities.getRootPane(button);
+                        if (root != null) root.setDefaultButton(button);
                     }
                 });
         }

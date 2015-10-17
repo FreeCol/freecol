@@ -20,18 +20,19 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -44,7 +45,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
@@ -70,6 +70,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
         super(freeColClient, "reportColonyAction");
         
         this.colonies.addAll(freeColClient.getMySortedColonies());
+        update();
     }
 
     private void update() {
@@ -103,21 +104,17 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel colonistsPanel
                 = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
             colonistsPanel.setOpaque(false);
-            List<Unit> unitList = colony.getUnitList();
-            Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
-                    true, true);
-                colonistsPanel.add(unitLabel);
+            for (Unit u : colony.getUnitList().stream()
+                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+                colonistsPanel.add(new UnitLabel(getFreeColClient(), u,
+                                                 true, true));
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
             unitsPanel.setOpaque(false);
-            unitList = colony.getTile().getUnitList();
-            Collections.sort(unitList, getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
-                    true, true);
-                unitsPanel.add(unitLabel);
+            for (Unit u : colony.getTile().getUnitList().stream()
+                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+                unitsPanel.add(new UnitLabel(getFreeColClient(), u,
+                                             true, true));
             }
             if (buildableLabel != null
                 && spec.getUnitTypeList().contains(currentType)) {
@@ -135,11 +132,8 @@ public final class ReportClassicColonyPanel extends ReportPanel
                 int newValue = colony.getNetProductionOf(gt);
                 int stockValue = colony.getGoodsCount(gt);
                 if (newValue != 0 || stockValue > 0) {
-                    int maxProduction = 0;
-                    for (WorkLocation wl
-                             : colony.getWorkLocationsForProducing(gt)) {
-                        maxProduction += wl.getMaximumProductionOf(gt);
-                    }
+                    int maxProduction = colony.getWorkLocationsForProducing(gt).stream()
+                        .mapToInt(wl -> wl.getMaximumProductionOf(gt)).sum();
                     ProductionLabel productionLabel
                         = new ProductionLabel(getFreeColClient(),
                             new AbstractGoods(gt, newValue),

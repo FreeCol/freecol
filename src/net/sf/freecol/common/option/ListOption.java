@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -141,12 +142,8 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return True if the option can be added.
      */
     public boolean canAdd(AbstractOption<T> ao) {
-        if (!allowDuplicates) {
-            for (AbstractOption<T> o : value) {
-                if (o.equals(ao)) return false;
-            }
-        }
-        return true;
+        return (allowDuplicates) ? true
+            : none(value, o -> o.equals(ao));
     }
 
 

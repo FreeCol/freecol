@@ -41,11 +41,11 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.StringTemplate.TemplateType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -60,7 +60,7 @@ import net.sf.freecol.common.model.StringTemplate.TemplateType;
  * Properties class is unable to handle UTF-8 directly, this class
  * uses its own implementation.
  *
- * Te individual messages may include variables, which must be
+ * The individual messages may include variables, which must be
  * delimited by percent characters (e.g. "%nation%"), and will be
  * replaced when the message is formatted. Furthermore, the messages
  * may include choice formats consisting of a tag followed by a colon
@@ -416,13 +416,9 @@ public class Messages {
     }
 
     public static String getBestDescription(String id) {
-        for (String suffix : DESCRIPTION_KEYS) {
-            String key = id + suffix;
-            if (containsKey(key)) {
-                return message(key);
-            }
-        }
-        return id;
+        String key = find(map(DESCRIPTION_KEYS, s -> id + s),
+            k -> containsKey(k), null);
+        return (key == null) ? id : message(key);
     }
 
     /**
@@ -874,10 +870,12 @@ public class Messages {
                 int replacementIndex = input.indexOf('|', start);
                 int nextOpenIndex = input.indexOf("{{", start);
                 if (nextOpenIndex >= 0 && nextOpenIndex < replacementIndex) {
-                    replacementIndex = input.indexOf('|', findMatchingBracket(input, nextOpenIndex + 2) + 2);
+                    replacementIndex = input.indexOf('|',
+                        findMatchingBracket(input, nextOpenIndex + 2) + 2);
                 }
-                int end = (replacementIndex < 0 || replacementIndex > closeChoice)
-                    ? closeChoice : replacementIndex;
+                int end = (replacementIndex < 0
+                    || replacementIndex > closeChoice) ? closeChoice
+                    : replacementIndex;
                 String replacement = input.substring(start, end);
                 if (!replacement.contains("{{")) {
                     result.append(replacement);

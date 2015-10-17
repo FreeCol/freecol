@@ -263,10 +263,8 @@ public class Building extends WorkLocation
         } else {
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                float production = 0f;
-                for (Unit u : getUnitList()) {
-                    production += getUnitProduction(u, goodsType);
-                }
+                float production = getUnitList().stream()
+                    .mapToInt(u -> getUnitProduction(u, goodsType)).sum();
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
                 production = applyModifiers(production, turn,
@@ -282,8 +280,8 @@ public class Building extends WorkLocation
 
         // Then reduce the minimum ratio if some input is in short supply.
         for (AbstractGoods input : getInputs()) {
-            int required = (int)Math.floor(input.getAmount() * minimumRatio);
-            int available = getAvailable(input.getType(), inputs);
+            long required = (long)Math.floor(input.getAmount() * minimumRatio);
+            long available = getAvailable(input.getType(), inputs);
             // Do not allow auto-production to go negative.
             if (canAutoProduce()) available = Math.max(0, available);
             // Experts in factory level buildings may produce a
@@ -292,13 +290,10 @@ public class Building extends WorkLocation
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-                int minimumGoodsInput = 0;
-                for (Unit unit: getUnitList()) {
-                    if (unit.getType() == getExpertUnitType()) {
-                        // FIXME: put magic number in specification
-                        minimumGoodsInput += 4;
-                    }
-                }
+                long minimumGoodsInput = 4 // FIXME: magic number
+                    * (int)getUnitList().stream()
+                        .filter(u -> u.getType() == getExpertUnitType())
+                        .count();
                 if (minimumGoodsInput > available) {
                     available = minimumGoodsInput;
                 }
@@ -368,11 +363,9 @@ public class Building extends WorkLocation
      */
     @Override
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (AbstractGoods ag : getType().getRequiredGoods()) {
-            result += ag.evaluateFor(player);
-        }
-        return result + super.evaluateFor(player);
+        return super.evaluateFor(player)
+            + getType().getRequiredGoods().stream()
+                .mapToInt(ag -> ag.evaluateFor(player)).sum();
     }
         
 
@@ -388,8 +381,9 @@ public class Building extends WorkLocation
     //   final UnitLocation.getUnitIterator
     //   UnitLocation.getUnitList
     //   UnitLocation.getGoodsContainer
-    //   final WorkLocation getSettlement
-    //   final WorkLocation getColony
+    //   final WorkLocation.getSettlement
+    //   final WorkLocation.getColony
+    //   final WorkLocation.getRank
 
     /**
      * {@inheritDoc}
@@ -459,6 +453,22 @@ public class Building extends WorkLocation
             : StringTemplate.key(buildingType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCurrent() {
+        return true;
+    }
+    
     /**
      * {@inheritDoc}
      */

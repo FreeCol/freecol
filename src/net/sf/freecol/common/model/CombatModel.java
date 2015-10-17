@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -66,11 +67,11 @@ public abstract class CombatModel {
      * Odds a particular outcome will occur in combat.
      */
     public static class CombatOdds {
-        public static final float UNKNOWN_ODDS = -1.0f;
+        public static final double UNKNOWN_ODDS = -1.0;
 
-        public final float win;
+        public final double win;
 
-        public CombatOdds(float win) {
+        public CombatOdds(double win) {
             this.win = win;
         }
     }
@@ -180,6 +181,16 @@ public abstract class CombatModel {
         return false;
     }
 
+    /**
+     * Get a comparator to order units by relative military strength
+     * with respect to this combat model.
+     *
+     * @return A suitable unit <code>Comparator</code>.
+     */
+    public final Comparator<Unit> getMilitaryStrengthComparator() {
+        return (u1, u2) -> Double.compare(calculateCombatOdds(u1, u2).win,
+                                          calculateCombatOdds(u2, u1).win);
+    }
 
     /**
      * Calculates the chance of the outcomes of a combat.
@@ -201,8 +212,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return The offensive power.
      */
-    public abstract float getOffencePower(FreeColGameObject attacker,
-                                          FreeColGameObject defender);
+    public abstract double getOffencePower(FreeColGameObject attacker,
+                                           FreeColGameObject defender);
 
     /**
      * Get the defensive power of a defender wrt an attacker.
@@ -211,8 +222,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return The defensive power.
      */
-    public abstract float getDefencePower(FreeColGameObject attacker,
-                                          FreeColGameObject defender);
+    public abstract double getDefencePower(FreeColGameObject attacker,
+                                           FreeColGameObject defender);
 
     /**
      * Collect all the offensive modifiers that apply to an attack.

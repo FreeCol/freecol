@@ -79,8 +79,8 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        JMenuItem source = (JMenuItem)(e.getSource());
+    public void actionPerformed(ActionEvent ae) {
+        JMenuItem source = (JMenuItem)ae.getSource();
         String s = "Action event detected."
                    + newline
                    + "    Event source: " + source.getText()
@@ -154,11 +154,6 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> { createAndShowGUI(); });
     }
 }

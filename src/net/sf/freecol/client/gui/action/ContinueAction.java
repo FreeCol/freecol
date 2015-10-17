@@ -55,7 +55,7 @@ public class ContinueAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         File lastSave = FreeColDirectories.getLastSaveGameFile();
         if (lastSave != null) {
             getGUI().removeInGameComponents();

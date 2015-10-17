@@ -66,9 +66,9 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
@@ -195,7 +195,7 @@ public final class FreeColServer {
     /** An active unit specified in a saved game. */
     private Unit activeUnit = null;
 
-
+    
     /**
      * Starts a new server, with a new game.
      *
@@ -205,12 +205,10 @@ public final class FreeColServer {
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
      * @exception IOException If the public socket cannot be created.
-     * @exception NoRouteToServerException If there is a problem with the
-     *     meta-server.
      */
     public FreeColServer(boolean publicServer, boolean singlePlayer,
                          Specification specification, int port, String name)
-        throws IOException, NoRouteToServerException {
+        throws IOException {
         this.publicServer = publicServer;
         this.singlePlayer = singlePlayer;
         this.name = name;
@@ -230,9 +228,7 @@ public final class FreeColServer {
         this.inGameController = new InGameController(this, random);
         this.mapGenerator = new SimpleMapGenerator(game, random);
 
-        if (publicServer) {
-            updateMetaServer(true); // Throws NoRouteToServerException
-        }
+        this.publicServer = updateMetaServer(true);
     }
 
     /**
@@ -248,13 +244,10 @@ public final class FreeColServer {
      * @param name An optional name for the server.
      * @exception IOException If save game can not be found.
      * @exception FreeColException If the savegame could not be loaded.
-     * @exception NoRouteToServerException If there is a problem with the
-     *     meta-server.
      */
     public FreeColServer(final FreeColSavegameFile savegame, 
                          Specification specification, int port, String name)
-        throws FreeColException, IOException, NoRouteToServerException,
-               XMLStreamException {
+        throws FreeColException, IOException, XMLStreamException {
         // publicServer will be read from the saved game
         // singlePlayer will be read from the saved game
         this.name = name;
@@ -279,9 +272,7 @@ public final class FreeColServer {
         this.inGameController = new InGameController(this, random);
         this.mapGenerator = null;
 
-        if (publicServer) {
-            updateMetaServer(true); // Throws NoRouteToServerException
-        }
+        this.publicServer = updateMetaServer(true);
     }
 
 
@@ -290,7 +281,7 @@ public final class FreeColServer {
      *
      * @return True if this is a single player game.
      */
-    public boolean isSinglePlayer() {
+    public boolean getSinglePlayer() {
         return this.singlePlayer;
     }
 
@@ -301,6 +292,15 @@ public final class FreeColServer {
      */
     public void setSinglePlayer(boolean singlePlayer) {
         this.singlePlayer = singlePlayer;
+    }
+
+    /**
+     * Get the public server state.
+     *
+     * @return The public server state.
+     */
+    public boolean getPublicServer() {
+        return this.publicServer;
     }
 
     /**
@@ -380,7 +380,8 @@ public final class FreeColServer {
                 break;
             } catch (BindException be) {
                 if (i == 1) {
-                    throw new IOException("Bind exception starting server", be);
+                    throw new IOException("Bind exception starting server at: "
+                        + host + ":" + port, be);
                 }
             } catch (IOException ie) {
                 if (i == 1) throw ie;
@@ -587,9 +588,11 @@ public final class FreeColServer {
      * Sends information about this server to the meta-server.
      *
      * Publically visible version, that is called in game.
+     *
+     * @return True if the MetaServer was updated.
      */
-    public void updateMetaServer() throws NoRouteToServerException {
-        if (publicServer) updateMetaServer(false);
+    public boolean updateMetaServer() {
+        return updateMetaServer(false);
     }
 
     /**
@@ -599,12 +602,10 @@ public final class FreeColServer {
      * when called from the constructors.
      *
      * @param firstTime Must be true when called for the first time.
-     * @throws NoRouteToServerException if the meta-server cannot connect to
-     *     this server.
+     * @return True if the MetaServer was updated.
      */
-    private void updateMetaServer(boolean firstTime)
-        throws NoRouteToServerException {
-        if (!publicServer) return;
+    private boolean updateMetaServer(boolean firstTime) {
+        if (!this.publicServer) return false;
 
         Connection mc;
         try {
@@ -612,8 +613,10 @@ public final class FreeColServer {
                                 FreeCol.META_SERVER_PORT, null,
                                 FreeCol.SERVER_THREAD);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not connect to meta-server.", e);
-            return;
+            logger.log(Level.WARNING, "Could not connect to meta-server: ",
+                FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT);
+            this.publicServer = false;
+            return false;
         }
 
         String tag = (firstTime) ? "register" : "update";
@@ -633,11 +636,14 @@ public final class FreeColServer {
                     "gameState", Integer.toString(getGameState().ordinal())));
             if (reply != null
                 && "noRouteToServer".equals(reply.getTagName())) {
-                throw new NoRouteToServerException();
+                this.publicServer = false;
+                return false;
             }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Network error with meta-server.", e);
-            return;
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Network error with meta-server:" + addr,
+                ioe);
+            this.publicServer = false;
+            return false;
         } finally {
             mc.close();
         }
@@ -651,20 +657,21 @@ public final class FreeColServer {
             t.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-                        try {
-                            updateMetaServer();
-                        } catch (NoRouteToServerException e) {}
+                        if (!updateMetaServer()) cancel();
                     }
                 }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
         }
+        return true;
     }
 
     /**
      * Removes this server from the metaserver's list. The information is only
      * sent if <code>public == true</code>.
+     *
+     * @return True if the MetaServer was updated.
      */
-    public void removeFromMetaServer() {
-        if (!publicServer) return;
+    public boolean removeFromMetaServer() {
+        if (!this.publicServer) return false;
 
         try (
             Connection mc = new Connection(FreeCol.META_SERVER_ADDRESS,
@@ -673,9 +680,14 @@ public final class FreeColServer {
         ) {
             mc.send(DOMMessage.createMessage("remove",
                     "port", Integer.toString(mc.getSocket().getPort())));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Network error with meta-server.", e);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Network error leaving meta-server: "
+                + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,
+                ioe);
+            this.publicServer = false;
+            return false;
         }
+        return true;
     }
 
     /**
@@ -1038,7 +1050,7 @@ public final class FreeColServer {
 
         // AI initialization.
         AIMain aiMain = getAIMain();
-        int aiIntegrity = aiMain.checkIntegrity(true);
+        int aiIntegrity = (aiMain == null) ? -1 : aiMain.checkIntegrity(true);
         if (aiIntegrity < 0) {
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
@@ -1125,7 +1137,7 @@ public final class FreeColServer {
                  : game.getNationOptions().getNations().entrySet()) {
             if (entry.getKey().isUnknownEnemy()) continue;
             if (entry.getValue() != NationState.NOT_AVAILABLE
-                && game.getPlayer(entry.getKey().getId()) == null) {
+                && game.getPlayerByNation(entry.getKey()) == null) {
                 newAI.add(makeAIPlayer(entry.getKey()));
             }
         }
@@ -1252,11 +1264,8 @@ public final class FreeColServer {
      * @return The player.
      */
     public ServerPlayer getPlayer(Connection connection) {
-        for (Player p : game.getPlayers()) {
-            ServerPlayer serverPlayer = (ServerPlayer)p;
-            if (serverPlayer.getConnection() == connection) return serverPlayer;
-        }
-        return null;
+        return (ServerPlayer)find(game.getPlayers(),
+            p -> ((ServerPlayer)p).getConnection() == connection);
     }
 
     /**

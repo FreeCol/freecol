@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -62,6 +63,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -580,15 +582,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void exploreLCRs() {
         final Tile tile = colony.getTile();
-        List<Unit> explorers = new ArrayList<>();
-        for (Unit u : tile.getUnitList()) {
-            if (u.isPerson()
-                && (u.getType().getSkill() <= 0
-                    || u.hasAbility(Ability.EXPERT_SCOUT))) {
-                explorers.add(u);
-            }
-        }
-        Collections.sort(explorers, scoutComparator);
+        List<Unit> explorers = tile.getUnitList().stream()
+            .filter(u -> u.isPerson() && (u.getType().getSkill() <= 0
+                        || u.hasAbility(Ability.EXPERT_SCOUT)))
+            .sorted(scoutComparator).collect(Collectors.toList());
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
@@ -618,28 +615,21 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
-        boolean hasDefender = false;
-        for (Unit u : tile.getUnitList()) {
-            if (u.isDefensiveUnit()
-                && getAIUnit(u).getMission(DefendSettlementMission.class) != null) {
-                // FIXME: be smarter
-                hasDefender = true;
-                break;
-            }
-        }
+        boolean hasDefender = any(tile.getUnitList(),
+            u -> u.isDefensiveUnit()
+                && getAIUnit(u).getMission(DefendSettlementMission.class) != null);
         if (!hasDefender) return;
 
         // What goods are really needed?
-        List<GoodsType> needed = new ArrayList<>();
-        for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
-            if (colony.getTotalProductionOf(g) <= 0) needed.add(g);
-        }
+        List<GoodsType> needed = spec.getRawBuildingGoodsTypeList().stream()
+            .filter(gt -> colony.getTotalProductionOf(gt) <= 0)
+            .collect(Collectors.toList());
 
         // If a tile can be stolen, do so if already at war with the
         // owner or if it is the best one available.
         UnitType unitType = spec.getDefaultUnitType(player);
         Tile steal = null;
-        float score = 1.0f;
+        double score = 1.0;
         for (Tile t : tile.getSurroundingTiles(1)) {
             Player owner = t.getOwner();
             if (owner == null || owner == player
@@ -655,13 +645,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // Pick the best tile to steal, considering mainly the
                 // building goods needed, but including food at a lower
                 // weight.
-                float s = 0.0f;
-                for (GoodsType g : needed) {
-                    s += t.getPotentialProduction(g, unitType);
-                }
-                for (GoodsType g : spec.getFoodGoodsTypeList()) {
-                    s += 0.1 * t.getPotentialProduction(g, unitType);
-                }
+                double s = needed.stream()
+                        .mapToInt(gt -> t.getPotentialProduction(gt, unitType)).sum()
+                    + spec.getFoodGoodsTypeList().stream()
+                        .mapToDouble(ft -> 0.1 * t.getPotentialProduction(ft, unitType)).sum();
                 if (s > score) {
                     score = s;
                     steal = t;
@@ -1078,14 +1065,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void requireGoodsWish(GoodsType type, int amount, int value,
                                  LogBuilder lb) {
-        GoodsWish gw = null;
-        for (Wish w : wishes) {
-            if (w instanceof GoodsWish
-                && ((GoodsWish)w).getGoodsType() == type) {
-                gw = (GoodsWish)w;
-                break;
-            }
-        }
+        GoodsWish gw = (GoodsWish)find(wishes, w -> w instanceof GoodsWish
+            && ((GoodsWish)w).getGoodsType() == type);
         if (gw != null) {
             gw.update(type, amount, gw.getValue() + 1);
             lb.add(", update ", gw);
@@ -1108,14 +1089,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void requireWorkerWish(UnitType type, boolean expertNeeded,
                                   int value, LogBuilder lb) {
-        WorkerWish ww = null;
-        for (Wish w : wishes) {
-            if (w instanceof WorkerWish
-                && ((WorkerWish)w).getUnitType() == type) {
-                ww = (WorkerWish)w;
-                break;
-            }
-        }
+        WorkerWish ww = (WorkerWish)find(wishes, w -> w instanceof WorkerWish
+            && ((WorkerWish)w).getUnitType() == type);
         if (ww != null) {
             ww.update(type, expertNeeded, ww.getValue() + 1);
             lb.add(", update ", ww);
@@ -1363,10 +1338,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private TileImprovementPlan getPlanFor(Tile tile,
                                            List<TileImprovementPlan> plans) {
-        for (TileImprovementPlan tip : plans) {
-            if (tip.getTarget() == tile) return tip;
-        }
-        return null;
+        return find(plans, tip -> tip.getTarget() == tile);
     }
 
     /**
@@ -1398,7 +1370,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             } else {
                 if (colonyTile.isEmpty()) continue;
-                goodsType = colonyTile.getUnitList().get(0).getWorkType();
+                goodsType = colonyTile.getCurrentWorkType();
             }
             if (goodsType == null) continue;
 
@@ -1414,21 +1386,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             } else {
                 if (!plan.update(goodsType)) plan = null;
             }
-            if (plan != null) {
-                // Defend against clearing the last forested tile, but
-                // otherwise add the plan.
-                TileType change = plan.getType().getChange(workTile.getType());
-                if (change != null && !change.isForested()) {
-                    int forest = 0;
-                    for (WorkLocation f : colony.getAvailableWorkLocations()) {
-                        if (f instanceof ColonyTile
-                            && ((ColonyTile)f).getWorkTile().isForested())
-                            forest++;
-                    }
-                    if (forest <= FOREST_MINIMUM) continue;
-                }
-                newPlans.add(plan);
-            }
+            if (plan == null) continue;
+
+            // Defend against clearing the last forested tile.
+            TileType change = plan.getType().getChange(workTile.getType());
+            if (change != null
+                && !change.isForested()
+                && !colonyTile.isColonyCenterTile()
+                && colony.getAvailableWorkLocations().stream()
+                    .filter(ct -> ct instanceof ColonyTile
+                        && !((ColonyTile)ct).isColonyCenterTile()
+                        && ((ColonyTile)ct).getWorkTile().isForested())
+                    .count() <= FOREST_MINIMUM) continue;
+
+            newPlans.add(plan); // Otherwise add the plan.
         }
         tileImprovementPlans.clear();
         tileImprovementPlans.addAll(newPlans);
@@ -1527,11 +1498,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> objects = new ArrayList<>();
-        for (AIGoods ag : getExportGoods()) {
-            if (ag.isDisposed() || ag.getGoods() == null) continue;
-            if (ag.getGoods().getLocation() == colony) objects.add(ag);
-        }
+        List<AIObject> objects = getExportGoods().stream()
+            .filter(ag -> !ag.isDisposed() && ag.getGoods() != null
+                && ag.getGoods().getLocation() == colony)
+            .collect(Collectors.toList());
         objects.addAll(wishes);
         wishes.clear();
         objects.addAll(tileImprovementPlans);

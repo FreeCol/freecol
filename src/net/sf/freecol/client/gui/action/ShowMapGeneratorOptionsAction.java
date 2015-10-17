@@ -48,7 +48,7 @@ public class ShowMapGeneratorOptionsAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         getGUI().showMapGeneratorOptionsDialog(false);
     }
 }

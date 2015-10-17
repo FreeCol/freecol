@@ -101,15 +101,15 @@ public final class ReportIndianPanel extends ReportPanel {
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(ImageLibrary.getSettlementImage(
             opponent.getNationType().getCapitalType(),
-            lib.getScalingFactor())));
+            lib.getScaleFactor())));
         reportPanel.add(villageLabel, "span, split 2");
-        JLabel headline = Utility.localizedLabel(opponent.getNationName());
+        JLabel headline = Utility.localizedLabel(opponent.getNationLabel());
         headline.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScalingFactor()));
+            FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
         reportPanel.add(headline, "wrap 20, aligny center");
         JLabel label = Utility.localizedLabel("report.indian.chieftain");
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
-            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScalingFactor());
+            FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor());
         label.setFont(font);
         reportPanel.add(label);
         reportPanel.add(Utility.localizedLabel(opponent.getName()), "left, wrap");

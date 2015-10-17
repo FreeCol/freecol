@@ -212,8 +212,8 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        ColorButton button = (ColorButton) e.getSource();
+    public void actionPerformed(ActionEvent ae) {
+        ColorButton button = (ColorButton)ae.getSource();
         Color color = JColorChooser
             .showDialog(FlagTest.this,
                         label.getText(),

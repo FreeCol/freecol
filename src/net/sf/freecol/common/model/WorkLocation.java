@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,7 +31,9 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -74,6 +75,7 @@ public abstract class WorkLocation extends UnitLocation
                     }
                 };
                     
+        public final WorkLocation workLocation;
         public final UnitType oldType;
         public final UnitType newType;
         public final GoodsType goodsType;
@@ -86,6 +88,8 @@ public abstract class WorkLocation extends UnitLocation
          * could produce <code>amount</code> more
          * <code>goodsType</code>.
          *
+         * @param workLocation The <code>WorkLocation</code> to add
+         *     a unit to.
          * @param oldType The optional <code>UnitType</code> currently
          *     doing the work.
          * @param newType A new <code>UnitType</code> to do the work.
@@ -93,8 +97,9 @@ public abstract class WorkLocation extends UnitLocation
          * @param amount The extra goods that would be produced if the
          *     suggestion is taken.
          */
-        public Suggestion(UnitType oldType, UnitType newType,
-            GoodsType goodsType, int amount) {
+        public Suggestion(WorkLocation workLocation, UnitType oldType,
+                          UnitType newType, GoodsType goodsType, int amount) {
+            this.workLocation = workLocation;
             this.oldType = oldType;
             this.newType = newType;
             this.goodsType = goodsType;
@@ -165,14 +170,28 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
+     * Get the current work type of any unit present.
+     *
+     * This assumes that all units in a work location are doing the same
+     * work, which is true for now.
+     *
+     * @return The current <code>GoodsType</code> being produced, or
+     *     null if none.
+     */
+    public GoodsType getCurrentWorkType() {
+        Unit unit = getFirstUnit();
+        return (unit != null && unit.getType() != null) ? unit.getWorkType()
+            : null;
+    }
+
+    /**
      * Update production type on the basis of the current work
      * location type (which might change due to an upgrade) and the
      * work type of units present.
      */
     public void updateProductionType() {
-        Unit unit = getFirstUnit();
-        GoodsType workType = (unit == null) ? null : unit.getWorkType();
-        setProductionType(getBestProductionType(unit == null, workType));
+        setProductionType(getBestProductionType(isEmpty(),
+                getCurrentWorkType()));
     }
 
     /**
@@ -351,14 +370,13 @@ public abstract class WorkLocation extends UnitLocation
                     ok = true;
                 } else if (colony.getTotalProductionOf(goodsType) == 0
                     && (bt = colony.getCurrentlyBuilding()) != null
-                    && AbstractGoods.findByType(goodsType,
-                        bt.getRequiredGoods()) != null) {
+                    && AbstractGoods.containsType(goodsType, bt.getRequiredGoods())) {
                     ok = true;
                 }
             }
         }
         return (!ok) ? null
-            : new Suggestion((unit == null) ? null : unit.getType(),
+            : new Suggestion(this, (unit == null) ? null : unit.getType(),
                              better, goodsType, delta);
     }
 
@@ -422,7 +440,7 @@ public abstract class WorkLocation extends UnitLocation
      *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
-        return AbstractGoods.findByType(goodsType, getOutputs()) != null;
+        return AbstractGoods.containsType(goodsType, getOutputs());
     }
 
     /**
@@ -525,13 +543,10 @@ public abstract class WorkLocation extends UnitLocation
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
         ProductionType pt = getBestProductionType(false, null);
-        if (pt != null) {
-            for (AbstractGoods goods : pt.getOutputs()) {
-                UnitType expert = spec.getExpertForProducing(goods.getType());
-                if (expert != null) return expert;
-            }
-        }
-        return null;
+        return (pt == null) ? null
+            : find(map(pt.getOutputs(),
+                    ag -> spec.getExpertForProducing(ag.getType())),
+                ut -> ut != null, null);
     }
 
     /**
@@ -557,17 +572,15 @@ public abstract class WorkLocation extends UnitLocation
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
-        if (unit == null) return 0;
+        if (unit == null || unit.getWorkType() != goodsType) return 0;
         final UnitType unitType = unit.getType();
-        if (unit.getWorkType() != goodsType) return 0;
         final Turn turn = getGame().getTurn();
         int bestAmount = 0;
         for (AbstractGoods output : getOutputs()) {
             if (output.getType() != goodsType) continue;
-            int amount = getBaseProduction(getProductionType(), goodsType,
-                                           unitType);
-            amount = (int)applyModifiers(amount, turn,
-                getProductionModifiers(goodsType, unitType));
+            int amount = (int)applyModifiers(getBaseProduction(getProductionType(),
+                    goodsType, unitType),
+                turn, getProductionModifiers(goodsType, unitType));
             if (bestAmount < amount) bestAmount = amount;
         }
         return bestAmount;
@@ -582,11 +595,8 @@ public abstract class WorkLocation extends UnitLocation
      */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
         if (unit == null) throw new IllegalArgumentException("Null unit.");
-
-        final UnitType unitType = unit.getType();
-        AbstractGoods goods = AbstractGoods.findByType(goodsType, getOutputs());
-        return (goods == null) ? 0
-            : Math.max(0, getPotentialProduction(goodsType, unitType));
+        return (!produces(goodsType)) ? 0
+            : Math.max(0, getPotentialProduction(goodsType, unit.getType()));
     }
 
     /**
@@ -726,7 +736,15 @@ public abstract class WorkLocation extends UnitLocation
         return colony;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int getRank() {
+        return Location.getRank(getTile());
+    }
 
+    
     // Interface UnitLocation
     // Inherits:
     //   UnitLocation.getSpaceTaken
@@ -756,6 +774,20 @@ public abstract class WorkLocation extends UnitLocation
      * @return A label <code>StringTemplate</code> for this work location.
      */
     public abstract StringTemplate getLabel();
+
+    /**
+     * Is this work location available?
+     *
+     * @return True if the work location is either current or can be claimed.
+     */
+    public abstract boolean isAvailable();
+
+    /**
+     * Is this a current work location of this colony?
+     *
+     * @return True if the work location is current.
+     */
+    public abstract boolean isCurrent();
 
     /**
      * Checks if this work location is available to the colony to be
@@ -830,9 +862,8 @@ public abstract class WorkLocation extends UnitLocation
      * @return A value for the player.
      */
     public int evaluateFor(Player player) {
-        int result = 0;
-        for (Unit u : getUnitList()) result += u.evaluateFor(player);
-        return result;
+        return getUnitList().stream()
+            .mapToInt(u -> u.evaluateFor(player)).sum();
     }
 
     /**

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -36,7 +37,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -63,25 +64,21 @@ public class TerrainDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode node =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        DefaultMutableTreeNode node
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                                         getName(), null));
         for (TileType t : getSpecification().getTileTypeList()) {
-            // FIXME: Use different method supporting a direct request of an
-            //        image of fixed ICON_SIZE.
-            final float maxTileImageHeight = ImageLibrary.TILE_OVERLAY_SIZE.height;
-            Image tile = MapViewer.createTileImageWithOverlayAndForest(t,
-                ImageLibrary.ICON_SIZE.height / maxTileImageHeight);
-            BufferedImage image = new BufferedImage(tile.getWidth(null), ImageLibrary.ICON_SIZE.height,
-                BufferedImage.TYPE_INT_ARGB);
+            Image tile = SwingGUI.createTileImageWithOverlayAndForest(t,
+                new Dimension(-1, ImageLibrary.ICON_SIZE.height));
+            BufferedImage image = new BufferedImage(tile.getWidth(null),
+                ImageLibrary.ICON_SIZE.height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
             g.drawImage(tile, 0, (ImageLibrary.ICON_SIZE.height - tile.getHeight(null)) / 2, null);
             g.dispose();
@@ -92,16 +89,11 @@ public class TerrainDetailPanel
     }
 
     /**
-     * Builds the details panel for the TileType with the given identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         TileType tileType = getSpecification().getTileType(id);
         panel.setLayout(new MigLayout("wrap 4, gap 20"));
@@ -113,13 +105,12 @@ public class TerrainDetailPanel
             defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        JLabel nameLabel = Utility.localizedLabel(tileType);
-        nameLabel.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel nameLabel = Utility.localizedHeaderLabel(tileType, FontLibrary.FontSize.SMALL);
         panel.add(nameLabel, "span, align center");
 
         panel.add(Utility.localizedLabel("colopedia.terrain.terrainImage"), "spany 3");
-        Image terrainImage = MapViewer.createTileImageWithOverlayAndForest(tileType, 1);
+        Image terrainImage = SwingGUI.createTileImageWithOverlayAndForest(
+            tileType, ImageLibrary.TILE_OVERLAY_SIZE);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();

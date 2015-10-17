@@ -49,8 +49,6 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController.BoycottAction;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
@@ -183,7 +181,7 @@ public final class EuropePanel extends PortPanel {
                     && unit.hasSpaceLeft()) {
                     StringTemplate locName = destination
                         .getLocationLabelFor(unit.getOwner());
-                    if (!getGUI().confirm(true, null, StringTemplate
+                    if (!getGUI().confirm(null, StringTemplate
                             .template("europePanel.leaveColonists")
                             .addStringTemplate("%newWorld%", locName),
                             unit, "ok", "cancel")) return null;
@@ -568,9 +566,9 @@ public final class EuropePanel extends PortPanel {
      * The constructor for a EuropePanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param canvas The enclosing <code>Canvas</code>.
+     * @param header True when a header should be added.
      */
-    public EuropePanel(FreeColClient freeColClient, Canvas canvas) {
+    public EuropePanel(FreeColClient freeColClient, boolean header) {
         super(freeColClient, new MigLayout("wrap 3, fill",
                                            "[30%:][30%:][15%:]"));
 
@@ -678,7 +676,7 @@ public final class EuropePanel extends PortPanel {
 
         initialize(europe);
 
-        if (canvas.getHeight() > 780) {
+        if(header) {
             add(Utility.localizedHeader(europe.getNameKey(), false),
                 "span, top, center");
         }
@@ -699,7 +697,7 @@ public final class EuropePanel extends PortPanel {
 
         setSelectedUnitLabel(null);
 
-        float scale = getImageLibrary().getScalingFactor();
+        float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
     }
 
@@ -839,8 +837,8 @@ public final class EuropePanel extends PortPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         EuropeAction act = EuropeAction.valueOf(command);
         switch (act) {
         case EXIT:
@@ -862,7 +860,7 @@ public final class EuropePanel extends PortPanel {
             unloadAction();
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

@@ -48,8 +48,13 @@ import javax.swing.text.StyleContext;
 
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Named;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -172,6 +177,43 @@ public final class Utility {
     }
 
     /**
+     * Make a suitable link button for a given key.
+     *
+     * Colonies and Europe-like objects are obvious, locations and units
+     * are dependent on the message source.
+     * TODO: Are there more useful possibilities?
+     *
+     * @param key The message key to make a link for.
+     * @param val The text for the link.
+     * @param player The <code>Player</code> to make a link for.
+     * @param source The message source <code>FreeColGameObject</code>.
+     * @return A <code>JButton</code> for the link, or null if no good
+     *     choice found.
+     */
+    public static JButton getMessageButton(String key, String val,
+        Player player, FreeColGameObject source) {
+        FreeColGameObject link = null;
+        if ("%colony%".equals(key) || key.endsWith("Colony%")) {
+            Settlement settlement = player.getGame().getSettlementByName(val);
+            link = (settlement == null) ? null
+                : (player.owns(settlement)) ? settlement
+                : settlement.getTile();
+        } else if ("%europe%".equals(key) || "%market%".equals(key)) {
+            link = player.getEurope();
+        } else if ("%location%".equals(key) || key.endsWith("Location%")) {
+            if (source instanceof Location) {
+                link = source.getLinkTarget(player);
+            }
+        } else if ("%unit%".equals(key) || key.endsWith("Unit%")) {
+            if (source instanceof Unit) {
+                link = source.getLinkTarget(player);
+            }
+        }
+        return (link == null) ? null
+            : getLinkButton(val, null, link.getId());
+    }
+
+    /**
      * Creates a text area with standard settings suitable for use in FreeCol
      * panels, without setting its size.
      *
@@ -233,7 +275,14 @@ public final class Utility {
      * @return The default <code>JTextPane</code> to use.
      */
     public static JTextPane getDefaultTextPane() {
-        return getDefaultTextPane(null);
+        DefaultStyledDocument document
+            = new DefaultStyledDocument(STYLE_CONTEXT);
+
+        JTextPane textPane = new JTextPane(document);
+        textPane.setOpaque(false);
+        textPane.setEditable(false);
+        textPane.setLogicalStyle(STYLE_CONTEXT.getStyle("regular"));
+        return textPane;
     }
 
     /**
@@ -243,14 +292,7 @@ public final class Utility {
      * @return A suitable <code>JTextPane</code>.
      */
     public static JTextPane getDefaultTextPane(String text) {
-        DefaultStyledDocument document
-            = new DefaultStyledDocument(STYLE_CONTEXT);
-
-        JTextPane textPane = new JTextPane(document);
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-        textPane.setLogicalStyle(STYLE_CONTEXT.getStyle("regular"));
-
+        JTextPane textPane = getDefaultTextPane();
         textPane.setText(text);
         return textPane;
     }
@@ -354,6 +396,55 @@ public final class Utility {
     }
 
     /**
+     * Gets a default header for panels containing a localized message.
+     *
+     * @param key The message key to use.
+     * @param small If true, use a smaller font.
+     * @return A suitable <code>JLabel</code>.
+     */
+    public static JLabel localizedHeader(String key, boolean small) {
+        JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
+            (small ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
+        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        return header;
+    }
+
+    /**
+     * Gets a label containing a localized message using the header font.
+     *
+     * @param key The message key to use.
+     * @param alignment The alignment.
+     * @param size The font size.
+     * @return A suitable <code>JLabel</code>.
+     */
+    public static JLabel localizedHeaderLabel(String key, int alignment,
+                                              FontLibrary.FontSize size) {
+        String text = Messages.message(key);
+        JLabel header = new JLabel(text, alignment);
+        header.setFont(FontLibrary.createCompatibleFont(
+            text, FontLibrary.FontType.HEADER, size));
+        header.setOpaque(false);
+        return header;
+    }
+
+    public static JLabel localizedHeaderLabel(StringTemplate template,
+                                              int alignment,
+                                              FontLibrary.FontSize size) {
+        String text = Messages.message(template);
+        JLabel header = new JLabel(text, alignment);
+        header.setFont(FontLibrary.createCompatibleFont(
+            text, FontLibrary.FontType.HEADER, size));
+        header.setOpaque(false);
+        return header;
+    }
+
+    public static JLabel localizedHeaderLabel(Named named,
+                                              FontLibrary.FontSize size) {
+        return localizedHeaderLabel(named.getNameKey(),
+                                    SwingConstants.LEADING, size);
+    }
+
+    /**
      * Get a JLabel with a named object.
      *
      * @param named The <code>Named</code> to use.
@@ -364,51 +455,13 @@ public final class Utility {
     }
 
     /**
-     * Gets a default header for panels containing a localized message.
-     *
-     * @param key The message key to use.
-     * @param small If true, use a smaller font.
-     * @return A suitable <code>JLabel</code>.
-     */
-    public static JLabel localizedHeader(String key, boolean small) {
-        JLabel header = new JLabel(Messages.message(key), JLabel.CENTER);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            (small) ? FontLibrary.FontSize.SMALL : FontLibrary.FontSize.BIG));
-        header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        return header;
-    }
-
-    /**
      * Get a JLabel with Messages.message(key) as text.
      *
      * @param key The key to use.
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(String key) {
-        return localizedLabel(key, SwingConstants.LEADING);
-    }
-
-    /**
-     * Get a JLabel with Messages.message(key) as text.
-     *
-     * @param key The key to use.
-     * @param alignment The alignment.
-     * @return The <code>JLabel</code>.
-     */
-    public static JLabel localizedLabel(String key, int alignment) {
-        return localizedLabel(key, null, alignment);
-    }
-
-    /**
-     * Get a JLabel with Messages.message(key) as text.
-     *
-     * @param key The key to use.
-     * @param icon The icon to use.
-     * @param alignment The alignment.
-     * @return The <code>JLabel</code>.
-     */
-    public static JLabel localizedLabel(String key, Icon icon, int alignment) {
-        return localizedLabel(StringTemplate.key(key), icon, alignment);
+        return localizedLabel(StringTemplate.key(key));
     }
 
     /**
@@ -418,7 +471,9 @@ public final class Utility {
      * @return The <code>JLabel</code>.
      */
     public static JLabel localizedLabel(StringTemplate template) {
-        return localizedLabel(template, null, SwingConstants.LEADING);
+        JLabel label = new JLabel(Messages.message(template));
+        label.setOpaque(false);
+        return label;
     }
 
     /**
@@ -431,7 +486,9 @@ public final class Utility {
      */
     public static JLabel localizedLabel(StringTemplate template, Icon icon,
                                         int alignment) {
-        return new JLabel(Messages.message(template), icon, alignment);
+        JLabel label = new JLabel(Messages.message(template), icon, alignment);
+        label.setOpaque(false);
+        return label;
     }
 
     /**

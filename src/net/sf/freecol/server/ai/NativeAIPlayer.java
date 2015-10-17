@@ -226,7 +226,7 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Prioritize promoting partially equipped units to full dragoon
         Collections.sort(units,
-            Unit.getMilitaryStrengthComparator(getGame().getCombatModel()));
+            getGame().getCombatModel().getMilitaryStrengthComparator());
 
         boolean moreHorses = true, moreMuskets = true;
         for (Unit u : units) {
@@ -279,7 +279,7 @@ public class NativeAIPlayer extends AIPlayer {
         }
 
         // Collect threats and other potential defenders
-        final HashMap<Tile, Float> threats = new HashMap<>();
+        final HashMap<Tile, Double> threats = new HashMap<>();
         Player enemy;
         Tension tension;
         for (Tile t : is.getTile().getSurroundingTiles(is.getRadius() + 1)) {
@@ -304,20 +304,19 @@ public class NativeAIPlayer extends AIPlayer {
                 ; // Not regarded as a threat
             } else {
                 // Evaluate the threat
-                float threshold, bonus, value = 0.0f;
+                double threshold, bonus, value = 0.0;
                 if (tension.getLevel().compareTo(Tension.Level.DISPLEASED) <= 0) {
-                    threshold = 1.0f;
+                    threshold = 1.0;
                     bonus = 0.0f;
                 } else {
-                    threshold = 0.0f;
+                    threshold = 0.0;
                     bonus = (float)tension.getLevel().ordinal()
                         - Tension.Level.CONTENT.ordinal();
                 }
-                for (Unit u : t.getUnitList()) {
-                    float offence = cm.getOffencePower(u, is);
-                    if (offence > threshold) value += offence + bonus;
-                }
-                if (value > 0.0f) threats.put(t, value);
+                value += t.getUnitList().stream()
+                    .filter(u -> cm.getOffencePower(u, is) > threshold)
+                    .mapToDouble(u -> cm.getOffencePower(u, is) + bonus).sum();
+                if (value > 0.0) threats.put(t, value);
             }
         }
 
@@ -367,7 +366,7 @@ public class NativeAIPlayer extends AIPlayer {
         Collections.sort(threatTiles, new Comparator<Tile>() {
                 @Override
                 public int compare(Tile t1, Tile t2) {
-                    return Float.compare(threats.get(t2),
+                    return Double.compare(threats.get(t2),
                             threats.get(t1));
                 }
             });

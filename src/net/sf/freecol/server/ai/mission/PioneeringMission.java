@@ -340,7 +340,7 @@ public class PioneeringMission extends Mission {
         if (deferOK) return getBestPioneeringColony(aiUnit);
         Location loc = findCircleTarget(aiUnit, getGoalDecider(aiUnit, false),
                                         range*3, false);
-        return (hasTools(aiUnit)) ? loc : upLoc(loc);
+        return (hasTools(aiUnit)) ? loc : Location.upLoc(loc);
     }
 
     /**

@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import javax.swing.ListCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -126,31 +126,25 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
         this.maxCargo = winner.getSpaceLeft();
 
         this.allButton = Utility.localizedButton("all");
-        this.allButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                    for (int i = 0; i < gl.getModel().getSize()
-                             && i < CaptureGoodsDialog.this.maxCargo; i++) {
-                        GoodsItem gi = gl.getModel().getElementAt(i);
-                        gi.setSelected(true);
-                        updateComponents();
-                    }
+        this.allButton.addActionListener((ActionEvent ae) -> {
+                JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
+                for (int i = 0; i < gl.getModel().getSize()
+                         && i < CaptureGoodsDialog.this.maxCargo; i++) {
+                    GoodsItem gi = gl.getModel().getElementAt(i);
+                    gi.setSelected(true);
+                    updateComponents();
                 }
             });
         this.allButton.setMnemonic('a');
         this.allButton.setActionCommand(this.allButton.getText());
  
         this.noneButton = Utility.localizedButton("none");
-        this.noneButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
-                    for (int i = 0; i < gl.getModel().getSize(); i++) {
-                        GoodsItem gi = gl.getModel().getElementAt(i);
-                        gi.setSelected(false);
-                        updateComponents();
-                    }
+        this.noneButton.addActionListener((ActionEvent ae) -> {
+                JList<GoodsItem> gl = CaptureGoodsDialog.this.goodsList;
+                for (int i = 0; i < gl.getModel().getSize(); i++) {
+                    GoodsItem gi = gl.getModel().getElementAt(i);
+                    gi.setSelected(false);
+                    updateComponents();
                 }
             });
         this.noneButton.setMnemonic('n');

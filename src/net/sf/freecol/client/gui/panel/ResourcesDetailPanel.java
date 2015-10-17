@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -37,7 +38,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Scope;
-
+import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -60,12 +61,10 @@ public class ResourcesDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
@@ -73,24 +72,16 @@ public class ResourcesDetailPanel
     }
 
     /**
-     * Builds the details panel for the ResourceType with the given
-     * identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         ResourceType type = getSpecification().getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
-        JLabel name = Utility.localizedLabel(type);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(type, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         panel.add(Utility.localizedLabel("colopedia.resource.bonusProduction"));
@@ -99,17 +90,12 @@ public class ResourcesDetailPanel
         for (Modifier modifier : type.getModifiers()) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
-                ArrayList<String> scopeStrings = new ArrayList<>();
-                for (Scope scope : modifier.getScopes()) {
-                    if (scope.getType() != null) {
-                        FreeColGameObjectType fcgot = getSpecification()
-                            .findType(scope.getType());
-                        scopeStrings.add(Messages.getName(fcgot));
-                    }
-                }
-                if (!scopeStrings.isEmpty()) {
-                    text += " (" + join(", ", scopeStrings) + ")";
-                }
+                final Specification spec = getSpecification();
+                String scopeStrings = modifier.getScopes().stream()
+                    .filter(s -> s.getType() != null)
+                    .map(s -> Messages.getName(spec.findType(s.getType())))
+                    .collect(Collectors.joining(", "));
+                if (!scopeStrings.isEmpty()) text += " (" + scopeStrings + ")";
             }
 
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
@@ -123,5 +109,4 @@ public class ResourcesDetailPanel
         panel.add(Utility.localizedTextArea(Messages.descriptionKey(type), 30),
                   "growx");
     }
-
 }

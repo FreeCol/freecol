@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -196,22 +197,17 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     public boolean hasWork(Unit unit, int turns) {
         // Look for goods to load.
         List<AbstractGoods> stopGoods = getCompactCargo();
-        for (AbstractGoods ag : stopGoods) {
-            if (unit.getGoodsCount(ag.getType()) >= ag.getAmount()) continue;
-            // There is space on the unit to load some more
-            // of this goods type, so return true if there is
-            // some available at the stop.
-            if (getExportAmount(ag.getType(), turns) > 0) return true;
-        }
+        // There is space on the unit to load some more of this goods
+        // type, so return true if there is some available at the stop.
+        if (any(stopGoods.stream()
+                .filter(ag -> unit.getGoodsCount(ag.getType()) < ag.getAmount()),
+                ag -> getExportAmount(ag.getType(), turns) > 0)) return true;
 
         // Look for goods to unload.
-        for (Goods goods : unit.getCompactGoodsList()) {
-            GoodsType type = goods.getType();
-            if (AbstractGoods.findByType(type, stopGoods) != null) continue;
-            // There are goods on board this unit that need to be unloaded.
-            if (getImportAmount(type, turns) > 0) return true;
-        }
-            
+        if (any(unit.getCompactGoodsList().stream()
+                .filter(ag -> !AbstractGoods.containsType(ag.getType(), stopGoods)),
+                ag -> getImportAmount(ag.getType(), turns) > 0)) return true;
+
         return false;
     }
 

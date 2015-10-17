@@ -20,6 +20,7 @@
 package net.sf.freecol.common.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.util.CollectionUtils;
@@ -53,5 +54,31 @@ public class UtilsTest extends FreeColTestCase {
         assertEquals(p.get(3), makeList(2,3,1));
         assertEquals(p.get(4), makeList(3,1,2));
         assertEquals(p.get(5), makeList(3,2,1));
+    }
+
+    public void testComparator() {
+        // This is more to prove that I know what I am doing with some
+        // trivial comparators than to actually test the code:-), MTP.
+        List<Double> d = new ArrayList<>();
+        d.add(1.0);
+        d.add(2.0);
+        d.add(3.0);
+        Collections.sort(d, CollectionUtils.descendingDoubleComparator);
+        assertEquals(d.get(0), 3.0);
+        Collections.sort(d, CollectionUtils.ascendingDoubleComparator);
+        assertEquals(d.get(0), 1.0);
+        
+        List<List<Object>> o = new ArrayList<>();
+        List<Object> o1 = new ArrayList<Object>();
+        List<Object> o2 = new ArrayList<Object>();
+        List<Object> o3 = new ArrayList<Object>();
+        o.add(o1);
+        o.add(o2);
+        o.add(o3);
+        o1.add(1);
+        o2.add(1);o2.add(2);
+        o3.add(1);o3.add(2);o3.add(3);
+        Collections.sort(o, CollectionUtils.descendingListLengthComparator);
+        assertEquals(o.get(0), o3);
     }
 }

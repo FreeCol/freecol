@@ -24,12 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.SwingUtilities;
-
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -48,7 +44,6 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -69,12 +64,11 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * Handles the network messages that arrives while in the game.
+ * Handle the network messages that arrives while in the game.
  *
- * Usually delegate to the real handlers in InGameController, making
- * sure anything non-trivial that touches the GUI is doing so inside
- * the EDT.  Usually this is done with SwingUtilities.invokeLater, but
- * some messages demand a response which requires invokeAndWait.
+ * Delegate to the real handlers in InGameController which are allowed
+ * to touch the GUI.  Call IGC through invokeLater except for the messages
+ * that demand a response, which requires invokeAndWait.
  *
  * Note that the EDT often calls the controller, which queries the
  * server, which results in handling the reply here, still within the
@@ -84,47 +78,23 @@ import org.w3c.dom.NodeList;
  *
  * ...except for the special case of the animations.  These have to be
  * done in series but are sometimes in the EDT (our unit moves) and
- * sometimes not (other nation unit moves).  Hence the hack in the
- * local invokeAndWait wrapper.
+ * sometimes not (other nation unit moves).  Hence the hack
+ * GUI.invokeNowOrWait.
  */
 public final class InGameInputHandler extends InputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
     // A bunch of predefined non-closure runnables.
-    private final Runnable closeMenusRunnable = new Runnable() {
-            @Override
-            public void run() {
-                getGUI().closeMenus();
-            }
-        };
-    private final Runnable deselectActiveUnitRunnable = new Runnable() {
-            @Override
-            public void run() {
-                getGUI().setActiveUnit(null);
-            }
-        };
-    private final Runnable displayModelMessagesRunnable = new Runnable() {
-            @Override
-            public void run() {
-                igc().displayModelMessages(false);
-            }
-        };
-    private final Runnable reconnectRunnable = new Runnable() {
-            @Override
-            public void run() {
-                igc().reconnect();
-            }
-        };
-    private final Runnable updateMenuBarRunnable = new Runnable() {
-            @Override
-            public void run() {
-                getGUI().updateMenuBar();
-            }
-        };
-
-    /** The unit last appearing in an animation. */
-    private Unit lastAnimatedUnit = null;
+    private final Runnable closeMenusRunnable = () -> {
+        igc().closeMenus();
+    };
+    private final Runnable displayModelMessagesRunnable = () -> {
+        igc().displayModelMessages(false);
+    };
+    private final Runnable reconnectRunnable = () -> {
+        igc().reconnect();
+    };
 
 
     /**
@@ -147,45 +117,30 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Wrapper for SwingUtilities.invokeAndWait.  This has to handle the
-     * case where we are already in the EDT.
+     * Shorthand to run in the EDT and wait.
      *
-     * @param runnable A <code>Runnable</code> to run.
+     * @param runnable The <code>Runnable</code> to run.
      */
     private void invokeAndWait(Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(runnable);
-            } catch (Exception e) {}
-        }
+        getFreeColClient().getGUI().invokeNowOrWait(runnable);
     }
-
+    
     /**
-     * Refresh the canvas.
+     * Shorthand to run in the EDT eventually.
      *
-     * @param focus If true, request the focus.
+     * @param runnable The <code>Runnable</code> to run.
      */
-    private void refreshCanvas(final boolean focus) {
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getGUI().refresh();
-
-                    if (focus && !getGUI().isShowingSubPanel()) {
-                        getGUI().requestFocusInWindow();
-                    }
-                }
-            });
+    private void invokeLater(Runnable runnable) {
+        getFreeColClient().getGUI().invokeNowOrLater(runnable);
     }
-
+    
     /**
      * Get the integer value of an element attribute.
      *
      * @param element The <code>Element</code> to query.
      * @param attrib The attribute to use.
-     * @return The integer value of the attribute, or MIN_INT on failure.
+     * @return The integer value of the attribute, or
+     *     Integer.MIN_VALUE on failure.
      */
     private static int getIntegerAttribute(Element element, String attrib) {
         int n;
@@ -219,6 +174,7 @@ public final class InGameInputHandler extends InputHandler {
      * Sometimes units appear which the client does not know about,
      * and are passed in as the children of the parent element.
      * Worse, if their location is a Unit, that unit has to be passed in too.
+     * Pull a unit out of the children by id.
      *
      * @param game The <code>Game</code> to add the unit to.
      * @param element The <code>Element</code> to find a unit in.
@@ -232,7 +188,7 @@ public final class InGameInputHandler extends InputHandler {
         if (e != null) {
             u = new Unit(game, e);
             if (u.getLocation() == null) {
-                throw new IllegalStateException("Null location: " + u);
+                throw new RuntimeException("Null location: " + u);
             }
         }
         return u;
@@ -252,7 +208,7 @@ public final class InGameInputHandler extends InputHandler {
 
         Element reply;
         String type = element.getTagName();
-        logger.log(Level.FINEST, "Received message: " + type);
+        logger.log(Level.FINEST, "Received: " + type);
         switch (type) {
         case "disconnect":
             reply = disconnect(element); break; // Inherited
@@ -325,7 +281,7 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
             && fcc.currentPlayerIsMyPlayer()) {
-            SwingUtilities.invokeLater(displayModelMessagesRunnable);
+            invokeLater(displayModelMessagesRunnable);
         }
         return reply;
     }
@@ -355,7 +311,8 @@ public final class InGameInputHandler extends InputHandler {
 
             final String tag = e.getTagName();
             if (FoundingFather.getXMLElementTagName().equals(tag)) {
-                FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
+                FoundingFather father
+                    = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
@@ -379,7 +336,7 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "addPlayer"-message.
+     * Handle an "addPlayer"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -402,7 +359,7 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "animateAttack"-message.  This only performs animation, if
+     * Handle an "animateAttack"-message.  This only performs animation, if
      * required.  It does not actually perform any attacks.
      *
      * @param element An element (root element in a DOM-parsed XML
@@ -412,8 +369,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element animateAttack(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.isHeadless()) return null;
+        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
         final Player player = freeColClient.getMyPlayer();
         String str;
@@ -465,26 +421,15 @@ public final class InGameInputHandler extends InputHandler {
             = Boolean.parseBoolean(element.getAttribute("success"));
 
         // All is well, do the animation.
-        // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
-        final boolean focus = lastAnimatedUnit != attacker;
-        lastAnimatedUnit = attacker;
-        invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    if (focus || !getGUI().onScreen(attackerTile)
-                        || !getGUI().onScreen(defenderTile)) {
-                        getGUI().setFocusImmediately(attackerTile);
-                    }
-                    getGUI().animateUnitAttack(attacker, defender,
-                        attackerTile, defenderTile, success);
-                    refreshCanvas(false);
-                }
+        invokeAndWait(() -> {
+                igc().animateAttack(attacker, defender,
+                                    attackerTile, defenderTile, success);
             });
         return null;
     }
 
     /**
-     * Handles an "animateMove"-message.  This only performs
+     * Handle an "animateMove"-message.  This only performs
      * animation, if required.  It does not actually change unit
      * positions, which happens in an "update".
      *
@@ -495,8 +440,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element animateMove(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        if (freeColClient.isHeadless()) return null;
+        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
         final Player player = freeColClient.getMyPlayer();
 
@@ -544,37 +488,12 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        final boolean focus = unit != lastAnimatedUnit;
-        lastAnimatedUnit = unit;
-        invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    if (getGUI().getAnimationSpeed(unit) > 0) {
-                        // All is well, queue the animation.  Use
-                        // lastAnimatedUnit as a filter to avoid
-                        // excessive refocussing.
-                        if (focus || !getGUI().onScreen(oldTile)) {
-                            getGUI().setFocusImmediately(oldTile);
-                        }
-                        getGUI().animateUnitMove(unit, oldTile, newTile);
-                        refreshCanvas(false);
-                    } else {
-                        // Not animating, but if the centering
-                        // option is enabled at least refocus so
-                        // we can see the move happen.
-                        if (!getGUI().onScreen(oldTile)
-                            && getFreeColClient().getClientOptions()
-                            .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                            getGUI().setFocus(oldTile);
-                        }
-                    }
-                }
-            });
+        invokeAndWait(() -> { igc().animateMove(unit, oldTile, newTile); });
         return null;
     }
 
     /**
-     * Handles a "chat"-message.
+     * Handle a "chat"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -584,19 +503,15 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getGUI().displayChatMessage(chatMessage.getPlayer(game),
-                                            chatMessage.getMessage(),
-                                            chatMessage.isPrivate());
-            }
-        });
+        invokeLater(() -> {
+                igc().chat(chatMessage.getPlayer(game),
+                           chatMessage.getMessage(), chatMessage.isPrivate());
+            });
         return null;
     }
 
     /**
-     * Handles an "chooseFoundingFather"-request.
+     * Handle an "chooseFoundingFather"-request.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -607,7 +522,7 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        getGUI().showChooseFoundingFatherDialog(ffs);
+        invokeLater(() -> { igc().chooseFoundingFather(ffs); });
         return null;
     }
 
@@ -627,7 +542,7 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "diplomacy"-request.  If the message informs of an
+     * Handle a "diplomacy"-request.  If the message informs of an
      * acceptance or rejection then display the result and return
      * null.  If the message is a proposal, then ask the user about
      * it and return the response with appropriate response set.
@@ -654,14 +569,9 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    message.setAgreement(igc().diplomacy(our, other,
-                                                         agreement));
-                }
+        invokeAndWait(() -> {
+                message.setAgreement(igc().diplomacy(our, other, agreement));
             });
-        SwingUtilities.invokeLater(updateMenuBarRunnable);
         return (message.getAgreement() == null) ? null
             : message.toXMLElement();
     }
@@ -696,7 +606,7 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "error"-message.
+     * Handle an "error"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -706,12 +616,7 @@ public final class InGameInputHandler extends InputHandler {
         final String messageId = element.getAttribute("messageID");
         final String message = element.getAttribute("message");
 
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getGUI().showErrorMessage(messageId, message);
-                }
-            });
+        invokeLater(() -> { igc().error(messageId, message); });
         return null;
     }
 
@@ -786,9 +691,9 @@ public final class InGameInputHandler extends InputHandler {
             logger.warning("firstContact with bad tile: " + tile);
             return null;
         }
+        final int n = message.getSettlementCount();
 
-        getGUI().showFirstContactDialog(player, other, tile,
-                                        message.getSettlementCount());
+        invokeLater(() -> { igc().firstContact(player, other, tile, n); });
         return null;
     }
 
@@ -800,19 +705,19 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element fountainOfYouth(Element element) {
-        int n = getIntegerAttribute(element, "migrants");
-        if (n > 0) {
-            getGUI().showEmigrationDialog(getFreeColClient().getMyPlayer(),
-                                          n, true);
-        } else {
+        final int n = getIntegerAttribute(element, "migrants");
+        if (n <= 0) {
             logger.warning("Invalid migrants attribute: "
                 + element.getAttribute("migrants"));
+            return null;
         }
+
+        invokeLater(() -> { igc().fountainOfYouth(n); });
         return null;
     }
 
     /**
-     * Handles a "gameEnded"-message.
+     * Handle a "gameEnded"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -824,23 +729,20 @@ public final class InGameInputHandler extends InputHandler {
         final Player winner
             = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                              Player.class);
-        final boolean highScore
-            = "true".equalsIgnoreCase(element.getAttribute("highScore"));
+        if (winner == null) {
+            logger.warning("Invalid player for gameEnded");
+            return null;
+        }
+        final String highScore = element.getAttribute("highScore");
 
         if (winner == freeColClient.getMyPlayer()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        igc().displayHighScores(highScore);
-                    }
-                });
-            getGUI().showVictoryDialog();
+            invokeLater(() -> { igc().victory(highScore); });
         }
         return null;
     }
 
     /**
-     * Handles an "indianDemand"-request.
+     * Handle an "indianDemand"-request.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -852,14 +754,12 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = getFreeColClient().getMyPlayer();
         final IndianDemandMessage message
             = new IndianDemandMessage(game, element);
-
         final Unit unit = message.getUnit(game);
         if (unit == null) {
             logger.warning("IndianDemand with null unit: "
                 + element.getAttribute("unit"));
             return null;
         }
-
         final Colony colony = message.getColony(game);
         if (colony == null) {
             logger.warning("IndianDemand with null colony: "
@@ -869,13 +769,9 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    boolean accepted = igc().indianDemand(unit, colony,
-                        message.getType(game), message.getAmount());
-                    message.setResult(accepted);
-                }
+        invokeAndWait(() -> {
+                message.setResult(igc().indianDemand(unit, colony,
+                        message.getType(game), message.getAmount()));
             });
         return message.toXMLElement();
     }
@@ -895,12 +791,12 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        getGUI().showCaptureGoodsDialog(unit, goods, defenderId);
+        invokeLater(() -> { igc().loot(unit, goods, defenderId); });
         return null;
     }
 
     /**
-     * Handles a "monarchAction"-request.
+     * Handle a "monarchAction"-request.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -911,8 +807,10 @@ public final class InGameInputHandler extends InputHandler {
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
-        getGUI().showMonarchDialog(message.getAction(), message.getTemplate(),
-                                   message.getMonarchKey());
+        invokeLater(() -> {
+                igc().monarch(message.getAction(), message.getTemplate(),
+                              message.getMonarchKey());
+            });
         return null;
     }
 
@@ -954,7 +852,7 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
 
-        igc().newLandName(defaultName, unit);
+        invokeLater(() -> { igc().newLandName(defaultName, unit); });
         return null;
     }
 
@@ -974,12 +872,14 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        igc().newRegionName(region, defaultName, tile, unit);
+        invokeLater(() -> {
+                igc().newRegionName(region, defaultName, tile, unit);
+            });
         return null;
     }
 
     /**
-     * Handles a "newTurn"-message.
+     * Handle a "newTurn"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.
@@ -987,23 +887,17 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element newTurn(Element element) {
         final int n = getIntegerAttribute(element, "turn");
+        if (n < 0) {
+            logger.warning("Invalid turn for newTurn");
+            return null;
+        }
 
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().newTurn(n);
-                }
-            });
-
-        igc().setCurrentPlayer(null);
-        refreshCanvas(false);
-
-        SwingUtilities.invokeLater(updateMenuBarRunnable);
+        invokeLater(() -> { igc().newTurn(n); });
         return null;
     }
 
     /**
-     * Handles an "reconnect"-message.
+     * Handle an "reconnect"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1012,12 +906,12 @@ public final class InGameInputHandler extends InputHandler {
     private Element reconnect(@SuppressWarnings("unused") Element element) {
         logger.finest("Entered reconnect.");
 
-        SwingUtilities.invokeLater(reconnectRunnable);
+        invokeLater(reconnectRunnable);
         return null;
     }
 
     /**
-     * Handles a "remove"-message.
+     * Handle a "remove"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1025,11 +919,9 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element remove(Element element) {
         final Game game = getGame();
-        String ds = element.getAttribute("divert");
-        FreeColGameObject divert = game.getFreeColGameObject(ds);
-        Player player = getFreeColClient().getMyPlayer();
-        boolean visibilityChange = false;
-
+        final FreeColGameObject divert
+            = game.getFreeColGameObject(element.getAttribute("divert"));
+        final List<FreeColGameObject> objects = new ArrayList<>();
         NodeList nodeList = element.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element e = (Element)nodeList.item(i);
@@ -1042,42 +934,17 @@ public final class InGameInputHandler extends InputHandler {
                 // freeColGameObjects, before this remove is processed.
                 continue;
             }
-            if (divert != null) {
-                player.divertModelMessages(fcgo, divert);
-            }
-            if (fcgo instanceof Settlement) {
-                Settlement settlement = (Settlement)fcgo;
-                if (settlement != null && settlement.getOwner() != null) {
-                    settlement.getOwner().removeSettlement(settlement);
-                }
-                visibilityChange = true;//-vis(player)
-                
-            } else if (fcgo instanceof Unit) {
-                // Deselect the object if it is the current active unit.
-                Unit u = (Unit)fcgo;
-                if (u == getGUI().getActiveUnit()) {
-                    invokeAndWait(deselectActiveUnitRunnable);
-                }
-                // Temporary hack until we have real containers.
-                if (u != null && u.getOwner() != null) {
-                    u.getOwner().removeUnit(u);
-                }
-                visibilityChange = true;//-vis(player)
-            }
-
-            // Do just the low level dispose that removes
-            // reference to this object in the client.  The other
-            // updates should have done the rest.
-            fcgo.disposeResources();
+            objects.add(fcgo);
         }
-        if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
 
-        refreshCanvas(false);
+        if (!objects.isEmpty()) {
+            invokeLater(() -> { igc().remove(objects, divert); });
+        }
         return null;
     }
 
     /**
-     * Handles a "setAI"-message.
+     * Handle a "setAI"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1093,25 +960,27 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "setCurrentPlayer"-message.
+     * Handle a "setCurrentPlayer"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
      * @return Null.
      */
     private Element setCurrentPlayer(Element element) {
-        Player player
+        final Player player
             = getGame().getFreeColGameObject(element.getAttribute("player"),
                                              Player.class);
-        
-        igc().setCurrentPlayer(player);
+        if (player == null) {
+            logger.warning("Invalid player for setCurrentPlayer");
+            return null;
+        }
 
-        refreshCanvas(true);
+        igc().setCurrentPlayer(player); // It is safe to call this one directly
         return null;
     }
 
     /**
-     * Handles a "setDead"-message.
+     * Handle a "setDead"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1120,18 +989,17 @@ public final class InGameInputHandler extends InputHandler {
     private Element setDead(Element element) {
         final Player player = getGame()
             .getFreeColGameObject(element.getAttribute("player"),Player.class);
+        if (player == null) {
+            logger.warning("Invalid player for setDead");
+            return null;
+        }
 
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().setDead(player);
-                }
-            });
+        invokeLater(() -> { igc().setDead(player); });
         return null;
     }
 
     /**
-     * Handles a "setStance"-request.
+     * Handle a "setStance"-request.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1141,22 +1009,29 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final Stance stance = Enum.valueOf(Stance.class,
                                            element.getAttribute("stance"));
+        if (stance == null) {
+            logger.warning("Invalid stance for setStance");
+            return null;
+        }
         final Player p1 = game
             .getFreeColGameObject(element.getAttribute("first"), Player.class);
+        if (p1 == null) {
+            logger.warning("Invalid player1 for setStance");
+            return null;
+        }
         final Player p2 = game
             .getFreeColGameObject(element.getAttribute("second"),Player.class);
+        if (p2 == null) {
+            logger.warning("Invalid player2 for setStance");
+            return null;
+        }
 
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    igc().setStance(stance, p1, p2);
-                }
-            });
+        invokeLater(() -> { igc().setStance(stance, p1, p2); });
         return null;
     }
 
     /**
-     * Handles a "spyResult" message.
+     * Handle a "spyResult" message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1190,23 +1065,17 @@ public final class InGameInputHandler extends InputHandler {
         // is closed.
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
-        SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tile.readFromXMLElement(fullElement);
-                    getGUI().showSpyColonyPanel(tile, new Runnable() {
-                        @Override
-                            public void run() {
-                                tile.readFromXMLElement(normalElement);
-                            }
-                        });
-                }
+        tile.readFromXMLElement(fullElement);
+        invokeLater(() -> {
+                igc().spyColony(tile, () -> {
+                        tile.readFromXMLElement(normalElement);
+                    });
             });
         return null;
     }
 
     /**
-     * Handles an "update"-message.
+     * Handle an "update"-message.
      *
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
@@ -1234,7 +1103,6 @@ public final class InGameInputHandler extends InputHandler {
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
 
-        refreshCanvas(false);
         return null;
     }
 }

@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,7 +52,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -74,21 +72,22 @@ public class BuildingDetailPanel
     }
 
 
+    // Implement ColopediaDetailPanel
+
     /**
-     * Adds one or several subtrees for all the objects for which this
-     * ColopediaDetailPanel could build a detail panel to the given
-     * root node.
-     *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * {@inheritDoc}
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode parent =
-            new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(), getName(), null));
+        DefaultMutableTreeNode parent
+            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, getId(),
+                    getName(), null));
 
         List<BuildingType> buildingTypes = new ArrayList<>();
-        Map<BuildingType, DefaultMutableTreeNode> buildingHash = new HashMap<>();
-        for (BuildingType buildingType : getSpecification().getBuildingTypeList()) {
+        Map<BuildingType, DefaultMutableTreeNode> buildingHash
+            = new HashMap<>();
+        for (BuildingType buildingType
+                 : getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
                 String name = Messages.getName(buildingType);
                 DefaultMutableTreeNode item =
@@ -124,24 +123,16 @@ public class BuildingDetailPanel
     }
 
     /**
-     * Builds the details panel for the BuildingType with the given
-     * identifier.
-     *
-     * @param id The object identifier.
-     * @param panel the detail panel to build
+     * {@inheritDoc}
      */
     @Override
     public void buildDetail(String id, JPanel panel) {
-        if (getId().equals(id)) {
-            return;
-        }
+        if (getId().equals(id)) return;
 
         BuildingType buildingType = getSpecification().getBuildingType(id);
         panel.setLayout(new MigLayout("wrap 7, gapx 20", "", ""));
 
-        JLabel name = Utility.localizedLabel(buildingType);
-        name.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.SMALL));
+        JLabel name = Utility.localizedHeaderLabel(buildingType, FontLibrary.FontSize.SMALL);
         panel.add(name, "span, align center, wrap 40");
 
         // Requires - prerequisites to build
@@ -280,5 +271,4 @@ public class BuildingDetailPanel
         panel.add(Utility.localizedTextArea(Messages.descriptionKey(buildingType)),
                   "span, growx");
     }
-
 }

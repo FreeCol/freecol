@@ -70,14 +70,14 @@ public class ChangeAction extends UnitAction {
     public final void update() {
         super.update();
 
-        Unit unit = getGUI().getActiveUnit();
+        final Unit unit = getGUI().getActiveUnit();
         if (unit != null && unit.hasTile()) {
             if (unit.getColony() != null) {
-                putValue(NAME, Messages.message("changeAction.enterColony.name"));
+                putValue(NAME, Messages.getName("changeAction.enterColony"));
             } else if (unit.isOnCarrier()) {
-                putValue(NAME, Messages.message("changeAction.selectCarrier.name"));
+                putValue(NAME, Messages.getName("changeAction.selectCarrier"));
             } else {
-                putValue(NAME, Messages.message("changeAction.nextUnitOnTile.name"));
+                putValue(NAME, Messages.getName("changeAction.nextUnitOnTile"));
             }
         }
     }
@@ -89,9 +89,9 @@ public class ChangeAction extends UnitAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        Unit unit = getGUI().getActiveUnit();
-        Tile tile = unit.getTile();
+    public void actionPerformed(ActionEvent ae) {
+        final Unit unit = getGUI().getActiveUnit();
+        final Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
             getGUI().showColonyPanel(tile.getColony(), unit);

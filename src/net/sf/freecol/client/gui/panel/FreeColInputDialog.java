@@ -19,14 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.ImageIcon;
-
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 
 

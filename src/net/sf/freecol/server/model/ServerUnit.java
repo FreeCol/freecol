@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
@@ -124,7 +125,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public ServerUnit(Game game, Location location, Unit template) {
         this(game, location,
-            game.getPlayer(template.getOwner().getNationId()),
+            game.getPlayerByNationId(template.getOwner().getNationId()),
             game.getSpecification().getUnitType(template.getType().getId()),
             game.getSpecification().getDefaultRole());
 
@@ -324,12 +325,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
             unitDirty = true;
         }
 
-        if (getWorkLeft() == 0) {
-            setWorkLeft(-1);
-            unitDirty = true;
+        if (getWorkLeft() <= 0) {
             if (getLocation() instanceof HighSeas) {
-                Europe europe = owner.getEurope();
-                Location dst = getDestination();
+                final Europe europe = owner.getEurope();
+                final Location dst = getDestination();
                 Location result = resolveDestination();
                 if (result == europe) {
                     lb.add(" arrives in Europe");
@@ -345,29 +344,38 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     setLocation(europe);//-vis: safe/Europe
                     cs.add(See.only(owner), owner.getHighSeas());
                     locDirty = true;
-                } else if (result instanceof Tile) {
-                    Tile tile = ((Tile)result).getSafeTile(owner, random);
+                } else {
+                    if (!(result instanceof Tile)) {
+                        logger.warning("Unit has unsupported destination: "
+                            + dst + " -> " + result);
+                        result = getEntryLocation().getTile();
+                    }
+                    Tile tile = result.getTile().getSafeTile(owner, random);
                     lb.add(" arrives in America at ", tile);
-                    if (dst != null) lb.add(" sailing for ", dst);
-                    if (dst instanceof Map) setDestination(null);
+                    if (dst != null) {
+                        lb.add(" sailing for ", dst);
+                        if (dst instanceof Map) setDestination(null);
+                    }
                     csMove(tile, random, cs);
                     locDirty = unitDirty = false; // loc update present
-                } else {
-                    lb.add(" has unsupported destination ", getDestination());
                 }
             } else {
                 switch (getState()) {
-                case FORTIFYING:
-                    setState(UnitState.FORTIFIED);
-                    break;
+                case ACTIVE: case FORTIFIED: case SENTRY: case IN_COLONY:
+                    break; // These states are stable
                 case IMPROVING:
                     csImproveTile(random, cs);
                     setWorkImprovement(null);
                     locDirty = true;
                     break;
-                default:
-                    lb.add(" unknown work completed, state=", getState());
+                case FORTIFYING:
+                    setState(UnitState.FORTIFIED);
+                    unitDirty = true;
+                    break;
+                case SKIPPED: default:
+                    lb.add(" work completed, bad state: ", getState());
                     setState(UnitState.ACTIVE);
+                    unitDirty = true;
                     break;
                 }
             }
@@ -394,42 +402,18 @@ public class ServerUnit extends Unit implements ServerModelObject {
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
         tile.cacheUnseen();//+til
-        AbstractGoods deliver = getWorkImprovement().getType().getProduction(tile.getType());
+        AbstractGoods deliver = getWorkImprovement().getType()
+            .getProduction(tile.getType());
         if (deliver != null) { // Deliver goods if any
             final Turn turn = getGame().getTurn();
             int amount = deliver.getAmount();
-            if (getType().hasAbility(Ability.EXPERT_PIONEER)) {
-                amount *= 2;
-            }
-            Settlement settlement = tile.getSettlement();
+            amount = (int)this.applyModifiers(amount, turn,
+                Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
+            Settlement settlement = tile.getOwningSettlement();
             if (settlement != null && owner.owns(settlement)) {
                 amount = (int)settlement.applyModifiers(amount, turn,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
-            } else {
-                List<Settlement> adjacent = new ArrayList<>();
-                int newAmount = amount;
-                for (Tile t : tile.getSurroundingTiles(2)) {
-                    Settlement ts = t.getSettlement();
-                    if (ts != null && owner.owns(ts)) {
-                        adjacent.add(ts);
-                        int modAmount = (int)ts.applyModifiers((float)amount,
-                            turn, Modifier.TILE_TYPE_CHANGE_PRODUCTION,
-                            deliver.getType());
-                        if (modAmount > newAmount) {
-                            newAmount = modAmount;
-                        }
-                    }
-                }
-                if (!adjacent.isEmpty()) {
-                    int deliverPerCity = newAmount / adjacent.size();
-                    for (Settlement s : adjacent) {
-                        s.addGoods(deliver.getType(), deliverPerCity);
-                    }
-                    // Add residue to first adjacent settlement.
-                    adjacent.get(0).addGoods(deliver.getType(),
-                                             newAmount % adjacent.size());
-                }
             }
         }
 
@@ -560,7 +544,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         CombatModel combatModel = game.getCombatModel();
         boolean pirate = hasAbility(Ability.PIRACY);
         Unit attacker = null;
-        float attackPower = 0, totalAttackPower = 0;
+        double attackPower = 0, totalAttackPower = 0;
 
         if (!isNaval() || getMovesLeft() <= 0) return null;
         for (Tile tile : newTile.getSurroundingTiles(1)) {
@@ -583,11 +567,12 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
         if (attacker != null) {
-            float defencePower = combatModel.getDefencePower(attacker, this);
-            float totalProbability = totalAttackPower + defencePower;
+            double defencePower = combatModel.getDefencePower(attacker, this);
+            double totalProbability = totalAttackPower + defencePower;
             if (randomInt(logger, "Slowed", random,
-                    Math.round(totalProbability) + 1) < totalAttackPower) {
-                int diff = Math.max(0, Math.round(totalAttackPower - defencePower));
+                    (int)Math.round(totalProbability + 1)) < totalAttackPower) {
+                int diff = Math.max(0,
+                    (int)Math.round(totalAttackPower - defencePower));
                 int moves = Math.min(9, 3 + diff / 3);
                 setMovesLeft(getMovesLeft() - moves);
                 logger.info(getId() + " slowed by " + attacker.getId()
@@ -615,7 +600,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                 RumourType.BURIAL_GROUND.getDescriptionKey(), serverPlayer, this)
-            .addStringTemplate("%nation%", indianPlayer.getNationName()));
+            .addStringTemplate("%nation%", indianPlayer.getNationLabel()));
     }
 
     /**
@@ -772,7 +757,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
                         HistoryEvent.HistoryEventType.CITY_OF_GOLD, serverPlayer)
-                    .addStringTemplate("%nation%", serverPlayer.getNationName())
+                    .addStringTemplate("%nation%", serverPlayer.getNationLabel())
                     .addName("%city%", cityName)
                     .addAmount("%treasure%", treasureAmount));
                 break;
@@ -859,12 +844,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return A list of new tiles to see.
      */
     public List<Tile> collectNewTiles(Tile tile) {
-        List<Tile> newTiles = new ArrayList<>();
-        int los = getLineOfSight();
-        for (Tile t : tile.getSurroundingTiles(0, los)) {
-            if (!getOwner().canSee(t)) newTiles.add(t);
-        }
-        return newTiles;
+        final int los = getLineOfSight();
+        return tile.getSurroundingTiles(0, los).stream()
+            .filter(t -> !getOwner().canSee(t)).collect(Collectors.toList());
     }
 
     /**
@@ -1032,7 +1014,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         is.getTile().cacheUnseen(copied);//+til
                         cs.add(See.only(contactPlayer), is);
                         // First European contact with native settlement.
-                        StringTemplate nation = is.getOwner().getNationName();
+                        StringTemplate nation = is.getOwner().getNationLabel();
                         cs.addMessage(See.only(contactPlayer),
                             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                              "model.unit.nativeSettlementContact",

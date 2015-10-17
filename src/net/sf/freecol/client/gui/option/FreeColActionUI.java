@@ -168,11 +168,11 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource() == recordButton) {
+    public void actionPerformed(ActionEvent ae) {
+        if (ae.getSource() == recordButton) {
             bl.startBlinking();
             bl.requestFocus();
-        } else if (evt.getSource() == removeButton) {
+        } else if (ae.getSource() == removeButton) {
             bl.stopBlinking();
             bl.setText(" ");
             keyStroke = null;
@@ -264,7 +264,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
          * {@inheritDoc}
          */
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent ae) {
             if (!hasFocus()) stopBlinking();
 
             if (blinkOn) {

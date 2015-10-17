@@ -20,15 +20,15 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
-import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -67,15 +67,12 @@ public final class LoadDialog extends FreeColDialog<File> {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
-        fileChooser.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    final String cmd = event.getActionCommand();
-                    File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
-                        ? ((JFileChooser)event.getSource()).getSelectedFile()
-                        : cancelFile;
-                    setValue(value);
-                }
+        fileChooser.addActionListener((ActionEvent ae) -> {
+                final String cmd = ae.getActionCommand();
+                File value = (JFileChooser.APPROVE_SELECTION.equals(cmd))
+                    ? ((JFileChooser)ae.getSource()).getSelectedFile()
+                    : cancelFile;
+                setValue(value);
             });
 
         List<ChoiceItem<File>> c = choices();

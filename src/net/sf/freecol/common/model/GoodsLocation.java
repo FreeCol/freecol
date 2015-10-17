@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -146,10 +147,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return True if the goods are all present.
      */
     public final boolean containsGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) {
-            if (getGoodsCount(ag.getType()) < ag.getAmount()) return false;
-        }
-        return true;
+        return all(goods, ag -> ag.getAmount() <= getGoodsCount(ag.getType()));
     }
 
     /**
@@ -198,6 +196,7 @@ public abstract class GoodsLocation extends UnitLocation {
     //    UnitLocation.getUnitCount
     //    UnitLocation.getUnitList
     //    UnitLocation.getSettlement
+    // Does not implement getRank
 
     /**
      * {@inheritDoc}

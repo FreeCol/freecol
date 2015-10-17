@@ -283,12 +283,9 @@ public final class PreGameInputHandler extends InputHandler {
                         } catch (Exception ex) {}
                     }
                     
-                    SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                getFreeColClient().getPreGameController()
-                                    .startGame();
-                            }
+                    SwingUtilities.invokeLater(() -> {
+                            getFreeColClient().getPreGameController()
+                                .startGame();
                         });
                 }
             }.start();
@@ -339,7 +336,6 @@ public final class PreGameInputHandler extends InputHandler {
             Game game = fcc.getGame();
             game.readFromXMLElement((Element)children.item(0));
             fcc.addSpecificationActions(game.getSpecification());
-            fcc.updateActions();
         } else {
             logger.warning("Child node expected: " + element.getTagName());
         }

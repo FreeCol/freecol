@@ -54,12 +54,14 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
         super(freeColClient, frame);
 
         textField = new JTextField(defaultValue);
+        textField.setOpaque(false);
         JPanel panel = new JPanel(new BorderLayout()) {
                 @Override
                 public void requestFocus() {
                     textField.requestFocus();
                 }
             };
+        panel.setOpaque(false);
 
         panel.add(Utility.getDefaultTextArea(text));
         panel.add(textField, BorderLayout.SOUTH);

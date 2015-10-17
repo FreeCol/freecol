@@ -36,14 +36,9 @@ import org.w3c.dom.Element;
  */
 public abstract class ValuedAIObject extends AIObject {
 
-    /** A comparator for the AI object value. */
+    /** A comparator by descending AI object value. */
     public static final Comparator<ValuedAIObject> valuedComparator
-        = new Comparator<ValuedAIObject>() {
-            @Override
-            public int compare(ValuedAIObject v1, ValuedAIObject v2) {
-                return v2.getValue() - v1.getValue();
-            }
-        };
+        = Comparator.comparingInt(ValuedAIObject::getValue).reversed();
 
     /** The value of this AIObject. */
     private int value;

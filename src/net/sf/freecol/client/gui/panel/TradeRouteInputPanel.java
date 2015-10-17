@@ -26,12 +26,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +52,7 @@ import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.PanelUI;
+
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
@@ -68,6 +69,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -223,12 +225,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(DefaultTransferHandler.flavor)) {
-                    return true;
-                }
-            }
-            return false;
+            return any(flavors, f -> f.equals(DefaultTransferHandler.flavor));
         }
     }
 
@@ -345,12 +342,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            for (DataFlavor flavor : flavors) {
-                if (flavor.equals(STOP_FLAVOR)) {
-                    return true;
-                }
-            }
-            return false;
+            return any(flavors, f -> f.equals(STOP_FLAVOR));
         }
 
         /**
@@ -465,7 +457,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
             } else if (location instanceof Colony) {
                 Colony colony = (Colony) location;
                 icon = new JLabel(new ImageIcon(ImageLibrary.getSettlementImage(
-                    colony, lib.getScalingFactor()* 0.5f)));
+                    colony, lib.getScaleFactor()* 0.5f)));
                 name = new JLabel(colony.getName());
             } else {
                 throw new IllegalStateException("Bogus location: " + location);
@@ -587,27 +579,18 @@ public final class TradeRouteInputPanel extends FreeColPanel
         this.messagesBox
             = new JCheckBox(Messages.message("tradeRouteInputPanel.silence"));
         this.messagesBox.setSelected(tradeRoute.isSilent());
-        this.messagesBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    tradeRoute.setSilent(messagesBox.isSelected());
-                }
+        this.messagesBox.addActionListener((ActionEvent ae) -> {
+                tradeRoute.setSilent(messagesBox.isSelected());
             });
 
         this.addStopButton = Utility.localizedButton("tradeRouteInputPanel.addStop");
-        this.addStopButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addSelectedStops();
-                }
+        this.addStopButton.addActionListener((ActionEvent ae) -> {
+                addSelectedStops();
             });
 
         this.removeStopButton = Utility.localizedButton("tradeRouteInputPanel.removeStop");
-        this.removeStopButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    deleteCurrentlySelectedStops();
-                }
+        this.removeStopButton.addActionListener((ActionEvent ae) -> {
+                deleteCurrentlySelectedStops();
             });
 
         this.goodsPanel = new GoodsPanel();
@@ -764,21 +747,21 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (command == null) return;
         switch (command) {
         case OK:
             if (!verifyNewTradeRoute()) return;
             // Return to TradeRoutePanel, which will add the route
             // if needed, and it is valid.
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         case CANCEL:
             cancelTradeRoute();
             break;
         default:
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
             break;
         }
     }

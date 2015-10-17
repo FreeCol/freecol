@@ -91,11 +91,9 @@ public enum Direction implements Named {
      * @return The map position after the step.
      */
     public Map.Position step(int x, int y) {
-        if((y & 1) != 0) {
-            return new Map.Position(x + oddDX, y + oddDY);
-        } else {
-            return new Map.Position(x + evenDX, y + evenDY);
-        }
+        return ((y & 1) != 0)
+            ? new Map.Position(x + oddDX, y + oddDY)
+            : new Map.Position(x + evenDX, y + evenDY);
     }
 
     /**

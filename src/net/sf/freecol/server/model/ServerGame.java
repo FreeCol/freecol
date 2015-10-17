@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -53,8 +55,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -114,16 +116,11 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        List<ServerPlayer> result = new ArrayList<>();
-        outer: for (Player otherPlayer : getLivePlayers(null)) {
-            ServerPlayer enemyPlayer = (ServerPlayer)otherPlayer;
-            if (!enemyPlayer.isConnected()) continue;
-            for (ServerPlayer exclude : serverPlayers) {
-                if (enemyPlayer == exclude) continue outer;
-            }
-            result.add(enemyPlayer);
-        }
-        return result;
+        return getLivePlayers(null).stream()
+            .map(p -> (ServerPlayer)p)
+            .filter(sp -> sp.isConnected()
+                && none(serverPlayers, s -> s == sp))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -233,39 +230,23 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return The <code>Player</code> who has won the game or null if none.
      */
     public Player checkForWinner() {
-        Specification spec = getSpecification();
+        final Specification spec = getSpecification();
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            for (Player player : getLiveEuropeanPlayers(null)) {
-                if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
-                    return player;
-                }
-            }
+            Player winner = find(getLiveEuropeanPlayers(null),
+                p -> p.getPlayerType() == Player.PlayerType.INDEPENDENT);
+            if (winner != null) return winner;
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
-            Player winner = null;
-            for (Player player : getLiveEuropeanPlayers(null)) {
-                if (!player.isREF()) {
-                    if (winner != null) { // A live European player
-                        winner = null;
-                        break;
-                    }
-                    winner = player;
-                }
-            }
-            if (winner != null) return winner;
+            List<Player> winners = getLiveEuropeanPlayers(null).stream()
+                .filter(p -> !p.isREF())
+                .collect(Collectors.toList());
+            if (winners.size() == 1) return winners.get(0);
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
-            Player winner = null;
-            for (Player player : getLiveEuropeanPlayers(null)) {
-                if (!player.isAI()) {
-                    if (winner != null) { // A live human player
-                        winner = null;
-                        break;
-                    }
-                    winner = player;
-                }
-            }
-            if (winner != null) return winner;
+            List<Player> winners = getLiveEuropeanPlayers(null).stream()
+                .filter(p -> !p.isAI())
+                .collect(Collectors.toList());
+            if (winners.size() == 1) return winners.get(0);
         }
         return null;
     }
@@ -355,8 +336,7 @@ public class ServerGame extends Game implements ServerModelObject {
             // Human players can trigger the event, but only transfer assets
             // between AI players.
             if (player.isAI()) { 
-                scores.put(player,
-                        player.getSpanishSuccessionScore());
+                scores.put(player, player.getSpanishSuccessionScore());
             }
         }
         if (!ready) return null; // No player meets the support limit.
@@ -435,8 +415,8 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
 
-        StringTemplate loser = weakestAIPlayer.getNationName();
-        StringTemplate winner = strongestAIPlayer.getNationName();
+        StringTemplate loser = weakestAIPlayer.getNationLabel();
+        StringTemplate winner = strongestAIPlayer.getNationLabel();
         cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "model.game.spanishSuccession",

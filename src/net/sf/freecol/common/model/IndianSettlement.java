@@ -460,7 +460,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         return (contacted)
             ? ((mostHated == null)
                 ? StringTemplate.key("model.indianSettlement.mostHatedNone")
-                : mostHated.getNationName())
+                : mostHated.getCountryLabel())
             : StringTemplate.key("model.indianSettlement.mostHatedUnknown");
     }
             
@@ -556,10 +556,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return True if any European player has spoken with the chief.
      */
     public boolean hasAnyScouted() {
-        for (Player p : contactLevels.keySet()) {
-            if (hasScouted(p)) return true;
-        }
-        return false;
+        return any(contactLevels.keySet(), p -> hasScouted(p));
     }
 
     /**
@@ -769,19 +766,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         final Specification spec = getSpecification();
         final UnitType unitType = getFirstUnit().getType();
-        final Role militaryRole = Role.getAvailableRoles(getOwner(),
-            unitType, spec.getMilitaryRoles()).get(0);
+        final List<Role> militaryRoles = Role.getAvailableRoles(getOwner(),
+            unitType, spec.getMilitaryRoles());
 
-        if (type.isMilitaryGoods()) {
-            // Retain enough goods to fully arm.
-            int need = 0;
-            for (Unit u : ownedUnits) {
-                if (u.getRole() == militaryRole) continue;
-                List<AbstractGoods> required
-                    = u.getGoodsDifference(militaryRole, 1);
-                need += AbstractGoods.getCount(type, required);
-            }
-            return need;
+        if (type.isMilitaryGoods()) { // Retain enough goods to fully arm
+            return ownedUnits.stream()
+                .filter(u -> !militaryRoles.contains(u.getRole()))
+                .mapToInt(u -> AbstractGoods.getCount(type, 
+                        u.getGoodsDifference(militaryRoles.get(0), 1))).sum();
         }
 
         int consumption = getConsumptionOf(type);
@@ -949,15 +941,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *         be produced in one turn.
      */
     public int getMaximumProduction(GoodsType goodsType) {
-        int amount = 0;
-        for (Tile workTile: getTile().getSurroundingTiles(getRadius())) {
-            if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
-                // FIXME: make unitType brave
-                amount += workTile.getPotentialProduction(goodsType, null);
-            }
-        }
-
-        return amount;
+        return getTile().getSurroundingTiles(0, getRadius()).stream()
+            .filter(t -> t.getOwningSettlement() == null
+                    || t.getOwningSettlement() == this)
+            // FIXME: make unitType brave
+            .mapToInt(t -> t.getPotentialProduction(goodsType, null)).sum();
     }
 
 
@@ -1105,6 +1093,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     //   UnitLocation.getUnitCount
     //   UnitLocation.getUnitList
     //   Settlement.getSettlement
+    //   final Settlement.getRank
 
     /**
      * {@inheritDoc}
@@ -1189,9 +1178,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
-        float defencePower = -1.0f;
+        double defencePower = -1.0;
         for (Unit nextUnit : getUnitList()) {
-            float unitPower = attacker.getGame().getCombatModel()
+            double unitPower = attacker.getGame().getCombatModel()
                 .getDefencePower(attacker, nextUnit);
             if (Unit.betterDefender(defender, defencePower,
                     nextUnit, unitPower)) {
@@ -1206,8 +1195,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public float getDefenceRatio() {
-        return getUnitCount() * 2.0f / (getType().getMinimumSize()
+    public double getDefenceRatio() {
+        return getUnitCount() * 2.0 / (getType().getMinimumSize()
             + getType().getMaximumSize());
     }
 
@@ -1257,9 +1246,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             return getUnitCount();
         }
 
-        int potential = 0;
         int tiles = 0;
-
+        int potential = 0;
         for (Tile workTile : getOwnedTiles()) {
             if (workTile != getTile() && !workTile.isOccupied()) {
                 // FIXME: make unitType brave
@@ -1306,7 +1294,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             ? "model.indianSettlement.tension.unknown"
             : "model.indianSettlement." + getAlarm(player).getKey();
         return StringTemplate.template(key)
-            .addStringTemplate("%nation%", getOwner().getNationName());
+            .addStringTemplate("%nation%", getOwner().getNationLabel());
     }
 
 

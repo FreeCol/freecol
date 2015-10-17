@@ -19,9 +19,9 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
@@ -121,13 +121,8 @@ public class ServerBuildingTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        List<Unit> units = new ArrayList<>() ;
-        for (Unit unit : colony.getUnitList()) {
-            if (type.equals(unit.getType())) {
-                units.add(unit);
-            }
-        }
-        return units;
+        return colony.getUnitList().stream()
+            .filter(u -> u.getType() == type).collect(Collectors.toList());
     }
 
     /**
@@ -259,24 +254,26 @@ public class ServerBuildingTest extends FreeColTestCase {
         // prevent starvation
         colony.addGoods(foodType, 100);
 
+        Building townHall = colony.getBuilding(townHallType);
+        Building lumberMill = colony.getBuilding(lumberMillType);
         Building college = colony.getBuilding(collegeType);
         Iterator<Unit> units = colony.getUnitIterator();
 
+        clearWorkLocation(townHall);
         Unit colonist1 = units.next();
         colonist1.setType(freeColonistType);
-        colonist1.setLocation(colony.getBuilding(townHallType));
-
+        colonist1.setLocation(townHall);
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
-        colonist2.setLocation(colony.getBuilding(townHallType));
+        colonist2.setLocation(townHall);
 
+        clearWorkLocation(lumberMill);
         Unit colonist3 = units.next();
         colonist3.setType(freeColonistType);
-        colonist3.setLocation(colony.getBuilding(lumberMillType));
-
+        colonist3.setLocation(lumberMill);
         Unit colonist4 = units.next();
         colonist4.setType(freeColonistType);
-        colonist4.setLocation(colony.getBuilding(lumberMillType));
+        colonist4.setLocation(lumberMill);
 
         Unit lumberjack = units.next();
         lumberjack.setType(expertLumberJackType);
@@ -290,22 +287,23 @@ public class ServerBuildingTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
 
-        blacksmith.setLocation(college);
+        clearWorkLocation(college);
         lumberjack.setLocation(college);
-        assertNotNull(blacksmith.getStudent());
         assertNotNull(lumberjack.getStudent());
-
+        blacksmith.setLocation(college);
+        assertNotNull(blacksmith.getStudent());
+        
         assertEquals(4, getUnitList(colony, freeColonistType).size());
-        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(1, getUnitList(colony, expertLumberJackType).size());
+        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
 
         while (4 == getUnitList(colony, freeColonistType).size()) {
             ServerTestHelper.newTurn();
         }
 
         assertEquals(3, getUnitList(colony, freeColonistType).size());
-        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
+        assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
 
         lumberjack.setLocation(colony.getWorkLocationFor(lumberjack,
                                                          grainType));
@@ -356,29 +354,32 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit colonist1 = units.next();
         colonist1.setType(freeColonistType);
-        colonist1.setLocation(colony.getBuilding(townHallType));
+        colonist1.setLocation(townHall);
 
         Unit colonist2 = units.next();
         colonist2.setType(freeColonistType);
-        colonist2.setLocation(colony.getBuilding(townHallType));
+        colonist2.setLocation(townHall);
 
         Unit colonist3 = units.next();
         colonist3.setType(freeColonistType);
-        colonist3.setLocation(colony.getBuilding(townHallType));
+        colonist3.setLocation(townHall);
 
         Unit black = units.next();
         black.setType(masterBlacksmithType);
+        black.setLocation(university);
 
         Unit ore = units.next();
         ore.setType(expertOreMinerType);
-
-        black.setLocation(university);
         ore.setLocation(university);
 
+        assertTrue("Should be longer to train blacksmith then ore miner",
+            black.getNeededTurnsOfTraining() > ore.getNeededTurnsOfTraining());
         assertEquals(3, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
@@ -413,7 +414,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumberJack = units.next();
         lumberJack.setType(expertLumberJackType);
@@ -456,7 +459,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumberjack1 = units.next();
         lumberjack1.setType(expertLumberJackType);
@@ -494,7 +499,9 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
-        colonist.setLocation(colony.getBuilding(townHallType));
+        Building townHall = colony.getBuilding(townHallType);
+        clearWorkLocation(townHall);
+        colonist.setLocation(townHall);
 
         Unit lumber = units.next();
         lumber.setType(expertLumberJackType);

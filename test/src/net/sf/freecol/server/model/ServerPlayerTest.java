@@ -83,8 +83,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        ServerPlayer english = (ServerPlayer) game.getPlayer("model.nation.english");
+        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
+        ServerPlayer english = (ServerPlayer) game.getPlayerByNationId("model.nation.english");
         Market frenchMarket = french.getMarket();
         Market englishMarket = english.getMarket();
         int frenchGold = french.getGold();
@@ -146,8 +146,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         
         Map map = game.getMap();
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
         InGameController igc = ServerTestHelper.getInGameController();
         Tile tile0 = map.getTile(0, 0);
         Tile tile1 = map.getTile(6, 8);
@@ -177,7 +177,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         colony.addGoods(cottonType, 200);
         ServerPlayer dutch
-            = (ServerPlayer)game.getPlayer("model.nation.dutch");
+            = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Unit wagonInColony
             = new ServerUnit(game, colony.getTile(), dutch, wagonTrainType);
         Unit wagonNotInColony
@@ -222,7 +222,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch
-            = (ServerPlayer)game.getPlayer("model.nation.dutch");
+            = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         Europe europe = dutch.getEurope();
         Unit privateer1
             = new ServerUnit(game, europe, dutch, privateerType);
@@ -254,7 +254,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testCheckGameOverNoUnits() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
 
         dutch.setGold(0);
         assertEquals("Should not have units", 0, dutch.getUnits().size());
@@ -264,7 +264,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testCheckNoGameOverEnoughMoney() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
 
         dutch.setGold(10000);
         assertEquals("Should not be game, enough money", 0,
@@ -274,7 +274,7 @@ public class ServerPlayerTest extends FreeColTestCase {
     public void testCheckNoGameOverHasColonistInNewWorld() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Map map = game.getMap();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         dutch.setGold(0);
 
         new ServerUnit(game, map.getTile(4, 7), dutch, colonistType);
@@ -284,7 +284,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testCheckGameOver1600Threshold() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         dutch.setGold(0);
 
         new ServerUnit(game, dutch.getEurope(), dutch, galleonType);
@@ -306,7 +306,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap(spec().getTileType("model.tile.highSeas")));
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         dutch.setGold(0);
 
         Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch,
@@ -330,7 +330,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
         dutch.setGold(0);
 
         Unit galleon = new ServerUnit(game, dutch.getEurope(), dutch,
@@ -352,7 +352,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testSellingMakesPricesFall() {
         Game g = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer p = (ServerPlayer)g.getPlayer("model.nation.dutch");
+        ServerPlayer p = (ServerPlayer)g.getPlayerByNationId("model.nation.dutch");
 
         Market dm = p.getMarket();
         int previousGold = p.getGold();
@@ -365,7 +365,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testBuyingMakesPricesRaise() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
-        ServerPlayer player = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer player = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
 
         Market dm = player.getMarket();
         player.modifyGold(1000000);
@@ -428,8 +428,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     public void testDutchMarket() {
 
         Game game = getStandardGame();
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
         assertEquals("model.nationType.trade", dutch.getNationType().getId());
         assertTrue(dutch.getNationType().hasModifier(Modifier.TRADE_BONUS));
         assertTrue(dutch.hasModifier(Modifier.TRADE_BONUS));
@@ -438,7 +438,7 @@ public class ServerPlayerTest extends FreeColTestCase {
             int dutchSellAmount = sellUntilPriceDrop(game, dutch, silverType);
 
             Game g2 = getStandardGame();
-            ServerPlayer french2 = (ServerPlayer)g2.getPlayer("model.nation.french");
+            ServerPlayer french2 = (ServerPlayer)g2.getPlayerByNationId("model.nation.french");
             int frenchSellAmount = sellUntilPriceDrop(g2, french2, silverType);
 
             assertTrue(dutchSellAmount > frenchSellAmount);

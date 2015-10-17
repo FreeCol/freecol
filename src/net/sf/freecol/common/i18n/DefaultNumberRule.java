@@ -22,6 +22,8 @@ package net.sf.freecol.common.i18n;
 import java.util.EnumMap;
 import java.util.Map;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * This class handles zero or one rule for each number category.
@@ -75,12 +77,8 @@ public class DefaultNumberRule extends Number {
      */
     @Override
     public Category getCategory(double input) {
-        for (Category number : Category.values()) {
-            Rule r = rules.get(number);
-            if (r != null && r.matches(input)) {
-                return number;
-            }
-        }
-        return Category.other;
+        return find(Category.values(),
+            category -> rules.containsKey(category)
+                && rules.get(category).matches(input), Category.other);
     }
 }

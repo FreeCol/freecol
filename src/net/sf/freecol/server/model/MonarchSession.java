@@ -24,10 +24,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**

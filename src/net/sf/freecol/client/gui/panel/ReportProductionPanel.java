@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,11 +92,8 @@ public final class ReportProductionPanel extends ReportPanel {
         reportPanel.add(selectLabel);
 
         JButton selectButton = Utility.localizedButton("report.production.update");
-        selectButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    update();
-                }
+        selectButton.addActionListener((ActionEvent ae) -> {
+                update();
             });
         reportPanel.add(selectButton, "wrap");
 

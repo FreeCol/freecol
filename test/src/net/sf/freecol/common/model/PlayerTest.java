@@ -37,8 +37,8 @@ public class PlayerTest extends FreeColTestCase {
 
     public void testUnits() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
         Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
         map.getTile(4, 7).setExplored(dutch, true);
@@ -114,10 +114,10 @@ public class PlayerTest extends FreeColTestCase {
         Game game = getStandardGame("classic");
 
         // europeans
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        Player english = game.getPlayer("model.nation.english");
-        Player spanish = game.getPlayer("model.nation.spanish");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
+        Player english = game.getPlayerByNationId("model.nation.english");
+        Player spanish = game.getPlayerByNationId("model.nation.spanish");
 
         testEuropeanPlayer(dutch);
         testEuropeanPlayer(french);
@@ -125,14 +125,14 @@ public class PlayerTest extends FreeColTestCase {
         testEuropeanPlayer(spanish);
 
         // indians
-        Player inca = game.getPlayer("model.nation.inca");
-        Player aztec = game.getPlayer("model.nation.aztec");
-        Player arawak = game.getPlayer("model.nation.arawak");
-        Player cherokee = game.getPlayer("model.nation.cherokee");
-        Player iroquois = game.getPlayer("model.nation.iroquois");
-        Player sioux = game.getPlayer("model.nation.sioux");
-        Player apache = game.getPlayer("model.nation.apache");
-        Player tupi = game.getPlayer("model.nation.tupi");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
+        Player aztec = game.getPlayerByNationId("model.nation.aztec");
+        Player arawak = game.getPlayerByNationId("model.nation.arawak");
+        Player cherokee = game.getPlayerByNationId("model.nation.cherokee");
+        Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
+        Player sioux = game.getPlayerByNationId("model.nation.sioux");
+        Player apache = game.getPlayerByNationId("model.nation.apache");
+        Player tupi = game.getPlayerByNationId("model.nation.tupi");
         testIndianPlayer(inca);
         testIndianPlayer(aztec);
         testIndianPlayer(arawak);
@@ -143,10 +143,10 @@ public class PlayerTest extends FreeColTestCase {
         testIndianPlayer(tupi);
 
         // royal
-        Player dutchREF = game.getPlayer("model.nation.dutchREF");
-        Player frenchREF = game.getPlayer("model.nation.frenchREF");
-        Player englishREF = game.getPlayer("model.nation.englishREF");
-        Player spanishREF = game.getPlayer("model.nation.spanishREF");
+        Player dutchREF = game.getPlayerByNationId("model.nation.dutchREF");
+        Player frenchREF = game.getPlayerByNationId("model.nation.frenchREF");
+        Player englishREF = game.getPlayerByNationId("model.nation.englishREF");
+        Player spanishREF = game.getPlayerByNationId("model.nation.spanishREF");
         testRoyalPlayer(dutchREF);
         testRoyalPlayer(frenchREF);
         testRoyalPlayer(englishREF);
@@ -179,14 +179,14 @@ public class PlayerTest extends FreeColTestCase {
         }
 
         // europeans
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
-        Player english = game.getPlayer("model.nation.english");
-        Player spanish = game.getPlayer("model.nation.spanish");
-        Player portuguese = game.getPlayer("model.nation.portuguese");
-        Player swedish = game.getPlayer("model.nation.swedish");
-        Player danish = game.getPlayer("model.nation.danish");
-        Player russian = game.getPlayer("model.nation.russian");
+        Player dutch = game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
+        Player english = game.getPlayerByNationId("model.nation.english");
+        Player spanish = game.getPlayerByNationId("model.nation.spanish");
+        Player portuguese = game.getPlayerByNationId("model.nation.portuguese");
+        Player swedish = game.getPlayerByNationId("model.nation.swedish");
+        Player danish = game.getPlayerByNationId("model.nation.danish");
+        Player russian = game.getPlayerByNationId("model.nation.russian");
 
         testEuropeanPlayer(dutch);
         testEuropeanPlayer(french);
@@ -198,14 +198,14 @@ public class PlayerTest extends FreeColTestCase {
         testEuropeanPlayer(russian);
 
         // indians
-        Player inca = game.getPlayer("model.nation.inca");
-        Player aztec = game.getPlayer("model.nation.aztec");
-        Player arawak = game.getPlayer("model.nation.arawak");
-        Player cherokee = game.getPlayer("model.nation.cherokee");
-        Player iroquois = game.getPlayer("model.nation.iroquois");
-        Player sioux = game.getPlayer("model.nation.sioux");
-        Player apache = game.getPlayer("model.nation.apache");
-        Player tupi = game.getPlayer("model.nation.tupi");
+        Player inca = game.getPlayerByNationId("model.nation.inca");
+        Player aztec = game.getPlayerByNationId("model.nation.aztec");
+        Player arawak = game.getPlayerByNationId("model.nation.arawak");
+        Player cherokee = game.getPlayerByNationId("model.nation.cherokee");
+        Player iroquois = game.getPlayerByNationId("model.nation.iroquois");
+        Player sioux = game.getPlayerByNationId("model.nation.sioux");
+        Player apache = game.getPlayerByNationId("model.nation.apache");
+        Player tupi = game.getPlayerByNationId("model.nation.tupi");
         testIndianPlayer(inca);
         testIndianPlayer(aztec);
         testIndianPlayer(arawak);
@@ -216,14 +216,14 @@ public class PlayerTest extends FreeColTestCase {
         testIndianPlayer(tupi);
 
         // royal
-        Player dutchREF = game.getPlayer("model.nation.dutchREF");
-        Player frenchREF = game.getPlayer("model.nation.frenchREF");
-        Player englishREF = game.getPlayer("model.nation.englishREF");
-        Player spanishREF = game.getPlayer("model.nation.spanishREF");
-        Player portugueseREF = game.getPlayer("model.nation.portugueseREF");
-        Player swedishREF = game.getPlayer("model.nation.swedishREF");
-        Player danishREF = game.getPlayer("model.nation.danishREF");
-        Player russianREF = game.getPlayer("model.nation.russianREF");
+        Player dutchREF = game.getPlayerByNationId("model.nation.dutchREF");
+        Player frenchREF = game.getPlayerByNationId("model.nation.frenchREF");
+        Player englishREF = game.getPlayerByNationId("model.nation.englishREF");
+        Player spanishREF = game.getPlayerByNationId("model.nation.spanishREF");
+        Player portugueseREF = game.getPlayerByNationId("model.nation.portugueseREF");
+        Player swedishREF = game.getPlayerByNationId("model.nation.swedishREF");
+        Player danishREF = game.getPlayerByNationId("model.nation.danishREF");
+        Player russianREF = game.getPlayerByNationId("model.nation.russianREF");
         testRoyalPlayer(dutchREF);
         testRoyalPlayer(frenchREF);
         testRoyalPlayer(englishREF);
@@ -246,8 +246,8 @@ public class PlayerTest extends FreeColTestCase {
         String errMsg = "";
         Game game = getStandardGame();
 
-        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayerByNationId("model.nation.french");
 
         int initialTension = 500;
         int change = 250;
@@ -271,8 +271,8 @@ public class PlayerTest extends FreeColTestCase {
         Map map = getTestMap();
         game.setMap(map);
 
-        Player dutch =  game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player dutch =  game.getPlayerByNationId("model.nation.dutch");
+        Player french = game.getPlayerByNationId("model.nation.french");
 
         assertEquals("Wrong number of units for dutch player",0,dutch.getUnits().size());
         assertEquals("Wrong number of units for french player",0,french.getUnits().size());

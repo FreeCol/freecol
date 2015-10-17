@@ -19,9 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -95,13 +95,8 @@ public class SchoolTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        List<Unit> units = new ArrayList<>() ;
-        for (Unit unit : colony.getUnitList()) {
-            if (type.equals(unit.getType())) {
-                units.add(unit);
-            }
-        }
-        return units;
+        return colony.getUnitList().stream()
+            .filter(u -> u.getType() == type).collect(Collectors.toList());
     }
 
     public void testUpgrades() {

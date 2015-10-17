@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -64,18 +65,19 @@ public class FirstContactDialog extends FreeColConfirmDialog {
 
         MigPanel panel
             = new MigPanel(new MigLayout("wrap 1", "[center]", "[]20"));
+        panel.setOpaque(false);
 
-        String headerKey = BASE_KEY + other.getNationNameKey();
-        String imageKey = IMAGE_BASE_KEY + other.getNationNameKey();
+        String headerKey = BASE_KEY + other.getNation().getSuffix();
+        String imageKey = IMAGE_BASE_KEY + other.getNationResourceKey();
         if (!Messages.containsKey(headerKey)) {
             headerKey = BASE_KEY + NATIVES_KEY;
             imageKey = IMAGE_BASE_KEY + NATIVES_KEY;
         }
-        JLabel header = Utility.localizedLabel(headerKey);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.MEDIUM));
+        JLabel header = Utility.localizedHeaderLabel(headerKey,
+            SwingConstants.LEADING, FontLibrary.FontSize.MEDIUM);
         JLabel image
             = new JLabel(new ImageIcon(ResourceManager.getImage(imageKey)));
+        image.setOpaque(false);
 
         JTextArea tutorial = null;
         if (!player.hasContactedIndians() && freeColClient.tutorialMode()) {
@@ -89,7 +91,7 @@ public class FirstContactDialog extends FreeColConfirmDialog {
             .getSettlementTypeKey(true);
         JTextArea text = Utility.localizedTextArea(StringTemplate
             .template(messageId)
-            .addStringTemplate("%nation%", other.getNationName())
+            .addStringTemplate("%nation%", other.getNationLabel())
             .addName("%camps%", Integer.toString(settlementCount))
             .add("%settlementType%", type));
 

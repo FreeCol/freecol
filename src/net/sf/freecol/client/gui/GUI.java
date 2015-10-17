@@ -19,41 +19,28 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
-import net.sf.freecol.client.gui.panel.TradeRoutePanel;
-import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -74,9 +61,9 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Stance;
@@ -84,9 +71,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -133,16 +118,8 @@ public class GUI {
         return freeColClient.getInGameController();
     }
 
-    public Canvas getCanvas() {
-        return null;
-    }
-
     public ImageLibrary getImageLibrary() {
         return imageLibrary;
-    }
-
-    public MapViewer getColonyTileMapViewer() {
-        return null;
     }
 
     public boolean isWindowed() {
@@ -183,9 +160,9 @@ public class GUI {
     /**
      * Display the splash screen.
      *
-     * @param splashFilename The name of the file to find the image in.
+     * @param splashStream A stream to find the image in.
      */
-    public void displaySplashScreen(final String splashFilename) {
+    public void displaySplashScreen(final InputStream splashStream) {
     }
 
     /**
@@ -213,11 +190,8 @@ public class GUI {
 
     /**
      * Change the windowed mode.
-     *
-     * @param windowed Use <code>true</code> for windowed mode
-     *     and <code>false</code> for fullscreen mode.
      */
-    public void changeWindowedMode(boolean windowed) {
+    public void changeWindowedMode() {
     }
 
     /**
@@ -242,42 +216,12 @@ public class GUI {
     }
 
     /**
-     * Make image icon from an image.
-     * Use only if you know having null is possible!
-     *
-     * @param image The <code>Image</code> to create an icon for.
-     * @return The <code>ImageIcon</code>.
-     */
-    public static ImageIcon createImageIcon(Image image) {
-        return (image==null) ? null : new ImageIcon(image);
-    }
-
-    public ImageIcon createUnitImageIcon(Unit unit) {
-        return new ImageIcon(imageLibrary.getUnitImage(unit));
-    }
-
-    public ImageIcon createSettlementImageIcon(Settlement settlement) {
-        return new ImageIcon(imageLibrary.getSettlementImage(settlement));
-    }
-
-    public ImageIcon createGoodsImageIcon(GoodsType goodsType) {
-        return new ImageIcon(imageLibrary.getIconImage(goodsType));
-    }
-
-    /**
-     * Make image icon from an object.
-     *
-     * @param display The FreeColObject to find an icon for.
-     * @return The <code>ImageIcon</code> found.
-     */
-    protected ImageIcon createObjectImageIcon(FreeColObject display) {
-        return (display == null) ? null
-            : createImageIcon(imageLibrary.getObjectImage(display, 2f));
-    }
-
-    /**
      * Create a thumbnail for the minimap.
      * 
+     * FIXME: Delete all code inside this method and replace it with
+     *        sensible code directly drawing in necessary size,
+     *        without creating a throwaway GUI panel, drawing in wrong
+     *        size and immediately resizing.
      * @return The created image.
      */
     public BufferedImage createMiniMapThumbNail() {
@@ -293,8 +237,6 @@ public class GUI {
         miniMap.paintMap(g1);
         g1.dispose();
 
-        // FIXME: this can probably done more efficiently by applying
-        // a suitable AffineTransform to the Graphics2D
         int scaledWidth = Math.min((int)((64 * width) / (float)height), 128);
         BufferedImage scaledImage = new BufferedImage(scaledWidth, 64,
             BufferedImage.TYPE_INT_ARGB);
@@ -321,14 +263,6 @@ public class GUI {
      * Refresh the GUI.
      */
     public void refresh() {
-    }
-
-    /**
-     * Refreshes the screen at the specified Tile.
-     *
-     * @param tile The <code>Tile</code> to refresh.
-     */
-    public void refreshTile(Tile tile) {
     }
 
     /**
@@ -361,8 +295,10 @@ public class GUI {
      * Set the active unit.
      *
      * @param unit The <code>Unit</code> to activate.
+     * @return true if the focus was set.
      */
-    public void setActiveUnit(Unit unit) {
+    public boolean setActiveUnit(Unit unit) {
+        return false;
     }
 
     /**
@@ -375,18 +311,15 @@ public class GUI {
     // Animation handling
 
     /**
-     * Common utility routine to retrieve animation speed.
+     * Require the given tile to be in the onScreen()-area.
      *
-     * @param unit The <code>Unit</code> to be animated.
-     * @return The animation speed.
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the focus was set.
      */
-    public int getAnimationSpeed(Unit unit) {
-        String key = (freeColClient.getMyPlayer() == unit.getOwner())
-            ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        return freeColClient.getClientOptions().getInteger(key);
+    public boolean requireFocus(Tile tile) {
+        return false;
     }
-
+    
     /**
      * Animate a unit attack.
      *
@@ -427,9 +360,6 @@ public class GUI {
     public void updateMapControls() {
     }
 
-    public void updateMapControlsInCanvas() {
-    }
-
     public void zoomInMapControls() {
     }
 
@@ -454,7 +384,7 @@ public class GUI {
     // Dialogs that return values
 
     /**
-     * Simple confirmation dialog.
+     * Simple modal confirmation dialog.
      *
      * @param textKey A string to use as the message key.
      * @param okKey A key for the "ok" button.
@@ -466,51 +396,42 @@ public class GUI {
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template,
+    public boolean confirm(Tile tile, StringTemplate template,
                            String okKey, String cancelKey) {
         return false;
     }
 
     /**
-     * General confirmation dialog.
+     * General modal confirmation dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template The <code>StringTemplate</code> explaining the choice.
-     * @param obj An optional unit to make an icon for the dialog from.
+     * @param unit An optional unit to make an icon for the dialog from.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
      */
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, Unit obj,
+    public boolean confirm(Tile tile, StringTemplate template, Unit unit,
                            String okKey, String cancelKey) {
         return false;
     }
 
-    /**
-     * General confirmation dialog.
-     *
-     * @param modal Is this a modal dialog?
-     * @param tile An optional <code>Tile</code> to expose.
-     * @param template The <code>StringTemplate</code> explaining the choice.
-     * @param icon An optional icon for the dialog.
-     * @param okKey A key for the "ok" button.
-     * @param cancelKey A key for the "cancel" button.
-     * @return True if the "ok" button was selected.
-     */
-    public boolean confirm(boolean modal, Tile tile,
-                           StringTemplate template, ImageIcon icon,
+    public boolean confirm(Tile tile, StringTemplate template,
+                           Settlement settlement,
+                           String okKey, String cancelKey) {
+        return false;
+    }
+
+    public boolean confirm(Tile tile, StringTemplate template,
+                           GoodsType goodsType,
                            String okKey, String cancelKey) {
         return false;
     }
@@ -548,7 +469,7 @@ public class GUI {
                 .addNamed("%building%", school)
             : null;
         return template == null
-            || confirm(true, unit.getTile(), template, unit,
+            || confirm(unit.getTile(), template, unit,
                        "abandonEducation.yes", "abandonEducation.no");
     }
 
@@ -567,7 +488,7 @@ public class GUI {
             .addStringTemplate("%unit%",
                 unit.getLabel(Unit.UnitLabelType.NATIONAL))
             .addName("%route%", tr.getName());
-        return confirm(true, unit.getTile(), template, unit, "yes", "no");
+        return confirm(unit.getTile(), template, unit, "yes", "no");
     }
 
     /**
@@ -602,14 +523,14 @@ public class GUI {
         int gold = ns.getGold();
         if (gold == 0) {
             t = StringTemplate.template("confirmTribute.broke")
-                .addStringTemplate("%nation%", other.getNationName());
+                .addStringTemplate("%nation%", other.getNationLabel());
             showInformationMessage(t);
             return -1;
         }
 
         int fin = (gold <= 100) ? 0 : (gold <= 1000) ? 1 : 2;
         t = StringTemplate.template("confirmTribute.european")
-            .addStringTemplate("%nation%", other.getNationName())
+            .addStringTemplate("%nation%", other.getNationLabel())
             .addStringTemplate("%danger%",
                 StringTemplate.template("danger." + levels[mil]))
             .addStringTemplate("%finance%",
@@ -666,9 +587,9 @@ public class GUI {
             messageId = "confirmHostile.peace";
             break;
         }
-        return confirm(true, attacker.getTile(), StringTemplate
+        return confirm(attacker.getTile(), StringTemplate
             .template(messageId)
-            .addStringTemplate("%nation%", enemy.getNationName()),
+            .addStringTemplate("%nation%", enemy.getNationLabel()),
             attacker, "confirmHostile.yes", "cancel");
     }
 
@@ -710,9 +631,9 @@ public class GUI {
             : (is.getAlarm(player).getLevel() == Tension.Level.HAPPY)
             ? "confirmTribute.happy"
             : "confirmTribute.normal";
-        return (confirm(true, is.getTile(), StringTemplate.template(messageId)
+        return (confirm(is.getTile(), StringTemplate.template(messageId)
                 .addName("%settlement%", is.getName())
-                .addStringTemplate("%nation%", other.getNationName()),
+                .addStringTemplate("%nation%", other.getNationLabel()),
                 attacker, "confirmTribute.yes", "confirmTribute.no"))
             ? 1 : -1;
     }
@@ -763,10 +684,9 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.attack"),
                 ArmedUnitSettlementAction.SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(),
-            Utility.localizedTextArea(settlement.getAlarmLevelLabel(player)),
-            new ImageIcon(imageLibrary.getSettlementImage(settlement)),
-            "cancel", choices);
+        return getChoice(settlement.getTile(),
+            settlement.getAlarmLevelLabel(player),
+            settlement, "cancel", choices);
     }
 
     /**
@@ -792,9 +712,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
 
-        return getChoice(true, null, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+        return getChoice(null, template,
+                         goods.getType(), "cancel", choices);
     }
 
     /**
@@ -810,7 +729,7 @@ public class GUI {
     public BuyAction getBuyChoice(Unit unit, Settlement settlement,
                                   Goods goods, int gold, boolean canBuy) {
         StringTemplate template = StringTemplate.template("buy.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
             .addAmount("%gold%", gold);
 
@@ -820,9 +739,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
                                      BuyAction.HAGGLE));
 
-        return getChoice(true, unit.getTile(), Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+        return getChoice(unit.getTile(), template,
+                         goods.getType(), "cancel", choices);
     }
 
     /**
@@ -840,7 +758,7 @@ public class GUI {
         StringTemplate template;
         if (owner.hasContacted(player)) {
             template = StringTemplate.template("indianLand.text")
-                .addStringTemplate("%player%", owner.getNationName());
+                .addStringTemplate("%player%", owner.getNationLabel());
             StringTemplate pay = StringTemplate.template("indianLand.pay")
                 .addAmount("%amount%", price);
             choices.add(new ChoiceItem<>(Messages.message(pay),
@@ -853,9 +771,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
                                      ClaimAction.STEAL));
 
-        return getChoice(true, tile, Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getMiscIconImage(owner.getNation())),
-                         "indianLand.cancel", choices);
+        return getChoice(tile, template,
+                         owner.getNation(), "indianLand.cancel", choices);
     }
 
     /**
@@ -890,11 +807,8 @@ public class GUI {
         }
         if (choices.isEmpty()) return null;
 
-        return getChoice(true, settlement.getTile(),
-                         Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+        return getChoice(settlement.getTile(), template,
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -932,11 +846,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
                                      MissionaryAction.INCITE_INDIANS));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+        return getChoice(unit.getTile(), template,
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -948,7 +859,7 @@ public class GUI {
      */
     public String getNewColonyName(Player player, Tile tile) {
         String suggested = player.getSettlementName(null);
-        String name = getInput(true, tile, StringTemplate
+        String name = getInput(tile, StringTemplate
             .template("nameColony.text"), suggested,
             "accept", "cancel");
         if (name == null) {
@@ -991,11 +902,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
                                      ScoutColonyAction.FOREIGN_COLONY_ATTACK));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(colony)),
-                         "cancel", choices);
+        return getChoice(unit.getTile(), template,
+                         colony, "cancel", choices);
     }
 
     /**
@@ -1016,7 +924,7 @@ public class GUI {
             .addName("\n\n")
             .addStringTemplate(StringTemplate
                 .template("scoutSettlement.greetings")
-                .addStringTemplate("%nation%", owner.getNationName())
+                .addStringTemplate("%nation%", owner.getNationLabel())
                 .addName("%settlement%", settlement.getName())
                 .addName("%number%", numberString)
                 .add("%settlementType%",
@@ -1053,11 +961,8 @@ public class GUI {
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
                                      ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
 
-        return getChoice(true, settlement.getTile(),
-                         Utility.localizedTextArea(template),
-                         new ImageIcon(
-                             imageLibrary.getSettlementImage(settlement)),
-                         "cancel", choices);
+        return getChoice(settlement.getTile(), template,
+                         settlement, "cancel", choices);
     }
 
     /**
@@ -1073,7 +978,7 @@ public class GUI {
                                     Goods goods, int gold) {
         StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate template = StringTemplate.template("sell.text")
-            .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+            .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goodsTemplate)
             .addAmount("%gold%", gold);
 
@@ -1087,35 +992,49 @@ public class GUI {
                     .addStringTemplate("%goods%", goodsTemplate)),
                 SellAction.GIFT));
 
-        return getChoice(true, unit.getTile(),
-                         Utility.localizedTextArea(template),
-                         new ImageIcon(imageLibrary.getIconImage(goods.getType())),
-                         "cancel", choices);
+        return getChoice(unit.getTile(), template,
+                         goods.getType(), "cancel", choices);
     }
 
 
     /**
-     * General choice dialog.
+     * General modal choice dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param explain An object explaining the choice.
-     * @param icon An optional icon for the dialog.
      * @param cancelKey A key for the "cancel" button.
      * @param choices A list a <code>ChoiceItem</code>s to choose from.
      * @return The selected value of the selected <code>ChoiceItem</code>,
      *     or null if cancelled.
      */
-    public <T> T getChoice(boolean modal, Tile tile, Object explain,
-                           ImageIcon icon,
+    public <T> T getChoice(Tile tile, Object explain,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    public <T> T getChoice(Tile tile, Object explain, Unit unit,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
+                           String cancelKey, List<ChoiceItem<T>> choices) {
+        return null;
+    }
+
+    public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
         return null;
     }
 
     /**
-     * General input dialog.
+     * General modal string input dialog.
      *
-     * @param modal Is this a modal dialog?
      * @param tile An optional <code>Tile</code> to expose.
      * @param template A <code>StringTemplate</code> explaining the choice.
      * @param defaultValue The default value to show initially.
@@ -1123,8 +1042,9 @@ public class GUI {
      * @param cancelKey A key for the "cancel" button.
      * @return The chosen value.
      */
-    public String getInput(boolean modal, Tile tile, StringTemplate template,
-                           String defaultValue, String okKey, String cancelKey) {
+    public String getInput(Tile tile, StringTemplate template,
+                           String defaultValue,
+                           String okKey, String cancelKey) {
         return null;
     }
 
@@ -1141,13 +1061,7 @@ public class GUI {
         return false;
     }
 
-    public void dialogRemove(FreeColDialog<?> fcd) {
-    }
-
-    public void displayObject(FreeColObject fco) {
-    }
-
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
+    public LoadingSavegameInfo getLoadingSavegameInfo() {
         return null;
     }
 
@@ -1172,13 +1086,7 @@ public class GUI {
     public void refreshPlayersTable() {
     }
 
-    public void removeFromCanvas(Component component) {
-    }
-
     public void removeInGameComponents() {
-    }
-
-    public void removeTradeRoutePanel(TradeRoutePanel panel) {
     }
 
     public void requestFocusForSubPanel() {
@@ -1188,36 +1096,24 @@ public class GUI {
         return false;
     }
 
-    public void restoreSavedSize(Component comp, int w, int h) {
-    }
-
-    public void restoreSavedSize(Component comp, Dimension size) {
-    }
-
     public void returnToTitle() {
     }
 
     public void showAboutPanel() {
     }
 
-    public void showBuildQueuePanel(Colony colony) {
-    }
-
-    public void showBuildQueuePanel(Colony colony, Runnable callBack) {
-    }
-
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
-                                       final String defenderId) {
+                                       DialogHandler<List<Goods>> handler) {
     }
 
     public void showChatPanel() {
     }
 
-    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs) {
+    public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
+            DialogHandler<FoundingFather> handler) {
     }
 
-    public OptionGroup showClientOptionsDialog() {
-        return null;
+    public void showClientOptionsDialog() {
     }
 
     /**
@@ -1242,21 +1138,13 @@ public class GUI {
     protected void showForeignColony(Settlement settlement) {
     }
 
-    public ColonyPanel showColonyPanel(Colony colony, Unit unit) {
-        return null;
+    public void showColonyPanel(Colony colony, Unit unit) {
     }
 
     public void showColopediaPanel(String nodeId) {
     }
 
-    public ColorChooserPanel showColorChooserPanel(ActionListener al) {
-        return null;
-    }
-
     public void showCompactLabourReport() {
-    }
-
-    public void showCompactLabourReport(UnitData unitData) {
     }
 
     public void showDeclarationPanel() {
@@ -1266,23 +1154,21 @@ public class GUI {
         return null;
     }
 
-    public OptionGroup showDifficultyDialog(Specification spec,
-                                            OptionGroup group) {
-        return null;
-    }
-
-    public void showDumpCargoDialog(Unit unit) {
+    public void showDumpCargoDialog(Unit unit,
+                                    DialogHandler<List<Goods>> handler) {
     }
 
     public boolean showEditOptionDialog(Option option) {
         return false;
     }
 
-    public void showEmigrationDialog(final Player player, final int n,
-                                     final boolean fountainOfYouth) {
+    public void showEmigrationDialog(final Player player,
+                                     final boolean fountainOfYouth,
+                                     DialogHandler<Integer> handler) {
     }
 
-    public void showEndTurnDialog(final List<Unit> units) {
+    public void showEndTurnDialog(final List<Unit> units,
+                                  DialogHandler<Boolean> handler) {
     }
 
     public void showErrorMessage(StringTemplate template) {
@@ -1360,10 +1246,6 @@ public class GUI {
         return null;
     }
 
-    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        return null;
-    }
-
     final public File showLoadSaveFileDialog() {
         File file = showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file != null && !file.isFile()) {
@@ -1396,21 +1278,19 @@ public class GUI {
     }
 
     public void showMonarchDialog(final MonarchAction action,
-                                  StringTemplate template, String monarchKey) {
+                                  StringTemplate template, String monarchKey,
+                                  DialogHandler<Boolean> handler) {
     }
 
-    public void showNameNewLandDialog(String key, final String defaultName,
-                                      final Unit unit) {
-    }
-
-    public void showNameNewRegionDialog(StringTemplate template,
-                                        final String defaultName,
-                                        final Unit unit, final Tile tile,
-                                        final Region region) {
+    public void showNamingDialog(StringTemplate template,
+                                 final String defaultName,
+                                 final Unit unit,
+                                 DialogHandler<String> handler) {
     }
 
     public void showFirstContactDialog(final Player player, final Player other,
-                                       final Tile tile, int settlementCount) {
+                                       final Tile tile, int settlementCount,
+                                       DialogHandler<Boolean> handler) {
     }
 
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
@@ -1438,12 +1318,6 @@ public class GUI {
         return false;
     }
 
-    public void showPurchasePanel() {
-    }
-
-    public void showRecruitPanel() {
-    }
-
     public void showReportCargoPanel() {
     }
 
@@ -1466,11 +1340,6 @@ public class GUI {
     }
 
     public void showReportIndianPanel() {
-    }
-
-    public void showReportLabourDetailPanel(UnitType unitType,
-            Map<UnitType, Map<Location, Integer>> data,
-            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
     }
 
     public void showReportLabourPanel() {
@@ -1501,11 +1370,6 @@ public class GUI {
         return null;
     }
 
-    public File showSaveDialog(File directory, FileFilter[] fileFilters,
-                               String defaultName, String extension) {
-        return null;
-    }
-
     public Dimension showScaleMapSizeDialog() {
         return null;
     }
@@ -1524,9 +1388,6 @@ public class GUI {
         return null;
     }
 
-    public void showServerListPanel(List<ServerInfo> serverList) {
-    }
-
     public void showStartGamePanel(Game game, Player player,
                                    boolean singlePlayerMode) {
     }
@@ -1537,33 +1398,13 @@ public class GUI {
     public void showStatusPanel(String message) {
     }
 
-    public void showTilePanel(Tile tile) {
-    }
-
     public void showTilePopUpAtSelectedTile() {
     }
 
     public void showTradeRoutePanel(Unit unit) {
     }
 
-    public void showTradeRouteInputPanel(TradeRoute newRoute,
-                                         Runnable callBack) {
-    }
-
-    public void showTrainPanel() {
-    }
-
-    public void showVictoryDialog() {
-    }
-
-    public boolean showWarehouseDialog(Colony colony) {
-        return false;
-    }
-
-    public void showWorkProductionPanel(Unit unit) {
-    }
-
-    public void updateEuropeanSubpanels() {
+    public void showVictoryDialog(DialogHandler<Boolean> handler) {
     }
 
     public void updateGameOptions() {
@@ -1578,15 +1419,6 @@ public class GUI {
     public void changeViewMode(int newViewMode) {
     }
 
-    public Point calculateUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
-        return null;
-    }
-
-    public void executeWithUnitOutForAnimation(final Unit unit,
-                                               final Tile sourceTile,
-                                               final OutForAnimationCallback r) {
-    }
-
     public Unit getActiveUnit() {
         return null;
     }
@@ -1595,45 +1427,18 @@ public class GUI {
         return null;
     }
 
-    public float getMapScale() {
-        return 1.0f;
-    }
-
     public Tile getSelectedTile() {
         return null;
-    }
-
-    public Rectangle getTileBounds(Tile tile) {
-        return null;
-    }
-
-    public Point getTilePosition(Tile tile) {
-        return null;
-    }
-
-    public double getTileWidthHeightRatio() {
-        return ImageLibrary.TILE_SIZE.width / (double)ImageLibrary.TILE_SIZE.height;
     }
 
     public int getViewMode() {
         return -1;
     }
 
-    public boolean onScreen(Tile tileToCheck) {
-        return true; // Lets pretend.
-    }
-
-    public void restartBlinking() {
-    }
-
     public void setFocus(Tile tileToFocus) {
     }
 
-    public void setFocusImmediately(Tile tileToFocus) {
-    }
-
-    public boolean setSelectedTile(Tile newTileToSelect,
-                                   boolean clearGoToOrders) {
+    public boolean setSelectedTile(Tile newTileToSelect) {
         return true; // Pretending again.
     }
 
@@ -1673,6 +1478,40 @@ public class GUI {
      */
     public String getSoundMixerLabelText() {
         return freeColClient.getSoundController().getSoundMixerLabelText();
+    }
+
+    // invoke method forwarding
+
+    /**
+     * Wrapper for SwingUtilities.invokeLater that handles the case
+     * where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    public void invokeNowOrLater(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    /**
+     * Wrapper for SwingUtilities.invokeAndWait that handles the case
+     * where we are already in the EDT.
+     *
+     * @param runnable A <code>Runnable</code> to run.
+     */
+    public void invokeNowOrWait(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.WARNING, "Client GUI interaction", ex);
+            }
+        }
     }
 
 }

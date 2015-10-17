@@ -51,7 +51,7 @@ public class ShowMainAction extends FreeColAction {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
         if (!getGUI().confirmStopGame()) return;
         getConnectController().quitGame(true);
         getGUI().removeInGameComponents();

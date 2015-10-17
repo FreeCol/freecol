@@ -37,6 +37,7 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,8 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
@@ -58,6 +59,7 @@ import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -235,7 +237,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private final FreeColClient freeColClient;
 
-    private final GUI gui;
+    private final SwingGUI gui;
 
     private final FreeColPanel parentPanel;
 
@@ -249,7 +251,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     public DefaultTransferHandler(FreeColClient freeColClient,
                                   FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        this.gui = (SwingGUI)freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 
@@ -277,14 +279,8 @@ public final class DefaultTransferHandler extends TransferHandler {
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
-        if (comp instanceof JPanel || comp instanceof JLabel) {
-            for (DataFlavor aFlavor : flavor) {
-                if (aFlavor.equals(DefaultTransferHandler.flavor)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return (comp instanceof JPanel || comp instanceof JLabel)
+            && any(flavor, f -> f.equals(DefaultTransferHandler.flavor));
     }
 
     /**
@@ -393,6 +389,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                                            defaultAmount, false);
                     if (amount <= 0) return false;
                     goods.setAmount(amount);
+                } else if (label.isFullChosen()) {
                 } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
                     goods.setAmount(GoodsContainer.CARGO_SIZE);
                 }

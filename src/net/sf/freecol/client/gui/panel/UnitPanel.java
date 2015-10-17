@@ -66,6 +66,8 @@ public abstract class UnitPanel extends MigPanel
         cleanup();
         addPropertyChangeListeners();
         update();
+        Unit active = portPanel.getGUI().getActiveUnit();
+        if (active != null && active.isCarrier()) setSelectedUnit(active);
     }
 
     /**

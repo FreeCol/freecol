@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.client.gui.panel;
+package net.sf.freecol.client.gui;
 
 import javax.swing.ImageIcon;
 

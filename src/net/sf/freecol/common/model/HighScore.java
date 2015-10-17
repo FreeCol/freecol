@@ -265,7 +265,7 @@ public class HighScore extends FreeColObject {
      *
      * @return The independent nation name.
      */
-    public final String getNationName() {
+    public final String getNationLabel() {
         return nationName;
     }
 

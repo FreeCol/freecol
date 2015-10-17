@@ -21,10 +21,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -38,12 +38,14 @@ import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.control.MapEditorController.IMapTransform;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -116,15 +118,17 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         final Specification spec = getSpecification();
         List<TileType> tileList = spec.getTileTypeList();
+        Dimension terrainSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_OVERLAY_SIZE, 0.5f);
         for (TileType type : tileList) {
-            listPanel.add(buildButton(MapViewer.createTileImageWithOverlayAndForest(type, 0.5f),
+            listPanel.add(buildButton(SwingGUI.createTileImageWithOverlayAndForest(type, terrainSize),
                                       Messages.getName(type),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", 0.5f),
+        Dimension riverSize = ImageLibrary.scaleDimension(ImageLibrary.TILE_SIZE, 0.5f);
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0101", riverSize),
                                   Messages.message("mapEditorTransformPanel.minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", 0.5f),
+        listPanel.add(buildButton(ImageLibrary.getRiverImage("0202", riverSize),
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
@@ -161,19 +165,18 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         button.setToolTipText(text);
         button.setOpaque(false);
         group.add(button);
-        button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    MapEditorController ctlr = getFreeColClient().getMapEditorController();
-                    MapTransform newMapTransform = null;
-                    if(ctlr.getMapTransform() != mt){
-                        newMapTransform = mt;
-                    }
-                    ctlr.setMapTransform(newMapTransform);
-                    if(newMapTransform == null && mt != null){
-                        //select the invisible button, de-selecting all others
-                        group.setSelected(group.getElements().nextElement().getModel(),true);
-                    }
+        button.addActionListener((ActionEvent ae) -> {
+                MapEditorController ctlr
+                    = getFreeColClient().getMapEditorController();
+                MapTransform newMapTransform = null;
+                if (ctlr.getMapTransform() != mt) {
+                    newMapTransform = mt;
+                }
+                ctlr.setMapTransform(newMapTransform);
+                if (newMapTransform == null && mt != null) {
+                    //select the invisible button, de-selecting all others
+                    group.setSelected(group.getElements().nextElement()
+                        .getModel(), true);
                 }
             });
         button.setBorder(null);
@@ -195,7 +198,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      *
      * @see #transform(Tile)
      */
-    public abstract class MapTransform {
+    public abstract class MapTransform implements IMapTransform {
 
         /**
          * A panel with information about this transformation.
@@ -311,9 +314,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         String name = Messages.getName(rt);
                         choices.add(new ChoiceItem<>(name, rt));
                     }
-                    ResourceType choice = getGUI().getChoice(true, null, 
+                    ResourceType choice = getGUI().getChoice(null, 
                         Messages.message("mapEditorTransformPanel.chooseResource"),
-                        null, "cancel", choices);
+                        "cancel", choices);
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));
@@ -345,7 +348,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 || nativeNation == null) return;
             UnitType skill = ((IndianNationType)nativeNation.getType())
                 .getSkills().get(0).getObject();
-            Player nativePlayer = getGame().getPlayer(nativeNation.getId());
+            Player nativePlayer = getGame().getPlayerByNation(nativeNation);
             if (nativePlayer == null) return;
             String name = nativePlayer.getSettlementName(null);
             ServerIndianSettlement settlement

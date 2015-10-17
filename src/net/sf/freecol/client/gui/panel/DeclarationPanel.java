@@ -95,11 +95,8 @@ public final class DeclarationPanel extends FreeColPanel {
 
         add(signaturePanel);
     
-        Timer t = new Timer(START_DELAY, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    signaturePanel.startAnimation();
-                }
+        Timer t = new Timer(START_DELAY, (ActionEvent ae) -> {
+                signaturePanel.startAnimation();
             });
         t.setRepeats(false);
         t.start();
@@ -112,19 +109,16 @@ public final class DeclarationPanel extends FreeColPanel {
      * {@inheritDoc}
      */
     @Override
-    public void actionPerformed(ActionEvent event) {
-        final String command = event.getActionCommand();
+    public void actionPerformed(ActionEvent ae) {
+        final String command = ae.getActionCommand();
         if (ANIMATION_STOPPED.equals(command)) {
-            Timer t = new Timer(FINISH_DELAY, new ActionListener() {
-                @Override
-                    public void actionPerformed(ActionEvent e) {
-                        getGUI().removeFromCanvas(DeclarationPanel.this);
-                    }
+            Timer t = new Timer(FINISH_DELAY, (x) -> {
+                    getGUI().removeFromCanvas(DeclarationPanel.this);
                 });
             t.setRepeats(false);
             t.start();
         } else {
-            super.actionPerformed(event);
+            super.actionPerformed(ae);
         }
     }
 
@@ -151,7 +145,8 @@ public final class DeclarationPanel extends FreeColPanel {
 
         private final FAFile faFile;
 
-        private final ArrayList<ActionListener> actionListeners = new ArrayList<>();
+        private final ArrayList<ActionListener> actionListeners
+            = new ArrayList<>();
 
         private Point[] points = null;
 
@@ -258,22 +253,19 @@ public final class DeclarationPanel extends FreeColPanel {
          * @see #addActionListener(ActionListener)
          */
         public void startAnimation() {
-            ActionListener taskPerformer = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    if (counter < points.length - 1) {
-                        counter += 20;
-                        if (counter > points.length) {
-                            counter = points.length - 1;
-                            ((Timer) evt.getSource()).stop();
-                            notifyStopped();
-                        }
-                        validate();
-                        repaint();
-                    } else {
-                        ((Timer)evt.getSource()).stop();
+            ActionListener taskPerformer = (ActionEvent ae) -> {
+                if (counter < points.length - 1) {
+                    counter += 20;
+                    if (counter > points.length) {
+                        counter = points.length - 1;
+                        ((Timer)ae.getSource()).stop();
                         notifyStopped();
                     }
+                    validate();
+                    repaint();
+                } else {
+                    ((Timer)ae.getSource()).stop();
+                    notifyStopped();
                 }
             };
             new Timer(ANIMATION_DELAY, taskPerformer).start();

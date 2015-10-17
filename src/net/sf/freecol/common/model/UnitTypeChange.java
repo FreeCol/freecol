@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -230,9 +231,8 @@ public class UnitTypeChange extends FreeColObject {
      */
     public boolean appliesTo(Player player) {
         List<Scope> scopeList = getScopes();
-        if (scopeList.isEmpty()) return true;
-        for (Scope scope : scopeList) if (scope.appliesTo(player)) return true;
-        return false;
+        return (scopeList.isEmpty()) ? true
+            : any(scopeList, s -> s.appliesTo(player));
     }
 
 

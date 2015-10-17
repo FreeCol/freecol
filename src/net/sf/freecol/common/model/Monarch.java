@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -110,16 +112,13 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public final void updateSpaceAndCapacity() {
             final Specification spec = getSpecification();
-            capacity = 0;
-            for (AbstractUnit nu : navalUnits) {
-                if (nu.getType(spec).canCarryUnits()) {
-                    capacity += nu.getType(spec).getSpace() * nu.getNumber();
-                }
-            }
-            spaceRequired = 0;
-            for (AbstractUnit lu : landUnits) {
-                spaceRequired += lu.getType(spec).getSpaceTaken() * lu.getNumber();
-            }
+            capacity = navalUnits.stream()
+                .filter(nu -> nu.getType(spec).canCarryUnits())
+                .mapToInt(nu -> nu.getType(spec).getSpace()
+                    * nu.getNumber()).sum();
+            spaceRequired = landUnits.stream()
+                .mapToInt(lu -> lu.getType(spec).getSpaceTaken()
+                    * lu.getNumber()).sum();
         }
 
         /**
@@ -359,17 +358,6 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     private Force interventionForce;
 
-    /**
-     * A force of mercenaries, which some random country will offer to
-     * send to support the player's rebellion.
-     */
-    private Force mercenaryForce;
-
-    /**
-     * A force of military units typically provided when the monarch declares
-     * war.
-     */
-    private Force warSupportForce;
     
     // Caches.  Do not serialize.
     /** The naval unit types suitable for support actions. */
@@ -404,7 +392,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
         this.player = player;
 
-        requireForces();
+        // The Forces rely on the spec, but in the client we have to
+        // create a player(with monarch) before the spec arrives from
+        // the server, so the Forces *must* be instantiated lazily.
     }
 
     /**
@@ -418,59 +408,61 @@ public final class Monarch extends FreeColGameObject implements Named {
     public Monarch(Game game, String id) {
         super(game, id);
 
-        // @compat 0.10.7(REF), 0.11.1(Intervention,Mecenary),
-        //   0.11.3(War Support)
-        requireForces();
-        // end @compat 0.11.3
+        // The Forces rely on the spec, but in the client we have to
+        // create a player(with monarch) before the spec arrives from
+        // the server, so the Forces *must* be instantiated lazily.
     }
 
-
-    /**
-     * Various Forces have been introduced (or renamed in the case of
-     * the REF) at various points of FreeCol history.  To ensure
-     * compatibility, check if they are empty and if so initialize
-     * from the corresponding option.
-     *
-     * Can be moved back into the main constructor in due course.
-     */
-    private void requireForces() {
-        final Specification spec = getSpecification();
-        UnitListOption op;
-        op = (UnitListOption)spec.getOption(GameOptions.REF_FORCE);
-        expeditionaryForce = new Force(op, Ability.REF_UNIT);
-        op = (UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE);
-        mercenaryForce = new Force(op, null);
-        op = (UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE);
-        interventionForce = new Force(op, null);
-        op = (UnitListOption)spec.getOption(GameOptions.WAR_SUPPORT_FORCE);
-        warSupportForce = new Force(op, null);
-    }
 
     /**
      * Get the force describing the REF.
      *
-     * @return The REF.
+     * @return The REF <code>Force</code>.
      */
     public Force getExpeditionaryForce() {
+        if (expeditionaryForce == null) {
+            final Specification spec = getSpecification();
+            expeditionaryForce = new Force((UnitListOption)spec.getOption(GameOptions.REF_FORCE), null);
+        }
         return expeditionaryForce;
     }
 
     /**
      * Get the force describing the Intervention Force.
      *
-     * @return The Intervention Force.
+     * @return The intervention <code>Force</code>.
      */
     public Force getInterventionForce() {
+        if (interventionForce == null) {
+            final Specification spec = getSpecification();
+            interventionForce = new Force((UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE), null);
+        }
         return interventionForce;
     }
 
     /**
      * Gets the force describing the Mercenary Force.
      *
-     * @return The Mercenary Force.
+     * This is never updated, and directly derived from the spec.
+     *
+     * @return The mercenary <code>Force</code>.
      */
     public Force getMercenaryForce() {
-        return mercenaryForce;
+        final Specification spec = getSpecification();
+        return new Force((UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE), null);
+    }
+
+    /**
+     * Get the war support force.
+     *
+     * This is never updated, and directly derived from the spec.
+     *
+     * @return The war support <code>Force</code>.
+     */
+    public Force getWarSupportForce() {
+        final Specification spec = getSpecification();
+        return new Force((UnitListOption)spec
+            .getOption(GameOptions.WAR_SUPPORT_FORCE), null);
     }
 
     /**
@@ -574,22 +566,12 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential enemy <code>Player</code>s.
      */
     public List<Player> collectPotentialEnemies() {
-        List<Player> enemies = new ArrayList<>();
         // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
-            for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-                if (enemy.hasAbility(Ability.IGNORE_EUROPEAN_WARS)
-                    || enemy.isREF()) continue;
-                switch (player.getStance(enemy)) {
-                case PEACE: case CEASE_FIRE:
-                    enemies.add(enemy);
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-        return enemies;
+        return (player.hasAbility(Ability.IGNORE_EUROPEAN_WARS))
+            ? Collections.<Player>emptyList()
+            : getGame().getLiveEuropeanPlayers(player).stream()
+                .filter(p -> p.isPotentialEnemy(player))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -600,18 +582,9 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
-        List<Player> friends = new ArrayList<>();
-        for (Player enemy : getGame().getLiveEuropeanPlayers(player)) {
-            if (enemy.isREF()) continue;
-            switch (player.getStance(enemy)) {
-            case WAR: case CEASE_FIRE:
-                friends.add(enemy);
-                break;
-            default:
-                break;
-            }
-        }
-        return friends;
+        return getGame().getLiveEuropeanPlayers(player).stream()
+            .filter(p -> p.isPotentialFriend(player))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -767,8 +740,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
         // FIXME: magic number 2.5 * Manowar-capacity = 15
-        boolean needNaval = expeditionaryForce.getCapacity()
-            < expeditionaryForce.getSpaceRequired() + 15;
+        Force ref = getExpeditionaryForce();
+        boolean needNaval = ref.getCapacity()
+            < ref.getSpaceRequired() + 15;
         List<UnitType> types = (needNaval) ? navalREFUnitTypes
             : landREFUnitTypes;
         if (types.isEmpty()) return null;
@@ -784,8 +758,8 @@ public final class Monarch extends FreeColGameObject implements Named {
             : randomInt(logger, "Choose land#", random, 3) + 1;
         AbstractUnit result = new AbstractUnit(unitType, role.getId(), number);
         logger.info("Add to " + player.getDebugName()
-            + " REF: capacity=" + expeditionaryForce.getCapacity()
-            + " spaceRequired=" + expeditionaryForce.getSpaceRequired()
+            + " REF: capacity=" + ref.getCapacity()
+            + " spaceRequired=" + ref.getSpaceRequired()
             + " => " + result);
         return result;
     }
@@ -799,16 +773,17 @@ public final class Monarch extends FreeColGameObject implements Named {
         Specification spec = getSpecification();
         int interventionTurns = spec.getInteger(GameOptions.INTERVENTION_TURNS);
         if (interventionTurns > 0) {
+            Force ivf = getInterventionForce();
             int updates = getGame().getTurn().getNumber() / interventionTurns;
-            for (AbstractUnit unit : interventionForce.getLandUnits()) {
+            for (AbstractUnit unit : ivf.getLandUnits()) {
                 // add units depending on current turn
                 int value = unit.getNumber() + updates;
                 unit.setNumber(value);
             }
-            interventionForce.updateSpaceAndCapacity();
-            while (interventionForce.getCapacity() < interventionForce.getSpaceRequired()) {
+            ivf.updateSpaceAndCapacity();
+            while (ivf.getCapacity() < ivf.getSpaceRequired()) {
                 boolean progress = false;
-                for (AbstractUnit ship : interventionForce.getNavalUnits()) {
+                for (AbstractUnit ship : ivf.getNavalUnits()) {
                     // add ships until all units can be transported at once
                     if (ship.getType(spec).canCarryUnits()
                         && ship.getType(spec).getSpace() > 0) {
@@ -818,7 +793,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                     }
                 }
                 if (!progress) break;
-                interventionForce.updateSpaceAndCapacity();
+                ivf.updateSpaceAndCapacity();
             }
         }
     }
@@ -922,9 +897,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         double p = 10.0 * (NOSUPPORT - strengthRatio);
         if (p >= 1.0 // Avoid calling randomDouble if unnecessary
             || (p > 0.0 && p > randomDouble(logger, "War support?", random))) {
-            result.addAll(warSupportForce.getUnits());
+            Force wsf = getWarSupportForce();
+            result.addAll(wsf.getUnits());
             double supportStrength, fullRatio, strength, ratio;
-            supportStrength = warSupportForce.calculateStrength(false);
+            supportStrength = wsf.calculateStrength(false);
             fullRatio = Player.strengthRatio(baseStrength + supportStrength,
                                              enemyStrength);
             if (fullRatio < NOSUPPORT) { // Full support, some randomization
@@ -1036,7 +1012,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         // @compat 0.10.x
         // Detects/fixes bogus expeditionary force roles
         List<AbstractUnit> todo = new ArrayList<>();
-        Iterator<AbstractUnit> it = expeditionaryForce.getLandUnits()
+        Force ref = getExpeditionaryForce();
+        Iterator<AbstractUnit> it = ref.getLandUnits()
             .iterator();
         while (it.hasNext()) {
             AbstractUnit au = it.next();
@@ -1061,7 +1038,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             }
         }
-        for (AbstractUnit au : todo) expeditionaryForce.add(au);
+        for (AbstractUnit au : todo) ref.add(au);
         // end @compat 0.10.x
         return result;
     }
@@ -1072,12 +1049,14 @@ public final class Monarch extends FreeColGameObject implements Named {
     private static final String DISPLEASURE_TAG = "displeasure";
     private static final String EXPEDITIONARY_FORCE_TAG = "expeditionaryForce";
     private static final String INTERVENTION_FORCE_TAG = "interventionForce";
-    private static final String MERCENARY_FORCE_TAG = "mercenaryForce";
     private static final String PLAYER_TAG = "player";
     private static final String SUPPORT_SEA_TAG = "supportSea";
     // @compat 0.11.1
     private static final String NAME_TAG = "name";
     // end @compat 0.11.1
+    // @compat 0.11.5
+    private static final String MERCENARY_FORCE_TAG = "mercenaryForce";
+    // end @compat 0.11.5
 
 
     /**
@@ -1106,11 +1085,9 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         if (xw.validFor(this.player)) {
 
-            expeditionaryForce.toXML(xw, EXPEDITIONARY_FORCE_TAG);
+            getExpeditionaryForce().toXML(xw, EXPEDITIONARY_FORCE_TAG);
 
-            interventionForce.toXML(xw, INTERVENTION_FORCE_TAG);
-
-            mercenaryForce.toXML(xw, MERCENARY_FORCE_TAG);
+            getInterventionForce().toXML(xw, INTERVENTION_FORCE_TAG);
         }
     }
 
@@ -1134,19 +1111,11 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        super.readChildren(xr);
+        // Provide dummy forces to read into.
+        if (expeditionaryForce == null) expeditionaryForce = new Force();
+        if (interventionForce == null) interventionForce = new Force();
 
-        // @compat 0.10.5
-        // Intervention and mercenary forces introduced here.  Add
-        // default definitions for the benefit of earlier versions.        
-        final Specification spec = getSpecification();
-        if (interventionForce.getUnits().isEmpty()) {
-            interventionForce = new Force((UnitListOption)spec.getOption(GameOptions.INTERVENTION_FORCE), null);
-        }
-        if (mercenaryForce.getUnits().isEmpty()) {
-            mercenaryForce = new Force((UnitListOption)spec.getOption(GameOptions.MERCENARY_FORCE), null);
-        }
-        // end @compat
+        super.readChildren(xr);
     }
 
     /**
@@ -1174,8 +1143,12 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         // end @compat
 
+        // @compat 0.11.5
+        // Mercenary force is never updated, and lives in the spec now, so
+        // just read and discard it.
         } else if (MERCENARY_FORCE_TAG.equals(tag)) {
-            mercenaryForce.readFromXML(xr);
+            new Force().readFromXML(xr);
+        // end @compat 0.11.5
             
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {

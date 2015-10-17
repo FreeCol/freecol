@@ -19,15 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
 

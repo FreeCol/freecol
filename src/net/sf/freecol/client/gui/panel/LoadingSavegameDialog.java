@@ -35,6 +35,7 @@ import javax.swing.SpinnerNumberModel;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
+import net.sf.freecol.client.gui.LoadingSavegameInfo;
 import net.sf.freecol.common.i18n.Messages;
 
 
@@ -70,9 +71,9 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
-        JLabel header = Utility.localizedLabel(Messages.nameKey("loadingSavegameDialog"), JLabel.CENTER);
-        header.setFont(FontLibrary.createFont(FontLibrary.FontType.HEADER,
-            FontLibrary.FontSize.MEDIUM));
+        JLabel header = Utility.localizedHeaderLabel(
+            Messages.nameKey("loadingSavegameDialog"), JLabel.CENTER,
+            FontLibrary.FontSize.MEDIUM);
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
 
         JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -144,6 +145,15 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
      */
     public String getServerName() {
         return serverNameField.getName();
+    }
+
+    /**
+     * Get all important information at once.
+     * 
+     * @return A LoadingSavegameInfo.
+     */
+    public LoadingSavegameInfo getInfo() {
+        return new LoadingSavegameInfo(isSinglePlayer(), getPort(), getServerName());
     }
 
     /**

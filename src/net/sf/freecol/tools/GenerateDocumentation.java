@@ -33,7 +33,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
@@ -57,7 +56,8 @@ public class GenerateDocumentation {
 
     private static final Map<String, String> resources = new HashMap<>();
 
-    private static final String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
+    private static final String[] sourceFiles
+        = STRING_DIRECTORY.list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.matches("FreeColMessages.*\\.properties");

@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -179,10 +180,8 @@ public class TileItemContainer extends FreeColGameObject {
      *     not found.
      */
     public final LostCityRumour getLostCityRumour() {
-        for (TileItem item : tileItems) {
-            if (item instanceof LostCityRumour) return (LostCityRumour)item;
-        }
-        return null;
+        return (LostCityRumour)find(tileItems,
+            ti -> ti instanceof LostCityRumour);
     }
 
     /**
@@ -191,10 +190,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A <code>Resource</code> item, or null is none found.
      */
     public final Resource getResource() {
-        for (TileItem item : tileItems) {
-            if (item instanceof Resource) return (Resource)item;
-        }
-        return null;
+        return (Resource)find(tileItems, ti -> ti instanceof Resource);
     }
 
     /**
@@ -218,13 +214,9 @@ public class TileItemContainer extends FreeColGameObject {
      *     present, otherwise null.
      */
     public TileImprovement getImprovement(TileImprovementType type) {
-        for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement
-                && ((TileImprovement)item).getType() == type) {
-                return (TileImprovement)item;
-            }
-        }
-        return null;
+        return (TileImprovement)find(tileItems,
+            ti -> ti instanceof TileImprovement
+                && ((TileImprovement)ti).getType() == type);
     }
 
     /**
@@ -234,13 +226,9 @@ public class TileItemContainer extends FreeColGameObject {
      *     not found.
      */
     public TileImprovement getRoad() {
-        for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement
-                && ((TileImprovement)item).isRoad()) {
-                return (TileImprovement)item;
-            }
-        }
-        return null;
+        return (TileImprovement)find(tileItems,
+            ti -> ti instanceof TileImprovement
+                && ((TileImprovement)ti).isRoad());
     }
 
     /**
@@ -250,13 +238,9 @@ public class TileItemContainer extends FreeColGameObject {
      *     not found.
      */
     public TileImprovement getRiver() {
-        for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement
-                && ((TileImprovement)item).isRiver()) {
-                return (TileImprovement)item;
-            }
-        }
-        return null;
+        return (TileImprovement)find(tileItems,
+            ti -> ti instanceof TileImprovement
+                && ((TileImprovement)ti).isRiver());
     }
 
     /**
@@ -435,10 +419,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return True if this container allows the goods type to be produced.
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
-        for (TileItem ti : tileItems) {
-            if (ti.canProduce(goodsType, unitType)) return true;
-        }
-        return false;
+        return any(tileItems, ti -> ti.canProduce(goodsType, unitType));
     }
 
     /**
@@ -561,6 +542,17 @@ public class TileItemContainer extends FreeColGameObject {
                                    + " / " + ti.getId());
                     ti.setLocation(tile);
                     integ = Math.min(integ, 0);
+                }
+                // There are also still maps floating around with
+                // rivers that go nowhere.
+                if (ti instanceof TileImprovement) {
+                    TileImprovement tim = (TileImprovement)ti;
+                    if (tim.isRiver()
+                        && (tim.getStyle() == null
+                            || "0000".equals(tim.getStyle().toString()))) {
+                        logger.warning("Style 0000 river: " + tim);
+                        integ = -1;
+                    }
                 }
                 // end @compat
                 if (integ < 0) {

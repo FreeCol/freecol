@@ -25,9 +25,8 @@ import java.awt.Rectangle;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.client.gui.OutForAnimationCallback;
+import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
@@ -40,7 +39,7 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class UnitImageAnimation {
     
-    private final GUI gui;
+    private final SwingGUI gui;
     private final Unit unit;
     private final Tile tile;
     private final SimpleZippedAnimation animation;
@@ -49,11 +48,12 @@ public final class UnitImageAnimation {
     /**
      * Constructor
      *
+     * @param gui The gui.
      * @param unit The <code>Unit</code> to be animated. 
      * @param tile The <code>Tile</code> where the animation occurs.
      * @param animation The animation to show.
      */
-    public UnitImageAnimation(GUI gui, Unit unit, Tile tile,
+    public UnitImageAnimation(SwingGUI gui, Unit unit, Tile tile,
                               SimpleZippedAnimation animation, boolean mirror) {
         this.gui = gui;
         this.unit = unit;
@@ -70,9 +70,7 @@ public final class UnitImageAnimation {
 
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         gui.paintImmediatelyCanvasInItsBounds();
-        gui.executeWithUnitOutForAnimation(unit, tile, new OutForAnimationCallback() {
-            @Override
-            public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
+        gui.executeWithUnitOutForAnimation(unit, tile, (JLabel unitLabel) -> {
                 for (AnimationEvent event : animation) {
                     long time = System.nanoTime();
                     if (event instanceof ImageAnimationEvent) {
@@ -85,7 +83,7 @@ public final class UnitImageAnimation {
                         }
                         icon.setImage(image);
                         gui.paintImmediatelyCanvasIn(getDirtyAnimationArea());
-
+                        
                         time = ievent.getDurationInMs()
                             - (System.nanoTime() - time) / 1000000;
                         if (time > 0) {
@@ -96,9 +94,8 @@ public final class UnitImageAnimation {
                             }
                         }
                     }
-                }             
-            }
-        });
+                }
+            });
     }
 
     protected Rectangle getDirtyAnimationArea() {

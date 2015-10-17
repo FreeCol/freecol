@@ -134,7 +134,7 @@ public class FreeColTestUtils {
         public Colony build() {
             // player not set, get default
             if (player == null) {
-                player = game.getPlayer(defaultPlayer);
+                player = game.getPlayerByNationId(defaultPlayer);
                 if (player == null) {
                     throw new IllegalArgumentException("Default Player "
                         + defaultPlayer + " not in game");

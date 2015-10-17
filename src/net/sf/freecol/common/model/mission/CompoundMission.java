@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -133,13 +134,9 @@ public class CompoundMission extends AbstractMission {
      */
     @Override
     public boolean isValid() {
-        if (super.isValid() && !missions.isEmpty()) {
-            for (Mission mission : missions) {
-                if (!mission.isValid()) return false;
-            }
-            return true;
-        }
-        return false;
+        return (super.isValid() && !missions.isEmpty())
+            ? all(missions, Mission::isValid)
+            : false;
     }
 
     /**
