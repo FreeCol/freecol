@@ -84,7 +84,6 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create attacking player and units
         ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Tile tile2 = map.getTile(2, 1);
@@ -105,7 +104,6 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Unit enemyGalleon = new ServerUnit(game, tile4, french, galleonType);
         //Make tests
-        int turnsToReach = 1; // not important
 
         assertNotNull("Cannot attack own unit",
             UnitSeekAndDestroyMission.invalidReason(aiUnit, friendlyColonist));
@@ -156,7 +154,6 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         // Create player and unit
         ServerPlayer dutch = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
-        EuropeanAIPlayer aiDutch = (EuropeanAIPlayer)aiMain.getAIPlayer(dutch);
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new ServerUnit(game, tile1, dutch, veteranType);
