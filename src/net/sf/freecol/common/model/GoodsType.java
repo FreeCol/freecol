@@ -42,26 +42,8 @@ public final class GoodsType extends FreeColGameObjectType {
 
     /** A comparator to impose a useful order on goods types. */
     public static final Comparator<GoodsType> goodsTypeComparator
-        = new Comparator<GoodsType>() {
-            private int rank(GoodsType g) {
-                return (!g.isStorable() || g.isTradeGoods()) ? -1
-                    : (g.isFoodType()) ? 1
-                    : (g.isNewWorldGoodsType()) ? 2
-                    : (g.isFarmed()) ? 3
-                    : (g.isRawMaterial()) ? 4
-                    : (g.isNewWorldLuxuryType()) ? 5
-                    : (g.isRefined()) ? 6
-                    : -1;
-            }
-
-            @Override
-            public int compare(GoodsType g1, GoodsType g2) {
-                int r1 = rank(g1);
-                int r2 = rank(g2);
-                return (r1 != r2) ? r1 - r2
-                : g1.getId().compareTo(g2.getId());
-            }
-        };
+        = Comparator.comparingInt(GoodsType::getRank)
+            .thenComparing(gt -> (FreeColObject)gt);
 
     /** Is this a farmed goods type. */
     private boolean isFarmed;
@@ -529,6 +511,22 @@ public final class GoodsType extends FreeColGameObjectType {
         for (GoodsType g : spec.getGoodsTypeList()) {
             if (g.madeFrom != null) g.madeFrom.makes = g;
         }
+    }
+
+    /**
+     * Impose a general order on the goods types.
+     *
+     * @return An integer useful in comparators.
+     */
+    private int getRank() {
+        return (!isStorable() || isTradeGoods()) ? -1
+            : (isFoodType()) ? 1
+            : (isNewWorldGoodsType()) ? 2
+            : (isFarmed()) ? 3
+            : (isRawMaterial()) ? 4
+            : (isNewWorldLuxuryType()) ? 5
+            : (isRefined()) ? 6
+            : -1;
     }
 
 
