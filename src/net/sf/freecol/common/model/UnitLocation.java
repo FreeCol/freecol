@@ -459,8 +459,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The sum of the space taken by the units in this location.
      */
     public int getSpaceTaken() {
-        return getUnitList().stream()
-            .mapToInt(u -> u.getSpaceTaken()).sum();
+        return getUnitList().stream().mapToInt(Unit::getSpaceTaken).sum();
     }
 
     /**

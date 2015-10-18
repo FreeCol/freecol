@@ -2776,7 +2776,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 .getStorableGoodsTypeList();
             int averageIncome = goodsTypes.stream()
                 .mapToInt(gt -> getPlayer().getIncomeAfterTaxes(gt)).sum()
-                / goodsTypes.size();
+                    / goodsTypes.size();
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
             ret = income <= 0 || income > averageIncome;
             lb.add(((ret) ? "accepted" : "rejected"),

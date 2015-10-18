@@ -501,7 +501,7 @@ public class ColonyPlan {
         rawMaterials.addAll(otherRawGoodsTypes);
         for (GoodsType g : rawMaterials) {
             int value = production.get(g).entrySet().stream()
-                .mapToInt(e -> e.getValue()).sum();
+                .mapToInt(Entry::getValue).sum();
             if (value <= LOW_PRODUCTION_THRESHOLD) {
                 production.remove(g);
                 continue;
@@ -905,47 +905,30 @@ public class ColonyPlan {
      */
     private void updateProductionList(final Map<GoodsType, Map<WorkLocation, Integer>> production) {
         final Comparator<GoodsType> productionComparator
-            = new Comparator<GoodsType>() {
-                @Override
-                public int compare(GoodsType g1, GoodsType g2) {
-                    int p1 = production.get(g1).values().stream()
-                        .mapToInt(Integer::intValue).sum();
-                    int p2 = production.get(g2).values().stream()
-                        .mapToInt(Integer::intValue).sum();
-                    return p2 - p1;
-                }
-            };
-        List<GoodsType> toAdd = new ArrayList<>();
+            = Comparator.comparingInt((GoodsType gt) ->
+                production.get(gt).values().stream().mapToInt(Integer::intValue)
+                    .sum())
+                .reversed();
 
         // If we need liberty put it before the new world production.
         if (colony.getSoL() < 100) {
-            for (GoodsType g : libertyGoodsTypes) {
-                if (production.containsKey(g)) toAdd.add(g);
-            }
-            Collections.sort(toAdd, productionComparator);
-            produce.addAll(0, toAdd);
-            toAdd.clear();
+            produce.addAll(0, libertyGoodsTypes.stream()
+                .filter(gt -> production.containsKey(gt))
+                .sorted(productionComparator).collect(Collectors.toList()));
         }
 
         // Always add raw/building materials first.
         Collections.sort(rawBuildingGoodsTypes, productionComparator);
-        for (GoodsType g : buildingGoodsTypes) {
-            if (production.containsKey(g)) {
-                GoodsType raw = g.getInputType();
-                if (colony.getGoodsCount(raw) >= GoodsContainer.CARGO_SIZE/2
-                    || production.containsKey(raw)) {
-                    toAdd.add(g);
-                }
-            }
-        }
-        Collections.sort(toAdd, new Comparator<GoodsType>() {
-                @Override
-                public int compare(GoodsType g1, GoodsType g2) {
-                    int i1 = rawBuildingGoodsTypes.indexOf(g1.getInputType());
-                    int i2 = rawBuildingGoodsTypes.indexOf(g2.getInputType());
-                    return i1 - i2;
-                }
-            });
+        Comparator<GoodsType> rawBuildingComparator
+            = Comparator.comparingInt(gt ->
+                rawBuildingGoodsTypes.indexOf(gt.getInputType()));
+        List<GoodsType> toAdd = new ArrayList<>();
+        toAdd.addAll(buildingGoodsTypes.stream()
+            .filter(gt -> production.containsKey(gt)
+                && (colony.getGoodsCount(gt.getInputType())
+                    >= GoodsContainer.CARGO_SIZE/2
+                    || production.containsKey(gt.getInputType())))
+            .sorted(rawBuildingComparator).collect(Collectors.toList()));
         for (int i = toAdd.size()-1; i >= 0; i--) {
             GoodsType make = toAdd.get(i);
             GoodsType raw = make.getInputType();
@@ -961,24 +944,17 @@ public class ColonyPlan {
                 produce.add(0, make);
             }
         }
-        toAdd.clear();
 
         // Military goods after lucrative production.
-        for (GoodsType g : militaryGoodsTypes) {
-            if (production.containsKey(g)) toAdd.add(g);
-        }
-        Collections.sort(toAdd, productionComparator);
-        produce.addAll(toAdd);
-        toAdd.clear();
+        produce.addAll(militaryGoodsTypes.stream()
+            .filter(gt -> production.containsKey(gt))
+            .sorted(productionComparator).collect(Collectors.toList()));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
-            for (GoodsType g : immigrationGoodsTypes) {
-                if (production.containsKey(g)) toAdd.add(g);
-            }
-            Collections.sort(toAdd, productionComparator);
-            produce.addAll(toAdd);
-            toAdd.clear();
+            produce.addAll(immigrationGoodsTypes.stream()
+                .filter(gt -> production.containsKey(gt))
+                .sorted(productionComparator).collect(Collectors.toList()));
         }
     }
 

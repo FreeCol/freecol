@@ -1491,7 +1491,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getSoL() {
         final List<Colony> colonies = getColonies();
         return (colonies.isEmpty()) ? 0
-            : colonies.stream().mapToInt(c -> c.getSoL()).sum()
+            : colonies.stream().mapToInt(Colony::getSoL).sum()
                 / colonies.size();
     }
 
@@ -2337,8 +2337,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The sum of the units currently working in the colonies.
      */
     public int getColoniesPopulation() {
-        return getColonies().stream()
-            .mapToInt(c -> c.getUnitCount()).sum();
+        return getColonies().stream().mapToInt(Colony::getUnitCount).sum();
     }
 
     /**

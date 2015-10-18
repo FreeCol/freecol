@@ -2487,7 +2487,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public int getUnitCount() {
         return getCurrentWorkLocations().stream()
-            .mapToInt(wl -> wl.getUnitCount()).sum();
+            .mapToInt(UnitLocation::getUnitCount).sum();
     }
 
     /**

@@ -469,7 +469,7 @@ public class Cargo {
         ret += (getMode().isCollection()) ? getTransportable().getSpaceTaken()
             : -getTransportable().getSpaceTaken();
         if (hasWrapped()) {
-            ret += wrapped.stream().mapToInt(c -> c.getNewSpace()).sum();
+            ret += wrapped.stream().mapToInt(Cargo::getNewSpace).sum();
         }
         return ret;
     }

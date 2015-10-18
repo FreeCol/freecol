@@ -286,7 +286,7 @@ public class CollectionUtils {
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map) {
         return map.entrySet().stream()
-            .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+            .sorted(Comparator.comparing(Entry::getKey))
             .collect(Collectors.toList());
     }
 
@@ -300,7 +300,7 @@ public class CollectionUtils {
     public static <K,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
         return map.entrySet().stream()
-            .sorted((e1, e2) -> comparator.compare(e1.getKey(), e2.getKey()))
+            .sorted(Comparator.comparing(Entry::getKey, comparator))
             .collect(Collectors.toList());
     }
 
@@ -313,7 +313,7 @@ public class CollectionUtils {
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map) {
         return map.entrySet().stream()
-            .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+            .sorted(Comparator.comparing(Entry::getValue))
             .collect(Collectors.toList());
     }
 
@@ -327,7 +327,7 @@ public class CollectionUtils {
     public static <K,V> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
         return map.entrySet().stream()
-            .sorted((e1, e2) -> comparator.compare(e1.getValue(), e2.getValue()))
+            .sorted(Comparator.comparing(Entry::getValue, comparator))
             .collect(Collectors.toList());
     }
 

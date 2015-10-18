@@ -830,8 +830,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         int oldScore = score;
         score = getUnits().stream()
                 .mapToInt(u -> u.getType().getScoreValue()).sum()
-            + getColonies().stream()
-                .mapToInt(c -> c.getLiberty()).sum()
+            + getColonies().stream().mapToInt(Colony::getLiberty).sum()
             + SCORE_FOUNDING_FATHER * getFathers().size();
         int gold = getGold();
         if (gold != GOLD_NOT_ACCOUNTED) {
@@ -1514,7 +1513,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         boolean changed = false;
         int upkeep = getSettlements().stream()
-            .mapToInt(s -> s.getUpkeep()).sum();
+            .mapToInt(Settlement::getUpkeep).sum();
         if (checkGold(upkeep)) {
             modifyGold(-upkeep);
             if (getBankrupt()) {

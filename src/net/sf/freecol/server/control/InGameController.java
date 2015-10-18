@@ -1282,12 +1282,8 @@ public final class InGameController extends Controller {
         // already be at war.
         List<Player> natives = game.getLiveNativePlayers(null).stream()
             .filter(p -> p.hasContacted(serverPlayer))
-            .sorted(new Comparator<Player>() {
-                    public int compare(Player p1, Player p2) {
-                        return p1.getTension(serverPlayer).getValue()
-                            - p2.getTension(serverPlayer).getValue();
-                    }
-                })
+            .sorted(Comparator.comparingInt(p ->
+                    p.getTension(serverPlayer).getValue()))
             .collect(Collectors.toList());
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)natives.get(0);

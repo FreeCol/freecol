@@ -648,7 +648,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 double s = needed.stream()
                         .mapToInt(gt -> t.getPotentialProduction(gt, unitType)).sum()
                     + spec.getFoodGoodsTypeList().stream()
-                        .mapToDouble(ft -> 0.1 * t.getPotentialProduction(ft, unitType)).sum();
+                        .mapToDouble(ft ->
+                            0.1 * t.getPotentialProduction(ft, unitType)).sum();
                 if (s > score) {
                     score = s;
                     steal = t;

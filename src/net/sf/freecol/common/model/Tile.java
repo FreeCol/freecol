@@ -1583,7 +1583,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         int food = goodsMap.entrySet().stream()
             .filter(e -> e.getKey().isFoodType())
-            .mapToInt(e -> e.getValue()).sum();
+            .mapToInt(Entry::getValue).sum();
         if (food < 8) {
             ret.add("warning.noFood");
         }

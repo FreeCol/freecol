@@ -523,7 +523,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public UnitType getEducationUnit(int maximumSkill) {
         return find(getTypeChanges().stream()
-                .filter(c -> c.canBeTaught())
+                .filter(UnitTypeChange::canBeTaught)
                 .map(UnitTypeChange::getNewUnitType),
             ut -> ut.hasSkill() && ut.getSkill() <= maximumSkill, null);
     }

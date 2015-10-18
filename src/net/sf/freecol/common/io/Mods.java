@@ -36,7 +36,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 
 
 /**
- * Contains methods for getting a list of available mods.
+ * Contains methods for getting a list of available mods and TCs.
  */
 public class Mods {
 
@@ -55,6 +55,7 @@ public class Mods {
         if (directory == null || !directory.isDirectory()) return;
         Arrays.stream(directory.listFiles(FreeColModFile.getFileFilter()))
             .map(FreeColModFile::make)
+            .filter(fcmf -> fcmf != null)
             .forEach(fcmf -> allMods.put(fcmf.getId(), fcmf));
     }
 
@@ -108,7 +109,7 @@ public class Mods {
      */
     public static List<FreeColTcFile> getRuleSets() {
         return Arrays.stream(FreeColDirectories.getRulesDirectory()
-            .listFiles(FreeColTcFile.getFileFilter()))
+                .listFiles(FreeColTcFile.getFileFilter()))
             .map(FreeColTcFile::make)
             .filter(tc -> tc != null)
             .collect(Collectors.toList());
