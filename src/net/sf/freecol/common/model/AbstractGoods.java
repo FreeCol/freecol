@@ -44,15 +44,9 @@ public class AbstractGoods extends FreeColObject implements Named {
      * predictable goods type order.
      */
     public static final Comparator<AbstractGoods> abstractGoodsComparator
-        = new Comparator<AbstractGoods>() {
-            @Override
-            public int compare(AbstractGoods a1, AbstractGoods a2) {
-                int cmp = a2.getAmount() - a1.getAmount();
-                return (cmp != 0) ? cmp
-                    : GoodsType.goodsTypeComparator.compare(a1.getType(),
-                                                            a2.getType());
-            }
-        };
+        = Comparator.comparingInt(AbstractGoods::getAmount).reversed()
+            .thenComparing(AbstractGoods::getType,
+                           GoodsType.goodsTypeComparator);
 
     /** The type of goods. */
     private GoodsType type;
