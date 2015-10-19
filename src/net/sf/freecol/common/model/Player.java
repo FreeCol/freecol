@@ -303,22 +303,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** A comparator for ordering players. */
     public static final Comparator<Player> playerComparator
-        = new Comparator<Player>() {
-            @Override
-            public int compare(Player player1, Player player2) {
-                int counter1 = 0;
-                int counter2 = 0;
-
-                if (player1.isAdmin()) counter1 += 8;
-                if (!player1.isAI()) counter1 += 4;
-                if (player1.isEuropean()) counter1 += 2;
-                if (player2.isAdmin()) counter2 += 8;
-                if (!player2.isAI()) counter2 += 4;
-                if (player2.isEuropean()) counter2 += 2;
-                
-                return counter2 - counter1;
-            }
-        };
+        = Comparator.comparingInt(Player::getRank);
 
     /** A magic constant to denote that a players gold is not tracked. */
     public static final int GOLD_NOT_ACCOUNTED = Integer.MIN_VALUE;
@@ -1160,6 +1145,19 @@ public class Player extends FreeColGameObject implements Nameable {
         final Nation nation = getNation();
         Color color = nation.getColor();
         return (color != null) ? color : nation.forceDefaultColor();
+    }
+
+    /**
+     * Get an integer to broadly categorized the player for sorting.
+     * AIs should always follow humans, and the administrator is special.
+     *
+     * @return An identifying integer.
+     */
+    public int getRank() {
+        int ret = (isEuropean()) ? 1 : 0;
+        if (isAI()) ret |= 2;
+        if (isAdmin()) ret |= 4;
+        return ret;
     }
 
 
