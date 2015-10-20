@@ -7,7 +7,7 @@
 
 * Introduction Sequence Started: showing boat travel west in the ocean to the new world.
 
-[introduction_screen]http://www.freecol.org/cv3-discoverer-english/images/introduction_screen.jpg)
+[introduction_screen](http://www.freecol.org/cv3-discoverer-english/images/introduction_screen.jpg)
 
 * MENU: Start Menu
 >        COLONIZATION Version 3.0 -- 7-Feb-95
@@ -19,7 +19,7 @@
 
 * COMMENT: Note that the 'selectable' options are indented one (1) space.
 
-[start_menu]http://www.freecol.org/cv3-discoverer-english/images/start_menu.jpg)
+[start_menu](http://www.freecol.org/cv3-discoverer-english/images/start_menu.jpg)
 
 * SELECTED: 'Start a Game in AMERICA'
 
@@ -30,7 +30,7 @@
 >         Original Americas
 >         Map Editor
 
-[select_menu]http://www.freecol.org/cv3-discoverer-english/images/select_menu.jpg)
+[select_menu](http://www.freecol.org/cv3-discoverer-english/images/select_menu.jpg)
 
 * SELECTED: 'Original Americas'
 
@@ -41,7 +41,7 @@
 >          GOVERNOR:     Tough
 >          VICEROY:      Toughest
 
-[choose_difficulty_level]http://www.freecol.org/cv3-discoverer-english/images/choose_difficulty_level.jpg)
+[choose_difficulty_level](http://www.freecol.org/cv3-discoverer-english/images/choose_difficulty_level.jpg)
 
 * SELECTED: 'DISCOVERER: Easiest'
 
@@ -51,7 +51,7 @@
 >          SPAIN:       Conquest
 >          NETHERLANDS: Trade
 
-[select_european_power]http://www.freecol.org/cv3-discoverer-english/images/select_european_power.jpg)
+[select_european_power](http://www.freecol.org/cv3-discoverer-english/images/select_european_power.jpg)
 
 * SELECTED: 'ENGLAND: Immigration'
 
@@ -60,7 +60,7 @@
 >           Englands default name is
 >           Walter Raleigh
 
-[enter_name]http://www.freecol.org/cv3-discoverer-english/images/enter_name.jpg)
+[enter_name](http://www.freecol.org/cv3-discoverer-english/images/enter_name.jpg)
 
 * SELECTED: Walter Raleigh
 
@@ -96,7 +96,7 @@
 >          Quakers) who
 >          faced persecution in the Old World.
 
-[european_power_info]http://www.freecol.org/cv3-discoverer-english/images/european_power_info.jpg)
+[european_power_info](http://www.freecol.org/cv3-discoverer-english/images/european_power_info.jpg)
 
 * CLICKED: Left clicked on the screen to continue.
 
@@ -108,7 +108,7 @@
 >         normal
 >         number of "Crosses" to generate immigrants.
 
-[european_power_bonus_info]http://www.freecol.org/cv3-discoverer-english/images/european_power_bonus_info.jpg)
+[european_power_bonus_info](http://www.freecol.org/cv3-discoverer-english/images/european_power_bonus_info.jpg)
 
 * CLICKED: Left clicked on the screen to continue.
 
@@ -128,7 +128,7 @@
 >          glory to yourself and
 >          our nation,"
 
-[audience_with_king]http://www.freecol.org/cv3-discoverer-english/images/audience_with_king.jpg)
+[audience_with_king](http://www.freecol.org/cv3-discoverer-english/images/audience_with_king.jpg)
 
 * CLICKED: Left clicked on the screen to continue.
 
@@ -138,54 +138,54 @@
 >          In the Year of Our Lord One Thousand Four Hundred
 >          Ninety-Two,
 
-[docks00]http://www.freecol.org/cv3-discoverer-english/images/docks00.jpg)
+[docks00](http://www.freecol.org/cv3-discoverer-english/images/docks00.jpg)
 
 * SCREEN:
 >          an Expedition led by the Great Discoverer,
 >          Walter Raleigh,
 
-[docks01]http://www.freecol.org/cv3-discoverer-english/images/docks01.jpg)
+[docks01](http://www.freecol.org/cv3-discoverer-english/images/docks01.jpg)
 
 * SCREEN:
 >          left London on a Voyage of Discovery.
 
-[docks02]http://www.freecol.org/cv3-discoverer-english/images/docks02.jpg)
+[docks02](http://www.freecol.org/cv3-discoverer-english/images/docks02.jpg)
 
 * SCREEN:
 >          Commisioned and Blessed by the King of England,
 
-[docks03]http://www.freecol.org/cv3-discoverer-english/images/docks03.jpg)
+[docks03](http://www.freecol.org/cv3-discoverer-english/images/docks03.jpg)
 
 * SCREEN:
 >          to Explore the Ocean Sea,
 
-[docks04]http://www.freecol.org/cv3-discoverer-english/images/docks04.jpg)
+[docks04](http://www.freecol.org/cv3-discoverer-english/images/docks04.jpg)
 
 * SCREEN:
 >          to find Uncharted Lands,
 
-[docks05]http://www.freecol.org/cv3-discoverer-english/images/docks05.jpg)
+[docks05](http://www.freecol.org/cv3-discoverer-english/images/docks05.jpg)
 
 * SCREEN:
 >          and to Establish Colonies for the Greater Glory of
 >          England.
 
-[docks06]http://www.freecol.org/cv3-discoverer-english/images/docks06.jpg)
+[docks06](http://www.freecol.org/cv3-discoverer-english/images/docks06.jpg)
 
 * SCREEN:
 >          A ship loaded with Pioneers and Soldiers
 
-[docks07]http://www.freecol.org/cv3-discoverer-english/images/docks07.jpg)
+[docks07](http://www.freecol.org/cv3-discoverer-english/images/docks07.jpg)
 
 * SCREEN:
 >          Set Sail to find a New Life, A new Beginning, ...
 
-[docks08]http://www.freecol.org/cv3-discoverer-english/images/docks08.jpg)
+[docks08](http://www.freecol.org/cv3-discoverer-english/images/docks08.jpg)
 
 * SCREEN:
 >          A new World!
 
-[docks09]http://www.freecol.org/cv3-discoverer-english/images/docks09.jpg)
+[docks09](http://www.freecol.org/cv3-discoverer-english/images/docks09.jpg)
 
 * TIME: Spring 1492
 
@@ -197,11 +197,11 @@
 >          If we sail to the east (right arrow), we
 >          can return to port.
 
-[opening_screen_new_world]http://www.freecol.org/cv3-discoverer-english/images/opening_screen_new_world.jpg)
+[opening_screen_new_world](http://www.freecol.org/cv3-discoverer-english/images/opening_screen_new_world.jpg)
 
 * CLICKED: Left clicked to remove the message dialog.
 
-[opening_screen_new_world01]http://www.freecol.org/cv3-discoverer-english/images/opening_screen_new_world01.jpg)
+[opening_screen_new_world01](http://www.freecol.org/cv3-discoverer-english/images/opening_screen_new_world01.jpg)
 
 * ARRIVED FROM EUROPE: Caravel: Free Colonist/Pioneer, Veteran Soldier
 
@@ -212,7 +212,7 @@
 
 * SCREEN: Discovery of the New World
 
-[discovery_new_world]http://www.freecol.org/cv3-discoverer-english/images/discovery_new_world.jpg)
+[discovery_new_world](http://www.freecol.org/cv3-discoverer-english/images/discovery_new_world.jpg)
 
 * CLICKED: Left clicked on the message to remove it.
 
@@ -221,7 +221,7 @@
 >          Your Excellency?
 >          Name: New England
 
-[naming_new_world]http://www.freecol.org/cv3-discoverer-english/images/naming_new_world.jpg)
+[naming_new_world](http://www.freecol.org/cv3-discoverer-english/images/naming_new_world.jpg)
 
 * COMMENT: from a different game
 
@@ -235,7 +235,7 @@
 >           ship toward land and shoose Make
 >           Landfall from the menu.
 
-[make_landfall_tut]http://www.freecol.org/cv3-discoverer-english/images/make_landfall_tut.jpg)
+[make_landfall_tut](http://www.freecol.org/cv3-discoverer-english/images/make_landfall_tut.jpg)
 
 * CLICKED: Left clicked on the message dialog to remove it.
 
@@ -244,11 +244,11 @@
 
 * CLICKED: Left clicked on the Caravel and the list of units at (53, 42) is displayed.
 
-[left_click_caravel_00]http://www.freecol.org/cv3-discoverer-english/images/left_click_caravel_00.jpg)
+[left_click_caravel_00](http://www.freecol.org/cv3-discoverer-english/images/left_click_caravel_00.jpg)
 
 * SELECTED: Selecting the soldier makes the soldier sprite appear (and blink) on (53, 42) where the Caravels sprite is, and the Caravel sprite disappears.
 
-[select_soldier_caravel]http://www.freecol.org/cv3-discoverer-english/images/select_soldier_caravel.jpg)
+[select_soldier_caravel](http://www.freecol.org/cv3-discoverer-english/images/select_soldier_caravel.jpg)
 
 * MOVED: Veteran Soldier SOUTH-WEST (numpad-key 1)
       One (1) tile from (53, 42) to (52, 43).
@@ -256,7 +256,7 @@
 
 * MEETING NATIVES: General
 
-[meeting_the_natives]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_natives.jpg)
+[meeting_the_natives](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_natives.jpg)
 
 * MEETING NATIVES: Tupi / 13 settlements
 >          "The Tupi tribe welcomes you. We are a
@@ -268,7 +268,7 @@
 >           Yes
 >           No
 
-[meeting_the_tupi]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi.jpg)
+[meeting_the_tupi](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi.jpg)
 
 * SELECTED: Yes.
 
@@ -278,7 +278,7 @@
 >          peace pipe to celebrate our perpetual
 >          friendship."
 
-[meeting_the_tupi_peace]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi_peace.jpg)
+[meeting_the_tupi_peace](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi_peace.jpg)
 
 * CLICKED: Left clicked the screen to remove the message dialog.
 
@@ -288,7 +288,7 @@
 >          you will send your wagon trains to
 >          trade with us."
 
-[meeting_the_tupi_peace_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi_peace_01.jpg)
+[meeting_the_tupi_peace_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_tupi_peace_01.jpg)
 
 * CLICKED: Left clicked the screen to remove the message dialog.
 
@@ -308,7 +308,7 @@
 >          You can also send it to a port of your choice
 >          by pressing the 'G' key.
 
-[navy_tutorial_english]http://www.freecol.org/cv3-discoverer-english/images/navy_tutorial_english.jpg)
+[navy_tutorial_english](http://www.freecol.org/cv3-discoverer-english/images/navy_tutorial_english.jpg)
 
 * CLICKED: It should be obvious by now that left (and right)
       clicking removes the screens and dialogs.  This action will not
@@ -346,7 +346,7 @@
 >          Tools from Europe or to have our blacksmiths
 >          manufacture them.
 
-[pioneer_tutorial_00]http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_00.jpg)
+[pioneer_tutorial_00](http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_00.jpg)
 
 * SCREEN: Build a Colony message dialog
 >          The abundance of Lumber in this area
@@ -354,7 +354,7 @@
 >          first colony. To begin a colony, Sire,
 >          press the 'B' key.
 
-[build_tutorial_00]http://www.freecol.org/cv3-discoverer-english/images/build_tutorial_00.jpg)
+[build_tutorial_00](http://www.freecol.org/cv3-discoverer-english/images/build_tutorial_00.jpg)
 
 * BUILD ROAD: The Pioneer starts building a ROAD, where the new colony will be located (53, 43).
 
@@ -370,7 +370,7 @@
 >          soldiers will also become more powerful if we
 >          equip them with Horses.
 
-[soldier_tutorial_00]http://www.freecol.org/cv3-discoverer-english/images/soldier_tutorial_00.jpg)
+[soldier_tutorial_00](http://www.freecol.org/cv3-discoverer-english/images/soldier_tutorial_00.jpg)
 
 * MOVED: Veteran Soldier SOUTH-EAST (numpad-key 3)
       One (1) tile from (52, 43) to (53, 44) finding Tupi camp One (1) tile SOUTH of (53, 44) at (53, 45)
@@ -405,7 +405,7 @@
 >          (Master Carpenters) now available in
 >          London.
 
-[religious_unrest_england]http://www.freecol.org/cv3-discoverer-english/images/religious_unrest_england.jpg)
+[religious_unrest_england](http://www.freecol.org/cv3-discoverer-english/images/religious_unrest_england.jpg)
 
 * TUTORIAL: Colonists in Europe
 >          Excellency, there are Master Carpenters
@@ -414,7 +414,7 @@
 >          gladly set sail with us and become useful
 >          members of our community.
 
-[colonists_in_europe]http://www.freecol.org/cv3-discoverer-english/images/colonists_in_europe.jpg)
+[colonists_in_europe](http://www.freecol.org/cv3-discoverer-english/images/colonists_in_europe.jpg)
 
 * TIME: Spring 1496
 
@@ -433,7 +433,7 @@
 >           Yes, steady as she goes.
 >           No, let us remain in these waters.
 
-[reached_high_seas]http://www.freecol.org/cv3-discoverer-english/images/reached_high_seas.jpg)
+[reached_high_seas](http://www.freecol.org/cv3-discoverer-english/images/reached_high_seas.jpg)
 
 * SELECTED: Yes, steady as she goes.
 
@@ -486,11 +486,11 @@
 
 * FREECOL ISSUE: WWC1D - WHAT WOULD COL 1 DO ?  Goods Price Differences PF#28, see image
 
-[european_docks_status_screen_start]http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_start.jpg)
+[european_docks_status_screen_start](http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_start.jpg)
 
 * PURCHASED: Europe: 50 Horses at 1 gold (Master Carpenter to Scout)
 
-[european_docks_status_screen_start_01]http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_start_01.jpg)
+[european_docks_status_screen_start_01](http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_start_01.jpg)
 
 * CLICKED: Left clicked on the Master Carpenter/Scout.
 
@@ -501,7 +501,7 @@
 >            Sell Horses (save 50gold).
 >            No changes.
 
-[european_dock_options_00]http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_00.jpg)
+[european_dock_options_00](http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_00.jpg)
 
 * SELECTED: 'No Changes'.
 
@@ -517,13 +517,13 @@
 >           Yes, steady as she goes.
 >           No, let us remain in port.
 
-[european_dock_options_ship_leaving]http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_ship_leaving.jpg)
+[european_dock_options_ship_leaving](http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_ship_leaving.jpg)
 
 * SELECTED: Yes, steady as she goes.
 
 * FREECOL ISSUE: NOTE: The Master Carpenter/Scout is shown to be with the ship in the above dialog.
 
-[european_docks_bound_for_new_england]http://www.freecol.org/cv3-discoverer-english/images/european_docks_bound_for_new_england.jpg)
+[european_docks_bound_for_new_england](http://www.freecol.org/cv3-discoverer-english/images/european_docks_bound_for_new_england.jpg)
 
 * SAILING TO THE NEW WORLD: Caravel: Master Carpenter/Scout
 
@@ -531,7 +531,7 @@
 
 * INDIAN MOVEMENT: The Tupi Braves moved WEST from (54, 44) to (53, 44) to be positioned one (1) tile SOUTH of the Pioneer.
 
-[spring_1498_easiest_english]http://www.freecol.org/cv3-discoverer-english/images/spring_1498_easiest_english.jpg)
+[spring_1498_easiest_english](http://www.freecol.org/cv3-discoverer-english/images/spring_1498_easiest_english.jpg)
 
 * FINISHED: Pioneer finished Building the ROAD, where the new
       colony will be located (53, 43).
@@ -572,13 +572,13 @@
 
 * NOT MOVED: Veteran Soldier at (54, 43).
 
-[spring_1500_easiest_english]http://www.freecol.org/cv3-discoverer-english/images/spring_1500_easiest_english.jpg)
+[spring_1500_easiest_english](http://www.freecol.org/cv3-discoverer-english/images/spring_1500_easiest_english.jpg)
 
 * END OF TURN
 
 * TIME: Spring 1501
 
-[spring_1501_easiest_english]http://www.freecol.org/cv3-discoverer-english/images/spring_1501_easiest_english.jpg)
+[spring_1501_easiest_english](http://www.freecol.org/cv3-discoverer-english/images/spring_1501_easiest_english.jpg)
 
 * MOVED: Caravel WEST (numpad-key 4)
       One (1) tile from (55, 46) to (54, 46).
@@ -741,7 +741,7 @@
 
 * PRICE CHANGE: Furs rise to 5 gold.
 
-[price_change]http://www.freecol.org/cv3-discoverer-english/images/price_change.jpg)
+[price_change](http://www.freecol.org/cv3-discoverer-english/images/price_change.jpg)
 
 * TIME: Spring 1511
 
@@ -765,13 +765,13 @@
 >          What shall we name this colony?
 >          Name: Jamestown
 
-[build_colony]http://www.freecol.org/cv3-discoverer-english/images/build_colony.jpg)
+[build_colony](http://www.freecol.org/cv3-discoverer-english/images/build_colony.jpg)
 
 * CLICKED: Left clicked to select Jamestown
 
 * SCREEN: Building A Colony
 
-[build_colony_screen]http://www.freecol.org/cv3-discoverer-english/images/build_colony_screen.jpg)
+[build_colony_screen](http://www.freecol.org/cv3-discoverer-english/images/build_colony_screen.jpg)
 
 * TUTORIAL: Colony
 >          On the Colony Screen, you can decide
@@ -787,9 +787,9 @@
 >          colony, drag him to the fence (near the
 >          water on the colony picture).
 
-[colony_tutorial_00]http://www.freecol.org/cv3-discoverer-english/images/colony_tutorial_00.jpg)
+[colony_tutorial_00](http://www.freecol.org/cv3-discoverer-english/images/colony_tutorial_00.jpg)
 
-[colony_start]http://www.freecol.org/cv3-discoverer-english/images/colony_start.jpg)
+[colony_start](http://www.freecol.org/cv3-discoverer-english/images/colony_start.jpg)
 
 * MOVED IN COLONY: Jamestown (53, 43). Master Carpenter, from Furs
       to Carpenter's Shop, producing: six (6) Hammers
@@ -802,15 +802,15 @@
 
 * COMMENT: Changing the Free Colonist from Furs to Lumberjack.
 
-[colony_select_profession]http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession.jpg)
+[colony_select_profession](http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession.jpg)
 
 * EQUIPPED: Jamestown (53, 43): Veteran Soldier with 50 Horses to Dragoon
 
-[colony_select_profession_trained_00]http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession_trained_00.jpg)
+[colony_select_profession_trained_00](http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession_trained_00.jpg)
 
-[colony_select_profession_trained_01]http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession_trained_01.jpg)
+[colony_select_profession_trained_01](http://www.freecol.org/cv3-discoverer-english/images/colony_select_profession_trained_01.jpg)
 
-[colony_start_01]http://www.freecol.org/cv3-discoverer-english/images/colony_start_01.jpg)
+[colony_start_01](http://www.freecol.org/cv3-discoverer-english/images/colony_start_01.jpg)
 
 * COLONY BUILD ITEM START: Jamestown (53, 43): Docks
 
@@ -830,15 +830,15 @@
 >           William Penn (Religious Advisor)
 >                              (f1 for Help)
 
-[continetal_congress_selection]http://www.freecol.org/cv3-discoverer-english/images/continetal_congress_selection.jpg)
+[continetal_congress_selection](http://www.freecol.org/cv3-discoverer-english/images/continetal_congress_selection.jpg)
 
 * COMMENT: The Continental Congress Report is shown in:
 
-[continental_congress_activities]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_activities.jpg)
+[continental_congress_activities](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_activities.jpg)
 
 * COMMENT: and
 
-[continentsl_congress_activities_01]http://www.freecol.org/cv3-discoverer-english/images/continentsl_congress_activities_01.jpg)
+[continentsl_congress_activities_01](http://www.freecol.org/cv3-discoverer-english/images/continentsl_congress_activities_01.jpg)
 
 * TIME: Spring 1512
 
@@ -855,7 +855,7 @@
 
 * COMMENT: The build options for the colony are shown in the following screenshot.
 
-[build_colony_items_pop_01]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_01.jpg)
+[build_colony_items_pop_01](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_01.jpg)
 
 * COMMENT: for population of 1 and 2.
 
@@ -871,7 +871,7 @@
 >          everlasting peace between our
 >          peoples."
 
-[indian_message_00]http://www.freecol.org/cv3-discoverer-english/images/indian_message_00.jpg)
+[indian_message_00](http://www.freecol.org/cv3-discoverer-english/images/indian_message_00.jpg)
 
 * RELIGIOUS UNREST: Expert Farmer
 
@@ -890,7 +890,7 @@
 >          square will be increased. Our units also move
 >          faster when they are moving along a road.
 
-[pioneer_tutorial_01]http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_01.jpg)
+[pioneer_tutorial_01](http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_01.jpg)
 
 * TUTORIAL: Pioneer plow
 >          This looks like a good place to plow or clear.
@@ -901,7 +901,7 @@
 >          square causes the forest to be cleared,
 >          making room for more agriculture.
 
-[pioneer_tutorial_02]http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_02.jpg)
+[pioneer_tutorial_02](http://www.freecol.org/cv3-discoverer-english/images/pioneer_tutorial_02.jpg)
 
 * CLICKED: Left clicked the screen to remove the dialog.
 
@@ -946,7 +946,7 @@
 
 * FREECOL ISSUE: FreeCol 0.11.5 has the behaviour of the Ship keeping its movement after going to a colony.  This version of Colonization (3.0) stops any more Ship movement after the Ship enters a colony.
 
-[ship_movement_entering_colony]http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony.jpg)
+[ship_movement_entering_colony](http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony.jpg)
 
 * COMMENT: Shows the amount of moves left two (2) to the Caravel before entering Jamestown colony by moving one (1) tile SOUTH-WEST (numpad-key 1).
 
@@ -966,17 +966,17 @@
 >          Then, on the ship's next turn, you can send it
 >          to Europe by pressing 'G'.
 
-[ship_entering_colony_tut_00]http://www.freecol.org/cv3-discoverer-english/images/ship_entering_colony_tut_00.jpg)
+[ship_entering_colony_tut_00](http://www.freecol.org/cv3-discoverer-english/images/ship_entering_colony_tut_00.jpg)
 
 * FREECOL ISSUE: FreeCol 0.11.5 has the behaviour that the Unit, e.g. the Expert Farmer has to leave the Ship when in a colony. In the below screen shot: ship_movement_entering_colony_01.jpg, the Expert Farmer is in the colony where the Veteran Dragoon is fortified (i.e. by the fence, near the water).  THEREFORE: The Expert Farmer can move like any other unit on the outside of the colony.  FreeCol 0.11.5 has the behaviour of having the unit only move one (1) spot as the unit is 'inside' a hold on the Ship.
 
 * FREECOL ISSUE: WWC1D - WHAT WOULD COL 1 DO? Movement Loss on Disarm PF#52: As shown in the screenshots, the game does not use the notion of the unit being in a cargo hold of the ship, but uses the 'free' holds to transport the unit. Unless the unit is fortified on the ship, the unit will get 'off' the ship when entering a port.  The unit can then be reselected to be in the 'state' of 'sentry' in order to get on the next ship leaving port with an empty cargo hold for the unit to board the ship.
 
-[ship_movement_entering_colony_01]http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_01.jpg)
+[ship_movement_entering_colony_01](http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_01.jpg)
 
-[ship_movement_entering_colony_02]http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_02.jpg)
+[ship_movement_entering_colony_02](http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_02.jpg)
 
-[ship_movement_entering_colony_03]http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_03.jpg)
+[ship_movement_entering_colony_03](http://www.freecol.org/cv3-discoverer-english/images/ship_movement_entering_colony_03.jpg)
 
 * MOVED IN COLONY: Jamestown (53, 43). Expert Farmer, from Outside
       Colony to Farmer. producing: five (5) food.
@@ -996,7 +996,7 @@
 >          building, and allows us to change it if we
 >          want.
 
-[colony_population_03_tutorial]http://www.freecol.org/cv3-discoverer-english/images/colony_population_03_tutorial.jpg)
+[colony_population_03_tutorial](http://www.freecol.org/cv3-discoverer-english/images/colony_population_03_tutorial.jpg)
 
 * CLICKED: Left clicked the screen to remove the dialog.
 
@@ -1006,7 +1006,7 @@
 
 * COLONY BUILD ITEM START:     Jamestown (53, 43): Docks.
 
-[colony_build_00]http://www.freecol.org/cv3-discoverer-english/images/colony_build_00.jpg)
+[colony_build_00](http://www.freecol.org/cv3-discoverer-english/images/colony_build_00.jpg)
 
 * TIME: Spring 1518
 
@@ -1132,7 +1132,7 @@
 >          Our pioneer has reverted to colonist
 >          status after using all its tools.
 
-[pioneer_used_all_tools]http://www.freecol.org/cv3-discoverer-english/images/pioneer_used_all_tools.jpg)
+[pioneer_used_all_tools](http://www.freecol.org/cv3-discoverer-english/images/pioneer_used_all_tools.jpg)
 
 * TUTORIAL: New Colonist
 >          New colonists have arrived in Jamestown, Your
@@ -1141,7 +1141,7 @@
 >          dragging the colonists from the "fence" to a
 >          field or building.
 
-[new_colonist_in_colony_tut]http://www.freecol.org/cv3-discoverer-english/images/new_colonist_in_colony_tut.jpg)
+[new_colonist_in_colony_tut](http://www.freecol.org/cv3-discoverer-english/images/new_colonist_in_colony_tut.jpg)
 
 * TUTORIAL: New colonist in colony
 >          The Colonist has no specialty
@@ -1149,7 +1149,7 @@
 >          friendly native village, the indians may
 >          be willing to teach him a new skill.
 
-[new_colonist_in_colony_tut_01]http://www.freecol.org/cv3-discoverer-english/images/new_colonist_in_colony_tut_01.jpg)
+[new_colonist_in_colony_tut_01](http://www.freecol.org/cv3-discoverer-english/images/new_colonist_in_colony_tut_01.jpg)
 
 * MOVED IN COLONY: Jamestown (53, 43). Free Colonist, from Outside Colony to Statesman. producing: Four (4) Bells from default: One (1) Bell.
 
@@ -1179,7 +1179,7 @@
 
 * PRICE CHANGE: Coats rises to 11 gold.
     
-[european_docks_spring_1528]http://www.freecol.org/cv3-discoverer-english/images/european_docks_spring_1528.jpg)
+[european_docks_spring_1528](http://www.freecol.org/cv3-discoverer-english/images/european_docks_spring_1528.jpg)
 
 * INDIAN MOVEMENT: The Tupi Braves moved from their camp to SOUTH-EAST of Jamestown (53, 43).
 
@@ -1222,7 +1222,7 @@
 >                Iroquois wreak havoc in
 >                Spanish colony Isabella.
 
-[spies_report_00]http://www.freecol.org/cv3-discoverer-english/images/spies_report_00.jpg)
+[spies_report_00](http://www.freecol.org/cv3-discoverer-english/images/spies_report_00.jpg)
 
 * CLICKED: Left clicked to remove the spies report dialog.
 
@@ -1281,7 +1281,7 @@
 
 * SCREEN: Cargo from the New World picture
 
-[cargo_from_the_new_world]http://www.freecol.org/cv3-discoverer-english/images/cargo_from_the_new_world.jpg)
+[cargo_from_the_new_world](http://www.freecol.org/cv3-discoverer-english/images/cargo_from_the_new_world.jpg)
 
 * ARRIVED IN EUROPE: Caravel: 100 sugar.
 
@@ -1305,7 +1305,7 @@
 >           Continue turn.
 >           Zoom to colony.
 
-[sons_of_liberty_message_00]http://www.freecol.org/cv3-discoverer-english/images/sons_of_liberty_message_00.jpg)
+[sons_of_liberty_message_00](http://www.freecol.org/cv3-discoverer-english/images/sons_of_liberty_message_00.jpg)
 
 * NEW CARGO: Jamestown (53, 43): Horses (100).
 
@@ -1319,7 +1319,7 @@
 >           Continue turn.
 >           Zoom to colony.
 
-[cargo_message_00]http://www.freecol.org/cv3-discoverer-english/images/cargo_message_00.jpg)
+[cargo_message_00](http://www.freecol.org/cv3-discoverer-english/images/cargo_message_00.jpg)
 
 * TUTORIAL: Cargo
 >          Sire, there are 100 Horses in Jamestown. If
@@ -1327,7 +1327,7 @@
 >          this cargo and take it back to London in
 >          Europe, where we can sell it for a profit.
 
-[cargo_message_01]http://www.freecol.org/cv3-discoverer-english/images/cargo_message_01.jpg)
+[cargo_message_01](http://www.freecol.org/cv3-discoverer-english/images/cargo_message_01.jpg)
 
 * REBEL SENTIMENT: 10%
 >          Rebel sentiment is rising in the colonies,
@@ -1339,7 +1339,7 @@
 >          least 50% Sons of Liberty membership
 >          receives a +1 production bonus.
 
-[rebel_sentiment_message_00]http://www.freecol.org/cv3-discoverer-english/images/rebel_sentiment_message_00.jpg)
+[rebel_sentiment_message_00](http://www.freecol.org/cv3-discoverer-english/images/rebel_sentiment_message_00.jpg)
 
 * TIME: Spring 1535
 
@@ -1357,7 +1357,7 @@
 >           Kiss pinky ring.
 >           Hold 'Jamestown Sugar Party.'
 
-[tax_increase_00]http://www.freecol.org/cv3-discoverer-english/images/tax_increase_00.jpg)
+[tax_increase_00](http://www.freecol.org/cv3-discoverer-english/images/tax_increase_00.jpg)
 
 * INDIAN MOVEMENT: The Tupi Brave has moved to SOUTH-WEST of Jamestown (53, 43).
 
@@ -1386,7 +1386,7 @@
 
 * ENTERING INDIAN VILLAGE: Tupi Camp at (53, 45): Asked to Speak with Chief, Skill: Master Sugar Planter, Trade: Rum, Horses and Cloth, Gift: valuable beads worth 120 gold.
 
-[entering_indian_village]http://www.freecol.org/cv3-discoverer-english/images/entering_indian_village.jpg)
+[entering_indian_village](http://www.freecol.org/cv3-discoverer-english/images/entering_indian_village.jpg)
 
 * DIALOG: Entering Indian Village message appears
 >          Your expedition has reached a Camp of
@@ -1398,7 +1398,7 @@
 >           Attack Village
 >           Cancel Action
 
-[entering_indian_village_message_00]http://www.freecol.org/cv3-discoverer-english/images/entering_indian_village_message_00.jpg)
+[entering_indian_village_message_00](http://www.freecol.org/cv3-discoverer-english/images/entering_indian_village_message_00.jpg)
 
 * SCREEN: Speak With Chief
 >          "Greeting, traveller. We are a
@@ -1408,7 +1408,7 @@
 >          needed Rum. We would also pay well for
 >          Horses or Cigars.
 
-[speak_with_indian_chief]http://www.freecol.org/cv3-discoverer-english/images/speak_with_indian_chief.jpg)
+[speak_with_indian_chief](http://www.freecol.org/cv3-discoverer-english/images/speak_with_indian_chief.jpg)
 
 * SCREEN: Speak with Chief message 2 (two)
 >          "The Tupi welcome the emissaries of the
@@ -1416,7 +1416,7 @@
 >          valuable beads (worth 120 gold) back to
 >          your chieftain as a peace offering."
 
-[speak_with_indian_chief_01]http://www.freecol.org/cv3-discoverer-english/images/speak_with_indian_chief_01.jpg)
+[speak_with_indian_chief_01](http://www.freecol.org/cv3-discoverer-english/images/speak_with_indian_chief_01.jpg)
 
 * END OF TURN
 
@@ -1424,7 +1424,7 @@
 
 * FREECOL ISSUE: FreeCol 0.11.5 does not show the TYPE of Indian tribe owning a camp, village, city when getting the information about what type of goods are traded at the camp, village, city.
 
-[indian_camp_information]http://www.freecol.org/cv3-discoverer-english/images/indian_camp_information.jpg)
+[indian_camp_information](http://www.freecol.org/cv3-discoverer-english/images/indian_camp_information.jpg)
 
 * TIME: Spring 1537
 
@@ -1444,7 +1444,7 @@
 
 * FREECOL ISSUE: FreeCol 0.11.5. does not show which Indian camp, village, or city that is the Indian capital. The screenshot below shows the Indian capital with a star on the Tupi camp.
 
-[indian_capital]http://www.freecol.org/cv3-discoverer-english/images/indian_capital.jpg)
+[indian_capital](http://www.freecol.org/cv3-discoverer-english/images/indian_capital.jpg)
 
 * COMMENT: Up until this point, the game has been giving the units as needed, similar to how a tutorial would provide pre-determined units available from the periods of religious unrest.
 
@@ -1492,7 +1492,7 @@
 
 * ENTERING INDIAN VILLAGE: Tupi Capital at (49, 44): Asked to Speak with Chief, Skill: Master Sugar Planter, Trade: Tobacco, Cotton and Rum, Gift: Tales of nearby lands.
 
-[tales_of_nearby_lands_capital]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_capital.jpg)
+[tales_of_nearby_lands_capital](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_capital.jpg)
 
 * END OF TURN
 
@@ -1520,11 +1520,11 @@
 
 * COMMENT: The build options for the colony are shown in the following screenshots.
 
-[build_colony_items_pop_03]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_03.jpg)
+[build_colony_items_pop_03](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_03.jpg)
 
 * COMMENT: for population of 3.
 
-[build_colony_items_pop_04]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_04.jpg)
+[build_colony_items_pop_04](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_04.jpg)
 
 * COMMENT: for population of 4.
 
@@ -1539,7 +1539,7 @@
 
 * ENTERING INDIAN VILLAGE: Tupi Camp at (45, 47): Asked to Speak with Chief, Skill: Master Sugar Planter, Trade: Rum, Horses, and Cotton, Gift: Tales of nearby lands.
 
-[tales_of_nearby_lands_camp]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp.jpg)
+[tales_of_nearby_lands_camp](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp.jpg)
 
 * END OF TURN
 
@@ -1574,7 +1574,7 @@
 
 * FINISHED: The Pioneer has completed Clearing the Forest, 20 lumber added to the stockpile.
 
-[pioneer_non_expert_lumber_add]http://www.freecol.org/cv3-discoverer-english/images/pioneer_non_expert_lumber_add.jpg)
+[pioneer_non_expert_lumber_add](http://www.freecol.org/cv3-discoverer-english/images/pioneer_non_expert_lumber_add.jpg)
 
 * MOVED: Seasoned Scout SOUTH (numpad-key 2)
       Two (2) tiles from (45, 49) to (45, 51).
@@ -1591,7 +1591,7 @@
 >           Continue turn.
 >           Zoom to colony.
 
-[colony_new_cargo]http://www.freecol.org/cv3-discoverer-english/images/colony_new_cargo.jpg)
+[colony_new_cargo](http://www.freecol.org/cv3-discoverer-english/images/colony_new_cargo.jpg)
 
 * TIME: Spring 1544
 
@@ -1621,7 +1621,7 @@
 * MOVED: Seasoned Scout SOUTH-WEST (numpad-key 1)
       One (1) tile from (46, 52) to (45, 53).
 
-[meeting_fellow_europeans]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans.jpg)
+[meeting_fellow_europeans](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans.jpg)
 
 * MEETING EUROPEANS: Dutch
 >          "Greetings, Discover Walter Raleigh, and
@@ -1632,7 +1632,7 @@
 >          overseas trading empire. Please do not
 >          interfere with this God-given mission."
 
-[meeting_fellow_europeans_msg_00]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_00.jpg)
+[meeting_fellow_europeans_msg_00](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_00.jpg)
 
 * DIALOG:
 >          "Although all of this land is rightfully ours by
@@ -1644,7 +1644,7 @@
 >           "Yes"
 >           "No"
 
-[meeting_fellow_europeans_msg_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_01.jpg)
+[meeting_fellow_europeans_msg_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_01.jpg)
 
 * DIALOG:
 >          "Excellent. All of the land which you now occupy shall
@@ -1660,7 +1660,7 @@
 >           swine?"
 >           "We suggest an alliance."
 
-[meeting_fellow_europeans_msg_02]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_02.jpg)
+[meeting_fellow_europeans_msg_02](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_02.jpg)
 
 * CLICKED: Left clicked on "Go in peace, Dutch brother."
 
@@ -1673,7 +1673,7 @@
 * MOVED: Seasoned Scout WEST (numpad-key 4)
       Two (2) tiles from (44, 55) to (42, 55).
 
-[attack_indian_braves]http://www.freecol.org/cv3-discoverer-english/images/attack_indian_braves.jpg)
+[attack_indian_braves](http://www.freecol.org/cv3-discoverer-english/images/attack_indian_braves.jpg)
 
 * MOVED: Seasoned Scout SOUTH-WEST (numpad-key 2)
       One (1) tile from (42, 55) to (41, 56).
@@ -1712,7 +1712,7 @@
 
 * MEETING NATIVES: Inca Nation
 
-[meeting_the_inca_nation]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation.jpg)
+[meeting_the_inca_nation](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation.jpg)
 
 * MEETING NATIVES: Inca / 5 settlements
 >          "The Inca tribe welcomes you. We are a
@@ -1724,7 +1724,7 @@
 >           Yes
 >           No
 
-[meeting_the_inca_nation_msg_00]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_00.jpg)
+[meeting_the_inca_nation_msg_00](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_00.jpg)
 
 * SCREEN:
 >          "The Incas welcome peace with our
@@ -1732,7 +1732,7 @@
 >          peace pipe to celebrate our perpetual
 >          friendship."
 
-[meeting_the_inca_nation_msg_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_01.jpg)
+[meeting_the_inca_nation_msg_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_01.jpg)
 
 * SCREEN:
 >          "We hope you will soon visit Inca
@@ -1740,7 +1740,7 @@
 >          and that you will send your wagon
 >          trains to trade with us."
 
-[meeting_the_inca_nation_msg_02]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_02.jpg)
+[meeting_the_inca_nation_msg_02](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_inca_nation_msg_02.jpg)
 
 * END OF TURN
 
@@ -1795,11 +1795,11 @@
 
 * SCREEN: Discovery of the Pacific Ocean picture
 
-[discovery_of_pacific_ocean]http://www.freecol.org/cv3-discoverer-english/images/discovery_of_pacific_ocean.jpg)
+[discovery_of_pacific_ocean](http://www.freecol.org/cv3-discoverer-english/images/discovery_of_pacific_ocean.jpg)
 
 * FREECOL ISSUE: In FreeCol 0.11.5. The Discovery of the Pacific Ocean cannot be doe by a scout or any unit except a Ship.  In Colonization, any unit, including a Ship can discover the Pacific Ocean.
 
-[discovery_of_pacific_ocean_on_map]http://www.freecol.org/cv3-discoverer-english/images/discovery_of_pacific_ocean_on_map.jpg)
+[discovery_of_pacific_ocean_on_map](http://www.freecol.org/cv3-discoverer-english/images/discovery_of_pacific_ocean_on_map.jpg)
 
 * MOVED: Seasoned Scout SOUTH-EAST (numpad-key 3)
       One (1) tile from (38, 68) to (39, 69)
@@ -1807,7 +1807,7 @@
 
 * FREECOL ISSUE: In FreeCol 0.11.5. It is not possible to SAIL through the Magellan Strait.
 
-[magellan_strait]http://www.freecol.org/cv3-discoverer-english/images/magellan_strait.jpg)
+[magellan_strait](http://www.freecol.org/cv3-discoverer-english/images/magellan_strait.jpg)
 
 * END OF TURN
 
@@ -1840,21 +1840,21 @@
         * THEREFORE: There are no taxes placed on equipment placed on the units at the docks and then removing the said equipment (Horses, Muskets, Tools)
         * HOWEVER: If you put any Cargo, including unit equipment tax does apply if you sell it back to the crown, as it is seen as a normal transaction which includes taxation.
 
-[european_docks_taxation_00]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_00.jpg)
+[european_docks_taxation_00](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_00.jpg)
 
-[european_docks_taxation_01]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_01.jpg)
+[european_docks_taxation_01](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_01.jpg)
 
-[european_docks_taxation_02]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_02.jpg)
+[european_docks_taxation_02](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_02.jpg)
 
-[european_docks_taxation_03]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_03.jpg)
+[european_docks_taxation_03](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_03.jpg)
 
-[european_docks_taxation_04]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_04.jpg)
+[european_docks_taxation_04](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_04.jpg)
 
-[european_docks_taxation_05]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_05.jpg)
+[european_docks_taxation_05](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_05.jpg)
 
-[european_docks_taxation_06]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_06.jpg)
+[european_docks_taxation_06](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_06.jpg)
 
-[european_docks_taxation_07]http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_07.jpg)
+[european_docks_taxation_07](http://www.freecol.org/cv3-discoverer-english/images/european_docks_taxation_07.jpg)
 
 * SAILING TO THE NEW WORLD: Caravel: Indentured Servant/Pioneer
 
@@ -1871,9 +1871,9 @@
 
 * ENTERING INDIAN VILLAGE: Inca City at (35, 66): Asked to Speak with Chief, Skill: Expert Silver Miner, Trade: Tools, Trade Goods and Rum, Gift:  Tales of nearby lands
 
-[nearby_lands_00]http://www.freecol.org/cv3-discoverer-english/images/nearby_lands_00.jpg)
+[nearby_lands_00](http://www.freecol.org/cv3-discoverer-english/images/nearby_lands_00.jpg)
 
-[nearby_lands_01]http://www.freecol.org/cv3-discoverer-english/images/nearby_lands_01.jpg)
+[nearby_lands_01](http://www.freecol.org/cv3-discoverer-english/images/nearby_lands_01.jpg)
 
 * END OF TURN
 
@@ -1890,13 +1890,13 @@
 
 * FREECOL ISSUE: WWC1D - WHAT WOULD COL 1 DO? Movement Points PF#30. The MOVED of the Seasoned Scout used three (3) of the four (4) allowed movement count, leaving one (1) to go. If the Seasoned Scout activate 'no orders' and 'saves' the one (1) movement count, the Seasoned Scout DOES NOT accumulate any move. i.e. The Seasoned Scout only gets four (4) moves in Spring 1553.  THEREFORE: The movement points are not accumulated for any units on the next turn.
 
-[pf_30_scout_00]http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_00.jpg)
+[pf_30_scout_00](http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_00.jpg)
 
-[pf_30_scout_01]http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_01.jpg)
+[pf_30_scout_01](http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_01.jpg)
 
-[pf_30_scout_02]http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_02.jpg)
+[pf_30_scout_02](http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_02.jpg)
 
-[pf_30_scout_03]http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_03.jpg)
+[pf_30_scout_03](http://www.freecol.org/cv3-discoverer-english/images/pf_30_scout_03.jpg)
 
 * END OF TURN
 
@@ -1908,17 +1908,17 @@
         * The unit needs to be Sentry(ed), and      
         * There is a free hold on the ship for the unit. As there may be many units sentried waiting for transport.                    
 
-[pf_52_pioneer_00]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_00.jpg)
+[pf_52_pioneer_00](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_00.jpg)
 
-[pf_52_pioneer_01]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_01.jpg)
+[pf_52_pioneer_01](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_01.jpg)
 
-[pf_52_pioneer_02]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_02.jpg)
+[pf_52_pioneer_02](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_02.jpg)
 
-[pf_52_pioneer_03]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_03.jpg)
+[pf_52_pioneer_03](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_03.jpg)
 
-[pf_52_pioneer_04]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_04.jpg)
+[pf_52_pioneer_04](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_04.jpg)
 
-[pf_52_pioneer_05]http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_05.jpg)
+[pf_52_pioneer_05](http://www.freecol.org/cv3-discoverer-english/images/pf_52_pioneer_05.jpg)
 
 * MOVED: Caravel WEST (numpad-key 4)
       Two (2) tiles from (56, 42) to (54, 42).
@@ -1955,7 +1955,7 @@
 
 * INDIAN FOOD REQUEST: Tupi: Jamestown (53, 43), 38 of 76 food.
 
-[indian_food_request_00]http://www.freecol.org/cv3-discoverer-english/images/indian_food_request_00.jpg)
+[indian_food_request_00](http://www.freecol.org/cv3-discoverer-english/images/indian_food_request_00.jpg)
 
 * SELECTED: Give food.
 
@@ -1971,7 +1971,7 @@
 
 * TIME: Spring 1555
 
-[existing_colonies_scouted_00]http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_00.jpg)
+[existing_colonies_scouted_00](http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_00.jpg)
 
 * MOVED: Caravel NORTH-WEST (numpad-key 7)
       Three (3) tiles from (50, 39) to (47, 36).
@@ -2017,15 +2017,15 @@
 
 * LIVING AMONG THE NATIVES: Indentured Servant to Master Sugar Planter.
 
-[living_with_natives_00]http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_00.jpg)
+[living_with_natives_00](http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_00.jpg)
 
-[living_with_natives_01]http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_01.jpg)
+[living_with_natives_01](http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_01.jpg)
 
-[living_with_natives_02]http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_02.jpg)
+[living_with_natives_02](http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_02.jpg)
 
-[living_with_natives_03]http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_03.jpg)
+[living_with_natives_03](http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_03.jpg)
 
-[living_with_natives_04]http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_04.jpg)
+[living_with_natives_04](http://www.freecol.org/cv3-discoverer-english/images/living_with_natives_04.jpg)
 
 * FREECOL ISSUE: The order of the units activated are consistent with an array order of when the unit was created. FreeCol 0.11.5. displays behaviour inconsistent with this. By basing the unit ordering according to location.  EXAMPLE: The Seasoned Scout in below the Indentured Servant + Master Sugar Planter, and the Seasoned Scout would be the selected after the Indentured Servant + Master Sugar Planter.
 
@@ -2035,11 +2035,11 @@
 
 * FREECOL ISSUE: Is this co-incidence, or a result of having the Indentured Servant trained as a Master Sugar Planter? One thing is certain, I have not yet built a Rum Distillery at Jamestown.
 
-[jamestown_spring_1557]http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1557.jpg)
+[jamestown_spring_1557](http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1557.jpg)
 
 * COLONY CARGO NONE: Jamestown (53, 43): run out of Lumber.
 
-[colony_cargo_none]http://www.freecol.org/cv3-discoverer-english/images/colony_cargo_none.jpg)
+[colony_cargo_none](http://www.freecol.org/cv3-discoverer-english/images/colony_cargo_none.jpg)
 
 * COLONY CARGO NEW: Jamestown (53, 43): new Furs.
 
@@ -2063,13 +2063,13 @@
 
 * FREECOL ISSUE: Do HORSES eat CORN only and not FISH?  The following screen shot shows the FISH being consumed by the colonists before starting to eat the corn. Thereby, saving the CORN for the HORSES.  A colony without the base being plowed and many ocean squares for fishing, and flood the colony with fish, would be a better example of whether the horse do not eat the FISH.
 
-[do_horses_eat_fish_00]http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_00.jpg)
+[do_horses_eat_fish_00](http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_00.jpg)
 
-[do_horses_eat_fish_01]http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_01.jpg)
+[do_horses_eat_fish_01](http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_01.jpg)
 
 * MOVED IN COLONY: Jamestown (53, 43): Master Sugar Planter from Outside Colony to Fisherman, producing four (4) Fish
 
-[foreign_affairs_report_spring_1557]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1557.jpg)
+[foreign_affairs_report_spring_1557](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1557.jpg)
 
 * COMMENT: The foreign affairs report, in order to compare it later on in the game.
 
@@ -2096,7 +2096,7 @@
 
 * CLEAR/PLOW: The Pioneer is PLOWing the field at (52, 42).
 
-[clearing_minerals_00]http://www.freecol.org/cv3-discoverer-english/images/clearing_minerals_00.jpg)
+[clearing_minerals_00](http://www.freecol.org/cv3-discoverer-english/images/clearing_minerals_00.jpg)
 
 * COMMENT: The Pioneer may 'clear' the Minerals from this tile. Testing this.
 
@@ -2109,7 +2109,7 @@
 
 * SPIES REPORT: Burn, Iroquois, Santo Domingo
 
-[spies_report_01]http://www.freecol.org/cv3-discoverer-english/images/spies_report_01.jpg)
+[spies_report_01](http://www.freecol.org/cv3-discoverer-english/images/spies_report_01.jpg)
 
 * COMMENT: Unfortunately, the Spanish colonies are unexplored and not shown on the map.
 
@@ -2142,7 +2142,7 @@
 
 * LOADED: Jamestown / Caravel / 100 Furs
 
-[colony_jamestown_spring_1560]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_spring_1560.jpg)
+[colony_jamestown_spring_1560](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_spring_1560.jpg)
 
 * MOVED: Caravel NORTH-EAST (numpad-key 9)
       One (1) tile from Jamestown (53, 43) to (54, 42).
@@ -2189,9 +2189,9 @@
 
 * ENTERING INDIAN VILLAGE: Inca Capital at (37, 53): Asked to Speak with Chief, Skill: Expert Silver Miner, Trade: Tobacco, Trade Goods and Tools, Gift:  Tales of nearby lands
 
-[native_speak_to_chief_inca_capital_00]http://www.freecol.org/cv3-discoverer-english/images/native_speak_to_chief_inca_capital_00.jpg)
+[native_speak_to_chief_inca_capital_00](http://www.freecol.org/cv3-discoverer-english/images/native_speak_to_chief_inca_capital_00.jpg)
 
-[native_speak_to_chief_inca_capital_01]http://www.freecol.org/cv3-discoverer-english/images/native_speak_to_chief_inca_capital_01.jpg)
+[native_speak_to_chief_inca_capital_01](http://www.freecol.org/cv3-discoverer-english/images/native_speak_to_chief_inca_capital_01.jpg)
 
 * COMMENT: How the tales of nearby lands display the unexplored areas of the map.  Some previous screenshots also showed the unexplored lands after being told the tales of nearby lands.
 
@@ -2235,13 +2235,13 @@
 
 * SONS OF LIBERTY MEMBERSHIP: Sons of Liberty down to 18% (1) rebel, 82% (5) tory, from 21% (1) rebel, 79% (4) tory
 
-[jamestown_spring_1564_00]http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_00.jpg)
+[jamestown_spring_1564_00](http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_00.jpg)
 
-[jamestown_spring_1564_01]http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_01.jpg)
+[jamestown_spring_1564_01](http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_01.jpg)
 
 * COMMENT: If I place the Veteran Dragoon in Jamestown (53, 43) as well, the Sons of Liberty drops to 16% (1) rebel 84% (6) tory
 
-[jamestown_spring_1564_02]http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_02.jpg)
+[jamestown_spring_1564_02](http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1564_02.jpg)
 
 * FREECOL ISSUE: The units were selected in order of creation, rather       the behaviour shown in FreeCol 0.11.5. which the units are selected by co-ordinate positions.  In other words, the Master Distiller would have been selected before the Seasoned Scout, instead of how the Seasoned Scout was selected before the Master Distiller.
 
@@ -2249,11 +2249,11 @@
 
 * COMMENT: These are for Native Annoyance PF#34,PF#70
 
-[indian_tension_alert_00]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_00.jpg)
+[indian_tension_alert_00](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_00.jpg)
 
-[indian_tension_alert_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_01.jpg)
+[indian_tension_alert_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_01.jpg)
 
-[indian_tension_alert_02]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_02.jpg)
+[indian_tension_alert_02](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_02.jpg)
 
 * COMMENT: I took the second screenshot after taking the Master Distiller out of the colony to show there is no tension at population 5, and the Indian Tension level inceases with population so close to their Tupi Camp.
 
@@ -2285,7 +2285,7 @@
 
 * TIME: Spring 1566
 
-[existing_colonies_scouted_01]http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_01.jpg)
+[existing_colonies_scouted_01](http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_01.jpg)
 
 * COMMENT: Fort Orange population to 3 not 1 I have not sent a scout or ship near these colonies for a while.
 
@@ -2293,7 +2293,7 @@
 
 * FINISHED: The Pioneer has finished PLOWing the field and has used all his Tools and reverted to Free Colonist.
 
-[pioneer_used_all_tools_00]http://www.freecol.org/cv3-discoverer-english/images/pioneer_used_all_tools_00.jpg)
+[pioneer_used_all_tools_00](http://www.freecol.org/cv3-discoverer-english/images/pioneer_used_all_tools_00.jpg)
 
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (35, 51) to (34, 50).
@@ -2335,7 +2335,7 @@
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (30, 49) to (29, 48).
 
-[line_of_sight_00]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_00.jpg)
+[line_of_sight_00](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_00.jpg)
 
 * COMMENT: Show the line of sight of a Seasoned Scout having a line of sight of two (2) on land, but only a line of sight of one (1) on sea.
 
@@ -2352,7 +2352,7 @@
 >          take a Galleon to get this treasure
 >          back to Europe!
 
-[spies_report_02]http://www.freecol.org/cv3-discoverer-english/images/spies_report_02.jpg)
+[spies_report_02](http://www.freecol.org/cv3-discoverer-english/images/spies_report_02.jpg)
 
 * TIME: Spring 1568
 
@@ -2381,7 +2381,7 @@
 * MOVED: Seasoned Scout WEST (numpad-key 4)
       One (1) tile from (29, 46) to (28, 46).
 
-[line_of_sight_01]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_01.jpg)
+[line_of_sight_01](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_01.jpg)
 
 * COMMENT: Show the line of sight of a Seasoned Scout having a line of sight of two (2) on land, but only a line of sight of one (1) on sea or where the sea is.
 
@@ -2394,7 +2394,7 @@
 >          laden with 800 gold arrives in Seville.
 >          Spanish King pleased with booty.
 
-[spies_report_03]http://www.freecol.org/cv3-discoverer-english/images/spies_report_03.jpg)
+[spies_report_03](http://www.freecol.org/cv3-discoverer-english/images/spies_report_03.jpg)
 
 * COLONY BUILD ITEM COMPLETED: Jamestown (53, 43): Warehouse Expansion.
 
@@ -2405,7 +2405,7 @@
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       Two (2) tiles from (28, 46) to (26, 44).
 
-[line_of_sight_02]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_02.jpg)
+[line_of_sight_02](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_02.jpg)
 
 * COMMENT: Show the line of sight of a Seasoned Scout having a line of sight of two (2) on land, but only a line of sight of one (1) on sea or where the sea is.
 
@@ -2426,11 +2426,11 @@
 * MOVED: Caravel SOUTH-WEST (numpad-key 1)
       One (1) tile from (54, 42) to Jamestown (53, 43).
 
-[fortified_wagon_train_change_00]http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_00.jpg)
+[fortified_wagon_train_change_00](http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_00.jpg)
 
-[fortified_wagon_train_change_01]http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_01.jpg)
+[fortified_wagon_train_change_01](http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_01.jpg)
 
-[fortified_wagon_train_change_02]http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_02.jpg)
+[fortified_wagon_train_change_02](http://www.freecol.org/cv3-discoverer-english/images/fortified_wagon_train_change_02.jpg)
 
 * COMMENT: Shows how the wagon train becomes active while being Fortified and receiving cargo.
 
@@ -2469,11 +2469,11 @@
 
 * COMMENT: The build options for the colony are shown in the following screenshots.
 
-[build_colony_items_pop_06]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_06.jpg)
+[build_colony_items_pop_06](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_06.jpg)
 
 * COMMENT: for population of 6.
 
-[foreign_affairs_report_spring_1572]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1572.jpg)
+[foreign_affairs_report_spring_1572](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1572.jpg)
 
 * COMMENT: The foriegn affairs report, in order to compare it to before and later on in the game.
 
@@ -2489,7 +2489,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 6: Tupi Capital (49, 44)
 
-[indian_tension_alert_03]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_03.jpg)
+[indian_tension_alert_03](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_03.jpg)
 
 * COMMENT: The Tupi Capital is alarmed. By the road building exercise?
 
@@ -2500,7 +2500,7 @@
 
 * INDIAN FOOD REQUEST: Tupi: Jamestown (53, 43), 41 of 83 food. FOR: Native Food Request PF#41
 
-[indian_food_request_01]http://www.freecol.org/cv3-discoverer-english/images/indian_food_request_01.jpg)
+[indian_food_request_01](http://www.freecol.org/cv3-discoverer-english/images/indian_food_request_01.jpg)
 
 * COMMENT: It makes sense that the natives/indians do not ask for food below 60/30 as then, the indians would be thinking of giving you food "for the winter".
 
@@ -2514,7 +2514,7 @@
 
 * ARRIVED IN EUROPE: Caravel: empty.
 
-[pf_40_tax_equipment_00]http://www.freecol.org/cv3-discoverer-english/images/pf_40_tax_equipment_00.jpg)
+[pf_40_tax_equipment_00](http://www.freecol.org/cv3-discoverer-english/images/pf_40_tax_equipment_00.jpg)
 
 * COMMENT: Showing no Tax on selling back equipment.
 
@@ -2541,7 +2541,7 @@
 * MOVED: Seasoned Scout NORTH (numpad-key 8)
       One (1) tile from (27, 37) to (27, 36).
 
-[panama_location_27_36_00]http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_00.jpg)
+[panama_location_27_36_00](http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_00.jpg)
 
 * COMMENT: Is this a place for the Panama Canal? This location can have a ship enter port from the EAST (Atlantic Ocean) in a SOUTH-WESTERN direction. A ship can also enter port from the WEST (Pacific Ocean) in a NORTH-EASTERN direction.
 
@@ -2599,7 +2599,7 @@
 * MOVED: Seasoned Scout EAST (numpad-key 6)
       One (1) tile from (26, 35) to (27, 35).
 
-[panama_location_27_36_01]http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_01.jpg)
+[panama_location_27_36_01](http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_01.jpg)
 
 * COMMENT: Panama Canal surrounds North.
 
@@ -2615,7 +2615,7 @@
 * MOVED: Seasoned Scout EAST (numpad-key 6)
       One (1) tile from (28, 36) to (29, 36).
 
-[panama_location_27_36_02]http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_02.jpg)
+[panama_location_27_36_02](http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_02.jpg)
 
 * COMMENT: Panama Canal surrounds East.
 
@@ -2632,7 +2632,7 @@
 
 * FREECOL ISSUE: INCONSISTENCY WITH COLONIZATION 1. The selection of colonists from Europe: FreeCol 0.11.5. appears to display the behaviour where there is only one 'pool' of colonists to either recruit or are provided due to Religious Unrest. Colonization appears to have three (3) pools of colonists One for each 'line' of choice. or just an illusion of three (3) pools, however, the way FreeCol 0.11.5. does not keep up the illusion of three (3) pools for the recruits.
 
-[european_dock_recruit_00]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_00.jpg)
+[european_dock_recruit_00](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_00.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools
 >           (none)
@@ -2649,7 +2649,7 @@
 * MOVED: Seasoned Scout NORTH-EAST (numpad-key 9)
       One (1) tile from (29, 36) to (30, 35).
 
-[panama_location_27_36_03]http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_03.jpg)
+[panama_location_27_36_03](http://www.freecol.org/cv3-discoverer-english/images/panama_location_27_36_03.jpg)
 
 * COMMENT: Panama Canal surrounds East.
 
@@ -2659,11 +2659,11 @@
 
 * ENTERING INDIAN VILLAGE: Tupi Camp at (29, 35): Asked to Speak with Chief, Skill: Master Sugar Planter, Trade: Horses, Rum and Cigars, Gift:  Tales of nearby lands
 
-[tales_of_nearby_lands_camp_01]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_01.jpg)
+[tales_of_nearby_lands_camp_01](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_01.jpg)
 
-[tales_of_nearby_lands_camp_02]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_02.jpg)
+[tales_of_nearby_lands_camp_02](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_02.jpg)
 
-[tales_of_nearby_lands_camp_03]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_03.jpg)
+[tales_of_nearby_lands_camp_03](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_03.jpg)
 
 * BUILD ROAD: The Pioneer starts building a ROAD at (50, 42).
 
@@ -2690,7 +2690,7 @@
 >                Ship returns to Seville
 >                for repairs
 
-[spies_report_04]http://www.freecol.org/cv3-discoverer-english/images/spies_report_04.jpg)
+[spies_report_04](http://www.freecol.org/cv3-discoverer-english/images/spies_report_04.jpg)
 
 * TIME: Spring 1581
 
@@ -2712,7 +2712,7 @@
 
 * TUTORIAL: Colony insufficient food
 
-[not_producing_enough_food_tut_00]http://www.freecol.org/cv3-discoverer-english/images/not_producing_enough_food_tut_00.jpg)
+[not_producing_enough_food_tut_00](http://www.freecol.org/cv3-discoverer-english/images/not_producing_enough_food_tut_00.jpg)
 
 * MOVED IN COLONY: Jamestown (53, 43): Free Colonist from Outside Colony to Farmer, producing five (5) Food.
 
@@ -2727,11 +2727,11 @@
 >                Cherokee Capital.
 >                600 gold treasure recovered.
 
-[spies_report_05]http://www.freecol.org/cv3-discoverer-english/images/spies_report_05.jpg)
+[spies_report_05](http://www.freecol.org/cv3-discoverer-english/images/spies_report_05.jpg)
 
 * SPIES REPORT: Dutch and Spanish (peace)
 
-[foreign_affairs_message_spring_1581]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_message_spring_1581.jpg)
+[foreign_affairs_message_spring_1581](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_message_spring_1581.jpg)
 
 * PRICE CHANGE: Cloth falls to 11 gold.
 
@@ -2741,7 +2741,7 @@
 
 * COLONY BUILD ITEM START:     Jamestown (53, 43): Armory.
 
-[build_colony_items_pop_08]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_08.jpg)
+[build_colony_items_pop_08](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_08.jpg)
 
 * COMMENT: for population of 8.
 
@@ -2768,20 +2768,20 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 6: Tupi Camp (53, 45)
 
-[indian_tension_alert_04]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_04.jpg)
+[indian_tension_alert_04](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_04.jpg)
 
 * COMMENT: The Tupi Camp has a lighter green exclamation. Due to the population of 8, as the next screenshot is a population of 7.
 
 * TIME: Spring 1583
 
-[line_of_sight_03]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_03.jpg)
+[line_of_sight_03](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_03.jpg)
 
 * COMMENT: More evidence to show Seasoned Scout only has line of sight on sea-water one (1) not two (2).
 
 * MOVED: Seasoned Scout SOUTH-EAST
       One (1) tile from (33, 36) to (34, 37).
 
-[line_of_sight_04]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_04.jpg)
+[line_of_sight_04](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_04.jpg)
 
 * COMMENT: More evidence to show line of sight one (1) on sea.
 
@@ -2791,9 +2791,9 @@
 
 * ENTERING INDIAN VILLAGE: Tupi Camp at (34, 38): Asked to Speak with Chief, Skill: Master Sugar Planter, Trade: Rum, Horses and Cigars, Gift:  Tales of nearby lands
 
-[tales_of_nearby_lands_camp_04]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_04.jpg)
+[tales_of_nearby_lands_camp_04](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_04.jpg)
 
-[tales_of_nearby_lands_camp_05]http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_05.jpg)
+[tales_of_nearby_lands_camp_05](http://www.freecol.org/cv3-discoverer-english/images/tales_of_nearby_lands_camp_05.jpg)
 
 * END OF TURN
 
@@ -2803,7 +2803,7 @@
 >                in Amsterdam.
 >                Dutch king pleased.
 
-[spies_report_06]http://www.freecol.org/cv3-discoverer-english/images/spies_report_06.jpg)
+[spies_report_06](http://www.freecol.org/cv3-discoverer-english/images/spies_report_06.jpg)
 
 * INDIAN GIFT: Tupi: 8 Coats to Jamestown (53, 43)
 
@@ -2815,7 +2815,7 @@
 
 * SOLD: Europe: 100 Sugar at 4 gold and 3% tax.
 
-[european_dock_recruit_01]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_01.jpg)
+[european_dock_recruit_01](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_01.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools
 >           (none)
@@ -2825,7 +2825,7 @@
 
 * SAILING TO THE NEW WORLD: Caravel: Master Carpenter.
 
-[european_dock_options_01]http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_01.jpg)
+[european_dock_options_01](http://www.freecol.org/cv3-discoverer-english/images/european_dock_options_01.jpg)
 
 * MOVED: Seasoned Scout SOUTH-WEST (numpad-key 1)
       One (1) tile from (34, 37) to (33, 38).
@@ -2854,7 +2854,7 @@
 
 * MOVED IN COLONY: Jamestown (53, 43): Farmer from Fisherman to Farmer, producing seven (7) Food.
 
-[pf_72_00]http://www.freecol.org/cv3-discoverer-english/images/pf_72_00.jpg)
+[pf_72_00](http://www.freecol.org/cv3-discoverer-english/images/pf_72_00.jpg)
 
 * COMMENT: This 'hopefully' shows that the rebel stays even when the population increases, along with previous screenshots of the colony and Sons of Liberty membership changes.
 
@@ -2890,31 +2890,31 @@
 
 * MOVED IN COLONY: Jamestown (53, 43): Farmer from Outside Colony to Statesman, producing an additional three (3) Bells.
 
-[foreign_affairs_report_spring_1586]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1586.jpg)
+[foreign_affairs_report_spring_1586](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1586.jpg)
 
 * COMMENT: The foriegn affairs report, in order to compare it to before and later on in the game.
 
-[select_profession_spring_1586_00]http://www.freecol.org/cv3-discoverer-english/images/select_profession_spring_1586_00.jpg)
+[select_profession_spring_1586_00](http://www.freecol.org/cv3-discoverer-english/images/select_profession_spring_1586_00.jpg)
 
-[select_profession_spring_1586_01]http://www.freecol.org/cv3-discoverer-english/images/select_profession_spring_1586_01.jpg)
+[select_profession_spring_1586_01](http://www.freecol.org/cv3-discoverer-english/images/select_profession_spring_1586_01.jpg)
 
 * COMMENT: Note the inclusion of Teacher in the second image.
 
-[pf_72_01]http://www.freecol.org/cv3-discoverer-english/images/pf_72_01.jpg)
+[pf_72_01](http://www.freecol.org/cv3-discoverer-english/images/pf_72_01.jpg)
 
 * COMMENT: Rebels 16% and 1 down from 18% and 1.
 
 * INDIAN TENSION ALERT: Jamestown Population 6: Tupi Camp (53, 45)
 
-[indian_tension_alert_06]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_06.jpg)
+[indian_tension_alert_06](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_06.jpg)
 
 * COMMENT: The Tupi Camp has a second green exclaimation.  Due to the population of 9.
 
-[indian_tension_alert_07]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_07.jpg)
+[indian_tension_alert_07](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_07.jpg)
 
 * COMMENT: Shows the camp in the left hand side information.
 
-[indian_tension_alert_08]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_08.jpg)
+[indian_tension_alert_08](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_08.jpg)
 
 * COMMENT: Shows the capital in the left hand side information.
 
@@ -2967,59 +2967,59 @@
 
 * SPIES REPORT: Loot+Burn, Spanish, Cherokee Village, 300 gold
 
-[spies_report_07]http://www.freecol.org/cv3-discoverer-english/images/spies_report_07.jpg)
+[spies_report_07](http://www.freecol.org/cv3-discoverer-english/images/spies_report_07.jpg)
 
 * CONTINENTAL CONGRESS JOINED: Francisco Coronado.
 
-[pf_83_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_00.jpg)
+[pf_83_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_00.jpg)
 
-[pf_83_spring_1589_01]http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_01.jpg)
+[pf_83_spring_1589_01](http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_01.jpg)
 
-[pf_83_spring_1589_02]http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_02.jpg)
+[pf_83_spring_1589_02](http://www.freecol.org/cv3-discoverer-english/images/pf_83_spring_1589_02.jpg)
 
 * COMMENT: The first screenshot is a later view of the Dutch colonies shown earlier.
 
-[existing_colonies_scouted_00]http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_00.jpg)
+[existing_colonies_scouted_00](http://www.freecol.org/cv3-discoverer-english/images/existing_colonies_scouted_00.jpg)
 
 * COMMENT: The Foriegn Affairs screenshots. Not only show how many colonists in total the Nation has, but also how many are rebels.
 
-[foreign_affairs_report_spring_1589]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1589.jpg)
+[foreign_affairs_report_spring_1589](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1589.jpg)
 
 * COMMENT: The colony at Fort Orange is still showing a population of 3. refer to pf_83_spring_1589_00.jpg
 
-[continental_congress_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_00.jpg)
+[continental_congress_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_00.jpg)
 
 * COMMENT: The REF is pictured in this shot (15 soldiers, 5 Dragoons, 2 Artillery, 2 Man of War)
 
 * COMMENT: The following Screenshots are from the Reports menu. These screenshots are from before and are not copies.
 
-[terrain_information]http://www.freecol.org/cv3-discoverer-english/images/terrain_information.jpg)
+[terrain_information](http://www.freecol.org/cv3-discoverer-english/images/terrain_information.jpg)
 
-[religious_adviser_spring_1589]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1589.jpg)
+[religious_adviser_spring_1589](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1589.jpg)
 
-[continental_congress_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_00.jpg)
+[continental_congress_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_00.jpg)
 
-[continental_congress_spring_1589_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_01.jpg)
+[continental_congress_spring_1589_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1589_01.jpg)
 
-[labor_adviser_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1589_00.jpg)
+[labor_adviser_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1589_00.jpg)
 
-[labor_adviser_spring_1589_01]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1589_01.jpg)
+[labor_adviser_spring_1589_01](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1589_01.jpg)
 
-[economic_adivser_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1589_00.jpg)
+[economic_adivser_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1589_00.jpg)
 
-[economic_adivser_spring_1589_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1589_01.jpg)
+[economic_adivser_spring_1589_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1589_01.jpg)
 
-[colony_adviser_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1589_00.jpg)
+[colony_adviser_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1589_00.jpg)
 
-[colony_adviser_spring_1589_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1589_01.jpg)
+[colony_adviser_spring_1589_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1589_01.jpg)
 
-[naval_adviser_spring_1589_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1589_00.jpg)
+[naval_adviser_spring_1589_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1589_00.jpg)
 
-[foreign_affairs_report_spring_1589]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1589.jpg)
+[foreign_affairs_report_spring_1589](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1589.jpg)
 
-[indian_adviser_spring_1589]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spring_1589.jpg)
+[indian_adviser_spring_1589](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spring_1589.jpg)
 
-[colonization_score_spring_1589]http://www.freecol.org/cv3-discoverer-english/images/colonization_score_spring_1589.jpg)
+[colonization_score_spring_1589](http://www.freecol.org/cv3-discoverer-english/images/colonization_score_spring_1589.jpg)
 
 * TIME: Spring 1589
 
@@ -3040,7 +3040,7 @@
 
 * ARRIVED IN EUROPE: Caravel: 100 Sugar.
 
-[european_dock_recruit_02]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_02.jpg)
+[european_dock_recruit_02](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_02.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders, Master Carpenters   to Indentured Servants, Expert Farmers
 
@@ -3056,15 +3056,15 @@
 
 * COMMENT: The following Screenshots are from the Reports menu
 
-[religious_adviser_spring_1590]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1590.jpg)
+[religious_adviser_spring_1590](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1590.jpg)
 
-[continental_congress_spring_1590_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1590_00.jpg)
+[continental_congress_spring_1590_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1590_00.jpg)
 
-[continental_congress_spring_1590_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1590_01.jpg)
+[continental_congress_spring_1590_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1590_01.jpg)
 
-[naval_adviser_spring_1590]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1590.jpg)
+[naval_adviser_spring_1590](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1590.jpg)
 
-[foreign_affairs_report_spring_1590]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1590.jpg)
+[foreign_affairs_report_spring_1590](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1590.jpg)
 
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (43, 39) to (42, 38).
@@ -3085,17 +3085,17 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[jamestown_spring_1591]http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1591.jpg)
+[jamestown_spring_1591](http://www.freecol.org/cv3-discoverer-english/images/jamestown_spring_1591.jpg)
 
-[religious_adviser_spring_1591]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1591.jpg)
+[religious_adviser_spring_1591](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1591.jpg)
 
-[continental_congress_spring_1591_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1591_00.jpg)
+[continental_congress_spring_1591_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1591_00.jpg)
 
-[continental_congress_spring_1591_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1591_01.jpg)
+[continental_congress_spring_1591_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1591_01.jpg)
 
-[naval_adviser_spring_1591]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1591.jpg)
+[naval_adviser_spring_1591](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1591.jpg)
 
-[foreign_affairs_report_spring_1591]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1591.jpg)
+[foreign_affairs_report_spring_1591](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1591.jpg)
 
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (42, 38) to (41, 37).
@@ -3115,21 +3115,21 @@
 
 * COMMENT: There is no indian_tension_alert_09.jpg
 
-[indian_tension_alert_10]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_10.jpg)
+[indian_tension_alert_10](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_10.jpg)
 
 * COMMENT: The Tupi Camp now has change from two (2) green exclamation marks to two (2) blue exclamation marks.
  
 * COMMENT: The following Screenshots are from the Reports menu
 
-[religious_adviser_spring_1592]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1592.jpg)
+[religious_adviser_spring_1592](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1592.jpg)
 
-[continental_congress_spring_1592_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1592_00.jpg)
+[continental_congress_spring_1592_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1592_00.jpg)
 
-[continental_congress_spring_1592_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1592_01.jpg)
+[continental_congress_spring_1592_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1592_01.jpg)
 
-[naval_adviser_spring_1592]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1592.jpg)
+[naval_adviser_spring_1592](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1592.jpg)
 
-[foreign_affairs_report_spring_1592]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1592.jpg)
+[foreign_affairs_report_spring_1592](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1592.jpg)
 
 * ARRIVED FROM EUROPE: Caravel: Jesuit Missionary.
 
@@ -3168,15 +3168,15 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_spring_1593]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1593.jpg)
+[religious_adviser_spring_1593](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1593.jpg)
 
-[continental_congress_spring_1593_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1593_00.jpg)
+[continental_congress_spring_1593_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1593_00.jpg)
 
-[continental_congress_spring_1593_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1593_01.jpg)
+[continental_congress_spring_1593_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1593_01.jpg)
 
-[naval_adviser_spring_1593]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1593.jpg)
+[naval_adviser_spring_1593](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1593.jpg)
 
-[foreign_affairs_report_spring_1593]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1593.jpg)
+[foreign_affairs_report_spring_1593](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1593.jpg)
 
 * MOVED: Caravel NORTH-EAST (numpad-key 9)
       One (1) tile from Jamestown (53, 43) to (54, 42).
@@ -3211,9 +3211,9 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_spring_1594]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1594.jpg)
+[religious_adviser_spring_1594](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1594.jpg)
 
-[continental_congress_spring_1594_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1594_00.jpg)
+[continental_congress_spring_1594_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1594_00.jpg)
 
 * END OF TURN
 
@@ -3227,7 +3227,7 @@
 
 * ARRIVED IN EUROPE: Caravel: 100 Sugar.
 
-[european_dock_recruit_03]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_03.jpg)
+[european_dock_recruit_03](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_03.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers, Master Carpenters to Indentured Servants, Expert Farmers
 
@@ -3239,7 +3239,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 10: Tupi Camp (53, 45).
 
-[indian_tension_alert_11]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_11.jpg)
+[indian_tension_alert_11](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_11.jpg)
 
 * COMMENT: The Tupi Camp now has changed from two (2) blue exclamation marks to two (2) green exclamation marks. after the Camp gave gift.
 
@@ -3264,7 +3264,7 @@
 >           "We offer you 195 gold in compensation."
 >           "I'm sorry, but this road is necessary."
 
-[indian_land_build_spring_1585]http://www.freecol.org/cv3-discoverer-english/images/indian_land_build_spring_1585.jpg)
+[indian_land_build_spring_1585](http://www.freecol.org/cv3-discoverer-english/images/indian_land_build_spring_1585.jpg)
 
 * SELECTED: "Then we shall not build a road, friend."
 
@@ -3283,15 +3283,15 @@
 
 * INDIAN TENSION ALERT: Jamestown population 10. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train from Tupi Capital (49, 44)
 
-[indian_tension_alert_12_spring_1596]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_12_spring_1596.jpg)
+[indian_tension_alert_12_spring_1596](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_12_spring_1596.jpg)
 
 * COMMENT: The Tupi Capital now has changed from one (1) blue exclamation mark to one (1) brown exclamation mark. perhaps by Fortifying the Seasoned Scout.
 
-[indian_tension_alert_23_spring_1596_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_23_spring_1596_01.jpg)
+[indian_tension_alert_23_spring_1596_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_23_spring_1596_01.jpg)
 
 * COMMENT: The Tupi Camp (53, 45) has not changed from two (2) green exclamation marks.
 
-[indian_tension_alert_23_spring_1596_02]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_23_spring_1596_02.jpg)
+[indian_tension_alert_23_spring_1596_02](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_23_spring_1596_02.jpg)
 
 * COMMENT: The Tupi Camp (50, 48) has changed to one (1) green exclamation mark.
 
@@ -3324,7 +3324,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 10. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train from Tupi Camp (50, 48)
 
-[indian_tension_alert_spring_1598]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1598.jpg)
+[indian_tension_alert_spring_1598](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1598.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) now has changed from one (1) blue exclamation mark to one (1) brown exclamation mark. perhaps by Fortifying the Seasoned Scout.
 
@@ -3343,7 +3343,7 @@
 
 * FREECOL ISSUE: INCONSISTENCY WITH COLONIZATION 1. FreeCol 0.11.5. only gives an assign trade route.
 
-[trade_route_menu]http://www.freecol.org/cv3-discoverer-english/images/trade_route_menu.jpg)
+[trade_route_menu](http://www.freecol.org/cv3-discoverer-english/images/trade_route_menu.jpg)
 
 * NOT MOVED: Master Carpenter at Jamestown (53, 43).
 
@@ -3380,7 +3380,7 @@
 
 * END OF TURN
 
-[help_time_scale]http://www.freecol.org/cv3-discoverer-english/images/help_time_scale.jpg)
+[help_time_scale](http://www.freecol.org/cv3-discoverer-english/images/help_time_scale.jpg)
 
 * SCREEN: Time scale help
 >          Colonization Help: Time Scale
@@ -3396,7 +3396,7 @@
 
 * ARRIVED IN EUROPE: Caravel: 100 Sugar.
 
-[european_dock_recruit_04]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_04.jpg)
+[european_dock_recruit_04](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_04.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers, Master Carpenters to Indentured Servants to Indentured Servants, Expert Farmers
 
@@ -3408,7 +3408,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 10. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train.
 
-[indian_tension_alert_autumn_1600]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_autumn_1600.jpg)
+[indian_tension_alert_autumn_1600](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_autumn_1600.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark.
 
@@ -3432,7 +3432,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 10. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train.
 
-[indian_tension_alert_spring_1601]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1601.jpg)
+[indian_tension_alert_spring_1601](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1601.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown exclamation mark to one (1) green exclamation mark after the food request and gift.
 
@@ -3469,9 +3469,9 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_autumn_1601]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_autumn_1601.jpg)
+[religious_adviser_autumn_1601](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_autumn_1601.jpg)
 
-[continental_congress_autumn_1601_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_autumn_1601_00.jpg)
+[continental_congress_autumn_1601_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_autumn_1601_00.jpg)
 
 * END OF TURN
 
@@ -3488,9 +3488,9 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1602_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1602_spring.jpg)
+[religious_adviser_1602_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1602_spring.jpg)
 
-[continental_congress_1602_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1602_spring_00.jpg)
+[continental_congress_1602_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1602_spring_00.jpg)
 
 * END OF TURN
 
@@ -3519,7 +3519,7 @@
 
 * MOVED IN COLONY: Plymouth (51, 41): Master Carpenter from Silver Miner to Lumberjack producing six (6) lumber.
 
-[plymouth_1602_autumn]http://www.freecol.org/cv3-discoverer-english/images/plymouth_1602_autumn.jpg)
+[plymouth_1602_autumn](http://www.freecol.org/cv3-discoverer-english/images/plymouth_1602_autumn.jpg)
 
 * COMMENT: Showing the Plymouth colony after initial build.
 
@@ -3549,13 +3549,13 @@
 >           Kiss pinky ring.
 >           Hold 'Jamestown Tools Party.'
 
-[tax_increase_1602_autumn]http://www.freecol.org/cv3-discoverer-english/images/tax_increase_1602_autumn.jpg)
+[tax_increase_1602_autumn](http://www.freecol.org/cv3-discoverer-english/images/tax_increase_1602_autumn.jpg)
 
 * TIME: Spring 1603
 
 * INDIAN TENSION ALERT: Jamestown Population 10. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train.
 
-[indian_tension_alert_spring_1603]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1603.jpg)
+[indian_tension_alert_spring_1603](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_spring_1603.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green exclamation mark
 
@@ -3565,9 +3565,9 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_spring_1603]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1603.jpg)
+[religious_adviser_spring_1603](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1603.jpg)
 
-[continental_congress_spring_1603_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1603_00.jpg)
+[continental_congress_spring_1603_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1603_00.jpg)
 
 * BUILD ROAD: The Pioneer starts building a ROAD at (48, 42).
 
@@ -3583,7 +3583,7 @@
 
 * ARRIVED IN EUROPE: Caravel: empty.
 
-[european_dock_recruit_05]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_05.jpg)
+[european_dock_recruit_05](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_05.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers to Petty Criminals Master Carpenters to Indentured Servants to Indentured Servants, Expert Farmers
 
@@ -3591,29 +3591,29 @@
 
 * SONS OF LIBERTY MEMBERSHIP: Jamestown (53, 43): up to 30%.
 
-[jamestown_1603_autumn]http://www.freecol.org/cv3-discoverer-english/images/jamestown_1603_autumn.jpg)
+[jamestown_1603_autumn](http://www.freecol.org/cv3-discoverer-english/images/jamestown_1603_autumn.jpg)
 
 * COMMENT: Shows three (3) rebels in Jamestown (53, 43).
 
-[plymouth_1603_autumn]http://www.freecol.org/cv3-discoverer-english/images/plymouth_1603_autumn.jpg)
+[plymouth_1603_autumn](http://www.freecol.org/cv3-discoverer-english/images/plymouth_1603_autumn.jpg)
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1603_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1603_autumn.jpg)
+[religious_adviser_1603_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1603_autumn.jpg)
 
-[continental_congress_1603_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1603_autumn_00.jpg)
+[continental_congress_1603_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1603_autumn_00.jpg)
 
-[foreign_affairs_report_1603_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1603_autumn.jpg)
+[foreign_affairs_report_1603_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1603_autumn.jpg)
 
 * COMMENT: Fellow European Colonies.
 
-[pf_83_1603_autumn_dutch]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_dutch.jpg)
+[pf_83_1603_autumn_dutch](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_dutch.jpg)
 
-[pf_83_1603_autumn_french]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_french.jpg)
+[pf_83_1603_autumn_french](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_french.jpg)
 
-[pf_83_1603_autumn_spanish]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_spanish.jpg)
+[pf_83_1603_autumn_spanish](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_spanish.jpg)
 
-[pf_83_1603_autumn_spanish_01]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_spanish_01.jpg)
+[pf_83_1603_autumn_spanish_01](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1603_autumn_spanish_01.jpg)
 
 * FREECOL ISSUE: Draw your own conclusions.  The Spanish and French have only one (1) rebel, according to the foreign affairs report.  Their colonies show population of 1.  Or wait for more evidence.  When scouting (enter the colony).
 
@@ -3641,7 +3641,7 @@
 
 * COLONY BUILD ITEM START:     Jamestown (53, 43): Newspaper.
 
-[build_colony_items_pop_10]http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_10.jpg)
+[build_colony_items_pop_10](http://www.freecol.org/cv3-discoverer-english/images/build_colony_items_pop_10.jpg)
 
 * COMMENT: for population of 10.
 
@@ -3657,11 +3657,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1604_autumn.jpg)
+[religious_adviser_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1604_autumn.jpg)
 
-[continental_congress_1604_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1604_autumn_00.jpg)
+[continental_congress_1604_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1604_autumn_00.jpg)
 
-[foreign_affairs_report_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1604_autumn.jpg)
+[foreign_affairs_report_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1604_autumn.jpg)
 
 * MOVED: Wagon Train One (1) NORTH-WEST (numpad-key 7)
       Two (2) tiles from Jamestown (53, 43) to Plymouth (51, 41).
@@ -3674,7 +3674,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train. Plymouth Population  1.
 
-[indian_tension_alert_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1604_autumn.jpg)
+[indian_tension_alert_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1604_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green exclamation mark to one (1) light blue exclamation mark.
 
@@ -3684,9 +3684,9 @@
 
 * COMMENT: Screenshots of Jamestown and Plymouth.
 
-[colony_jamestown_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1604_autumn.jpg)
+[colony_jamestown_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1604_autumn.jpg)
 
-[colony_plymouth_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1604_autumn.jpg)
+[colony_plymouth_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1604_autumn.jpg)
 
 * END OF TURN
 
@@ -3704,13 +3704,13 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1605_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1605_spring.jpg)
+[religious_adviser_1605_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1605_spring.jpg)
 
-[continental_congress_1605_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_spring_00.jpg)
+[continental_congress_1605_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_spring_00.jpg)
 
-[continental_congress_1605_spring_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_spring_01.jpg)
+[continental_congress_1605_spring_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_spring_01.jpg)
 
-[foreign_affairs_report_1605_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1605_spring.jpg)
+[foreign_affairs_report_1605_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1605_spring.jpg)
 
 * MOVED: Caravel NORTH-EAST (numpad-key 9)
       One (1) tile from Jamestown (53, 43) to (54, 42).
@@ -3745,7 +3745,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train. Plymouth Population  1.
 
-[indian_tension_alert_1604_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1604_autumn.jpg)
+[indian_tension_alert_1604_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1604_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) light blue exclamation mark.
 
@@ -3755,11 +3755,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1605_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1605_autumn.jpg)
+[religious_adviser_1605_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1605_autumn.jpg)
 
-[continental_congress_1605_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_autumn_00.jpg)
+[continental_congress_1605_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1605_autumn_00.jpg)
 
-[foreign_affairs_report_1605_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1605_autumn.jpg)
+[foreign_affairs_report_1605_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1605_autumn.jpg)
 
 * LOADED: Plymouth / Wagon Train / 12 Sugar
 
@@ -3774,7 +3774,7 @@
 
 * ARRIVED IN EUROPE: Caravel: empty.
 
-[european_dock_recruit_06]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_06.jpg)
+[european_dock_recruit_06](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_06.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers to Petty Criminals, Master Carpenters to Indentured Servants to Indentured Servants, Expert Farmers to Free Colonists.
 
@@ -3791,7 +3791,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train. Plymouth Population  1.
 
-[indian_tension_alert_1606_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1606_spring.jpg)
+[indian_tension_alert_1606_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1606_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light blue exclamation mark to one (1) (light) yellow exclamation mark.
 
@@ -3821,7 +3821,7 @@
 >          empire, and you interfere with us at your
 >          peril."
 
-[meeting_fellow_europeans_msg_1606_autumn]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn.jpg)
+[meeting_fellow_europeans_msg_1606_autumn](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn.jpg)
 
 * DIALOG:
 >         "Although the English do not properly belong in this
@@ -3835,7 +3835,7 @@
 >          swine?"
 >          "We suggest an alliance."
 
-[meeting_fellow_europeans_msg_1606_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_01.jpg)
+[meeting_fellow_europeans_msg_1606_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_01.jpg)
 
 * SELECTED: "We suggest an alliance."
 
@@ -3844,7 +3844,7 @@
 >            Incas
 >            Tupi
 
-[meeting_fellow_europeans_msg_1606_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_02.jpg)
+[meeting_fellow_europeans_msg_1606_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_02.jpg)
 
 * SELECTED: Incas
 
@@ -3854,7 +3854,7 @@
 >           Pay 1400 gold.
 >           Never mind
 
-[meeting_fellow_europeans_msg_1606_autumn_03]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_03.jpg)
+[meeting_fellow_europeans_msg_1606_autumn_03](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_msg_1606_autumn_03.jpg)
 
 * SELECTED: Never Mind
 
@@ -3866,7 +3866,7 @@
 
 * EQUIPPED: Plymouth (51, 41): Free Colonist with 100 Tools to Pioneer
 
-[colonies_1606_autumn]http://www.freecol.org/cv3-discoverer-english/images/colonies_1606_autumn.jpg)
+[colonies_1606_autumn](http://www.freecol.org/cv3-discoverer-english/images/colonies_1606_autumn.jpg)
 
 * COMMENT: Showing the Dutch Dragoon.
 
@@ -3884,7 +3884,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Wagon Train. Plymouth Population  1.
 
-[indian_tension_alert_1607_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_spring.jpg)
+[indian_tension_alert_1607_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) (light) yellow exclamation mark.
 
@@ -3932,7 +3932,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 10. Fortified: two (2) Veteran Dragoons. one (1) Seasoned Scout. Plymouth Population  1.
 
-[indian_tension_alert_1607_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_autumn.jpg)
+[indian_tension_alert_1607_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) (light) yellow exclamation mark to one (1) red exclamation mark.
 
@@ -3981,25 +3981,25 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1608_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1608_spring.jpg)
+[religious_adviser_1608_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1608_spring.jpg)
 
-[continental_congress_1608_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1608_spring_00.jpg)
+[continental_congress_1608_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1608_spring_00.jpg)
 
-[foreign_affairs_report_1608_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1608_spring.jpg)
+[foreign_affairs_report_1608_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1608_spring.jpg)
 
 * COMMENT: The following Screenshots are of Colonies to compare the amount of Crosses and Liberty Bells in production, to whether net or gross Crosses and Liberty Bells are used in Religious Unrest and Founding Fathers.
 
-[colony_jamestown_1608_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1608_spring.jpg)
+[colony_jamestown_1608_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1608_spring.jpg)
 
-[colony_plymouth_1608_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1608_spring.jpg)
+[colony_plymouth_1608_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1608_spring.jpg)
 
 * COMMENT: The following Screenshot shows the Goods Price Differences PF#28 later on in the game. Compare it to the previous screenshot: european_docks_status_screen_start_01.jpg
 
-[european_docks_status_screen_1608_spring]http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_1608_spring.jpg)
+[european_docks_status_screen_1608_spring](http://www.freecol.org/cv3-discoverer-english/images/european_docks_status_screen_1608_spring.jpg)
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout. Plymouth Population  2.
 
-[indian_tension_alert_1607_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_autumn.jpg)
+[indian_tension_alert_1607_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1607_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red exclamation mark to one (1) (light) red exclamation mark.
 
@@ -4026,7 +4026,7 @@
 
 * ARRIVED IN EUROPE: Caravel: 100 Sugar.
 
-[european_dock_recruit_07]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_07.jpg)
+[european_dock_recruit_07](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_07.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers to Petty Criminals, Master Carpenters to Indentured Servants to Indentured Servants, Expert Farmers to Free Colonists to Free Colonists
 
@@ -4040,17 +4040,17 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1608_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1608_autumn.jpg)
+[religious_adviser_1608_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1608_autumn.jpg)
 
-[continental_congress_1608_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1608_autumn_00.jpg)
+[continental_congress_1608_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1608_autumn_00.jpg)
 
-[foreign_affairs_report_1608_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1608_autumn.jpg)
+[foreign_affairs_report_1608_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1608_autumn.jpg)
 
 * COMMENT: The following Screenshots are of Colonies to compare the amount of Crosses and Liberty Bells in production, to whether net or gross Crosses and Liberty Bells are used in Religious Unrest and Founding Fathers.
 
-[colony_jamestown_1608_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1608_autumn.jpg)
+[colony_jamestown_1608_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1608_autumn.jpg)
 
-[colony_plymouth_1608_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1608_autumn.jpg)
+[colony_plymouth_1608_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1608_autumn.jpg)
 
 * NOT MOVED: Wagon Train at Plymouth (51, 41).
 
@@ -4070,7 +4070,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout. Plymouth Population  2.
 
-[indian_tension_alert_1609_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1609_spring.jpg)
+[indian_tension_alert_1609_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1609_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) (light) red exclamation mark.
 
@@ -4096,11 +4096,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1609_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1609_autumn.jpg)
+[religious_adviser_1609_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1609_autumn.jpg)
 
-[continental_congress_1609_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1609_autumn_00.jpg)
+[continental_congress_1609_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1609_autumn_00.jpg)
 
-[foreign_affairs_report_1609_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1609_autumn.jpg)
+[foreign_affairs_report_1609_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1609_autumn.jpg)
 
 * COMMENT: The report screens do not show the 'date'.  This could be updated in FreeCol to show the 'date'?
 
@@ -4109,7 +4109,7 @@
 * MOVED: Free Colonist NORTH-EAST (numpad-key 7)
       Two (2) tiles from Plymouth  (51, 41) to Jamestown (53, 43).
 
-[colonist_lose_no_movement_point_at_colony]http://www.freecol.org/cv3-discoverer-english/images/colonist_lose_no_movement_point_at_colony.jpg)
+[colonist_lose_no_movement_point_at_colony](http://www.freecol.org/cv3-discoverer-english/images/colonist_lose_no_movement_point_at_colony.jpg)
 
 * COMMENT: Note the colonist does not lose any movement points when reaching a colony.  On the right hand side of the screen, where the icon of the Free Colonist is, it says "Moves: 1/3".
 
@@ -4124,7 +4124,7 @@
 >          that your colonies are beginning to
 >          overuse the lands near our settlements.
 
-[indians_concerned_1609_autumn]http://www.freecol.org/cv3-discoverer-english/images/indians_concerned_1609_autumn.jpg)
+[indians_concerned_1609_autumn](http://www.freecol.org/cv3-discoverer-english/images/indians_concerned_1609_autumn.jpg)
 
 * PRICE CHANGE: Rum rises to 15 gold.
 
@@ -4136,7 +4136,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout. Plymouth Population  2.
 
-[indian_tension_alert_1610_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1610_spring.jpg)
+[indian_tension_alert_1610_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1610_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light red exclamation mark to one (1) light green exclamation mark. Due to message about their concern.
 
@@ -4167,11 +4167,11 @@
 
 * INDIAN RAID: Tupi, Plymouth, kills Pioneer
 
-[indian_raid_00]http://www.freecol.org/cv3-discoverer-english/images/indian_raid_00.jpg)
+[indian_raid_00](http://www.freecol.org/cv3-discoverer-english/images/indian_raid_00.jpg)
 
-[indian_raid_1610_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1610_spring.jpg)
+[indian_raid_1610_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1610_spring.jpg)
 
-[indian_ambush_1610_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_ambush_1610_spring.jpg)
+[indian_ambush_1610_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_ambush_1610_spring.jpg)
 
 * COMMENT: The raid appears to be from the Camp (50, 48).
 
@@ -4197,7 +4197,7 @@
 
 * INDIAN TENSION ALERT: Jamestown Population 11. Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout. Plymouth Population  2 (now 3).
 
-[indian_tension_alert_1610_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1610_autumn.jpg)
+[indian_tension_alert_1610_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1610_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) light green exclamation mark.
 
@@ -4215,7 +4215,7 @@
 
 * ARRIVED IN EUROPE: Caravel: empty.
 
-[european_dock_recruit_08]http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_08.jpg)
+[european_dock_recruit_08](http://www.freecol.org/cv3-discoverer-english/images/european_dock_recruit_08.jpg)
 
 * COMMENT: This screenshot shows the three (3) recruitment pools: (none), Jesuit Missionaries to Master Fur Traders to Firebrand Preachers to Petty Criminals to Free Colonists, Master Carpenters to Indentured Servants to Indentured Servants, Expert Farmers to Free Colonists to Free Colonists
 
@@ -4241,7 +4241,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 11: Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout. Plymouth Population  2 (now 3).
 
-[indian_tension_alert_1612_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1612_spring.jpg)
+[indian_tension_alert_1612_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1612_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light green exclamation mark to one (1) light blue exclamation mark.
 
@@ -4258,7 +4258,7 @@
 
 * COMMENT: Selecting the Petty Criminal makes the Petty Criminal sprite appear (and blink) on (54, 42) where the Caravels sprite is, and the Caravel sprite disappears.
 
-[select_petty_criminal_caravel]http://www.freecol.org/cv3-discoverer-english/images/select_petty_criminal_caravel.jpg)
+[select_petty_criminal_caravel](http://www.freecol.org/cv3-discoverer-english/images/select_petty_criminal_caravel.jpg)
 
 * MOVED: Caravel SOUTH-WEST (numpad-key 1)
       One (1) tile from (54, 42) to Jamestown (53, 43).
@@ -4298,7 +4298,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Crimimal, one (1) Seasoned Scout, one (1) Scout/Indentured Servant.  Plymouth Population  3.
 
-[indian_tension_alert_1612_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1612_autumn.jpg)
+[indian_tension_alert_1612_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1612_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light blue exclamation mark to one (1) blue exclamation mark.
 
@@ -4333,7 +4333,7 @@
 
 * COMMENT: This brings the four (4) Food/Corn to be the 'excess' Food.
 
-[colony_plymouth_1613_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1613_spring.jpg)
+[colony_plymouth_1613_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1613_spring.jpg)
 
 * MOVED: Dragoon/Petty Criminal NORTH-WEST (numpad-key 7)
       Two (2) tiles from Jamestown (53, 43) to   Plymouth  (51, 41).
@@ -4358,7 +4358,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Scout/Indentured Servant. Plymouth Population  4: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1613_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1613_autumn.jpg)
+[indian_tension_alert_1613_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1613_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue exclamation mark to one (1) brown exclamation mark.
 
@@ -4378,7 +4378,7 @@
 >           Man the stockade.
 >           Hand them over.
 
-[indian_demand_1613_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_demand_1613_autumn.jpg)
+[indian_demand_1613_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_demand_1613_autumn.jpg)
 
 * SELECTED: Man the stockade.
 
@@ -4386,7 +4386,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Scout/Indentured Servant.  Plymouth Population  4, Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1614_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1614_spring.jpg)
+[indian_tension_alert_1614_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1614_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark.
 
@@ -4400,13 +4400,13 @@
 
 * INDIAN RAID: Tupi, Jamestown, defeated
 
-[indian_raid_1614_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1614_spring.jpg)
+[indian_raid_1614_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1614_spring.jpg)
 
-[pf_73_combat_analysis_1614_spring]http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1614_spring.jpg)
+[pf_73_combat_analysis_1614_spring](http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1614_spring.jpg)
 
 * COMMENT: There is no terrain bonus for Colony Defence. PF#73 The Stockade/Fort/Fortress are the bonus for defence.
 
-[indian_raid_1614_spring_colony_win]http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1614_spring_colony_win.jpg)
+[indian_raid_1614_spring_colony_win](http://www.freecol.org/cv3-discoverer-english/images/indian_raid_1614_spring_colony_win.jpg)
 
 * PRICE CHANGE: Rum rises to 15 gold.
 
@@ -4455,7 +4455,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons, one (1) Seasoned Scout, one (1) Scout/Indentured Servant.  Plymouth Population  4: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1615_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1615_spring.jpg)
+[indian_tension_alert_1615_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1615_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark.
 
@@ -4482,7 +4482,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons.  Plymouth Population  5: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1615_spring_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1615_spring_01.jpg)
+[indian_tension_alert_1615_spring_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1615_spring_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark.
 
@@ -4519,7 +4519,7 @@
 
 * REF INCREASE: Artillery.
 
-[ref_increase_1615_autumn]http://www.freecol.org/cv3-discoverer-english/images/ref_increase_1615_autumn.jpg)
+[ref_increase_1615_autumn](http://www.freecol.org/cv3-discoverer-english/images/ref_increase_1615_autumn.jpg)
 
 * TIME: Autumn 1615
 
@@ -4537,20 +4537,20 @@
 
 * LOST CITY RUMOUR: Fountain of Youth (7 colonists)
 
-[fountain_of_youth_1615_autumn]http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn.jpg)
+[fountain_of_youth_1615_autumn](http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn.jpg)
 
-[fountain_of_youth_1615_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_01.jpg)
+[fountain_of_youth_1615_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_01.jpg)
 
-[fountain_of_youth_1615_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_02.jpg)
+[fountain_of_youth_1615_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_02.jpg)
 
-[fountain_of_youth_1615_autumn_europe]http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_europe.jpg)
+[fountain_of_youth_1615_autumn_europe](http://www.freecol.org/cv3-discoverer-english/images/fountain_of_youth_1615_autumn_europe.jpg)
 
 * COMMENT: Seven (7) colonists were selectable for the fountain of youth. A Master Carpenter was already waiting due to religious unrest.
 
 * MOVED: Scout WEST (numpad-key 4)
       One (1) tile from (50, 41) to (49, 41).
 
-[english_colonies_1615_autumn]http://www.freecol.org/cv3-discoverer-english/images/english_colonies_1615_autumn.jpg)
+[english_colonies_1615_autumn](http://www.freecol.org/cv3-discoverer-english/images/english_colonies_1615_autumn.jpg)
 
 * COMMENT: Indian ambush?
 
@@ -4583,23 +4583,23 @@
 
 * SONS OF LIBERTY MEMBERSHIP: Jamestown (53, 43): up to 50%.
 
-[colony_jamestown_1616_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1616_spring.jpg)
+[colony_jamestown_1616_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1616_spring.jpg)
 
-[colony_plymouth_1616_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1616_spring.jpg)
+[colony_plymouth_1616_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1616_spring.jpg)
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1616_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1616_spring.jpg)
+[religious_adviser_1616_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1616_spring.jpg)
 
-[continental_congress_1616_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1616_spring_00.jpg)
+[continental_congress_1616_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1616_spring_00.jpg)
 
-[continental_congress_1616_spring_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1616_spring_01.jpg)
+[continental_congress_1616_spring_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1616_spring_01.jpg)
 
-[foreign_affairs_report_1616_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1616_spring.jpg)
+[foreign_affairs_report_1616_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1616_spring.jpg)
 
 * INDIAN TENSION ALERT:  Jamestown Population 10: Fortified: two (2) Veteran Dragoons. Plymouth Population  5: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1616_spring_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1616_spring_01.jpg)
+[indian_tension_alert_1616_spring_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1616_spring_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown exclamation mark to one (1) blue exclamation mark.
 
@@ -4712,7 +4712,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 11: Fortified: two (2) Veteran Dragoons.  Plymouth Population  7: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1617_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1617_autumn.jpg)
+[indian_tension_alert_1617_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1617_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue exclamation mark to one (1) yellow exclamation mark.
 
@@ -4787,7 +4787,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 11: Fortified: two (2) Veteran Dragoons. Plymouth Population  7: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1618_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1618_spring.jpg)
+[indian_tension_alert_1618_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1618_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) yellow exclamation mark.
 
@@ -4797,23 +4797,23 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1618_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1618_spring.jpg)
+[religious_adviser_1618_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1618_spring.jpg)
 
-[continental_congress_1618_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1618_spring_00.jpg)
+[continental_congress_1618_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1618_spring_00.jpg)
 
-[foreign_affairs_report_1618_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1618_spring.jpg)
+[foreign_affairs_report_1618_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1618_spring.jpg)
 
 * COMMENT: The following screenshots are the existing foreign colonies before scouting the colonies.
 
-[pf_83_1618_spring_dutch_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_dutch_00.jpg)
+[pf_83_1618_spring_dutch_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_dutch_00.jpg)
 
-[pf_83_1618_spring_dutch_01]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_dutch_01.jpg)
+[pf_83_1618_spring_dutch_01](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_dutch_01.jpg)
 
-[pf_83_1618_spring_french]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_french.jpg)
+[pf_83_1618_spring_french](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_french.jpg)
 
-[pf_83_1618_spring_spanish_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_spanish_00.jpg)
+[pf_83_1618_spring_spanish_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_spanish_00.jpg)
 
-[pf_83_1618_spring_spanish_01]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_spanish_01.jpg)
+[pf_83_1618_spring_spanish_01](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1618_spring_spanish_01.jpg)
 
 * MOVED: Wagon Train NORTH-WEST (numpad-key 7)
       Two (2) tiles from Jamestown (53, 43) to   Plymouth  (51, 41).
@@ -4884,7 +4884,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 11: Fortified: two (2) Veteran Dragoons. Plymouth Population  7: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1618_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1618_autumn.jpg)
+[indian_tension_alert_1618_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1618_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) yellow exclamation mark to one (1) red exclamation mark.
 
@@ -4947,7 +4947,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 11: Fortified: two (2) Veteran Dragoons. Plymouth Population  7: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1619_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1619_spring.jpg)
+[indian_tension_alert_1619_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1619_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red exclamation mark.
 
@@ -4968,7 +4968,7 @@
 
 * COMMENT: The following screenshot is the existing foreign colonies after scouting the colonies.
 
-[pf_83_1619_spring_french]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1619_spring_french.jpg)
+[pf_83_1619_spring_french](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1619_spring_french.jpg)
 
 * COMMENT: Quebec has changed to population of Two (2) when the Privateer re-scouted the area.
 
@@ -5007,14 +5007,14 @@
 
 * MOVED IN COLONY: Jamestown (53, 43): Master Carpenter from Outside Colony to Carpenter producing fourteen (14) Hammers.
 
-[line_of_sight_ship_1619_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_ship_1619_autumn_00.jpg)
+[line_of_sight_ship_1619_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_ship_1619_autumn_00.jpg)
 
 * COMMENT: The initial screenshot before moving the Privateer.
 
 * MOVED: Privateeer NORTH (numpad-key 8)
       Seven (7) tiles from (47, 29) to (47, 22)
 
-[line_of_sight_ship_1619_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_ship_1619_autumn_01.jpg)
+[line_of_sight_ship_1619_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_ship_1619_autumn_01.jpg)
 
 * COMMENT: The line of sight for a ship is definitely two (2) tiles.
 
@@ -5030,19 +5030,19 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1619_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1619_autumn.jpg)
+[religious_adviser_1619_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1619_autumn.jpg)
 
-[continental_congress_1619_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1619_autumn_00.jpg)
+[continental_congress_1619_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1619_autumn_00.jpg)
 
-[foreign_affairs_report_1619_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1619_autumn.jpg)
+[foreign_affairs_report_1619_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1619_autumn.jpg)
 
 * COMMENT: Changed the amount of Liberty Bells being produced in Plymouth.
 
 * COMMENT: The following Screenshots are of Colonies to compare the amount of Crosses and Liberty Bells in production, to whether net or gross Crosses and Liberty Bells are used in Religious Unrest and Founding Fathers.
 
-[colony_jamestown_1619_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1619_autumn.jpg)
+[colony_jamestown_1619_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1619_autumn.jpg)
 
-[colony_plymouth_1619_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1619_autumn.jpg)
+[colony_plymouth_1619_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1619_autumn.jpg)
 
 * END OF TURN
 
@@ -5060,7 +5060,7 @@
 
 * INDIAN RAID: Tupi, Jamestown, defeated
 
-[pf_73_combat_analysis_1619_autumn]http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1619_autumn.jpg)
+[pf_73_combat_analysis_1619_autumn](http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1619_autumn.jpg)
 
 * PRICE CHANGE: Rum falls to 14 gold
 
@@ -5068,7 +5068,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 12: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1620_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1620_spring.jpg)
+[indian_tension_alert_1620_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1620_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red exclamation mark.
 
@@ -5080,11 +5080,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1620_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1620_spring.jpg)
+[religious_adviser_1620_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1620_spring.jpg)
 
-[continental_congress_1620_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1620_spring_00.jpg)
+[continental_congress_1620_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1620_spring_00.jpg)
 
-[foreign_affairs_report_1620_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1620_spring.jpg)
+[foreign_affairs_report_1620_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1620_spring.jpg)
 
 * WAITED: The Caravel at Jamestown (53, 43).
 
@@ -5162,13 +5162,13 @@
 
 * INDIAN RAID: Tupi, Plymouth, defeated
 
-[pf_73_combat_analysis_1620_spring]http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1620_spring.jpg)
+[pf_73_combat_analysis_1620_spring](http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1620_spring.jpg)
 
 * INDIAN CONCERNED AT PROGRESS: Tupi Mounted Braves
 
 * INDIAN RAID: Tupi, Plymouth, defeated
 
-[pf_73_combat_analysis_1620_spring_01]http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1620_spring_01.jpg)
+[pf_73_combat_analysis_1620_spring_01](http://www.freecol.org/cv3-discoverer-english/images/pf_73_combat_analysis_1620_spring_01.jpg)
 
 * PRICE CHANGE: Rum falls to 13 gold.
 
@@ -5182,7 +5182,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 12: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1620_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1620_autumn.jpg)
+[indian_tension_alert_1620_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1620_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red exclamation mark to one (1) light green exclamation mark.
 
@@ -5198,7 +5198,7 @@
 * MOVED: Scout 01 EAST (numpad-key 6)
       One (1) tile from (42, 55) to (43, 55).
 
-[line_of_sight_scout_3_1620_autumn]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_3_1620_autumn.jpg)
+[line_of_sight_scout_3_1620_autumn](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_3_1620_autumn.jpg)
 
 * COMMENT: This shows the Scout has a line of sight of 3 as the population of New Amsterdam changing from 1 (the last time scouted) to 8.
 
@@ -5210,7 +5210,7 @@
 
 * COMMENT: The following screenshots are the existing foreign colonies after scouting the colonies.
 
-[pf_83_1620_autumn_dutch_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1620_autumn_dutch_00.jpg)
+[pf_83_1620_autumn_dutch_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1620_autumn_dutch_00.jpg)
 
 * COMMENT: This not only shows the population not keeping up to date, but also that not all colonies are set at 1, but the population at the time of scouting. The reason it seems that the colonies appear as only 1 population, is that at the time Francisco de Coronado joins the congress, the population is only 1, as the AI seems to favour having a colony of 1 when starting. IMHO.
 
@@ -5239,9 +5239,9 @@
 >          provide you with guides to aid your
 >          passage through our lands."
 
-[indian_guides_seasoned_scout]http://www.freecol.org/cv3-discoverer-english/images/indian_guides_seasoned_scout.jpg)
+[indian_guides_seasoned_scout](http://www.freecol.org/cv3-discoverer-english/images/indian_guides_seasoned_scout.jpg)
 
-[indian_guides_seasoned_scout_01]http://www.freecol.org/cv3-discoverer-english/images/indian_guides_seasoned_scout_01.jpg)
+[indian_guides_seasoned_scout_01](http://www.freecol.org/cv3-discoverer-english/images/indian_guides_seasoned_scout_01.jpg)
 
 * COMMENT: The Scout 02 was an Indentured Servant.
 
@@ -5318,9 +5318,9 @@
 
 * FREECOL ISSUE: Does FreeCol 0.11.5 do this?  Allow a unit Outside Colony to Sentry / Board Ship or Fortify or No changes?
 
-[outside_colony_menu]http://www.freecol.org/cv3-discoverer-english/images/outside_colony_menu.jpg)
+[outside_colony_menu](http://www.freecol.org/cv3-discoverer-english/images/outside_colony_menu.jpg)
 
-[outside_colony_menu_01]http://www.freecol.org/cv3-discoverer-english/images/outside_colony_menu_01.jpg)
+[outside_colony_menu_01](http://www.freecol.org/cv3-discoverer-english/images/outside_colony_menu_01.jpg)
 
 * COMMENT: Left Clicked on the Dragoon in Units Present section and the menu appeared.
 
@@ -5329,7 +5329,7 @@
 
 * LOST CITY RUMOUR: Strange Mounds (3400 gold)
 
-[lost_city_rumor_strange_burial_grounds_00]http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_strange_burial_grounds_00.jpg)
+[lost_city_rumor_strange_burial_grounds_00](http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_strange_burial_grounds_00.jpg)
 
 * DIALOG:
 >          Your expedition happens upon strange
@@ -5339,7 +5339,7 @@
 
 * SELECTED: "Let us search for Treasure!"
 
-[lost_city_rumor_strange_burial_grounds_01]http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_strange_burial_grounds_01.jpg)
+[lost_city_rumor_strange_burial_grounds_01](http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_strange_burial_grounds_01.jpg)
 
 * SCREEN:
 >          Within, you find incrediable treasure
@@ -5382,7 +5382,7 @@
 >           share."
 >           "No, I would sooner kiss your royal pinky ring."
 
-[treasure_train_galleon_crown_offer]http://www.freecol.org/cv3-discoverer-english/images/treasure_train_galleon_crown_offer.jpg)
+[treasure_train_galleon_crown_offer](http://www.freecol.org/cv3-discoverer-english/images/treasure_train_galleon_crown_offer.jpg)
 
 * SELECTED: "Very well, and let the Crown claim its rightful share."
 
@@ -5392,17 +5392,17 @@
 >          11% share. 3026 gold added to English
 >          treasury.
 
-[treasure_train_galleon_crown_offer_accepted]http://www.freecol.org/cv3-discoverer-english/images/treasure_train_galleon_crown_offer_accepted.jpg)
+[treasure_train_galleon_crown_offer_accepted](http://www.freecol.org/cv3-discoverer-english/images/treasure_train_galleon_crown_offer_accepted.jpg)
 
 * MOVED IN COLONY: Roanoke (39, 65): Indentured Servant from Fur Trapper producing two (2) Furs to Scout Outside Colony.
 
 * ABANDON COLONY: Roanoke (39, 65)
 
-[abandon_colony_roanoke]http://www.freecol.org/cv3-discoverer-english/images/abandon_colony_roanoke.jpg)
+[abandon_colony_roanoke](http://www.freecol.org/cv3-discoverer-english/images/abandon_colony_roanoke.jpg)
 
 * INDIAN TENSION ALERT:  Jamestown Population 12: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1621_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1621_autumn.jpg)
+[indian_tension_alert_1621_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1621_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light green exclamation mark to one (1) light blue exclamation mark.
 
@@ -5468,7 +5468,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Unfortified: one (1) Indentured Servant/Dragoon. Plymouth Population  8: Fortified: one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1622_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_spring.jpg)
+[indian_tension_alert_1622_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) light blue exclamation mark to one (1) blue exclamation mark AND one (1) light blue exclamation mark.
 
@@ -5488,7 +5488,7 @@
 
 * SPIES REPORT: Burn, Spanish, Cherokee Village
 
-[spies_report_1622_spring]http://www.freecol.org/cv3-discoverer-english/images/spies_report_1622_spring.jpg)
+[spies_report_1622_spring](http://www.freecol.org/cv3-discoverer-english/images/spies_report_1622_spring.jpg)
 
 * COMMENT: It is not a spies report as a normal spies report starts with the text Spies Report. I have classified a lot of these 'foriegn/indian affairs' reports as spies reports to simplify the different pop-up reports.
 
@@ -5502,17 +5502,17 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1622_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1622_autumn.jpg)
+[religious_adviser_1622_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1622_autumn.jpg)
 
-[continental_congress_1622_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1622_autumn_00.jpg)
+[continental_congress_1622_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1622_autumn_00.jpg)
 
-[continental_congress_1622_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1622_autumn_01.jpg)
+[continental_congress_1622_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1622_autumn_01.jpg)
 
-[foreign_affairs_report_1622_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1622_autumn.jpg)
+[foreign_affairs_report_1622_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1622_autumn.jpg)
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: one (1) Indentured Servant/Dragoon, one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1622_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_autumn.jpg)
+[indian_tension_alert_1622_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue exclamation mark AND one (1) light blue exclamation mark to one (1) brown exclamation mark AND one (1) yellow exclamation mark.
 
@@ -5541,13 +5541,13 @@
 
 * MEETING NATIVES: Aztec Empire
 
-[aztec_nation_meeting_00]http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_00.jpg)
+[aztec_nation_meeting_00](http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_00.jpg)
 
-[aztec_nation_meeting_01]http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_01.jpg)
+[aztec_nation_meeting_01](http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_01.jpg)
 
-[aztec_nation_meeting_02]http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_02.jpg)
+[aztec_nation_meeting_02](http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_02.jpg)
 
-[aztec_nation_meeting_03]http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_03.jpg)
+[aztec_nation_meeting_03](http://www.freecol.org/cv3-discoverer-english/images/aztec_nation_meeting_03.jpg)
 
 * MOVED: Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (38, 61) to (37, 60).
@@ -5566,7 +5566,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: one (1) Indentured Servant/Dragoon, one (1) Petty Crimimal/Dragoon
 
-[indian_tension_alert_1622_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_autumn_01.jpg)
+[indian_tension_alert_1622_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1622_autumn_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark AND one (1) yellow exclamation mark.
 
@@ -5598,7 +5598,7 @@
 >           Juan de Sepulveda (Religious Adviser)
 >                                   (F1 for Help)
 
-[colonpedia_adam_smith]http://www.freecol.org/cv3-discoverer-english/images/colonpedia_adam_smith.jpg)
+[colonpedia_adam_smith](http://www.freecol.org/cv3-discoverer-english/images/colonpedia_adam_smith.jpg)
 
 * NOT MOVED: Wagon Train at Plymouth (51, 41).
 
@@ -5618,7 +5618,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8, Fortified: one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1623_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1623_spring.jpg)
+[indian_tension_alert_1623_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1623_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) brown exclamation mark AND one (1) yellow exclamation mark.
 
@@ -5652,7 +5652,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8. Fortified: one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1623_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1623_autumn.jpg)
+[indian_tension_alert_1623_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1623_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown exclamation mark AND one (1) yellow exclamation mark to one (1) red exclamation mark AND one (1) light red exclamation mark.
 
@@ -5664,14 +5664,14 @@
 
 * NOT MOVED: Wagon Train at Plymouth (51, 41).
 
-[pf_83_1623_autumn_spanish_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1623_autumn_spanish_00.jpg)
+[pf_83_1623_autumn_spanish_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1623_autumn_spanish_00.jpg)
 
 * COMMENT: The screenshot shows all three (3) Spanish colonies, all showing a population of one (1).
 
 * MOVED: Seasoned Scout NORTH-WEST (numpad-key 7)
       One (1) tile from (23, 29) to the Privateer (22, 28).
 
-[line_of_sight_scout_prelim_1623_autumn]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_prelim_1623_autumn.jpg)
+[line_of_sight_scout_prelim_1623_autumn](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_prelim_1623_autumn.jpg)
 
 * COMMENT: The preliminary screen shot before the Scout makes landfall.
 
@@ -5696,7 +5696,7 @@
 >                Spanish colony at Veracruz
 >                Spanish govenor vows revenge
 
-[indian_burn_colony_1623_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_burn_colony_1623_autumn.jpg)
+[indian_burn_colony_1623_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_burn_colony_1623_autumn.jpg)
 
 * INDIAN CONCERNED AT PROGRESS: Tupi Mounted Braves
 >          The Tupi are pleased to see the
@@ -5705,13 +5705,13 @@
 >          that your colonies are beginning to
 >          overuse the lands near our settlements.
 
-[indian_concern_1623_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_concern_1623_autumn.jpg)
+[indian_concern_1623_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_concern_1623_autumn.jpg)
 
 * PRICE CHANGE: Coats fall to 10 gold.
 
 * PRICE CHANGE: Tools rise to 4 gold.
 
-[price_change_1623_autumn]http://www.freecol.org/cv3-discoverer-english/images/price_change_1623_autumn.jpg)
+[price_change_1623_autumn](http://www.freecol.org/cv3-discoverer-english/images/price_change_1623_autumn.jpg)
 
 * COLONY BUILD ITEM COMPLETED: Plymouth (51, 41): Stable.
 
@@ -5737,13 +5737,13 @@
 
 * COMMENT: I selected the Seasoned Scout from the unit menu of the Privateer and the Seasoned Scout. By selecting the Seasoned Scout this way, I made the privateer 'wait' for other units to have a turn.
 
-[line_of_sight_scout_1624_spring]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_1624_spring.jpg)
+[line_of_sight_scout_1624_spring](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_1624_spring.jpg)
 
 * FREECOL ISSUE: This shows the Seasoned Scout has a line of sight of 3 after de Soto joins.
 
 * COMMENT: Compare this screenshot with line_of_sight_scout_prelim_1623_autumn.jpg from the turn before.
 
-[line_of_sight_scout_1624_spring_01]http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_1624_spring_01.jpg)
+[line_of_sight_scout_1624_spring_01](http://www.freecol.org/cv3-discoverer-english/images/line_of_sight_scout_1624_spring_01.jpg)
 
 * COMMENT: Shows the size of a tile.
 
@@ -5759,7 +5759,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8, Fortified: one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Crimimal
 
-[indian_tension_alert_1624_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1624_autumn.jpg)
+[indian_tension_alert_1624_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1624_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red exclamation mark AND one (1) light red exclamation mark.
 
@@ -5818,7 +5818,7 @@
 
 * COMMENT: The following screenshot is the existing foreign colonies after scouting the colonies.
 
-[pf_83_1624_autumn_dutch_01]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1624_autumn_dutch_01.jpg)
+[pf_83_1624_autumn_dutch_01](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1624_autumn_dutch_01.jpg)
 
 * COMMENT: Also shows the lin of sight of 3 for an ordinary Scout (not a Seasoned Scout).
 
@@ -5844,7 +5844,7 @@
 >           Yes
 >           No
 
-[meeting_the_natives_apache_1624_autumn]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_natives_apache_1624_autumn.jpg)
+[meeting_the_natives_apache_1624_autumn](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_natives_apache_1624_autumn.jpg)
 
 * COMMENT: Showing the different graphics for the different tribes.
 
@@ -5854,13 +5854,13 @@
 >          from Petty Criminals to Indentured
 >          Servants status.
 
-[battlefield_upgrade_1624_autumn]http://www.freecol.org/cv3-discoverer-english/images/battlefield_upgrade_1624_autumn.jpg)
+[battlefield_upgrade_1624_autumn](http://www.freecol.org/cv3-discoverer-english/images/battlefield_upgrade_1624_autumn.jpg)
 
 * TIME: Spring 1625
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8. Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1625_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1625_spring.jpg)
+[indian_tension_alert_1625_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1625_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red exclamation mark AND one (1) light red exclamation mark.
 
@@ -5881,7 +5881,7 @@
 * MOVED: Privateer NORTH (numpad-key 8)
       One (1) tile from (29, 19) to (29, 18).
 
-[pf_83_1625_spring_spanish_00]http://www.freecol.org/cv3-discoverer-english/images/pf_83_1625_spring_spanish_00.jpg)
+[pf_83_1625_spring_spanish_00](http://www.freecol.org/cv3-discoverer-english/images/pf_83_1625_spring_spanish_00.jpg)
 
 * COMMENT: Note the exclusion of Veracruz as it was burnt down by natives.
 
@@ -5981,7 +5981,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 13: Fortified: two (2) Veteran Dragoons. Plymouth Population  8. Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1626_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1626_spring.jpg)
+[indian_tension_alert_1626_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1626_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red exclamation mark AND one (1) light red exclamation mark to one (1) green exclamation mark AND one (1) light green exclamation mark.
 
@@ -6003,7 +6003,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 15: Fortified: two (2) Veteran Dragoons. Plymouth Population  8. Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1626_spring_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1626_spring_01.jpg)
+[indian_tension_alert_1626_spring_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1626_spring_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green exclamation mark AND one (1) light green exclamation mark.
 
@@ -6049,7 +6049,7 @@
 * LOST CITY RUMOUR: Ruins (140 gold)
 >          You find ruins of a lost civilization. Within are gold and artifacts worth 140 gold
 
-[lost_city_rumor_find_ruins]http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_find_ruins.jpg)
+[lost_city_rumor_find_ruins](http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_find_ruins.jpg)
 
 * END OF TURN
 
@@ -6121,7 +6121,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 15: Fortified: two (2) Veteran Dragoons. Plymouth Population  8. Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1627_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1627_spring.jpg)
+[indian_tension_alert_1627_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1627_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green exclamation mark AND one (1) light green exclamation mark to one (1) blue exclamation mark AND one (1) light blue exclamation mark.
 
@@ -6211,7 +6211,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 15: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1627_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1627_autumn.jpg)
+[indian_tension_alert_1627_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1627_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue exclamation mark AND one (1) light blue exclamation mark to one (1) brown exclamation mark AND one (1) yellow exclamation mark.
 
@@ -6321,7 +6321,7 @@
 
 * INDIAN TENSION ALERT:  Jamestown Population 14: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1628_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1628_autumn.jpg)
+[indian_tension_alert_1628_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1628_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown exclamation mark AND one (1) yellow exclamation mark to one (1) red exclamation mark AND one (1) light red exclamation mark.
 
@@ -6373,7 +6373,7 @@
 
 * MOVED IN COLONY: Plymouth (51, 41): Expert Fisherman from Outside Colony to Fisherman producing 6 Fish
 
-[units_present_pop_up_menu_1628_autumn]http://www.freecol.org/cv3-discoverer-english/images/units_present_pop_up_menu_1628_autumn.jpg)
+[units_present_pop_up_menu_1628_autumn](http://www.freecol.org/cv3-discoverer-english/images/units_present_pop_up_menu_1628_autumn.jpg)
 
 * COMMENT: Shows the pop up menu for a colonist Outside the Colony, in the 'Units Present' window option.
 
@@ -6466,11 +6466,11 @@
 
 * TIME: Autumn 1629
 
-[continental_congress_1629_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1629_autumn_00.jpg)
+[continental_congress_1629_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1629_autumn_00.jpg)
 
 * INDIAN TENSION ALERT:  Jamestown Population 14: Fortified: two (2) Veteran Dragoons. Plymouth Population  8: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1629_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1629_autumn.jpg)
+[indian_tension_alert_1629_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1629_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green exclamation mark AND one (1) light green exclamation mark.
 
@@ -6500,13 +6500,13 @@
 
 * END OF TURN
 
-[privateer_slips_past_privateer_1629_autumn]http://www.freecol.org/cv3-discoverer-english/images/privateer_slips_past_privateer_1629_autumn.jpg)
+[privateer_slips_past_privateer_1629_autumn](http://www.freecol.org/cv3-discoverer-english/images/privateer_slips_past_privateer_1629_autumn.jpg)
 
 * COMMENT: The Dutch Privateer came straight towards the English Privateer
 
 * MESSAGE: Dutch Privateer slips past English Privateer!
 
-[privateer_combat_analysis_1629_autumn]http://www.freecol.org/cv3-discoverer-english/images/privateer_combat_analysis_1629_autumn.jpg)
+[privateer_combat_analysis_1629_autumn](http://www.freecol.org/cv3-discoverer-english/images/privateer_combat_analysis_1629_autumn.jpg)
 
 * RESULT: English Privateer damaged! Ship returns to London for repairs.
 
@@ -6542,7 +6542,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1630_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1630_spring.jpg)
+[indian_tension_alert_1630_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1630_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green exclamation mark AND one (1) light green exclamation mark.
 
@@ -6592,7 +6592,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort. Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1630_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1630_autumn.jpg)
+[indian_tension_alert_1630_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1630_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -6635,7 +6635,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1631_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1631_spring.jpg)
+[indian_tension_alert_1631_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1631_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -6687,7 +6687,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1631_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1631_autumn.jpg)
+[indian_tension_alert_1631_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1631_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue        exclamation mark AND one (1) light blue  exclamation mark to one (1) brown       exclamation mark AND one (1) yellow      exclamation mark.
 
@@ -6742,7 +6742,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1632_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1632_spring.jpg)
+[indian_tension_alert_1632_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1632_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown     exclamation mark AND one (1) yellow    exclamation mark to one (1) red       exclamation mark AND one (1) light red exclamation mark.
 
@@ -6774,7 +6774,7 @@
 >          specifies that all French possessions in the
 >          New World now fall under Spanish rule.
 
-[spanish_succession_1632_spring]http://www.freecol.org/cv3-discoverer-english/images/spanish_succession_1632_spring.jpg)
+[spanish_succession_1632_spring](http://www.freecol.org/cv3-discoverer-english/images/spanish_succession_1632_spring.jpg)
 
 * REBEL SENTIMENT: 50%
 >          Your Excellency! 50% of the population
@@ -6784,7 +6784,7 @@
 >          with the King and declare our
 >          Independence!
 
-[rebel_sentiment_50_precent_1632_spring]http://www.freecol.org/cv3-discoverer-english/images/rebel_sentiment_50_precent_1632_spring.jpg)
+[rebel_sentiment_50_precent_1632_spring](http://www.freecol.org/cv3-discoverer-english/images/rebel_sentiment_50_precent_1632_spring.jpg)
 
 * TIME: Autumn 1632
 
@@ -6798,7 +6798,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant
 
-[indian_tension_alert_1632_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1632_autumn.jpg)
+[indian_tension_alert_1632_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1632_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark.
 
@@ -6854,7 +6854,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Criminal.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal
 
-[indian_tension_alert_1633_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1633_spring.jpg)
+[indian_tension_alert_1633_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1633_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark to one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -6938,7 +6938,7 @@
 
 * PRICE CHANGE: Rum falls to 9 gold.
 
-[price_change_in_europe_1634_spring]http://www.freecol.org/cv3-discoverer-english/images/price_change_in_europe_1634_spring.jpg)
+[price_change_in_europe_1634_spring](http://www.freecol.org/cv3-discoverer-english/images/price_change_in_europe_1634_spring.jpg)
 
 * COMMENT: Shows the background information, including the sale information at the very top of the screen.
 
@@ -6956,7 +6956,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Criminal.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1634_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_spring.jpg)
+[indian_tension_alert_1634_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -6984,7 +6984,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Criminal.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1634_spring_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_spring_01.jpg)
+[indian_tension_alert_1634_spring_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_spring_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) blue       exclamation mark AND one (1) light blue exclamation mark.
 
@@ -7022,7 +7022,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Criminal.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1634_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_autumn.jpg)
+[indian_tension_alert_1634_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1634_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) blue       exclamation mark AND one (1) light blue exclamation mark.
 
@@ -7079,7 +7079,7 @@
 
 * SPIES REPORT: Loot+Burn, Spanish, Arawak Village, 500
 
-[loot_and_burn_1634_autumn]http://www.freecol.org/cv3-discoverer-english/images/loot_and_burn_1634_autumn.jpg)
+[loot_and_burn_1634_autumn](http://www.freecol.org/cv3-discoverer-english/images/loot_and_burn_1634_autumn.jpg)
 
 * PRICE CHANGE: Rum falls to 7 gold.
 
@@ -7089,7 +7089,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress: Fortified: two (2) Veteran Dragoons, one (1) Dragoon/Petty Criminal.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1635_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1635_spring.jpg)
+[indian_tension_alert_1635_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1635_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue       exclamation mark AND one (1) light blue exclamation mark to one (1) brown      exclamation mark AND one (1) yellow     exclamation mark.
 
@@ -7145,7 +7145,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1635_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1635_autumn.jpg)
+[indian_tension_alert_1635_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1635_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown     exclamation mark AND one (1) yellow    exclamation mark ro one (1) red       exclamation mark AND one (1) light red exclamation mark.
 
@@ -7276,7 +7276,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress, Fortified: two (2) Veteran Dragoons.   Plymouth (51, 41), Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1636_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1636_autumn.jpg)
+[indian_tension_alert_1636_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1636_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark.
 
@@ -7340,7 +7340,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 15, Fortress: Fortified: two (2) Veteran Dragoons.   Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1637_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1637_spring.jpg)
+[indian_tension_alert_1637_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1637_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark.
 
@@ -7462,7 +7462,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1638_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1638_spring.jpg)
+[indian_tension_alert_1638_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1638_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark to one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -7540,7 +7540,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  8, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1638_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1638_autumn.jpg)
+[indian_tension_alert_1638_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1638_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -7555,17 +7555,17 @@
 
 * UNLOADED: Plymouth (51, 41) / Wagon Train / 100 Tools
 
-[do_horses_eat_fish_1638_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_00.jpg)
+[do_horses_eat_fish_1638_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_00.jpg)
 
 * COMMENT: FOR: DO HORSES EAT FISH? This screenshot shows the Fish being consumed by the colonists, with 4 Fish and 4 Food as the excess Food. 
 
 * UNLOADED: Plymouth (51, 41) / Wagon Train / 50 Horses
 
-[do_horses_eat_fish_1638_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_01.jpg)
+[do_horses_eat_fish_1638_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_01.jpg)
 
 * COMMENT: FOR: DO HORSES EAT FISH? This screenshot shows the Fish being consumed by the colonists and the Horses, with 4 Food as the excess Food. 
 
-[do_horses_eat_fish_1638_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_02.jpg)
+[do_horses_eat_fish_1638_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/do_horses_eat_fish_1638_autumn_02.jpg)
 
 * COMMENT: FOR: DO HORSES EAT FISH? This screenshot shows four (4) horses being bred. 
 
@@ -7632,13 +7632,13 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1638_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1638_autumn.jpg)
+[religious_adviser_1638_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1638_autumn.jpg)
 
-[continental_congress_1638_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1638_autumn_00.jpg)
+[continental_congress_1638_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1638_autumn_00.jpg)
 
-[continental_congress_1638_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1638_autumn_01.jpg)
+[continental_congress_1638_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1638_autumn_01.jpg)
 
-[foreign_affairs_report_1638_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1638_autumn.jpg)
+[foreign_affairs_report_1638_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1638_autumn.jpg)
 
 * END OF TURN
 
@@ -7661,7 +7661,7 @@
 >           "Not a penny for those heretic swine!"
 >           "We will gladly donate 950 gold to such a worthy cause."
 
-[meeting_fellow_europeans_1638_autumn]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn.jpg)
+[meeting_fellow_europeans_1638_autumn](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn.jpg)
 
 * SELECTED: "Not a penny for those heretic swine!"
 
@@ -7669,17 +7669,17 @@
 >          "We can no longer tolerate your foul
 >          provocations. Prepare for WAR!"
 
-[meeting_fellow_europeans_1638_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_01.jpg)
+[meeting_fellow_europeans_1638_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_01.jpg)
 
-[meeting_fellow_europeans_1638_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_02.jpg)
+[meeting_fellow_europeans_1638_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_02.jpg)
 
 * COMMENT: The Combat Analysis screen
 
 * RESULT: Dutch Dragoons routed!
 
-[meeting_fellow_europeans_1638_autumn_03]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_03.jpg)
+[meeting_fellow_europeans_1638_autumn_03](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_03.jpg)
 
-[meeting_fellow_europeans_1638_autumn_04]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_04.jpg)
+[meeting_fellow_europeans_1638_autumn_04](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_1638_autumn_04.jpg)
 
 * PRICE CHANGE: Silver falls to 18 gold.
 
@@ -7701,7 +7701,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant,  one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1639_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1639_spring.jpg)
+[indian_tension_alert_1639_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1639_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -7764,11 +7764,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1639_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1639_spring.jpg)
+[religious_adviser_1639_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1639_spring.jpg)
 
-[continental_congress_1639_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1639_spring_00.jpg)
+[continental_congress_1639_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1639_spring_00.jpg)
 
-[foreign_affairs_report_1639_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1639_spring.jpg)
+[foreign_affairs_report_1639_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1639_spring.jpg)
 
 * END OF TURN
 
@@ -7782,7 +7782,7 @@
 >           Yes
 >           No
 
-[meeting_the_sioux_1639_spring]http://www.freecol.org/cv3-discoverer-english/images/meeting_the_sioux_1639_spring.jpg)
+[meeting_the_sioux_1639_spring](http://www.freecol.org/cv3-discoverer-english/images/meeting_the_sioux_1639_spring.jpg)
 
 * SCREEN:
 >          "The Sioux welcome peace with our
@@ -7802,13 +7802,13 @@
 
 * RELIGIOUS UNREST: Free Colonist
 
-[religious_unrest_1639_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_unrest_1639_spring.jpg)
+[religious_unrest_1639_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_unrest_1639_spring.jpg)
 
 * TIME: Autumn 1639
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1639_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1639_autumn.jpg)
+[indian_tension_alert_1639_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1639_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue       exclamation mark AND one (1) light blue exclamation mark to one (1) brown      exclamation mark AND one (1) yellow     exclamation mark.
 
@@ -7820,11 +7820,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1639_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1639_autumn.jpg)
+[religious_adviser_1639_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1639_autumn.jpg)
 
-[continental_congress_1639_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1639_autumn_00.jpg)
+[continental_congress_1639_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1639_autumn_00.jpg)
 
-[foreign_affairs_report_1639_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1639_autumn.jpg)
+[foreign_affairs_report_1639_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1639_autumn.jpg)
 
 * MOVED: Wagon Train NORTH-WEST (numpad-key 7)
       Two (2) tiles from Jamestown (53, 43) to  Plymouth  (51, 41).
@@ -7844,7 +7844,7 @@
 * MOVED: Privateer 02 SOUTH (numpad-key 2)
       Five (5) tiles from (03, 39) to (03, 44).
 
-[attack_pirate_1639_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_00.jpg)
+[attack_pirate_1639_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_00.jpg)
 
 * MOVED: Privateer 02 SOUTH-EAST (numpad-key 3)
       One (1) tile from (03, 44) to (04, 45).
@@ -7853,7 +7853,7 @@
 >          English Privateer slips past Dutch
 >          Privateer!
 
-[attack_pirate_1639_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_01.jpg)
+[attack_pirate_1639_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_01.jpg)
 
 * COMMENT: Note the amount of movement points left (4).
 
@@ -7863,15 +7863,15 @@
       One (1) tile from (04, 45) to (04, 45).
       Attacking the European Privateer.
 
-[attack_pirate_1639_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_02.jpg)
+[attack_pirate_1639_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_02.jpg)
 
-[attack_pirate_1639_autumn_03]http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_03.jpg)
+[attack_pirate_1639_autumn_03](http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_03.jpg)
 
 * RESULT:
 >          English Privateer damaged! Ship
 >          returns to London for repairs.
 
-[attack_pirate_1639_autumn_04]http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_04.jpg)
+[attack_pirate_1639_autumn_04](http://www.freecol.org/cv3-discoverer-english/images/attack_pirate_1639_autumn_04.jpg)
 
 * MOVED: Scout WEST (numpad-key 4)
       One (1) tile from (17, 03) to Lost City Rumor (16, 03).
@@ -7917,7 +7917,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1640_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1640_spring.jpg)
+[indian_tension_alert_1640_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1640_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) brown     exclamation mark AND one (1) yellow    exclamation mark to one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -7965,7 +7965,7 @@
 
 * LOST CITY RUMOUR: Village (50 gold)
 
-[lost_city_rumor_small_tribe_1640_spring]http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_small_tribe_1640_spring.jpg)
+[lost_city_rumor_small_tribe_1640_spring](http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_small_tribe_1640_spring.jpg)
 
 * MEETING EUROPEANS: Spanish
 >          "Greetings, Discoverer Walter Raleigh, and
@@ -7975,7 +7975,7 @@
 >          heathen and enrich our Sovereign. Please do
 >          not interfere with this God-given mission."
 
-[meeting_fellow_europeans_spanish_1640_spring_00]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_00.jpg)
+[meeting_fellow_europeans_spanish_1640_spring_00](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_00.jpg)
 
 * DIALOG:
 >          "The Pope has told us that we must drive all English
@@ -7986,14 +7986,14 @@
 >           "Not a penny for those heretic swine!"
 >           "We will gladly donate 400 gold to such a worthy cause."
 
-[meeting_fellow_europeans_spanish_1640_spring_01]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_01.jpg)
+[meeting_fellow_europeans_spanish_1640_spring_01](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_01.jpg)
 
 * SCREEN:
 >          "You reject our generous offer? Then in the
 >          name of the Pope we shall wipe you from the
 >          face of the New World. Prepare for WAR!
 
-[meeting_fellow_europeans_spanish_1640_spring_02]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_02.jpg)
+[meeting_fellow_europeans_spanish_1640_spring_02](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spanish_1640_spring_02.jpg)
 
 * MOVED: Scout SOUTH (numpad-key 2)
       One (1) tile from (13, 05) to (13, 06).
@@ -8190,17 +8190,17 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1642_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1642_autumn.jpg)
+[religious_adviser_1642_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1642_autumn.jpg)
 
-[continental_congress_1642_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1642_autumn_00.jpg)
+[continental_congress_1642_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1642_autumn_00.jpg)
 
-[continental_congress_1642_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1642_autumn_01.jpg)
+[continental_congress_1642_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1642_autumn_01.jpg)
 
-[foreign_affairs_report_1642_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1642_autumn.jpg)
+[foreign_affairs_report_1642_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1642_autumn.jpg)
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1642_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1642_autumn.jpg)
+[indian_tension_alert_1642_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1642_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -8341,11 +8341,11 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1643_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1643_autumn.jpg)
+[religious_adviser_1643_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1643_autumn.jpg)
 
-[continental_congress_1643_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1643_autumn_00.jpg)
+[continental_congress_1643_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1643_autumn_00.jpg)
 
-[foreign_affairs_report_1643_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1643_autumn.jpg)
+[foreign_affairs_report_1643_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1643_autumn.jpg)
 
 * COMMENT: Jamestown (53, 43): The Elder Statesmen are producing a total of 62 Bells. Plymouth (51, 41): The Elder Statsmen are producing a total of 28 Bells; This totals 90 Bells.
 
@@ -8395,15 +8395,15 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1644_spring]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1644_spring.jpg)
+[religious_adviser_1644_spring](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1644_spring.jpg)
 
-[continental_congress_1644_spring_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1644_spring_00.jpg)
+[continental_congress_1644_spring_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1644_spring_00.jpg)
 
-[foreign_affairs_report_1644_spring]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1644_spring.jpg)
+[foreign_affairs_report_1644_spring](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1644_spring.jpg)
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1644_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1644_spring.jpg)
+[indian_tension_alert_1644_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1644_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -8461,7 +8461,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 12, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  9, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1644_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1644_autumn.jpg)
+[indian_tension_alert_1644_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1644_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -8564,13 +8564,13 @@
 
 * FORTRESS ATTACK: Jamestown (53, 43): open fire on Dutch Merchantman!
 
-[fortress_attack_1645_spring]http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring.jpg)
+[fortress_attack_1645_spring](http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring.jpg)
 
-[fortress_attack_1645_spring_01]http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring_01.jpg)
+[fortress_attack_1645_spring_01](http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring_01.jpg)
 
 * RESULT: Dutch Merchantman damaged!
 
-[fortress_attack_1645_spring_02]http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring_02.jpg)
+[fortress_attack_1645_spring_02](http://www.freecol.org/cv3-discoverer-english/images/fortress_attack_1645_spring_02.jpg)
 
 * REF INCREASE: Artillery.
 
@@ -8680,7 +8680,7 @@
 >          Galleon to get this treasure back to
 >          Europe!
 
-[seven_cities_of_cibola_1646_spring]http://www.freecol.org/cv3-discoverer-english/images/seven_cities_of_cibola_1646_spring.jpg)
+[seven_cities_of_cibola_1646_spring](http://www.freecol.org/cv3-discoverer-english/images/seven_cities_of_cibola_1646_spring.jpg)
 
 * NOT MOVED: Seasoned Scout 02 at (04, 07).
 
@@ -8717,7 +8717,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 14, Fortress: Fortified: one (1) Veteran Dragoons. Plymouth (51, 41): Population  10, Fort: Fortified: two (2) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1646_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1646_autumn.jpg)
+[indian_tension_alert_1646_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1646_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -8810,43 +8810,43 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[menu_game_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/menu_game_spring_1647.jpg)
+[menu_game_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/menu_game_spring_1647.jpg)
 
-[menu_view_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/menu_view_spring_1647.jpg)
+[menu_view_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/menu_view_spring_1647.jpg)
 
-[menu_orders_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/menu_orders_spring_1647.jpg)
+[menu_orders_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/menu_orders_spring_1647.jpg)
 
-[menu_reports_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/menu_reports_spring_1647.jpg)
+[menu_reports_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/menu_reports_spring_1647.jpg)
 
-[menu_trade_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/menu_trade_spring_1647.jpg)
+[menu_trade_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/menu_trade_spring_1647.jpg)
 
-[religious_adviser_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1647.jpg)
+[religious_adviser_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spring_1647.jpg)
 
-[continental_congress_spring_1647_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1647_00.jpg)
+[continental_congress_spring_1647_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1647_00.jpg)
 
-[continental_congress_spring_1647_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1647_01.jpg)
+[continental_congress_spring_1647_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spring_1647_01.jpg)
 
-[labor_adviser_spring_1647_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1647_00.jpg)
+[labor_adviser_spring_1647_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1647_00.jpg)
 
-[labor_adviser_spring_1647_01]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1647_01.jpg)
+[labor_adviser_spring_1647_01](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spring_1647_01.jpg)
 
-[economic_adivser_spring_1647_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1647_00.jpg)
+[economic_adivser_spring_1647_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1647_00.jpg)
 
-[economic_adivser_spring_1647_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1647_01.jpg)
+[economic_adivser_spring_1647_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spring_1647_01.jpg)
 
-[colony_adviser_spring_1647_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1647_00.jpg)
+[colony_adviser_spring_1647_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1647_00.jpg)
 
-[colony_adviser_spring_1647_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1647_01.jpg)
+[colony_adviser_spring_1647_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spring_1647_01.jpg)
 
-[naval_adviser_spring_1647_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1647_00.jpg)
+[naval_adviser_spring_1647_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spring_1647_00.jpg)
 
-[foreign_affairs_report_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1647.jpg)
+[foreign_affairs_report_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_spring_1647.jpg)
 
-[indian_adviser_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spring_1647.jpg)
+[indian_adviser_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spring_1647.jpg)
 
-[colonization_score_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/colonization_score_spring_1647.jpg)
+[colonization_score_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/colonization_score_spring_1647.jpg)
 
-[european_docks_spring_1647]http://www.freecol.org/cv3-discoverer-english/images/european_docks_spring_1647.jpg)
+[european_docks_spring_1647](http://www.freecol.org/cv3-discoverer-english/images/european_docks_spring_1647.jpg)
 
 * COMMENT: The Customs Powers.  According to Col1 manual:
 >            Another important function of the custom house
@@ -8935,7 +8935,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: one (1) Veteran Dragoons, one (1) Veteran Dragoon. Plymouth (51, 41): Population  10, Fort: Fortified: two (2) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1647_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1647_autumn.jpg)
+[indian_tension_alert_1647_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1647_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -9035,7 +9035,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: one (1) Veteran Dragoons, one (1) Veteran Dragoon. Plymouth (51, 41): Population  10, Fort: Fortified: two (2) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1648_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1648_autumn.jpg)
+[indian_tension_alert_1648_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1648_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -9157,7 +9157,7 @@
 * RESULT: Dutch Colonist/Veteran Soldiers captured!
       Soldiers lose Veteran status.
 
-[battle_dutch_colonist_1649_spring]http://www.freecol.org/cv3-discoverer-english/images/battle_dutch_colonist_1649_spring.jpg)
+[battle_dutch_colonist_1649_spring](http://www.freecol.org/cv3-discoverer-english/images/battle_dutch_colonist_1649_spring.jpg)
 
 * FORTIFIED: The Dragoon/Petty Criminal at Plymouth (51, 41).
 
@@ -9387,7 +9387,7 @@
 >           No thank you.
 >           Pay 6000 gold.
 
-[king_offer_1651_spring]http://www.freecol.org/cv3-discoverer-english/images/king_offer_1651_spring.jpg)
+[king_offer_1651_spring](http://www.freecol.org/cv3-discoverer-english/images/king_offer_1651_spring.jpg)
 
 * SELECTED: No thank you.
 
@@ -9437,7 +9437,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 17, Fortress: Fortified: one (1) Veteran Dragoons, one (1) Veteran Dragoon. Plymouth (51, 41): Population  11, Fort: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1651_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1651_autumn.jpg)
+[indian_tension_alert_1651_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1651_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -9466,7 +9466,7 @@
 
 * LOST CITY RUMOUR: Village (42 gold)
 
-[lost_city_rumor_1651_autumn]http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_1651_autumn.jpg)
+[lost_city_rumor_1651_autumn](http://www.freecol.org/cv3-discoverer-english/images/lost_city_rumor_1651_autumn.jpg)
 
 * FINISHED: The Hardy Pioneer has finished building a ROAD at (50, 41) and uses up all its Tools.
 
@@ -9489,7 +9489,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 17, Fortress: Fortified: one (1) Veteran Dragoons, one (1) Veteran Dragoon. Plymouth (51, 41): Population  11, Fort: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1652_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1652_spring.jpg)
+[indian_tension_alert_1652_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1652_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red       exclamation mark AND one (1) light red exclamation mark
 
@@ -9796,33 +9796,33 @@
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1654_autumn.jpg)
+[religious_adviser_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1654_autumn.jpg)
 
-[continental_congress_1654_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1654_autumn_00.jpg)
+[continental_congress_1654_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1654_autumn_00.jpg)
 
-[continental_congress_1654_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1654_autumn_01.jpg)
+[continental_congress_1654_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1654_autumn_01.jpg)
 
-[labor_adviser_1654_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_1654_autumn_00.jpg)
+[labor_adviser_1654_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_1654_autumn_00.jpg)
 
-[economic_adivser_1654_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1654_autumn_00.jpg)
+[economic_adivser_1654_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1654_autumn_00.jpg)
 
-[economic_adivser_1654_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1654_autumn_01.jpg)
+[economic_adivser_1654_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1654_autumn_01.jpg)
 
-[colony_adviser_1654_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1654_autumn_00.jpg)
+[colony_adviser_1654_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1654_autumn_00.jpg)
 
-[colony_adviser_1654_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1654_autumn_01.jpg)
+[colony_adviser_1654_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1654_autumn_01.jpg)
 
-[naval_adviser_1654_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_1654_autumn_00.jpg)
+[naval_adviser_1654_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_1654_autumn_00.jpg)
 
-[foreign_affairs_report_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1654_autumn.jpg)
+[foreign_affairs_report_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1654_autumn.jpg)
 
-[indian_adviser_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_1654_autumn.jpg)
+[indian_adviser_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_1654_autumn.jpg)
 
-[colonization_score_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/colonization_score_1654_autumn.jpg)
+[colonization_score_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/colonization_score_1654_autumn.jpg)
 
-[colony_jamestown_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1654_autumn.jpg)
+[colony_jamestown_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_1654_autumn.jpg)
 
-[colony_jamestown_custom_house_1654_autumn]http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_custom_house_1654_autumn.jpg)
+[colony_jamestown_custom_house_1654_autumn](http://www.freecol.org/cv3-discoverer-english/images/colony_jamestown_custom_house_1654_autumn.jpg)
 
 * COMMENT: No NEW report for the Custom House.
 
@@ -9872,7 +9872,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 14, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1655_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1655_spring.jpg)
+[indian_tension_alert_1655_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1655_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark to one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -9947,7 +9947,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 14, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1655_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1655_autumn.jpg)
+[indian_tension_alert_1655_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1655_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -10018,7 +10018,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 14, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1656_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1656_spring.jpg)
+[indian_tension_alert_1656_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1656_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -10139,7 +10139,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 13, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Dragoon: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal, Unfortified: three (3) Veteran Dragoons.
 
-[indian_tension_alert_1656_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1656_autumn.jpg)
+[indian_tension_alert_1656_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1656_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue        exclamation mark AND one (1) light blue  exclamation mark to one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10241,7 +10241,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 14, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1657_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1657_autumn.jpg)
+[indian_tension_alert_1657_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1657_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10345,11 +10345,11 @@
 >          93% of the population now supports the
 >          notion of independence from England.
 
-[tory_sentiment_1658_spring]http://www.freecol.org/cv3-discoverer-english/images/tory_sentiment_1658_spring.jpg)
+[tory_sentiment_1658_spring](http://www.freecol.org/cv3-discoverer-english/images/tory_sentiment_1658_spring.jpg)
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1658_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1658_spring.jpg)
+[indian_tension_alert_1658_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1658_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10508,7 +10508,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1659_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1659_spring.jpg)
+[indian_tension_alert_1659_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1659_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10579,7 +10579,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: four (4) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier, one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1659_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1659_autumn.jpg)
+[indian_tension_alert_1659_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1659_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10618,7 +10618,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier, one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal. Not Fortified: two (2) Veteran Dragoons.
 
-[indian_tension_alert_1660_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_spring.jpg)
+[indian_tension_alert_1660_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark to one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -10701,7 +10701,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier, one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal. Not Fortified: two (2) Veteran Dragoons.
 
-[indian_tension_alert_1660_spring_01]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_spring_01.jpg)
+[indian_tension_alert_1660_spring_01](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_spring_01.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) green       exclamation mark AND one (1) light green exclamation mark.
 
@@ -10733,7 +10733,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal. Not Fortified: two (2) Veteran Dragoons.
 
-[indian_tension_alert_1660_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_autumn.jpg)
+[indian_tension_alert_1660_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1660_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) green       exclamation mark AND one (1) light green exclamation mark to one (1) blue        exclamation mark AND one (1) light blue  exclamation mark.
 
@@ -10834,7 +10834,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: three (3) Veteran Soldiers. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal. Not Fortified: four (4) Veteran Dragoons.
 
-[indian_tension_alert_1661_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1661_spring.jpg)
+[indian_tension_alert_1661_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1661_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has changed from one (1) blue        exclamation mark AND one (1) light blue  exclamation mark to one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -10863,7 +10863,7 @@
 >           45 Furs
 >           6 Coats
 
-[privateer_attack_1661_spring]http://www.freecol.org/cv3-discoverer-english/images/privateer_attack_1661_spring.jpg)
+[privateer_attack_1661_spring](http://www.freecol.org/cv3-discoverer-english/images/privateer_attack_1661_spring.jpg)
 
 * RESULT: Spanish Merchantman damaged!
 
@@ -10993,7 +10993,7 @@
 * SCREEN:
 >          Spanish Galleon slips past English Privateer.
 
-[ship_slips_past_1661_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1661_autumn_00.jpg)
+[ship_slips_past_1661_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1661_autumn_00.jpg)
 
 * COMMENT: The Spanish Galleon is heading South.
 
@@ -11120,7 +11120,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: three (3) Veteran Soldiers. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal. Not Fortified: four (4) Veteran Dragoons.
 
-[indian_tension_alert_1662_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1662_autumn.jpg)
+[indian_tension_alert_1662_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1662_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -11167,9 +11167,9 @@
 * SCREEN:
 >          English Privateer slips past Spanish Privateer.
 
-[ship_slips_past_1663_spring_00]http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1663_spring_00.jpg)
+[ship_slips_past_1663_spring_00](http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1663_spring_00.jpg)
 
-[ship_slips_past_1663_spring_01]http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1663_spring_01.jpg)
+[ship_slips_past_1663_spring_01](http://www.freecol.org/cv3-discoverer-english/images/ship_slips_past_1663_spring_01.jpg)
 
 * MOVED: Privateer 01 NORTH (numpad-key 8)
       One (1) tile from (51, 40) to (51, 40)
@@ -11213,7 +11213,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Not Fortified: three (3) Veteran Soldiers. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal. Not Fortified: four (4) Veteran Dragoons.
 
-[indian_tension_alert_1663_spring]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1663_spring.jpg)
+[indian_tension_alert_1663_spring](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1663_spring.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -11241,7 +11241,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier: Fortified: one (1) Dragoon/Indentured Servant: Fortified: one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1663_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1663_autumn.jpg)
+[indian_tension_alert_1663_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1663_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -11393,7 +11393,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress, Fortified: two (2) Veteran Dragoons. Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier, one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[indian_tension_alert_1664_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1664_autumn.jpg)
+[indian_tension_alert_1664_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_tension_alert_1664_autumn.jpg)
 
 * COMMENT: The Tupi Capital (49, 44) has not changed from one (1) red         exclamation mark AND one (1) light red   exclamation mark.
 
@@ -11992,11 +11992,11 @@
 >          Frigate's progress slowed by presence
 >          of Dutch Privateer.
 
-[ships_progress_slowed_1667_autumn]http://www.freecol.org/cv3-discoverer-english/images/ships_progress_slowed_1667_autumn.jpg)
+[ships_progress_slowed_1667_autumn](http://www.freecol.org/cv3-discoverer-english/images/ships_progress_slowed_1667_autumn.jpg)
 
 * COMMENT: The Frigate has Seven (7) moves left.
 
-[ships_progress_slowed_1667_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/ships_progress_slowed_1667_autumn_01.jpg)
+[ships_progress_slowed_1667_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/ships_progress_slowed_1667_autumn_01.jpg)
 
 * COMMENT: The Frigate has Four and two-thirds (4 2/3) moves left.
 
@@ -12007,9 +12007,9 @@
 * RESULT:
 >          Dutch Privateer evades English Frigate.
 
-[ship_evades_1667_autumn]http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1667_autumn.jpg)
+[ship_evades_1667_autumn](http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1667_autumn.jpg)
 
-[ship_evades_1667_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1667_autumn_01.jpg)
+[ship_evades_1667_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1667_autumn_01.jpg)
 
 * NOT MOVED: Colonist/Soldier 01 at Plymouth (51, 41).
 
@@ -12188,9 +12188,9 @@
 
 * CONTINENTAL CONGRESS JOINED: Pocahontas.
 
-[pocahontas_join_1669_spring_00]http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_00.jpg)
+[pocahontas_join_1669_spring_00](http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_00.jpg)
 
-[pocahontas_join_1669_spring_01]http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_01.jpg)
+[pocahontas_join_1669_spring_01](http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_01.jpg)
 
 * NEW CARGO: Jamestown (53, 43): Horses.
 
@@ -12198,7 +12198,7 @@
 
 * INDIAN TENSION ALERT: Jamestown (53, 43): Population 16, Fortress: Fortified: two (2) Veteran Dragoons.  Plymouth (51, 41): Population  13, Fort: Fortified: one (1) Veteran Soldier, one (1) Dragoon/Indentured Servant, one (1) Dragoon/Petty Criminal.
 
-[pocahontas_join_1669_spring_01]http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_01.jpg)
+[pocahontas_join_1669_spring_01](http://www.freecol.org/cv3-discoverer-english/images/pocahontas_join_1669_spring_01.jpg)
 
 * COMMENT: To save images, the indian_tension_alert_1669_spring.jpg is equal to pocahontas_join_1669_spring.jpg as the tension levels are down to 'content'.
 
@@ -12478,9 +12478,9 @@
 
 * RESULT: Spanish Privateer evades English Frigate.
 
-[ship_evades_1670_spring_00]http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1670_spring_00.jpg)
+[ship_evades_1670_spring_00](http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1670_spring_00.jpg)
 
-[ship_evades_1670_spring_01]http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1670_spring_01.jpg)
+[ship_evades_1670_spring_01](http://www.freecol.org/cv3-discoverer-english/images/ship_evades_1670_spring_01.jpg)
 
 * NOT MOVED: Veteran Dragoon 05 at Plymouth (51, 41).
 
@@ -12563,21 +12563,21 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Camp (53, 45): Trade Goods.
 
-[native_trade_consecutive_1670_autumn]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn.jpg)
+[native_trade_consecutive_1670_autumn](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn.jpg)
 
-[native_trade_consecutive_1670_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_01.jpg)
+[native_trade_consecutive_1670_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_01.jpg)
 
-[native_trade_consecutive_1670_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_02.jpg)
+[native_trade_consecutive_1670_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_02.jpg)
 
 * SELECTED: "We gratefully accept 38 gold."
 
 * SOLD: Tupi Camp (53, 45): 100 Trade Goods for 38 gold
 
-[native_trade_consecutive_1670_autumn_03]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_03.jpg)
+[native_trade_consecutive_1670_autumn_03](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_03.jpg)
 
 * SELECTED "Coats."
 
-[native_trade_consecutive_1670_autumn_04]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_04.jpg)
+[native_trade_consecutive_1670_autumn_04](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1670_autumn_04.jpg)
 
 * PURCHASED: Tupi Camp (53, 45): 100 Coats for 987 gold
 
@@ -12666,9 +12666,9 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Camp (53, 45): Trade Goods.
 
-[native_trade_consecutive_1671_spring_00]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1671_spring_00.jpg)
+[native_trade_consecutive_1671_spring_00](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1671_spring_00.jpg)
 
-[native_trade_consecutive_1671_spring_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1671_spring_01.jpg)
+[native_trade_consecutive_1671_spring_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1671_spring_01.jpg)
 
 * NOT MOVED: Veteran Dragoon 01 at (53, 44).
 
@@ -13029,13 +13029,13 @@
 
 * SOLD: Tupi Capital (49, 44): 100 Trade Goods for 187 gold.
 
-[native_trade_1673_spring]http://www.freecol.org/cv3-discoverer-english/images/native_trade_1673_spring.jpg)
+[native_trade_1673_spring](http://www.freecol.org/cv3-discoverer-english/images/native_trade_1673_spring.jpg)
 
 * COMMENT: Selling both Coats and Horses.
 
 * PURCHASED: Tupi Capital (49, 44): 100 Coats for 1179 gold
 
-[native_trade_1673_spring_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_1673_spring_01.jpg)
+[native_trade_1673_spring_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_1673_spring_01.jpg)
 
 * NOT MOVED: Veteran Dragoon 01 at (50, 43).
 
@@ -13085,9 +13085,9 @@
 
 * COMMENT: The next screenshot shows 120 Lumber added to the stockpile at Plymouth.
 
-[lumber_120_added_1673_spring]http://www.freecol.org/cv3-discoverer-english/images/lumber_120_added_1673_spring.jpg)
+[lumber_120_added_1673_spring](http://www.freecol.org/cv3-discoverer-english/images/lumber_120_added_1673_spring.jpg)
 
-[colony_plymouth_1673_spring]http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1673_spring.jpg)
+[colony_plymouth_1673_spring](http://www.freecol.org/cv3-discoverer-english/images/colony_plymouth_1673_spring.jpg)
 
 * NOT MOVED: free Colonist 03   at Plymouth (51. 41).
 
@@ -13157,7 +13157,7 @@
 
 * FREECOL ISSUE: INCOMPATIBILITY WITH COL1?  The Frigate given by John Paul Jones selected to the has arrived from europe.  FreeCol 0.11.5 behaviour is to have the Frigate stay on the docks at Europe.
 
-[john_paul_jones_frigate_1673_autumn]http://www.freecol.org/cv3-discoverer-english/images/john_paul_jones_frigate_1673_autumn.jpg)
+[john_paul_jones_frigate_1673_autumn](http://www.freecol.org/cv3-discoverer-english/images/john_paul_jones_frigate_1673_autumn.jpg)
 
 * LOADED: Jamestown (53, 43) / Caravel / 200 Furs
 
@@ -14262,11 +14262,11 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Capital (49, 44): Tobacco.
 
-[native_trade_consecutive_1679_spring_00]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_spring_00.jpg)
+[native_trade_consecutive_1679_spring_00](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_spring_00.jpg)
 
 * SOLD: Tupi Capital (49, 44): 100 Tobacco for 1077 gold.
 
-[native_trade_consecutive_1679_spring_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_spring_01.jpg)
+[native_trade_consecutive_1679_spring_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_spring_01.jpg)
 
 * NOT MOVED: Veteran Dragoon 01 at (50, 43).
 
@@ -14349,9 +14349,9 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Capital (49, 44): Tobacco.
 
-[native_trade_consecutive_1679_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_autumn_00.jpg)
+[native_trade_consecutive_1679_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_autumn_00.jpg)
 
-[native_trade_consecutive_1679_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_autumn_01.jpg)
+[native_trade_consecutive_1679_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1679_autumn_01.jpg)
 
 * ARRIVED FROM EUROPE: Galleon: Free Colonist.
 
@@ -14849,11 +14849,11 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Capital (49, 44): Muskets.
 
-[native_trade_consecutive_1683_spring_00]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_spring_00.jpg)
+[native_trade_consecutive_1683_spring_00](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_spring_00.jpg)
 
 * SOLD: Tupi Capital (49, 44): 100 Muskets for 1010 gold.
 
-[native_trade_consecutive_1683_spring_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_spring_01.jpg)
+[native_trade_consecutive_1683_spring_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_spring_01.jpg)
 
 * NOT MOVED: All units at Plymouth (51, 41).
 
@@ -14892,9 +14892,9 @@
 
 * NATIVE TRADE CONSECUTIVE: Tupi Capital (49, 44).  Muskets.
 
-[native_trade_consecutive_1683_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_autumn_00.jpg)
+[native_trade_consecutive_1683_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_autumn_00.jpg)
 
-[native_trade_consecutive_1683_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_autumn_01.jpg)
+[native_trade_consecutive_1683_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/native_trade_consecutive_1683_autumn_01.jpg)
 
 * COMMENT: The Natives would not accept the second load of Muskets.
 
@@ -14919,7 +14919,7 @@
 >           No thank you.
 >           Pay 1600 gold.
 
-[king_offers_mercenaries_1684_spring_01]http://www.freecol.org/cv3-discoverer-english/images/king_offers_mercenaries_1684_spring_01.jpg)
+[king_offers_mercenaries_1684_spring_01](http://www.freecol.org/cv3-discoverer-english/images/king_offers_mercenaries_1684_spring_01.jpg)
 
 * SELECTED: Pay 1600 gold.
 
@@ -14927,7 +14927,7 @@
 >          English mercenaries arrive in
 >          Jamestown.
 
-[king_offers_mercenaries_1684_spring_02]http://www.freecol.org/cv3-discoverer-english/images/king_offers_mercenaries_1684_spring_02.jpg)
+[king_offers_mercenaries_1684_spring_02](http://www.freecol.org/cv3-discoverer-english/images/king_offers_mercenaries_1684_spring_02.jpg)
 
 * LOADED: Jamestown (53, 43) / Privateer / 100 Horses
 
@@ -16130,7 +16130,7 @@
 * MOVED: Treasure Train 300 EAST (numpad-key 6)
       Two (2) tiles from (49, 41) to Plymouth (51, 41).
 
-[king_galleon_transport_offer_1687_spring]http://www.freecol.org/cv3-discoverer-english/images/king_galleon_transport_offer_1687_spring.jpg)
+[king_galleon_transport_offer_1687_spring](http://www.freecol.org/cv3-discoverer-english/images/king_galleon_transport_offer_1687_spring.jpg)
 
 * COMMENT: The King offers to transport a Treasure Train for free, even though I own two (2) Galleons.
 
@@ -21358,7 +21358,7 @@
 
 * MOVED IN COLONY: Jamestown (53, 43): The Master Gunsmith from Outside Colony to Gunsmith producing 24 Muskets.
 
-[factory_arsenal_production_1702_spring]http://www.freecol.org/cv3-discoverer-english/images/factory_arsenal_production_1702_spring.jpg)
+[factory_arsenal_production_1702_spring](http://www.freecol.org/cv3-discoverer-english/images/factory_arsenal_production_1702_spring.jpg)
 
 * NOT MOVED: Galleon at Jamestown (53, 43).
 
@@ -21479,13 +21479,13 @@
 
 * UNLOADED: Plymouth / Wagon Train / 150 Muskets
 
-[factory_arsenal_production_1702_autumn]http://www.freecol.org/cv3-discoverer-english/images/factory_arsenal_production_1702_autumn.jpg)
+[factory_arsenal_production_1702_autumn](http://www.freecol.org/cv3-discoverer-english/images/factory_arsenal_production_1702_autumn.jpg)
 
 * COMMENT: 48 Tools used for 48 Muskets.
 
 * LOADED: Plymouth (51, 41) / Wagon Train / 84 Tools
 
-[factory_iron_works_production_1702_autumn]http://www.freecol.org/cv3-discoverer-english/images/factory_iron_works_production_1702_autumn.jpg)
+[factory_iron_works_production_1702_autumn](http://www.freecol.org/cv3-discoverer-english/images/factory_iron_works_production_1702_autumn.jpg)
 
 * NOT MOVED: Galleon at Jamestown (53, 43).
 
@@ -21590,7 +21590,7 @@
 
 * COLONY LEARN: Plymouth (51, 41): Expert Farmer.
 
-[factory_iron_works_production_1703_spring]http://www.freecol.org/cv3-discoverer-english/images/factory_iron_works_production_1703_spring.jpg)
+[factory_iron_works_production_1703_spring](http://www.freecol.org/cv3-discoverer-english/images/factory_iron_works_production_1703_spring.jpg)
 
 * COMMENT: The Iron Works produced 27 Tools from 18 Ore.
 
@@ -23141,7 +23141,7 @@
 * MOVED: Seasoned Scout SOUTH (numpad-key 2)
       One (1) tile from (45, 52) to (45, 53).
 
-[scout_hostile_colony_1708_autumn]http://www.freecol.org/cv3-discoverer-english/images/scout_hostile_colony_1708_autumn.jpg)
+[scout_hostile_colony_1708_autumn](http://www.freecol.org/cv3-discoverer-english/images/scout_hostile_colony_1708_autumn.jpg)
 
 * MOVED: Seasoned Scout SOUTH-EAST (numpad-key 3)
       One (1) tile from (45, 53) to (45, 53).
@@ -23311,7 +23311,7 @@
 
 * NOT MOVED: Free Colonist 01 at Plymouth (51, 41).
 
-[scout_hostile_colony_1709_spring]http://www.freecol.org/cv3-discoverer-english/images/scout_hostile_colony_1709_spring.jpg)
+[scout_hostile_colony_1709_spring](http://www.freecol.org/cv3-discoverer-english/images/scout_hostile_colony_1709_spring.jpg)
 
 * COMMENT: The Hostile European Colony has not attacked the Seasoned Scout after not achieving peace.
 
@@ -23930,7 +23930,7 @@
 
 * MOVED IN COLONY: Jamestown (53, 43): The Master Fur Trader from Outside Colony to Fur Trader producing 24 Coats
 
-[factory_fur_factory_production_1712_spring]http://www.freecol.org/cv3-discoverer-english/images/factory_fur_factory_production_1712_spring.jpg)
+[factory_fur_factory_production_1712_spring](http://www.freecol.org/cv3-discoverer-english/images/factory_fur_factory_production_1712_spring.jpg)
 
 * COMMENT: There is 48 Furs in the Warehouse, plus 16 Furs being produced should equate to 64 Furs. If the Fur Traders use 32 Furs to produce 48 Coats, then there should be 32 Furs in the Warehouse in Autumn 1712.
 
@@ -24022,7 +24022,7 @@
 
 * TIME: Autumn 1712
 
-[factory_fur_factory_production_1712_autumn]http://www.freecol.org/cv3-discoverer-english/images/factory_fur_factory_production_1712_autumn.jpg)
+[factory_fur_factory_production_1712_autumn](http://www.freecol.org/cv3-discoverer-english/images/factory_fur_factory_production_1712_autumn.jpg)
 
 * COMMENT: There was 48 Furs in the Warehouse, plus 16 Furs being produced should equate to 64 Furs. The Fur Traders have used 32 Furs to produce 48 Coats, and there is 32 Furs in the Warehouse.
 
@@ -24864,7 +24864,7 @@
 >           "Very well, you shall be spared."
 >           "Alas, it is God's will."
 
-[meeting_fellow_europeans_spare_us_1716_spring]http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spare_us_1716_spring.jpg)
+[meeting_fellow_europeans_spare_us_1716_spring](http://www.freecol.org/cv3-discoverer-english/images/meeting_fellow_europeans_spare_us_1716_spring.jpg)
 
 * SELECTED: "Alas, it is God's will."
 
@@ -25769,7 +25769,7 @@
 >          Pioneers clear forest near Plymouth
 >          120 Lumber added to stockpile.
 
-[lumber_added_1719_spring]http://www.freecol.org/cv3-discoverer-english/images/lumber_added_1719_spring.jpg)
+[lumber_added_1719_spring](http://www.freecol.org/cv3-discoverer-english/images/lumber_added_1719_spring.jpg)
 
 * NOT MOVED: Veteran Dragoon 25 at (52, 42).
 
@@ -26548,11 +26548,11 @@
 >           "Never! That would be treasonous! God save the King!"
 >           "Yes! Give me liberty or give me death!"
 
-[declare_independence_1722_spring]http://www.freecol.org/cv3-discoverer-english/images/declare_independence_1722_spring.jpg)
+[declare_independence_1722_spring](http://www.freecol.org/cv3-discoverer-english/images/declare_independence_1722_spring.jpg)
 
 * SELECTED: "Yes! Give me liberty or give me death!".
 
-[declare_independence_paper_1722_spring]http://www.freecol.org/cv3-discoverer-english/images/declare_independence_paper_1722_spring.jpg)
+[declare_independence_paper_1722_spring](http://www.freecol.org/cv3-discoverer-english/images/declare_independence_paper_1722_spring.jpg)
 
 * SCREEN:
 >          Continental Congress signs Declaration of
@@ -26562,21 +26562,21 @@
 >          General Walter Raleigh calls for volunteers
 >          for new Continental Army!
 
-[declare_independence_dialog_1722_spring_01]http://www.freecol.org/cv3-discoverer-english/images/declare_independence_dialog_1722_spring_01.jpg)
+[declare_independence_dialog_1722_spring_01](http://www.freecol.org/cv3-discoverer-english/images/declare_independence_dialog_1722_spring_01.jpg)
 
 * END OF TURN
 
 * SCREEN:
 >          Royal Expeditionary Force lands near Plymouth!
 
-[ref_lands_1722_spring_00]http://www.freecol.org/cv3-discoverer-english/images/ref_lands_1722_spring_00.jpg)
+[ref_lands_1722_spring_00](http://www.freecol.org/cv3-discoverer-english/images/ref_lands_1722_spring_00.jpg)
 
 * SCREEN:
 >          Your Excellency, the King's forces control all
 >          but 2 of our colonies! We need to protect our
 >          remaining colonies, or we will lose the war!
 
-[woi_warning_only_2_1722_spring]http://www.freecol.org/cv3-discoverer-english/images/woi_warning_only_2_1722_spring.jpg)
+[woi_warning_only_2_1722_spring](http://www.freecol.org/cv3-discoverer-english/images/woi_warning_only_2_1722_spring.jpg)
 
 * FORTRESS ATTACK: Plymouth (51, 41) opens fire on Tory Man-O-War!
 
@@ -26599,14 +26599,14 @@
 >          If we can generate 2000 liberty bells, they
 >          will join us.
 
-[woi_nation_help_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_nation_help_1722_autumn.jpg)
+[woi_nation_help_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_nation_help_1722_autumn.jpg)
 
 * SCREEN:
 >          Continental Army mobilizes at
 >          Jamestown! 7 Veteran units have been
 >          promoted to Continental Army status.
 
-[woi_continental_army_jamestown_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_continental_army_jamestown_1722_autumn.jpg)
+[woi_continental_army_jamestown_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_continental_army_jamestown_1722_autumn.jpg)
 
 * COMMENT: There are 15 Veteran Dragoons at both Jamestown (53, 43) and Plymouth (51, 41) colonies.
 
@@ -26615,38 +26615,38 @@
 >          10 Veteran units have been promoted to
 >          Continental Army status.
 
-[woi_continental_army_plymouth_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_continental_army_plymouth_1722_autumn.jpg)
+[woi_continental_army_plymouth_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_continental_army_plymouth_1722_autumn.jpg)
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1722_autumn.jpg)
+[religious_adviser_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1722_autumn.jpg)
 
-[continental_congress_1722_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1722_autumn_00.jpg)
+[continental_congress_1722_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1722_autumn_00.jpg)
 
-[continental_congress_1722_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1722_autumn_01.jpg)
+[continental_congress_1722_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_1722_autumn_01.jpg)
 
-[labor_adviser_1722_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_1722_autumn_00.jpg)
+[labor_adviser_1722_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_1722_autumn_00.jpg)
 
-[economic_adivser_1722_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1722_autumn_00.jpg)
+[economic_adivser_1722_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1722_autumn_00.jpg)
 
-[economic_adivser_1722_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1722_autumn_01.jpg)
+[economic_adivser_1722_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_1722_autumn_01.jpg)
 
-[colony_adviser_1722_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1722_autumn_00.jpg)
+[colony_adviser_1722_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1722_autumn_00.jpg)
 
-[colony_adviser_1722_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1722_autumn_01.jpg)
+[colony_adviser_1722_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_1722_autumn_01.jpg)
 
-[naval_adviser_1722_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_1722_autumn_00.jpg)
+[naval_adviser_1722_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_1722_autumn_00.jpg)
 
 * SCREEN:
 >          The Foriegn Affairs Adviser's report is
 >          no longer available once the War of
 >          Independence has begun.
 
-[foreign_affairs_report_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1722_autumn.jpg)
+[foreign_affairs_report_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/foreign_affairs_report_1722_autumn.jpg)
 
-[indian_adviser_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_1722_autumn.jpg)
+[indian_adviser_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_1722_autumn.jpg)
 
-[colonization_score_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/colonization_score_1722_autumn.jpg)
+[colonization_score_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/colonization_score_1722_autumn.jpg)
 
 * NOT MOVED: Wagon Train at Jamestown (53, 43).
 
@@ -26666,7 +26666,7 @@
 >          Continental Army Status, Your
 >          Excellency!
 
-[woi_military_promotion_1722_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_military_promotion_1722_autumn.jpg)
+[woi_military_promotion_1722_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_military_promotion_1722_autumn.jpg)
 
 * MOVED: Veteran Dragoon 02 WEST (numpad-key 4)
       One (1) tile from Plymouth (51, 41) to (50, 41).
@@ -27833,14 +27833,14 @@
 >          navy plans bombardment of Tory-held
 >          fortifications.
 
-[woi_netherlands_join_spring_1725]http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_spring_1725.jpg)
+[woi_netherlands_join_spring_1725](http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_spring_1725.jpg)
 
 * SCREEN:
 >          Dutch Intervention Force arrives in
 >          Jamestown! Local Rebel Army
 >          commander regales Dutch admiral.
 
-[woi_netherlands_join_1725_spring_01]http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_1725_spring_01.jpg)
+[woi_netherlands_join_1725_spring_01](http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_1725_spring_01.jpg)
 
 * COMMENT: The English are at war with both the Dutch and Spanish. The French left the New World earlier.
 
@@ -27972,7 +27972,7 @@
 >          Congress proclaims Walter Raleigh the first
 >          President of the new republic!
 
-[woi_win_1725_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn.jpg)
+[woi_win_1725_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn.jpg)
 
 * SCREEN:
 >          "In our wisdom,
@@ -27990,21 +27990,21 @@
 >          not be
 >          forthcoming."
 
-[woi_win_1725_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn_01.jpg)
+[woi_win_1725_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn_01.jpg)
 
-[woi_win_1725_autumn_02]http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn_02.jpg)
-[score_1726_spring]http://www.freecol.org/cv3-discoverer-english/images/score_1726_spring.jpg)
+[woi_win_1725_autumn_02](http://www.freecol.org/cv3-discoverer-english/images/woi_win_1725_autumn_02.jpg)
+[score_1726_spring](http://www.freecol.org/cv3-discoverer-english/images/score_1726_spring.jpg)
 
-[rating_1726_spring]http://www.freecol.org/cv3-discoverer-english/images/rating_1726_spring.jpg)
+[rating_1726_spring](http://www.freecol.org/cv3-discoverer-english/images/rating_1726_spring.jpg)
 
-[hall_of_fame_1726_spring]http://www.freecol.org/cv3-discoverer-english/images/hall_of_fame_1726_spring.jpg)
+[hall_of_fame_1726_spring](http://www.freecol.org/cv3-discoverer-english/images/hall_of_fame_1726_spring.jpg)
 
 * DIALOG:
 >          Scoring for this game is now complete.
 >           That's all.
 >           Keep playing anyway.
 
-[end_scoring_1726_spring]http://www.freecol.org/cv3-discoverer-english/images/end_scoring_1726_spring.jpg)
+[end_scoring_1726_spring](http://www.freecol.org/cv3-discoverer-english/images/end_scoring_1726_spring.jpg)
 
 * TIME: Spring 1726
 
@@ -28019,106 +28019,106 @@
 >          Plymouth! Local Rebel Army commander
 >          regales Dutch admiral.
 
-[woi_netherlands_join_1726_spring]http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_1726_spring.jpg)
+[woi_netherlands_join_1726_spring](http://www.freecol.org/cv3-discoverer-english/images/woi_netherlands_join_1726_spring.jpg)
 
 * TIME: Autumn 1726
 
 * COMMENT: The following Screenshots are from the Reports menu.
 
-[religious_adviser_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1726_autumn.jpg)
+[religious_adviser_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_1726_autumn.jpg)
 
-[religious_adviser_english_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_english_1726_autumn.jpg)
+[religious_adviser_english_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_english_1726_autumn.jpg)
 
-[religious_adviser_french_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_french_1726_autumn.jpg)
+[religious_adviser_french_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_french_1726_autumn.jpg)
 
-[religious_adviser_spanish_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spanish_1726_autumn.jpg)
+[religious_adviser_spanish_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_spanish_1726_autumn.jpg)
 
-[religious_adviser_dutch_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_dutch_1726_autumn.jpg)
+[religious_adviser_dutch_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/religious_adviser_dutch_1726_autumn.jpg)
 
-[continental_congress_english_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_english_1726_autumn_00.jpg)
+[continental_congress_english_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_english_1726_autumn_00.jpg)
 
-[continental_congress_english_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_english_1726_autumn_01.jpg)
+[continental_congress_english_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_english_1726_autumn_01.jpg)
 
-[continental_congress_french_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_french_1726_autumn_00.jpg)
+[continental_congress_french_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_french_1726_autumn_00.jpg)
 
-[continental_congress_french_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_french_1726_autumn_01.jpg)
+[continental_congress_french_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_french_1726_autumn_01.jpg)
 
-[continental_congress_spanish_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spanish_1726_autumn_00.jpg)
+[continental_congress_spanish_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spanish_1726_autumn_00.jpg)
 
-[continental_congress_spanish_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spanish_1726_autumn_01.jpg)
+[continental_congress_spanish_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_spanish_1726_autumn_01.jpg)
 
-[continental_congress_dutch_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_dutch_1726_autumn_00.jpg)
+[continental_congress_dutch_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_dutch_1726_autumn_00.jpg)
 
-[continental_congress_dutch_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/continental_congress_dutch_1726_autumn_01.jpg)
+[continental_congress_dutch_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/continental_congress_dutch_1726_autumn_01.jpg)
 
-[labor_adviser_english_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_english_1726_autumn_00.jpg)
+[labor_adviser_english_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_english_1726_autumn_00.jpg)
 
-[labor_adviser_french_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_french_1726_autumn_00.jpg)
+[labor_adviser_french_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_french_1726_autumn_00.jpg)
 
-[labor_adviser_spanish_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spanish_1726_autumn_00.jpg)
+[labor_adviser_spanish_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_spanish_1726_autumn_00.jpg)
 
-[labor_adviser_dutch_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_dutch_1726_autumn_00.jpg)
+[labor_adviser_dutch_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/labor_adviser_dutch_1726_autumn_00.jpg)
 
-[economic_adivser_english_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_english_1726_autumn_00.jpg)
+[economic_adivser_english_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_english_1726_autumn_00.jpg)
 
-[economic_adivser_english_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_english_1726_autumn_01.jpg)
+[economic_adivser_english_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_english_1726_autumn_01.jpg)
 
-[economic_adivser_french_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_french_1726_autumn_00.jpg)
+[economic_adivser_french_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_french_1726_autumn_00.jpg)
 
-[economic_adivser_french_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_french_1726_autumn_01.jpg)
+[economic_adivser_french_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_french_1726_autumn_01.jpg)
 
-[economic_adivser_spanish_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spanish_1726_autumn_00.jpg)
+[economic_adivser_spanish_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spanish_1726_autumn_00.jpg)
 
-[economic_adivser_spanish_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spanish_1726_autumn_01.jpg)
+[economic_adivser_spanish_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_spanish_1726_autumn_01.jpg)
 
-[economic_adivser_dutch_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_dutch_1726_autumn_00.jpg)
+[economic_adivser_dutch_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_dutch_1726_autumn_00.jpg)
 
-[economic_adivser_dutch_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_dutch_1726_autumn_01.jpg)
+[economic_adivser_dutch_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/economic_adivser_dutch_1726_autumn_01.jpg)
 
-[colony_adviser_english_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_english_1726_autumn_00.jpg)
+[colony_adviser_english_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_english_1726_autumn_00.jpg)
 
-[colony_adviser_english_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_english_1726_autumn_01.jpg)
+[colony_adviser_english_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_english_1726_autumn_01.jpg)
 
-[colony_adviser_french_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_french_1726_autumn_00.jpg)
+[colony_adviser_french_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_french_1726_autumn_00.jpg)
 
-[colony_adviser_french_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_french_1726_autumn_01.jpg)
+[colony_adviser_french_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_french_1726_autumn_01.jpg)
 
-[colony_adviser_spanish_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_00.jpg)
+[colony_adviser_spanish_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_00.jpg)
 
-[colony_adviser_spanish_1726_autumn_00_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_00_01.jpg)
+[colony_adviser_spanish_1726_autumn_00_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_00_01.jpg)
 
-[colony_adviser_spanish_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_01.jpg)
+[colony_adviser_spanish_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_01.jpg)
 
-[colony_adviser_spanish_1726_autumn_01_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_01_01.jpg)
+[colony_adviser_spanish_1726_autumn_01_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_spanish_1726_autumn_01_01.jpg)
 
-[colony_adviser_dutch_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_dutch_1726_autumn_00.jpg)
+[colony_adviser_dutch_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_dutch_1726_autumn_00.jpg)
 
-[colony_adviser_dutch_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_dutch_1726_autumn_01.jpg)
+[colony_adviser_dutch_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/colony_adviser_dutch_1726_autumn_01.jpg)
 
-[naval_adviser_english_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_english_1726_autumn_00.jpg)
+[naval_adviser_english_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_english_1726_autumn_00.jpg)
 
-[naval_adviser_english_1726_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_english_1726_autumn_01.jpg)
+[naval_adviser_english_1726_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_english_1726_autumn_01.jpg)
 
-[naval_adviser_french_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_french_1726_autumn_00.jpg)
+[naval_adviser_french_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_french_1726_autumn_00.jpg)
 
-[naval_adviser_spanish_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spanish_1726_autumn_00.jpg)
+[naval_adviser_spanish_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_spanish_1726_autumn_00.jpg)
 
-[naval_adviser_dutch_1726_autumn_00]http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_dutch_1726_autumn_00.jpg)
+[naval_adviser_dutch_1726_autumn_00](http://www.freecol.org/cv3-discoverer-english/images/naval_adviser_dutch_1726_autumn_00.jpg)
 
 * SCREEN:
 >          The Foriegn Affairs Adviser's report is
 >          no longer available once the War of
 >          Independence has begun.
 
-[indian_adviser_english_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_english_1726_autumn.jpg)
+[indian_adviser_english_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_english_1726_autumn.jpg)
 
-[indian_adviser_french_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_french_1726_autumn.jpg)
+[indian_adviser_french_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_french_1726_autumn.jpg)
 
-[indian_adviser_spanish_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spanish_1726_autumn.jpg)
+[indian_adviser_spanish_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_spanish_1726_autumn.jpg)
 
-[indian_adviser_dutch_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_dutch_1726_autumn.jpg)
+[indian_adviser_dutch_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/indian_adviser_dutch_1726_autumn.jpg)
 
-[colonization_score_english_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/colonization_score_english_1726_autumn.jpg)
+[colonization_score_english_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/colonization_score_english_1726_autumn.jpg)
 
 * COMMENT: The Scoring is complete for ALL Nations.
 
@@ -28149,7 +28149,7 @@
 >          Custom House improvements can trade
 >          with European smugglers, however.
 
-[woi_sail_to_europe_1726_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_sail_to_europe_1726_autumn.jpg)
+[woi_sail_to_europe_1726_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_sail_to_europe_1726_autumn.jpg)
 
 * MOVED: Frigate 01 WEST (numpad-key 4)
       Two (2) tiles from (56, 42) to (54, 42)
@@ -28532,25 +28532,25 @@
 
 * COMMENT: Using the View menu, and European Status.
 
-[woi_european_status_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_1727_autumn.jpg)
+[woi_european_status_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_1727_autumn.jpg)
 
 * COMMENT: The following menu appears
 
-[woi_european_status_choose_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_choose_1727_autumn.jpg)
+[woi_european_status_choose_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_choose_1727_autumn.jpg)
 
 * COMMENT: The following city views.
 
-[woi_european_status_london_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_london_1727_autumn.jpg)
+[woi_european_status_london_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_london_1727_autumn.jpg)
 
-[woi_european_status_la_rochelle_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_la_rochelle_1727_autumn.jpg)
+[woi_european_status_la_rochelle_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_la_rochelle_1727_autumn.jpg)
 
-[woi_european_status_seville_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_seville_1727_autumn.jpg)
+[woi_european_status_seville_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_seville_1727_autumn.jpg)
 
 * COMMENT: I clicked on 'Recruit' two (2) times and two Spanish colonists appeared. This was at no cost to me. Clicking on 'Purchase' and/or 'Train' give the default menu for items to purchase or train.
 
-[woi_european_status_seville_1727_autumn_01]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_seville_1727_autumn_01.jpg)
+[woi_european_status_seville_1727_autumn_01](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_seville_1727_autumn_01.jpg)
 
-[woi_european_status_amsterdam_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_amsterdam_1727_autumn.jpg)
+[woi_european_status_amsterdam_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_european_status_amsterdam_1727_autumn.jpg)
 
 * WAITED: The Wagon Train at Plymouth (51, 41).
 
@@ -28569,7 +28569,7 @@
 >          Scouts cannot meet with mayors during
 >          the War of Independence.
 
-[woi_scout_1727_autumn]http://www.freecol.org/cv3-discoverer-english/images/woi_scout_1727_autumn.jpg)
+[woi_scout_1727_autumn](http://www.freecol.org/cv3-discoverer-english/images/woi_scout_1727_autumn.jpg)
 
 * NOT MOVED: Frigate 01 at Jamestown (53, 43).
 
