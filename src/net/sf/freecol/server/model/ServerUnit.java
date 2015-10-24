@@ -223,7 +223,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         boolean unitDirty = false;
 
         // Attrition.  Do it first as the unit might die.
-        if (loc instanceof Tile && !((Tile)loc).hasSettlement()) {
+        if (getType().hasMaximumAttrition() && loc instanceof Tile
+            && !((Tile)loc).hasSettlement()) {
             int attrition = getAttrition() + 1;
             setAttrition(attrition);
             if (attrition > getType().getMaximumAttrition()) {

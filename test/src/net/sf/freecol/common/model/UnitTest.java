@@ -637,4 +637,14 @@ public class UnitTest extends FreeColTestCase {
             assertNotNull(type.getDefaultRole());
         }
     }
+
+    public void testAttrition() {
+        for (UnitType type : spec().getUnitTypeList()) {
+            if (type == indianConvertType) {
+                assertTrue(type.hasMaximumAttrition());
+            } else {
+                assertFalse(type.hasMaximumAttrition());
+            }
+        }
+    }        
 }

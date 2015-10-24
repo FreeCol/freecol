@@ -2161,4 +2161,46 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Production(unit/building-advantage)", 5,
             building.getTotalProductionOf(hammersType));
     }
+
+    public void testAttrition() {
+        final Game game = ServerTestHelper.startServerGame(getTestMap());
+        final InGameController igc = ServerTestHelper.getInGameController();
+
+        Colony colony = getStandardColony();
+        ServerPlayer player = (ServerPlayer)colony.getOwner();
+        Unit unit = new ServerUnit(game, colony.getTile(), player,
+                                   indianConvertType);
+
+        // Starts at zero attrition
+        assertEquals(0, unit.getAttrition());
+
+        // Should stay there because unit is at colony
+        ServerTestHelper.newTurn();
+        assertEquals(0, unit.getAttrition());
+
+        // Move the unit out, and attrition should start
+        for (Tile t : colony.getTile().getSurroundingTiles(1, 1)) {
+            if (t.isLand()) {
+                unit.setLocation(t);
+                break;
+            }
+        }
+        ServerTestHelper.newTurn();
+        assertEquals(1, unit.getAttrition());
+
+        // Normal unit is not subject to attrition
+        Unit colonist = new ServerUnit(game, unit.getTile(), player,
+                                       colonistType);
+        assertEquals(0, colonist.getAttrition());
+        ServerTestHelper.newTurn();
+        assertEquals(0, colonist.getAttrition());
+        
+        // Run down the clock on the convert
+        while (unit.getAttrition() < unit.getType().getMaximumAttrition()) {
+            ServerTestHelper.newTurn();
+        }
+        assertFalse(unit.isDisposed());
+        ServerTestHelper.newTurn();
+        assertTrue(unit.isDisposed());
+    }        
 }

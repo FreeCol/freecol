@@ -354,6 +354,15 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
+     * Is this unit type subject to attrition?
+     *
+     * @return True if attrition can happen for this unit type.
+     */
+    public boolean hasMaximumAttrition() {
+        return maximumAttrition != INFINITY;
+    }
+
+    /**
      * Get the maximum attrition for this unit type (greater attrition than
      * this destroys the unit).
      *
@@ -738,7 +747,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
         xw.writeAttribute(MAXIMUM_EXPERIENCE_TAG, maximumExperience);
 
-        if (maximumAttrition < INFINITY) {
+        if (hasMaximumAttrition()) {
             xw.writeAttribute(MAXIMUM_ATTRITION_TAG, maximumAttrition);
         }
 
