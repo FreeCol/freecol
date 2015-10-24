@@ -1702,7 +1702,7 @@
     </unit-type>
     <unit-type id="model.unit.indianConvert" 
                skill="0" offence="0" defence="1" movement="3" line-of-sight="1"
-               maximum-attrition="10" score-value="3">
+               maximum-attrition="8" score-value="3">
       <consumes id="model.goods.food" value="2"/>
       <consumes id="model.goods.bells" value="1"/>
       <downgrade unit="model.unit.freeColonist" delete="true"/>
