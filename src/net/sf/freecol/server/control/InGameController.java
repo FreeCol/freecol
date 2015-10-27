@@ -4301,24 +4301,15 @@ public final class InGameController extends Controller {
             }
         }
 
-        Iterator<UnitChange> uci = unitChanges.iterator();
-        while (uci.hasNext()) {
-            UnitChange uc = uci.next();
-            if (uc.unit.getRole() == uc.role) uci.remove();
-        }
-        if (!unitChanges.isEmpty()) {
-            Collections.sort(unitChanges,
-                             RearrangeColonyMessage.roleComparator);
-            Collections.reverse(unitChanges);
-            for (UnitChange uc : unitChanges) {
-                if (uc.role != defaultRole) {
-                    if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
-                        // Should not happen if we equip simplest first
-                        return DOMMessage.clientError("Failed to equip "
-                            + uc.unit.getId() + " for role " + uc.role
-                            + " at " + colony);
-                    }
-                }
+        // Collect roles that cause a change, ordered by simplest change
+        for (UnitChange uc : iterable(unitChanges.stream()
+                .filter(uc -> uc.role != uc.unit.getRole()
+                    && uc.role != defaultRole)
+                .sorted(Comparator.<UnitChange>reverseOrder()))) {
+            if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
+                return DOMMessage.clientError("Failed to equip "
+                    + uc.unit.getId() + " for role " + uc.role
+                    + " at " + colony);
             }
         }
         

@@ -467,4 +467,16 @@ public class CollectionUtils {
         Function<? super T,? extends R> mapper) {
         return collection.stream().map(mapper);
     }
+
+    /**
+     * Convenience function to convert a stream to an iterable.
+     *
+     * @param stream The <code>Stream</code> to convert.
+     * @return The suitable <code>Iterable</code>.
+     */
+    public static <T> Iterable<T> iterable(final Stream<T> stream) {
+        return new Iterable<T>() {
+            public Iterator<T> iterator() { return stream.iterator(); }
+        };
+    }
 }

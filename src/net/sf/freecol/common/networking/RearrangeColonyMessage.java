@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 public class RearrangeColonyMessage extends DOMMessage {
 
     /** Container for the unit change information. */
-    public static class UnitChange {
+    public static class UnitChange implements Comparable<UnitChange> {
 
         public Unit unit;
         public Location loc;
@@ -129,18 +129,18 @@ public class RearrangeColonyMessage extends DOMMessage {
                 + " " + role.getRoleSuffix() + "." + roleCount
                 + ((work == null) ? "" : " work " + work.getId()) + "]";
         }
-    }
 
-    /** A comparator for UnitChanges, favouring simplest roles first. */
-    public static final Comparator<UnitChange> roleComparator
-        = new Comparator<UnitChange>() {
-            @Override
-            public int compare(UnitChange uc1, UnitChange uc2) {
-                int cmp = uc1.role.compareTo(uc2.role);
-                if (cmp == 0) cmp = uc1.roleCount - uc2.roleCount;
-                return cmp;
-            }
-        };
+        // Interface Comparable<UnitChange>
+
+        /**
+         * {@inheritDoc}
+         */
+        public int compareTo(UnitChange other) {
+            int cmp = this.role.compareTo(other.role);
+            if (cmp == 0) cmp = this.roleCount - other.roleCount;
+            return cmp;
+        }
+    }
 
     /** The id of the colony requesting the rearrangement. */
     private final String colonyId;
