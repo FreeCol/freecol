@@ -4670,12 +4670,12 @@ public final class InGameController implements NetworkConstants {
             && freeColClient.currentPlayerIsMyPlayer()) {
             gui.closeMenus();
         }
-        FreeColDebugger.finishDebugRun(freeColClient, false);
 
         final Game game = freeColClient.getGame();
         game.setCurrentPlayer(player);
 
         if (freeColClient.getMyPlayer().equals(player)) {
+            FreeColDebugger.finishDebugRun(freeColClient, false);
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
                 && DebugUtils.checkDesyncAction(freeColClient)) {
                 freeColClient.getConnectController().reconnect();
