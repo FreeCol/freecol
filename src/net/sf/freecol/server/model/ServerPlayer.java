@@ -34,10 +34,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1119,8 +1121,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<>();
-        randomShuffle(logger, "Naval load", navalUnits, random);
-        randomShuffle(logger, "Land load", landUnits, random);
+        if (random != null) {
+            randomShuffle(logger, "Naval load", navalUnits, random);
+            randomShuffle(logger, "Land load", landUnits, random);
+        }
         LogBuilder lb = new LogBuilder(256);
         lb.mark();
         landUnit: for (Unit unit : landUnits) {
@@ -1141,16 +1145,34 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Simpler frontend to loadShips.
+     *
+     * @param units The <code>Unit</code>s to load.
+     * @return The left over units.
+     */
+    public List<Unit> loadShips(List<Unit> units) {
+        List<Unit> landUnits = new ArrayList<Unit>();
+        List<Unit> navalUnits = new ArrayList<Unit>();
+        for (Unit u : units) {
+            if (u.isNaval()) navalUnits.add(u); else landUnits.add(u);
+        }
+        return loadShips(landUnits, navalUnits, null);
+    }
+
+    /**
      * Calculates the price of a group of mercenaries for this player.
      *
      * @param mercenaries A list of mercenaries to price.
      * @return The price.
      */
     public int priceMercenaries(List<AbstractUnit> mercenaries) {
-        int mercPrice = mercenaries.stream()
-            .mapToInt(au -> getPrice(au)).sum();
-        if (!checkGold(mercPrice)) mercPrice = getGold();
-        return mercPrice;
+        int price = 0;
+        for (AbstractUnit au : mercenaries) {
+            int auPrice = getPrice(au);
+            if (auPrice == INFINITY) continue;
+            price += auPrice;
+        }
+        return (checkGold(price)) ? price : getGold();
     }
 
     /**
@@ -4218,6 +4240,31 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Add a mercenary offer to the player.
+     *
+     * @param mercenaries A list of mercenary units.
+     * @param action The monarch action that caused the offer.
+     * @param random A pseudo-random number source.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csMercenaries(List<AbstractUnit> mercenaries,
+                              Monarch.MonarchAction action,
+                              Random random, ChangeSet cs) {
+        if (mercenaries.isEmpty()) return;
+        final int n = NameCache.getMercenaryLeaderIndex(random);
+        final int price = priceMercenaries(mercenaries);
+        cs.add(See.only(this), ChangePriority.CHANGE_EARLY,
+            new MonarchActionMessage(action, StringTemplate
+                .template(action.getTextKey())
+                .addName("%leader%", NameCache.getMercenaryLeaderName(n))
+                .addAmount("%gold%", price)
+                .addStringTemplate("%mercenaries%",
+                    AbstractUnit.getListLabel(", ", mercenaries)),
+                "image.flavor.model.mercenaries." + n));
+        new MonarchSession(this, action, mercenaries, price);
+    }
+        
+    /**
      * Set the player tax rate.
      * If this requires a change to the bells bonuses, we have to update
      * the whole player (bah) because we can not yet independently update
@@ -4245,8 +4292,25 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,
                                  ChangeSet cs) {
         if (checkGold(price)) {
-            createUnits(mercs, getEurope());//-vis: safe, Europe
-            cs.add(See.only(this), getEurope());
+            final Specification spec = getSpecification();
+            List<AbstractUnit> naval = mercs.stream()
+                .filter(au -> au.getType(spec).isNaval())
+                .collect(Collectors.toList());
+            Tile dst;
+            if (naval.isEmpty()) { // Deliver to first settlement
+                dst = getColonies().get(0).getTile();
+                createUnits(mercs, dst);//-vis: safe, in colony
+                cs.add(See.only(this), dst);
+            } else { // Let them sail in
+                dst = getEntryLocation().getTile();
+                loadShips(createUnits(mercs, dst));//-vis
+                invalidateCanSeeTiles();//+vis(this)
+                cs.add(See.perhaps(), dst);
+            }
+            cs.addMessage(See.only(this),
+                new ModelMessage("model.player.mercenariesArrived", this)
+                    .addStringTemplate("%location%",
+                        dst.up().getLocationLabelFor(this)));
             modifyGold(-price);
             cs.addPartial(See.only(this), this, "gold");
         } else {

@@ -617,9 +617,11 @@ public final class Monarch extends FreeColGameObject implements Named {
             return player.getAttackedByPrivateers() && !getSupportSea()
                 && !getDispleasure();
         case SUPPORT_LAND: case MONARCH_MERCENARIES:
-            return player.isAtWar() && !getDispleasure();
+            return player.isAtWar() && !getDispleasure()
+                && player.getNumberOfSettlements() > 0;
         case HESSIAN_MERCENARIES:
-            return player.checkGold(HESSIAN_MINIMUM_PRICE);
+            return player.checkGold(HESSIAN_MINIMUM_PRICE)
+                && player.getNumberOfSettlements() > 0;
         case DISPLEASURE:
             return false;
         default:

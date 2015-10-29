@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1010,21 +1009,8 @@ public final class InGameController extends Controller {
             new MonarchSession(serverPlayer, action, mercenaries, mercPrice);
             break;
         case HESSIAN_MERCENARIES:
-            final List<AbstractUnit> hessians
-                = monarch.getMercenaries(random);
-            if (hessians.isEmpty()) break;
-            int n = NameCache.getMercenaryLeaderIndex(random);
-            final int hessPrice = serverPlayer.priceMercenaries(hessians);
-            message = new MonarchActionMessage(action, StringTemplate
-                .template(messageId)
-                .addName("%leader%", NameCache.getMercenaryLeaderName(n))
-                .addAmount("%gold%", hessPrice)
-                .addStringTemplate("%mercenaries%",
-                    AbstractUnit.getListLabel(", ", hessians)),
-                "image.flavor.model.mercenaries." + n);
-            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_EARLY,
-                   message);
-            new MonarchSession(serverPlayer, action, hessians, hessPrice);
+            serverPlayer.csMercenaries(monarch.getMercenaries(random), action,
+                                       random, cs);
             break;
         case DISPLEASURE: default:
             logger.warning("Bogus action: " + action);
@@ -1210,7 +1196,8 @@ public final class InGameController extends Controller {
         ServerPlayer refPlayer = createREFPlayer(serverPlayer);
         cs.addPlayer(refPlayer);
         // Update the intervention force
-        serverPlayer.getMonarch().updateInterventionForce();
+        final Monarch monarch = serverPlayer.getMonarch();
+        monarch.updateInterventionForce();
         String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -1220,11 +1207,6 @@ public final class InGameController extends Controller {
                 .addAmount("%number%",
                     spec.getInteger(GameOptions.INTERVENTION_BELLS)));
         serverPlayer.csChangeStance(Stance.WAR, refPlayer, true, cs);
-
-        // Now the REF is ready, we can dispose of the European connection.
-        cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
-        europe.dispose();
-        // Do not clean up the Monarch, it contains the intervention force
 
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
@@ -1275,11 +1257,11 @@ public final class InGameController extends Controller {
             }
         }
 
-        // Most hostile contacted non-warring natives declare war on
-        // you and peace with the REF, least hostile contacted natives
-        // declare peace on you and war on the REF.  If they are the
-        // same nation, go to the next most hostile nation that may
-        // already be at war.
+        // The most hostile contacted non-warring natives declare war
+        // on you and peace with the REF, least hostile contacted
+        // natives declare peace on you and war on the REF.  If they
+        // are the same nation, go to the next most hostile nation
+        // that may already be at war.
         List<Player> natives = game.getLiveNativePlayers(null).stream()
             .filter(p -> p.hasContacted(serverPlayer))
             .sorted(Comparator.comparingInt(p ->
@@ -1343,7 +1325,10 @@ public final class InGameController extends Controller {
             }
         }
 
-        //
+        // Make the mercenary force offer
+        serverPlayer.csMercenaries(monarch.getMercenaryForce().getUnits(),
+            Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
+        
         // Pity to have to update such a heavy object as the player,
         // but we do this, at most, once per player.  Other players
         // only need a partial player update and the stance change.
@@ -1362,6 +1347,11 @@ public final class InGameController extends Controller {
                 .add("%ruler%", serverPlayer.getRulerNameKey()));
         cs.add(See.only(serverPlayer), serverPlayer);
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+
+        // Now that everything is ready, we can dispose of Europe.
+        cs.addRemove(See.only(serverPlayer), null, europe);//-vis: not on map
+        europe.dispose();
+        // Do not clean up the Monarch, it contains the intervention force
 
         getGame().sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
