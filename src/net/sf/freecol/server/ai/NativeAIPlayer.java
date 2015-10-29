@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.function.ToIntFunction;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -325,19 +326,13 @@ public class NativeAIPlayer extends AIPlayer {
         // Also favour units native to the settlement.
         final int homeBonus = 3;
         final Tile isTile = is.getTile();
+        final ToIntFunction<Unit> scoreHome = u -> {
+            final Tile t = u.getTile();
+            return t.getDistanceTo(isTile)
+                - ((u.getHomeIndianSettlement() == is) ? homeBonus : 0);
+        };
         final Comparator<Unit> isComparator
-            = new Comparator<Unit>() {
-                @Override
-                public int compare(Unit u1, Unit u2) {
-                    Tile t1 = u1.getTile();
-                    int s1 = t1.getDistanceTo(isTile);
-                    Tile t2 = u2.getTile();
-                    int s2 = t2.getDistanceTo(isTile);
-                    if (u1.getHomeIndianSettlement() == is) s1 -= homeBonus;
-                    if (u2.getHomeIndianSettlement() == is) s2 -= homeBonus;
-                    return s1 - s2;
-                }
-           };
+            = Comparator.comparingInt(scoreHome);
 
         // Do we need more or less defenders?
         int needed = minimumDefence + threats.size();
@@ -354,8 +349,7 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             }
         } else if (defenders.size() > needed) { // Less needed, release them
-            Collections.sort(defenders, isComparator);
-            Collections.reverse(defenders);
+            Collections.sort(defenders, isComparator.reversed());
             while (defenders.size() > needed) {
                 units.add(defenders.remove(0));
             }
@@ -363,13 +357,8 @@ public class NativeAIPlayer extends AIPlayer {
 
         // Sort threat tiles by threat value.
         List<Tile> threatTiles = new ArrayList<>(threats.keySet());
-        Collections.sort(threatTiles, new Comparator<Tile>() {
-                @Override
-                public int compare(Tile t1, Tile t2) {
-                    return Double.compare(threats.get(t2),
-                            threats.get(t1));
-                }
-            });
+        Collections.sort(threatTiles,
+            Comparator.comparingDouble(t -> threats.get(t)));
 
         if (!defenders.isEmpty()) {
             lb.add(" defend with:");
