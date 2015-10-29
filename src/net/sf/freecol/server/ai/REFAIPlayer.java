@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -497,20 +499,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         if (transports.size() < nt) {
             // Sort by longest distance to target
-            Collections.sort(naval, new Comparator<AIUnit>() {
-                    @Override
-                    public int compare(AIUnit a1, AIUnit a2) {
-                        int d1 = a1.getMission(PrivateerMission.class)
-                            .getDistanceToTarget();
-                        int d2 = a2.getMission(PrivateerMission.class)
-                            .getDistanceToTarget();
-                        return d1 - d2;
-                    }
-                });
+            final ToIntFunction<AIUnit> targetDistance = aiu -> {
+                Unit target = (Unit)aiu.getMission().getTarget();
+                Tile tile = aiu.getUnit().getTile();
+                return tile.getDistanceTo(target.getTile());
+            };
+            final Comparator<AIUnit> targetDistanceComparator
+                = Comparator.comparingInt(targetDistance);
+            Collections.sort(naval, targetDistanceComparator);
             while (!naval.isEmpty()) {
                 AIUnit aiu = naval.remove(0);
-                int distance = aiu.getMission(PrivateerMission.class)
-                    .getDistanceToTarget();
+                int distance = targetDistance.applyAsInt(aiu);
                 if ((m = getTransportMission(aiu)) != null) {
                     lb.add(" REQUIRED ", distance, " ", m);
                     result.add(aiu);
@@ -803,12 +802,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
                 // Send transports to the idle ports, preferring the ones
                 // with the most units.
-                Collections.sort(idlePorts, new Comparator<Location>() {
-                        @Override
-                        public int compare(Location l1, Location l2) {
-                            return idlers.get(l1).size() - idlers.get(l2).size();
-                        }
-                    });
+                final Comparator<Location> portUnitComparator
+                    = Comparator.comparing(loc -> idlers.get(loc),
+                                           ascendingListLengthComparator);
+                Collections.sort(idlePorts, portUnitComparator);
                 boolean bad = false;
                 while (!bad && !todo.isEmpty()) {
                     for (Location l : idlePorts) {
