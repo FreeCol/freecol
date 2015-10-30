@@ -872,23 +872,16 @@ public class ColonyPlan {
         // list, and then by amount.  If the type of goods produced is
         // not on the produce list, then make sure such plans sort to
         // the end, except for food plans.
-        Collections.sort(workPlans, new Comparator<WorkLocationPlan>() {
-                @Override
-                public int compare(WorkLocationPlan w1, WorkLocationPlan w2) {
-                    GoodsType g1 = w1.getGoodsType();
-                    GoodsType g2 = w2.getGoodsType();
-                    int i1 = produce.indexOf(g1);
-                    int i2 = produce.indexOf(g2);
-                    if (i1 < 0 && !g1.isFoodType()) i1 = 99999;
-                    if (i2 < 0 && !g2.isFoodType()) i2 = 99999;
-                    int cmp = i1 - i2;
-                    if (cmp == 0) {
-                        cmp = w2.getWorkLocation().getGenericPotential(g2)
-                            - w1.getWorkLocation().getGenericPotential(g1);
-                    }
-                    return cmp;
-                }
-            });
+        Collections.sort(workPlans,
+            Comparator.comparingInt((WorkLocationPlan wp) -> {
+                    final GoodsType gt = wp.getGoodsType();
+                    int i = produce.indexOf(gt);
+                    return (i < 0 && !gt.isFoodType()) ? 99999 : i;
+                })
+            .thenComparingInt((WorkLocationPlan wp) ->
+                wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
+            .thenComparing((WorkLocationPlan wp) ->
+                wp.getGoodsType(), GoodsType.goodsTypeComparator));
     }
 
     /**
@@ -1139,7 +1132,7 @@ public class ColonyPlan {
         if (role.isOffensive()) {
             for (Role r : unit.getAvailableRoles(spec.getMilitaryRoles())) {
                 if (colony.equipForRole(unit, 
-                                        r, r.getMaximumCount())) return true;
+                        r, r.getMaximumCount())) return true;
             }
             return false;
         }
@@ -1201,39 +1194,27 @@ public class ColonyPlan {
                     if ((role = u.getMilitaryRole()) == null) continue;
                 }
                 if (u.getType() == role.getExpertUnit()
-                        && fullEquipUnit(spec(), u, role, col)) {
+                    && fullEquipUnit(spec(), u, role, col)) {
                     workers.remove(u);
                     lb.add(u.getId(), "(", u.getType().getSuffix(),
-                            ") -> ", role.getSuffix(), "\n");
+                        ") -> ", role.getSuffix(), "\n");
                 }
             }
         }
 
         // Consider the defence situation.
         // FIXME: scan for neighbouring hostiles
-        // Favour low-skill/experience units for defenders, order experts
-        // in reverse order of their production on the produce-list.
-        Comparator<Unit> soldierComparator = new Comparator<Unit>() {
-            @Override
-            public int compare(Unit u1, Unit u2) {
-                int cmp = u1.getSkillLevel() - u2.getSkillLevel();
-                if (cmp == 0) {
-                    GoodsType g1 = u1.getType().getExpertProduction();
-                    GoodsType g2 = u2.getType().getExpertProduction();
-                    cmp = ((g2 == null) ? 1 : 0) - ((g1 == null) ? 1 : 0);
-                    if (cmp == 0 && g1 != null) {
-                        int i = produce.indexOf(g2);
-                        cmp = (i < 0) ? produce.size() : i;
-                        i = produce.indexOf(g1);
-                        cmp -= (i < 0) ? produce.size() : i;
-                    }
-                }
-                if (cmp == 0) {
-                    cmp = u1.getExperience() - u2.getExperience();
-                }
-                return cmp;
-            }
-        };
+        // Favour low-skill units for defenders, then order experts
+        // in reverse order of their production on the produce-list,
+        // and finally by least experience.
+        final Comparator<Unit> soldierComparator
+            = Comparator.<Unit>comparingInt(Unit::getSkillLevel)
+                .thenComparingInt(u ->
+                    (u.getType().getExpertProduction() == null) ? 1 : 0)
+                .thenComparingInt(u ->
+                    produce.indexOf(u.getType().getExpertProduction()))
+                .reversed()
+                .thenComparingInt(Unit::getExperience);
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<>(workers)) {
             if (workers.size() <= 1) break;
