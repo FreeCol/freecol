@@ -42,11 +42,11 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -77,6 +77,40 @@ import net.sf.freecol.common.util.LogBuilder;
 public class ColonyPlan {
 
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
+
+    /** The things to build, and their priority. */
+    private static class BuildPlan {
+
+        public final BuildableType type;
+        public double weight;
+        public double support;
+        public double difficulty;
+
+        public BuildPlan(BuildableType type, double weight, double support) {
+            this.type = type;
+            this.weight = weight;
+            this.support = support;
+            this.difficulty = 1.0f;
+        }
+
+        public double getValue() {
+            return weight * support / difficulty;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return String.format("%s (%1.3f * %1.3f / %1.3f = %1.3f)",
+                                 type.getSuffix(), weight, support,
+                                 difficulty, getValue());
+        }
+    };
+
+    /** Comparator to sort buildable by descending value. */
+    private static final Comparator<BuildPlan> buildPlanComparator
+        = Comparator.comparingDouble(BuildPlan::getValue).reversed();
 
     /** Require production plans to always produce an amount exceeding this. */
     private static final int LOW_PRODUCTION_THRESHOLD = 1;
@@ -116,49 +150,8 @@ public class ColonyPlan {
     /** The colony this AIColony manages. */
     private final Colony colony;
 
-    /** The things to build, and their priority. */
-    private static class BuildPlan {
-
-        public final BuildableType type;
-        public double weight;
-        public double support;
-        public double difficulty;
-
-        public BuildPlan(BuildableType type, double weight, double support) {
-            this.type = type;
-            this.weight = weight;
-            this.support = support;
-            this.difficulty = 1.0f;
-        }
-
-        public double getValue() {
-            return weight * support / difficulty;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return String.format("%s (%1.3f * %1.3f / %1.3f = %1.3f)",
-                                 type.getSuffix(), weight, support,
-                                 difficulty, getValue());
-        }
-    };
-    private final List<BuildPlan> buildPlans = new ArrayList<>();
-
-    /**
-     * Comparator to sort buildable types on their priority in the
-     * buildPlan map.
-     */
-    private static final Comparator<BuildPlan> buildPlanComparator
-        = new Comparator<BuildPlan>() {
-            @Override
-            public int compare(BuildPlan b1, BuildPlan b2) {
-                double d = b1.getValue() - b2.getValue();
-                return (d > 0.0) ? -1 : (d < 0.0) ? 1 : 0;
-            }
-        };
+ 
+   private final List<BuildPlan> buildPlans = new ArrayList<>();
 
     /** Plans for work locations available to this colony. */
     private final List<WorkLocationPlan> workPlans = new ArrayList<>();
