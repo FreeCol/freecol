@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -263,18 +264,11 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
-        List<JMenuItem> ret = new ArrayList<>(map.keySet());
-        Collections.sort(ret, new Comparator<JMenuItem>() {
-                @Override
-                public int compare(JMenuItem m1, JMenuItem m2) {
-                    Integer i1 = map.get(m1);
-                    Integer i2 = map.get(m2);
-                    int cmp = i2.compareTo(i1);
-                    if (cmp == 0) cmp = m1.getText().compareTo(m2.getText());
-                    return cmp;
-                }
-            });
-        return ret;
+        return map.keySet().stream()
+            .sorted(Comparator.comparingInt((JMenuItem k)
+                    -> map.get(k)).reversed()
+                .thenComparing(JMenuItem::getText))
+            .collect(Collectors.toList());
     }
 
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,
