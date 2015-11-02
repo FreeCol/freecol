@@ -72,10 +72,7 @@ public class Unit extends GoodsLocation
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
-    /**
-     * A comparator to compare units by position, top to bottom,
-     * left to right.
-     */
+    /** Compare units by location. */
     public static final Comparator<Unit> locComparator
         = Comparator.comparingInt(u -> Location.getRank(u));
 
