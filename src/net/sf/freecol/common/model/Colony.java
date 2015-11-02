@@ -2060,16 +2060,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
          * amount.
          */
         public static final Comparator<TileImprovementSuggestion> descendingAmountComparator
-            = new Comparator<TileImprovementSuggestion>() {
-                    @Override
-                    public int compare(TileImprovementSuggestion tis1,
-                                       TileImprovementSuggestion tis2) {
-                        int cmp = tis2.amount - tis1.amount;
-                        if (cmp == 0) cmp = tis2.tile.compareTo(tis1.tile);
-                        return cmp;
-                    }
-                };
-        
+            = Comparator.comparingInt(TileImprovementSuggestion::getAmount)
+                .reversed()
+                .thenComparing(tis -> (FreeColObject)tis.tile);
+
         /** The tile to explore or improve. */
         public Tile tile;
         /** The tile improvement to make, or if null to explore an LCR. */
@@ -2086,6 +2080,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         public boolean isExploration() {
             return this.tileImprovementType == null;
+        }
+
+        public int getAmount() {
+            return this.amount;
         }
     };
     
