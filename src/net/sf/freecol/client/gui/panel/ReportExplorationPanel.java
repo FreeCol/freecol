@@ -32,6 +32,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.model.Region;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -39,19 +40,12 @@ import net.sf.freecol.common.model.Region;
  */
 public final class ReportExplorationPanel extends ReportPanel {
 
-    // only use this for regions that have already been discovered!
-    private static final Comparator<Region> regionComparator = new Comparator<Region>() {
-        @Override
-        public int compare(Region region1, Region region2) {
-            int number1 = region1.getDiscoveredIn().getNumber();
-            int number2 = region2.getDiscoveredIn().getNumber();
-            if (number1 == number2) {
-                return region2.getScoreValue() - region1.getScoreValue();
-            } else {
-                return number2 - number1;
-            }
-        }
-    };
+    /** Comparator for discovered regions, by descending turn and score. */
+    private static final Comparator<Region> regionComparator
+        = Comparator.comparingInt((Region r) ->
+            r.getDiscoveredIn().getNumber()).reversed()
+                .thenComparingInt(Region::getScoreValue).reversed();
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -63,20 +57,9 @@ public final class ReportExplorationPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-
-        List<Region> regions = new ArrayList<>();
-        for (Region region : getGame().getMap().getRegions()) {
-            if (region.getDiscoveredIn() != null) {
-                regions.add(region);
-            }
-        }
-        Collections.sort(regions, regionComparator);
-
         reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
-        /**
-         * Header Row
-         */
+        // Header Row
         Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD, getImageLibrary().getScaleFactor());
         JLabel nameOfRegion = Utility.localizedLabel("report.exploration.nameOfRegion");
@@ -95,12 +78,11 @@ public final class ReportExplorationPanel extends ReportPanel {
         valueOfRegion.setFont(font);
         reportPanel.add(valueOfRegion);
         
-        /**
-         * Content Rows
-         * 
-         * TODO: Display "None" if no contents, though this would be rare.
-         */
-        for (Region region : regions) {
+        // Content Rows
+        // TODO: Display "None" if no contents, though this would be rare.
+        for (Region region : iterable(getGame().getMap().getRegions().stream()
+                .filter(r -> r.getDiscoveredIn() != null)
+                .sorted(regionComparator))) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(Utility.localizedLabel(region.getType()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()
