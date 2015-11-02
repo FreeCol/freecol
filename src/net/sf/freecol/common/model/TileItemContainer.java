@@ -42,20 +42,6 @@ public class TileItemContainer extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(TileItemContainer.class.getName());
 
-    /** A comparator to sort by ascending zIndex. */
-    private static final Comparator<TileItem> tileItemComparator
-        = new Comparator<TileItem>() {
-            @Override
-            public int compare(TileItem tileItem1, TileItem tileItem2) {
-                int cmp = tileItem1.getZIndex() - tileItem2.getZIndex();
-                if (cmp == 0) {
-                    cmp = compareIds(tileItem1,
-                            tileItem2);
-                }
-                return cmp;
-            }
-        };
-
     /** The tile owner for which this is the container. */
     private Tile tile;
 
