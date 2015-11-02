@@ -382,15 +382,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         super(freeColClient, "reportColonyAction");
 
         final Player player = getMyPlayer();
-        final Comparator<Colony> colonyComparator = freeColClient
-            .getClientOptions().getColonyComparator();
         final Comparator<List<Colony>> firstColonyComparator
-            = new Comparator<List<Colony>>() {
-                @Override
-                public int compare(List<Colony> l1, List<Colony> l2) {
-                    return colonyComparator.compare(l1.get(0), l2.get(0));
-                }
-            };
+            = Comparator.comparing(l -> l.get(0), freeColClient
+                .getClientOptions().getColonyComparator());
 
         this.spec = getSpecification();
         this.lib = getImageLibrary();
