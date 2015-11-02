@@ -817,14 +817,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
         List<JButton> result = new ArrayList<>();
         List<UnitType> types = new ArrayList<>();
         types.addAll(suggestions.keySet());
-        Collections.sort(types, new Comparator<UnitType>() {
-                @Override
-                public int compare(UnitType t1, UnitType t2) {
-                    Suggestion s1 = suggestions.get(t1);
-                    Suggestion s2 = suggestions.get(t2);
-                    return Suggestion.descendingAmountComparator.compare(s1, s2);
-                }
-            });
+        final Comparator<UnitType> buttonComparator
+            = Comparator.comparing(ut -> suggestions.get(ut),
+                                   Suggestion.descendingAmountComparator);
+        Collections.sort(types, buttonComparator);
         for (UnitType type : types) {
             boolean present = have.contains(type);
             Suggestion suggestion = suggestions.get(type);

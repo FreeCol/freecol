@@ -60,20 +60,10 @@ public abstract class WorkLocation extends UnitLocation
     public static class Suggestion {
 
         public static final Comparator<Suggestion> descendingAmountComparator
-            = new Comparator<Suggestion>() {
-                    @Override
-                    public int compare(Suggestion s1, Suggestion s2) {
-                        int cmp = s2.amount - s1.amount;
-                        if (cmp == 0) {
-                            cmp = GoodsType.goodsTypeComparator
-                                .compare(s1.goodsType, s2.goodsType);
-                        }
-                        if (cmp == 0) {
-                            cmp = s2.newType.getId().compareTo(s1.newType.getId());
-                        }
-                        return cmp;
-                    }
-                };
+            = Comparator.comparingInt(Suggestion::getAmount).reversed()
+                .thenComparing(Suggestion::getGoodsType,
+                               GoodsType.goodsTypeComparator)
+                .thenComparing(Suggestion::getNewUnitType);
                     
         public final WorkLocation workLocation;
         public final UnitType oldType;
@@ -104,6 +94,18 @@ public abstract class WorkLocation extends UnitLocation
             this.newType = newType;
             this.goodsType = goodsType;
             this.amount = amount;
+        }
+
+        public UnitType getNewUnitType() {
+            return this.newType;
+        }
+        
+        public GoodsType getGoodsType() {
+            return this.goodsType;
+        }
+        
+        public int getAmount() {
+            return this.amount;
         }
     };
 
