@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -54,30 +55,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         SCOUTED          // Scouting bonus consumed
     };
 
-    // When choosing what goods to sell, sort goods with new world
-    // goods first, then by price, then amount.
-    private final Comparator<Goods> exportGoodsComparator
-        = new Comparator<Goods>() {
-            @Override
-            public int compare(Goods goods1, Goods goods2) {
-                int cmp;
-                GoodsType t1 = goods1.getType();
-                GoodsType t2 = goods2.getType();
-                cmp = (((t2.isNewWorldGoodsType()) ? 1 : 0)
-                    - ((t1.isNewWorldGoodsType()) ? 1 : 0));
-                if (cmp == 0) {
-                    int a1 = Math.min(goods2.getAmount(),
-                        GoodsContainer.CARGO_SIZE);
-                    int a2 = Math.min(goods1.getAmount(),
-                        GoodsContainer.CARGO_SIZE);
-                    cmp = getPriceToSell(t2, a2) - getPriceToSell(t1, a1);
-                    if (cmp == 0) {
-                        cmp = a2 - a1;
-                    }
-                }
-                return cmp;
-            }
-        };
 
     /** The production fudge factor. */
     public static final double NATIVE_PRODUCTION_EFFICIENCY = 0.67;
@@ -875,36 +852,46 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Gets the goods this settlement is willing to sell.
      *
+     * Sell new world goods first, then by decreasing price, then
+     * decreasing amount.
+     *
      * @param limit The maximum number of goods required.
-     * @param unit The <code>Unit</code> that is trading.
+     * @param unit An optional <code>Unit</code> that is trading.
      * @return A list of goods to sell.
      */
     public List<Goods> getSellGoods(int limit, Unit unit) {
+        // Collect all the candidate goods
         List<Goods> result = new ArrayList<>();
-        List<Goods> settlementGoods = getCompactGoods();
-        Collections.sort(settlementGoods, exportGoodsComparator);
-
-        int count = 0;
-        for (Goods goods : settlementGoods) {
-            if (!willSell(goods.getType())) continue;
-            int amount = goods.getAmount();
-            int retain = getWantedGoodsAmount(goods.getType());
+        for (Goods g : getCompactGoods()) {
+            if (!willSell(g.getType())) continue;
+            int amount = g.getAmount();
+            int retain = getWantedGoodsAmount(g.getType());
             if (retain >= amount) continue;
             amount -= retain;
-            if (amount > GoodsContainer.CARGO_SIZE) {
-                amount = GoodsContainer.CARGO_SIZE;
-            }
             if (unit != null) {
                 amount = Math.round(applyModifiers((float)amount,
                         getGame().getTurn(),
                         unit.getModifiers(Modifier.TRADE_VOLUME_PENALTY)));
             }
             if (amount < TRADE_MINIMUM_SIZE) continue;
-            result.add(new Goods(getGame(), this, goods.getType(), amount));
-            count++;
-            if (count >= limit) break;
+            if (amount > GoodsContainer.CARGO_SIZE) {
+                amount = GoodsContainer.CARGO_SIZE;
+            }
+            result.add(new Goods(getGame(), this, g.getType(), amount));
         }
-        return result;
+
+        // Sort and truncate to limit
+        final Comparator<Goods> salePriceComparator
+            = Comparator.comparingInt((Goods g) -> getPriceToSell(g.getType(),
+                    Math.min(g.getAmount(), GoodsContainer.CARGO_SIZE)))
+            .reversed();
+        final Comparator<Goods> exportGoodsComparator
+            = Comparator.comparingInt((Goods g) ->
+                    (g.getType().isNewWorldGoodsType()) ? 0 : 1)
+                .thenComparing(salePriceComparator)
+                .thenComparing(AbstractGoods.abstractGoodsComparator);
+        return result.stream().sorted(exportGoodsComparator).limit(limit)
+            .collect(Collectors.toList());
     }
 
 
