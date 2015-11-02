@@ -402,7 +402,46 @@ public class AIUnit extends TransportableAIObject {
             && unit.getRole() == role && unit.getRoleCount() == count;
     }
 
-        
+    /**
+     * Score this AI unit with its suitability for building.
+     *
+     * Favour unequipped freeColonists, and other unskilled over experts.
+     * Also slightly favour units on the map.
+     *
+     * @return An integer score.
+     */
+    public int getBuilderScore() {
+        Unit unit = getUnit();
+        if (unit == null || BuildColonyMission.invalidReason(this) != null)
+            return -1000;
+        int ret = (!unit.hasDefaultRole()) ? 0
+            : (unit.getSkillLevel() > 0) ? 100
+            : 500 + 100 * unit.getSkillLevel();
+        if (unit.hasTile()) ret += 50;
+        return ret;
+    }        
+
+    /**
+     * Score this AI unit with its suitability for pioneering.
+     *
+     * @return An integer score.
+     */
+    public int getPioneerScore() {
+        Unit unit = getUnit();
+        return (unit == null) ? -1000 : unit.getPioneerScore();
+    }
+
+    /**
+     * Score this AI unit with its suitability for scouting.
+     *
+     * @return An integer score.
+     */
+    public int getScoutScore() {
+        Unit unit = getUnit();
+        return (unit == null) ? -1000 : unit.getScoutScore();
+    }
+
+    
     // Implement TransportableAIObject
 
     /**

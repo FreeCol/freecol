@@ -137,31 +137,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     /** Maximum number of turns to travel to a scouting target. */
     private static final int scoutingRange = 20;
 
-    /**
-     * A comparator to sort units by suitability for a BuildColonyMission.
-     *
-     * Favours unequipped freeColonists, and other unskilled over experts.
-     * Also favour units on the map.
-     */
+    /** A comparator to sort units by decreasing builder score. */
     private static final Comparator<AIUnit> builderComparator
-        = new Comparator<AIUnit>() {
-            private int score(AIUnit a) {
-                Unit unit;
-                if (a == null || (unit = a.getUnit()) == null
-                    || BuildColonyMission.invalidReason(a) != null)
-                    return -1000;
-                int base = (!unit.hasDefaultRole()) ? 0
-                    : (unit.getSkillLevel() > 0) ? 100
-                    : 500 + 100 * unit.getSkillLevel();
-                if (unit.hasTile()) base += 50;
-                return base;
-            }
-
-            @Override
-            public int compare(AIUnit a1, AIUnit a2) {
-                return score(a2) - score(a1);
-            }
-        };
+        = Comparator.comparingInt(AIUnit::getBuilderScore).reversed();
 
     /**
      * A comparator to sort units by suitability for a PioneeringMission.
@@ -170,18 +148,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * as that is likely to be too expensive.  FIXME: perhaps we should.
      */
     public static final Comparator<AIUnit> pioneerComparator
-        = new Comparator<AIUnit>() {
-            private int score(AIUnit a) {
-                Unit unit;
-                return (a == null || (unit = a.getUnit()) == null) ? -1000
-                    : unit.getPioneerScore();
-            }
-
-            @Override
-            public int compare(AIUnit a1, AIUnit a2) {
-                return score(a2) - score(a1);
-            }
-        };
+        = Comparator.comparingInt(AIUnit::getPioneerScore).reversed();
 
     /**
      * A comparator to sort units by suitability for a ScoutingMission.
@@ -190,18 +157,7 @@ public class EuropeanAIPlayer extends AIPlayer {
      * as that is likely to be too expensive.  FIXME: perhaps we should.
      */
     public static final Comparator<AIUnit> scoutComparator
-        = new Comparator<AIUnit>() {
-            private int score(AIUnit a) {
-                Unit unit;
-                return (a == null || (unit = a.getUnit()) == null) ? -1000
-                    : unit.getScoutScore();
-            }
-
-            @Override
-            public int compare(AIUnit a1, AIUnit a2) {
-                return score(a2) - score(a1);
-            }
-        };
+        = Comparator.comparingInt(AIUnit::getScoutScore).reversed();
 
 
     // These should be final, but need the spec.
