@@ -315,16 +315,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         LootCargoMessage message = new LootCargoMessage(game, element);
         Unit unit = message.getUnit(game);
         List<Goods> goods = message.getGoods();
-        Collections.sort(goods, new Comparator<Goods>() {
-                @Override
-                public int compare(Goods g1, Goods g2) {
-                    int p1 = market.getPaidForSale(g1.getType())
-                        * g1.getAmount();
-                    int p2 = market.getPaidForSale(g2.getType())
-                        * g2.getAmount();
-                    return p2 - p1;
-                }
-            });
+        Collections.sort(goods, market.getSalePriceComparator());
         List<Goods> loot = new ArrayList<>();
         int space = unit.getSpaceLeft();
         while (!goods.isEmpty()) {
