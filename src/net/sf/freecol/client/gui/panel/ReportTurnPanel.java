@@ -22,13 +22,14 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -68,14 +69,14 @@ public final class ReportTurnPanel extends ReportPanel {
 
     private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 
+    /** Map message identifiers to label. */
+    private final Hashtable<String, List<JComponent>> labelsByMessage
+        = new Hashtable<>();
+    /** Map message identifiers to text pane. */
+    private final Hashtable<String, List<JComponent>> textPanesByMessage
+        = new Hashtable<>();
     /** The messages to display. */
     private List<ModelMessage> messages;
-
-    private final Hashtable<String, Vector<JComponent>> textPanesByMessage
-        = new Hashtable<>();
-    private final Hashtable<String, Vector<JComponent>> labelsByMessage
-        = new Hashtable<>();
-
 
     /**
      * Creates the turn report.
@@ -161,7 +162,7 @@ public final class ReportTurnPanel extends ReportPanel {
             }
 
             reportPanel.add(component, "newline");
-            
+
             final JTextPane textPane = Utility.getDefaultTextPane();
             try {
                 insertMessage(textPane.getStyledDocument(), message,
@@ -192,52 +193,42 @@ public final class ReportTurnPanel extends ReportPanel {
                 break;
             }
             
-            // So that we can iterate through rows in ActionListeners
-            // by message identifier.
-            if (!textPanesByMessage.containsKey(message.getId())) {
-                textPanesByMessage.put(message.getId(), new Vector<JComponent>());
-            }
-            textPanesByMessage.get(message.getId()).add(textPane);
+            // Fill the message maps so that we can iterate through
+            // them by message identifier in the ActionListeners.
+            String id = message.getId();
+            List<JComponent> components;
+            if ((components = textPanesByMessage.get(id)) == null)
+                textPanesByMessage.put(id,
+                    components = new ArrayList<JComponent>());
+            components.add(textPane);
+
+            if ((components = labelsByMessage.get(id)) == null)
+                labelsByMessage.put(id,
+                    components = new ArrayList<JComponent>());
+            components.add(label);
             
-            if (!labelsByMessage.containsKey(message.getId())) {
-                labelsByMessage.put(message.getId(), new Vector<JComponent>());
-            }
-            textPanesByMessage.get(message.getId()).add(textPane);
-            textPanesByMessage.get(message.getId()).add(label);
-            
+            // Add filter button if option present.
             final BooleanOption filterOption = options.getBooleanOption(message);
-            // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
                 Utility.localizeToolTip(filterButton, StringTemplate
                     .template("report.turn.filter")
                     .addNamed("%type%", message.getMessageType()));
-                final ModelMessage m = message;
+                final ModelMessage mess = message;
                 filterButton.addActionListener((ActionEvent ae) -> {
                         boolean flag = filterOption.getValue();
                         filterOption.setValue(!flag);
-                        //textPane.setEnabled(!flag);
-                        //label.setEnabled(!flag);
-                        setEnabledByType(m.getMessageType(), !flag);
+                        messages.stream()
+                            .filter(m -> m.getMessageType() == mess.getMessageType())
+                            .forEach(m ->
+                                Stream.concat(textPanesByMessage.get(m.getId()).stream(),
+                                    labelsByMessage.get(m.getId()).stream())
+                                    .forEach(jc -> jc.setEnabled(!flag)));
                     });
                 if (ignore) {
                     reportPanel.add(filterButton);
                 } else {
                     reportPanel.add(filterButton, "skip");
-                }
-            }
-        }
-    }
-
-    private void setEnabledByType(ModelMessage.MessageType type,
-                                  boolean enabled) {
-        for (ModelMessage m : messages) {
-            if (m.getMessageType() == type) {
-                for (JComponent textPane: textPanesByMessage.get(m.getId())) {
-                    textPane.setEnabled(enabled);
-                }
-                for (JComponent label: labelsByMessage.get(m.getId())) {
-                    label.setEnabled(enabled);
                 }
             }
         }
