@@ -1295,18 +1295,14 @@ public class Game extends FreeColGameObject {
 
         super.readChildren(xr);
 
-        // @compat 0.10.7
-        for (Player player : getLiveEuropeanPlayers(null)) {
-            for (Unit unit : player.getUnits()) {
-                if (unit.isInColony()) {
-                    unit.getWorkLocation().updateProductionType();
-                }
-            }
-        }
-        // end @compat
-
         currentPlayer = (current == null) ? null
             : getFreeColGameObject(current, Player.class);
+
+        // Make sure all work locations have rational default production
+        // now that all tiles are defined.
+        for (Player player : getLiveEuropeanPlayers(null)) {
+            for (Colony c : player.getColonies()) c.updateProductionTypes();
+        }
     }
 
     /**

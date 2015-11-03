@@ -2016,6 +2016,19 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Update all the production types.
+     *
+     * Called at initialization, to default to something rational when
+     * nothing was specified.  This can not be done until all the tiles are
+     * present.
+     */
+    public void updateProductionTypes() {
+        for (WorkLocation wl : getAvailableWorkLocations()) {
+            wl.updateProductionType();
+        }
+    }
+            
+    /**
      * Can this colony produce certain goods?
      *
      * @param goodsType The <code>GoodsType</code> to check production of.

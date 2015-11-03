@@ -948,17 +948,6 @@ public abstract class WorkLocation extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-
-        super.readChildren(xr);
-
-        updateProductionType();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
