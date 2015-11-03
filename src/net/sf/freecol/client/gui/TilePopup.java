@@ -90,6 +90,7 @@ public final class TilePopup extends JPopupMenu {
         this.gui = (SwingGUI)freeColClient.getGUI();
         this.canvas = canvas;
 
+        final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
         final boolean owned = player != null && activeUnit != null
@@ -122,7 +123,6 @@ public final class TilePopup extends JPopupMenu {
             }
 
             // Add move to Europe entry if the unit can do so
-            final InGameController igc = freeColClient.getInGameController();
             if (unitTile == tile && activeUnit.hasHighSeasMove()) {
                 JMenuItem europeMenuItem = Utility.localizedMenuItem(StringTemplate
                     .template("goToEurope"));
@@ -223,12 +223,8 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem activateAllItem = Utility.localizedMenuItem(StringTemplate
                 .template("activateAllUnits"));
             activateAllItem.addActionListener((ActionEvent ae) -> {
-                    Unit lastUnit = null;
-                    for (Unit unit : tile.getUnitList()) {
-                        freeColClient.getInGameController().clearOrders(unit);
-                        lastUnit = unit;
-                    }
-                    gui.setActiveUnit(lastUnit);
+                    for (Unit unit : tile.getUnitList()) igc.clearOrders(unit);
+                    gui.setActiveUnit(tile.getFirstUnit());
                 });
             add(activateAllItem);
         }
