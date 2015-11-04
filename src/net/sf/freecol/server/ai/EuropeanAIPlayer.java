@@ -2447,6 +2447,12 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             
             updateTransport(aiu, oldTarget, lb);
+            // Check again that the unit is alive, updateTransport() can
+            // cause unit to disembark onto a fatal LCR!
+            if (unit.isDisposed() || unit.getLocation() == null) {
+                lb.add(", DIED.");
+                continue;
+            }
             
             // Units with moves left should be requeued.  If they are on a
             // carrier the carrier needs to have moves left.
