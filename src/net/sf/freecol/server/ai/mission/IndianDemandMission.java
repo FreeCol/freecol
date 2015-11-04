@@ -354,9 +354,11 @@ public class IndianDemandMission extends Mission {
         while (!this.demanded) {
             Unit.MoveType mt = travelToTarget(getTarget(), null, lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
-            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
                 return lbWait(lb);
+
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
 
             case MOVE_NO_TILE:
                 return this;
@@ -422,16 +424,18 @@ public class IndianDemandMission extends Mission {
             Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
-            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            case MOVE: // Arrived
+                break;
+                
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
                 return lbWait(lb);
+
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
 
             case MOVE_NO_TILE:
                 return this;
 
-            case MOVE: // Arrived
-                break;
-                
             default:
                 return lbMove(lb, mt);
             }

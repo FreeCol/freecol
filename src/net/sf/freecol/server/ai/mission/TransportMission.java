@@ -1433,9 +1433,11 @@ public class TransportMission extends Mission {
                 }
                 break;
 
-            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
-            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
                 return lbWait(lb);
+
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
 
             case MOVE_NO_TILE: // Another unit is blocking a river?
                 moveRandomly(tag, null);

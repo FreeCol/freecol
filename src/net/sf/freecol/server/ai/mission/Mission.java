@@ -76,6 +76,7 @@ public abstract class Mission extends AIObject {
 
     // Common mission invalidity reasons.
     protected static final String AIUNITNULL = "aiUnit-null";
+    protected static final String AIUNITDIED = "aiUnit-died";
     protected static final String TARGETNULL = "target-null";
     protected static final String TARGETINVALID = "target-invalid";
     protected static final String TARGETOWNERSHIP = "target-ownership";

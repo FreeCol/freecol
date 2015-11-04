@@ -584,9 +584,11 @@ public class PioneeringMission extends Mission {
             case MOVE: // Arrived
                 break;
 
-            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
-            case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
+            case MOVE_HIGH_SEAS: case MOVE_NO_MOVES: case MOVE_ILLEGAL:
                 return lbWait(lb);
+
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
 
             case MOVE_NO_ACCESS_EMBARK: case MOVE_NO_TILE:
                 return this;
@@ -621,14 +623,17 @@ public class PioneeringMission extends Mission {
             && invalidTargetReason(getTarget(), player) == null) {
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
+            case MOVE:
+                break;
+
+            case MOVE_HIGH_SEAS:
                 return lbWait(lb);
+
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
 
             case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
                 return this;
-
-            case MOVE:
-                break;
 
             default:
                 return lbMove(lb, mt);
@@ -672,14 +677,17 @@ public class PioneeringMission extends Mission {
         for (;;) {
             Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
-            case MOVE_HIGH_SEAS: case MOVE_NO_REPAIR:
-                return lbWait(lb);
-                
-            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
-                return this;
-                
             case MOVE: // Arrived
                 break;
+                
+            case MOVE_HIGH_SEAS:
+                return lbWait(lb);
+                
+            case MOVE_NO_REPAIR:
+                return lbFail(lb, false, AIUNITDIED);
+
+            case MOVE_NO_MOVES: case MOVE_NO_TILE: case MOVE_ILLEGAL:
+                return this;
                 
             case MOVE_NO_ATTACK_CIVILIAN:
                 // Might be a temporary blockage due to an occupying
