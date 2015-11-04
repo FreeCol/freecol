@@ -2877,13 +2877,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Join existing colony if present
-        final Colony colony = tile.getColony();
-        if (colony != null) {
-            askServer().joinColony(unit, colony);
-            updateGUI(null);
-            colonyPanel(colony, unit);
-            return false;
-        }
+        if (joinColony(unit) || tile.getColony() != null) return false;
 
         // Check for other impediments.
         final Player player = freeColClient.getMyPlayer();
@@ -3849,6 +3843,24 @@ public final class InGameController implements NetworkConstants {
         return accepted;
     }
 
+    /**
+     * Join the colony at a unit's current location.
+     *
+     * @param unit The <code>Unit</code> to use.
+     * @return True if the unit joined a colony.
+     */
+    public boolean joinColony(Unit unit) {
+        final Tile tile = unit.getTile();
+        final Colony colony = (tile == null) ? null : tile.getColony();
+        boolean ret = colony != null && askServer().joinColony(unit, colony)
+            && unit.getState() == UnitState.IN_COLONY;
+        if (ret) {
+            updateGUI(null);
+            colonyPanel(colony, unit);
+        }
+        return ret;
+    }
+    
     /**
      * Leave a ship.  The ship must be in harbour.
      *
