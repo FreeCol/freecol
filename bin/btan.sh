@@ -78,7 +78,7 @@ section "Cashins"
 sed -n -e 's/^Count cashins: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-section "Cibola Finds"
+section "CibolaFinds"
 sed -n -e 's/^Count Cibola: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
@@ -90,7 +90,7 @@ section "EuroIncome"
 (for r in $runs ; do eval $r ; echo $EI ; done) | statit
 blockit
 
-section "Fountain Finds"
+section "FountainFinds"
 sed -n -e 's/^Count fountain: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
@@ -106,11 +106,11 @@ section "Missions"
 sed -n -e 's/^Count missions: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-section "Native Demands"
+section "NativeDemands"
 sed -n -e 's/^Count demands: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-section "Native Gifts"
+section "NativeGifts"
 sed -n -e 's/^Count gifts: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
@@ -134,7 +134,7 @@ section "Transports"
 sed -n -e 's/^Count transports: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
-section "Turn Speed"
+section "TurnSpeed"
 sed -n -e 's/^Average turn: *\(.*\)$/\1/p' "$tmp" | statit
 blockit
 
