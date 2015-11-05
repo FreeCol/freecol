@@ -28,9 +28,13 @@ import java.awt.image.ColorConvertOp;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -44,10 +48,13 @@ public class ImageResource extends Resource
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
 
+    private final Object loadingLock = new Object();
+    private volatile BufferedImage image = null;
+    private List<URI> alternativeLocators = new ArrayList<>();
+    private List<BufferedImage> loadedImages = null;
+
     private HashMap<Dimension, BufferedImage> scaledImages = new HashMap<>();
     private HashMap<Dimension, BufferedImage> grayscaleImages = new HashMap<>();
-    private volatile BufferedImage image = null;
-    private final Object loadingLock = new Object();
 
 
     /**
@@ -60,6 +67,15 @@ public class ImageResource extends Resource
         super(resourceLocator);
     }
 
+    /**
+     * Adds another URI for loading a differently sized version of the image.
+     * Only use before preload got called!
+     *
+     * @param resourceLocator The <code>URI</code> used when loading.
+     */
+    public void addAlternativeResourceLocator(URI resourceLocator) {
+        alternativeLocators.add(resourceLocator);
+    }
 
     /**
      * Preload the image.
@@ -68,19 +84,37 @@ public class ImageResource extends Resource
     public void preload() {
         synchronized (loadingLock) {
             if (image == null) {
-                try {
-                    URL url = getResourceLocator().toURL();
-                    image = ImageIO.read(url);
-                    if(image == null) {
-                        logger.log(Level.WARNING, "Failed to load image from: "
-                            + getResourceLocator());
-                    }
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Failed to load image from: "
-                        + getResourceLocator(), e);
-                }
+                BufferedImage baseImage = loadImage(getResourceLocator());
+
+                loadedImages = alternativeLocators.stream()
+                    .map(uri -> loadImage(uri))
+                    .filter(img -> img != null)
+                    .collect(Collectors.toList());
+                if(baseImage != null)
+                    loadedImages.add(baseImage);
+                loadedImages.sort((img0, img1) ->
+                    img0.getWidth()*img0.getHeight() -
+                        img1.getWidth()*img1.getHeight());
+
+                image = baseImage != null ? baseImage :
+                    loadedImages.isEmpty() ? null : loadedImages.get(0);
             }
         }
+    }
+
+    private static BufferedImage loadImage(URI uri) {
+        try {
+            URL url = uri.toURL();
+            BufferedImage image = ImageIO.read(url);
+            if(image != null)
+                return image;
+            logger.log(Level.WARNING, "Failed to load image from: "
+                + uri);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to load image from: "
+                + uri, e);
+        }
+        return null;
     }
 
     /**
@@ -147,6 +181,23 @@ public class ImageResource extends Resource
 
         final BufferedImage cached = scaledImages.get(d);
         if (cached != null) return cached;
+
+        final int wNew2 = wNew;
+        final int hNew2 = hNew;
+        Optional<BufferedImage> oim = loadedImages.stream()
+            .filter(img -> img.getWidth() >= wNew2 && img.getHeight() >= hNew2)
+            .findFirst();
+        im = oim.isPresent() ? oim.get() :
+            loadedImages.get(loadedImages.size() - 1);
+        w = im.getWidth();
+        h = im.getHeight();
+        if(wNew*h > w*hNew) {
+            wNew = (2*w*hNew + (h+1)) / (2*h);
+        } else if(wNew*h < w*hNew) {
+            hNew = (2*h*wNew + (w+1)) / (2*w);
+        }
+        if(wNew == w && hNew == h)
+            return im;
 
         // Directly scaling to less than half size would ignore some pixels.
         // Prevent that by halving the base image size as often as needed.

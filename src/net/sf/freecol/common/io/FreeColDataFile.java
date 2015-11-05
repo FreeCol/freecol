@@ -39,10 +39,12 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapper;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.common.util.LogBuilder;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -229,18 +231,27 @@ public class FreeColDataFile {
 
         ResourceMapping rc = new ResourceMapping();
         List<String> todo = new ArrayList<>();
+        List<String> alternatives = new ArrayList<>();
         Enumeration<?> pn = properties.propertyNames();
         ResourceMapper rm = new ResourceMapper(rc);
         while (pn.hasMoreElements()) {
             final String key = (String) pn.nextElement();
-            final String value = properties.getProperty(key);
-            if (value.startsWith(resourceScheme)) {
-                todo.add(key);
+            int split = key.lastIndexOf('.');
+            if(split != -1 && split+2 < key.length()
+                && key.charAt(split+1) == 'a'
+                && key.charAt(split+2) >= '0' && key.charAt(split+2) <= '9'
+                && key.startsWith("image.")) {
+                alternatives.add(key);
             } else {
-                URI uri = getURI(value);
-                if (uri != null) {
-                    rm.setKey(key);
-                    ResourceFactory.createResource(uri, rm);
+                final String value = properties.getProperty(key);
+                if (value.startsWith(resourceScheme)) {
+                    todo.add(key);
+                } else {
+                    URI uri = getURI(value);
+                    if (uri != null) {
+                        rm.setKey(key);
+                        ResourceFactory.createResource(uri, rm);
+                    }
                 }
             }
         }
@@ -265,6 +276,19 @@ public class FreeColDataFile {
             lb.add(", could not resolve virtual resource/s: ",
                    join(" ", todo));
         }
+        alternatives.forEach(key -> {
+            final String value = properties.getProperty(key);
+            URI uri = getURI(value);
+            if (uri != null) {
+                int split = key.lastIndexOf('.');
+                ImageResource ir = rc.getImageResource(key.substring(0, split));
+                if(ir != null)
+                    ir.addAlternativeResourceLocator(uri);
+                else
+                    logger.warning("Missing resource when adding alternative: "
+                        + key);
+            }
+        });
         if (lb.grew()) lb.log(logger, Level.INFO);
         return rc;
     }
