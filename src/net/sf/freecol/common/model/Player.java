@@ -631,7 +631,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A nation resource key.
      */
     public String getNationResourceKey() {
-        return lastPart(nationId, ".").toUpperCase(Locale.US);
+        return lastPart(nationId, ".");
     }
 
     /**
