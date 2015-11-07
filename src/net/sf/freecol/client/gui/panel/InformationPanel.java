@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,6 +36,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -71,8 +73,7 @@ public class InformationPanel extends FreeColPanel {
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {
-        super(freeColClient, new MigLayout("wrap 1, insets 200 10 10 10",
-                "[510]", "[242]20[20]"));
+        super(freeColClient, createLayout(freeColClient));
 
         final SwingGUI gui = getGUI();
         JPanel textPanel = new MigPanel();
@@ -111,6 +112,23 @@ public class InformationPanel extends FreeColPanel {
         add(okButton, "tag ok");
     }
 
+    private static MigLayout createLayout(FreeColClient freeColClient) {
+        BufferedImage skin = getSkin(freeColClient);
+        int w = skin.getWidth();
+        int h = skin.getHeight();
+        return new MigLayout("wrap 1, insets " + (h-290) + " 10 10 10",
+                "[" + (w-2*10) + "]", "[240]20[20]");
+    }
+
+    private static BufferedImage getSkin(FreeColClient freeColClient) {
+        Player player = freeColClient.getMyPlayer();
+        String key = player.isRebel() ? "image.skin.InformationPanel.rebel"
+            : "image.skin.InformationPanel." + player.getNationResourceKey();
+        if(!ResourceManager.hasImageResource(key))
+            key = "image.skin.InformationPanel";
+        return ResourceManager.getImage(key);
+    }
+
     /**
      * A label for an FCO that can meaningfully be displayed.
      *
@@ -135,7 +153,6 @@ public class InformationPanel extends FreeColPanel {
 
     @Override
     public void paintComponent(Graphics g) {
-        g.drawImage(ResourceManager.getImage("image.skin.InformationPanel"),
-            0, 0, this);
+        g.drawImage(getSkin(getFreeColClient()), 0, 0, this);
     }
 }
