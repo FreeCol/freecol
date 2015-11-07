@@ -895,6 +895,7 @@ public final class ImageLibrary {
 
         if (ResourceManager.hasImageResource(resource)) {
             BufferedImage image = ResourceManager.getImage(resource);
+            // FIXME: Test and profile if calling fillTexture is better.
             int dx = image.getWidth();
             int dy = image.getHeight();
             int xmax = xmin + width;
