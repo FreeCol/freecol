@@ -81,7 +81,7 @@ public class TileItemContainerTest extends FreeColTestCase {
         assertTrue("Setup error, original must have rumour",original.getLostCityRumour()!=null);
         assertFalse("Setup error, copy cannot have rumour",copy.getLostCityRumour()!=null);
         
-        copy.copyFrom(original, true, false);
+        copy.copyFrom(original, Map.Layer.ALL);
         
         assertTrue("Copy should have road",copy.getRoad()!=null);
         assertTrue("Copy should have river",copy.getRiver()!=null);
@@ -89,7 +89,7 @@ public class TileItemContainerTest extends FreeColTestCase {
         assertTrue("Copy should have rumour",copy.getLostCityRumour()!=null);
         
         // Copy only natural
-        copy.copyFrom(original, true, true);
+        copy.copyFrom(original, Map.Layer.RESOURCES);
         
         assertFalse("Copy should not have road",copy.getRoad()!=null);
         assertTrue("Copy should have river",copy.getRiver()!=null);

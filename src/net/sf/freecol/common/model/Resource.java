@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Map.Layer;
 
 
 /**
@@ -256,6 +257,14 @@ public class Resource extends TileItem {
         return true;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Layer getLayer() {
+        return Layer.RESOURCES;
+    }
+
 
     // Override FreeColGameObject
 

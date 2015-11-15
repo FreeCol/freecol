@@ -53,9 +53,8 @@ public class TileItemContainer extends FreeColGameObject {
      * Create an empty <code>TileItemContainer</code>.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> this
-     *     <code>TileItemContainer</code> contains
-     *     <code>TileItems</code> for.
+     * @param tile The <code>Tile</code> this <code>TileItemContainer</code>
+     *     contains <code>TileItems</code> for.
      */
     public TileItemContainer(Game game, Tile tile) {
         super(game);
@@ -63,17 +62,15 @@ public class TileItemContainer extends FreeColGameObject {
         if (tile == null) {
             throw new IllegalArgumentException("Tile must not be 'null'.");
         }
-
         this.tile = tile;
     }
 
     /**
-     * Initiates a new <code>TileItemContainer</code> from an XML stream.
+     * Create a new <code>TileItemContainer</code> from an existing template.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> this
-     *     <code>TileItemContainer</code> contains
-     *     <code>TileItems</code> for.
+     * @param tile The <code>Tile</code> this <code>TileItemContainer</code>
+     *     contains <code>TileItems</code> for.
      * @param template A <code>TileItemContainer</code> to copy.
      * @param layer A maximum allowed <code>Layer</code>.
      */
@@ -81,31 +78,7 @@ public class TileItemContainer extends FreeColGameObject {
                              Layer layer) {
         this(game, tile);
 
-        final Specification spec = getSpecification();
-        for (TileItem item : template.getTileItems()) {
-            if (item instanceof Resource) {
-                Resource resource = (Resource)item;
-                if (layer.compareTo(Layer.RESOURCES) >= 0) {
-                    addTileItem(new Resource(game, tile,
-                            spec.getResourceType(resource.getId()),
-                            resource.getQuantity()));
-                }
-            } else if (item instanceof LostCityRumour) {
-                LostCityRumour rumour = (LostCityRumour)item;
-                if (layer.compareTo(Layer.NATIVES) >= 0) {
-                    addTileItem(new LostCityRumour(game, tile, rumour.getType(),
-                            rumour.getName()));
-                }
-            } else if (item instanceof TileImprovement) {
-                TileImprovement improvement = (TileImprovement)item;
-                if (layer.compareTo(Layer.RIVERS) >= 0
-                    || improvement.getType().isNatural()) {
-                    addTileItem(new TileImprovement(game, tile, improvement));
-                }
-            } else {
-                logger.warning("Bogus tile item: " + item.getId());
-            }
-        }
+        copyFrom(template, layer);
     }
 
     /**
@@ -433,59 +406,46 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Copy from another <code>TileItemContainer</code> including resources.
+     * Copy the tile items from another <code>TileItemContainer</code>,
+     * observing a layer maximum.
+     *
+     * Note that some types need to be looked up in the spec as the tic
+     * parameter might be an import from a different game.
      *
      * @param tic The <code>TileItemContainer</code> to copy from.
+     * @param layer The maximum <code>Layer</code> to import from.
      */
-    public void copyFrom(TileItemContainer tic) {
-        copyFrom(tic, true, false);
-    }
-
-    /**
-     * Copy from another <code>TileItemContainer</code>.
-     *
-     * @param tic The <code>TileItemContainer</code> to copy from.
-     * @param importResources If true, import resources.
-     */
-    public void copyFrom(TileItemContainer tic, boolean importResources) {
-        copyFrom(tic, importResources, false);
-    }
-
-    /**
-     * Copy from another <code>TileItemContainer</code>.
-     *
-     * @param tic The <code>TileItemContainer</code> to copy from.
-     * @param importResources If true, import resources.
-     * @param copyOnlyNatural Restrict import to natural resources.
-     */
-    public void copyFrom(TileItemContainer tic, boolean importResources,
-                         boolean copyOnlyNatural) {
-        tileItems.clear();
-        for (TileItem item : tic.getTileItems()) {
+    public void copyFrom(TileItemContainer tic, Layer layer) {
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+        List<TileItem> otherItems = tic.getTileItems();
+        List<TileItem> result = new ArrayList<TileItem>();
+        for (TileItem item : otherItems) {
+            if (layer.compareTo(item.getLayer()) < 0) continue;
             if (item instanceof Resource) {
-                if (importResources) {
-                    Resource ticR = (Resource) item;
-                    Resource r = new Resource(getGame(), tile,
-                        ticR.getType(), ticR.getQuantity());
-                    tileItems.add(r);
-                }
+                Resource resource = (Resource)item;
+                ResourceType type
+                    = spec.getResourceType(resource.getType().getId());
+                result.add(new Resource(game, tile, type, resource.getQuantity()));
             } else if (item instanceof LostCityRumour) {
-                if (!copyOnlyNatural) {
-                    LostCityRumour ticR = (LostCityRumour) item;
-                    LostCityRumour r = new LostCityRumour(getGame(), tile,
-                        ticR.getType(), ticR.getName());
-                    addTileItem(r);
-                }
+                LostCityRumour rumour = (LostCityRumour)item;
+                result.add(new LostCityRumour(game, tile,
+                        rumour.getType(), rumour.getName()));
             } else if (item instanceof TileImprovement) {
-                if (!copyOnlyNatural
-                    || ((TileImprovement)item).getType().isNatural()) {
-                    addTileItem(new TileImprovement(getGame(), tile, 
-                                                    (TileImprovement)item));
+                TileImprovement improvement = (TileImprovement)item;
+                if (layer.compareTo(Map.Layer.ALL) >= 0
+                    || improvement.getType().isNatural()) {
+                    TileImprovementType type
+                        = spec.getTileImprovementType(improvement.getType().getId());
+                    result.add(new TileImprovement(game, tile, type));
                 }
+            } else {
+                logger.warning("Bogus tile item: " + item.getId());
             }
         }
+        setTileItems(result);
     }
-
+    
     /**
      * Checks if the specified <code>TileItem</code> is in this container.
      *

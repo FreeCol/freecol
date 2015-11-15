@@ -83,7 +83,8 @@ public class ScaleMapAction extends FreeColAction {
                     t.setMoveToEurope(importTile.getMoveToEurope());
                 }
                 if (t.getTileItemContainer() != null) {
-                    t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
+                    t.getTileItemContainer().copyFrom(importTile
+                        .getTileItemContainer(), Map.Layer.ALL);
                 }
                 map.setTile(t, x, y);
             }

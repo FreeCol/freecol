@@ -919,10 +919,11 @@ public class TerrainGenerator {
                         TileItemContainer container
                             = new TileItemContainer(game, t);
                         // TileItemContainer copies every natural item
-                        // including Resource unless importBonuses ==
-                        // false Rumors and roads are not copied
+                        // including Resource if importBonuses is true.
+                        // Rumors and roads are not copied.
                         container.copyFrom(importTile.getTileItemContainer(),
-                            importBonuses, true);
+                            (importBonuses) ? Map.Layer.RESOURCES
+                            : Map.Layer.RIVERS);
                         t.setTileItemContainer(container);
                     }
                     Region r = importTile.getRegion();

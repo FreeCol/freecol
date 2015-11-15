@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -367,6 +368,14 @@ public class LostCityRumour extends TileItem {
     @Override
     public boolean isComplete() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Layer getLayer() {
+        return Layer.NATIVES;
     }
 
 

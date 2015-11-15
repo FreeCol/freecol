@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.model.Map.Layer;
 
 
 /**
@@ -139,6 +140,13 @@ public abstract class TileItem extends FreeColGameObject
      * @return True if complete.
      */
     public abstract boolean isComplete();
+
+    /**
+     * Get the layer associated with this tile item.
+     *
+     * @return The layer.
+     */
+    public abstract Layer getLayer();
 
 
     // Interface Locatable
