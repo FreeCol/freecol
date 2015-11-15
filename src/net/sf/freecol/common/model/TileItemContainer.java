@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -102,12 +104,34 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Get the tile items in this container.
-     *
-     * @return A list of <code>TileItem</code>s.
+     * Invalidate the production cache of the owning colony if any
+     * but only if the tile is actually being used.
      */
-    public final List<TileItem> getTileItems() {
-        return tileItems;
+    private void invalidateCache() {
+        final Colony colony = tile.getColony();
+        if (colony != null && colony.isTileInUse(tile)) {
+            colony.invalidateCache();
+        }
+    }
+
+    /**
+     * Get a copy of the tile items list.
+     *
+     * @return A copy of the <code>TileItem</code>s.
+     */
+    private List<TileItem> getTileItems() {
+        synchronized (tileItems) {
+            return new ArrayList<TileItem>(tileItems);
+        }
+    }
+
+    /**
+     * Clear the tile items list.
+     */
+    private void clearTileItems() {
+        synchronized (tileItems) {
+            tileItems.clear();
+        }
     }
 
     /**
@@ -116,55 +140,111 @@ public class TileItemContainer extends FreeColGameObject {
      * @param newTileItems The new tile items list.
      */
     public final void setTileItems(final List<TileItem> newTileItems) {
-        this.tileItems.clear();
-        if (newTileItems != null) this.tileItems.addAll(newTileItems);
+        clearTileItems();
+        if (newTileItems != null) {
+            synchronized (tileItems) {
+                tileItems.addAll(newTileItems);
+            }
+        }
         invalidateCache();
     }
 
     /**
-     * Invalidate the production cache of the owning colony if any
-     * but only if the tile is actually being used.
+     * Add a tile item to this container.
+     *
+     * @param item The <code>TileItem</code> to add.
      */
-    private void invalidateCache() {
-        Colony colony = tile.getColony();
-        if (colony != null && colony.isTileInUse(tile)) {
-            colony.invalidateCache();
+    private final void addTileItem(TileItem item) {
+        synchronized (tileItems) {
+            tileItems.add(item);
+        }
+    }
+    
+    /**
+     * Try to add a <code>TileItem</code> to this container.
+     * If the item is of lower magnitude than an existing one the existing
+     * one stands.
+     *
+     * @param item The <code>TileItem</code> to add to this container.
+     * @return The added <code>TileItem</code> or the existing
+     *     <code>TileItem</code> if of higher magnitude, or null on error.
+     */
+    public final TileItem tryAddTileItem(TileItem item) {
+        if (item == null) return null;
+        List<TileItem> items = getTileItems();
+        for (int index = 0; index < items.size(); index++) {
+            TileItem oldItem = items.get(index);
+            if (item instanceof TileImprovement
+                && oldItem instanceof TileImprovement) {
+                TileImprovement oldTip = (TileImprovement)oldItem;
+                TileImprovement newTip = (TileImprovement)item;
+                if (oldTip.getType().getId().equals(newTip.getType().getId())) {
+                    if (oldTip.getMagnitude() < newTip.getMagnitude()) {
+                        synchronized (tileItems) {
+                            tileItems.set(index, item);
+                        }
+                        oldItem.dispose();
+                        invalidateCache();
+                        return item;
+                    } else {
+                        return oldItem; // Found it, but not replacing.
+                    }
+                } else if (oldItem.getZIndex() > item.getZIndex()) {
+                    break;
+                }
+            }
+        }
+        addTileItem(item);
+        invalidateCache();
+        return item;
+    }
+
+    /**
+     * Removes a <code>TileItem</code> from this container.
+     *
+     * @param item The <code>TileItem</code> to remove from this container.
+     * @return The <code>TileItem</code> that has been removed from
+     *     this container (if any).
+     */
+    public final <T extends TileItem> T removeTileItem(T item) {
+        boolean removed;
+        synchronized (tileItems) {
+            removed = tileItems.remove(item);
+        }
+        if (removed) {
+            item.setLocation(null);
+            invalidateCache();
+            return item;
+        }
+        return null;
+    }
+
+    /**
+     * Removes all tile items of a given class.
+     *
+     * @param c The <code>Class</code> to remove.
+     */
+    public final <T extends TileItem> void removeAll(Class<T> c) {
+        synchronized (tileItems) {
+            Iterator<TileItem> iterator = tileItems.iterator();
+            while (iterator.hasNext()) {
+                if (c.isInstance(iterator.next())) iterator.remove();
+            }
         }
     }
 
     /**
-     * Gets any lost city rumour in this container.
+     * Get the completed tile items.
      *
-     * @return A <code>LostCityRumour</code> item if any, or null if
-     *     not found.
+     * @return A list of complete <code>TileItem</code>s.
      */
-    public final LostCityRumour getLostCityRumour() {
-        return (LostCityRumour)find(tileItems,
-            ti -> ti instanceof LostCityRumour);
+    public List<TileItem> getCompleteItems() {
+        synchronized (tileItems) {
+            return tileItems.stream()
+                .filter(TileItem::isComplete).collect(Collectors.toList());
+        }
     }
-
-    /**
-     * Gets any resource item.
-     *
-     * @return A <code>Resource</code> item, or null is none found.
-     */
-    public final Resource getResource() {
-        return (Resource)find(tileItems, ti -> ti instanceof Resource);
-    }
-
-    /**
-     * Check whether this tile has a completed improvement of the given
-     * type.
-     *
-     * @param type The <code>TileImprovementType</code> to check for.
-     * @return Whether the tile has the improvement and the improvement is
-     *     completed.
-     */
-    public boolean hasImprovement(TileImprovementType type) {
-        TileImprovement improvement = getImprovement(type);
-        return improvement != null && improvement.isComplete();
-    }
-
+        
     /**
      * Gets the tile improvement of the given type if any.
      *
@@ -173,53 +253,11 @@ public class TileItemContainer extends FreeColGameObject {
      *     present, otherwise null.
      */
     public TileImprovement getImprovement(TileImprovementType type) {
-        return (TileImprovement)find(tileItems,
-            ti -> ti instanceof TileImprovement
+        synchronized (tileItems) {
+            return (TileImprovement)find(tileItems,
+                ti -> ti instanceof TileImprovement
                 && ((TileImprovement)ti).getType() == type);
-    }
-
-    /**
-     * Gets any road improvement in this container.
-     *
-     * @return A road <code>TileImprovement</code> if any, or null if
-     *     not found.
-     */
-    public TileImprovement getRoad() {
-        return (TileImprovement)find(tileItems,
-            ti -> ti instanceof TileImprovement
-                && ((TileImprovement)ti).isRoad());
-    }
-
-    /**
-     * Gets any river improvement in this container.
-     *
-     * @return A river <code>TileImprovement</code> if any, or null if
-     *     not found.
-     */
-    public TileImprovement getRiver() {
-        return (TileImprovement)find(tileItems,
-            ti -> ti instanceof TileImprovement
-                && ((TileImprovement)ti).isRiver());
-    }
-
-    /**
-     * Remove improvements incompatible with the given TileType.  This
-     * method is called whenever the type of the container's tile
-     * changes, i.e. due to clearing.
-     */
-    public void removeIncompatibleImprovements() {
-        TileType tileType = tile.getType();
-        Iterator<TileItem> iterator = tileItems.iterator();
-        boolean removed = false;
-        while (iterator.hasNext()) {
-            TileItem item = iterator.next();
-            if (!item.isTileTypeAllowed(tileType)) {
-                iterator.remove();
-                item.dispose();
-                removed = true;
-            }
         }
-        if (removed) invalidateCache();
     }
 
     /**
@@ -230,14 +268,13 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of <code>TileImprovement</code>s.
      */
     private List<TileImprovement> getImprovements(boolean completedOnly) {
-        List<TileImprovement> improvements = new ArrayList<>();
-        for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement
-                && (!completedOnly || ((TileImprovement)item).isComplete())) {
-                improvements.add((TileImprovement)item);
-            }
+        synchronized (tileItems) {
+            return tileItems.stream()
+                .filter(ti -> ti instanceof TileImprovement
+                    && (!completedOnly || ((TileImprovement)ti).isComplete()))
+                .map(ti -> (TileImprovement)ti)
+                .collect(Collectors.toList());
         }
-        return improvements;
     }
 
     /**
@@ -256,73 +293,98 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @return A list of <code>TileImprovement</code>s.
      */
-    public List<TileImprovement> getCompletedImprovements() {
+    public List<TileImprovement> getCompleteImprovements() {
         return getImprovements(true);
     }
 
     /**
-     * Try to add a <code>TileItem</code> to this container.
-     * If the item is of lower magnitude than an existing one the existing
-     * one stands.
+     * Find a tile item matching a predicate.
      *
-     * @param item The <code>TileItem</code> to add to this container.
-     * @return The added <code>TileItem</code> or the existing
-     *     <code>TileItem</code> if of higher magnitude, or null on error.
+     * @param pred The <code>Predicate</code> to match.
+     * @return The <code>TileItem</code> found, or null if none present.
      */
-    public final TileItem addTileItem(TileItem item) {
-        if (item == null) return null;
-        for (int index = 0; index < tileItems.size(); index++) {
-            TileItem oldItem = tileItems.get(index);
-            if (item instanceof TileImprovement
-                && oldItem instanceof TileImprovement) {
-                TileImprovement oldTip = (TileImprovement)oldItem;
-                TileImprovement newTip = (TileImprovement)item;
-                if (oldTip.getType().getId().equals(newTip.getType().getId())) {
-                    if (oldTip.getMagnitude() < newTip.getMagnitude()) {
-                        tileItems.set(index, item);
-                        oldItem.dispose();
-                        invalidateCache();
-                        return item;
-                    } else {
-                        return oldItem; // Found it, but not replacing.
-                    }
-                } else if (oldItem.getZIndex() > item.getZIndex()) {
-                    break;
+    private TileItem findTileItem(Predicate<TileItem> pred) {
+        synchronized (tileItems) {
+            return find(tileItems, pred);
+        }
+    }
+    
+    /**
+     * Gets any lost city rumour in this container.
+     *
+     * @return A <code>LostCityRumour</code> item if any, or null if
+     *     not found.
+     */
+    public final LostCityRumour getLostCityRumour() {
+        return (LostCityRumour)findTileItem(ti -> ti instanceof LostCityRumour);
+    }
+
+    /**
+     * Gets any resource item.
+     *
+     * @return A <code>Resource</code> item, or null is none found.
+     */
+    public final Resource getResource() {
+        return (Resource)findTileItem(ti -> ti instanceof Resource);
+    }
+
+    /**
+     * Gets any road improvement in this container.
+     *
+     * @return A road <code>TileImprovement</code> if any, or null if
+     *     not found.
+     */
+    public TileImprovement getRoad() {
+        return (TileImprovement)findTileItem(ti ->
+            ti instanceof TileImprovement
+            && ((TileImprovement)ti).isRoad());
+    }
+
+    /**
+     * Gets any river improvement in this container.
+     *
+     * @return A river <code>TileImprovement</code> if any, or null if
+     *     not found.
+     */
+    public TileImprovement getRiver() {
+        return (TileImprovement)findTileItem(ti ->
+            ti instanceof TileImprovement
+            && ((TileImprovement)ti).isRiver());
+    }
+
+    /**
+     * Check whether this tile has a completed improvement of the given
+     * type.
+     *
+     * @param type The <code>TileImprovementType</code> to check for.
+     * @return Whether the tile has the improvement and the improvement is
+     *     completed.
+     */
+    public boolean hasImprovement(TileImprovementType type) {
+        TileImprovement improvement = getImprovement(type);
+        return improvement != null && improvement.isComplete();
+    }
+
+    /**
+     * Remove improvements incompatible with the given TileType.  This
+     * method is called whenever the type of the container's tile
+     * changes, i.e. due to clearing.
+     */
+    public void removeIncompatibleImprovements() {
+        TileType tileType = tile.getType();
+        boolean removed = false;
+        synchronized (tileItems) {
+            Iterator<TileItem> iterator = tileItems.iterator();
+            while (iterator.hasNext()) {
+                TileItem item = iterator.next();
+                if (!item.isTileTypeAllowed(tileType)) {
+                    iterator.remove();
+                    item.dispose();
+                    removed = true;
                 }
             }
         }
-        tileItems.add(item);
-        invalidateCache();
-        return item;
-    }
-
-    /**
-     * Removes a <code>TileItem</code> from this container.
-     *
-     * @param item The <code>TileItem</code> to remove from this container.
-     * @return The <code>TileItem</code> that has been removed from
-     *     this container (if any).
-     */
-    public final <T extends TileItem> T removeTileItem(T item) {
-        boolean removed = tileItems.remove(item);
-        if (removed) {
-            item.setLocation(null);
-            invalidateCache();
-            return item;
-        }
-        return null;
-    }
-
-    /**
-     * Removes all tile items of a given class.
-     *
-     * @param c The <code>Class</code> to remove.
-     */
-    public final <T extends TileItem> void removeAll(Class<T> c) {
-        Iterator<TileItem> iterator = tileItems.iterator();
-        while (iterator.hasNext()) {
-            if (c.isInstance(iterator.next())) iterator.remove();
-        }
+        if (removed) invalidateCache();
     }
 
     /**
@@ -343,10 +405,10 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The resulting production.
      */
     public int getTotalBonusPotential(GoodsType goodsType, UnitType unitType,
-                                      int potential, boolean onlyNatural) {
+        int potential, boolean onlyNatural) {
         int result = potential;
-        for (TileItem item : tileItems) {
-            if (item.isNatural() || !onlyNatural) {
+        for (TileItem item : getTileItems()) {
+            if (!onlyNatural || item.isNatural()) {
                 result = item.applyBonus(goodsType, unitType, result);
             }
         }
@@ -361,9 +423,9 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of the applicable modifiers.
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
+        UnitType unitType) {
         List<Modifier> result = new ArrayList<>();
-        for (TileItem item : tileItems) {
+        for (TileItem item : getTileItems()) {
             result.addAll(item.getProductionModifiers(goodsType, unitType));
         }
         return result;
@@ -378,7 +440,9 @@ public class TileItemContainer extends FreeColGameObject {
      * @return True if this container allows the goods type to be produced.
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
-        return any(tileItems, ti -> ti.canProduce(goodsType, unitType));
+        synchronized (tileItems) {
+            return any(tileItems, ti -> ti.canProduce(goodsType, unitType));
+        }
     }
 
     /**
@@ -393,7 +457,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public int getMoveCost(Tile fromTile, Tile targetTile, int basicMoveCost) {
         int moveCost = basicMoveCost;
-        for (TileItem item : tileItems) {
+        for (TileItem item : getTileItems()) {
             if (item instanceof TileImprovement
                 && ((TileImprovement)item).isComplete()) {
                 Direction direction = targetTile.getDirection(fromTile);
@@ -453,7 +517,9 @@ public class TileItemContainer extends FreeColGameObject {
      * @return True if the tile item is present.
      */
     public boolean contains(TileItem t) {
-        return tileItems.contains(t);
+        synchronized (tileItems) {
+            return tileItems.contains(t);
+        }
     }
 
 
@@ -464,7 +530,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     @Override
     public void disposeResources() {
-        tileItems.clear();
+        clearTileItems();
         super.disposeResources();
     }
 
@@ -477,7 +543,7 @@ public class TileItemContainer extends FreeColGameObject {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        for (TileItem ti : new ArrayList<>(tileItems)) {
+        for (TileItem ti : getTileItems()) {
             int integ = ti.checkIntegrity(fix);
             if (fix) {
                 // @compat 0.10.5
@@ -485,7 +551,7 @@ public class TileItemContainer extends FreeColGameObject {
                 // that reference the wrong tile.
                 if (ti.getTile() != tile) {
                     logger.warning("Fixing improvement tile at: " + tile
-                                   + " / " + ti.getId());
+                        + " / " + ti.getId());
                     ti.setLocation(tile);
                     integ = Math.min(integ, 0);
                 }
@@ -503,8 +569,8 @@ public class TileItemContainer extends FreeColGameObject {
                 // end @compat
                 if (integ < 0) {
                     logger.warning("Removing broken improvement at: " + tile
-                                   + " / " + ti.getId());
-                    tileItems.remove(ti);
+                        + " / " + ti.getId());
+                    removeTileItem(ti);
                     integ = 0;
                 }
             }
@@ -539,7 +605,7 @@ public class TileItemContainer extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (TileItem item : tileItems) {
+        for (TileItem item : getTileItems()) {
             item.toXML(xw);
         }
     }
@@ -561,7 +627,7 @@ public class TileItemContainer extends FreeColGameObject {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        tileItems.clear();
+        clearTileItems();
 
         super.readChildren(xr);
     }
@@ -577,22 +643,22 @@ public class TileItemContainer extends FreeColGameObject {
         if (LostCityRumour.getXMLElementTagName().equals(tag)) {
             LostCityRumour lcr = xr.readFreeColGameObject(game, LostCityRumour.class);
             if (lcr != null) {
-                tileItems.add(lcr);
                 // @compat 0.10.4
                 // Fix LCR tile, see LostCityRumour.readAttributes
                 lcr.setTile(tile);
                 // end @compat 0.10.4
+                addTileItem(lcr);
             }
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
-            tileItems.add(xr.readFreeColGameObject(game, Resource.class));
+            addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
                    ) {
-            tileItems.add(xr.readFreeColGameObject(game, TileImprovement.class));
+            addTileItem(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {
             super.readChild(xr);
@@ -606,7 +672,7 @@ public class TileItemContainer extends FreeColGameObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId());
-        for (TileItem item : tileItems) sb.append(" ").append(item);
+        for (TileItem item : getTileItems()) sb.append(" ").append(item);
         sb.append("]");
         return sb.toString();
     }

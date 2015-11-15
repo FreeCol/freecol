@@ -138,8 +138,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             ok = false;
         }
 
-        List<TileItem> ti = (copied.getTileItemContainer() == null) ? null
-            : copied.getTileItemContainer().getTileItems();
+        List<TileItem> ti = copied.getCompleteItems();
         if ((ti == null) != (tileItems == null)
             || (ti != null && ti.size() != tileItems.size())) {
             // Not trying too hard to match up the tile items

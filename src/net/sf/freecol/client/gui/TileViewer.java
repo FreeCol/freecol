@@ -697,9 +697,7 @@ public final class TileViewer {
         // might be taller than a tile.
 
         // layer additions and improvements according to zIndex
-        List<TileItem> tileItems = (tile.getTileItemContainer() != null)
-            ? tile.getTileItemContainer().getTileItems()
-            : new ArrayList<TileItem>();
+        List<TileItem> tileItems = tile.getCompleteItems();
         int startIndex = 0;
         for (int index = startIndex; index < tileItems.size(); index++) {
             if (tileItems.get(index).getZIndex() < Tile.OVERLAY_ZINDEX) {

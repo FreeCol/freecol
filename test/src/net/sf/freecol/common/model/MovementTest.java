@@ -85,7 +85,7 @@ public class MovementTest extends FreeColTestCase {
         TileImprovement ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.plow"));
         ti.setTurnsToComplete(0);
         tile2.add(ti);
-        assertTrue("Plowed", tile2.getCompletedTileImprovements().size() == 1);
+        assertTrue("Plowed", tile2.getCompleteTileImprovements().size() == 1);
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));

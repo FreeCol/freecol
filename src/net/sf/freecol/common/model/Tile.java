@@ -407,6 +407,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get the completed tile items for this tile.
+     *
+     * @return A list of completed <code>TileItem</code>s.
+     */
+    public List<TileItem> getCompleteItems() {
+        return (tileItemContainer == null) ? Collections.<TileItem>emptyList()
+            : tileItemContainer.getCompleteItems();
+    }
+
+    /**
      * Get the tile region.
      *
      * @return The tile <code>Region</code>.
@@ -676,10 +686,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return A list of all completed <code>TileImprovements</code>.
      */
-    public List<TileImprovement> getCompletedTileImprovements() {
+    public List<TileImprovement> getCompleteTileImprovements() {
         return (tileItemContainer == null)
             ? Collections.<TileImprovement>emptyList()
-            : tileItemContainer.getCompletedImprovements();
+            : tileItemContainer.getCompleteImprovements();
     }
 
     /**
@@ -744,8 +754,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a river <code>Tile</code>.
      */
     public boolean hasRiver() {
-        return tileItemContainer != null
-            && tileItemContainer.getRiver() != null;
+        return getRiver() != null;
     }
 
     /**
@@ -776,8 +785,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this <code>Tile</code> has a road.
      */
     public boolean hasRoad() {
-        return tileItemContainer != null
-            && tileItemContainer.getRoad() != null;
+        return getRoad() != null;
     }
 
     /**
@@ -802,7 +810,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (tileItemContainer == null) {
             tileItemContainer = new TileItemContainer(getGame(), this);
         }
-        TileItem added = tileItemContainer.addTileItem(item);
+        TileItem added = tileItemContainer.tryAddTileItem(item);
         return added == item;
     }
 
@@ -996,7 +1004,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public List<RandomChoice<Disaster>> getDisasters() {
         List<RandomChoice<Disaster>> disasters = new ArrayList<>();
         disasters.addAll(type.getDisasters());
-        for (TileImprovement ti : getCompletedTileImprovements()) {
+        for (TileImprovement ti : getCompleteTileImprovements()) {
             disasters.addAll(ti.getType().getDisasters());
         }
         return disasters;
@@ -1017,8 +1025,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getLabel() {
         StringTemplate label = StringTemplate.key(type);
         if (tileItemContainer != null) {
-            List<Named> keys = tileItemContainer.getTileItems().stream()
-                .filter(TileItem::isComplete).collect(Collectors.toList());
+            List<TileItem> keys = tileItemContainer.getCompleteItems();
             if (!keys.isEmpty()) {
                 label = StringTemplate.label("/").addNamed(type);
                 for (Named key : keys) label.addNamed(key);
@@ -1713,12 +1720,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         int maxProduction = 0;
         for (TileType tileType : tileTypes) {
             float potential = tileType.getPotentialProduction(goodsType, unitType);
-            if (tileType == type && hasResource()) {
-                for (TileItem item : tileItemContainer.getTileItems()) {
-                    if (item instanceof Resource) {
-                        potential = item.applyBonus(goodsType, unitType,
+            if (tileType == type) {
+                Resource resource = (tileItemContainer == null) ? null
+                    : tileItemContainer.getResource();
+                if (resource != null) {
+                    potential = resource.applyBonus(goodsType, unitType,
                                                     (int)potential);
-                    }
                 }
             }
             for (TileImprovementType ti : spec.getTileImprovementTypeList()) {

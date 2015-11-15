@@ -158,7 +158,7 @@ public class ColonizationMapLoader implements MapLoader {
                         TileImprovement river =
                             new TileImprovement(game, tiles[x][y], riverType);
                         river.setMagnitude (overlay <= 3 ? 1 : 2);
-                        container.addTileItem(river);
+                        container.tryAddTileItem(river);
                         tiles[x][y].setTileItemContainer(container);
                     }
                     index++;
