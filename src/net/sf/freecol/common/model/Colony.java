@@ -2900,7 +2900,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 logger.warning("Unit count fail: " + uc + " id=" + getId()
                     + " unitCount=" + getUnitCount()
                     + " scope=" + xw.getWriteScope()
-                    + " player=" + xw.getWriteScope().getClient() + "\n"
+                    + "/" + xw.getWriteScope().getClient() + "\n"
                     + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
             }
             xw.writeAttribute(UNIT_COUNT_TAG, uc);

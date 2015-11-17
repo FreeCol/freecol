@@ -3849,7 +3849,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public Tile getTile() {
-        return (this.location != null) ? this.location.getTile() : null;
+        return (getLocation() != null) ? getLocation().getTile() : null;
     }
 
     /**
@@ -4028,8 +4028,9 @@ public class Unit extends GoodsLocation
      */
     @Override
     public void disposeResources() {
-        if (this.location != null) {
-            this.location.remove(this);
+        Location loc = getLocation();
+        if (loc != null) {
+            loc.remove(this);
             // Do not set location to null, units that are slaughtered in
             // battle need to remain valid during the animation.
         }
@@ -4253,11 +4254,22 @@ public class Unit extends GoodsLocation
                 // working inside a colony and has to be specially
                 // serialized to the client.
                 xw.writeLocationAttribute(LOCATION_TAG, getColony());
-                logger.warning("Unit->Colony(for animation) " + this.getId()
-                    + " " + getColony().getId());
-
+                logger.warning("Unit->Colony(animation) " + this.getId()
+                    + " -> " + getColony().getName()
+                    + " unit owner=" + getOwner()
+                    + " colony owner=" + getColony().getOwner()
+                    + " scope=" + xw.getWriteScope() + "/" + xw.getWriteScope().getClient() + "\n"
+                    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
             } else {
                 xw.writeLocationAttribute(LOCATION_TAG, location);
+                if (location instanceof Colony) {
+                    logger.warning("Unit->Colony(already) " + this.getId()
+                        + " -> " + getColony().getName()
+                        + " unit owner=" + getOwner()
+                        + " colony owner=" + getColony().getOwner()
+                        + " scope=" + xw.getWriteScope() + "/" + xw.getWriteScope().getClient() + "\n"
+                        + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+                }
             }
         }
 
@@ -4384,7 +4396,7 @@ public class Unit extends GoodsLocation
             // end @compat 0.10.x
             );
 
-        location = xr.getLocationAttribute(game, LOCATION_TAG, true);
+        setLocationNoUpdate(xr.getLocationAttribute(game, LOCATION_TAG, true));
 
         entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
                                                 true);
