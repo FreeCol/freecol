@@ -912,6 +912,11 @@ public class Unit extends GoodsLocation
      */
     public void setLocationNoUpdate(Location newLocation) {
         this.location = newLocation;
+        if (newLocation instanceof Colony) {
+            logger.warning("Unit->Colony " + this.getId()
+                + " " + ((Colony)newLocation).getId() + "\n"
+                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        }                
     }
 
     /**
@@ -4248,6 +4253,8 @@ public class Unit extends GoodsLocation
                 // working inside a colony and has to be specially
                 // serialized to the client.
                 xw.writeLocationAttribute(LOCATION_TAG, getColony());
+                logger.warning("Unit->Colony(for animation) " + this.getId()
+                    + " " + getColony().getId());
 
             } else {
                 xw.writeLocationAttribute(LOCATION_TAG, location);
