@@ -1283,6 +1283,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return True if the add succeeds.
      */
     public boolean joinColony(Unit unit) {
+        boolean ret;
         Occupation occupation = getOccupationFor(unit, false);
         if (occupation == null) {
             if (!traceOccupation) {
@@ -1290,9 +1291,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 getOccupationFor(unit, false, lb);
                 lb.log(logger, Level.WARNING);
             }
-            return false;
+            ret = false;
+        } else {
+            ret = occupation.install(unit);
         }
-        return occupation.install(unit);
+        if (!ret) {
+            unit.setLocation(getTile()); // Fall back to safe value
+            logger.warning("Failed to join " + getName() + ": " + unit);
+        }
+        return ret;
     }
 
     /**

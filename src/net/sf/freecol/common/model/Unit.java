@@ -623,8 +623,8 @@ public class Unit extends GoodsLocation
             return getMovesLeft() > 0;
         case IMPROVING:
             return getMovesLeft() > 0
-                && location instanceof Tile
-                && getOwner().canAcquireForImprovement(location.getTile());
+                && getLocation() instanceof Tile
+                && getOwner().canAcquireForImprovement(getLocation().getTile());
         case IN_COLONY:
             return !isNaval();
         case SENTRY:
@@ -911,7 +911,7 @@ public class Unit extends GoodsLocation
      * @param newLocation The new <code>Location</code>.
      */
     public void setLocationNoUpdate(Location newLocation) {
-        location = newLocation;
+        this.location = newLocation;
     }
 
     /**
@@ -939,8 +939,8 @@ public class Unit extends GoodsLocation
      * @return True if at sea.
      */
     public boolean isAtSea() {
-        return (location instanceof Unit) ? ((Unit)location).isAtSea()
-            : location instanceof HighSeas;
+        return (isOnCarrier()) ? getCarrier().isAtSea()
+            : getLocation() instanceof HighSeas;
     }
 
     /**
@@ -992,10 +992,8 @@ public class Unit extends GoodsLocation
      * @return The current <code>Building</code>, or null if none.
      */
     public Building getWorkBuilding() {
-        if (getLocation() instanceof Building) {
-            return ((Building) getLocation());
-        }
-        return null;
+        return (getLocation() instanceof Building) ? (Building)getLocation()
+            : null;
     }
 
     /**
@@ -1004,10 +1002,8 @@ public class Unit extends GoodsLocation
      * @return The current <code>ColonyTile</code>, or null if none.
      */
     public ColonyTile getWorkTile() {
-        if (getLocation() instanceof ColonyTile) {
-            return ((ColonyTile) getLocation());
-        }
-        return null;
+        return (getLocation() instanceof ColonyTile) ? (ColonyTile)getLocation()
+            : null;
     }
 
     /**
@@ -3740,7 +3736,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     /**
@@ -3762,7 +3758,7 @@ public class Unit extends GoodsLocation
             return ((Colony)newLocation).joinColony(this);
         }
 
-        if (newLocation == location) return true;
+        if (newLocation == this.location) return true;
         if (newLocation != null && !newLocation.canAdd(this)) {
             logger.warning("Can not add " + this + " to "
                 + newLocation.getId());
@@ -3776,12 +3772,12 @@ public class Unit extends GoodsLocation
         // We have to handle this issue here in setLocation as this is
         // the only place that contains information about both
         // locations.
-        Colony oldColony = (isInColony()) ? location.getColony() : null;
+        Colony oldColony = (isInColony()) ? this.location.getColony() : null;
         Colony newColony = (newLocation instanceof WorkLocation)
             ? newLocation.getColony() : null;
         boolean withinColony = newColony != null && newColony == oldColony;
         boolean preserveEducation = withinColony
-            && (((WorkLocation)location).canTeach()
+            && (((WorkLocation)this.location).canTeach()
                 == ((WorkLocation)newLocation).canTeach());
 
         // First disable education that will fail due to the move.
@@ -3790,12 +3786,12 @@ public class Unit extends GoodsLocation
         }
 
         // Move out of the old location.
-        if (location == null) {
+        if (this.location == null) {
             ; // do nothing
-        } else if (!location.remove(this)) {//-vis
+        } else if (!this.location.remove(this)) {//-vis
             // "Should not happen" (should always be able to remove)
             throw new RuntimeException("Failed to remove " + this
-                + " from " + location.getId());
+                + " from " + this.location.getId());
         }
 
         // Move in to the new location.
@@ -3828,7 +3824,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public boolean isInEurope() {
-        return (location instanceof Unit) ? ((Unit)location).isInEurope()
+        return (isOnCarrier()) ? getCarrier().isInEurope()
             : getLocation() instanceof Europe;
     }
 
@@ -3848,7 +3844,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public Tile getTile() {
-        return (location != null) ? location.getTile() : null;
+        return (this.location != null) ? this.location.getTile() : null;
     }
 
     /**
@@ -3921,8 +3917,8 @@ public class Unit extends GoodsLocation
      */
     @Override
     public Settlement getSettlement() {
-        Location location = getLocation();
-        return (location != null) ? location.getSettlement() : null;
+        Location loc = getLocation();
+        return (loc != null) ? loc.getSettlement() : null;
     }
 
     /**
@@ -4027,8 +4023,8 @@ public class Unit extends GoodsLocation
      */
     @Override
     public void disposeResources() {
-        if (location != null) {
-            location.remove(this);
+        if (this.location != null) {
+            this.location.remove(this);
             // Do not set location to null, units that are slaughtered in
             // battle need to remain valid during the animation.
         }
