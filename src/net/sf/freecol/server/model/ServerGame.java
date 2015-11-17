@@ -154,9 +154,18 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param serverPlayers The list of <code>ServerPlayer</code>s to send to.
      */
     public void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
-        for (ServerPlayer s : serverPlayers) s.send(cs);
+        for (ServerPlayer s : serverPlayers) sendTo(s, cs);
     }
-    
+
+    /**
+     * Send a change set to one player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to send to.
+     */
+    public void sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
+        serverPlayer.send(cs);
+    }
+
 
     /**
      * Makes a trivial server object in this game given a server object tag

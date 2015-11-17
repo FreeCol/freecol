@@ -226,7 +226,7 @@ public final class InGameController extends Controller {
     public void yearlyGoodsAdjust(ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csYearlyGoodsAdjust(random, cs);
-        serverPlayer.send(cs);
+        getGame().sendTo(serverPlayer, cs);
     }
 
     /**
@@ -242,7 +242,7 @@ public final class InGameController extends Controller {
         serverPlayer.csAddFoundingFather(father, random, cs);
         cs.addAttribute(See.only(serverPlayer), "flush",
                         Boolean.TRUE.toString());
-        serverPlayer.send(cs);
+        getGame().sendTo(serverPlayer, cs);
     }
 
     /**
@@ -490,9 +490,9 @@ public final class InGameController extends Controller {
             boolean single = getFreeColServer().getSinglePlayer();
             reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
         } catch (TimeoutException te) {
-            serverPlayer.send(new ChangeSet()
+            getGame().sendTo(serverPlayer, new ChangeSet()
                 .addTrivial(See.only(serverPlayer), "closeMenus",
-                            ChangePriority.CHANGE_NORMAL));
+                    ChangePriority.CHANGE_NORMAL));
             reply = null;
         } catch (InterruptedException | ExecutionException e) {
             reply = null;
@@ -549,16 +549,16 @@ public final class InGameController extends Controller {
         final ServerGame game = getGame();
         final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
 
-        ServerPlayer player = (ServerPlayer)game.getCurrentPlayer();
-        if (serverPlayer != player) {
+        ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
+        if (serverPlayer != current) {
             throw new IllegalArgumentException("It is not "
                 + serverPlayer.getName() + "'s turn, it is "
-                + ((player == null) ? "noone" : player.getName()) + "'s!");
+                + ((current == null) ? "noone" : current.getName()) + "'s!");
         }
 
         for (;;) {
-            logger.finest("Ending turn for " + player.getName());
-            player.clearModelMessages();
+            logger.finest("Ending turn for " + current.getName());
+            current.clearModelMessages();
 
             // Check for new turn
             ChangeSet cs = new ChangeSet();
@@ -582,32 +582,32 @@ public final class InGameController extends Controller {
                 }
             }
 
-            if ((player = (ServerPlayer)game.getNextPlayer()) == null) {
+            if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
                 // "can not happen"
                 return DOMMessage.clientError("Can not get next player");
             }
 
             // Remove dead players and retry
-            switch (player.checkForDeath()) {
+            switch (current.checkForDeath()) {
             case ServerPlayer.IS_DEAD:
-                player.csWithdraw(cs);
+                current.csWithdraw(cs);
                 logger.info("For " + serverPlayer.getSuffix()
-                    + ", " + player.getNation() + " is dead.");
-                game.sendToAll(cs, player);
+                    + ", " + current.getNation() + " is dead.");
+                game.sendToAll(cs, current);
                 continue;
             case ServerPlayer.IS_ALIVE:
-                if (player.isREF() && player.checkForREFDefeat()) {
-                    for (Player p : player.getRebels()) {
-                        csGiveIndependence(player, (ServerPlayer)p, cs);
+                if (current.isREF() && current.checkForREFDefeat()) {
+                    for (Player p : current.getRebels()) {
+                        csGiveIndependence(current, (ServerPlayer)p, cs);
                     }
-                    player.csWithdraw(cs);
-                    logger.info(player.getNation() + " is defeated.");
-                    game.sendToAll(cs, player);
+                    current.csWithdraw(cs);
+                    logger.info(current.getNation() + " is defeated.");
+                    game.sendToAll(cs, current);
                     continue;
                 }
                 break;
             default: // Need to autorecruit a unit to keep alive.
-                player.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
                 break;
             }
             // Are there humans left?
@@ -630,7 +630,7 @@ public final class InGameController extends Controller {
             // Has the player won?
             // Do not end single player games where an AI has won,
             // that would stop revenge mode.
-            if (winner == player
+            if (winner == current
                 && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
@@ -642,30 +642,30 @@ public final class InGameController extends Controller {
 
             // Do "new turn"-like actions that need to wait until right
             // before the player is about to move.
-            game.setCurrentPlayer(player);
-            if (player.isREF() && player.getEntryLocation() == null) {
+            game.setCurrentPlayer(current);
+            if (current.isREF() && current.getEntryLocation() == null) {
                 // Initialize this newly created REF
                 // If the teleportREF option is enabled, teleport it in.
                 REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
-                    .getAIPlayer(player);
+                    .getAIPlayer(current);
                 boolean teleport = game.getSpecification()
                     .getBoolean(GameOptions.TELEPORT_REF);
                 if (refAIPlayer.initialize(teleport)) {
-                    csLaunchREF(player, teleport, cs);
+                    csLaunchREF(current, teleport, cs);
                 } else {
                     logger.severe("REF failed to initialize.");
                 }
             }
-            player.csStartTurn(random, cs);
+            current.csStartTurn(random, cs);
 
             cs.addTrivial(See.all(), "setCurrentPlayer",
                           ChangePriority.CHANGE_LATE,
-                          "player", player.getId());
-            if (player.getPlayerType() == PlayerType.COLONIAL) {
-                Monarch monarch = player.getMonarch();
+                          "player", current.getId());
+            if (current.getPlayerType() == PlayerType.COLONIAL) {
+                Monarch monarch = current.getMonarch();
                 MonarchAction action = null;
                 if (debugMonarchAction != null
-                    && player == debugMonarchPlayer) {
+                    && current == debugMonarchPlayer) {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
@@ -678,7 +678,7 @@ public final class InGameController extends Controller {
                 if (action != null) {
                     if (monarch.actionIsValid(action)) {
                         logger.finest("Monarch action: " + action);
-                        csMonarchAction(player, action, cs);
+                        csMonarchAction(current, action, cs);
                     } else {
                         logger.finest("Skipping invalid monarch action: "
                             + action);
@@ -686,23 +686,24 @@ public final class InGameController extends Controller {
                 }
             }
 
-            // Flush accumulated changes.  Send to all players, but
-            // take care that the new player is last so that it does
-            // not immediately start moving and cause further changes
-            // which conflict with these updates.  Finally return to the
-            // current player which requested the end-of-turn, unless
-            // it is doing a debug run.
-            boolean debugSkip = !player.isAI()
+            // Prepare to update, with current player last so that it
+            // does not immediately start moving and cause further
+            // changes which conflict with these updates.
+            List<ServerPlayer> players = game.getConnectedPlayers(current);
+            players.add(current);
+
+            // If this is a debug run, update everyone and continue.
+            boolean debugSkip = !current.isAI()
                 && freeColServer.getSinglePlayer()
                 && debugOnlyAITurns > 0;
             if (debugSkip) {
-                game.sendToOthers(player, cs);
-                player.send(cs);
+                game.sendToList(players, cs);
                 continue;
             }
-            game.sendToList(game.getConnectedPlayers(player, serverPlayer),
-                            cs);
-            if (player != serverPlayer) player.send(cs);
+
+            // Flush accumulated changes, returning to serverPlayer.
+            players.remove(serverPlayer);
+            game.sendToList(players, cs);
             return cs.build(serverPlayer);
         }
     }
@@ -847,7 +848,7 @@ public final class InGameController extends Controller {
                           boolean result) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
-        serverPlayer.send(cs);
+        getGame().sendTo(serverPlayer, cs);
     }
 
     /**
