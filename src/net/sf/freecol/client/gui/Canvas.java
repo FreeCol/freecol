@@ -1720,7 +1720,6 @@ public final class Canvas extends JDesktopPane {
                 try {
                     logger.log(Level.WARNING, "Exception in ColonyPanel for "
                         + colony.getId(), e);
-                    colony.dumpObject();
                 } finally {
                     return null;
                 }
