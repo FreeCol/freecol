@@ -107,19 +107,19 @@ public class DOMMessage {
 
             inputSource.getByteStream().mark(1000000);
         }
-
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             tempDocument = builder.parse(inputSource);
         } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            logger.log(Level.WARNING, "Parser error", pce);
-        } catch (IOException|SAXException ex) {
+            logger.log(Level.WARNING, "Parser configuration", pce);
+        } catch (IOException ex) {
+            //} catch (IOException|SAXException ex) {
             throw ex;
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (Exception ex) {
             // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
             // some FreeCol messages. I'd like to see the messages upon which
-            // it barfs
+            // it barfs.
+            // Its also throwing SAXParseException in BR#2925
             if (dumpMsgOnError) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 inputSource.getByteStream().reset();
@@ -130,12 +130,13 @@ public class DOMMessage {
                     }
                     baos.write(i);
                 }
-                logger.severe(baos.toString("UTF-8"));
+                logger.log(Level.SEVERE, baos.toString("UTF-8"), ex);
+            } else {
+                logger.log(Level.WARNING, "Parse error", ex);
             }
-            throw e;
+            throw ex;
         }
-
-        document = tempDocument;
+        this.document = tempDocument;
     }
 
     /**
