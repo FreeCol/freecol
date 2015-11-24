@@ -114,22 +114,15 @@ public class GoodsTradeItem extends TradeItem {
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
         final Goods goods = getGoods();
-        int value;
-        if (!isValid()) {
-            return Integer.MIN_VALUE;
-        } else if (market == null) {
-            value = 2 * goods.getAmount();
-            if (getSource() == player) value = -value;
-        } else {
-            if (getSource() == player) {
-                value = -market.getBidPrice(goods.getType(), goods.getAmount());
-            } else {
-                value = market.getSalePrice(goods.getType(), goods.getAmount());
-                value = (int)Math.round(value
-                    * (1.0 - player.getTax() / 100.0));
-            }
-        }
-        return value;
+        return (!isValid())
+            ? Integer.MIN_VALUE
+            : (market == null)
+            ? 2 * goods.getAmount()
+            : (getSource() == player)
+            ? market.getBidPrice(goods.getType(), goods.getAmount())
+            : (int)Math.round(market.getSalePrice(goods.getType(),
+                                                  goods.getAmount())
+                * (1.0 - player.getTax() / 100.0));
     }
 
     // Override Object

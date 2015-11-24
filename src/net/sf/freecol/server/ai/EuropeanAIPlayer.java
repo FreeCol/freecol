@@ -2490,7 +2490,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         TradeItem peace = null;
         // TradeItem cash = null;
         LogBuilder lb = new LogBuilder(64);
-        lb.add("Evaluate trade offer from ", other.getName());
+        lb.add("Evaluate trade offer to ", player.getName(),
+            " from ", other.getName());
         TradeStatus result = null;
 
         int unacceptable = 0;
@@ -2499,10 +2500,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 getNationSummary(other); // Freshen the name summary cache
             }                    
             int value = item.evaluateFor(player);
-            if (item instanceof GoldTradeItem) {
-                // cash = item;
-            } else if (item instanceof StanceTradeItem) {
-                // Handle some special cases
+            if (item instanceof StanceTradeItem) { // Handle some special cases
                 switch (item.getStance()) {
                 case ALLIANCE: case CEASE_FIRE:
                     if (franklin) {
@@ -2518,9 +2516,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     break;
                 }
             }
-            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
-            if (value == Integer.MIN_VALUE) unacceptable++;
+            if (value == Integer.MIN_VALUE) {
+                unacceptable++;
+            } else if (item.getSource() == player) {
+                value = -value;
+            }
             scores.put(item, value);
+            lb.add(", ", Messages.message(item.getLabel()), " = ", value);
         }
         lb.add(".");
         

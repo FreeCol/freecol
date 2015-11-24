@@ -1706,14 +1706,24 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             && player.getNumberOfSettlements() < 5) {// FIXME: magic#
             return Integer.MIN_VALUE;
         }
-        int result;
+        int result, v;
         if (player.owns(this)) {
-            result = getAvailableWorkLocations().stream()
-                    .mapToInt(wl -> wl.evaluateFor(player)).sum()
-                + getTile().getUnitList().stream()
-                    .mapToInt(u -> u.evaluateFor(player)).sum()
-                + getCompactGoods().stream()
-                    .mapToInt(g -> g.evaluateFor(player)).sum();
+            result = 0;
+            for (WorkLocation wl : getAvailableWorkLocations()) {
+                v = wl.evaluateFor(player);
+                if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
+                result += v;
+            }
+            for (Unit u : getTile().getUnitList()) {
+                v = u.evaluateFor(player);
+                if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
+                result += v;
+            }
+            for (Goods g : getCompactGoods()) {
+                v = g.evaluateFor(player);
+                if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
+                result += v;
+            }
         } else { // Much guesswork
             result = getDisplayUnitCount() * 1000
                 + 500 // Some useful goods?

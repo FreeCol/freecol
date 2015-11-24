@@ -117,10 +117,9 @@ public class ColonyTradeItem extends TradeItem {
      */
     public int evaluateFor(Player player) {
         final Colony colony = getColony(player.getGame());
-        if (colony == null
-            || !getSource().owns(colony)) return Integer.MIN_VALUE;
-        int value = colony.evaluateFor(player);
-        return (getSource() == player) ? -value : value;
+        return (colony == null || !getSource().owns(colony))
+            ? Integer.MIN_VALUE
+            : colony.evaluateFor(player);
     }
     
 

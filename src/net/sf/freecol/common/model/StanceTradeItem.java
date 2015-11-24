@@ -125,9 +125,10 @@ public class StanceTradeItem extends TradeItem {
             else if (ratio < 0.33) value = 1000;
             break;
         case UNCONTACTED: default:
-            return Integer.MIN_VALUE;
+            value = Integer.MIN_VALUE;
+            break;
         }
-        return (getSource() == player) ? -value : value;
+        return value;
     }
 
 
