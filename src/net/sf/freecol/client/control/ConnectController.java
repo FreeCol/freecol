@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
@@ -416,16 +417,13 @@ public final class ConnectController {
                 return false;
             }
 
-            List<ChoiceItem<String>> choices = new ArrayList<>();
-            for (String n : names) {
-                String nam = Messages.message(StringTemplate
-                    .template("countryName")
-                    .add("%nation%", Messages.nameKey(n)));
-                choices.add(new ChoiceItem<>(nam, n));
-            }
             String choice = gui.getChoice(null,
                 Messages.message("client.choicePlayer"),
-                "cancel", choices);
+                "cancel", names.stream()
+                    .map(n -> new ChoiceItem<>(Messages.message(StringTemplate
+                                .template("countryName")
+                                .add("%nation%", Messages.nameKey(n))), n))
+                    .collect(Collectors.toList()));
             if (choice == null) return false; // User cancelled
 
             if (!login(Messages.getRulerName(choice), host, port)) {
