@@ -74,7 +74,10 @@ public class Connection implements Closeable {
 
     private Socket socket;
 
+    /** The output stream to write to. */
     private OutputStream out;
+    /** A lock to protect the output stream. */
+    private Object outLock = new Object();
 
     private final Transformer xmlTransformer;
 
@@ -221,26 +224,22 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Get the output stream.
-     *
-     * @return The output stream.
-     */
-    private synchronized OutputStream getOutputStream() {
-        return this.out;
-    }
-
-    /**
      * Close and clear the output stream.
      */
-    private synchronized void closeOutputStream() {
-        if (this.out != null) {
+    private void closeOutputStream() {
+        IOException ioe = null;
+        synchronized (this.outLock) {
+            if (this.out == null) return;
             try {
                 this.out.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing output", ioe);
+            } catch (IOException e) {
+                ioe = e;
             } finally {
                 this.out = null;
             }
+        }
+        if (ioe != null) {
+            logger.log(Level.WARNING, "Error closing output", ioe);
         }
     }
 
@@ -307,20 +306,19 @@ public class Connection implements Closeable {
      * @param send True if sending (else replying).
      */
     protected void log(DOMSource source, boolean send) {
-        if (this.logResult != null) {
-            try {
-                this.logWriter.write(name, 0, name.length());
-                if (send) {
-                    this.logWriter.write(SEND_SUFFIX, 0, SEND_SUFFIX.length());
-                } else {
-                    this.logWriter.write(REPLY_SUFFIX, 0, REPLY_SUFFIX.length());
-                }
-                this.xmlTransformer.transform(source, this.logResult);
-                this.logWriter.write('\n');
-                this.logWriter.flush();
-            } catch (IOException|TransformerException e) {
-                ; // Ignore logging failure
+        if (this.logResult == null) return;
+        try {
+            this.logWriter.write(name, 0, name.length());
+            if (send) {
+                this.logWriter.write(SEND_SUFFIX, 0, SEND_SUFFIX.length());
+            } else {
+                this.logWriter.write(REPLY_SUFFIX, 0, REPLY_SUFFIX.length());
             }
+            this.xmlTransformer.transform(source, this.logResult);
+            this.logWriter.write('\n');
+            this.logWriter.flush();
+        } catch (IOException|TransformerException e) {
+            ; // Ignore logging failure
         }
     }
 
@@ -332,18 +330,21 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {
-        OutputStream os = getOutputStream();
-        if (os != null) {
-            DOMSource source = new DOMSource(element);
+        TransformerException te = null;
+        DOMSource source = null;
+        synchronized (this.outLock) {
+            if (this.out == null) return;
+            source = new DOMSource(element);
             try {
-                xmlTransformer.transform(source, new StreamResult(os));
-            } catch (TransformerException te) {
-                logger.log(Level.WARNING, "Failed to transform", te);
+                xmlTransformer.transform(source, new StreamResult(this.out));
+            } catch (TransformerException e) {
+                te = e;
             }
-            os.write('\n');
-            os.flush();
-            log(source, true);
+            this.out.write('\n');
+            this.out.flush();
         }
+        if (source != null) log(source, true);
+        if (te != null) logger.log(Level.WARNING, "Failed to transform", te);
     }
 
     /**
