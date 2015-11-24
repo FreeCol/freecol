@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -1087,6 +1088,7 @@ public class DebugUtils {
         final Specification sSpec = sGame.getSpecification();
         final IndianSettlement sis = sGame.getFreeColGameObject(is.getId(),
             IndianSettlement.class);
+        final List<GoodsType> sGoodsTypes = sSpec.getGoodsTypeList();
 
         LogBuilder lb = new LogBuilder(256);
         lb.add(sis.getName(), "\n\nAlarm\n");
@@ -1101,19 +1103,22 @@ public class DebugUtils {
                    " ", sis.getContactLevel(p), "\n");
         }
 
-        lb.add("\nGoods Present\n");
-        for (Goods goods : sis.getCompactGoods()) {
-            lb.add(Messages.message(goods.getLabel(true)), "\n");
-        }
-
-        lb.add("\nGoods Production\n");
-        for (GoodsType type : sSpec.getGoodsTypeList()) {
-            int prod = sis.getTotalProductionOf(type);
-            if (prod > 0) {
-                lb.add(Messages.getName(type), " ", prod, "\n");
+        lb.add("\nGoods\n");
+        for (GoodsType gt : sGoodsTypes) {
+            int amount = sis.getGoodsCount(gt);
+            int prod = sis.getTotalProductionOf(gt);
+            if (amount > 0 || prod != 0) {
+                lb.add(Messages.message(AbstractGoods.getLabel(gt, amount)),
+                    " ", ((prod > 0) ? "+" : ""), prod, "\n");
             }
         }
 
+        lb.add("\nPotential sales\n");
+        for (Goods g : sis.getSellGoods(sGoodsTypes.size(), null)) {
+            lb.add(Messages.getName(g.getType()), " ", g.getAmount(),
+                " = ", sis.getPriceToSell(g.getType(), g.getAmount()), "\n");
+        }
+        
         lb.add("\nPrices (buy 1/100 / sell 1/100)\n");
         GoodsType[] wanted = sis.getWantedGoods();
         for (GoodsType type : sSpec.getStorableGoodsTypeList()) {
