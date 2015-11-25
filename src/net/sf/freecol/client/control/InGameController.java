@@ -1390,11 +1390,9 @@ public final class InGameController implements NetworkConstants {
                 moveDirection(disembarkable.get(0), direction, false);
             }
         } else {
-            List<ChoiceItem<Unit>> choices = new ArrayList<>();
-            for (Unit dUnit : disembarkable) {
-                choices.add(new ChoiceItem<>(dUnit.getDescription(Unit.UnitLabelType.NATIONAL),
-                                             dUnit));
-            }
+            List<ChoiceItem<Unit>> choices = disembarkable.stream()
+                .map(u -> new ChoiceItem<Unit>(u.getDescription(Unit.UnitLabelType.NATIONAL), u))
+                .collect(Collectors.toList());
             choices.add(new ChoiceItem<>(Messages.message("all"), unit));
 
             // Use moveDirection() to disembark units as while the
@@ -1440,19 +1438,15 @@ public final class InGameController implements NetworkConstants {
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
-        List<ChoiceItem<Unit>> choices = new ArrayList<>();
-        for (Unit u : destinationTile.getUnitList()) {
-            if (u.canAdd(unit)) {
-                String m = u.getDescription(Unit.UnitLabelType.NATIONAL);
-                choices.add(new ChoiceItem<>(m, u));
-                carrier = u; // Save a default
-            }
-        }
+        List<ChoiceItem<Unit>> choices = destinationTile.getUnitList().stream()
+            .filter(u -> u.canAdd(unit))
+            .map(u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u))
+            .collect(Collectors.toList());
         if (choices.isEmpty()) {
             throw new RuntimeException("Unit " + unit.getId()
                 + " found no carrier to embark upon.");
         } else if (choices.size() == 1) {
-            // Use the default
+            carrier = choices.get(0).getObject();
         } else {
             carrier = gui.getChoice(unit.getTile(),
                                     Messages.message("embark.text"),
@@ -1930,15 +1924,11 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Choose goods to buy
-            List<ChoiceItem<Goods>> choices = new ArrayList<>();
-            for (Goods g : forSale) {
-                String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<>(label, g));
-            }
             goods = gui.getChoice(unit.getTile(),
-                                  Messages.message("buyProposition.text"),
-                                  settlement,
-                                  "nothing", choices);
+                Messages.message("buyProposition.text"), settlement, "nothing",
+                forSale.stream()
+                    .map(g -> new ChoiceItem<>(Messages.message(g.getLabel()), g))
+                    .collect(Collectors.toList()));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1984,15 +1974,11 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
-            List<ChoiceItem<Goods>> choices = new ArrayList<>();
-            for (Goods g : unit.getGoodsList()) {
-                String label = Messages.message(g.getLabel(true));
-                choices.add(new ChoiceItem<>(label, g));
-            }
             goods = gui.getChoice(unit.getTile(),
-                                  Messages.message("sellProposition.text"),
-                                  settlement,
-                                  "nothing", choices);
+                Messages.message("sellProposition.text"), settlement, "nothing",
+                unit.getGoodsList().stream()
+                    .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
+                    .collect(Collectors.toList()));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -2038,15 +2024,11 @@ public final class InGameController implements NetworkConstants {
      */
     private StringTemplate attemptGiftToSettlement(Unit unit,
                                                    Settlement settlement) {
-        List<ChoiceItem<Goods>> choices = new ArrayList<>();
-        for (Goods g : unit.getGoodsList()) {
-            String label = Messages.message(g.getLabel(true));
-            choices.add(new ChoiceItem<>(label, g));
-        }
         Goods goods = gui.getChoice(unit.getTile(),
-                                    Messages.message("gift.text"),
-                                    settlement,
-                                    "cancel", choices);
+            Messages.message("gift.text"), settlement, "cancel",
+            unit.getGoodsList().stream()
+                .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
+                .collect(Collectors.toList()));
         return (goods != null
             && askServer().deliverGiftToSettlement(unit, settlement, goods))
             ? null
@@ -2116,15 +2098,12 @@ public final class InGameController implements NetworkConstants {
             }
             break;
         case INCITE_INDIANS:
-            List<ChoiceItem<Player>> choices = new ArrayList<>();
-            for (Player p : freeColClient.getGame().getLiveEuropeanPlayers(player)) {
-                String label = Messages.message(p.getCountryLabel());
-                choices.add(new ChoiceItem<>(label, p));
-            }
             Player enemy = gui.getChoice(unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
-                unit,
-                "missionarySettlement.cancel", choices);
+                unit, "missionarySettlement.cancel",
+                freeColClient.getGame().getLiveEuropeanPlayers(player).stream()
+                    .map(p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))
+                    .collect(Collectors.toList()));
             if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
             if (gold < 0) {

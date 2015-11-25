@@ -366,23 +366,13 @@ public class DebugUtils {
         final Specification sSpec = sGame.getSpecification();
         final GUI gui = freeColClient.getGUI();
 
-        List<ChoiceItem<GoodsType>> gtl = new ArrayList<>();
-        for (GoodsType t : sSpec.getGoodsTypeList()) {
-            if (t.isFoodType() && t != sSpec.getPrimaryFoodType()) continue;
-            String msg = Messages.getName(t);
-            gtl.add(new ChoiceItem<>(msg, t));
-        }
-        Collections.sort(gtl);
         GoodsType goodsType = gui.getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"),
             "cancel",
             sSpec.getGoodsTypeList().stream()
-            .filter(gt -> !gt.isFoodType() || gt == sSpec.getPrimaryFoodType())
-            .map(gt -> {
-                    String msg = Messages.getName(gt);
-                    return new ChoiceItem<GoodsType>(msg, gt);
-                })
-            .sorted().collect(Collectors.toList()));
+                .filter(gt -> !gt.isFoodType() || gt == sSpec.getPrimaryFoodType())
+                .map(gt -> new ChoiceItem<GoodsType>(Messages.getName(gt), gt))
+                .sorted().collect(Collectors.toList()));
         if (goodsType == null) return;
 
         String amount = gui.getInput(null,

@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -309,14 +310,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   resourceType.getMaxValue()));
                     return;
                 default:
-                    List<ChoiceItem<ResourceType>> choices = new ArrayList<>();
-                    for (ResourceType rt : resList) {
-                        String name = Messages.getName(rt);
-                        choices.add(new ChoiceItem<>(name, rt));
-                    }
                     ResourceType choice = getGUI().getChoice(null, 
                         Messages.message("mapEditorTransformPanel.chooseResource"),
-                        "cancel", choices);
+                        "cancel", resList.stream()
+                            .map(rt -> new ChoiceItem<>(Messages.getName(rt), rt))
+                            .collect(Collectors.toList()));
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));
