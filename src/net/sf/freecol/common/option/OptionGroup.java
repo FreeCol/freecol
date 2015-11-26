@@ -24,10 +24,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -55,6 +57,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /** Is this option group user editable? */
     private boolean editable = true;
 
+    /** Should this option group be visible? */
+    private boolean visible = true;
+    
 
     /**
      * Creates a new <code>OptionGroup</code>.
@@ -115,6 +120,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    /**
+     * Should this option group be visible?
+     *
+     * @return True if the option group should be visible.
+     */
+    public boolean isVisible() {
+        return visible;
     }
 
     /**
@@ -207,6 +221,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public boolean merge(Option option) {
         final String id = option.getId();
+        OptionGroup etc = null;
 
         // Check first, it is valid to merge an option group onto
         // one at the same level, for which it will not contain a key.
@@ -214,6 +229,17 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             OptionGroup optionGroup = (OptionGroup)option;
             boolean result = true;
             for (Option o : optionGroup.getOptions()) {
+                // @compat 0.11.6
+                // Placement options move to their own group
+                if (o.getId().startsWith("net.sf.freecol.client.gui.panel.")) {
+                    if (etc == null) etc = getOptionGroup(ClientOptions.ETC);
+                    etc.add(o);
+                    logger.log(Level.INFO, "Moved " + o.getId()
+                        + " to " + ClientOptions.ETC);
+                    continue;
+                }
+                // end @compat 0.11.6
+                
                 // Merge from the top level, so that the new
                 // option will end up in the group inherited
                 // from the standard client-options.xml.
@@ -538,6 +564,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     // Serialization
 
     private static final String EDITABLE_TAG = "editable";
+    private static final String VISIBLE_TAG = "visible";
 
 
     /**
@@ -548,6 +575,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         super.writeAttributes(xw);
 
         xw.writeAttribute(EDITABLE_TAG, editable);
+
+        xw.writeAttribute(VISIBLE_TAG, visible);
     }
 
     /**
@@ -568,6 +597,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         super.readAttributes(xr);
 
         editable = xr.getAttribute(EDITABLE_TAG, true);
+
+        visible = xr.getAttribute(VISIBLE_TAG, true);
     }
 
     /**

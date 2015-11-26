@@ -255,7 +255,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         final String tag = xr.getLocalName();
 
         if (null != tag) // @compat 0.10.4
-        switch (tag) {
+            switch (tag) {
             case OPTION_VALUE_TAG:
                 String modId = xr.readId();
                 logger.log(Level.FINEST, "Found old-style mod value: {0}",
@@ -282,7 +282,8 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
                 } catch (XMLStreamException xse) {
                     logger.log(Level.WARNING, "Invalid option at: " + tag, xse);
                     xr.closeTag(tag);
-            }   if (op != null) addMember(op);
+                }
+                if (op != null) addMember(op);
                 break;
         }
     }

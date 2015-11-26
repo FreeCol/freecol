@@ -909,15 +909,16 @@ public final class Canvas extends JDesktopPane {
     private void saveInteger(String className, String key, int value) {
         if (freeColClient != null
             && freeColClient.getClientOptions() != null) {
-            Option o = freeColClient.getClientOptions()
-                .getOption(className + key);
+            OptionGroup etc = freeColClient.getClientOptions()
+                .getOptionGroup(ClientOptions.ETC);
+            Option o = etc.getOption(className + key);
             if (o == null) {
                 Specification specification = (freeColClient.getGame() == null)
                     ? null : freeColClient.getGame().getSpecification();
                 IntegerOption io = new IntegerOption(className + key,
                                                      specification);
                 io.setValue(value);
-                freeColClient.getClientOptions().add(io);
+                etc.add(io);
             } else if (o instanceof IntegerOption) {
                 ((IntegerOption)o).setValue(value);
             }

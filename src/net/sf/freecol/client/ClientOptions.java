@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ModListOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
@@ -430,6 +431,13 @@ public class ClientOptions extends OptionGroup {
     /** The mods. */
     public static final String USER_MODS
         = "clientOptions.mods.userMods";
+
+
+    // clientOptions.etc
+
+    /** The dynamic placement options. */
+    public static final String ETC
+        = "clientOptions.etc";
 
 
     // Comparators for sorting colonies.
@@ -818,6 +826,14 @@ public class ClientOptions extends OptionGroup {
             op.setGroup(gr);
             op.setValue(val);
             add(op);
+        }
+    }
+
+    private void addOptionGroup(String id, String gr) {
+        if (getOption(id) == null) {
+            OptionGroup og = new OptionGroup(id);
+            og.setGroup(gr);
+            add(og);
         }
     }
 

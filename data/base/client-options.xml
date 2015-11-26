@@ -325,4 +325,8 @@
         </template>
       </modListOption>
     </optionGroup>
+
+    <optionGroup id="clientOptions.etc" editable="false" visible="false">
+      <!-- Placement options, set dynamically, not from the options dialogs. -->
+    </optionGroup>
 </clientOptions>
