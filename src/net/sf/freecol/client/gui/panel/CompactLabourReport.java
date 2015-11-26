@@ -23,8 +23,10 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedHashSet;
+
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -346,16 +348,15 @@ public final class CompactLabourReport extends ReportPanel {
             if (allColonists) {
                 addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
             } else {
-                Set<UnitType> resultOfTraining = new LinkedHashSet<>();
-                if (colony != null) {
-                    for (Unit teacher : colony.getTeachers()) {
-                        Unit student = teacher.getStudent();
-                        if (student != null && student.getType() == unitType) {
-                            resultOfTraining.add(Unit.getUnitTypeTeaching(teacher.getType(), student.getType()));
-                        }
-                    }
-                }
-
+                Set<UnitType> resultOfTraining = (colony == null)
+                    ? Collections.<UnitType>emptySet()
+                    : colony.getTeachers().stream()
+                        .filter(u -> {
+                                final Unit student = u.getStudent();
+                                return student != null && student.getType() == unitType;
+                            })
+                        .map(u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()))
+                        .collect(Collectors.toSet());
                 String student = resultOfTraining.size() == 1 ?
                     Messages.message(StringTemplate
                         .template("report.labour.learning")
