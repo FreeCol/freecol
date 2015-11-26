@@ -19,10 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.util.List;
+
 import javax.swing.JFrame;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ChoiceItem;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -31,6 +35,10 @@ import net.sf.freecol.common.option.OptionGroup;
  * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
  */
 public final class ClientOptionsDialog extends OptionsDialog  {
+
+    /** Magic cookie for the reset button. */
+    private static final OptionGroup resetCookie = new OptionGroup("cookie");
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -44,7 +52,9 @@ public final class ClientOptionsDialog extends OptionsDialog  {
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
               ClientOptions.getXMLElementTagName());
 
-        initialize(frame, choices());
+        List<ChoiceItem<OptionGroup>> c = choices();
+        c.add(new ChoiceItem<>(Messages.message("reset"), resetCookie));
+        initialize(frame, c);
     }
 
 
@@ -56,7 +66,14 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     @Override
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
-        if (value != null) {
+        if (value == null) {
+            ; // Cancelled
+        } else if (value == resetCookie) {
+            load(FreeColDirectories.getBaseClientOptionsFile());
+            getOptionUI().updateOption();
+            saveDefaultOptions();
+            value = getGroup();
+        } else {
             saveDefaultOptions();
         }
         return value;
