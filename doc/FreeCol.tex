@@ -394,7 +394,7 @@ options:
   that specifying a save game file on the command line will override
   the save game directory.  If the specified directory does not
   exist FreeCol will exit.
-\item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode,
+\item\verb$--windowed [WIDTHxHEIGHT]$ Run FreeCol in windowed mode,
   and optionally explicitly set the window width and height.  If the
   size is not specified FreeCol will attempt to use as much space as
   possible without overlapping menu bars et al.  Window size
@@ -410,7 +410,7 @@ information:
 \begin{itemize}
 \item\verb$--check-savegame SAVEGAME_FILE$ Check the integrity of a saved game,
   exit with status equal to the result of the check.
-\item\verb$--debug[[=]MODES]$ Start the game in (non-scoring)
+\item\verb$--debug [MODES]$ Start the game in (non-scoring)
   debugging mode.  The optional argument is a comma separated list of
   the debug modes: `menus' (enables the debug menu and extra entries
   in popups and panels), `init' (generates a starting colony), `comms'
@@ -418,7 +418,7 @@ information:
   client-server desynchronization at start and end of the player's
   turn) and `paths' (more infomation is displayed on goto paths).  It
   defaults to `menus' if null.
-\item\verb$--debug-run[=]TURNS[,SAVENAME]$ Run in debug `menus' mode
+\item\verb$--debug-run TURNS[,SAVENAME]$ Run in debug `menus' mode
   for the specified number of turns, then optionally save the game to
   the specified save name and quit.
 \item\verb$--headless$ Force headless mode.

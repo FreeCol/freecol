@@ -30,7 +30,7 @@
               value="jars/miglayout-swing-4.2.jar"/>
     <property name="miglayout-core.jar"
               value="jars/miglayout-core-4.2.jar"/>
-    <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
+    <property name="cli.jar" value="jars/commons-cli-1.3.1.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 
 

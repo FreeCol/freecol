@@ -59,10 +59,10 @@ import net.sf.freecol.server.FreeColServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.DefaultParser;
 
 
 /**
@@ -426,195 +426,194 @@ public final class FreeCol {
     private static void handleArgs(String[] args) {
         Options options = new Options();
         final String help = Messages.message("cli.help");
-        final File dummy = new File("dummy");
         final String argDirectory = Messages.message("cli.arg.directory");
 
         // Help options.
-        options.addOption(OptionBuilder.withLongOpt("usage")
-                          .withDescription(help)
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("help")
-                          .withDescription(help)
-                          .create());
+        options.addOption(Option.builder().longOpt("usage")
+                          .desc(help)
+                          .build());
+        options.addOption(Option.builder().longOpt("help")
+                          .desc(help)
+                          .build());
 
         // Special options handled early.
-        options.addOption(OptionBuilder.withLongOpt("freecol-data")
-                          .withDescription(Messages.message("cli.freecol-data"))
-                          .withArgName(argDirectory)
+        options.addOption(Option.builder().longOpt("freecol-data")
+                          .desc(Messages.message("cli.freecol-data"))
+                          .argName(argDirectory)
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("default-locale")
-                          .withDescription(Messages.message("cli.default-locale"))
-                          .withArgName(Messages.message("cli.arg.locale"))
+                          .build());
+        options.addOption(Option.builder().longOpt("default-locale")
+                          .desc(Messages.message("cli.default-locale"))
+                          .argName(Messages.message("cli.arg.locale"))
                           .hasArg()
-                          .create());
+                          .build());
 
         // Ordinary options, handled here.
-        options.addOption(OptionBuilder.withLongOpt("advantages")
-                          .withDescription(Messages.message(StringTemplate
+        options.addOption(Option.builder().longOpt("advantages")
+                          .desc(Messages.message(StringTemplate
                                   .template("cli.advantages")
                                   .addName("%advantages%", getValidAdvantages())))
-                          .withArgName(Messages.message("cli.arg.advantages"))
+                          .argName(Messages.message("cli.arg.advantages"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("check-savegame")
-                          .withDescription(Messages.message("cli.check-savegame"))
-                          .withArgName(Messages.message("cli.arg.file"))
+                          .build());
+        options.addOption(Option.builder().longOpt("check-savegame")
+                          .desc(Messages.message("cli.check-savegame"))
+                          .argName(Messages.message("cli.arg.file"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("clientOptions")
-                          .withDescription(Messages.message("cli.clientOptions"))
-                          .withArgName(Messages.message("cli.arg.clientOptions"))
+                          .build());
+        options.addOption(Option.builder().longOpt("clientOptions")
+                          .desc(Messages.message("cli.clientOptions"))
+                          .argName(Messages.message("cli.arg.clientOptions"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug")
-                          .withDescription(Messages.message(StringTemplate
+                          .build());
+        options.addOption(Option.builder().longOpt("debug")
+                          .desc(Messages.message(StringTemplate
                                   .template("cli.debug")
                                   .addName("%modes%", FreeColDebugger.getDebugModes())))
-                          .withArgName(Messages.message("cli.arg.debug"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug-run")
-                          .withDescription(Messages.message("cli.debug-run"))
-                          .withArgName(Messages.message("cli.arg.debugRun"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug-start")
-                          .withDescription(Messages.message("cli.debug-start"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("difficulty")
-                          .withDescription(Messages.message("cli.difficulty"))
-                          .withArgName(Messages.message("cli.arg.difficulty"))
+                          .argName(Messages.message("cli.arg.debug"))
+                          .optionalArg(true)
+                          .build());
+        options.addOption(Option.builder().longOpt("debug-run")
+                          .desc(Messages.message("cli.debug-run"))
+                          .argName(Messages.message("cli.arg.debugRun"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("europeans")
-                          .withDescription(Messages.message("cli.european-count"))
-                          .withArgName(Messages.message("cli.arg.europeans"))
+                          .build());
+        options.addOption(Option.builder().longOpt("debug-start")
+                          .desc(Messages.message("cli.debug-start"))
+                          .build());
+        options.addOption(Option.builder().longOpt("difficulty")
+                          .desc(Messages.message("cli.difficulty"))
+                          .argName(Messages.message("cli.arg.difficulty"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("fast")
-                          .withDescription(Messages.message("cli.fast"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("font")
-                          .withDescription(Messages.message("cli.font"))
-                          .withArgName(Messages.message("cli.arg.font"))
+                          .build());
+        options.addOption(Option.builder().longOpt("europeans")
+                          .desc(Messages.message("cli.european-count"))
+                          .argName(Messages.message("cli.arg.europeans"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("full-screen")
-                          .withDescription(Messages.message("cli.full-screen"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("gui-scale")
-                          .withDescription(Messages.message(StringTemplate
+                          .build());
+        options.addOption(Option.builder().longOpt("fast")
+                          .desc(Messages.message("cli.fast"))
+                          .build());
+        options.addOption(Option.builder().longOpt("font")
+                          .desc(Messages.message("cli.font"))
+                          .argName(Messages.message("cli.arg.font"))
+                          .hasArg()
+                          .build());
+        options.addOption(Option.builder().longOpt("full-screen")
+                          .desc(Messages.message("cli.full-screen"))
+                          .build());
+        options.addOption(Option.builder().longOpt("gui-scale")
+                          .desc(Messages.message(StringTemplate
                                   .template("cli.gui-scale")
                                   .addName("%scales%", getValidGUIScales())))
-                          .withArgName(Messages.message("cli.arg.gui-scale"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("headless")
-                          .withDescription(Messages.message("cli.headless"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("load-savegame")
-                          .withDescription(Messages.message("cli.load-savegame"))
-                          .withArgName(Messages.message("cli.arg.file"))
+                          .argName(Messages.message("cli.arg.gui-scale"))
+                          .optionalArg(true)
+                          .build());
+        options.addOption(Option.builder().longOpt("headless")
+                          .desc(Messages.message("cli.headless"))
+                          .build());
+        options.addOption(Option.builder().longOpt("load-savegame")
+                          .desc(Messages.message("cli.load-savegame"))
+                          .argName(Messages.message("cli.arg.file"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("log-console")
-                          .withDescription(Messages.message("cli.log-console"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("log-file")
-                          .withDescription(Messages.message("cli.log-file"))
-                          .withArgName(Messages.message("cli.arg.name"))
+                          .build());
+        options.addOption(Option.builder().longOpt("log-console")
+                          .desc(Messages.message("cli.log-console"))
+                          .build());
+        options.addOption(Option.builder().longOpt("log-file")
+                          .desc(Messages.message("cli.log-file"))
+                          .argName(Messages.message("cli.arg.name"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("log-level")
-                          .withDescription(Messages.message("cli.log-level"))
-                          .withArgName(Messages.message("cli.arg.loglevel"))
+                          .build());
+        options.addOption(Option.builder().longOpt("log-level")
+                          .desc(Messages.message("cli.log-level"))
+                          .argName(Messages.message("cli.arg.loglevel"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("name")
-                          .withDescription(Messages.message("cli.name"))
-                          .withArgName(Messages.message("cli.arg.name"))
+                          .build());
+        options.addOption(Option.builder().longOpt("name")
+                          .desc(Messages.message("cli.name"))
+                          .argName(Messages.message("cli.arg.name"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-intro")
-                          .withDescription(Messages.message("cli.no-intro"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-java-check")
-                          .withDescription(Messages.message("cli.no-java-check"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-memory-check")
-                          .withDescription(Messages.message("cli.no-memory-check"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-sound")
-                          .withDescription(Messages.message("cli.no-sound"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-splash")
-                          .withDescription(Messages.message("cli.no-splash"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("private")
-                          .withDescription(Messages.message("cli.private"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("seed")
-                          .withDescription(Messages.message("cli.seed"))
-                          .withArgName(Messages.message("cli.arg.seed"))
+                          .build());
+        options.addOption(Option.builder().longOpt("no-intro")
+                          .desc(Messages.message("cli.no-intro"))
+                          .build());
+        options.addOption(Option.builder().longOpt("no-java-check")
+                          .desc(Messages.message("cli.no-java-check"))
+                          .build());
+        options.addOption(Option.builder().longOpt("no-memory-check")
+                          .desc(Messages.message("cli.no-memory-check"))
+                          .build());
+        options.addOption(Option.builder().longOpt("no-sound")
+                          .desc(Messages.message("cli.no-sound"))
+                          .build());
+        options.addOption(Option.builder().longOpt("no-splash")
+                          .desc(Messages.message("cli.no-splash"))
+                          .build());
+        options.addOption(Option.builder().longOpt("private")
+                          .desc(Messages.message("cli.private"))
+                          .build());
+        options.addOption(Option.builder().longOpt("seed")
+                          .desc(Messages.message("cli.seed"))
+                          .argName(Messages.message("cli.arg.seed"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("server")
-                          .withDescription(Messages.message("cli.server"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("server-name")
-                          .withDescription(Messages.message("cli.server-name"))
-                          .withArgName(Messages.message("cli.arg.name"))
+                          .build());
+        options.addOption(Option.builder().longOpt("server")
+                          .desc(Messages.message("cli.server"))
+                          .build());
+        options.addOption(Option.builder().longOpt("server-name")
+                          .desc(Messages.message("cli.server-name"))
+                          .argName(Messages.message("cli.arg.name"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("server-port")
-                          .withDescription(Messages.message("cli.server-port"))
-                          .withArgName(Messages.message("cli.arg.port"))
+                          .build());
+        options.addOption(Option.builder().longOpt("server-port")
+                          .desc(Messages.message("cli.server-port"))
+                          .argName(Messages.message("cli.arg.port"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("splash")
-                          .withDescription(Messages.message("cli.splash"))
-                          .withArgName(Messages.message("cli.arg.file"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("tc")
-                          .withDescription(Messages.message("cli.tc"))
-                          .withArgName(Messages.message("cli.arg.name"))
+                          .build());
+        options.addOption(Option.builder().longOpt("splash")
+                          .desc(Messages.message("cli.splash"))
+                          .argName(Messages.message("cli.arg.file"))
+                          .optionalArg(true)
+                          .build());
+        options.addOption(Option.builder().longOpt("tc")
+                          .desc(Messages.message("cli.tc"))
+                          .argName(Messages.message("cli.arg.name"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("timeout")
-                          .withDescription(Messages.message("cli.timeout"))
-                          .withArgName(Messages.message("cli.arg.timeout"))
+                          .build());
+        options.addOption(Option.builder().longOpt("timeout")
+                          .desc(Messages.message("cli.timeout"))
+                          .argName(Messages.message("cli.arg.timeout"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("user-cache-directory")
-                          .withDescription(Messages.message("cli.user-cache-directory"))
-                          .withArgName(argDirectory)
-                          .withType(dummy)
+                          .build());
+        options.addOption(Option.builder().longOpt("user-cache-directory")
+                          .desc(Messages.message("cli.user-cache-directory"))
+                          .argName(argDirectory)
+                          .type(File.class)
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("user-config-directory")
-                          .withDescription(Messages.message("cli.user-config-directory"))
-                          .withArgName(argDirectory)
-                          .withType(dummy)
+                          .build());
+        options.addOption(Option.builder().longOpt("user-config-directory")
+                          .desc(Messages.message("cli.user-config-directory"))
+                          .argName(argDirectory)
+                          .type(File.class)
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("user-data-directory")
-                          .withDescription(Messages.message("cli.user-data-directory"))
-                          .withArgName(argDirectory)
-                          .withType(dummy)
+                          .build());
+        options.addOption(Option.builder().longOpt("user-data-directory")
+                          .desc(Messages.message("cli.user-data-directory"))
+                          .argName(argDirectory)
+                          .type(File.class)
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("version")
-                          .withDescription(Messages.message("cli.version"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("windowed")
-                          .withDescription(Messages.message("cli.windowed"))
-                          .withArgName(Messages.message("cli.arg.dimensions"))
-                          .hasOptionalArg()
-                          .create());
+                          .build());
+        options.addOption(Option.builder().longOpt("version")
+                          .desc(Messages.message("cli.version"))
+                          .build());
+        options.addOption(Option.builder().longOpt("windowed")
+                          .desc(Messages.message("cli.windowed"))
+                          .argName(Messages.message("cli.arg.dimensions"))
+                          .optionalArg(true)
+                          .build());
 
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         boolean usageError = false;
         try {
             CommandLine line = parser.parse(options, args);
