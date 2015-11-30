@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -469,12 +470,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
-            for (Player p : getGame().getLivePlayers(this.source)) {
-                if (p == this.other
-                    || this.source.getStance(p) == Stance.ALLIANCE
-                    || this.source.getStance(p) == Stance.WAR) continue;
-                available.add(p);
-            }
+            available.addAll(getGame().getLivePlayers(this.source).stream()
+                .filter(p -> p != this.other
+                    && this.source.getStance(p).isIncitable())
+                .collect(Collectors.toList()));
 
             add(this.label);
             add(this.victimBox);
@@ -1024,14 +1023,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * @return A list of storable <code>Goods</code>.
      */
     private List<Goods> getAnyGoods(GoodsLocation gl) {
-        List<Goods> goodsList = new ArrayList<>();
-        for (GoodsType type : getSpecification().getStorableGoodsTypeList()) {
-            Goods g = new Goods(getGame(), null, type,
-                                GoodsContainer.CARGO_SIZE);
-            g.setLocation(gl);
-            goodsList.add(g);
-        }
-        return goodsList;
+        return getSpecification().getStorableGoodsTypeList().stream()
+            .map(gt -> new Goods(getGame(), gl, gt, GoodsContainer.CARGO_SIZE))
+            .collect(Collectors.toList());
     }
 
     /**

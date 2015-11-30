@@ -143,6 +143,19 @@ public enum Stance implements Named {
     }
 
     /**
+     * Is this stance one that can be incited to war?
+     *
+     * @return True if this stance is incitable.
+     */
+    public boolean isIncitable() {
+        switch (this) {
+        case CEASE_FIRE: case PEACE: return true;
+        default: break;
+        }
+        return false;
+    }
+            
+    /**
      * Get the stem key.
      *
      * @return The stance stem key.
