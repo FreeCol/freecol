@@ -607,7 +607,7 @@ public class ClientOptions extends OptionGroup {
     private boolean load(FreeColSavegameFile save) {
         if (save == null) return false;
         try {
-            return load(save.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
+            return load(save.getClientOptionsFreeColXMLReader());
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not open options input stream", ioe);
         }

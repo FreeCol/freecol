@@ -541,7 +541,7 @@ public final class ConnectController {
         // settings from the file, and update the client options if
         // possible.
         try (
-            FreeColXMLReader xr = fis.getFreeColXMLReader();
+            FreeColXMLReader xr = fis.getSavedGameFreeColXMLReader();
         ) {
             xr.nextTag();
 

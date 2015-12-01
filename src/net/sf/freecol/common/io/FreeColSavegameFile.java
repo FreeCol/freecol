@@ -83,7 +83,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      */
     public int getSavegameVersion() {
         try (
-            FreeColXMLReader xr = this.getFreeColXMLReader();
+            FreeColXMLReader xr = this.getSavedGameFreeColXMLReader();
         ) {
             xr.nextTag();
             return xr.getAttribute(VERSION_TAG, -1);
@@ -94,26 +94,38 @@ public class FreeColSavegameFile extends FreeColDataFile {
     }
 
     /**
-     * Gets the input stream to the savegame data.
+     * Gets the input stream to the saved game data.
+     *
+     * Only still needed by the validator.
      *
      * @return An <code>InputStream</code> to the file
      *      "savegame.xml" within this data file.
-     * @throws IOException if thrown while opening the
-     *      input stream.
+     * @exception IOException if there is a problem opening the input stream.
      */
     public BufferedInputStream getSavegameInputStream() throws IOException {
         return getInputStream(SAVEGAME_FILE);
     }
 
     /**
-     * Creates a <code>FreeColXMLReader</code> for reading this saved game.
+     * Get a reader for the client options data.
      *
-     * @return The <code>FreeColXMLReaderr</code>.
-     * @exception IOException if thrown while loading the game or if a
-     *     <code>XMLStreamException</code> have been thrown by the parser.
+     * @return A reader for the file "client-options.xml" within this file.
+     * @exception IOException if there is a problem opening the input stream.
      */
-    public FreeColXMLReader getFreeColXMLReader() throws IOException {
-        return new FreeColXMLReader(getSavegameInputStream());
+    public FreeColXMLReader getClientOptionsFreeColXMLReader()
+        throws IOException {
+        return new FreeColXMLReader(getInputStream(CLIENT_OPTIONS));
+    }
+
+    /**
+     * Get a reader for the saved game data.
+     *
+     * @return A reader for the file "savegame.xml" within this file.
+     * @exception IOException if there is a problem opening the input stream.
+     */
+    public FreeColXMLReader getSavedGameFreeColXMLReader()
+        throws IOException {
+        return new FreeColXMLReader(getInputStream(SAVEGAME_FILE));
     }
 
     /**

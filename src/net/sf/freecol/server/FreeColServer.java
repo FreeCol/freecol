@@ -910,7 +910,7 @@ public final class FreeColServer {
 
         ServerGame game = null;
         try (
-            FreeColXMLReader xr = fis.getFreeColXMLReader();
+            FreeColXMLReader xr = fis.getSavedGameFreeColXMLReader();
         ) {
             // Switch to the read scope that creates server objects.
             xr.setReadScope(FreeColXMLReader.ReadScope.SERVER);
