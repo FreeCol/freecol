@@ -646,26 +646,12 @@ public class ClientOptions extends OptionGroup {
      * @return The language option value, or null if none or IO error.
      */
     public static String getLanguageOption() {
-        File options = FreeColDirectories.getClientOptionsFile();
-        if (options.canRead()) {
-            try (
-                FileInputStream fis = new FileInputStream(options);
-                FreeColXMLReader xr = new FreeColXMLReader(fis);
-            ) {
-                xr.nextTag();
-                for (int type = xr.getEventType();
-                     type != XMLEvent.END_DOCUMENT; type = xr.getEventType()) {
-                    if (type == XMLEvent.START_ELEMENT
-                        && LANGUAGE.equals(xr.readId())) {
-                        return xr.getAttribute("value", null);
-                    }
-                    xr.nextTag();
-                }
-                // We don't have a language option in our file, it is
-                // either not there or the file is corrupt
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failure getting language.", e);
-            }
+        final File optionsFile = FreeColDirectories.getClientOptionsFile();
+        FreeColXMLReader xr = findOption(optionsFile, LANGUAGE);
+        if (xr != null) {
+            String ret = xr.getAttribute("value", null);
+            xr.close();
+            return ret;
         }
         return null;
     }

@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.io;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -79,24 +83,49 @@ public class FreeColXMLReader extends StreamReaderDelegate
     /**
      * Creates a new <code>FreeColXMLReader</code>.
      *
+     * @param bis The <code>BufferedInputStream</code> to create
+     *     an <code>FreeColXMLReader</code> for.
+     * @exception IOException if thrown while creating the
+     *     <code>XMLStreamReader</code>.
+     */
+    public FreeColXMLReader(BufferedInputStream bis) throws IOException {
+        super();
+
+        try {
+            XMLInputFactory xif = XMLInputFactory.newInstance();
+            setParent(xif.createXMLStreamReader(bis, "UTF-8"));
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
+        }
+        this.inputStream = bis;
+        this.readScope = ReadScope.NORMAL;
+    }
+
+    /**
+     * Creates a new <code>FreeColXMLReader</code>.
+     *
      * @param inputStream The <code>InputStream</code> to create
      *     an <code>FreeColXMLReader</code> for.
      * @exception IOException if thrown while creating the
      *     <code>XMLStreamReader</code>.
      */
-    public FreeColXMLReader(InputStream inputStream) throws IOException {
-        super();
-
-        try {
-            XMLInputFactory xif = XMLInputFactory.newInstance();
-            setParent(xif.createXMLStreamReader(inputStream, "UTF-8"));
-        } catch (XMLStreamException e) {
-            throw new IOException(e);
-        }
-        this.inputStream = inputStream;
-        this.readScope = ReadScope.NORMAL;
+    public FreeColXMLReader(InputStream is) throws IOException {
+        this(new BufferedInputStream(is));
     }
 
+    /**
+     * Creates a new <code>FreeColXMLReader</code>.
+     *
+     * @param file The <code>File</code> to create
+     *     an <code>FreeColXMLReader</code> for.
+     * @exception IOException if thrown while creating the
+     *     <code>XMLStreamReader</code>.
+     */
+    public FreeColXMLReader(File file) throws IOException {
+        this(new FileInputStream(file));
+    }
+    
+    
     /**
      * Creates a new <code>FreeColXMLReader</code>.
      *
@@ -860,5 +889,23 @@ public class FreeColXMLReader extends StreamReaderDelegate
         setReadScope(ReadScope.NOINTERN);
         nextTag();
         return uninternedRead(game, returnClass);
+    }
+
+    /**
+     * Seek to an identifier in this stream.
+     *
+     * @param id The identifier to find.
+     * @return This <code>FreeColXMLReader</code> positioned such that the 
+     *     required identifier is current, or null on error or if not found.
+     */
+    public FreeColXMLReader seek(String id) throws XMLStreamException {
+        nextTag();
+        for (int type = getEventType(); type != XMLEvent.END_DOCUMENT;
+             type = getEventType()) {
+            if (type == XMLEvent.START_ELEMENT
+                && id.equals(readId())) return this;
+            nextTag();
+        }
+        return null;
     }
 }

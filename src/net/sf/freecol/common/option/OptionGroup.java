@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.option;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -323,6 +325,32 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public Iterator<Option> iterator() {
         return options.iterator();
+    }
+
+    /**
+     * Read a option file until an option identifier is found.
+     *
+     * @param file The <code>File</code> to read.
+     * @param optionId The option identifier to look for.
+     * @return A <code>FreeColXMLReader</code> positions such that the
+     *     required identifier current, or null on error or if not found.
+     */
+    public static FreeColXMLReader findOption(File file, String optionId) {
+        if (file.canRead() && optionId != null) {
+            try {
+                FreeColXMLReader xr = new FreeColXMLReader(file);
+                try {
+                    return xr.seek(optionId);
+                } catch (Exception ex) {
+                    logger.log(Level.WARNING, "Failure finding option: "
+                        + optionId, ex);
+                }
+                xr.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "IO error with " + file, ioe);
+            }
+        }
+        return null;
     }
 
 
