@@ -247,10 +247,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             // If this player is the first to reconnect, it is the
             // current player.
             isCurrentPlayer = game.getCurrentPlayer() == null;
-            if (isCurrentPlayer) {
-                game.setCurrentPlayer(player);
-                active = freeColServer.getActiveUnit();
-            }
+            if (isCurrentPlayer) game.setCurrentPlayer(player);
 
             // Go straight into the game.
             mh = freeColServer.getInGameInputHandler();
@@ -261,8 +258,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
         freeColServer.updateMetaServer();
         return new LoginMessage(player, userName, version, !starting,
                                 freeColServer.getSinglePlayer(),
-                                isCurrentPlayer, active,
-                                game).toXMLElement();
+                                isCurrentPlayer, game).toXMLElement();
     }
 
     /**

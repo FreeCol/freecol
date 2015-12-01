@@ -106,7 +106,9 @@ public final class FreeColServer {
 
     private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
+    // @compat 0.11.6
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
+    // end @compat 0.11.6
     public static final String DEBUG_TAG = "debug";
     public static final String RANDOM_STATE_TAG = "randomState";
     public static final String OWNER_TAG = "owner";
@@ -191,9 +193,6 @@ public final class FreeColServer {
 
     /** The game integrity state. */
     private int integrity = 1;
-
-    /** An active unit specified in a saved game. */
-    private Unit activeUnit = null;
 
     
     /**
@@ -566,25 +565,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the active unit specified in a saved game, if any.
-     *
-     * @return The active unit.
-     */
-    public Unit getActiveUnit() {
-        return activeUnit;
-    }
-
-    /**
-     * Gets the active unit specified in a saved game, if any.
-     *
-     * @param unit The active unit to save.
-     */
-    public void setActiveUnit(Unit unit) {
-        activeUnit = unit;
-    }
-
-
-    /**
      * Sends information about this server to the meta-server.
      *
      * Publically visible version, that is called in game.
@@ -721,14 +701,17 @@ public final class FreeColServer {
     }
 
     /**
-     * Saves a game.
+     * Saves a normal (non-map-editor) game.
      *
      * @param file The file where the data will be written.
+     * @param options The client options to save.
+     * @param active An optional active <code>Unit</code>.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
-    public void saveGame(File file, OptionGroup options) throws IOException {
-        saveGame(file, options, null);
+    public void saveGame(File file, OptionGroup options, Unit active)
+        throws IOException {
+        saveGame(file, options, active, null);
     }
 
     /**
@@ -742,7 +725,7 @@ public final class FreeColServer {
     public void saveMapEditorGame(File file, BufferedImage image) 
         throws IOException {
         this.setAIMain(null);
-        saveGame(file, null, image);
+        saveGame(file, null, null, image);
     }
 
     /**
@@ -750,12 +733,13 @@ public final class FreeColServer {
      *
      * @param file The file where the data will be written.
      * @param options Optional client options to save in the game.
+     * @param active An optional active <code>Unit</code>.
      * @param image A thumbnail <code>Image</code> value to save in the game.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
-    public void saveGame(File file, OptionGroup options, BufferedImage image)
-        throws IOException {
+    private void saveGame(File file, OptionGroup options, Unit active,
+                          BufferedImage image) throws IOException {
         final ServerGame game = getGame();
         try (
             JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
@@ -805,10 +789,6 @@ public final class FreeColServer {
 
                 xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
 
-                if (getActiveUnit() != null) {
-                    xw.writeAttribute(ACTIVE_UNIT_TAG, getActiveUnit());
-                }
-            
                 // Add server side model information:
                 xw.writeStartElement(SERVER_OBJECTS_TAG);
 
@@ -822,6 +802,7 @@ public final class FreeColServer {
 
                 xw.writeEndElement();
 
+                if (active != null) game.setInitialActiveUnitId(active.getId());
                 game.toXML(xw); // Add the game
 
                 if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
@@ -931,7 +912,9 @@ public final class FreeColServer {
                 FreeColDebugger.setDebugModes(xr.getAttribute(DEBUG_TAG,
                                                               (String)null));
 
+                // @compat 0.11.6
                 active = xr.getAttribute(ACTIVE_UNIT_TAG, (String)null);
+                // end @compat 0.11.6
             }
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -957,11 +940,11 @@ public final class FreeColServer {
                 }
             }
 
-            if (server != null && active != null && game != null) {
-                // Now units are all present, set active unit.
-                Unit u = game.getFreeColGameObject(active, Unit.class);
-                server.setActiveUnit(u);
+            // @compat 0.11.6
+            if (game != null && active != null) {
+                game.setInitialActiveUnitId(active);
             }
+            // end @compat 0.11.6
         }
         return game;
     }

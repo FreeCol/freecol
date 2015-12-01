@@ -313,11 +313,12 @@ public final class ConnectController {
                 if (msg.isCurrentPlayer()) {
                     freeColClient.getInGameController()
                         .setCurrentPlayer(player);
-                    Unit activeUnit = msg.getActiveUnit();
+                    Unit activeUnit = game.getInitialActiveUnit();
                     if (activeUnit != null) {
                         activeUnit.getOwner().resetIterators();
                         activeUnit.getOwner().setNextActiveUnit(activeUnit);
                         gui.setActiveUnit(activeUnit);
+                        game.setInitialActiveUnitId(null);
                     } else {
                         gui.setSelectedTile(entryTile);
                     }

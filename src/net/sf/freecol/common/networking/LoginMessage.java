@@ -54,9 +54,6 @@ public class LoginMessage extends DOMMessage {
     /** Is the client the current player. */
     private final boolean currentPlayer;
 
-    /** The optional identifier of the active unit. */
-    private final String activeUnitId;
-
     /** The game. */
     private final Game game;
 
@@ -71,13 +68,11 @@ public class LoginMessage extends DOMMessage {
      * @param startGame Whether to start the game.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
-     * @param activeUnit The current active <code>Unit</code>, or null.
      * @param game The entire game.
      */
     public LoginMessage(Player player, String userName, String version,
                         boolean startGame, boolean singlePlayer,
-                        boolean currentPlayer, Unit activeUnit,
-                        Game game) {
+                        boolean currentPlayer, Game game) {
         super(getXMLElementTagName());
 
         this.player = player;
@@ -87,7 +82,6 @@ public class LoginMessage extends DOMMessage {
         this.startGame = startGame;
         this.singlePlayer = singlePlayer;
         this.currentPlayer = currentPlayer;
-        this.activeUnitId = (activeUnit == null) ? null : activeUnit.getId();
         this.game = game;
     }
 
@@ -112,7 +106,6 @@ public class LoginMessage extends DOMMessage {
         this.singlePlayer = Boolean.parseBoolean(str);
         str = element.getAttribute("currentPlayer");
         this.currentPlayer = Boolean.parseBoolean(str);
-        this.activeUnitId = element.getAttribute("activeUnit");
         NodeList children = element.getChildNodes();
         this.game = (children.getLength() != 1) ? null
             : new Game((Element)children.item(0), this.userName);
@@ -143,11 +136,6 @@ public class LoginMessage extends DOMMessage {
 
     public boolean isCurrentPlayer() {
         return currentPlayer;
-    }
-
-    public Unit getActiveUnit() {
-        return (activeUnitId == null) ? null
-            : game.getFreeColGameObject(activeUnitId, Unit.class);
     }
 
     public Game getGame() {
@@ -183,8 +171,7 @@ public class LoginMessage extends DOMMessage {
             "admin", Boolean.toString(admin),
             "startGame", Boolean.toString(startGame),
             "singlePlayer", Boolean.toString(singlePlayer),
-            "currentPlayer", Boolean.toString(currentPlayer),
-            "activeUnit", activeUnitId);
+            "currentPlayer", Boolean.toString(currentPlayer));
         result.appendChild(game.toXMLElement(result.getOwnerDocument(), 
                                              player));
         return result;

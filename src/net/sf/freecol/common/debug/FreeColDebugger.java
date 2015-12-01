@@ -267,7 +267,7 @@ public class FreeColDebugger {
             if (fcs != null) {
                 try {
                     fcs.saveGame(new File(".", getDebugRunSave()),
-                                 freeColClient.getClientOptions());
+                                 freeColClient.getClientOptions(), null);
                 } catch (IOException e) {}
             }
             freeColClient.quit();
