@@ -90,19 +90,15 @@ public class ServerGame extends Game implements ServerModelObject {
      * Initiate a new <code>ServerGame</code> with information from a
      * saved game.
      *
-     * @param freeColGameObjectListener A listener that should be monitoring
-     *     this <code>Game</code>.
      * @param xr The input stream containing the XML.
      * @param specification The <code>Specification</code> to use in this game.
      * @exception XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
-    public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
-                      FreeColXMLReader xr, Specification specification)
+    public ServerGame(FreeColXMLReader xr, Specification specification)
         throws XMLStreamException {
         this(specification);
 
-        this.freeColGameObjectListener = freeColGameObjectListener;
         this.setGame(this);
         readFromXML(xr);
     }

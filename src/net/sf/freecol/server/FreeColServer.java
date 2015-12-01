@@ -943,7 +943,7 @@ public final class FreeColServer {
 
                 } else if (Game.getXMLElementTagName().equals(tag)) {
                     // Read the game
-                    game = new ServerGame(null, xr, specification);
+                    game = new ServerGame(xr, specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
 
