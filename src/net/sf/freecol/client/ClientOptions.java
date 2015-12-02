@@ -19,12 +19,8 @@
 
 package net.sf.freecol.client;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,8 +52,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.util.Utils;
-
-import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -528,61 +522,19 @@ public class ClientOptions extends OptionGroup {
 
 
     /**
-     * Loads the options from the given reader.
+     * Loads the options from the given save game.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param save The <code>FreeColSaveGame</code> to read the options from.
      * @return True if the options were loaded without error.
      */
-    private boolean load(FreeColXMLReader xr) {
-        if (xr == null) return false;
-        try {
-            xr.nextTag();
-            readFromXML(xr);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Failed to read client option", xse);
-        }
-        return true;
-    }
-    
-    /**
-     * Loads the options from the given buffered input stream.
-     *
-     * @param bis The <code>BufferedInputStream</code> to read the
-     *     options from.
-     * @return True if the options were loaded without error.
-     */
-    private boolean load(BufferedInputStream bis) {
-        if (bis == null) return false;
-        try {
-            return load(new FreeColXMLReader(bis));
+    private boolean load(FreeColSavegameFile save) {
+        if (save == null) return false;
+        try (
+            FreeColXMLReader xr = save.getClientOptionsFreeColXMLReader();
+        ) {
+            return load(xr);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failed to open FreeColXMLReader", ioe);
-        }
-        return false;
-    }
-
-    /**
-     * Loads the options from the given input stream.
-     *
-     * @param is The <code>InputStream</code> to read the options from.
-     * @return True if the options were loaded without error.
-     */
-    private boolean load(InputStream is) {
-        return (is == null) ? false : load(new BufferedInputStream(is));
-    }
-
-    /**
-     * Loads the options from the given file.
-     *
-     * @param file The <code>File</code> to read the options from.
-     * @return True if the options were loaded without error.
-     */
-    public boolean load(File file) {
-        if (file == null) return false;
-        try {
-            return load(new FileInputStream(file));
-        } catch (FileNotFoundException fnfe) {
-            logger.log(Level.WARNING, "Could not open file input stream", fnfe);
+            logger.warning("Error getting client options from " + save);
         }
         return false;
     }
@@ -599,22 +551,6 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Loads the options from the given save game.
-     *
-     * @param save The <code>FreeColSaveGame</code> to read the options from.
-     * @return True if the options were loaded without error.
-     */
-    private boolean load(FreeColSavegameFile save) {
-        if (save == null) return false;
-        try {
-            return load(save.getClientOptionsFreeColXMLReader());
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not open options input stream", ioe);
-        }
-        return false;
-    }
-
-    /**
      * Merge the options from the given save game.
      *
      * @param save The <code>FreeColSaveGame</code> to merge from.
@@ -624,7 +560,7 @@ public class ClientOptions extends OptionGroup {
         ClientOptions clop = new ClientOptions();
         return (!clop.load(save)) ? false : this.merge(clop);
     }
-        
+
     /**
      * Gets a list of active mods in this ClientOptions.
      *

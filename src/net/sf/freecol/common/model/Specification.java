@@ -432,40 +432,6 @@ public final class Specification {
     }
 
     /**
-     * Load a limited set of options from a file.
-     *
-     * Useful to load the user game and map generator options before
-     * starting a new game.
-     *
-     * @param optionId The root identifier of an option group expected to
-     *     be found in the file.
-     * @param file The <code>File</code> to load from.
-     * @return The <code>OptionGroup</code> found.
-     */
-    public OptionGroup loadOptionsFile(String optionId, File file) {
-        OptionGroup group = null;
-        try (
-            FileInputStream fis = new FileInputStream(file);
-            FreeColXMLReader xr = new FreeColXMLReader(fis);
-        ) {
-            xr.nextTag();
-            group = new OptionGroup(this);
-            group.readFromXML(xr);
-            if (!optionId.equals(group.getId())) {
-                Option op = group.getOption(optionId);
-                group = (op instanceof OptionGroup) ? (OptionGroup)op : null;
-            }                   
-            logger.info("Loaded " + optionId + " group from file "
-                + file.getPath() 
-                + ((group == null) ? " failed" : " succeeded"));
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load OptionGroup "
-                + optionId + " from " + file.getName(), e);
-        }
-        return group;
-    }
-
-    /**
      * Merge an option group into the spec.
      *
      * @param group The <code>OptionGroup</code> to merge.
@@ -486,29 +452,6 @@ public final class Specification {
         return realGroup;
     }
                 
-    /**
-     * Save a limited set of options to a file.
-     *
-     * Useful to save the user game and map generator options before
-     * starting a new game.
-     *
-     * @param group The <code>OptionGroup</code> to save.
-     * @param file The <code>File</code> to save to.
-     * @return The <code>OptionGroup</code> saved, or null on error.
-     */
-    public static OptionGroup saveOptionsFile(OptionGroup group, File file) {
-        if (group != null) {
-            try {
-                return (group.save(file, FreeColXMLWriter.WriteScope.toSave(),
-                                   true)) ? group : null;
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to save option group "
-                    + group.getId() + " to " + file.getName(), e);
-            }
-        }
-        return null;
-    }
-
     /**
      * Clean up the specification.
      *

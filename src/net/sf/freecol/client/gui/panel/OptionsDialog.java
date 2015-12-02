@@ -179,8 +179,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the load succeeded.
      */
     protected boolean load(File file) {
-        OptionGroup og = getSpecification()
-            .loadOptionsFile(getOptionGroupId(), file);
+        OptionGroup og = OptionGroup.load(file, getOptionGroupId(),
+                                          getSpecification());
         if (og == null) return false;
 
         reset(og);
@@ -194,8 +194,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
-        OptionGroup og = Specification.saveOptionsFile(this.group, file);
-        if (og != null) return true;
+        if (this.group.save(file)) return true;
         getGUI().showErrorMessage(FreeCol.badSave(file));
         return false;
     }

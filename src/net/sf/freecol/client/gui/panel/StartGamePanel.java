@@ -91,20 +91,20 @@ public final class StartGamePanel extends FreeColPanel {
             String gtag = GameOptions.getXMLElementTagName();
             File gof = FreeColDirectories
                 .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
-            OptionGroup gog = (gof.exists()) ? spec.loadOptionsFile(gtag, gof)
+            OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, spec)
                 : null;
             gog = (gog != null) ? spec.mergeGroup(gog)
                 : spec.getOptionGroup(gtag);
-            Specification.saveOptionsFile(gog, gof);
+            gog.save(gof);
 
             String mtag = MapGeneratorOptions.getXMLElementTagName();
             File mof = FreeColDirectories
                 .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
-            OptionGroup mog = (mof.exists()) ? spec.loadOptionsFile(mtag, mof)
+            OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, spec)
                 : null;
             mog = (mog != null) ? spec.mergeGroup(mog)
                 : spec.getOptionGroup(mtag);
-            Specification.saveOptionsFile(mog, mof);
+            mog.save(mof);
         }
 
         NationOptions nationOptions = getGame().getNationOptions();
