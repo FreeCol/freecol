@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
@@ -426,7 +427,7 @@ public final class PlayersTable extends JTable {
 
         private final List<Nation> nations;
 
-        private final Map<Nation, Player> players;
+        private final Map<Nation, Player> players = new HashMap<>();
 
 
         /**
@@ -443,17 +444,13 @@ public final class PlayersTable extends JTable {
             this.preGameController = preGameController;
             this.nationOptions = nationOptions;
             this.thisPlayer = thisPlayer;
-            nations = new ArrayList<>();
-            players = new HashMap<>();
-            for (Nation nation : thisPlayer.getSpecification().getNations()) {
-                if (nation.isUnknownEnemy()) continue;
-                NationState state = nationOptions.getNations().get(nation);
-                if (state != null) {
-                    nations.add(nation);
-                    players.put(nation, null);
-                }
-            }
-            players.put(thisPlayer.getNation(), thisPlayer);
+            this.players.clear();
+            this.nations = thisPlayer.getSpecification().getNations().stream()
+                .filter(n -> !n.isUnknownEnemy()
+                    && nationOptions.getNations().get(n) != null)
+                .peek(n -> this.players.put(n, null))
+                .collect(Collectors.toList());
+            this.players.put(thisPlayer.getNation(), thisPlayer);
         }
 
         public void update() {
