@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -422,6 +423,22 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
 
     /**
+     * Helper to quickly decide is a unit can reach a settlement.
+     *
+     * Does *not* do the full path finding, this is intentionally a quick
+     * check to eliminate obvious failures before calling the (expensive)
+     * path finder to determine the precise travel time.
+     *
+     * @param u The <code>Unit</code> to check.
+     * @param s The <code>Settlement</code> to check.
+     * @return True if a unit can reach a settlement, assuming no blockages.
+     */
+    private boolean canReach(Unit u, Settlement s) {
+        return (u.isNaval()) ? s.isConnectedPort()
+            : Map.isSameContiguity(u.getLocation(), s.getTile());
+    }
+
+    /**
      * Load destinations for a given unit and carried goods types.
      *
      * @param unit The <code>Unit</code> to select destinations for.
@@ -435,68 +452,60 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Europe europe = player.getEurope();
         final Game game = getGame();
         final Map map = game.getMap();
-        int turns;
-
+        if (this.destinationComparator == null) {
+            this.destinationComparator = new DestinationComparator(player);
+        }
+        
         if (unit.isInEurope() && !unit.getType().canMoveToHighSeas()) return;
 
+        // Add Europe or "New World" (the map) depending where the unit is
         if (unit.isInEurope()) {
             this.destinations.add(new Destination(map, unit.getSailTurns(),
                                                   unit, goodsTypes));
         } else if (europe != null
             && player.canMoveToEurope()
-            && unit.getType().canMoveToHighSeas()
-            && (turns = unit.getTurnsToReach(europe)) < Unit.MANY_TURNS) {
-            this.destinations.add(new Destination(europe, turns, 
-                                                  unit, goodsTypes));
-        }
-
-        for (Settlement s : player.getSettlements()) {
-            if (s == inSettlement) continue;
-            if (unit.isNaval()) {
-                if (!s.isConnectedPort()) continue;
-            } else {
-                if (!Map.isSameContiguity(unit.getLocation(),
-                        s.getTile())) continue;
-            }
-            if ((turns = unit.getTurnsToReach(s)) < Unit.MANY_TURNS) {
-                this.destinations.add(new Destination(s, turns,
+            && unit.getType().canMoveToHighSeas()) {
+            int turns = unit.getTurnsToReach(europe);
+            if (turns < Unit.MANY_TURNS) {
+                this.destinations.add(new Destination(europe, turns, 
                                                       unit, goodsTypes));
             }
         }
-        
-        List<Location> locs = new ArrayList<>();
-        for (Player p : game.getLivePlayers(player)) {
-            if (!p.hasContacted(player)
-                || (p.isEuropean() && !canTrade)) continue;
 
-            for (Settlement s : p.getSettlements()) {
-                if (unit.isNaval()) {
-                    if (!s.isConnectedPort()) continue;
-                } else {
-                    if (!Map.isSameContiguity(unit.getLocation(),
-                                              s.getTile())) continue;
-                }
-                if (s instanceof IndianSettlement
-                    && !((IndianSettlement)s).hasContacted(player)) continue;
-                locs.add(s.getTile());
-            }
-        }
+        // Add all the player accessible settlements except the current one.
+        this.destinations.addAll(player.getSettlements().stream()
+            .filter(s -> s != inSettlement && canReach(unit, s))
+            .map(s -> new Destination(s, unit.getTurnsToReach(s),
+                                      unit, goodsTypes))
+            .filter(d -> d.turns < Unit.MANY_TURNS)
+            .collect(Collectors.toList()));
+
+        // Add all other player accessible settlements.  Build a list
+        // of accessible settlement locations and do a bulk path search
+        // to determine the travel times, and create Destinations from
+        // the results.
+        List<Location> locs = game.getLivePlayers(player).stream()
+            .filter(p -> p.hasContacted(player)
+                && (canTrade || !p.isEuropean()))
+            .flatMap(p -> p.getSettlements().stream()
+                .filter(s -> canReach(unit, s) && s.hasContacted(p)))
+            .map(s -> s.getTile()).collect(Collectors.toList());
         MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
                     FreeColObject.INFINITY, null);
-        PathNode path;
-        for (Entry<Location, PathNode> e : md.getResults().entrySet()) {
-            Settlement s = e.getKey().getTile().getSettlement();
-            PathNode p = e.getValue();
-            turns = p.getTotalTurns();
-            if (unit.isInEurope()) turns += unit.getSailTurns();
-            if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
-            this.destinations.add(new Destination(s, turns, unit, goodsTypes));
-        }
+        this.destinations.addAll(md.getResults().entrySet().stream()
+            .map(e -> {
+                    Settlement s = e.getKey().getTile().getSettlement();
+                    PathNode p = e.getValue();
+                    int turns = p.getTotalTurns();
+                    if (unit.isInEurope()) turns += unit.getSailTurns();
+                    if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
+                    return new Destination(s, turns, unit, goodsTypes);
+                })
+            .filter(d -> d.turns < Unit.MANY_TURNS)
+            .collect(Collectors.toList()));
 
-        if (this.destinationComparator == null) {
-            this.destinationComparator = new DestinationComparator(player);
-        }
+        // Finally sort the results.
         Collections.sort(this.destinations, this.destinationComparator);
     }
 
