@@ -44,9 +44,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
               ClientOptions.getXMLElementTagName());
 
-        // Client options are loaded early
-
-        initialize(frame);
+        initialize(frame, choices());
     }
 
 

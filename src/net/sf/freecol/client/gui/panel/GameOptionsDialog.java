@@ -43,12 +43,12 @@ public final class GameOptionsDialog extends OptionsDialog {
      * @param custom Whether to load custom options.
      */
     public GameOptionsDialog(FreeColClient freeColClient, JFrame frame,
-            boolean editable, boolean custom) {
+                             boolean editable, boolean custom) {
         super(freeColClient, frame, editable,
-            freeColClient.getGame().getGameOptions(),
-            GameOptions.getXMLElementTagName(),
-            FreeColDirectories.GAME_OPTIONS_FILE_NAME,
-            GameOptions.getXMLElementTagName());
+              freeColClient.getGame().getGameOptions(),
+              GameOptions.getXMLElementTagName(),
+              FreeColDirectories.GAME_OPTIONS_FILE_NAME,
+              GameOptions.getXMLElementTagName());
 
         if (isEditable()) loadDefaultOptions();
 
@@ -64,7 +64,7 @@ public final class GameOptionsDialog extends OptionsDialog {
             }
         }
 
-        initialize(frame);
+        initialize(frame, choices());
     }
 
 

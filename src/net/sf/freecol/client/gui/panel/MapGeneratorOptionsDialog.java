@@ -71,10 +71,10 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     public MapGeneratorOptionsDialog(FreeColClient freeColClient, JFrame frame,
                                      boolean editable) {
         super(freeColClient, frame, editable,
-            freeColClient.getGame().getMapGeneratorOptions(),
-            MapGeneratorOptions.getXMLElementTagName(),
-            FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
-            MapGeneratorOptions.getXMLElementTagName());
+              freeColClient.getGame().getMapGeneratorOptions(),
+              MapGeneratorOptions.getXMLElementTagName(),
+              FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME,
+              MapGeneratorOptions.getXMLElementTagName());
 
         if (isEditable()) {
             loadDefaultOptions();
@@ -101,7 +101,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 panel.add(scrollPane);
             }
         }
-        initialize(frame);
+        initialize(frame, choices());
     }
 
     /**

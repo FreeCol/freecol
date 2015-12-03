@@ -46,11 +46,25 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     private static final Logger logger = Logger.getLogger(OptionsDialog.class.getName());
 
+    /** Are the settings in this dialog editable? */
     private final boolean editable;
+
+    /** The option group to display. */
     private OptionGroup group;
+
+    /** The supporting UI for the displayed group. */
     private OptionGroupUI ui;
+
+    /** The name of the file containing the default settings. */
     private final String defaultFileName;
+
+    /**
+     * The option group identifier defining the group to load within the
+     * default settings file.
+     */
     private final String optionGroupId;
+
+    /** Dialog internal parts. */
     private JScrollPane scrollPane;
     private MigPanel optionPanel;
     protected MigPanel panel;
@@ -62,10 +76,15 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param frame The owner frame.
      * @param editable Whether the dialog is editable.
+     * @param group The <code>OptionGroup</code> to display.
+     * @param headerKey The message identifier for the header.
+     * @param defaultFileName The name of the default file to back
+     *     this dialog with.
+     * @param optionGroupId The identifier for the overall option group.
      */
     public OptionsDialog(FreeColClient freeColClient, JFrame frame,
-            boolean editable, OptionGroup group,
-            String headerKey, String defaultFileName, String optionGroupId) {
+                         boolean editable, OptionGroup group, String headerKey,
+                         String defaultFileName, String optionGroupId) {
         super(freeColClient, frame);
 
         this.editable = editable;
@@ -136,34 +155,42 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         this.scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
         this.panel = new MigPanel(new MigLayout("wrap 1, fill"));
-        this.panel.add(Utility.localizedHeader(Messages.nameKey(headerKey), false),
-                       "span, center");
+        this.panel.add(Utility.localizedHeader(Messages.nameKey(headerKey),
+                                               false), "span, center");
     }
 
     /**
      * Initialize this dialog.
      * 
      * @param frame The owner frame.
+     * @param c Extra choices to add beyond the default ok and cancel.
      */
-    protected void initialize(JFrame frame) {
+    protected void initialize(JFrame frame, List<ChoiceItem<OptionGroup>> c) {
         this.panel.add(this.scrollPane, "height 100%, width 100%");
         this.panel.setPreferredSize(new Dimension(850, 650));
         this.panel.setSize(this.panel.getPreferredSize());
 
-        List<ChoiceItem<OptionGroup>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("ok"), this.group).okOption());
         c.add(new ChoiceItem<>(Messages.message("cancel"), (OptionGroup)null,
-                isEditable()).cancelOption().defaultOption());
+                               isEditable()).cancelOption().defaultOption());
+        
         initializeDialog(frame, DialogType.PLAIN, true, this.panel, null, c);
     }
 
     /**
-     * Reset the group for this panel.
+     * Set the group for this panel.
      *
      * @param group The new <code>OptionGroup</code>.
      */
-    private void reset(OptionGroup group) {
+    protected void set(OptionGroup group) {
         this.group = group;
+        update();
+    }
+
+    /**
+     * Completely update the ui.
+     */
+    private void update() {
         this.optionPanel.removeAll();
         this.ui = new OptionGroupUI(getGUI(), this.group, this.editable);
         this.optionPanel.add(this.ui);
@@ -182,8 +209,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         OptionGroup og = OptionGroup.load(file, getOptionGroupId(),
                                           getSpecification());
         if (og == null) return false;
-
-        reset(og);
+        set(og);
         return true;
     }
 
@@ -229,7 +255,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();
         if (value == null) {
-            getOptionUI().reset();
+            ; // Cancelled, do nothing
         } else {
             getOptionUI().updateOption();
         }
