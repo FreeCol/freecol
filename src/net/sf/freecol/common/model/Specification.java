@@ -1852,7 +1852,7 @@ public final class Specification {
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
             + getRoles().stream()
-                .map(Role::getId).collect(Collectors.joining()));
+                .map(Role::getId).collect(Collectors.joining(" ")));
     }
     // end @compat 0.10.x
 

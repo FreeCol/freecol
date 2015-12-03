@@ -332,15 +332,12 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      *
      * @param xr The <code>FreeColXMLReader</code> to read from.
      * @return True if the options were loaded without error.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
-    public boolean load(FreeColXMLReader xr) {
+    protected boolean load(FreeColXMLReader xr) throws XMLStreamException {
         if (xr == null) return false;
-        try {
-            xr.nextTag();
-            readFromXML(xr);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Failed to read XML stream", xse);
-        }
+        xr.nextTag();
+        readFromXML(xr);
         return true;
     }
     
@@ -352,14 +349,19 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     public boolean load(File file) {
         if (file == null) return false;
+        boolean ret = false;
         try (
             FreeColXMLReader xr = new FreeColXMLReader(file);
         ) {
-            return load(xr);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Failure loading file", ioe);
+            ret = load(xr);
+        } catch (IOException|XMLStreamException ex) {
+            logger.log(Level.WARNING, "Load OptionGroup(" + getId()
+                + ") from file " + file.getPath() + " crashed", ex);
+            return false;
         }
-        return false;
+        logger.info("Load OptionGroup(" + getId() + ") from " + file.getPath()
+            + ((ret) ? " succeeded" : " failed"));
+        return ret;
     }
 
     /**
@@ -371,7 +373,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @return The <code>OptionGroup</code> found, or null on error or
      *     not found.
      */
-    public static OptionGroup load(File file, String optionId, Specification spec) {
+    public static OptionGroup load(File file, String optionId,
+                                   Specification spec) {
         OptionGroup ret = new OptionGroup(spec);
         if (ret.load(file)) {
             if (!optionId.equals(ret.getId())) {
@@ -381,8 +384,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         } else {
             ret = null;
         }
-        logger.info("Load OptionGroup(" + optionId + ") from " + file.getPath()
-            + ((ret == null) ? " failed" : " succeeded"));
         return ret;
     }
 
@@ -659,11 +660,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         try {
             ret = this.save(file, FreeColXMLWriter.WriteScope.toSave(), true);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to save option group "
-                + getId() + " to " + file.getName(), e);
+            logger.log(Level.WARNING, "Save OptionGroup(" + getId()
+                + ") to " + file.getPath() + " crashed", e);
             return false;
         }
-        logger.info("Save OptionGroup(" + getId() + ") to  " + file.getPath()
+        logger.info("Save OptionGroup(" + getId() + ") to " + file.getPath()
             + ((ret) ? " succeeded" : " failed"));
         return ret;
     }

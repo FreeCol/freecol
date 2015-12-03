@@ -343,7 +343,8 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return The specification from the game.
      */
     protected Specification getSpecification() {
-        return getGame().getSpecification();
+        final Game game = getGame();
+        return (game == null) ? null : game.getSpecification();
     }
 
     /**

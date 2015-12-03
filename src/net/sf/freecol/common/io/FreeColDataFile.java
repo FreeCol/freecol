@@ -313,4 +313,15 @@ public class FreeColDataFile {
                     && name.length() > e.length());
         };
     }
+
+    /**
+     * Get the path to the underlying file.
+     *
+     * Useful for error messages.
+     *
+     * @return The path to the file.
+     */
+    public String getPath() {
+        return file.getPath();
+    }
 }
