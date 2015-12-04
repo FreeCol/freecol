@@ -20,8 +20,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,6 +39,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TypeCountMap;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -64,16 +67,13 @@ public final class ReportProductionPanel extends ReportPanel {
     public ReportProductionPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportProductionAction");
 
-        this.goodsTypes = new ArrayList<>();
-
-        List<String> goodsNames = new ArrayList<>();
-        goodsNames.add(Messages.message("nothing"));
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (!goodsType.isFarmed()) {
-                this.goodsTypes.add(goodsType);
-                goodsNames.add(Messages.getName(goodsType));
-            }
-        }
+        this.goodsTypes = getSpecification().getGoodsTypeList().stream()
+            .filter(gt -> !gt.isFarmed())
+            .collect(Collectors.toList());
+        List<String> goodsNames = this.goodsTypes.stream()
+            .map(gt -> Messages.getName(gt))
+            .collect(Collectors.toList());
+        goodsNames.add(0, Messages.message("nothing"));
         String[] model = goodsNames.toArray(new String[0]);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
             JComboBox<String> newBox = new JComboBox<>(model);
@@ -88,13 +88,13 @@ public final class ReportProductionPanel extends ReportPanel {
 
     private void update() {
         reportPanel.removeAll();
-        JLabel selectLabel = Utility.localizedLabel("report.production.selectGoods");
+        JLabel selectLabel
+            = Utility.localizedLabel("report.production.selectGoods");
         reportPanel.add(selectLabel);
 
-        JButton selectButton = Utility.localizedButton("report.production.update");
-        selectButton.addActionListener((ActionEvent ae) -> {
-                update();
-            });
+        JButton selectButton
+            = Utility.localizedButton("report.production.update");
+        selectButton.addActionListener((ActionEvent ae) -> update());
         reportPanel.add(selectButton, "wrap");
 
         List<GoodsType> selectedTypes = new ArrayList<>();
@@ -106,24 +106,18 @@ public final class ReportProductionPanel extends ReportPanel {
                 selectedTypes.add(this.goodsTypes.get(selectedIndex - 1));
             }
         }
+
         if (!selectedTypes.isEmpty()) {
-            TypeCountMap<BuildingType> buildingCount
-                = new TypeCountMap<>();
-            List<List<BuildingType>> basicBuildingTypes = new ArrayList<>();
-            for (GoodsType goodsType : selectedTypes) {
-                List<BuildingType> buildingTypes = new ArrayList<>();
-                for (BuildingType buildingType
-                         : getSpecification().getBuildingTypeList()) {
-                    if (goodsType.equals(buildingType.getProducedGoodsType())
-                        || buildingType.hasModifier(goodsType.getId())) {
-                        BuildingType firstLevel = buildingType.getFirstLevel();
-                        if (!buildingTypes.contains(firstLevel)) {
-                            buildingTypes.add(firstLevel);
-                        }
-                    }
-                }
-                basicBuildingTypes.add(buildingTypes);
-            }
+            final Specification spec = getSpecification();
+            final FreeColClient fcc = getFreeColClient();
+            List<List<BuildingType>> basicBuildingTypes
+                = selectedTypes.stream()
+                .map(gt -> spec.getBuildingTypeList().stream()
+                    .filter(bt -> gt == bt.getProducedGoodsType()
+                        || bt.hasModifier(gt.getId()))
+                    .map(bt -> bt.getFirstLevel())
+                    .distinct().collect(Collectors.toList()))
+                .collect(Collectors.toList());
 
             // labels
             JLabel newLabel;
@@ -136,8 +130,8 @@ public final class ReportProductionPanel extends ReportPanel {
                 newLabel.setBorder(Utility.TOPCELLBORDER);
                 reportPanel.add(newLabel);
 
-                for (BuildingType buildingType : basicBuildingTypes.get(index)) {
-                    newLabel = Utility.localizedLabel(buildingType);
+                for (BuildingType bt : basicBuildingTypes.get(index)) {
+                    newLabel = Utility.localizedLabel(bt);
                     newLabel.setBorder(Utility.TOPCELLBORDER);
                     reportPanel.add(newLabel);
                 }
@@ -157,22 +151,22 @@ public final class ReportProductionPanel extends ReportPanel {
                     GoodsType goodsType = selectedTypes.get(index);
                     int newValue = colony.getNetProductionOf(goodsType);
                     totalProduction[index] += newValue;
-                    Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
+                    Goods goods = new Goods(colony.getGame(), colony,
+                                            goodsType, newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
                     goodsLabel.setHorizontalAlignment(JLabel.LEADING);
                     goodsLabel.setBorder(Utility.CELLBORDER);
                     reportPanel.add(goodsLabel);
 
-                    for (BuildingType buildingType : basicBuildingTypes.get(index)) {
-                        Building building = colony.getBuilding(buildingType);
+                    for (BuildingType bt : basicBuildingTypes.get(index)) {
+                        Building building = colony.getBuilding(bt);
                         if (building == null) {
                             newLabel = new JLabel();
                             newLabel.setBorder(Utility.CELLBORDER);
                             reportPanel.add(newLabel);
                         } else {
-                            buildingCount.incrementCount(building.getType(), 1);
-                            BuildingPanel buildingPanel =
-                                new BuildingPanel(getFreeColClient(), building);
+                            BuildingPanel buildingPanel
+                                = new BuildingPanel(fcc, building);
                             buildingPanel.setBorder(Utility.CELLBORDER);
                             buildingPanel.initialize();
                             reportPanel.add(buildingPanel);
@@ -180,7 +174,6 @@ public final class ReportProductionPanel extends ReportPanel {
                     }
                 }
             }
-
         }
         revalidate();
         repaint();
