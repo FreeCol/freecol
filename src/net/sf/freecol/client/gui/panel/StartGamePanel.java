@@ -243,13 +243,11 @@ public final class StartGamePanel extends FreeColPanel {
         if (singlePlayerGame
             && spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)
             && !spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            int n = 0;
-            for (Entry<Nation, NationState> e
-                     : getGame().getNationOptions().getNations().entrySet()) {
-                if (e.getKey().getType().isEuropean()
+            int n = (int)getGame().getNationOptions()
+                .getNations().entrySet().stream()
+                .filter(e -> e.getKey().getType().isEuropean()
                     && !e.getKey().isUnknownEnemy()
-                    && e.getValue() != NationState.NOT_AVAILABLE) n++;
-            }
+                    && e.getValue() != NationState.NOT_AVAILABLE).count();
             if (n == 0) {
                 getGUI().showInformationMessage("info.noEuropeans");
                 return false;

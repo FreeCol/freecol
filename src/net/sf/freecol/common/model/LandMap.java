@@ -353,13 +353,12 @@ public class LandMap {
                 (1 + Math.max(preferredDistanceToEdge - Math.min(x, width-x),
                     2 * preferredDistanceToEdge - Math.min(y, height-y))));
 
-        int sum = 0;
         Position p = new Position(x, y);
-        for (Direction direction : Direction.values()) {
-            Position n = new Position(p, direction);
-            if (n.isValid(width, height) && map[n.getX()][n.getY()]) sum++;
-        }
-
+        int sum = (int)Arrays.stream(Direction.values())
+            .filter(d -> {
+                    Position n = new Position(p, d);
+                    return n.isValid(width, height) && map[n.getX()][n.getY()];
+                }).count();
         return (sum > r) ? setLand(x, y, preferredDistanceToEdge, random)
             : 0;
     }

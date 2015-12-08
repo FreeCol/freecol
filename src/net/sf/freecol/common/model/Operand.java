@@ -19,9 +19,11 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -301,14 +303,8 @@ public class Operand extends Scope {
      * @param objects The list of objects to check.
      * @return The number of applicable objects.
      */
-    private int count(List<? extends FreeColObject> objects) {
-        int result = 0;
-        for (FreeColObject object : objects) {
-            if (appliesTo(object)) {
-                result++;
-            }
-        }
-        return result;
+    private Integer count(Collection<? extends FreeColObject> objects) {
+        return (int)objects.stream().filter(o -> this.appliesTo(o)).count();
     }
 
 

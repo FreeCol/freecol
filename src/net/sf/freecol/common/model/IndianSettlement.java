@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -376,9 +377,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The number of wanted goods.
      */
     public int getWantedGoodsAmount() {
-        int n = 0;
-        for (GoodsType gt : wantedGoods) if (gt != null) n++;
-        return n;
+        return (int)Arrays.stream(wantedGoods).filter(gt -> gt != null).count();
     }
 
     /**

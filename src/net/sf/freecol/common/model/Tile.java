@@ -1284,9 +1284,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The number of adjacent available tiles.
      */
     public int getAvailableAdjacentCount() {
-        int n = 0;
-        for (Tile t : getSurroundingTiles(1)) if (t.isLand() == isLand()) n++;
-        return n;
+        return (int)getSurroundingTiles(1, 1).stream()
+            .filter(t -> t.isLand() == isLand()).count();
     }
 
     /**

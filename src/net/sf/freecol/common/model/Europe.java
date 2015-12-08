@@ -242,10 +242,7 @@ public class Europe extends UnitLocation
      */
     public int getImmigration(int production) {
         final Specification spec = getSpecification();
-        int n = 0;
-        for (Unit u : getUnitList()) {
-            if (u.isPerson()) n++;
-        }
+        int n = (int)getUnitList().stream().filter(Unit::isPerson).count();
         n *= spec.getInteger(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY);
         n += spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
         // Do not allow total production to be negative.

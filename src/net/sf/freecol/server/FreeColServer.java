@@ -678,12 +678,10 @@ public final class FreeColServer {
      *     by the AI.
      */
     public int getSlotsAvailable() {
-        int n = 0;
-        for (Player player : game.getLiveEuropeanPlayers(null)) {
-            ServerPlayer sp = (ServerPlayer)player;
-            if (!sp.isREF() && sp.isAI() && !sp.isConnected()) n++;
-        }
-        return n;
+        return (int)game.getLiveEuropeanPlayers(null).stream()
+            .map(p -> (ServerPlayer)p)
+            .filter(sp -> !sp.isREF() && sp.isAI() && !sp.isConnected())
+            .count();
     }
 
     /**
@@ -692,12 +690,10 @@ public final class FreeColServer {
      * @return The number of living human players.
      */
     public int getNumberOfLivingHumanPlayers() {
-        int n = 0;
-        for (Player player : game.getLivePlayers(null)) {
-            ServerPlayer sp = (ServerPlayer)player;
-            if (!sp.isAI() && sp.isConnected()) n++;
-        }
-        return n;
+        return (int)game.getLivePlayers(null).stream()
+            .map(p -> (ServerPlayer)p)
+            .filter(sp -> !sp.isAI() && sp.isConnected())
+            .count();
     }
 
     /**

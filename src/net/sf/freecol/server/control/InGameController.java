@@ -781,10 +781,8 @@ public final class InGameController extends Controller {
         // independent players other than the one we are granting
         // here, and generate the bonus with a special case in
         // ServerPlayer.updateScore().
-        int n = 0;
-        for (Player p : game.getLiveEuropeanPlayers(independent)) {
-            if (p.getPlayerType() == PlayerType.INDEPENDENT) n++;
-        }
+        int n = (int)game.getLiveEuropeanPlayers(independent).stream()
+            .filter(p -> p.getPlayerType() == PlayerType.INDEPENDENT).count();
         h.setScore(n);
         cs.addGlobalHistory(game, h);
         cs.addMessage(See.only(independent),

@@ -1387,11 +1387,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }
         }
         Europe europe = player.getEurope();
-        if (europe != null) {
-            for (Unit u : europe.getUnitList()) {
-                if (u.isPerson()) nEuropean++;
-            }
-        }
+        nEuropean = (europe == null) ? 0
+            : (int)europe.getUnitList().stream().filter(Unit::isPerson).count();
             
         // If would be good to have at least two colonies, and at least
         // one port.  After that, determine the ratio of workers to colonies

@@ -2234,12 +2234,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of port settlements this player has.
      */
     public int getNumberOfPorts() {
-        if (!isEuropean()) return 0;
-        int n = 0;
-        for (Colony colony : getColonies()) {
-            if (colony.isConnectedPort()) n++;
-        }
-        return n;
+        return (!isEuropean()) ? 0
+            : (int)getColonies().stream()
+                .filter(Colony::isConnectedPort).count();
     }
 
     /**
