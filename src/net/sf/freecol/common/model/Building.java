@@ -131,16 +131,6 @@ public class Building extends WorkLocation
     }
 
     /**
-     * Gets the level of this building.
-     * Delegates to type.
-     *
-     * @return The building level.
-     */
-    public int getLevel() {
-        return getType().getLevel();
-    }
-
-    /**
      * Does this building have a higher level?
      *
      * @return True if this <code>Building</code> can have a higher level.
@@ -475,6 +465,13 @@ public class Building extends WorkLocation
     @Override
     public NoAddReason getNoWorkReason() {
         return NoAddReason.NONE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getLevel() {
+        return getType().getLevel(); // Delegate to type
     }
 
     /**

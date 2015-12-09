@@ -800,6 +800,15 @@ public abstract class WorkLocation extends UnitLocation
     public abstract NoAddReason getNoWorkReason();
 
     /**
+     * Get the "level" of this work location.
+     *
+     * Note: only meaningful for buildings at present.
+     *
+     * @return The work location level.
+     */
+    public abstract int getLevel();
+        
+    /**
      * Can this work location can produce goods without workers?
      *
      * @return True if this work location can produce goods without

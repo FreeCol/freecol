@@ -406,6 +406,13 @@ public class ColonyTile extends WorkLocation {
     /**
      * {@inheritDoc}
      */
+    public int getLevel() {
+        return 0; // Level not meaningful for colony tiles
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canAutoProduce() {
         return isColonyCenterTile();
