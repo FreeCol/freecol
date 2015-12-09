@@ -1336,7 +1336,9 @@ public final class FreeCol {
             .append("\n  save:       ")
             .append((save == null) ? "NONE" : save.getPath())
             .append("\n  userMods:   ")
-            .append((userMods == null) ? "NONE" : userMods.getPath());
+            .append((userMods == null) ? "NONE" : userMods.getPath())
+            .append("\n  debug:      ")
+            .append(FreeColDebugger.getDebugModes());
         return sb;
     }
 
