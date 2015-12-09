@@ -23,12 +23,14 @@ import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -156,8 +158,31 @@ public final class FreeCol {
     /** A font override. */
     private static String fontName = null;
 
-    /** The level of logging in this game. */
-    private static Level logLevel = LOGLEVEL_DEFAULT;
+    /** The levels of logging in this game. */
+    private static class LogLevel {
+
+        public final String name;
+        public final Level level;
+        // We need to keep a hard reference to the instantiated logger, as
+        // Logger only uses weak references.
+        public Logger logger;
+        
+        public LogLevel(String name, Level level) {
+            this.name = name;
+            this.level = level;
+            this.logger = null;
+        }
+
+        public void buildLogger() {
+            this.logger = Logger.getLogger("net.sf.freecol"
+                + ((this.name.isEmpty()) ? "" : "." + this.name));
+            this.logger.setLevel(this.level);
+        }
+    }
+    private static final List<LogLevel> logLevels = new ArrayList<>();
+    static {
+        logLevels.add(new LogLevel("", LOGLEVEL_DEFAULT));
+    }
 
     /** The client player name. */
     private static String name = null;
@@ -266,15 +291,13 @@ public final class FreeCol {
 
         // Now we have the log file path, start logging.
         final Logger baseLogger = Logger.getLogger("");
-        final Handler[] handlers = baseLogger.getHandlers();
-        for (Handler handler : handlers) {
+        for (Handler handler : baseLogger.getHandlers()) {
             baseLogger.removeHandler(handler);
         }
         String logFile = FreeColDirectories.getLogFilePath();
         try {
             baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
-            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
-            freecolLogger.setLevel(logLevel);
+            for (LogLevel ll : logLevels) ll.buildLogger();
         } catch (FreeColException e) {
             System.err.println("Logging initialization failure: "
                 + e.getMessage());
@@ -668,8 +691,8 @@ public final class FreeCol {
                     gripe(StringTemplate.template("cli.error.debug")
                         .addName("%modes%", FreeColDebugger.getDebugModes()));
                 }
-                // user set log level has precedence
-                if (!line.hasOption("log-level")) logLevel = Level.FINEST;
+                // Keep doing this before checking log-level option!
+                logLevels.add(new LogLevel("", Level.FINEST));
             }
             if (line.hasOption("debug-run")) {
                 FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
@@ -735,11 +758,18 @@ public final class FreeCol {
             if (line.hasOption("log-console")) {
                 consoleLogging = true;
             }
+
             if (line.hasOption("log-file")) {
                 FreeColDirectories.setLogFilePath(line.getOptionValue("log-file"));
             }
+
             if (line.hasOption("log-level")) {
-                setLogLevel(line.getOptionValue("log-level"));
+                for (String value : line.getOptionValues("log-level")) {
+                    String[] s = value.split(":");
+                    logLevels.add((s.length == 1)
+                        ? new LogLevel("", Level.parse(s[0].toUpperCase()))
+                        : new LogLevel(s[0], Level.parse(s[1].toUpperCase())));
+                }
             }
 
             if (line.hasOption("name")) {
@@ -1076,15 +1106,6 @@ public final class FreeCol {
             }
         } catch (NumberFormatException nfe) {}
         return -1;
-    }
-
-    /**
-     * Sets the log level.
-     *
-     * @param arg The log level to set.
-     */
-    private static void setLogLevel(String arg) {
-        logLevel = Level.parse(arg.toUpperCase());
     }
 
     /**
