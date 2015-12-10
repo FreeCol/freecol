@@ -530,9 +530,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of available <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getAvailableWorkLocations() {
-        return getAllWorkLocationsStream()
-            .filter(WorkLocation::isAvailable)
-            .collect(Collectors.toList());
+        return transform(getAllWorkLocationsStream(),
+            WorkLocation::isAvailable, Collectors.toList());
     }
 
     /**
@@ -541,9 +540,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of current <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getCurrentWorkLocations() {
-        return getAllWorkLocationsStream()
-            .filter(WorkLocation::isCurrent)
-            .collect(Collectors.toList());
+        return transform(getAllWorkLocationsStream(),
+            WorkLocation::isCurrent, Collectors.toList());
     }
 
     /**
@@ -664,9 +662,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        return getCurrentWorkLocations().stream()
-            .filter(wl -> any(wl.getInputs(), ag -> ag.getType() == goodsType))
-            .collect(Collectors.toList());
+        return transform(getCurrentWorkLocations(),
+            wl -> any(wl.getInputs(), ag -> ag.getType() == goodsType),
+            Collectors.toList());
     }
 
     /**
@@ -677,9 +675,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        return getCurrentWorkLocations().stream()
-            .filter(wl -> any(wl.getOutputs(), ag -> ag.getType() == goodsType))
-            .collect(Collectors.toList());
+        return transform(getCurrentWorkLocations(),
+            wl -> any(wl.getOutputs(), ag -> ag.getType() == goodsType),
+            Collectors.toList());
     }
 
     /**
@@ -809,9 +807,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of buildable <code>UnitType</code>s.
      */
     public List<UnitType> getBuildableUnits() {
-        return getSpecification().getUnitTypeList().stream()
-            .filter(ut -> ut.needsGoodsToBuild() && canBuild(ut))
-            .collect(Collectors.toList());
+        return transform(getSpecification().getUnitTypeList().stream(),
+            ut -> ut.needsGoodsToBuild() && canBuild(ut),
+            Collectors.toList());
     }
 
     /**
@@ -1648,8 +1646,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of burnable buildings.
      */
     public List<Building> getBurnableBuildings() {
-        return getBuildings().stream()
-            .filter(Building::canBeDamaged).collect(Collectors.toList());
+        return transform(getBuildings(), Building::canBeDamaged,
+                                Collectors.toList());
     }
 
     /**
@@ -1659,9 +1657,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of lootable goods in this colony.
      */
     public List<Goods> getLootableGoodsList() {
-        return getGoodsContainer().getGoods().stream()
-            .filter(g -> g.getType().isStorable())
-            .collect(Collectors.toList());
+        return transform(getGoodsContainer().getGoods(),
+            g -> g.getType().isStorable(), Collectors.toList());
     }
 
     /**

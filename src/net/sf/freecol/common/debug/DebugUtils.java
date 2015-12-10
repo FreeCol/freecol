@@ -119,12 +119,11 @@ public class DebugUtils {
 
         BuildingType buildingType = gui.getChoice(null, buildingTitle,
             "cancel",
-            game.getSpecification().getBuildingTypeList().stream()
-                .map(bt -> {
-                        String msg = Messages.getName(bt);
-                        return new ChoiceItem<BuildingType>(msg, bt);
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(game.getSpecification().getBuildingTypeList(),
+                bt -> true,
+                (BuildingType bt) ->
+                    new ChoiceItem<BuildingType>(Messages.getName(bt), bt), 
+                Collectors.toList()));
         if (buildingType == null) return;
 
         final Game sGame = server.getGame();
@@ -176,13 +175,11 @@ public class DebugUtils {
 
         FoundingFather father = gui.getChoice(null, fatherTitle,
             "cancel",
-            sSpec.getFoundingFathers().stream()
-                .filter(f -> !sPlayer.hasFather(f))
-                .map(f -> {
-                        String msg = Messages.getName(f);
-                        return new ChoiceItem<FoundingFather>(msg, f);
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(sSpec.getFoundingFathers(),
+                f -> !sPlayer.hasFather(f),
+                (FoundingFather f) ->
+                    new ChoiceItem<FoundingFather>(Messages.getName(f), f),
+                Collectors.toList()));
         if (father != null) {
             server.getInGameController()
                 .addFoundingFather((ServerPlayer)sPlayer, father);
@@ -320,12 +317,11 @@ public class DebugUtils {
 
         UnitType unitChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectUnitType"), "cancel",
-            sSpec.getUnitTypeList().stream()
-                .map(ut -> {
-                        String msg = Messages.getName(ut);
-                        return new ChoiceItem<UnitType>(msg, ut);
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(sSpec.getUnitTypeList(),
+                ut -> true,
+                (UnitType ut) ->
+                    new ChoiceItem<UnitType>(Messages.getName(ut), ut),
+                Collectors.toList()));
         if (unitChoice == null) return;
 
         Unit carrier = null, sCarrier = null;
@@ -369,10 +365,11 @@ public class DebugUtils {
         GoodsType goodsType = gui.getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"),
             "cancel",
-            sSpec.getGoodsTypeList().stream()
-                .filter(gt -> !gt.isFoodType() || gt == sSpec.getPrimaryFoodType())
-                .map(gt -> new ChoiceItem<GoodsType>(Messages.getName(gt), gt))
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(sSpec.getGoodsTypeList(),
+                gt -> !gt.isFoodType() || gt == sSpec.getPrimaryFoodType(),
+                (GoodsType gt) ->
+                    new ChoiceItem<GoodsType>(Messages.getName(gt), gt),
+                Collectors.toList()));
         if (goodsType == null) return;
 
         String amount = gui.getInput(null,
@@ -414,13 +411,12 @@ public class DebugUtils {
         }
         Disaster disaster = gui.getChoice(null,
             StringTemplate.template("prompt.selectDisaster"), "cancel",
-            disasters.stream()
-                .map(rc -> {
-                        String label = Messages.getName(rc.getObject())
-                            + " " + Integer.toString(rc.getProbability());
-                        return new ChoiceItem<Disaster>(label, rc.getObject());
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(disasters, rc -> true,
+                (RandomChoice<Disaster> rc) ->
+                    new ChoiceItem<Disaster>(Messages.getName(rc.getObject())
+                        + " " + Integer.toString(rc.getProbability()),
+                        rc.getObject()),
+                Collectors.toList()));
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -458,12 +454,11 @@ public class DebugUtils {
 
         Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
-            game.getLiveEuropeanPlayers(colony.getOwner()).stream()
-                .map(p -> {
-                        String msg = Messages.message(p.getCountryLabel());
-                        return new ChoiceItem<Player>(msg, p);
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(game.getLiveEuropeanPlayers(colony.getOwner()),
+                p -> true,
+                (Player p) ->
+                    new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p),
+                Collectors.toList()));
         if (player == null) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -495,13 +490,11 @@ public class DebugUtils {
 
         Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
-            game.getLivePlayers(null).stream()
-            .filter(p -> unit.getType().isAvailableTo(p))
-            .map(p -> {
-                    String msg = Messages.message(p.getCountryLabel());
-                    return new ChoiceItem<Player>(msg, p);
-                })
-            .sorted().collect(Collectors.toList()));
+            transformAndSort(game.getLivePlayers(null),
+                p -> unit.getType().isAvailableTo(p),
+                (Player p) ->
+                    new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p),
+                Collectors.toList()));
         if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
@@ -538,9 +531,9 @@ public class DebugUtils {
 
         Role roleChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectRole"), "cancel",
-            sGame.getSpecification().getRoles().stream()
-                .map(r -> new ChoiceItem<Role>(r.getId(), r))
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(sGame.getSpecification().getRoles(), r -> true,
+                (Role r) -> new ChoiceItem<Role>(r.getId(), r),
+                Collectors.toList()));
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
@@ -928,13 +921,11 @@ public class DebugUtils {
         final Specification spec = colony.getSpecification();
         GoodsType goodsType = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"), "cancel",
-            spec.getGoodsTypeList().stream()
-                .filter(gt -> !gt.isFoodType() || gt == spec.getPrimaryFoodType())
-                .map(gt -> {
-                        String msg = Messages.getName(gt);
-                        return new ChoiceItem<GoodsType>(msg, gt);
-                    })
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(spec.getGoodsTypeList(),
+                gt -> !gt.isFoodType() || gt == spec.getPrimaryFoodType(),
+                (GoodsType gt) ->
+                    new ChoiceItem<GoodsType>(Messages.getName(gt), gt),
+                Collectors.toList()));
         if (goodsType == null) return;
 
         String response = freeColClient.getGUI().getInput(null,
@@ -979,9 +970,9 @@ public class DebugUtils {
 
         MonarchAction action = gui.getChoice(null, monarchTitle,
             "cancel",
-            Arrays.stream(MonarchAction.values())
-                .map(a -> new ChoiceItem<MonarchAction>(a))
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(MonarchAction.values(), a -> true,
+                (MonarchAction a) -> new ChoiceItem<MonarchAction>(a),
+                Collectors.toList()));
         if (action == null) return;
         
         server.getInGameController().setMonarchAction(sPlayer, action);
@@ -1005,10 +996,10 @@ public class DebugUtils {
         RumourType rumourChoice = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectLostCityRumour"),
             "cancel",
-            Arrays.stream(RumourType.values())
-                .filter(r -> r != RumourType.NO_SUCH_RUMOUR)
-                .map(r -> new ChoiceItem<RumourType>(r.toString(), r))
-                .sorted().collect(Collectors.toList()));
+            transformAndSort(RumourType.values(), 
+                r -> r != RumourType.NO_SUCH_RUMOUR,
+                (RumourType r) -> new ChoiceItem<RumourType>(r.toString(), r),
+                Collectors.toList()));
         if (rumourChoice == null) return;
 
         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);

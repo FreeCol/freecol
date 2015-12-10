@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -291,8 +292,8 @@ public final class ResourceMapping {
      * @return A list of keys.
      */
     public List<String> getImageKeys(String prefix) {
-        return imageResources.keySet().stream()
-            .filter(k -> k.startsWith(prefix)).collect(Collectors.toList());
+        return transform(imageResources.keySet(),
+            k -> k.startsWith(prefix), Collectors.toList());
     }
 
     /**
@@ -302,8 +303,8 @@ public final class ResourceMapping {
      * @return The set of keys.
      */
     public Set<String> getImageKeySet(String prefix) {
-        return imageResources.keySet().stream()
-            .filter(k -> k.startsWith(prefix)).collect(Collectors.toSet());
+        return transform(imageResources.keySet(),
+            k -> k.startsWith(prefix), Collectors.toSet());
     }
 
     /**
@@ -315,8 +316,8 @@ public final class ResourceMapping {
      * @return A list of keys.
      */
     public List<String> getImageKeys(String prefix, String suffix) {
-        return imageResources.keySet().stream()
-            .filter(k -> k.startsWith(prefix) && k.endsWith(suffix))
-            .collect(Collectors.toList());
+        return transform(imageResources.keySet(),
+            k -> k.startsWith(prefix) && k.endsWith(suffix),
+            Collectors.toList());
     }
 }

@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -470,10 +471,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
-            available.addAll(getGame().getLivePlayers(this.source).stream()
-                .filter(p -> p != this.other
-                    && this.source.getStance(p).isIncitable())
-                .collect(Collectors.toList()));
+            available.addAll(transform(getGame().getLivePlayers(this.source),
+                    p -> p != this.other && this.source.getStance(p).isIncitable(),
+                    Collectors.toList()));
 
             add(this.label);
             add(this.victimBox);

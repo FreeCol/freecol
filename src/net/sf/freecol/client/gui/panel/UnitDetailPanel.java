@@ -156,9 +156,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 }
             }
 
-            List<IndianNationType> nations = spec.getIndianNationTypes().stream()
-                .filter(nt -> any(nt.getSkills(), ut -> ut.getObject() == type))
-                .collect(Collectors.toList());
+            List<IndianNationType> nations = transform(spec.getIndianNationTypes(),
+                nt -> any(nt.getSkills(), ut -> ut.getObject() == type),
+                Collectors.toList());
             if (!nations.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.natives"), "newline");
                 int count = 0;

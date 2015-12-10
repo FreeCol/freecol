@@ -1102,10 +1102,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of nations in rebellion against us.
      */
     public List<Player> getRebels() {
-        return getGame().getLiveEuropeanPlayers(this).stream()
-            .filter(p -> p.getREFPlayer() == this
-                && (p.isRebel() || p.isUndead()))
-            .collect(Collectors.toList());
+        return transform(getGame().getLiveEuropeanPlayers(this),
+            p -> p.getREFPlayer() == this && (p.isRebel() || p.isUndead()),
+            Collectors.toList());
     }
 
     /**
@@ -2042,9 +2041,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        return getUnits().stream()
-            .filter(u -> u.couldCarry(unit))
-            .collect(Collectors.toList());
+        return transform(getUnits(), u -> u.couldCarry(unit),
+                         Collectors.toList());
     }
 
     /**
@@ -2243,9 +2241,8 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<Colony> getPorts() {
         return (!isEuropean())
             ? Collections.<Colony>emptyList()
-            : getColonies().stream()
-                .filter(Colony::isConnectedPort)
-                .collect(Collectors.toList());
+            : transform(getColonies(), Colony::isConnectedPort,
+                Collectors.toList());
     }
 
     /**
@@ -2419,9 +2416,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<ModelMessage> getNewModelMessages() {
         synchronized (modelMessages) {
-            return modelMessages.stream()
-                .filter(m -> !m.hasBeenDisplayed())
-                .collect(Collectors.toList());
+            return transform(modelMessages, m -> !m.hasBeenDisplayed(),
+                Collectors.toList());
         }
     }
 

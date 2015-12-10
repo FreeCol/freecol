@@ -240,8 +240,8 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public List<TileItem> getCompleteItems() {
         synchronized (tileItems) {
-            return tileItems.stream()
-                .filter(TileItem::isComplete).collect(Collectors.toList());
+            return transform(tileItems, TileItem::isComplete,
+                Collectors.toList());
         }
     }
         
@@ -269,11 +269,10 @@ public class TileItemContainer extends FreeColGameObject {
      */
     private List<TileImprovement> getImprovements(boolean completedOnly) {
         synchronized (tileItems) {
-            return tileItems.stream()
-                .filter(ti -> ti instanceof TileImprovement
-                    && (!completedOnly || ((TileImprovement)ti).isComplete()))
-                .map(ti -> (TileImprovement)ti)
-                .collect(Collectors.toList());
+            return transform(tileItems,
+                ti -> ti instanceof TileImprovement
+                    && (!completedOnly || ((TileImprovement)ti).isComplete()),
+                ti -> (TileImprovement)ti, Collectors.toList());
         }
     }
 

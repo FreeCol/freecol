@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
 
@@ -131,10 +132,8 @@ public class FreeColDebugger {
      * @return A string containing the modes as csv.
      */
     public static String getDebugModes() {
-        return Arrays.stream(DebugMode.values())
-            .filter(m -> isInDebugMode(m))
-            .map(m -> m.toString())
-            .collect(Collectors.joining(","));
+        return transform(DebugMode.values(), m -> isInDebugMode(m),
+            m -> m.toString(), Collectors.joining(","));
     }
 
     /**

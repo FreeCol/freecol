@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -67,9 +68,8 @@ public final class ReportProductionPanel extends ReportPanel {
     public ReportProductionPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportProductionAction");
 
-        this.goodsTypes = getSpecification().getGoodsTypeList().stream()
-            .filter(gt -> !gt.isFarmed())
-            .collect(Collectors.toList());
+        this.goodsTypes = transform(getSpecification().getGoodsTypeList(),
+            gt -> !gt.isFarmed(), Collectors.toList());
         List<String> goodsNames = this.goodsTypes.stream()
             .map(gt -> Messages.getName(gt))
             .collect(Collectors.toList());
@@ -111,13 +111,13 @@ public final class ReportProductionPanel extends ReportPanel {
             final Specification spec = getSpecification();
             final FreeColClient fcc = getFreeColClient();
             List<List<BuildingType>> basicBuildingTypes
-                = selectedTypes.stream()
-                .map(gt -> spec.getBuildingTypeList().stream()
-                    .filter(bt -> gt == bt.getProducedGoodsType()
-                        || bt.hasModifier(gt.getId()))
-                    .map(bt -> bt.getFirstLevel())
-                    .distinct().collect(Collectors.toList()))
-                .collect(Collectors.toList());
+                = transform(selectedTypes, gt -> true,
+                    gt -> transformDistinct(spec.getBuildingTypeList(),
+                        bt -> gt == bt.getProducedGoodsType()
+                            || bt.hasModifier(gt.getId()),
+                        (BuildingType bt) -> bt.getFirstLevel(),
+                        Collectors.toList()),
+                    Collectors.toList());
 
             // labels
             JLabel newLabel;

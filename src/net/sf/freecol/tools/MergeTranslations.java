@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * Merge some translation updates.
@@ -70,10 +72,10 @@ public class MergeTranslations {
             if (targetFile.exists()) {
                 Map<String, String> targetProperties = readFile(targetFile);
 
-                List<Entry<?,?>> missingProperties
-                    = sourceProperties.entrySet().stream()
-                    .filter(e -> !targetProperties.containsKey(e.getKey()))
-                    .collect(Collectors.toList());
+                List<Entry<String,String>> missingProperties
+                    = transform(sourceProperties.entrySet(),
+                        e -> !targetProperties.containsKey(e.getKey()),
+                        Collectors.toList());
                 if (!missingProperties.isEmpty()) {
                     try (FileWriter out = new FileWriter(targetFile, true)) {
                         out.write("### Merged from trunk on "

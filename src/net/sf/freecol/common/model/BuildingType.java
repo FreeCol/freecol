@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -224,10 +225,9 @@ public final class BuildingType extends BuildableType {
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
-        return productionTypes.stream()
-            .filter(pt -> pt.getUnattended() == unattended
-                && pt.appliesTo(level))
-            .collect(Collectors.toList());
+        return transform(productionTypes,
+            pt -> pt.getUnattended() == unattended && pt.appliesTo(level),
+            Collectors.toList());
     }
 
     // @compat 0.10.6

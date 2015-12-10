@@ -112,11 +112,10 @@ public class ServerGame extends Game implements ServerModelObject {
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
-        return getLivePlayers(null).stream()
-            .map(p -> (ServerPlayer)p)
-            .filter(sp -> sp.isConnected()
-                && none(serverPlayers, s -> s == sp))
-            .collect(Collectors.toList());
+        return transform(getLivePlayers(null),
+            p -> ((ServerPlayer)p).isConnected()
+                && none(serverPlayers, s -> s == (ServerPlayer)p),
+            p -> (ServerPlayer)p, Collectors.toList());
     }
 
     /**
@@ -242,15 +241,13 @@ public class ServerGame extends Game implements ServerModelObject {
             if (winner != null) return winner;
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
-            List<Player> winners = getLiveEuropeanPlayers(null).stream()
-                .filter(p -> !p.isREF())
-                .collect(Collectors.toList());
+            List<Player> winners = transform(getLiveEuropeanPlayers(null),
+                p -> !p.isREF(), Collectors.toList());
             if (winners.size() == 1) return winners.get(0);
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
-            List<Player> winners = getLiveEuropeanPlayers(null).stream()
-                .filter(p -> !p.isAI())
-                .collect(Collectors.toList());
+            List<Player> winners = transform(getLiveEuropeanPlayers(null),
+                p -> !p.isAI(), Collectors.toList());
             if (winners.size() == 1) return winners.get(0);
         }
         return null;

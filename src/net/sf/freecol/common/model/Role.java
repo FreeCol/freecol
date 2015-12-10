@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -380,9 +381,8 @@ public class Role extends BuildableType {
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {
-        return roles.stream()
-            .filter(r -> r.isAvailableTo(player, type))
-            .collect(Collectors.toList());
+        return transform(roles, r -> r.isAvailableTo(player, type),
+            Collectors.toList());
     }
 
     /**

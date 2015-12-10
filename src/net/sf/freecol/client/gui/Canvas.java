@@ -95,6 +95,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -682,9 +683,8 @@ public final class Canvas extends JDesktopPane {
         Point p = new Point(x, y);
         todo.add(p);
 
-        List<Component> allComponents = Arrays.stream(this.getComponents())
-            .filter(c -> !(c instanceof GrayLayer) && c.isValid())
-            .collect(Collectors.toList());
+        List<Component> allComponents = transform(this.getComponents(),
+            c -> !(c instanceof GrayLayer) && c.isValid(), Collectors.toList());
         for (FreeColDialog<?> fcd : dialogs) allComponents.add(fcd);
 
         // Find the position with the least overlap

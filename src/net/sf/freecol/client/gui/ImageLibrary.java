@@ -66,7 +66,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -556,9 +556,8 @@ public final class ImageLibrary {
                                                 Dimension size,
                                                 Set<String> overlayCache) {
         final String prefix = "image.tileoverlay." + type.getId() + ".r";
-        final List<String> keys = overlayCache.stream()
-            .filter(k -> k.startsWith(prefix))
-            .collect(Collectors.toList());
+        final List<String> keys = transform(overlayCache,
+            k -> k.startsWith(prefix), Collectors.toList());
         return getRandomizedImage(keys, id, size);
     }
 

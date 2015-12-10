@@ -23,11 +23,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.FreeColTestUtils.ColonyBuilder;
-
 
 public class SchoolTest extends FreeColTestCase {
 
@@ -95,8 +95,8 @@ public class SchoolTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        return colony.getUnitList().stream()
-            .filter(u -> u.getType() == type).collect(Collectors.toList());
+        return transform(colony.getUnitList(), u -> u.getType() == type,
+                         Collectors.toList());
     }
 
     public void testUpgrades() {

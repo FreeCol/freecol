@@ -517,8 +517,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a river corner.
      */
     public boolean isRiverCorner() {
-        List<Tile> tiles = getSurroundingTiles(0, 1).stream()
-            .filter(Tile::isOnRiver).collect(Collectors.toList());
+        List<Tile> tiles = transform(getSurroundingTiles(0, 1),
+            Tile::isOnRiver, Collectors.toList());
         switch (tiles.size()) {
         case 0: case 1:
             return false;
@@ -1438,10 +1438,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of suitable <code>Tile</code>s.
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
-        return getSurroundingTiles(0, 1).stream()
-            .filter(t -> !t.isLand() && t.isHighSeasConnected()
-                && !t.isDangerousToShip(unit))
-            .collect(Collectors.toList());
+        return transform(getSurroundingTiles(0, 1),
+            t -> !t.isLand() && t.isHighSeasConnected()
+                && !t.isDangerousToShip(unit), Collectors.toList());
     }
                 
 

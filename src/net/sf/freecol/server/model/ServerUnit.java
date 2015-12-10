@@ -72,6 +72,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
@@ -846,8 +847,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public List<Tile> collectNewTiles(Tile tile) {
         final int los = getLineOfSight();
-        return tile.getSurroundingTiles(0, los).stream()
-            .filter(t -> !getOwner().canSee(t)).collect(Collectors.toList());
+        return transform(tile.getSurroundingTiles(0, los),
+            t -> !getOwner().canSee(t), Collectors.toList());
     }
 
     /**

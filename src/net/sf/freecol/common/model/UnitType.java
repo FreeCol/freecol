@@ -406,9 +406,8 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return a list of expert roles
      */
     public List<Role> getExpertRoles() {
-        return getSpecification().getRoles().stream()
-            .filter(r -> r.getExpertUnit() == this)
-            .collect(Collectors.toList());
+        return transform(getSpecification().getRoles(),
+            r -> r.getExpertUnit() == this, Collectors.toList());
     }
 
     /**

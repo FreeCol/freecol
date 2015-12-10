@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -121,8 +122,8 @@ public class ServerBuildingTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        return colony.getUnitList().stream()
-            .filter(u -> u.getType() == type).collect(Collectors.toList());
+        return transform(colony.getUnitList(), u -> u.getType() == type,
+                         Collectors.toList());
     }
 
     /**

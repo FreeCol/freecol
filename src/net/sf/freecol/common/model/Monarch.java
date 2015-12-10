@@ -35,6 +35,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -569,9 +570,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Benjamin Franklin puts an end to the monarch's interference
         return (player.hasAbility(Ability.IGNORE_EUROPEAN_WARS))
             ? Collections.<Player>emptyList()
-            : getGame().getLiveEuropeanPlayers(player).stream()
-                .filter(p -> p.isPotentialEnemy(player))
-                .collect(Collectors.toList());
+            : transform(getGame().getLiveEuropeanPlayers(player),
+                p -> p.isPotentialEnemy(player), Collectors.toList());
     }
 
     /**
@@ -582,9 +582,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
-        return getGame().getLiveEuropeanPlayers(player).stream()
-            .filter(p -> p.isPotentialFriend(player))
-            .collect(Collectors.toList());
+        return transform(getGame().getLiveEuropeanPlayers(player),
+            p -> p.isPotentialFriend(player), Collectors.toList());
     }
 
     /**

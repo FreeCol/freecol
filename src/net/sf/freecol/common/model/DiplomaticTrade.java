@@ -313,9 +313,8 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        return items.stream()
-            .filter(ti -> ti.getSource() == player)
-            .collect(Collectors.toList());
+        return transform(items, ti -> ti.getSource() == player,
+            Collectors.toList());
     }
 
     /**

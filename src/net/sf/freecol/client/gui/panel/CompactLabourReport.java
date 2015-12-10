@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -350,13 +351,13 @@ public final class CompactLabourReport extends ReportPanel {
             } else {
                 Set<UnitType> resultOfTraining = (colony == null)
                     ? Collections.<UnitType>emptySet()
-                    : colony.getTeachers().stream()
-                        .filter(u -> {
-                                final Unit student = u.getStudent();
-                                return student != null && student.getType() == unitType;
-                            })
-                        .map(u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()))
-                        .collect(Collectors.toSet());
+                    : transform(colony.getTeachers(),
+                        u -> {
+                            final Unit student = u.getStudent();
+                            return student != null && student.getType() == unitType;
+                        },
+                        u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()),
+                        Collectors.toSet());
                 String student = resultOfTraining.size() == 1 ?
                     Messages.message(StringTemplate
                         .template("report.labour.learning")

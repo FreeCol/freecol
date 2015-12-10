@@ -97,6 +97,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
@@ -4293,9 +4294,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                  ChangeSet cs) {
         if (checkGold(price)) {
             final Specification spec = getSpecification();
-            List<AbstractUnit> naval = mercs.stream()
-                .filter(au -> au.getType(spec).isNaval())
-                .collect(Collectors.toList());
+            List<AbstractUnit> naval = transform(mercs,
+                au -> au.getType(spec).isNaval(), Collectors.toList());
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
                 dst = getColonies().get(0).getTile();

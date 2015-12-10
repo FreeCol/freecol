@@ -263,10 +263,9 @@ public class ColonyPlan {
      * @return A list of food producing plans.
      */
     public List<WorkLocationPlan> getFoodPlans() {
-        return workPlans.stream()
-            .filter(wp -> wp.isFoodPlan()
-                && !wp.getWorkLocation().canAutoProduce())
-            .collect(Collectors.toList());
+        return transform(workPlans,
+            wp -> wp.isFoodPlan() && !wp.getWorkLocation().canAutoProduce(),
+            Collectors.toList());
     }
 
     /**
@@ -276,10 +275,9 @@ public class ColonyPlan {
      * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
-        return workPlans.stream()
-            .filter(wp -> !wp.isFoodPlan()
-                && !wp.getWorkLocation().canAutoProduce())
-            .collect(Collectors.toList());
+        return transform(workPlans,
+            wp -> !wp.isFoodPlan() && !wp.getWorkLocation().canAutoProduce(),
+            Collectors.toList());
     }
 
     /**

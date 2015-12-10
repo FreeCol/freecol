@@ -845,9 +845,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if the turn ended.
      */
     private boolean doEndTurn(boolean showDialog) {
+        final Player player = freeColClient.getMyPlayer();
         if (showDialog) {
-            List<Unit> units = freeColClient.getMyPlayer().getUnits().stream()
-                .filter(Unit::couldMove).collect(Collectors.toList());
+            List<Unit> units = transform(player.getUnits(), Unit::couldMove,
+                Collectors.toList());
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 gui.showEndTurnDialog(units,
@@ -881,7 +882,7 @@ public final class InGameController implements NetworkConstants {
 
         // Unskip all skipped, some may have been faked in-client.
         // Server-side skipped units are set active in csNewTurn.
-        for (Unit unit : freeColClient.getMyPlayer().getUnits()) {
+        for (Unit unit : player.getUnits()) {
             if (unit.getState() == UnitState.SKIPPED) {
                 unit.setState(UnitState.ACTIVE);
             }
@@ -1381,9 +1382,8 @@ public final class InGameController implements NetworkConstants {
 
         // Disembark selected units able to move.
         unit.setStateToAllChildren(UnitState.ACTIVE);
-        final List<Unit> disembarkable = unit.getUnitList().stream()
-            .filter(u -> u.getMoveType(tile).isProgress())
-            .collect(Collectors.toList());
+        final List<Unit> disembarkable = transform(unit.getUnitList(),
+            u -> u.getMoveType(tile).isProgress(), Collectors.toList());
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
         if (disembarkable.size() == 1) {
             if (gui.confirm(tile,
@@ -1440,10 +1440,10 @@ public final class InGameController implements NetworkConstants {
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
-        List<ChoiceItem<Unit>> choices = destinationTile.getUnitList().stream()
-            .filter(u -> u.canAdd(unit))
-            .map(u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u))
-            .collect(Collectors.toList());
+        List<ChoiceItem<Unit>> choices = transform(destinationTile.getUnitList(),
+            u -> u.canAdd(unit),
+            u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u),
+            Collectors.toList());
         if (choices.isEmpty()) {
             throw new RuntimeException("Unit " + unit.getId()
                 + " found no carrier to embark upon.");

@@ -227,9 +227,8 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned <code>Unit</code>s.
      */
     public List<Unit> getAssignedUnits() {
-        return owner.getUnits().stream()
-            .filter(u -> u.getTradeRoute() == this)
-            .collect(Collectors.toList());
+        return transform(owner.getUnits(),
+            u -> u.getTradeRoute() == this, Collectors.toList());
     }
 
     /**

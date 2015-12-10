@@ -971,9 +971,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: cAlarm
-        List<Tile> tiles = rTileSuggestions.stream()
-            .filter(ts -> ts.isExploration())
-            .map(ts -> ts.tile).distinct().collect(Collectors.toList());
+        List<Tile> tiles = transformDistinct(rTileSuggestions,
+            (TileImprovementSuggestion ts) -> ts.isExploration(),
+            (TileImprovementSuggestion ts) -> ts.tile, Collectors.toList());
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
@@ -984,10 +984,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
             tiles.clear();
-            tiles.addAll(rTileSuggestions.stream()
-                .filter(tis -> tis.tileImprovementType == ti)
-                .map(tis -> tis.tile)
-                .distinct().collect(Collectors.toList()));
+            tiles.addAll(transformDistinct(rTileSuggestions,
+                    (TileImprovementSuggestion ts) -> ts.tileImprovementType == ti,
+                    (TileImprovementSuggestion ts) -> ts.tile,
+                    Collectors.toList()));
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()

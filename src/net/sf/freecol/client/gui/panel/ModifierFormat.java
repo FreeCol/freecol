@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Named;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Turn;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class ModifierFormat {
@@ -129,7 +130,7 @@ public class ModifierFormat {
     }
 
     public static String getModifierAsString(Modifier modifier) {
-        return Arrays.stream(getModifierStrings(modifier))
-            .filter(s -> s != null).collect(Collectors.joining());
+        return transform(getModifierStrings(modifier), s -> s != null,
+                         Collectors.joining());
     }
 }

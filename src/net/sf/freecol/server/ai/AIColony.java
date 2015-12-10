@@ -574,9 +574,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!hasDefender) return;
 
         // What goods are really needed?
-        List<GoodsType> needed = spec.getRawBuildingGoodsTypeList().stream()
-            .filter(gt -> colony.getTotalProductionOf(gt) <= 0)
-            .collect(Collectors.toList());
+        List<GoodsType> needed = transform(spec.getRawBuildingGoodsTypeList(),
+            gt -> colony.getTotalProductionOf(gt) <= 0, Collectors.toList());
 
         // If a tile can be stolen, do so if already at war with the
         // owner or if it is the best one available.
@@ -1444,10 +1443,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> objects = getExportGoods().stream()
-            .filter(ag -> !ag.isDisposed() && ag.getGoods() != null
-                && ag.getGoods().getLocation() == colony)
-            .collect(Collectors.toList());
+        List<AIObject> objects = transform(getExportGoods(),
+            aig -> !aig.isDisposed() && aig.getGoods() != null
+                && aig.getGoods().getLocation() == colony,
+            aig -> (AIObject)aig, Collectors.toList());
         objects.addAll(wishes);
         wishes.clear();
         objects.addAll(tileImprovementPlans);

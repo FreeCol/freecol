@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -465,8 +466,7 @@ public class CollectionUtils {
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Stream<T> stream, Predicate<T> predicate,
-                             T fail) {
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate, T fail) {
         return stream.filter(predicate).findFirst().orElse(fail);
     }
 
@@ -494,6 +494,206 @@ public class CollectionUtils {
         return collection.stream().map(mapper);
     }
 
+    /**
+     * Transform the contents of an array.
+     *
+     * @param array The array to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,C> C transform(T[] array, Predicate<T> predicate,
+        Collector<T,?,C> collector) {
+        return fmc(Arrays.stream(array), predicate, i -> i, collector);
+    }
+
+    /**
+     * Transform the contents of an array.
+     *
+     * @param array The array to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R,C> C transform(T[] array, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+        return fmc(Arrays.stream(array), predicate, mapper, collector);
+    }
+
+    /**
+     * Transform the contents of a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,C> C transform(Collection<T> collection,
+        Predicate<T> predicate, Collector<T,?,C> collector) {
+        return fmc(collection.stream(), predicate, i -> i, collector);
+    }
+
+    /**
+     * Transform the contents of a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R,C> C transform(Collection<T> collection,
+        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
+        return fmc(collection.stream(), predicate, mapper, collector);
+    }
+
+    /**
+     * Transform the contents of a stream.
+     *
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,C> C transform(Stream<T> stream, Predicate<T> predicate,
+        Collector<T,?,C> collector) {
+        return fmc(stream, predicate, i -> i, collector);
+    }
+
+    /**
+     * Transform the contents of a stream.
+     *
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R,C> C transform(Stream<T> stream, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+        return fmc(stream, predicate, mapper, collector);
+    }
+
+    /**
+     * Underlying implementation for the transform functions.
+     *
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    private static <T,R,C> C fmc(Stream<T> stream, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+        return stream.filter(predicate).map(mapper).collect(collector);
+    }
+
+    /**
+     * Transform and sort the contents of an array.
+     *
+     * @param array The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R extends Comparable<? super R>,C> C
+        transformAndSort(T[] array, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+        final Comparator<? super R> comparator = Comparator.naturalOrder();
+        return fmcs(Arrays.stream(array), predicate, mapper, comparator,
+                    collector);
+    }
+
+    /**
+     * Transform and sort the contents of an array.
+     *
+     * @param array The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R,C> C transformAndSort(T[] array, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+        return fmcs(Arrays.stream(array), predicate, mapper, comparator,
+                    collector);
+    }
+
+    /**
+     * Transform and sort the contents of a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R extends Comparable<? super R>,C> C
+        transformAndSort(Collection<T> collection,
+        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
+        final Comparator<? super R> comparator = Comparator.naturalOrder();
+        return fmcs(collection.stream(), predicate, mapper, comparator,
+                    collector);
+    }
+
+    /**
+     * Transform and sort the contents of a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R,C> C transformAndSort(Collection<T> collection,
+        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+        return fmcs(collection.stream(), predicate, mapper, comparator,
+                    collector);
+    }
+
+    /**
+     * Underlying implementation for the sorted transform functions.
+     *
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    private static <T,R,C> C fmcs(Stream<T> stream, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+        return stream.filter(predicate).map(mapper).sorted(comparator)
+            .collect(collector);
+    }
+    
+    /**
+     * Transform and return distinct items from a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T,R extends Comparable<? super R>,C> C
+        transformDistinct(Collection<T> collection,
+        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
+        final Comparator<? super R> comparator = Comparator.naturalOrder();
+        return fmcd(collection.stream(), predicate, mapper, collector);
+    }
+
+    /**
+     * Underlying implementation for the distinct transform functions.
+     *
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    private static <T,R,C> C fmcd(Stream<T> stream, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+        return stream.filter(predicate).map(mapper).distinct()
+            .collect(collector);
+    }
+    
     /**
      * Convenience function to convert a stream to an iterable.
      *

@@ -873,8 +873,7 @@ public class Unit extends GoodsLocation
      */
     public List<Role> getAvailableRoles(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRoles();
-        return roles.stream()
-            .filter(r -> roleIsAvailable(r)).collect(Collectors.toList());
+        return transform(roles, r -> roleIsAvailable(r), Collectors.toList());
     }
 
     /**
