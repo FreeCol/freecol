@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -281,9 +282,7 @@ public class Building extends WorkLocation
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 long minimumGoodsInput = 4 // FIXME: magic number
-                    * (int)getUnitList().stream()
-                        .filter(u -> u.getType() == getExpertUnitType())
-                        .count();
+                    * count(getUnitList(), u -> u.getType() == getExpertUnitType());
                 if (minimumGoodsInput > available) {
                     available = minimumGoodsInput;
                 }

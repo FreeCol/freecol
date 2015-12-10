@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -207,7 +208,7 @@ public class Operand extends Scope {
                     return null;
                 }
             }
-            return count(list);
+            return ourCount(list);
         }
     }
 
@@ -233,15 +234,15 @@ public class Operand extends Scope {
         List<FreeColObject> list = new LinkedList<>();
         switch (operandType) {
         case UNITS:
-            return count(player.getUnits());
+            return ourCount(player.getUnits());
         case BUILDINGS:
             for (Colony colony : player.getColonies()) {
                 list.addAll(colony.getBuildings());
             }
-            return count(list);
+            return ourCount(list);
         case SETTLEMENTS:
             if (methodName == null) {
-                return count(player.getSettlements())
+                return ourCount(player.getSettlements())
                     + spec.getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
             } else {
                 final String methodValue = getMethodValue();
@@ -255,7 +256,7 @@ public class Operand extends Scope {
             }
         case FOUNDING_FATHERS:
             list.addAll(player.getFathers());
-            return count(list);
+            return ourCount(list);
         default:
             return player.invokeMethod(methodName, Integer.class,
                                        (Integer)null);
@@ -285,7 +286,7 @@ public class Operand extends Scope {
                     return colony.invokeMethod(getMethodName(), Integer.class,
                                                (Integer)null);
                 }
-                return count(list);
+                return ourCount(list);
             } else {
                 // in future, we might expand this to handle native
                 // settlements
@@ -303,8 +304,8 @@ public class Operand extends Scope {
      * @param objects The list of objects to check.
      * @return The number of applicable objects.
      */
-    private Integer count(Collection<? extends FreeColObject> objects) {
-        return (int)objects.stream().filter(o -> this.appliesTo(o)).count();
+    private Integer ourCount(Collection<? extends FreeColObject> objects) {
+        return count(objects, o -> this.appliesTo(o));
     }
 
 

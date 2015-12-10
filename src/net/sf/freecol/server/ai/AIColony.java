@@ -1339,11 +1339,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (change != null
                 && !change.isForested()
                 && !colonyTile.isColonyCenterTile()
-                && colony.getAvailableWorkLocations().stream()
-                    .filter(ct -> ct instanceof ColonyTile
-                        && !((ColonyTile)ct).isColonyCenterTile()
-                        && ((ColonyTile)ct).getWorkTile().isForested())
-                    .count() <= FOREST_MINIMUM) continue;
+                && count(colony.getAvailableWorkLocations(),
+                         ct -> ct instanceof ColonyTile
+                             && !((ColonyTile)ct).isColonyCenterTile()
+                             && ((ColonyTile)ct).getWorkTile().isForested())
+                    <= FOREST_MINIMUM) continue;
 
             newPlans.add(plan); // Otherwise add the plan.
         }

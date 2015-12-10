@@ -2054,9 +2054,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units.
      */
     public int getUnitCount(boolean naval) {
-        return (int)getUnits().stream()
-            .filter(u -> u.isNaval() == naval)
-            .count();
+        return count(getUnits(), u -> u.isNaval() == naval);
     }
         
     /**
@@ -2065,9 +2063,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units
      */
     public int getNumberOfKingLandUnits() {
-        return (int)getUnits().stream()
-            .filter(u -> u.hasAbility(Ability.REF_UNIT) && !u.isNaval())
-            .count();
+        return count(getUnits(),
+                     u -> u.hasAbility(Ability.REF_UNIT) && !u.isNaval());
     }
 
     /**
@@ -2235,8 +2232,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getNumberOfPorts() {
         return (!isEuropean()) ? 0
-            : (int)getColonies().stream()
-                .filter(Colony::isConnectedPort).count();
+            : count(getColonies(), Colony::isConnectedPort);
     }
 
     /**

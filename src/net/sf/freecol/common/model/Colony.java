@@ -1727,8 +1727,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         } else { // Much guesswork
             result = getDisplayUnitCount() * 1000
                 + 500 // Some useful goods?
-                + 200 * (int)getTile().getSurroundingTiles(0, 1).stream()
-                    .filter(t -> t.getOwningSettlement() == this).count();
+                + 200 * count(getTile().getSurroundingTiles(0, 1),
+                              t -> t.getOwningSettlement() == this);
             Building stockade = getStockade();
             if (stockade != null) result *= stockade.getLevel();
         }

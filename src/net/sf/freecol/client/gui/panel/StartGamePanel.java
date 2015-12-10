@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -243,11 +244,10 @@ public final class StartGamePanel extends FreeColPanel {
         if (singlePlayerGame
             && spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)
             && !spec.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            int n = (int)getGame().getNationOptions()
-                .getNations().entrySet().stream()
-                .filter(e -> e.getKey().getType().isEuropean()
+            int n = count(getGame().getNationOptions().getNations().entrySet(),
+                e -> e.getKey().getType().isEuropean()
                     && !e.getKey().isUnknownEnemy()
-                    && e.getValue() != NationState.NOT_AVAILABLE).count();
+                    && e.getValue() != NationState.NOT_AVAILABLE);
             if (n == 0) {
                 getGUI().showInformationMessage("info.noEuropeans");
                 return false;

@@ -377,7 +377,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The number of wanted goods.
      */
     public int getWantedGoodsAmount() {
-        return (int)Arrays.stream(wantedGoods).filter(gt -> gt != null).count();
+        return count(wantedGoods, gt -> gt != null);
     }
 
     /**

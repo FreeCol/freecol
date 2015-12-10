@@ -335,56 +335,82 @@ public class CollectionUtils {
         return all(Arrays.stream(array), predicate);
     }
 
+    public static <T> boolean all(Collection<T> c, Predicate<T> predicate) {
+        return all(c.stream(), predicate);
+    }
+
+    public static <T> boolean all(Stream<T> stream, Predicate<T> predicate) {
+        return stream.allMatch(predicate);
+    }
+
     public static <T> boolean any(T[] array, Predicate<T> predicate) {
         return any(Arrays.stream(array), predicate);
+    }
+
+    public static <T> boolean any(Collection<T> c, Predicate<T> predicate) {
+        return any(c.stream(), predicate);
+    }
+
+    public static <T> boolean any(Stream<T> stream, Predicate<T> predicate) {
+        return stream.anyMatch(predicate);
     }
 
     public static <T> boolean none(T[] array, Predicate<T> predicate) {
         return none(Arrays.stream(array), predicate);
     }
 
-    public static <T> boolean all(Collection<T> collection,
-                                  Predicate<T> predicate) {
-        return all(collection.stream(), predicate);
+    public static <T> boolean none(Collection<T> c, Predicate<T> predicate) {
+        return none(c.stream(), predicate);
     }
 
-    public static <T> boolean any(Collection<T> collection,
-                                  Predicate<T> predicate) {
-        return any(collection.stream(), predicate);
-    }
-
-    public static <T> boolean none(Collection<T> collection,
-                                   Predicate<T> predicate) {
-        return none(collection.stream(), predicate);
-    }
-
-    public static <T> boolean all(Stream<T> stream,
-                                  Predicate<T> predicate) {
-        return stream.allMatch(predicate);
-    }
-
-    public static <T> boolean any(Stream<T> stream,
-                                  Predicate<T> predicate) {
-        return stream.anyMatch(predicate);
-    }
-
-    public static <T> boolean none(Stream<T> stream,
-                                   Predicate<T> predicate) {
+    public static <T> boolean none(Stream<T> stream, Predicate<T> predicate) {
         return stream.noneMatch(predicate);
     }
 
     /**
      * Does a collection contain at least one element that matches a predicate?
      *
-     * @param collection The <code>Collection</code> to search.
+     * @param c The <code>Collection</code> to search.
      * @param predicate A <code>Predicate</code> to test with.
      * @return True if the predicate ever succeeds.
      */
-    public static <T> boolean contains(Collection<T> collection,
-                                       Predicate<T> predicate) {
-        return collection.stream().filter(predicate).findFirst().isPresent();
+    public static <T> boolean contains(Collection<T> c, Predicate<T> predicate) {
+        return c.stream().filter(predicate).findFirst().isPresent();
     }
 
+    /**
+     * Count the number of members of an array that match a predicate.
+     *
+     * @param array The array to check.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(T[] array, Predicate<T> predicate) {
+        return count(Arrays.stream(array), predicate);
+    }
+        
+    /**
+     * Count the number of members of a collection that match a predicate.
+     *
+     * @param c The <code>Collection</code> to check.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(Collection<T> c, Predicate<T> predicate) {
+        return count(c.stream(), predicate);
+    }
+        
+    /**
+     * Count the number of members of a stream that match a predicate.
+     *
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(Stream<T> stream, Predicate<T> predicate) {
+        return (int)stream.filter(predicate).count();
+    }
+        
     /**
      * Simple stream search for the first item that matches a predicate.
      *
@@ -399,12 +425,12 @@ public class CollectionUtils {
     /**
      * Simple stream search for the first item that matches a predicate.
      *
-     * @param collection The <code>Collection</code> to search.
+     * @param c The <code>Collection</code> to search.
      * @param predicate A <code>Predicate</code> to match with.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Collection<T> collection, Predicate<T> predicate) {
-        return find(collection, predicate, (T)null);
+    public static <T> T find(Collection<T> c, Predicate<T> predicate) {
+        return find(c, predicate, (T)null);
     }
 
     /**

@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.UnitState;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -242,7 +243,7 @@ public class Europe extends UnitLocation
      */
     public int getImmigration(int production) {
         final Specification spec = getSpecification();
-        int n = (int)getUnitList().stream().filter(Unit::isPerson).count();
+        int n = count(getUnitList(), u -> u.isPerson());
         n *= spec.getInteger(GameOptions.EUROPEAN_UNIT_IMMIGRATION_PENALTY);
         n += spec.getInteger(GameOptions.PLAYER_IMMIGRATION_BONUS);
         // Do not allow total production to be negative.

@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -188,9 +189,8 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Add a big bonus for treasure trains on the tile.
         // Do not cheat and look at the value.
-        value += 1000 * tile.getUnitList().stream()
-            .filter(u -> u.canCarryTreasure() && u.getTreasureAmount() > 0)
-            .count();
+        value += 1000 * count(tile.getUnitList(),
+            u -> u.canCarryTreasure() && u.getTreasureAmount() > 0);
 
         if (defender.isNaval()) {
             if (tile.isLand()) value += 500; // Easy win
