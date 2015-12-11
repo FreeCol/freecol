@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -207,12 +208,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
             for (GoodsType gt : goodsTypes) produce(gt);
                 
-            for (Unit u : colony.getTile().getUnitList()) {
-                if (u.getState() != Unit.UnitState.FORTIFIED
-                    && u.getState() != Unit.UnitState.SENTRY) {
-                    this.notWorking.add(u);
-                }
-            }
+            this.notWorking.addAll(colony.getTile().getUnitList().stream()
+                .filter(u -> u.getState() != Unit.UnitState.FORTIFIED
+                    && u.getState() != Unit.UnitState.SENTRY)
+                .collect(Collectors.toList()));
 
             // Collect the types of the units at work in the colony
             // (colony tiles and buildings) that are suboptimal (and
@@ -256,13 +255,14 @@ public final class ReportCompactColonyPanel extends ReportPanel
             
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
-            for (Unit u : this.notWorking) {
-                GoodsType t = u.getWorkType();
-                WorkLocation wl = u.getWorkLocation();
-                if (wl == null) continue;
-                GoodsType w = wl.getWorkFor(u);
-                if (w == null || w != t) this.couldWork.add(u.getType());
-            }
+            this.couldWork.addAll(this.notWorking.stream()
+                .filter(u -> {
+                        WorkLocation wl = u.getWorkLocation();
+                        return wl != null
+                            && (wl.getWorkFor(u) == null
+                                || wl.getWorkFor(u) != u.getWorkType());
+                    })
+                .map(Unit::getType).collect(Collectors.toList()));
 
             this.build = colony.getCurrentlyBuilding();
             if (this.build == null) {
@@ -591,10 +591,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: Always cAlarm
-        int n = 0;
-        for (TileImprovementSuggestion tis : s.tileSuggestions) {
-            if (tis.isExploration()) n++;
-        }
+        int n = count(s.tileSuggestions,
+                      TileImprovementSuggestion::isExploration);
         if (n > 0) {
             t = stpld("report.colony.exploring")
                     .addName("%colony%", s.colony.getName())
@@ -973,12 +971,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: cAlarm
-        List<Tile> tiles = new ArrayList<>();
-        for (TileImprovementSuggestion tis : rTileSuggestions) {
-            if (tis.isExploration() && !tiles.contains(tis.tile)) {
-                tiles.add(tis.tile);
-            }
-        }
+        List<Tile> tiles = rTileSuggestions.stream()
+            .filter(ts -> ts.isExploration())
+            .map(ts -> ts.tile).distinct().collect(Collectors.toList());
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
@@ -989,12 +984,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
             tiles.clear();
-            for (TileImprovementSuggestion tis : rTileSuggestions) {
-                if (tis.tileImprovementType == ti
-                    && !tiles.contains(tis.tile)) {
-                    tiles.add(tis.tile);
-                }
-            }
+            tiles.addAll(rTileSuggestions.stream()
+                .filter(tis -> tis.tileImprovementType == ti)
+                .map(tis -> tis.tile)
+                .distinct().collect(Collectors.toList()));
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()
@@ -1037,15 +1030,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // Field: The required goods rates.
         // Colour: cPlain
-        List<JLabel> labels = new ArrayList<>();
-        for (Entry<GoodsType, Double> e
-                 : mapEntriesByValue(rNeeded, descendingDoubleComparator)) {
-            labels.add(newLabel(String.format("%4.1f %s", e.getValue(),
-                                              Messages.getName(e.getKey())),
-                                null, cPlain,
-                                stpld("report.colony.making.summary")
-                                    .addNamed("%goods%", e.getKey())));
-        }
+        List<JLabel> labels = mapEntriesByValue(rNeeded, descendingDoubleComparator).stream()
+            .map(e -> newLabel(String.format("%4.1f %s", e.getValue(),
+                                             Messages.getName(e.getKey())),
+                    null, cPlain,
+                    stpld("report.colony.making.summary")
+                        .addNamed("%goods%", e.getKey())))
+            .collect(Collectors.toList());
 
         // Field: What is being trained (attached to previous)
         // Colour: cPlain.
