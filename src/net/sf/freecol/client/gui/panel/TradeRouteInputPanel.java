@@ -30,11 +30,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -646,11 +648,9 @@ public final class TradeRouteInputPanel extends FreeColPanel
             startIndex = sel;
             endIndex = startIndex+1;
         }
-        List<GoodsType> cargo = new ArrayList<>();
-        for (Component comp : cargoPanel.getComponents()) {
-            CargoLabel label = (CargoLabel)comp;
-            cargo.add(label.getType());
-        }
+        List<GoodsType> cargo = transform(cargoPanel.getComponents(),
+            c -> c instanceof CargoLabel, c -> ((CargoLabel)c).getType(),
+            Collectors.toList());
         int maxIndex = this.stopList.getMaxSelectionIndex();
         for (int i = startIndex; i < endIndex; i++) {
             String id = this.destinationSelector.getItemAt(i);
