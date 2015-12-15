@@ -46,11 +46,11 @@ final class ReceivingThread extends Thread {
     /**
      * Input stream for buffering the data from the network.
      * 
-     * This is just a buffered input stream that signals end-of-stream
-     * when a given token {@link #END_OF_STREAM} is encountered.  In
-     * order to continue receiving data, the method {@link #enable}
-     * has to be called.  Calls to <code>close()</code> have no effect,
-     * the underlying input stream has to be closed directly.
+     * This is just an input stream that signals end-of-stream when a
+     * given token {@link #END_OF_STREAM} is encountered.  In order to
+     * continue receiving data, the method {@link #enable} has to be
+     * called.  Calls to <code>close()</code> have no effect, the
+     * underlying input stream has to be closed directly.
      */
     private static class FreeColNetworkInputStream extends InputStream {
 
@@ -58,15 +58,19 @@ final class ReceivingThread extends Thread {
 
         private static final char END_OF_STREAM = '\n';
 
+        private static final int EOS_RESULT = -1;
+
         private final InputStream in;
 
         private final byte[] buffer = new byte[BUFFER_SIZE];
 
+        private final byte[] bb = new byte[1];
+        
         private int bStart = 0;
 
         private int bEnd = 0;
 
-        private boolean empty = true;
+        private int bSize = 0;
 
         private boolean wait = false;
 
@@ -83,8 +87,9 @@ final class ReceivingThread extends Thread {
 
         /**
          * Prepares the input stream for a new message.
+         *
          * Makes the subsequent calls to <code>read</code> return the data
-         * instead of <code>-1</code>.
+         * instead of <code>EOS_RESULT</code>.
          */
         public void enable() {
             this.wait = false;
@@ -98,51 +103,26 @@ final class ReceivingThread extends Thread {
          * @exception IllegalStateException if the buffer is not empty.
          */
         private boolean fill() throws IOException {
-            if (!this.empty) throw new IllegalStateException("Not empty.");
+            if (this.bSize != 0) throw new IllegalStateException("Not empty.");
 
-            int r;
-            if (this.bStart < this.bEnd) {
-                r = this.in.read(buffer, this.bEnd, BUFFER_SIZE - this.bEnd);
-            } else if (this.bStart == this.bEnd) {
-                this.bStart = this.bEnd = 0; // Might as well resync.
-                r = this.in.read(buffer, this.bEnd, BUFFER_SIZE - this.bEnd);
-            } else {
-                r = this.in.read(buffer, this.bEnd, this.bStart - this.bEnd);
-            }
+            int r = this.in.read(buffer, 0, BUFFER_SIZE);
             if (r <= 0) return false;
 
-            this.empty = false;
-            this.bEnd += r;
-            if (this.bEnd >= BUFFER_SIZE) this.bEnd = 0;
+            this.bStart = 0;
+            this.bEnd = this.bSize = r;
             return true;
         }
 
         /**
          * Reads a single byte.
          * 
-         * @return The byte read, or -1 on error or "end" of stream.
+         * @return The byte read, or EOS_RESULT on error or "end" of stream.
          * @see #read(byte[], int, int)
          * @exception IOException is thrown by the underlying read.
          */
         @Override
         public int read() throws IOException {
-            if (this.wait) return -1;
-
-            if (this.empty && !fill()) {
-                this.wait = true;
-                return -1;
-            }
-
-            int ret = buffer[this.bStart];
-            this.bStart++;
-            if (this.bStart >= BUFFER_SIZE) this.bStart = 0;
-            if (this.bStart == this.bEnd) this.empty = true;
-
-            if (ret == END_OF_STREAM) {
-                this.wait = true;
-                ret = -1;
-            }
-            return ret;
+            return (read(bb, 0, 1) == 1) ? bb[0] : EOS_RESULT;
         }
 
         /**
@@ -151,25 +131,23 @@ final class ReceivingThread extends Thread {
          * @param b The buffer to put the data in.
          * @param off The offset to use when writing the data.
          * @param len The maximum number of bytes to read.
-         * @return The actual number of bytes read, or -1 if the 
+         * @return The actual number of bytes read, or EOS_RESULT if the 
          *     message has ended ({@link #END_OF_STREAM} was encountered).
          */
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            if (this.wait) return -1;
+            if (this.wait) return EOS_RESULT;
 
             int n = 0;
             for (; n < len; n++) {
-                if (this.empty && !fill()) {
+                if (this.bSize == 0 && !fill()) {
                     this.wait = true;
                     break;
                 }
 
                 byte value = buffer[this.bStart];
                 this.bStart++;
-                if (this.bStart == BUFFER_SIZE) this.bStart = 0;
-                if (this.bStart == this.bEnd) this.empty = true;
-
+                this.bSize--;
                 if (value == END_OF_STREAM) {
                     this.wait = true;
                     break;
@@ -177,7 +155,7 @@ final class ReceivingThread extends Thread {
                 b[n + off] = value;
             }
 
-            return (n <= 0 && this.wait) ? -1 : n;
+            return (n > 0 || !this.wait) ? n : EOS_RESULT;
         }
     }
 
