@@ -2989,6 +2989,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         super.readChildren(xr);
 
         invalidateCache();
+
+        // Temporary trace to check if serialization is causing BR#2982.
+        // Take this out if that gets found and fixed.
+        if (this.colonyTiles.isEmpty()) {
+            logger.severe("Colony tile fail here!"
+                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        }
     }
 
     /**
