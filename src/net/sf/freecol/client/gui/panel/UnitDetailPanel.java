@@ -134,14 +134,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(Utility.localizedLabel("colopedia.unit.skill"));
             panel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
-            List<BuildingType> schools = new ArrayList<>();
-            for (BuildingType buildingType : spec.getBuildingTypeList()) {
-                if (buildingType.hasAbility(Ability.TEACH)
-                    && buildingType.canAdd(type)) {
-                    schools.add(buildingType);
-                }
-            }
-
+            List<BuildingType> schools = transform(spec.getBuildingTypeList(),
+                bt -> bt.hasAbility(Ability.TEACH) && bt.canAdd(type),
+                Collectors.toList());
             if (!schools.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.school"), "newline");
                 int count = 0;
@@ -189,10 +184,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
         }
 
-        List<Modifier> bonusList = new ArrayList<>();
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            bonusList.addAll(type.getModifiers(goodsType.getId()));
-        }
+        List<Modifier> bonusList = spec.getGoodsTypeList().stream()
+            .flatMap(gt -> type.getModifiers(gt.getId()).stream())
+            .collect(Collectors.toList());
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
             StringTemplate template = StringTemplate
