@@ -780,7 +780,6 @@ public class ServerColony extends Colony implements ServerModelObject {
      * @return True if the building was built.
      */
     public boolean buildBuilding(Building building) {
-net.sf.freecol.common.debug.FreeColDebugger.debugLog("BUILD " + building + "\n" +net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
         Tile copied = (building.getType().isDefenceType())
             ? getTile().getTileToCache() : null;
         if (!addBuilding(building)) return false;
