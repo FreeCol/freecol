@@ -494,12 +494,12 @@ public final class FreeCol {
                                   .template("cli.debug")
                                   .addName("%modes%", FreeColDebugger.getDebugModes())))
                           .argName(Messages.message("cli.arg.debug"))
-                          .optionalArg(true)
+                          .hasArgs()
                           .build());
         options.addOption(Option.builder().longOpt("debug-run")
                           .desc(Messages.message("cli.debug-run"))
                           .argName(Messages.message("cli.arg.debugRun"))
-                          .hasArg()
+                          .hasArgs()
                           .build());
         options.addOption(Option.builder().longOpt("debug-start")
                           .desc(Messages.message("cli.debug-start"))
@@ -551,7 +551,7 @@ public final class FreeCol {
         options.addOption(Option.builder().longOpt("log-level")
                           .desc(Messages.message("cli.log-level"))
                           .argName(Messages.message("cli.arg.loglevel"))
-                          .hasArg()
+                          .hasArgs()
                           .build());
         options.addOption(Option.builder().longOpt("name")
                           .desc(Messages.message("cli.name"))
