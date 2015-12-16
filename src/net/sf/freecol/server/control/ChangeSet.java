@@ -355,6 +355,8 @@ public class ChangeSet {
             this.attacker.setLocationNoUpdate(this.attacker.getTile());
             this.defender = defender.copy(game, Unit.class);
             this.defender.setLocationNoUpdate(this.defender.getTile());
+            this.defender.setWorkType(null);
+            this.defender.setState(Unit.UnitState.ACTIVE);            
             this.success = success;
         }
 
@@ -410,7 +412,6 @@ public class ChangeSet {
             }
             if (!canSeeUnit(serverPlayer, defender)
                 || this.defenderInSettlement) {
-                defender.setWorkType(null);
                 element.appendChild(defender.toXMLElement(doc));
             }
             return element;

@@ -4247,29 +4247,7 @@ public class Unit extends GoodsLocation
         }
 
         if (location != null) {
-            if (!full && isInColony()) {
-                // Really special case.  This happens in attack
-                // animations when a defender unit is invisible
-                // working inside a colony and has to be specially
-                // serialized to the client.
-                xw.writeLocationAttribute(LOCATION_TAG, getColony());
-                logger.warning("Unit->Colony(animation) " + this.getId()
-                    + " -> " + getColony().getName()
-                    + " unit owner=" + getOwner()
-                    + " colony owner=" + getColony().getOwner()
-                    + " scope=" + xw.getWriteScope() + "/" + xw.getWriteScope().getClient() + "\n"
-                    + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
-            } else {
-                xw.writeLocationAttribute(LOCATION_TAG, location);
-                if (location instanceof Colony) {
-                    logger.warning("Unit->Colony(already) " + this.getId()
-                        + " -> " + getColony().getName()
-                        + " unit owner=" + getOwner()
-                        + " colony owner=" + getColony().getOwner()
-                        + " scope=" + xw.getWriteScope() + "/" + xw.getWriteScope().getClient() + "\n"
-                        + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
-                }
-            }
+            xw.writeLocationAttribute(LOCATION_TAG, location);
         }
 
         xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
