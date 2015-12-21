@@ -813,6 +813,7 @@ public class FreeColDirectories {
         for (File directory : new File[] {
                 FreeColDirectories.getSaveDirectory(),
                 FreeColDirectories.getAutosaveDirectory() }) {
+            if (directory == null) continue;
             for (File savegame : directory.listFiles(FreeColSavegameFile.getFileFilter())) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
