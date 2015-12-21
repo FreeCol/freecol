@@ -35,6 +35,11 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+
 
 /**
  * Collection of small static helper methods.
@@ -148,5 +153,31 @@ public class Utils {
             return null;
         }
         return osw;
+    }
+
+    /**
+     * Helper to make an XML Transformer.
+     *
+     * @param declaration If true, include the XML declaration.
+     * @param indent If true, set up the transformer to indent.
+     * @return A suitable <code>Transformer</code>.
+     */
+    public static Transformer makeTransformer(boolean declaration,
+                                              boolean indent) {
+        Transformer tf = null;
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            tf = factory.newTransformer();
+            if (!declaration) {
+                tf.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            }
+            if (indent) {
+                tf.setOutputProperty(OutputKeys.INDENT, "yes");
+                tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            }
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "Failed to install transformer!", e);
+        }
+        return tf;
     }
 }

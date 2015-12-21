@@ -36,16 +36,15 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -63,12 +62,6 @@ import net.sf.freecol.common.model.Player;
 public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
-
-    /** Magic properties to indent files if supported. */
-    private static final String[] indentProps = {
-        OutputKeys.INDENT, "yes",
-        "{http://xml.apache.org/xslt}indent-amount", "2"
-    };
 
     /** The scope of a FreeCol object write. */
     public static enum WriteScope {
@@ -219,32 +212,22 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      */
     @Override
     public void close() {
-        if (xmlStreamWriter != null) {
+        if (this.xmlStreamWriter != null) {
             try {
-                xmlStreamWriter.close();
+                this.xmlStreamWriter.close();
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Error closing stream.", xse);
             }
         }
 
         if (this.outputWriter != null) {
-            TransformerFactory factory;
-            Transformer transformer;
-            StreamSource source;
-            StreamResult result;
+            StreamSource source = new StreamSource(new StringReader(this.stringWriter.toString()));
+            StreamResult result = new StreamResult(this.outputWriter);
+            Transformer transformer = Utils.makeTransformer(true, true);
             try {
-                source = new StreamSource(new StringReader(this.stringWriter
-                                                               .toString()));
-                result = new StreamResult(this.outputWriter);
-                factory = TransformerFactory.newInstance();
-                transformer = factory.newTransformer();
-                for (int i = 0; i < indentProps.length; i += 2) {
-                    transformer.setOutputProperty(indentProps[i],
-                                                  indentProps[i+1]);
-                }
                 transformer.transform(source, result);
             } catch (TransformerException te) {
-                logger.log(Level.WARNING, "Transformer fail", te);
+                logger.log(Level.WARNING, "Transform fail", te);
             }
             try {
                 this.outputWriter.flush();

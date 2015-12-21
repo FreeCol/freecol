@@ -34,16 +34,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -101,16 +100,7 @@ public class Connection implements Closeable {
         this.in = null;
         this.socket = null;
         this.out = null;
-        Transformer myTransformer = null;
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            myTransformer = factory.newTransformer();
-            myTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-                                            "yes");
-        } catch (TransformerException e) {
-            logger.log(Level.WARNING, "Failed to install transformer!", e);
-        }
-        this.xmlTransformer = myTransformer;
+        this.xmlTransformer = Utils.makeTransformer(false, false);
         this.thread = null;
         this.messageHandler = null;
         this.name = name;
