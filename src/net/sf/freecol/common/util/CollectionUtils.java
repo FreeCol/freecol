@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -375,7 +376,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to test with.
      * @return True if the predicate ever succeeds.
      */
-    public static <T> boolean contains(Collection<T> c, Predicate<T> predicate) {
+    public static <T> boolean contains(Collection<T> c,
+                                       Predicate<T> predicate) {
         return c.stream().filter(predicate).findFirst().isPresent();
     }
 
@@ -478,7 +480,7 @@ public class CollectionUtils {
      * @return The resulting <code>Stream</code>.
      */
     public static <T,R> Stream<R> map(T[] array,
-        Function<? super T,? extends R> mapper) {
+                                      Function<? super T,? extends R> mapper) {
         return Arrays.stream(array).map(mapper);
     }
 
@@ -490,10 +492,38 @@ public class CollectionUtils {
      * @return The resulting <code>Stream</code>.
      */
     public static <T,R> Stream<R> map(Collection<T> collection,
-        Function<? super T,? extends R> mapper) {
+                                      Function<? super T,? extends R> mapper) {
         return collection.stream().map(mapper);
     }
 
+    /**
+     * Find the maximum int value in a collection.
+     *
+     * @param c The <code>Collection</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param fail The result to return if the stream is empty.
+     * @return The maximum value found.
+     */
+    public static <T> int max(Collection<T> c, Predicate<T> predicate,
+                              ToIntFunction<T> tif, int fail) {
+        return max(c.stream(), predicate, tif, fail);
+    }
+
+    /**
+     * Find the maximum int value in a stream.
+     *
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param fail The result to return if the stream is empty.
+     * @return The maximum value found.
+     */
+    public static <T> int max(Stream<T> stream, Predicate<T> predicate,
+                              ToIntFunction<T> tif, int fail) {
+        return stream.filter(predicate).mapToInt(tif).max().orElse(fail);
+    }
+        
     /**
      * Transform the contents of an array.
      *
@@ -502,7 +532,7 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,C> C transform(T[] array, Predicate<T> predicate,
-        Collector<T,?,C> collector) {
+                                    Collector<T,?,C> collector) {
         return fmc(Arrays.stream(array), predicate, i -> i, collector);
     }
 
@@ -515,7 +545,8 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R,C> C transform(T[] array, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+                                      Function<? super T, ? extends R> mapper,
+                                      Collector<R,?,C> collector) {
         return fmc(Arrays.stream(array), predicate, mapper, collector);
     }
 
@@ -527,7 +558,8 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,C> C transform(Collection<T> collection,
-        Predicate<T> predicate, Collector<T,?,C> collector) {
+                                    Predicate<T> predicate,
+                                    Collector<T,?,C> collector) {
         return fmc(collection.stream(), predicate, i -> i, collector);
     }
 
@@ -540,8 +572,9 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R,C> C transform(Collection<T> collection,
-        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
-        Collector<R,?,C> collector) {
+                                      Predicate<T> predicate,
+                                      Function<? super T, ? extends R> mapper,
+                                      Collector<R,?,C> collector) {
         return fmc(collection.stream(), predicate, mapper, collector);
     }
 
@@ -553,7 +586,7 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,C> C transform(Stream<T> stream, Predicate<T> predicate,
-        Collector<T,?,C> collector) {
+                                    Collector<T,?,C> collector) {
         return fmc(stream, predicate, i -> i, collector);
     }
 
@@ -566,7 +599,8 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R,C> C transform(Stream<T> stream, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+                                      Function<? super T, ? extends R> mapper,
+                                      Collector<R,?,C> collector) {
         return fmc(stream, predicate, mapper, collector);
     }
 
@@ -579,7 +613,8 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     private static <T,R,C> C fmc(Stream<T> stream, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+                                 Function<? super T, ? extends R> mapper,
+                                 Collector<R,?,C> collector) {
         return stream.filter(predicate).map(mapper).collect(collector);
     }
 
@@ -593,7 +628,8 @@ public class CollectionUtils {
      */
     public static <T,R extends Comparable<? super R>,C> C
         transformAndSort(T[] array, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+                         Function<? super T, ? extends R> mapper,
+                         Collector<R,?,C> collector) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
         return fmcs(Arrays.stream(array), predicate, mapper, comparator,
                     collector);
@@ -609,8 +645,9 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R,C> C transformAndSort(T[] array, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+                                             Function<? super T, ? extends R> mapper,
+                                             Comparator<? super R> comparator,
+                                             Collector<R,?,C> collector) {
         return fmcs(Arrays.stream(array), predicate, mapper, comparator,
                     collector);
     }
@@ -625,8 +662,9 @@ public class CollectionUtils {
      */
     public static <T,R extends Comparable<? super R>,C> C
         transformAndSort(Collection<T> collection,
-        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
-        Collector<R,?,C> collector) {
+                         Predicate<T> predicate,
+                         Function<? super T, ? extends R> mapper,
+                         Collector<R,?,C> collector) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
         return fmcs(collection.stream(), predicate, mapper, comparator,
                     collector);
@@ -642,8 +680,10 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R,C> C transformAndSort(Collection<T> collection,
-        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+                                             Predicate<T> predicate,
+                                             Function<? super T, ? extends R> mapper,
+                                             Comparator<? super R> comparator,
+                                             Collector<R,?,C> collector) {
         return fmcs(collection.stream(), predicate, mapper, comparator,
                     collector);
     }
@@ -658,8 +698,9 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     private static <T,R,C> C fmcs(Stream<T> stream, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator, Collector<R,?,C> collector) {
+                                  Function<? super T, ? extends R> mapper,
+                                  Comparator<? super R> comparator,
+                                  Collector<R,?,C> collector) {
         return stream.filter(predicate).map(mapper).sorted(comparator)
             .collect(collector);
     }
@@ -673,9 +714,9 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     public static <T,R extends Comparable<? super R>,C> C
-        transformDistinct(Collection<T> collection,
-        Predicate<T> predicate, Function<? super T, ? extends R> mapper,
-        Collector<R,?,C> collector) {
+        transformDistinct(Collection<T> collection, Predicate<T> predicate,
+                          Function<? super T, ? extends R> mapper,
+                          Collector<R,?,C> collector) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
         return fmcd(collection.stream(), predicate, mapper, collector);
     }
@@ -689,7 +730,8 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      */
     private static <T,R,C> C fmcd(Stream<T> stream, Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper, Collector<R,?,C> collector) {
+                                  Function<? super T, ? extends R> mapper,
+                                  Collector<R,?,C> collector) {
         return stream.filter(predicate).map(mapper).distinct()
             .collect(collector);
     }
