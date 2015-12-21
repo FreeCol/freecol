@@ -634,7 +634,8 @@ public final class ConnectController {
                 err = FreeCol.badLoad(theFile);
                 logger.log(Level.WARNING, "Stream error.", e);
             } catch (Exception e) {
-                err = StringTemplate.name(e.getMessage());
+                String msg = e.getMessage();
+                err = StringTemplate.name((msg == null) ? "(null)" : msg);
                 logger.log(Level.WARNING, "FreeCol error.", e);
             }                
             if (err != null) {
