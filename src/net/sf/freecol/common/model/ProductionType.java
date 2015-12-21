@@ -488,13 +488,23 @@ public class ProductionType extends FreeColObject {
         if (INPUT_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
-            addInput(type, xr.getAttribute(VALUE_TAG, -1));
+            if (type == null) {
+                logger.warning("Skipping input with null type: "
+                    + xr.getAttribute(GOODS_TYPE_TAG, (String)null));
+            } else {
+                addInput(type, xr.getAttribute(VALUE_TAG, -1));
+            }
             xr.closeTag(INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
-            addOutput(type, xr.getAttribute(VALUE_TAG, -1));
+            if (type == null) {
+                logger.warning("Skipping output with null type: "
+                    + xr.getAttribute(GOODS_TYPE_TAG, (String)null));
+            } else {
+                addOutput(type, xr.getAttribute(VALUE_TAG, -1));
+            }
             xr.closeTag(OUTPUT_TAG);
 
         } else {
