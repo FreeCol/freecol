@@ -149,12 +149,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A deep copy of the list of required goods.
      */
     public List<AbstractGoods> getRequiredGoods() {
-        if (requiredGoods == null) return Collections.<AbstractGoods>emptyList();
-        List<AbstractGoods> result = new ArrayList<>();
-        for (AbstractGoods ag : requiredGoods) {
-            result.add(new AbstractGoods(ag.getType(), ag.getAmount()));
-        }
-        return result;
+        return (requiredGoods == null) ? Collections.<AbstractGoods>emptyList()
+            : transform(requiredGoods, ag -> true,
+                ag -> new AbstractGoods(ag.getType(), ag.getAmount()),
+                Collectors.toList());
     }
 
     /**

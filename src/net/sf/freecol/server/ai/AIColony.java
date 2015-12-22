@@ -976,13 +976,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the wishes list with non-goods wishes removed.
      */
     public List<GoodsWish> getGoodsWishes() {
-        List<GoodsWish> result = new ArrayList<>();
-        for (Wish wish : wishes) {
-            if (wish instanceof GoodsWish) {
-                result.add((GoodsWish) wish);
-            }
-        }
-        return result;
+        return transform(wishes, w -> w instanceof GoodsWish,
+            w -> (GoodsWish)w, Collectors.toList());
     }
 
     /**
@@ -991,13 +986,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return A copy of the wishes list with non-worker wishes removed.
      */
     public List<WorkerWish> getWorkerWishes() {
-        List<WorkerWish> result = new ArrayList<>();
-        for (Wish wish : wishes) {
-            if (wish instanceof WorkerWish) {
-                result.add((WorkerWish) wish);
-            }
-        }
-        return result;
+        return transform(wishes, w -> w instanceof WorkerWish,
+            w -> (WorkerWish)w, Collectors.toList());
     }
 
     /**

@@ -21,12 +21,14 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -192,12 +194,9 @@ public class AbstractUnit extends FreeColObject {
      * @return A list of <code>AbstractUnit</code>s.
      */
     public static List<AbstractUnit> deepCopy(List<AbstractUnit> units) {
-        List<AbstractUnit> result = new ArrayList<>();
-        for (AbstractUnit au : units) {
-            result.add(new AbstractUnit(au.getId(), au.getRoleId(),
-                                        au.getNumber()));
-        }
-        return result;
+        return transform(units, au -> true,
+            au -> new AbstractUnit(au.getId(), au.getRoleId(), au.getNumber()),
+            Collectors.toList());
     }
 
     /**
