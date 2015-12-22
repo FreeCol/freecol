@@ -432,7 +432,7 @@ public class Unit extends GoodsLocation
     public static StringTemplate getDestinationLabel(String tag,
         Location destination, Player player) {
         return StringTemplate.template("model.unit.goingTo")
-            .add("%type%", tag)
+            .addTagged("%type%", tag)
             .addStringTemplate("%location%",
                 destination.getLocationLabelFor(player));
     }

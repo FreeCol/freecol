@@ -324,7 +324,7 @@ public class MessagesTest extends FreeColTestCase {
             .equals(Messages.message("key.france")));
 
         StringTemplate t1 = StringTemplate.template("key.france")
-            .add("%randomKey%", "country");
+            .addTagged("%randomKey%", "country");
         assertTrue("France"
             .equals(Messages.message(t1)));
 

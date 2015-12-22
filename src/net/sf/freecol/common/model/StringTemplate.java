@@ -412,6 +412,20 @@ public class StringTemplate extends FreeColObject {
         return complete(null, template);
     }
 
+    /**
+     * Add a tagged value.
+     *
+     * Functionally identical to add(), but used to distinguish the special
+     * cases at the point they are used.
+     *
+     * @param key The tag.
+     * @param value The special tag value.
+     * @return This.
+     */
+    public <T extends StringTemplate> T addTagged(String key, String value) {
+        return add(key, value);
+    }
+
 
     // Override Object
 

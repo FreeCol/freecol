@@ -2454,7 +2454,7 @@ public class Player extends FreeColGameObject implements Nameable {
             : "west";
         addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
                                          "model.player.startGame", this)
-            .add("%direction%", sailTag));
+            .addTagged("%direction%", sailTag));
     }
 
     /**
