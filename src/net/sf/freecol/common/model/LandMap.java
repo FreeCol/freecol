@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -294,6 +295,24 @@ public class LandMap {
     }
 
     /**
+     * Get the positions surrounding a central position that are potential
+     * valid land positions.
+     *
+     * @param p The central <code>Position</code> to work from.
+     * @param preferredDistanceToEdge The preferred distance to the map edge.
+     * @return A list of suitable <code>Position</code>s.
+     */
+    private List<Position> newPositions(Position p, int preferredDistanceToEdge) {
+        return Direction.longSides.stream()
+            .map(d -> new Position(p, d))
+            .filter(n -> n.isValid(width, height)
+                && isSingleTile(n.getX(), n.getY())
+                && n.getX() > preferredDistanceToEdge
+                && n.getX() < width - preferredDistanceToEdge)
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Sets a given map position to land.
      *
      * Calls #growLand(int,int) for all valid adjacent map positions,
@@ -395,17 +414,8 @@ public class LandMap {
         size++;
 
         // Add all valid neighbour positions to list
-        List<Position> l = new ArrayList<>();
         Position p = new Position(x, y);
-        for (Direction direction : Direction.longSides) {
-            Position n = new Position(p, direction);
-            if (n.isValid(width, height)
-                && isSingleTile(n.getX(), n.getY())
-                && n.getX() > preferredDistanceToEdge
-                && n.getX() < width-preferredDistanceToEdge) {
-                l.add(n);
-            }
-        }
+        List<Position> l = newPositions(p, preferredDistanceToEdge);
 
         // Get a random position from the list,
         // set it to land,
@@ -419,16 +429,7 @@ public class LandMap {
             if (!newLand[p.getX()][p.getY()]) {
                 newLand[p.getX()][p.getY()] = true;
                 size++;
-
-                for (Direction direction : Direction.longSides) {
-                    Position n = new Position(p, direction);
-                    if (n.isValid(width, height)
-                        && isSingleTile(n.getX(), n.getY())
-                        && n.getX() > preferredDistanceToEdge
-                        && n.getX() < width-preferredDistanceToEdge) {
-                        l.add(n);
-                    }
-                }
+                l.addAll(newPositions(p, preferredDistanceToEdge));
             }
         }
 
