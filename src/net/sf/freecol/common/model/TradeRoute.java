@@ -289,15 +289,14 @@ public class TradeRoute extends FreeColGameObject
             if (!stop.getCargo().isEmpty()) empty = false;
             always.retainAll(stop.getCargo());
         }
-        if (empty) return StringTemplate.template("model.tradeRoute.allEmpty");
         final boolean enhancedTradeRoutes = getSpecification()
             .getBoolean(GameOptions.ENHANCED_TRADE_ROUTES);
-        if (!enhancedTradeRoutes && !always.isEmpty()) {
-            return StringTemplate.template("model.tradeRoute.alwaysPresent")
-                .addNamed("%goodsType%", always.iterator().next());
-        }
-        
-        return null;
+        return (empty)
+            ? StringTemplate.template("model.tradeRoute.allEmpty")
+            : (!enhancedTradeRoutes && !always.isEmpty())
+            ? StringTemplate.template("model.tradeRoute.alwaysPresent")
+                .addNamed("%goodsType%", always.iterator().next())
+            : null;
     }
 
 

@@ -159,7 +159,7 @@ public class TileItemContainer extends FreeColGameObject {
             tileItems.add(item);
         }
     }
-    
+
     /**
      * Try to add a <code>TileItem</code> to this container.
      * If the item is of lower magnitude than an existing one the existing
@@ -244,7 +244,7 @@ public class TileItemContainer extends FreeColGameObject {
                 Collectors.toList());
         }
     }
-        
+
     /**
      * Gets the tile improvement of the given type if any.
      *
@@ -404,7 +404,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The resulting production.
      */
     public int getTotalBonusPotential(GoodsType goodsType, UnitType unitType,
-        int potential, boolean onlyNatural) {
+                                      int potential, boolean onlyNatural) {
         int result = potential;
         for (TileItem item : getTileItems()) {
             if (!onlyNatural || item.isNatural()) {
@@ -508,7 +508,7 @@ public class TileItemContainer extends FreeColGameObject {
         }
         setTileItems(result);
     }
-    
+
     /**
      * Checks if the specified <code>TileItem</code> is in this container.
      *
@@ -550,7 +550,7 @@ public class TileItemContainer extends FreeColGameObject {
                 // that reference the wrong tile.
                 if (ti.getTile() != tile) {
                     logger.warning("Fixing improvement tile at: " + tile
-                        + " / " + ti.getId());
+                                   + " / " + ti.getId());
                     ti.setLocation(tile);
                     integ = Math.min(integ, 0);
                 }
@@ -568,7 +568,7 @@ public class TileItemContainer extends FreeColGameObject {
                 // end @compat
                 if (integ < 0) {
                     logger.warning("Removing broken improvement at: " + tile
-                        + " / " + ti.getId());
+                                   + " / " + ti.getId());
                     removeTileItem(ti);
                     integ = 0;
                 }

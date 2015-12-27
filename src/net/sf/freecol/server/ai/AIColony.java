@@ -446,8 +446,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         for (Unit u : tile.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
-            if (!aiu.trySomeUsefulMission(colony, lb))
-                result.add(aiu);
+            if (!aiu.trySomeUsefulMission(colony, lb)) result.add(aiu);
         }
 
         // Log the changes.

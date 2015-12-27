@@ -423,11 +423,7 @@ public class HighScore extends FreeColObject {
             ret = true;
             xw.writeStartDocument("UTF-8", "1.0");
             xw.writeStartElement(HIGH_SCORES_TAG);
-            int count = 0;
-            for (HighScore score : scores) {
-                score.toXML(xw);
-                count++;
-            }
+            for (HighScore score : scores) score.toXML(xw);
             xw.writeEndElement();
             xw.writeEndDocument();
             xw.flush();

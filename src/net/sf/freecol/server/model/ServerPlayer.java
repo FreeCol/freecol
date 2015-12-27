@@ -1122,10 +1122,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                 List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<>();
-        if (random != null) {
-            randomShuffle(logger, "Naval load", navalUnits, random);
-            randomShuffle(logger, "Land load", landUnits, random);
-        }
+        randomShuffle(logger, "Naval load", navalUnits, random);
+        randomShuffle(logger, "Land load", landUnits, random);
         LogBuilder lb = new LogBuilder(256);
         lb.mark();
         landUnit: for (Unit unit : landUnits) {
