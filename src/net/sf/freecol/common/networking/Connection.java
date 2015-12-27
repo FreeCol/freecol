@@ -63,6 +63,7 @@ public class Connection implements Closeable {
     public static final String DISCONNECT_TAG = "disconnect";
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
+    public static final String RECONNECT_TAG = "reconnect";
     public static final String REPLY_TAG = "reply";
     public static final String SEND_SUFFIX = "-send\n";
     public static final String REPLY_SUFFIX = "-reply\n";
@@ -235,17 +236,15 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Sends a "disconnect"-message and closes this connection.
-     *
-     * Failure is expected if the other end has closed already.
+     * Close this connection.
      */
     @Override
     public void close() {
         try {
-            send(DOMMessage.createMessage(DISCONNECT_TAG));
+            disconnect();
         } catch (IOException ioe) {
-            logger.fine("Error disconnecting " + this.name
-                + ": " + ioe.getMessage());
+            // Failure is expected if the other end has closed already
+            logger.log(Level.FINE, "Disconnect failed for " + this.name, ioe);
         } finally {
             reallyClose();
         }
@@ -488,6 +487,26 @@ public class Connection implements Closeable {
      */
     public Element handle(Element request) throws FreeColException {
         return this.messageHandler.handle(this, request);
+    }
+
+
+    /**
+     * Send a disconnect message.
+     */
+    public void disconnect() throws IOException {
+        this.send(DOMMessage.createMessage(DISCONNECT_TAG));
+    }
+
+    /**
+     * Send a reconnect message, ignoring (but logging) I/O errors.
+     */
+    public void reconnect() {
+        try {
+            this.send(DOMMessage.createMessage(RECONNECT_TAG));
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Reconnect failed for " + this.name,
+                ioe);
+        }
     }
 
 

@@ -1224,12 +1224,7 @@ public final class FreeColServer {
         }
 
         for (Player player : getGame().getLiveEuropeanPlayers(null)) {
-            try {
-                ((ServerPlayer)player).getConnection()
-                    .send(DOMMessage.createMessage("reconnect"));
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Error sending reconnect.", e);
-            }
+            ((ServerPlayer)player).getConnection().reconnect();
         }
     }
 

@@ -107,9 +107,10 @@ public final class MetaRegister {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public synchronized void addServer(String name, String address, int port, int slotsAvailable,
-                int currentlyPlaying, boolean isGameStarted, String version, int gameState)
-                throws IOException {
+    public synchronized void addServer(String name, String address, int port,
+                                       int slotsAvailable, int currentlyPlaying,
+                                       boolean isGameStarted, String version,
+                                       int gameState) throws IOException {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
             // Check connection before adding the server:
@@ -117,10 +118,10 @@ public final class MetaRegister {
                 Connection mc = new Connection(address, port, null,
                                                FreeCol.METASERVER_THREAD);
             ) {
-                mc.send(DOMMessage.createMessage("disconnect"));
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Server rejected disconnect.", e);
-                throw e;
+                mc.disconnect();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Server rejected disconnect.", ioe);
+                throw ioe;
             }
             items.add(new MetaItem(name, address, port, slotsAvailable,
                     currentlyPlaying, isGameStarted, version, gameState));

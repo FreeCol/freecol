@@ -63,9 +63,9 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     public InputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // All sub-classes are forced to implement this one
+        register(Connection.DISCONNECT_TAG, new DisconnectHandler());
         register("logout", (Connection connection, Element element) ->
             logout(connection, element));
-        register("disconnect", new DisconnectHandler());
         register("chat", (Connection connection, Element element) ->
             new ChatMessage(getGame(), element)
                 .handle(freeColServer, connection));
@@ -113,26 +113,13 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
                 logger.log(Level.WARNING, "Handler failed", e);
-                sendReconnectSafely(connection);
+                connection.reconnect();
             }
         } else {
             // Should we return an error here? The old handler returned null.
             logger.warning("No handler installed for " + tagName);
         }
         return null;
-    }
-
-    /**
-     * Send a reconnect message ignoring (but logging) IO errors.
-     * 
-     * @param connection The connection.
-     */
-    private void sendReconnectSafely(Connection connection) {
-        try {
-            connection.send(DOMMessage.createMessage("reconnect"));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send reconnect message!", e);
-        }
     }
 
     /**
@@ -179,7 +166,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         }
 
         private void logDisconnect(Connection connection, ServerPlayer player) {
-            logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
+            logger.info("Disconnection by: " + connection
+                + ((player != null) ? " (" + player.getName() + ") " : ""));
         }
     }
 }

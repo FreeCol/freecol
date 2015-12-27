@@ -65,30 +65,27 @@ public final class NetworkHandler implements MessageHandler {
     @Override
     public synchronized Element handle(Connection connection, Element element) {
         Element reply = null;
-
-        String type = element.getTagName();
-
-        switch (type) {
-            case "register":
-                reply = register(connection, element);
-                break;
-            case "update":
-                reply = update(connection, element);
-                break;
-            case "getServerList":
-                reply = getServerList(connection, element);
-                break;
-            case "remove":
-                reply = remove(connection, element);
-                break;
-            case "disconnect":
-                reply = disconnect(connection, element);
-                break;
-            default:
-                logger.warning("Unkown request: " + type);
-                break;
+        final String tag = element.getTagName();
+        switch (tag) {
+        case Connection.DISCONNECT_TAG:
+            reply = disconnect(connection, element);
+            break;
+        case "register":
+            reply = register(connection, element);
+            break;
+        case "update":
+            reply = update(connection, element);
+            break;
+        case "getServerList":
+            reply = getServerList(connection, element);
+            break;
+        case "remove":
+            reply = remove(connection, element);
+            break;
+        default:
+            logger.warning("Unknown request: " + tag);
+            break;
         }
-
         return reply;
     }
 

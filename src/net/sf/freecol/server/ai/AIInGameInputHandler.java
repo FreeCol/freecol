@@ -136,7 +136,7 @@ public final class AIInGameInputHandler implements MessageHandler {
         Element reply = null;
         try {
             switch (tag) {
-            case "reconnect":
+            case Connection.RECONNECT_TAG:
                 logger.warning("Reconnect on illegal operation, refer to any previous error message."); break;
             case "chooseFoundingFather":
                 reply = chooseFoundingFather(connection, element); break;
@@ -164,8 +164,9 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Since we're the server, we can see everything.
             // Therefore most of these messages are useless.  This
             // may change one day.
+            case Connection.DISCONNECT_TAG:                
             case "addObject": case "addPlayer": case "animateMove":
-            case "animateAttack": case "chat": case "disconnect":
+            case "animateAttack": case "chat":
             case "error": case "featureChange": case "gameEnded":
             case "logout": case "newTurn": case "remove":
             case "removeGoods": case "setAI": case "setDead":

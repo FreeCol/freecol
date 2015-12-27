@@ -71,7 +71,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
     @Override
     public synchronized Element handle(Connection conn, Element element) {
         final String tag = element.getTagName();
-        return ("disconnect".equals(tag)) 
+        return (Connection.DISCONNECT_TAG.equals(tag)) 
             ? disconnect(conn, element)
             : ("gameState".equals(tag))
             ? gameState(conn, element)

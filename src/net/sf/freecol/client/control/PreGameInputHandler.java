@@ -74,12 +74,12 @@ public final class PreGameInputHandler extends InputHandler {
     public synchronized Element handle(Connection connection,
                                        Element element) {
         String type = (element == null) ? "(null)" : element.getTagName();
-        return ("addPlayer".equals(type))
+        return (Connection.DISCONNECT_TAG.equals(type))
+            ? disconnect(element)
+            : ("addPlayer".equals(type))
             ? addPlayer(element)
             : ("chat".equals(type))
             ? chat(element)
-            : ("disconnect".equals(type))
-            ? disconnect(element)
             : ("error".equals(type))
             ? error(element)
             : ("logout".equals(type))

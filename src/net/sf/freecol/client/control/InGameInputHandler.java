@@ -210,7 +210,7 @@ public final class InGameInputHandler extends InputHandler {
         String type = element.getTagName();
         logger.log(Level.FINEST, "Received: " + type);
         switch (type) {
-        case "disconnect":
+        case Connection.DISCONNECT_TAG:
             reply = disconnect(element); break; // Inherited
         case "addObject":
             reply = addObject(element); break;
@@ -252,7 +252,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = newRegionName(element); break;
         case "newTurn":
             reply = newTurn(element); break;
-        case "reconnect":
+        case Connection.RECONNECT_TAG:
             reply = reconnect(element); break;
         case "remove":
             reply = remove(element); break;
