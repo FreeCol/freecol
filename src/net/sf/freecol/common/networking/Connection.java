@@ -80,7 +80,7 @@ public class Connection implements Closeable {
 
     private final Transformer xmlTransformer;
 
-    private ReceivingThread thread;
+    private ReceivingThread receivingThread;
 
     private MessageHandler messageHandler;
 
@@ -101,7 +101,7 @@ public class Connection implements Closeable {
         this.socket = null;
         this.out = null;
         this.xmlTransformer = Utils.makeTransformer(false, false);
-        this.thread = null;
+        this.receivingThread = null;
         this.messageHandler = null;
         this.name = name;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
@@ -111,21 +111,6 @@ public class Connection implements Closeable {
             this.logWriter = null;
             this.logResult = null;
         }
-    }
-
-    /**
-     * Sets up a new socket with specified host and port and uses
-     * {@link #Connection(Socket, MessageHandler, String)}.
-     *
-     * @param host The host to connect to.
-     * @param port The port to connect to.
-     * @param messageHandler The MessageHandler to call for each message
-     *     received.
-     * @exception IOException
-     */
-    public Connection(String host, int port, MessageHandler messageHandler,
-                      String name) throws IOException {
-        this(createSocket(host, port), messageHandler, name);
     }
 
     /**
@@ -144,12 +129,28 @@ public class Connection implements Closeable {
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
-        this.thread = new ReceivingThread(this, in, name);
+        this.receivingThread = new ReceivingThread(this, this.in, name);
         this.messageHandler = messageHandler;
         this.name = name;
 
-        thread.start();
+        this.receivingThread.start();
     }
+
+    /**
+     * Sets up a new socket with specified host and port and uses
+     * {@link #Connection(Socket, MessageHandler, String)}.
+     *
+     * @param host The host to connect to.
+     * @param port The port to connect to.
+     * @param messageHandler The MessageHandler to call for each message
+     *     received.
+     * @exception IOException
+     */
+    public Connection(String host, int port, MessageHandler messageHandler,
+                      String name) throws IOException {
+        this(createSocket(host, port), messageHandler, name);
+    }
+
 
     /**
      * Creates a socket to communication with a given host, port pair.
@@ -183,7 +184,7 @@ public class Connection implements Closeable {
      *     the other peer.
      */
     public Socket getSocket() {
-        return socket;
+        return this.socket;
     }
 
     /**
@@ -192,7 +193,7 @@ public class Connection implements Closeable {
      * @param mh The new MessageHandler for this Connection.
      */
     public void setMessageHandler(MessageHandler mh) {
-        messageHandler = mh;
+        this.messageHandler = mh;
     }
 
     /**
@@ -201,7 +202,7 @@ public class Connection implements Closeable {
      * @return The MessageHandler for this Connection.
      */
     public MessageHandler getMessageHandler() {
-        return messageHandler;
+        return this.messageHandler;
     }
 
     /**
@@ -210,7 +211,7 @@ public class Connection implements Closeable {
      * @return The connection name.
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -254,7 +255,7 @@ public class Connection implements Closeable {
      * Really closes this connection.
      */
     public void reallyClose() {
-        if (this.thread != null) thread.askToStop();
+        if (this.receivingThread != null) this.receivingThread.askToStop();
 
         closeOutputStream();
         if (this.in != null) {
@@ -280,22 +281,12 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Log transfer of an element.
-     *
-     * @param e The <code>Element</code> to log.
-     * @param send True if sending (else replying).
-     */
-    protected void log(Element e, boolean send) {
-        log(new DOMSource(e), send);
-    }
-
-    /**
      * Log transfer of a DOMSource.
      *
-     * @param source The <code>DOMSource</code> to log.
+     * @param element The <code>Element</code> to log.
      * @param send True if sending (else replying).
      */
-    protected void log(DOMSource source, boolean send) {
+    protected void log(Element element, boolean send) {
         if (this.logResult == null) return;
         try {
             this.logWriter.write(name, 0, name.length());
@@ -304,7 +295,7 @@ public class Connection implements Closeable {
             } else {
                 this.logWriter.write(REPLY_SUFFIX, 0, REPLY_SUFFIX.length());
             }
-            this.xmlTransformer.transform(source, this.logResult);
+            this.xmlTransformer.transform(new DOMSource(element), this.logResult);
             this.logWriter.write('\n');
             this.logWriter.flush();
         } catch (IOException|TransformerException e) {
@@ -321,10 +312,9 @@ public class Connection implements Closeable {
      */
     private void sendInternal(Element element) throws IOException {
         TransformerException te = null;
-        DOMSource source = null;
         synchronized (this.outLock) {
             if (this.out == null) return;
-            source = new DOMSource(element);
+            DOMSource source = new DOMSource(element);
             try {
                 xmlTransformer.transform(source, new StreamResult(this.out));
             } catch (TransformerException e) {
@@ -333,7 +323,7 @@ public class Connection implements Closeable {
             this.out.write('\n');
             this.out.flush();
         }
-        if (source != null) log(source, true);
+        log(element, true);
         if (te != null) logger.log(Level.WARNING, "Failed to transform", te);
     }
 
@@ -346,10 +336,10 @@ public class Connection implements Closeable {
      * @see #sendInternal(Element)
      */
     private Element askInternal(Element element) throws IOException {
-        int networkReplyId = thread.getNextNetworkReplyId();
-        String tag = element.getTagName();
+        int networkReplyId = this.receivingThread.getNextNetworkReplyId();
+        final String tag = element.getTagName();
 
-        if (Thread.currentThread() == thread) {
+        if (Thread.currentThread() == this.receivingThread) {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 
@@ -359,15 +349,15 @@ public class Connection implements Closeable {
                               Integer.toString(networkReplyId));
         question.appendChild(element);
 
-        NetworkReplyObject nro = thread.waitForNetworkReply(networkReplyId);
+        NetworkReplyObject nro
+            = this.receivingThread.waitForNetworkReply(networkReplyId);
         sendInternal(question);
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null
             : response.getDocument().getDocumentElement();
         log(reply, false);
 
-        Element child = (reply==null) ? null : (Element)reply.getFirstChild();
-        return child;
+        return (reply == null) ? null : (Element)reply.getFirstChild();
     }
 
 
@@ -424,7 +414,6 @@ public class Connection implements Closeable {
      */
     public void handleAndSendReply(final BufferedInputStream in) 
         throws IOException {
-
         in.mark(200); // Peek at the reply identifier and tag.
 
         // Extract the reply id and check if this is a question.
@@ -437,7 +426,6 @@ public class Connection implements Closeable {
             question = QUESTION_TAG.equals(xr.getLocalName());
             networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
                                              (String)null);
-
         } catch (XMLStreamException xse) {
             logger.log(Level.WARNING, "XML stream failure", xse);
             return;
@@ -499,7 +487,7 @@ public class Connection implements Closeable {
      * @exception FreeColException if there is trouble with the response.
      */
     public Element handle(Element request) throws FreeColException {
-        return messageHandler.handle(this, request);
+        return this.messageHandler.handle(this, request);
     }
 
 
@@ -508,6 +496,8 @@ public class Connection implements Closeable {
      */
     @Override
     public String toString() {
-        return "[Connection " + name + " (" + socket + ")]";
+        return "[Connection " + this.name
+            + " (" + this.socket.getInetAddress()
+            + ":" + this.socket.getPort() + ")]";
     }
 }
