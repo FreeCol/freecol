@@ -653,22 +653,9 @@ public final class InGameInputHandler extends InputHandler
     @Override
     protected Element logout(Connection connection, Element logoutElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
+        if (player == null) return null;
         logger.info("Logout by: " + connection
                     + ((player != null) ? " (" + player.getName() + ") " : ""));
-        if (player == null) {
-            return null;
-        }
-        // FIXME:
-        // Remove the player's units/colonies from the map and send map updates
-        // to the
-        // players that can see such units or colonies.
-        // SHOULDN'T THIS WAIT UNTIL THE CURRENT PLAYER HAS FINISHED HIS TURN?
-        /*
-         * player.setDead(true); Element setDeadElement =
-         * Message.createNewRootElement("setDead");
-         * setDeadElement.setAttribute("player", player.getId());
-         * freeColServer.getServer().sendToAll(setDeadElement, connection);
-         */
 
         /*
          * FIXME: Setting the player dead directly should be a server

@@ -175,6 +175,21 @@ public class DOMMessage {
         return message;
     }
 
+    /**
+     * Creates a new element with specified attributes.
+     *
+     * @param tagName The tag name of the element beeing created,
+     * @param attributes Key,value string pairs.
+     * @return A new <code>Element</code>.
+     */
+    public static Element createMessage(String tagName, String... attributes) {
+        Element root = createNewDocument().createElement(tagName);
+        String[] all = attributes;
+        for (int i = 0; i < all.length; i += 2) {
+            root.setAttribute(all[i], all[i+1]);
+        }
+        return root;
+    }
 
     /**
      * Gets the <code>Document</code> holding the message data.
@@ -302,33 +317,6 @@ public class DOMMessage {
             logger.log(Level.WARNING, "Parser failure", pce);
         }
         return null;
-    }
-
-    /**
-     * Creates a new root element. This is done by creating a new document and
-     * using this document to create the root element.
-     *
-     * @param tagName The tag name of the root element beeing created,
-     * @return the new root element.
-     */
-    public static Element createNewRootElement(String tagName) {
-        return createNewDocument().createElement(tagName);
-    }
-
-    /**
-     * Creates a new element with specified attributes.
-     *
-     * @param tagName The tag name of the element beeing created,
-     * @param attributes Key,value string pairs.
-     * @return A new <code>Element</code>.
-     */
-    public static Element createMessage(String tagName, String... attributes) {
-        Element root = createNewRootElement(tagName);
-        String[] all = attributes;
-        for (int i = 0; i < all.length; i += 2) {
-            root.setAttribute(all[i], all[i+1]);
-        }
-        return root;
     }
 
     /**

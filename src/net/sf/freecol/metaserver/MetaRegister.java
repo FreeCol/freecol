@@ -112,8 +112,7 @@ public final class MetaRegister {
                                        boolean isGameStarted, String version,
                                        int gameState) throws IOException {
         MetaItem mi = getItem(address, port);
-        if (mi == null) {
-            // Check connection before adding the server:
+        if (mi == null) { // Check connection before adding the server:
             try (
                 Connection mc = new Connection(address, port, null,
                                                FreeCol.METASERVER_THREAD);
