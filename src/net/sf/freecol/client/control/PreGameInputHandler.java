@@ -96,8 +96,8 @@ public final class PreGameInputHandler extends InputHandler {
             ? startGame(element)
             : ("updateColor".equals(type))
             ? updateColor(element)
-            : ("updateGame".equals(type))
-            ? updateGame(element)
+            : ("update".equals(type))
+            ? update(element)
             : ("updateGameOptions".equals(type))
             ? updateGameOptions(element)
             : ("updateMapGeneratorOptions".equals(type))
@@ -277,7 +277,12 @@ public final class PreGameInputHandler extends InputHandler {
         new Thread(FreeCol.CLIENT_THREAD + "Starting game") {
                 @Override
                 public void run() {
-                    while (getFreeColClient().getGame().getMap() == null) {
+                    for (;;) {
+                        FreeColClient fcc = getFreeColClient();
+                        if (fcc != null) {
+                            Game game = fcc.getGame();
+                            if (game != null && game.getMap() != null) break;
+                        }
                         try {
                             Thread.sleep(200);
                         } catch (Exception ex) {}
@@ -323,13 +328,13 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "updateGame"-message.
+     * Handles an "update"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information.
      * @return Null.
      */
-    private Element updateGame(Element element) {
+    private Element update(Element element) {
         NodeList children = element.getChildNodes();
         if (children.getLength() == 1) {
             FreeColClient fcc = getFreeColClient();

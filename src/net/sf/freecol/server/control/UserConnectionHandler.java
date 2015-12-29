@@ -111,10 +111,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
         @SuppressWarnings("unused") Element element) {
         final FreeColServer freeColServer = getFreeColServer();
 
-        Element reply = DOMMessage.createMessage("gameState");
-        reply.setAttribute("state",
-                           freeColServer.getGameState().toString());
-        return reply;
+        DOMMessage message = new DOMMessage("gameState",
+            "state", freeColServer.getGameState().toString());
+        return message.toXMLElement();
     }
 
     /**
@@ -132,17 +131,14 @@ public final class UserConnectionHandler extends FreeColServerHolder
         final FreeColServer freeColServer = getFreeColServer();
         final Game game = getGame();
 
-        Element reply = DOMMessage.createMessage("vacantPlayers");
-        Document doc = reply.getOwnerDocument();
+        DOMMessage message = new DOMMessage("vacantPlayers");
         for (Player p : game.getLiveEuropeanPlayers(null)) {
             if (!p.isREF()
                 && (p.isAI() || !((ServerPlayer)p).isConnected())) {
-                Element playerElement = doc.createElement("player");
-                playerElement.setAttribute("username", p.getNationId());
-                reply.appendChild(playerElement);
+                message.add("player", "username", p.getNationId());
             }
         }
-        return reply;
+        return message.toXMLElement();
     }
 
     /**
@@ -172,7 +168,6 @@ public final class UserConnectionHandler extends FreeColServerHolder
         }
 
         final FreeColServer freeColServer = getFreeColServer();
-        final Server server = freeColServer.getServer();
         Game game;
         ServerPlayer player;
         Unit active = null;
@@ -184,7 +179,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             // Wait until the game has been created.
             // FIXME: is this still needed?
             int timeOut = 20000;
-            while (freeColServer.getGame() == null) {
+            while ((game = freeColServer.getGame()) == null) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {}
@@ -193,7 +188,6 @@ public final class UserConnectionHandler extends FreeColServerHolder
                 }
             }
 
-            game = freeColServer.getGame();
             if (!game.canAddNewPlayer()) {
                 return DOMMessage.createError("server.maximumPlayers", null);
             } else if (game.playerNameInUse(userName)) {
@@ -210,9 +204,9 @@ public final class UserConnectionHandler extends FreeColServerHolder
 
             // Send message to all players except to the new player.
             // FIXME: check visibility.
-            Element add = DOMMessage.createMessage("addPlayer");
-            add.appendChild(player.toXMLElement(add.getOwnerDocument()));
-            server.sendToAll(add, connection);
+            DOMMessage adp = new DOMMessage("addPlayer");
+            adp.add(player);
+            freeColServer.sendToAll(adp, connection);
 
             // Ready now to handle pre-game messages.
             mh = freeColServer.getPreGameInputHandler();
@@ -239,9 +233,10 @@ public final class UserConnectionHandler extends FreeColServerHolder
 
             if (player.isAI()) {
                 player.setAI(false);
-                server.sendToAll(DOMMessage.createMessage("setAI",
+                freeColServer.sendToAll(new DOMMessage("setAI",
                         "player", player.getId(),
-                        "ai", Boolean.toString(false)));
+                        "ai", Boolean.toString(false)),
+                    null);
             }
 
             // If this player is the first to reconnect, it is the
@@ -254,7 +249,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
         }
 
         connection.setMessageHandler(mh);
-        server.addConnection(connection);
+        freeColServer.getServer().addConnection(connection);
         freeColServer.updateMetaServer();
         return new LoginMessage(player, userName, version, !starting,
                                 freeColServer.getSinglePlayer(),

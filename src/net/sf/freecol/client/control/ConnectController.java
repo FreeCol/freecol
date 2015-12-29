@@ -348,15 +348,16 @@ public final class ConnectController {
     // {@link StartGamePanel}.  The start game panel can then send a
     // requestLaunch message which will tell the server to generate
     // the game and map with the required parameters.  The updated
-    // game is sent to all clients with an "updateGame" message.
+    // game is sent to all clients with an "update" message.
     //
     // The server then tells the clients that the game is starting
     // with a "startGame" message.  Except for saved games where it
     // cheats and sets a "startGame" flag in the login response that
     // short circuits this.  FIXME: which is awkward, tidy?
     //
-    // "startGame" ends up in PreGameController.startGame, where the
-    // inGame state is finally set to true, and the game begins.
+    // "startGame" eventually ends up in FreeColServer.startGame,
+    // where the inGame state is finally set to true, and the game
+    // begins.
     //
 
     /**

@@ -171,7 +171,6 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "logout": case "newTurn": case "remove":
             case "removeGoods": case "setAI": case "setDead":
             case "setStance": case "startGame": case "update":
-            case "updateGame":
                 break;
             default:
                 logger.warning("Unknown message type: " + tag);

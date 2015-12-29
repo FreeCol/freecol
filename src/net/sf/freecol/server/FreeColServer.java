@@ -74,6 +74,8 @@ import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.InGameInputHandler;
@@ -562,6 +564,50 @@ public final class FreeColServer {
      */
     public void setServerRandom(Random random) {
         this.random = random;
+    }
+
+    /**
+     * Start the game.
+     *
+     * Called from PreGameController following a requestLaunch message.
+     *
+     * <ol>
+     *   <li>Creates the game.
+     *   <li>Sends updated game information to the clients.
+     *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
+     *   <li>Sends the "startGame"-message to the clients.
+     * </ol>
+     *
+     * @exception FreeColException if there is a problem creating the game.
+     */
+    public void startGame() throws FreeColException {
+        final Game game = buildGame();
+
+        // Inform the clients.
+        for (Player player : game.getLivePlayers(null)) {
+            if (player.isAI()) continue;
+            ServerPlayer serverPlayer = (ServerPlayer)player;
+
+            serverPlayer.invalidateCanSeeTiles(); // Send clean copy of the game
+            ChangeSet cs = new ChangeSet();
+            cs.add(See.only(serverPlayer), game);
+            serverPlayer.send(cs);
+        }
+
+        setGameState(FreeColServer.GameState.IN_GAME);
+        updateMetaServer();
+        sendToAll(new DOMMessage("startGame"), null);
+        getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
+    }
+
+    /**
+     * Send a message to all connections.
+     *
+     * @param msg The <code>DOMMessage</code> to send.
+     * @param conn An option <code>Connection</code> to omit.
+     */
+    public void sendToAll(DOMMessage msg, Connection conn) {
+        getServer().sendToAll(msg, conn);
     }
 
     /**

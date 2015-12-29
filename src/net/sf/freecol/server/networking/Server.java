@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 
@@ -174,16 +175,16 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections with an optional exception.
      *
-     * @param element The root <code>Element</code> of the message to send.
+     * @param message The <code>DOMMessage</code> to send.
      * @param exceptConnection An optional <code>Connection</code> not
      *     to send to.
      */
-    public void sendToAll(Element element, Connection exceptConnection) {
+    public void sendToAll(DOMMessage message, Connection exceptConnection) {
         for (Connection c : new ArrayList<>(connections.values())) {
             if (c == exceptConnection) continue;
             if (c.isAlive()) {
                 try {
-                    c.sendAndWait(element);
+                    c.sendAndWait(message.toXMLElement());
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Unable to send to: " + c, e);
                 }
@@ -197,12 +198,12 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections.
      *
-     * @param element The root element of the message to send.
+     * @param message The <code>DOMMessage</code> to send.
      */
-    public void sendToAll(Element element) {
-        sendToAll(element, null);
+    public void sendToAll(DOMMessage message) {
+        sendToAll(message, null);
     }
-
+    
     /**
      * Start the thread processing.  Contains the loop that is waiting
      * for new connections to the public socket.  When a new client

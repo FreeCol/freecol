@@ -40,7 +40,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.util.Introspector;
 
 import org.w3c.dom.Document;
@@ -67,11 +69,12 @@ public class DOMMessage {
 
 
     /**
-     * Protected constructor for the benefit of the subclasses.
+     * Constructs a new DOMMessage with data from the given XML-document.
+     *
+     * @param document The document representing an XML-message.
      */
-    protected DOMMessage(String tag) {
-        this.document = createNewDocument();
-        this.document.appendChild(this.document.createElement(tag));
+    public DOMMessage(Document document) {
+        this.document = document;
     }
 
     /**
@@ -139,14 +142,23 @@ public class DOMMessage {
         this.document = tempDocument;
     }
 
+
     /**
-     * Constructs a new DOMMessage with data from the given XML-document.
+     * Create a DOMMessage with given tag and attributes.
      *
-     * @param document The document representing an XML-message.
+     * @param tag The main tag.
+     * @param attributes Attribute,value pairs.
      */
-    public DOMMessage(Document document) {
-        this.document = document;
+    public DOMMessage(String tag, String... attributes) {
+        this.document = createNewDocument();
+        Element root = this.document.createElement(tag);
+        this.document.appendChild(root);
+        String[] all = attributes;
+        for (int i = 0; i < all.length; i += 2) {
+            root.setAttribute(all[i], all[i+1]);
+        }
     }
+
 
     /**
      * Create a DOMMessage from an element.
@@ -200,14 +212,18 @@ public class DOMMessage {
         return document;
     }
 
+    private Element getElement() {
+        return this.document.getDocumentElement();
+    }
+    
     /**
      * Gets the type of this DOMMessage.
      *
      * @return The type of this DOMMessage.
      */
     public String getType() {
-        return (document != null && document.getDocumentElement() != null)
-            ? document.getDocumentElement().getTagName()
+        return (document != null && getElement() != null)
+            ? getElement().getTagName()
             : INVALID_MESSAGE;
     }
 
@@ -229,7 +245,7 @@ public class DOMMessage {
      * @return The value of the attribute with the given key.
      */
     public String getAttribute(String key) {
-        return document.getDocumentElement().getAttribute(key);
+        return getElement().getAttribute(key);
     }
 
     /**
@@ -239,7 +255,7 @@ public class DOMMessage {
      * @param value The value of the attribute.
      */
     public void setAttribute(String key, String value) {
-        document.getDocumentElement().setAttribute(key, value);
+        getElement().setAttribute(key, value);
     }
 
     /**
@@ -259,9 +275,24 @@ public class DOMMessage {
      * @return <code>true</code> if the root element has the given attribute.
      */
     public boolean hasAttribute(String attribute) {
-        return document.getDocumentElement().hasAttribute(attribute);
+        return getElement().hasAttribute(attribute);
     }
 
+    public void add(FreeColObject fco) {
+        getElement().appendChild(fco.toXMLElement(document));
+    }
+    public void add(FreeColObject fco, Player player) {
+        getElement().appendChild(fco.toXMLElement(document, player));
+    }
+    public void add(String tag, String... attributes) {
+        Element e = document.createElement(tag);
+        getElement().appendChild(e);
+        String[] all = attributes;
+        for (int i = 0; i < all.length; i += 2) {
+            e.setAttribute(all[i], all[i+1]);
+        }
+    }        
+        
     /**
      * Inserts an element as a new root element to the existing
      * element of this message.
@@ -269,8 +300,7 @@ public class DOMMessage {
      * @param newRoot The new root <code>Element</code>.
      */
     public void insertAsRoot(Element newRoot) {
-        Element oldRoot = document.getDocumentElement();
-
+        Element oldRoot = getElement();
         if (oldRoot != null) {
             document.removeChild(oldRoot);
             newRoot.appendChild(oldRoot);
@@ -283,10 +313,10 @@ public class DOMMessage {
      * Dummy serialization stub.
      * Must be overridden by subclasses.
      *
-     * @return Null.
+     * @return The document element.
      */
     public Element toXMLElement() {
-        return null; // do nothing
+        return getElement();
     }
 
 
@@ -356,14 +386,14 @@ public class DOMMessage {
      * @return The root <code>Element</code> of the error message.
      */
     public static Element createError(String messageID, String message) {
-        Element errorElement = createMessage("error");
+        DOMMessage err = new DOMMessage("error");
         if (messageID != null && !messageID.isEmpty()) {
-            errorElement.setAttribute("messageID", messageID);
+            err.setAttribute("messageID", messageID);
         }
         if (message != null && !message.isEmpty()) {
-            errorElement.setAttribute("message", message);
+            err.setAttribute("message", message);
         }
-        return errorElement;
+        return err.toXMLElement();
     }
 
     /**
@@ -403,9 +433,9 @@ public class DOMMessage {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             Thread.dumpStack();
         }
-        return createMessage("error",
+        return new DOMMessage("error",
             "messageID", "server.reject",
-            "message", message);
+            "message", message).toXMLElement();
     }
 
     /**

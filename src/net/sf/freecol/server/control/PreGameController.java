@@ -64,40 +64,9 @@ public final class PreGameController extends Controller {
      * Called in response to a requestLaunch message arriving at the 
      * PreGameInputHandler.
      *
-     * <ol>
-     *   <li>Creates the game.
-     *   <li>Sends updated game information to the clients.
-     *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
-     *   <li>Sends the "startGame"-message to the clients.
-     * </ol>
-     *
-     * @exception FreeColException if there is an error building the game.
+     * @exception FreeColException if there is a problem creating the game.
      */
     public void startGame() throws FreeColException {
-        final FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.buildGame();
-
-        // Inform the clients.
-        for (Player player : game.getLivePlayers(null)) {
-            if (player.isAI()) continue;
-
-            player.invalidateCanSeeTiles();//Send clean copy of the game
-            Connection conn = ((ServerPlayer)player).getConnection();
-            Element update = DOMMessage.createMessage("updateGame");
-            update.appendChild(game.toXMLElement(update.getOwnerDocument(),
-                                                 player));
-            try {
-                conn.ask(update);
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Unable to updateGame", e);
-            }
-        }
-
-        // Start the game:
-        freeColServer.setGameState(FreeColServer.GameState.IN_GAME);
-        freeColServer.updateMetaServer();
-        freeColServer.getServer()
-            .sendToAll(DOMMessage.createMessage("startGame"));
-        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
+        getFreeColServer().startGame();
     }
 }
