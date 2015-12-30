@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Modifier;
@@ -706,11 +707,35 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
     // AIPlayer interface
     // Inherit:
-    //   indianDemand
     //   acceptDiplomaticTrade
     //   acceptTax
     //   acceptMercenaries
     //   selectFoundingFather
+
+    /**
+     * Decides whether to accept an Indian demand, or not.
+     *
+     * @param unit The <code>Unit</code> making demands.
+     * @param colony The <code>Colony</code> where demands are being made.
+     * @param type The <code>GoodsType</code> demanded.
+     * @param amount The amount of gold demanded.
+     * @param accept The acceptance state of the demand.
+     * @return True if this player accepts the demand, false if rejected,
+     *     null if no further action is required.
+     */
+    public Boolean indianDemand(Unit unit, Colony colony,
+                                GoodsType type, int amount, Boolean accept) {
+        final Player player = getPlayer();
+        AIUnit aiu;
+        IndianDemandMission mission;
+        if (unit.getOwner() == player // Its one of ours
+            && (aiu = getAIUnit(unit)) != null // and its valid and demanding
+            && (mission = aiu.getMission(IndianDemandMission.class)) != null
+            && accept != null) {
+            mission.setSucceeded(accept);
+        }
+        return null;
+    }
 
     /**
      * {@inheritDoc}

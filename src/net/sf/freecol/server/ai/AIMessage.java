@@ -515,11 +515,8 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           GoodsType type, int amount) {
-        Element reply = askExpecting(aiUnit.getAIOwner().getConnection(),
-            new IndianDemandMessage(aiUnit.getUnit(), colony,
-                                    type, amount).toXMLElement(),
-            IndianDemandMessage.getXMLElementTagName());
-        return new IndianDemandMessage(colony.getGame(), reply).getResult();
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
+            new IndianDemandMessage(aiUnit.getUnit(), colony, type, amount));
     }
 
 

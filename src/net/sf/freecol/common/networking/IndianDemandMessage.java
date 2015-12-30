@@ -134,8 +134,8 @@ public class IndianDemandMessage extends DOMMessage {
      *
      * @return The result of this demand.
      */
-    public boolean getResult() {
-        return Boolean.parseBoolean(result);
+    public Boolean getResult() {
+        return (result == null) ? null : Boolean.parseBoolean(result);
     }
 
     /**

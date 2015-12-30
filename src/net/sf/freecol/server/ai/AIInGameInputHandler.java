@@ -292,7 +292,9 @@ public final class AIInGameInputHandler implements MessageHandler {
         Colony colony = message.getColony(game);
         GoodsType type = message.getType(game);
         int amount = message.getAmount();
-        boolean accept = aiPlayer.indianDemand(unit, colony, type, amount);
+        Boolean accept = message.getResult();
+        accept = aiPlayer.indianDemand(unit, colony, type, amount, accept);
+        if (accept == null) return null;
         message.setResult(accept);
         logger.finest("AI handling native demand by " + unit
             + " at " + colony.getName() + " result: " + accept);

@@ -2465,8 +2465,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType goods, int gold) {
+    public Boolean indianDemand(Unit unit, Colony colony,
+                                GoodsType goods, int gold, Boolean accept) {
         // FIXME: make a better choice, check whether the colony is
         // well defended
         return !"conquest".equals(getAIAdvantage());

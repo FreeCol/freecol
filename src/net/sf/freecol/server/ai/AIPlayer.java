@@ -292,16 +292,19 @@ public abstract class AIPlayer extends AIObject {
     public abstract void startWorking();
 
     /**
-     * Decides whether to accept an Indian demand, or not.
+     * Decide whether to accept an Indian demand, or not.  Or for native
+     * players, return the result of the demand.
      *
      * @param unit The <code>Unit</code> making demands.
      * @param colony The <code>Colony</code> where demands are being made.
      * @param type The <code>GoodsType</code> demanded.
      * @param amount The amount of gold demanded.
-     * @return True if this player accepts the demand.
+     * @param accept The acceptance state of the demand.
+     * @return True if this player accepts the demand, false if the demand
+     *     is rejected, null if no further consideration is required.
      */
-    public boolean indianDemand(Unit unit, Colony colony,
-                                GoodsType type, int amount) {
+    public Boolean indianDemand(Unit unit, Colony colony,
+                                GoodsType type, int amount, Boolean accept) {
         return false;
     }
 
