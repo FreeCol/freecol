@@ -209,13 +209,13 @@ public class IndianDemandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element ret = createMessage(getXMLElementTagName(),
+        DOMMessage ret = new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
             "colony", colonyId,
             "amount", amount);
         if (typeId != null) ret.setAttribute("type", typeId);
         if (result != null) ret.setAttribute("result", result);
-        return ret;
+        return ret.toXMLElement();
     }
 
     /**

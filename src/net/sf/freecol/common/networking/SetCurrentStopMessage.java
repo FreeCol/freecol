@@ -116,9 +116,9 @@ public class SetCurrentStopMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "index", index);
+            "index", index).toXMLElement();
     }
 
     /**

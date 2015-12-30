@@ -122,9 +122,9 @@ public class BuildColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "name", colonyName,
-            "unit", builderId);
+            "unit", builderId).toXMLElement();
     }
 
     /**

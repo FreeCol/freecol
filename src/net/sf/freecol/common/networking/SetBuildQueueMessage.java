@@ -138,13 +138,13 @@ public class SetBuildQueueMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "colony", colonyId,
             "size", Integer.toString(queue.length));
         for (int i = 0; i < queue.length; i++) {
             result.setAttribute("x" + Integer.toString(i), queue[i]);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

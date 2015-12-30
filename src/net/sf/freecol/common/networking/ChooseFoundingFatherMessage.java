@@ -154,14 +154,14 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName());
+        DOMMessage result = new DOMMessage(getXMLElementTagName());
         for (FoundingFather f : getFathers()) {
             result.setAttribute(f.getType().toString(), f.getId());
         }
         if (this.foundingFatherId != null) {
             result.setAttribute("foundingFather", foundingFatherId);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

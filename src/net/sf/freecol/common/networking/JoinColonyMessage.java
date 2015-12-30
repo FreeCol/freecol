@@ -109,9 +109,9 @@ public class JoinColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "colony", colonyId,
-            "unit", builderId);
+            "unit", builderId).toXMLElement();
     }
 
     /**

@@ -173,11 +173,11 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "region", regionId,
             "tile", tileId,
             "unit", unitId,
-            "newRegionName", newRegionName);
+            "newRegionName", newRegionName).toXMLElement();
     }
 
     /**

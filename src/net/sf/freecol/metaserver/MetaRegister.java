@@ -47,8 +47,8 @@ public final class MetaRegister {
      *
      * @param address The IP-address of the server.
      * @param port The port number of the server.
-     * @return The server entry or <code>null</code> if the given 
-     *         entry could not be found.
+     * @return The server entry or <code>null</code> if the given
+     *     entry could not be found.
      */
     private MetaItem getItem(String address, int port) {
         int index = indexOf(address, port);
@@ -58,7 +58,6 @@ public final class MetaRegister {
             return null;
         }
     }
-    
 
     /**
      * Gets the index of the server entry with the diven address and port.
@@ -69,15 +68,14 @@ public final class MetaRegister {
      *     not be found.
      */
     private int indexOf(String address, int port) {
-        for (int i=0; i<items.size(); i++) {
-            if (address.equals(items.get(i).getAddress()) && port == items.get(i).getPort()) {
+        for (int i = 0; i < items.size(); i++) {
+            if (address.equals(items.get(i).getAddress())
+                && port == items.get(i).getPort()) {
                 return i;
             }
         }
-
         return -1;
     }
-
 
     /**
      * Removes servers that have not sent an update for some time.
@@ -93,7 +91,6 @@ public final class MetaRegister {
             }
         }
     }
-
 
     /**
      * Adds a new server with the given attributes.
@@ -131,7 +128,6 @@ public final class MetaRegister {
         }
     }
 
-
     /**
      * Updates a server with the given attributes.
      *
@@ -144,17 +140,21 @@ public final class MetaRegister {
      * @param version The version of the server.
      * @param gameState The current state of the game.
      */
-    public synchronized void updateServer(String name, String address, int port, int slotsAvailable,
-            int currentlyPlaying, boolean isGameStarted, String version, int gameState)
-            throws IOException {
+    public synchronized void updateServer(String name, String address,
+                                          int port, int slotsAvailable,
+                                          int currentlyPlaying,
+                                          boolean isGameStarted,
+                                          String version, int gameState)
+        throws IOException {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
-            addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+            addServer(name, address, port, slotsAvailable, currentlyPlaying,
+                      isGameStarted, version, gameState);
         } else {
-            updateServer(mi, name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+            updateServer(mi, name, address, port, slotsAvailable,
+                         currentlyPlaying, isGameStarted, version, gameState);
         }
     }
-
 
     /**
      * Removes a server from the register.
@@ -172,20 +172,16 @@ public final class MetaRegister {
         }
     }
 
-    
     /**
      * Creates a server list.
      *
      * @return The server list as an XML DOM Element.
      */
     public synchronized Element createServerList() {
-        Element element = DOMMessage.createMessage("serverList");
-        for (MetaItem item : items) {
-            element.appendChild(item.toXMLElement(element.getOwnerDocument()));
-        }
-        return element;
+        DOMMessage result = new DOMMessage("serverList");
+        for (MetaItem item : items) result.add(item.toMessage());
+        return result.toXMLElement();
     }
-
 
     /**
      * Updates a given <code>MetaItem</code>.
@@ -203,10 +199,12 @@ public final class MetaRegister {
      *     {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
      *     {@link net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
      */
-    private void updateServer(MetaItem mi, String name, String address, int port, int slotsAvailable,
-            int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
-        mi.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+    private void updateServer(MetaItem mi, String name, String address,
+                              int port, int slotsAvailable,
+                              int currentlyPlaying, boolean isGameStarted,
+                              String version, int gameState) {
+        mi.update(name, address, port, slotsAvailable, currentlyPlaying,
+                  isGameStarted, version, gameState);
         logger.info("Server updated:" + mi.toString());
     }
 }
-

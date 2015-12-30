@@ -158,10 +158,10 @@ public class MissionaryMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unitId", unitId,
             "direction", directionString,
-            "denounce", Boolean.toString(denounce));
+            "denounce", Boolean.toString(denounce)).toXMLElement();
     }
 
     /**

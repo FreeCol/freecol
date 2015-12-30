@@ -193,15 +193,13 @@ public class MonarchActionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "action", action.toString(),
             "monarch", monarchKey);
         if (tax != null) result.setAttribute("tax", tax);
         if (resultString != null) result.setAttribute("result", resultString);
-        if (template != null) {
-            result.appendChild(template.toXMLElement(result.getOwnerDocument()));
-        }
-        return result;
+        if (template != null) result.add(template);
+        return result.toXMLElement();
     }
 
     /**

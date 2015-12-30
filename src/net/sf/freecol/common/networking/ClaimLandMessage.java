@@ -187,10 +187,10 @@ public class ClaimLandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "tile", tileId,
             "claimant", claimantId,
-            "price", priceString);
+            "price", priceString).toXMLElement();
     }
 
     /**

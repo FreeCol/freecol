@@ -152,15 +152,13 @@ public class LootCargoMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "winner", winnerId,
             "loser", loserId);
         if (goods != null) {
-            for (Goods g : goods) {
-                result.appendChild(g.toXMLElement(result.getOwnerDocument()));
-            }
+            for (Goods g : goods) result.add(g);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

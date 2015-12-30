@@ -166,11 +166,11 @@ public class SetTradeRoutesMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName());
+        DOMMessage result = new DOMMessage(getXMLElementTagName());
         for (TradeRoute tradeRoute : tradeRoutes) {
-            result.appendChild(tradeRoute.toXMLElement(result.getOwnerDocument()));
+            result.add(tradeRoute);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

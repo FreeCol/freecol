@@ -83,16 +83,6 @@ public class RearrangeColonyMessage extends DOMMessage {
             }
         }
 
-        public void writeToElement(Element e, int i) {
-            e.setAttribute(unitKey(i), this.unit.getId());
-            e.setAttribute(locKey(i), this.loc.getId());
-            if (this.work != null) {
-                e.setAttribute(workKey(i), this.work.getId());
-            }
-            e.setAttribute(roleKey(i), this.role.toString());
-            e.setAttribute(roleCountKey(i), String.valueOf(this.roleCount));
-        }
-
         public UnitChange readFromElement(Game game, Element e, int i) {
             init(game,
                 e.getAttribute(unitKey(i)),
@@ -154,12 +144,25 @@ public class RearrangeColonyMessage extends DOMMessage {
      * supplied colony.  Add changes with addChange().
      *
      * @param colony The <code>Colony</code> that is rearranging.
+     * @param workers A list of worker <code>Unit</code>s to rearrange.
+     * @param scratch A scratch <code>Colony</code> laid out as required.
      */
-    public RearrangeColonyMessage(Colony colony) {
+    public RearrangeColonyMessage(Colony colony, List<Unit> workers,
+                                  Colony scratch) {
         super(getXMLElementTagName());
 
         this.colonyId = colony.getId();
         this.unitChanges = new ArrayList<>();
+        for (Unit u : workers) {
+            Unit su = scratch.getCorresponding(u);
+            if (u.getLocation().getId().equals(su.getLocation().getId())
+                && u.getWorkType() == su.getWorkType()
+                && u.getRole() == su.getRole()
+                && u.getRoleCount() == su.getRoleCount()) continue;
+            addChange(u,
+                (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
+                su.getWorkType(), su.getRole(), su.getRoleCount());
+        }
     }
 
     /**
@@ -262,15 +265,21 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "colony", colonyId,
             FreeColObject.ARRAY_SIZE_TAG, Integer.toString(unitChanges.size()));
         int i = 0;
         for (UnitChange uc : unitChanges) {
-            uc.writeToElement(result, i);
+            result.setAttribute(uc.unitKey(i), uc.unit.getId());
+            result.setAttribute(uc.locKey(i), uc.loc.getId());
+            if (uc.work != null) {
+                result.setAttribute(uc.workKey(i), uc.work.getId());
+            }
+            result.setAttribute(uc.roleKey(i), uc.role.toString());
+            result.setAttribute(uc.roleCountKey(i), String.valueOf(uc.roleCount));
             i++;
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

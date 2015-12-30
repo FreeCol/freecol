@@ -124,8 +124,8 @@ public class EmigrateUnitMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "slot", slotString);
+        return new DOMMessage(getXMLElementTagName(),
+            "slot", slotString).toXMLElement();
     }
 
     /**

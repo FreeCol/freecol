@@ -32,6 +32,7 @@ public class MetaItem extends ServerInfo {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MetaItem.class.getName());
 
+    /** Timestamp for last update. */
     private long lastUpdated;
 
 
@@ -47,11 +48,13 @@ public class MetaItem extends ServerInfo {
      * @param version The version the server is running.
      * @param gameState The current state of the game.
      */
-    public MetaItem(String name, String address, int port, int slotsAvailable,
-                    int currentlyPlaying, boolean isGameStarted, String version,
-                    int gameState) {
+    public MetaItem(String name, String address, int port,
+                    int slotsAvailable, int currentlyPlaying,
+                    boolean isGameStarted, String version, int gameState) {
         super();
-        update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+
+        update(name, address, port, slotsAvailable, currentlyPlaying,
+               isGameStarted, version, gameState);
     }
 
 
@@ -66,13 +69,13 @@ public class MetaItem extends ServerInfo {
      * @param isGameStarted <i>true</i> if the game has started.
      */
     @Override
-    public void update(String name, String address, int port, int slotsAvailable,
-                       int currentlyPlaying, boolean isGameStarted, String version,
-                       int gameState) {
-        super.update(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
+    public void update(String name, String address, int port,
+                       int slotsAvailable, int currentlyPlaying,
+                       boolean isGameStarted, String version, int gameState) {
+        super.update(name, address, port, slotsAvailable, currentlyPlaying,
+                     isGameStarted, version, gameState);
         lastUpdated = System.currentTimeMillis();
     }
-    
     
     /**
      * Gets the last time this object was updated.

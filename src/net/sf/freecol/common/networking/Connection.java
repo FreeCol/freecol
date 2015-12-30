@@ -454,8 +454,9 @@ public class Connection implements Closeable {
                             reply = (Element)element.getFirstChild();
                             reply = conn.handle(reply);
                             if (reply == null) {
-                                reply = DOMMessage.createMessage(REPLY_TAG,
-                                    NETWORK_REPLY_ID_TAG, networkReplyId);
+                                reply = new DOMMessage(REPLY_TAG,
+                                    NETWORK_REPLY_ID_TAG, networkReplyId)
+                                    .toXMLElement();
                             } else {
                                 Element header = reply.getOwnerDocument()
                                     .createElement(REPLY_TAG);
@@ -494,7 +495,7 @@ public class Connection implements Closeable {
      * Send a disconnect message.
      */
     public void disconnect() throws IOException {
-        this.send(DOMMessage.createMessage(DISCONNECT_TAG));
+        this.send(new DOMMessage(DISCONNECT_TAG).toXMLElement());
     }
 
     /**
@@ -502,7 +503,7 @@ public class Connection implements Closeable {
      */
     public void reconnect() {
         try {
-            this.send(DOMMessage.createMessage(RECONNECT_TAG));
+            this.send(new DOMMessage(RECONNECT_TAG).toXMLElement());
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Reconnect failed for " + this.name,
                 ioe);

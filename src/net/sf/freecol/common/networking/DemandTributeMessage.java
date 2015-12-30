@@ -134,9 +134,9 @@ public class DemandTributeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "direction", directionString);
+            "direction", directionString).toXMLElement();
     }
 
     /**

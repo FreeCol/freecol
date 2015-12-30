@@ -149,12 +149,12 @@ public class BuyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
             "settlement", settlementId,
             "gold", goldString);
-        result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
-        return result;
+        result.add(goods);
+        return result.toXMLElement();
     }
 
     /**

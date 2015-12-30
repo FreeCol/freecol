@@ -177,12 +177,12 @@ public final class ConnectController {
      */
     private GameState getGameState(String host, int port) {
         String state = null;
-        Element element = DOMMessage.createMessage("gameState");
+        DOMMessage message = new DOMMessage("gameState");
         try (
             Connection mc = getConnection(host, port);
         ) {
             if (mc == null) return null;
-            Element reply = mc.ask(element);
+            Element reply = mc.ask(message.toXMLElement());
             if (reply == null) {
                 gui.showErrorMessage("server.couldNotConnect", "no reply");
                 return null;
@@ -220,12 +220,12 @@ public final class ConnectController {
      */
     private List<String> getVacantPlayers(String host, int port) {
         List<String> items = new ArrayList<>();
-        Element element = DOMMessage.createMessage("getVacantPlayers");
+        DOMMessage message = new DOMMessage("getVacantPlayers");
         try (
             Connection mc = getConnection(host, port);
         ) {
             if (mc == null) return null;
-            Element reply = mc.ask(element);
+            Element reply = mc.ask(message.toXMLElement());
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
@@ -732,7 +732,7 @@ public final class ConnectController {
         ) {
             Element reply = null;
             try {
-                reply = mc.ask(DOMMessage.createMessage("getServerList"));
+                reply = mc.ask(new DOMMessage("getServerList").toXMLElement());
             } catch (IOException e) {
                 reply = null;
             }

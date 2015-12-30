@@ -138,9 +138,9 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "improvementType", improvementId);
+            "improvementType", improvementId).toXMLElement();
     }
 
     /**

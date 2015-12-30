@@ -44,8 +44,11 @@ class TrivialMessage extends DOMMessage {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Element toXMLElement() {
-        return DOMMessage.createMessage(tag, attributes);
+        return new DOMMessage(tag, attributes).toXMLElement();
     }
 }

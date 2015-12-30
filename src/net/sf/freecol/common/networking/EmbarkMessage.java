@@ -152,13 +152,13 @@ public class EmbarkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
             "carrier", carrierId);
         if (directionString != null) {
             result.setAttribute("direction", directionString);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

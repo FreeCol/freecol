@@ -130,9 +130,9 @@ public class AttackMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", this.unitId,
-            "direction", this.directionString);
+            "direction", this.directionString).toXMLElement();
     }
 
     /**

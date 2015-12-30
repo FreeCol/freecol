@@ -134,15 +134,13 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
             "settlement", settlementId);
         if (sellGoods != null) {
-            for (Goods goods : sellGoods) {
-                result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
-            }
+            for (Goods goods : sellGoods) result.add(goods);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

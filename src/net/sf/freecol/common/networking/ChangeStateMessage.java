@@ -115,9 +115,9 @@ public class ChangeStateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "state", stateString);
+            "state", stateString).toXMLElement();
     }
 
     /**

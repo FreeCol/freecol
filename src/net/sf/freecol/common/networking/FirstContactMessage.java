@@ -163,19 +163,19 @@ public class FirstContactMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element element = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "player", this.playerId,
             "other", this.otherId);
         if (this.tileId != null) {
-            element.setAttribute("tile", this.tileId);
+            result.setAttribute("tile", this.tileId);
         }
         if (this.settlementCount != null) {
-            element.setAttribute("camps", this.settlementCount);
+            result.setAttribute("camps", this.settlementCount);
         }
         if (this.result != null) {
-            element.setAttribute("result", this.result);
+            result.setAttribute("result", this.result);
         }
-        return element;
+        return result.toXMLElement();
     }
 
     /**

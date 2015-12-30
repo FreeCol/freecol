@@ -108,9 +108,9 @@ public class MoveToMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return DOMMessage.createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "destination", destinationId);
+            "destination", destinationId).toXMLElement();
     }
 
     /**

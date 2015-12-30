@@ -127,9 +127,9 @@ public class WorkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "workLocation", workLocationId);
+            "workLocation", workLocationId).toXMLElement();
     }
 
     /**

@@ -142,7 +142,6 @@ public class DOMMessage {
         this.document = tempDocument;
     }
 
-
     /**
      * Create a DOMMessage with given tag and attributes.
      *
@@ -185,22 +184,6 @@ public class DOMMessage {
             message = null;
         }
         return message;
-    }
-
-    /**
-     * Creates a new element with specified attributes.
-     *
-     * @param tagName The tag name of the element beeing created,
-     * @param attributes Key,value string pairs.
-     * @return A new <code>Element</code>.
-     */
-    public static Element createMessage(String tagName, String... attributes) {
-        Element root = createNewDocument().createElement(tagName);
-        String[] all = attributes;
-        for (int i = 0; i < all.length; i += 2) {
-            root.setAttribute(all[i], all[i+1]);
-        }
-        return root;
     }
 
     /**
@@ -283,6 +266,9 @@ public class DOMMessage {
     }
     public void add(FreeColObject fco, Player player) {
         getElement().appendChild(fco.toXMLElement(document, player));
+    }
+    public void add(DOMMessage msg) {
+        getElement().appendChild(msg.toXMLElement());
     }
     public void add(String tag, String... attributes) {
         Element e = document.createElement(tag);

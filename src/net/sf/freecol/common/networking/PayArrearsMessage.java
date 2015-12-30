@@ -91,8 +91,8 @@ public class PayArrearsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "goodsType", goodsTypeId);
+        return new DOMMessage(getXMLElementTagName(),
+            "goodsType", goodsTypeId).toXMLElement();
     }
 
     /**

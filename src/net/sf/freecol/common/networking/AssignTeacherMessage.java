@@ -128,9 +128,9 @@ public class AssignTeacherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "student", studentId,
-            "teacher", teacherId);
+            "teacher", teacherId).toXMLElement();
     }
 
     /**

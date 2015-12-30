@@ -652,14 +652,15 @@ public final class FreeColServer {
         int nPlayers = getNumberOfLivingHumanPlayers();
         boolean started = gameState != GameState.STARTING_GAME;
         try {
-            Element reply = mc.ask(DOMMessage.createMessage(tag,
+            Element reply = mc.ask(new DOMMessage(tag,
                     "name", addr,
                     "port", Integer.toString(port),
                     "slotsAvailable", Integer.toString(getSlotsAvailable()),
                     "currentlyPlaying", Integer.toString(nPlayers),
                     "isGameStarted", Boolean.toString(started),
                     "version", FreeCol.getVersion(),
-                    "gameState", Integer.toString(getGameState().ordinal())));
+                    "gameState", Integer.toString(getGameState().ordinal()))
+                .toXMLElement());
             if (reply != null
                 && "noRouteToServer".equals(reply.getTagName())) {
                 this.publicServer = false;
@@ -704,8 +705,9 @@ public final class FreeColServer {
                 FreeCol.META_SERVER_PORT,
                 null, FreeCol.SERVER_THREAD);
         ) {
-            mc.send(DOMMessage.createMessage("remove",
-                    "port", Integer.toString(mc.getSocket().getPort())));
+            mc.send(new DOMMessage("remove",
+                    "port", Integer.toString(mc.getSocket().getPort()))
+                .toXMLElement());;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Network error leaving meta-server: "
                 + FreeCol.META_SERVER_ADDRESS + ":" + FreeCol.META_SERVER_PORT,

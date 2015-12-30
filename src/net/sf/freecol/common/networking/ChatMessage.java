@@ -131,10 +131,10 @@ public class ChatMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "sender", sender,
             "message", message,
-            "privateChat", String.valueOf(privateChat));
+            "privateChat", String.valueOf(privateChat)).toXMLElement();
     }
 
     /**

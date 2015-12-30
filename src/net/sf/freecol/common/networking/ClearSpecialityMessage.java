@@ -95,8 +95,8 @@ public class ClearSpecialityMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "unit", unitId);
+        return new DOMMessage(getXMLElementTagName(),
+            "unit", unitId).toXMLElement();
     }
 
     /**

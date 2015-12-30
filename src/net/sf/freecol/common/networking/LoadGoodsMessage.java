@@ -143,11 +143,11 @@ public class LoadGoodsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "location", locationId,
             "type", goodsTypeId,
             "amount", amountString,
-            "carrier", carrierId);
+            "carrier", carrierId).toXMLElement();
     }
 
     /**

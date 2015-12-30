@@ -20,6 +20,7 @@
 package net.sf.freecol.common;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.networking.DOMMessage;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -132,39 +133,39 @@ public class ServerInfo {
 
     /**
      * Returns the IP-address.
+     *
      * @return The IP-address of the server.
      */
     public String getAddress() {
         return address;
     }
 
-
     /**
      * Returns the port in which clients may connect.
+     *
      * @return The port.
      */
     public int getPort() {
         return port;
     }
-    
-    
+
     /**
      * Returns the number of currently active (connected and not dead) players.
+     *
      * @return The number of players.
      */
     public int getCurrentlyPlaying() {
         return currentlyPlaying;
     }
-    
-    
+
     /**
      * Returns the number of players that may connect.
+     *
      * @return The number of slots available on the server.
      */
     public int getSlotsAvailable() {
         return slotsAvailable;
     }
-
     
     /**
      * Returns the FreeCol version of the server.
@@ -176,7 +177,6 @@ public class ServerInfo {
         return version;
     }
 
-
     /**
      * Gets the current state of the game.
      * 
@@ -187,49 +187,56 @@ public class ServerInfo {
         return gameState;
     }
 
+    /**
+     * Convert this to a message.
+     *
+     * @return A <code>DOMMessage</code> describing this server.
+     */
+    public DOMMessage toMessage() {
+        return new DOMMessage(getXMLElementTagName(),
+            "name", name,
+            "address", address,
+            "port", Integer.toString(port),
+            "slotsAvailable", Integer.toString(slotsAvailable),
+            "currentlyPlaying", Integer.toString(currentlyPlaying),
+            "isGameStarted", Boolean.toString(isGameStarted),
+            "version", version,
+            "gameState", Integer.toString(gameState));
+    }
 
     /**
      * Creates an XML-representation of this object.
-     * @param document The document in which the element should be created.
+     *
      * @return The XML DOM Element representing this object.
      */
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
-
-        element.setAttribute("name", name);
-        element.setAttribute("address", address);
-        element.setAttribute("port", Integer.toString(port));
-        element.setAttribute("slotsAvailable", Integer.toString(slotsAvailable));
-        element.setAttribute("currentlyPlaying", Integer.toString(currentlyPlaying));
-        element.setAttribute("isGameStarted", Boolean.toString(isGameStarted));
-        element.setAttribute("version", version);
-        element.setAttribute("gameState", Integer.toString(gameState));
-        
-        return element;
+    public Element toXMLElement() {
+        return toMessage().toXMLElement();
     }
-
 
     /**
      * Reads attributes from the given element.
+     *
      * @param element The XML DOM Element containing information that
-     *        should be read by this object.
+     *     should be read by this object.
      */
     public void readFromXMLElement(Element element) {
         update(element);
     }
 
-
     /**
      * Gets the tag name of the root element representing this object.
-     * @return "metaItem".
+     *
+     * @return "serverInfo".
      */
     public static String getXMLElementTagName() {
         return "serverInfo";
     }
 
 
+    // Override Object
+
     /**
-     * Returns a <code>String</code> representation of this object for debugging purposes.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
@@ -237,5 +244,4 @@ public class ServerInfo {
                 + ", " + slotsAvailable + ", " + isGameStarted + ", " + version
                 + ", " + gameState;
     }
-
 }

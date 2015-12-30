@@ -132,10 +132,10 @@ public class UnloadGoodsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "type", goodsTypeId,
             "amount", amountString,
-            "carrier", carrierId);
+            "carrier", carrierId).toXMLElement();
     }
 
     /**

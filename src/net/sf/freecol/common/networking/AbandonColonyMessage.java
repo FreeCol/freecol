@@ -101,8 +101,8 @@ public class AbandonColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "colony", colonyId);
+        return new DOMMessage(getXMLElementTagName(), "colony", colonyId)
+            .toXMLElement();
     }
 
     /**

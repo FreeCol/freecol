@@ -106,9 +106,9 @@ public class RenameMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "nameable", id,
-            "name", newName);
+            "name", newName).toXMLElement();
     }
 
     /**

@@ -96,8 +96,8 @@ public class DisembarkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "unit", unitId);
+        return new DOMMessage(getXMLElementTagName(),
+            "unit", unitId).toXMLElement();
     }
 
     /**

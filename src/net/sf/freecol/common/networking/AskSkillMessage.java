@@ -125,9 +125,9 @@ public class AskSkillMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unitId", unitId,
-            "direction", directionString);
+            "direction", directionString).toXMLElement();
     }
 
     /**

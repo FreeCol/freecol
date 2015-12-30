@@ -112,9 +112,9 @@ public class GetTransactionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "settlement", settlementId);
+            "settlement", settlementId).toXMLElement();
     }
 
     /**

@@ -102,23 +102,6 @@ public abstract class ServerAPI {
     // Internal message passing routines
 
     /**
-     * Sends an Element to the server.
-     *
-     * FIXME: remove all uses of this.
-     *
-     * @param element The <code>Element</code> to send.
-     * @return True if the send succeeded.
-     */
-    private boolean send(Element element) {
-        try {
-            client.send(element);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send: " + element, e);
-        }
-        return false;
-    }
-
-    /**
      * Sends a DOMMessage to the server.
      *
      * @param message The <code>DOMMessage</code> to send.
@@ -1461,8 +1444,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean updateGameOptions(OptionGroup gameOptions) {
-        Element up = DOMMessage.createMessage("updateGameOptions");
-        up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
+        DOMMessage up = new DOMMessage("updateGameOptions");
+        up.add(gameOptions);
         return send(up);        
     }
 
@@ -1475,8 +1458,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean updateMapGeneratorOptions(OptionGroup mapOptions) {
-        Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
-        up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
+        DOMMessage up = new DOMMessage("updateMapGeneratorOptions");
+        up.add(mapOptions);
         return send(up);    
     }
 

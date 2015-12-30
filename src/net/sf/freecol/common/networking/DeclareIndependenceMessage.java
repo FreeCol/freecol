@@ -104,9 +104,9 @@ public class DeclareIndependenceMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "nationName", nationName,
-            "countryName", countryName);
+            "countryName", countryName).toXMLElement();
     }
 
     /**

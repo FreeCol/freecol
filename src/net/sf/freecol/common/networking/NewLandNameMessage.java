@@ -136,9 +136,9 @@ public class NewLandNameMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
-            "newLandName", newLandName);
+            "newLandName", newLandName).toXMLElement();
     }
 
     /**

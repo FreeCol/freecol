@@ -131,10 +131,10 @@ public class EquipForRoleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
+        return new DOMMessage(getXMLElementTagName(),
             "unit", unitId,
             "role", roleId,
-            "count", roleCount);
+            "count", roleCount).toXMLElement();
     }
 
     /**

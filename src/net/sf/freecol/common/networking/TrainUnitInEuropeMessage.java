@@ -94,8 +94,8 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return createMessage(getXMLElementTagName(),
-            "unitType", typeId);
+        return new DOMMessage(getXMLElementTagName(),
+            "unitType", typeId).toXMLElement();
     }
 
     /**

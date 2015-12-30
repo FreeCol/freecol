@@ -113,12 +113,12 @@ public class AssignTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "unit", unitId);
         if (tradeRouteId != null) {
             result.setAttribute("tradeRoute", tradeRouteId);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**

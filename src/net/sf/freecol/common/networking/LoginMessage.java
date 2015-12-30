@@ -165,16 +165,15 @@ public class LoginMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "userName", userName,
             "version", version,
             "admin", Boolean.toString(admin),
             "startGame", Boolean.toString(startGame),
             "singlePlayer", Boolean.toString(singlePlayer),
             "currentPlayer", Boolean.toString(currentPlayer));
-        result.appendChild(game.toXMLElement(result.getOwnerDocument(), 
-                                             player));
-        return result;
+        result.add(game, player);
+        return result.toXMLElement();
     }
 
     /**

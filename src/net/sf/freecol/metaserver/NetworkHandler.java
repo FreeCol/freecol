@@ -123,10 +123,10 @@ public final class NetworkHandler implements MessageHandler {
         try {
             metaRegister.addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);
         } catch (IOException e) {
-            return DOMMessage.createMessage("noRouteToServer");
+            return new DOMMessage("noRouteToServer").toXMLElement();
         }
 
-        return DOMMessage.createMessage("ok");
+        return new DOMMessage("ok").toXMLElement();
     }
 
 

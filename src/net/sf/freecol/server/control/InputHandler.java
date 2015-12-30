@@ -123,19 +123,6 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     }
 
     /**
-     * Create a reply message with an error.
-     *
-     * FIXME: should this be localized (return message name)?
-     * 
-     * @param message The error message.
-     * @return An error message.
-     */
-    protected Element createErrorReply(String message) {
-        return DOMMessage.createMessage("error",
-            "message", message);
-    }
-
-    /**
      * Handles a "logout"-message.
      * 
      * @param connection The <code>Connection</code> the message was received

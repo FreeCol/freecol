@@ -366,13 +366,12 @@ public class DiplomacyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "ourId", ourId,
             "otherId", otherId);
-        Document doc = result.getOwnerDocument();
-        result.appendChild(agreement.toXMLElement(doc));
-        if (extraUnit != null) result.appendChild(extraUnit.toXMLElement(doc));
-        return result;
+        result.add(agreement);
+        if (extraUnit != null) result.add(extraUnit);
+        return result.toXMLElement();
     }
 
     /**

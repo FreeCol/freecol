@@ -224,33 +224,6 @@ public class AIMessage {
             : false;
     }
 
-    /**
-     * Send a trivial message.
-     *
-     * @param connection The <code>Connection</code> to send on.
-     * @param tag The tag of the message.
-     * @param attributes Attributes to add to the message.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean sendTrivial(Connection connection, String tag,
-                                      String... attributes) {
-        return sendMessage(connection, makeTrivial(tag, attributes));
-    }
-
-    /**
-     * Make a trivial message.
-     *
-     * @param tag The tag of the message.
-     * @param attributes Attributes to add to the message.
-     * @return The Element encapsulating the message.
-     */
-    public static Element makeTrivial(String tag, String... attributes) {
-        if ((attributes.length & 1) == 1) {
-            throw new IllegalArgumentException("Attributes list must have even length");
-        }
-        return DOMMessage.createMessage(tag, attributes);
-    }
-
 
     /**
      * An AIUnit attacks in the given direction.
@@ -461,7 +434,8 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askEndTurn(AIPlayer aiPlayer) {
-        return sendTrivial(aiPlayer.getConnection(), "endTurn");
+        return sendMessage(aiPlayer.getConnection(),
+                           new DOMMessage("endTurn"));
     }
 
 
@@ -631,18 +605,8 @@ public class AIMessage {
     public static boolean askRearrangeColony(AIColony aiColony,
                                              List<Unit> workers,
                                              Colony scratch) {
-        Colony colony = aiColony.getColony();
-        RearrangeColonyMessage message = new RearrangeColonyMessage(colony);
-        for (Unit u : workers) {
-            Unit su = scratch.getCorresponding(u);
-            if (u.getLocation().getId().equals(su.getLocation().getId())
-                && u.getWorkType() == su.getWorkType()
-                && u.getRole() == su.getRole()
-                && u.getRoleCount() == su.getRoleCount()) continue;
-            message.addChange(u,
-                (Location)colony.getCorresponding((FreeColObject)su.getLocation()),
-                su.getWorkType(), su.getRole(), su.getRoleCount());
-        }
+        RearrangeColonyMessage message
+            = new RearrangeColonyMessage(aiColony.getColony(), workers, scratch);
         return (message.isEmpty()) ? false
             : sendMessage(aiColony.getAIOwner().getConnection(), message);
     }

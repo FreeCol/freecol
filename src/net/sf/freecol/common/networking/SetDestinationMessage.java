@@ -106,12 +106,12 @@ public class SetDestinationMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        Element result = createMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getXMLElementTagName(),
             "unit", unitId);
         if (destinationId != null) {
             result.setAttribute("destination", destinationId);
         }
-        return result;
+        return result.toXMLElement();
     }
 
     /**
