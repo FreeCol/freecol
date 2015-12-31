@@ -170,6 +170,56 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Close and clear the socket.
+     */
+    private void closeSocket() {
+        if (this.socket != null) {
+            try {
+                this.socket.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing socket", ioe);
+            } finally {
+                this.socket = null;
+            }
+        }
+    }
+    
+    /**
+     * Close and clear the output stream.
+     */
+    private void closeOutputStream() {
+        IOException ioe = null;
+        synchronized (this.outLock) {
+            if (this.out == null) return;
+            try {
+                this.out.close();
+            } catch (IOException e) {
+                ioe = e;
+            } finally {
+                this.out = null;
+            }
+        }
+        if (ioe != null) {
+            logger.log(Level.WARNING, "Error closing output", ioe);
+        }
+    }
+
+    /**
+     * Close and clear the input stream.
+     */
+    private void closeInputStream() {
+        if (this.in != null) {
+            try {
+                this.in.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing input", ioe);
+            } finally {
+                this.in = null;
+            }
+        }
+    }
+
+    /**
      * Is this connection alive?
      *
      * @return True if the connection is alive.
@@ -216,26 +266,6 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Close and clear the output stream.
-     */
-    private void closeOutputStream() {
-        IOException ioe = null;
-        synchronized (this.outLock) {
-            if (this.out == null) return;
-            try {
-                this.out.close();
-            } catch (IOException e) {
-                ioe = e;
-            } finally {
-                this.out = null;
-            }
-        }
-        if (ioe != null) {
-            logger.log(Level.WARNING, "Error closing output", ioe);
-        }
-    }
-
-    /**
      * Close this connection.
      */
     @Override
@@ -257,25 +287,9 @@ public class Connection implements Closeable {
         if (this.receivingThread != null) this.receivingThread.askToStop();
 
         closeOutputStream();
-        if (this.in != null) {
-            try {
-                this.in.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing input", ioe);
-            } finally {
-                this.in = null;
-            }
-        }
-        if (this.socket != null) {
-            try {
-                this.socket.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing socket", ioe);
-            } finally {
-                this.socket = null;
-            }
-        }
-
+        closeInputStream();
+        closeSocket();
+        
         logger.fine("Connection really closed for " + this.name);
     }
 
