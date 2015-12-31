@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -146,6 +148,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = firstContact(connection, element); break;
             case "fountainOfYouth":
                 reply = fountainOfYouth(connection, element); break;
+            case "getNationSummary":
+                reply = getNationSummary(connection, element); break;
             case "indianDemand":
                 reply = indianDemand(connection, element); break;
             case "lootCargo":
@@ -272,6 +276,29 @@ public final class AIInGameInputHandler implements MessageHandler {
         return null;
     }
 
+    /**
+     * Handle an incoming nation summary.
+     *
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
+     */
+    private Element getNationSummary(
+        @SuppressWarnings("unused") Connection connection,
+        Element element) {
+        final Game game = aiMain.getGame();
+        final AIPlayer aiPlayer = getAIPlayer();
+
+        GetNationSummaryMessage message = new GetNationSummaryMessage(element);
+        Player player = aiPlayer.getPlayer();
+        Player other = message.getPlayer(game);
+        NationSummary ns = message.getNationSummary();
+        player.putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for AI " + player.getSuffix());
+        return null;
+    }
+    
     /**
      * Handles an "indianDemand"-message.
      *

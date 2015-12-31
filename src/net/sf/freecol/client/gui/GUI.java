@@ -514,13 +514,13 @@ public class GUI {
         Player player = attacker.getOwner();
         Player other = colony.getOwner();
         int strength = player.calculateStrength(false);
-        int otherStrength = ns.getMilitaryStrength();
+        int otherStrength = (ns == null) ? strength : ns.getMilitaryStrength();
         int mil = (otherStrength <= 1 || otherStrength * 5 < strength) ? 0
             : (strength == 0 || strength * 5 < otherStrength) ? 2
             : 1;
 
         StringTemplate t;
-        int gold = ns.getGold();
+        int gold = (ns == null) ? 0 : ns.getGold();
         if (gold == 0) {
             t = StringTemplate.template("confirmTribute.broke")
                 .addStringTemplate("%nation%", other.getNationLabel());

@@ -73,6 +73,15 @@ public class GetNationSummaryMessage extends DOMMessage {
     // Public interface
 
     /**
+     * Client side helper to get the player.
+     *
+     * @return The player.
+     */
+    public Player getPlayer(Game game) {
+        return game.getFreeColGameObject(playerId, Player.class);
+    }
+
+    /**
      * Client side helper to get the summary.
      *
      * @return The summary.
@@ -95,7 +104,7 @@ public class GetNationSummaryMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = serverPlayer.getGame();
 
-        Player player = game.getFreeColGameObject(playerId, Player.class);
+        Player player = getPlayer(game);
         if (player == null) {
             return DOMMessage.clientError("Not a player: " + playerId);
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {

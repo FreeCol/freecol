@@ -888,16 +888,15 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking for the nation summary of a player.
      *
+     * @param self The <code>Player</code> requesting the summary.
      * @param player The <code>Player</code> to summarize.
      * @return A summary of that nation, or null on error.
      */
-    public NationSummary getNationSummary(Player player) {
-        GetNationSummaryMessage message = new GetNationSummaryMessage(player);
-        Element reply = askExpecting(message,
-            GetNationSummaryMessage.getXMLElementTagName(), null);
-        if (reply == null) return null;
-
-        return new GetNationSummaryMessage(reply).getNationSummary();
+    public NationSummary getNationSummary(Player self, Player player) {
+        return (askHandling(new GetNationSummaryMessage(player),
+                            null, null))
+            ? self.getNationSummary(player)
+            : null;
     }
 
     /**

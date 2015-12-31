@@ -3614,7 +3614,12 @@ public final class InGameController implements NetworkConstants {
     public NationSummary getNationSummary(Player player) {
         if (player == null) return null;
 
-        return askServer().getNationSummary(player);
+        final Player myPlayer = freeColClient.getMyPlayer();
+        NationSummary ns = myPlayer.getNationSummary(player);
+        if (ns != null) return ns;
+        // Refresh from server
+        askServer().getNationSummary(myPlayer, player);
+        return myPlayer.getNationSummary(player);
     }
 
     /**
@@ -4257,6 +4262,7 @@ public final class InGameController implements NetworkConstants {
                 .addStringTemplate("%year%", currTurn.getLabel())
                 .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
+        player.clearNationCache();
         return true;
     }
 

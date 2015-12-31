@@ -476,15 +476,11 @@ public class AIMessage {
      *
      * @param owner The <code>AIPlayer</code> making the inquiry.
      * @param player The <code>Player</code> to summarize.
-     * @return A <code>NationSummary</code> if the message was sent,
-     *      and a non-error reply returned.
+     * @return True if the message was sent, and a non-error reply returned.
      */
-    public static NationSummary askGetNationSummary(AIPlayer owner,
-                                                    Player player) {
-        Element reply = askExpecting(owner.getConnection(),
-            new GetNationSummaryMessage(player).toXMLElement(),
-            GetNationSummaryMessage.getXMLElementTagName());
-        return new GetNationSummaryMessage(reply).getNationSummary();
+    public static boolean askGetNationSummary(AIPlayer owner, Player player) {
+        return sendMessage(owner.getConnection(),
+            new GetNationSummaryMessage(player));
     }
 
 

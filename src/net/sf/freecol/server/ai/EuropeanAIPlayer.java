@@ -1576,13 +1576,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The current <code>NationSummary</code> for a player.
      */
     protected NationSummary getNationSummary(Player other) {
-        Player player = getPlayer();
+        final Player player = getPlayer();
         NationSummary ns = player.getNationSummary(other);
-        if (ns == null) {
-            ns = AIMessage.askGetNationSummary(this, other);
-            player.putNationSummary(other, ns);
-        }            
-        return ns;
+        if (ns != null) return ns;
+        AIMessage.askGetNationSummary(this, other);
+        return player.getNationSummary(other);
     }
 
     /**

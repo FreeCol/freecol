@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
@@ -53,6 +54,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -238,6 +240,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = fountainOfYouth(element); break;
         case "gameEnded":
             reply = gameEnded(element); break;
+        case "getNationSummary":
+            reply = getNationSummary(element); break;
         case "indianDemand":
             reply = indianDemand(element); break;
         case "lootCargo":
@@ -741,6 +745,26 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Handle an incoming nation summary.
+     *
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
+     */
+    private Element getNationSummary(Element element) {
+        final Game game = getGame();
+        final Player player = getFreeColClient().getMyPlayer();
+
+        GetNationSummaryMessage message = new GetNationSummaryMessage(element);
+        Player other = message.getPlayer(game);
+        NationSummary ns = message.getNationSummary();
+        player.putNationSummary(other, ns);
+        logger.info("Updated nation summary of " + other.getSuffix()
+            + " for " + player.getSuffix());
+        return null;
+    }
+        
     /**
      * Handle an "indianDemand"-request.
      *

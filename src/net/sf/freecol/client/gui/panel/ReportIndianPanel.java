@@ -95,7 +95,8 @@ public final class ReportIndianPanel extends ReportPanel {
         List<IndianSettlement> nativeSettlements
             = opponent.getIndianSettlements();
         String numSettlements = String.valueOf(nativeSettlements.size())
-            + " / " + String.valueOf(ns.getNumberOfSettlements());
+            + " / " + ((ns == null) ? "?"
+                : String.valueOf(ns.getNumberOfSettlements()));
 
         ImageLibrary lib = getImageLibrary();
         JLabel villageLabel = new JLabel();

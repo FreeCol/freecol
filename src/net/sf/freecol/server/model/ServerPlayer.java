@@ -1394,6 +1394,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
         lb.add("PLAYER ", getName(), ": ");
+        final Game game = getGame();
 
         // Settlements
         List<Settlement> settlements = new ArrayList<>(getSettlements());
@@ -1463,7 +1464,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 Colony port = getRandomMember(logger, "Intervention port",
                                               ports, random);
                 Tile portTile = port.getTile();
-                Tile entry = getGame().getMap().searchCircle(portTile,
+                Tile entry = game.getMap().searchCircle(portTile,
                     GoalDeciders.getSimpleHighSeasGoalDecider(),
                     portTile.getHighSeasCount()+1).getSafeTile(this, random);
                 
@@ -1511,7 +1512,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Stance sta = getStance(s);
             boolean war = sta == Stance.WAR;
             if (sta == Stance.UNCONTACTED) continue;
-            for (Player p : getGame().getLiveEuropeanPlayers(this)) {
+            for (Player p : game.getLiveEuropeanPlayers(this)) {
                 ServerPlayer sp = (ServerPlayer) p;
                 if (p == s || !p.hasContacted(this)
                     || !p.hasContacted(s)) continue;
