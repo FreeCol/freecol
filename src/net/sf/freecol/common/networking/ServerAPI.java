@@ -621,7 +621,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean continuePlaying() {
-        return send(new TrivialMessage("continuePlaying"));        
+        return send(new DOMMessage("continuePlaying"));        
     }
 
     /**
@@ -805,7 +805,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean endTurn() {
-        return askHandling(new TrivialMessage("endTurn"),
+        return askHandling(new DOMMessage("endTurn"),
             null, null);
     }
 
@@ -815,7 +815,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean enterRevengeMode() {
-        return askHandling(new TrivialMessage("enterRevengeMode"),
+        return askHandling(new DOMMessage("enterRevengeMode"),
             null, null);
     }
 
@@ -873,7 +873,7 @@ public abstract class ServerAPI {
      * @return The list of high scores.
      */
     public List<HighScore> getHighScores() {
-        Element reply = askExpecting(new TrivialMessage("getHighScores"),
+        Element reply = askExpecting(new DOMMessage("getHighScores"),
             null, null);
         if (reply == null) return Collections.<HighScore>emptyList();
 
@@ -905,7 +905,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean getNewTradeRoute() {
-        return askHandling(new TrivialMessage("getNewTradeRoute"),
+        return askHandling(new DOMMessage("getNewTradeRoute"),
             null, null);
     }
 
@@ -915,7 +915,7 @@ public abstract class ServerAPI {
      * @return A list of REF units for the player.
      */
     public List<AbstractUnit> getREFUnits() {
-        Element reply = askExpecting(new TrivialMessage("getREFUnits"),
+        Element reply = askExpecting(new DOMMessage("getREFUnits"),
             null, null);
         if (reply == null) return Collections.<AbstractUnit>emptyList();
 
@@ -936,7 +936,7 @@ public abstract class ServerAPI {
      */
     public java.util.Map<String, String> getStatistics() {
         HashMap<String, String> results = loadMap("*");
-        return (askExpecting(new TrivialMessage("getStatistics"),
+        return (askExpecting(new DOMMessage("getStatistics"),
                 "statistics", results) == null) ? null
             : results;
     }
@@ -1009,9 +1009,9 @@ public abstract class ServerAPI {
      * @return A <code>LoginMessage</code> on success, or null on error.
      */
     public LoginMessage login(String userName, String version) {
-        Element reply = askExpecting(new TrivialMessage("login",
-                                                        "userName", userName,
-                                                        "version", version),
+        Element reply = askExpecting(new DOMMessage("login",
+                                                    "userName", userName,
+                                                    "version", version),
                                      "login", null);
         return (reply == null) ? null : new LoginMessage(null, reply);
     }
@@ -1022,7 +1022,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean logout() {
-        return sendAndWait(new TrivialMessage("logout",
+        return sendAndWait(new DOMMessage("logout",
                 "reason", "User has quit the client."));
     }
 
@@ -1181,7 +1181,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean requestLaunch() {
-        return send(new TrivialMessage("requestLaunch"));    
+        return send(new DOMMessage("requestLaunch"));    
     }
 
     /**
@@ -1190,7 +1190,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean retire() {
-        return askHandling(new TrivialMessage("retire"), null, null);
+        return askHandling(new DOMMessage("retire"), null, null);
     }
 
     /**
@@ -1269,7 +1269,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
-        return askHandling(new TrivialMessage("setAvailable",
+        return askHandling(new DOMMessage("setAvailable",
                 "nation", nation.getId(),
                 "state", state.toString()),
             null, null);
@@ -1297,7 +1297,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
-        return askHandling(new TrivialMessage("setColor",
+        return askHandling(new DOMMessage("setColor",
                 "nation", nation.getId(),
                 "color", Integer.toString(color.getRGB())),
             null, null);
@@ -1348,7 +1348,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
-        return askHandling(new TrivialMessage("setNation",
+        return askHandling(new DOMMessage("setNation",
                 "value", nation.getId()),
             null, null);
     }
@@ -1361,7 +1361,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setNationType(NationType nationType) {
-        return askHandling(new TrivialMessage("setNationType",
+        return askHandling(new DOMMessage("setNationType",
                 "value", nationType.getId()),
             null, null);
     }
@@ -1374,7 +1374,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setReady(boolean ready) {
-        return send(new TrivialMessage("ready",
+        return send(new DOMMessage("ready",
                 "value", Boolean.toString(ready)));
     }
 
@@ -1407,7 +1407,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean startSkipping() {
-        return send(new TrivialMessage("endTurn"));
+        return send(new DOMMessage("endTurn"));
     }
 
     /**
