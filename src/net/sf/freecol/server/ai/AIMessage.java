@@ -150,50 +150,6 @@ public class AIMessage {
         }
         return true;
     }
-
-    /**
-     * Ask the server a question, returning non-error replies.
-     *
-     * @param conn The <code>Connection</code> to use when
-     *     communicating with the server.
-     * @param request The <code>Element</code> to send.
-     * @return The reply <code>Element</code> if not an error, otherwise null.
-     */
-    private static Element askExpecting(Connection conn, Element request,
-                                        String expect) {
-        Element reply = ask(conn, request);
-        if (checkError(reply, request.getTagName())
-            || reply == null) return null;
-       
-        final String tag = reply.getTagName();
-        if ("multiple".equals(tag)) {
-            List<Element> replies = new ArrayList<>();
-            NodeList nodes = reply.getChildNodes();
-            Element result = null;
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                if (nodes.item(i) instanceof Element
-                    && ((Element)nodes.item(i)).getTagName().equals(expect)) {
-                    result = (Element)nodes.item(i);
-                    continue;
-                }
-                try {
-                    Element e = conn.handle((Element)nodes.item(i));
-                    if (e != null) replies.add(e);
-                } catch (FreeColException fce) {
-                    logger.log(Level.WARNING, "AI handler failed: " + reply, fce);
-                }
-            }
-            if (!askHandling(conn, DOMMessage.collapseElements(replies))
-                || result == null) return null;
-            reply = result;
-        }
-
-        if (expect.equals(reply.getTagName())) return reply;
-        logger.log(Level.WARNING, "AI handler expected " + expect
-            + ", recieved " + tag);
-        return null;
-    }
         
     /**
      * Sends a DOMMessage to the server.
