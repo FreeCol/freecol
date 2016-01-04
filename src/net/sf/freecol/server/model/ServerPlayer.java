@@ -149,6 +149,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** The connection for this player. */
     private Connection connection;
 
+    /** An overriding switch indicating connection. */
     private boolean connected = false;
 
     /** Remaining emigrants to select due to a fountain of youth */
@@ -236,8 +237,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.currentFather = null;
 
         this.socket = socket;
-        this.connection = connection;
-        connected = connection != null;
+        this.setConnection(connection);
     }
 
 
@@ -247,15 +247,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if this player is currently connected to the server.
      */
     public boolean isConnected() {
-        return connected;
+        return this.connected;
     }
 
     /**
      * Sets the "connected"-status of this player.
      *
-     * @param connected Should be <i>true</i> if this player is currently
-     *         connected to the server and <code>false</code> otherwise.
-     * @see #isConnected
+     * This allows an override of the default check of whether
+     * this.connection is null, and is used to allow a reconnection
+     * after a player logs out.
+     * @see InGameInputHandler#logout
+     *
+     * @param connected True if this player should be considered as
+     *     connected to the server.
      */
     public void setConnected(boolean connected) {
         this.connected = connected;
@@ -266,7 +270,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The <code>Socket</code>.
      */
     public Socket getSocket() {
-        return socket;
+        return this.socket;
     }
 
     /**
@@ -275,7 +279,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The <code>Connection</code>.
      */
     public Connection getConnection() {
-        return connection;
+        return this.connection;
     }
 
     /**
@@ -285,7 +289,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void setConnection(Connection connection) {
         this.connection = connection;
-        connected = (connection != null);
+        this.connected = this.connection != null;
     }
 
     /**
@@ -304,7 +308,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param request An <code>Element</code> containing the update.
      */
     private void askElement(Element request) {
-        if (this.connection == null) return;
+        if (!isConnected()) return;
 
         while (request != null) {
             Element reply;
@@ -4477,7 +4481,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[ServerPlayer ").append(getId())
             .append(" ").append(getName())
-            .append(" ").append(connection)
+            .append(" ").append(this.connection)
             .append("]");
         return sb.toString();
     }
