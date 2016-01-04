@@ -332,14 +332,10 @@ public class DiplomaticTrade extends FreeColObject {
      *
      * @return A list of <code>Colony</code>s offered in this trade.
      */
-    public List<Colony> getColoniesGivenBy(Player player) {
-        List<Colony> colonyList = new ArrayList<>();
-        for (TradeItem ti : items) {
-            if (ti instanceof ColonyTradeItem && player == ti.getSource()) {
-                colonyList.add(ti.getColony(player.getGame()));
-            }
-        }
-        return colonyList;
+    public List<Colony> getColoniesGivenBy(final Player player) {
+        return transform(items,
+            ti -> ti instanceof ColonyTradeItem && ti.getSource() == player,
+            ti -> ti.getColony(player.getGame()), Collectors.toList());
     }
 
     /**
@@ -360,13 +356,9 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Goods</code> offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player) {
-        List<Goods> goodsList = new ArrayList<>();
-        for (TradeItem ti : items) {
-            if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
-                goodsList.add(ti.getGoods());
-            }
-        }
-        return goodsList;
+        return transform(items,
+            ti -> ti instanceof GoodsTradeItem && ti.getSource() == player,
+            TradeItem::getGoods, Collectors.toList());
     }
 
     /**
@@ -385,13 +377,9 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Unit</code>s offered in this trade.
      */
     public List<Unit> getUnitsGivenBy(Player player) {
-        List<Unit> unitList = new ArrayList<>();
-        for (TradeItem ti : items) {
-            if (ti instanceof UnitTradeItem && player == ti.getSource()) {
-                unitList.add(ti.getUnit());
-            }
-        }
-        return unitList;
+        return transform(items,
+            ti -> ti instanceof UnitTradeItem && ti.getSource() == player,
+            TradeItem::getUnit, Collectors.toList());
     }
 
     /**
