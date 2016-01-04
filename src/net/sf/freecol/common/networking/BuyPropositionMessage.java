@@ -59,7 +59,7 @@ public class BuyPropositionMessage extends DOMMessage {
      */
     public BuyPropositionMessage(Unit unit, Settlement settlement,
                                  Goods goods, int gold) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -75,12 +75,12 @@ public class BuyPropositionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public BuyPropositionMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
+            DOMMessage.getChildElement(element, Goods.getTagName()));
         this.goldString = element.getAttribute("gold");
     }
 
@@ -150,7 +150,7 @@ public class BuyPropositionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "unit", unitId,
             "settlement", settlementId,
             "gold", goldString);
@@ -163,7 +163,7 @@ public class BuyPropositionMessage extends DOMMessage {
      *
      * @return "buyProposition".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "buyProposition";
     }
 }

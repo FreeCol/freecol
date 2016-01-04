@@ -378,7 +378,7 @@ public abstract class FreeColAction extends AbstractAction
      */
     @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getXMLElementTagName());
+        xw.writeStartElement(getTagName());
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
 
@@ -399,7 +399,7 @@ public abstract class FreeColAction extends AbstractAction
         String acc = xr.getAttribute(ACCELERATOR_TAG, "");
         putValue(ACCELERATOR_KEY, (acc == null || acc.isEmpty()) ? null
             : KeyStroke.getKeyStroke(acc));
-        xr.closeTag(getXMLElementTagName());
+        xr.closeTag(getTagName());
     }
 
     /**
@@ -415,7 +415,7 @@ public abstract class FreeColAction extends AbstractAction
      *
      * @return "action".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "action";
     }
 }

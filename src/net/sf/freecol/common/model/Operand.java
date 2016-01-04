@@ -392,5 +392,5 @@ public class Operand extends Scope {
         return super.toString().replaceFirst("^[^ ]*", sb.toString());
     }
 
-    // getXMLElementTagName apparently not needed, uses parents.
+    // getTagName apparently not needed, uses parents.
 }

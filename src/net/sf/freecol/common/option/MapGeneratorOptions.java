@@ -148,7 +148,7 @@ public class MapGeneratorOptions {
      *
      * @return "mapGeneratorOptions".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "mapGeneratorOptions";
     }
 }

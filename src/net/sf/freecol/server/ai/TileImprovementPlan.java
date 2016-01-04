@@ -86,7 +86,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
                                TileImprovementType type, int value) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+        super(aiMain, getTagName() + ":" + aiMain.getNextId());
 
         this.target = target;
         this.type = type;
@@ -379,14 +379,14 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tileImprovementPlan"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tileImprovementPlan";
     }
 }

@@ -46,9 +46,9 @@ public final class GameOptionsDialog extends OptionsDialog {
                              boolean editable, boolean custom) {
         super(freeColClient, frame, editable,
               freeColClient.getGame().getGameOptions(),
-              GameOptions.getXMLElementTagName(),
+              GameOptions.getTagName(),
               FreeColDirectories.GAME_OPTIONS_FILE_NAME,
-              GameOptions.getXMLElementTagName());
+              GameOptions.getTagName());
 
         if (isEditable()) loadDefaultOptions();
 

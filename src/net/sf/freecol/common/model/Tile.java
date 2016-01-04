@@ -2522,7 +2522,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     // Do not call toXML!  It will look for a cached tile,
                     // inside t which is already a cached copy!
                     try {
-                        t.internalToXML(xw, getXMLElementTagName());
+                        t.internalToXML(xw, getTagName());
                     } finally {
                         xw.setWriteScope(scope);
                     }
@@ -2649,7 +2649,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 FreeColXMLReader.ReadScope scope = xr.getReadScope();
                 xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
                 xr.nextTag();
-                xr.expectTag(Tile.getXMLElementTagName());
+                xr.expectTag(Tile.getTagName());
                 Tile tile = xr.readFreeColGameObject(game, Tile.class);
 
                 // Temporary workaround for BR#2618 on input
@@ -2685,14 +2685,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         // end @compat
 
-        } else if (Colony.getXMLElementTagName().equals(tag)) {
+        } else if (Colony.getTagName().equals(tag)) {
             settlement = xr.readFreeColGameObject(game, Colony.class);
 
-        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
+        } else if (IndianSettlement.getTagName().equals(tag)) {
             settlement = xr.readFreeColGameObject(game, IndianSettlement.class);
 
         // @compat 0.10.7
-        } else if (PlayerExploredTile.getXMLElementTagName().equals(tag)) {
+        } else if (PlayerExploredTile.getTagName().equals(tag)) {
             // Only from a saved game.
             Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
                 Player.class, (Player)null, true);
@@ -2717,7 +2717,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             pet.fixCache();
         // end @compat 0.10.7
 
-        } else if (TileItemContainer.getXMLElementTagName().equals(tag)
+        } else if (TileItemContainer.getTagName().equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_ITEM_CONTAINER_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -2758,14 +2758,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tile".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tile";
     }
 }

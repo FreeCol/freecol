@@ -73,7 +73,7 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Player player, String userName, String version,
                         boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.player = player;
         this.userName = userName;
@@ -92,7 +92,7 @@ public class LoginMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public LoginMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         String str;
         this.player = null; // Should not be used on client side
@@ -165,7 +165,7 @@ public class LoginMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "userName", userName,
             "version", version,
             "admin", Boolean.toString(admin),
@@ -181,7 +181,7 @@ public class LoginMessage extends DOMMessage {
      *
      * @return "login".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "login";
     }
 }

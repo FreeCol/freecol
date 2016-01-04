@@ -49,7 +49,7 @@ public class MoveToMessage extends DOMMessage {
      * @param destination The <code>Location</code> to move to.
      */
     public MoveToMessage(Unit unit, Location destination) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.destinationId = destination.getId();
@@ -63,7 +63,7 @@ public class MoveToMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MoveToMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.destinationId = element.getAttribute("destination");
@@ -108,7 +108,7 @@ public class MoveToMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "destination", destinationId).toXMLElement();
     }
@@ -118,7 +118,7 @@ public class MoveToMessage extends DOMMessage {
      *
      * @return "moveTo".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "moveTo";
     }
 }

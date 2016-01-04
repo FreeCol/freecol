@@ -387,7 +387,7 @@ public class TradeRoute extends FreeColGameObject
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (TradeRouteStop.getXMLElementTagName().equals(tag)) {
+        if (TradeRouteStop.getTagName().equals(tag)) {
             stops.add(new TradeRouteStop(getGame(), xr));
             
         } else {
@@ -414,14 +414,14 @@ public class TradeRoute extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tradeRoute".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tradeRoute";
     }
 }

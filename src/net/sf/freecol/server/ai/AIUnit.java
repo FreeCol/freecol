@@ -873,60 +873,60 @@ public class AIUnit extends TransportableAIObject {
         final String tag = xr.getLocalName();
 
         mission = null;
-        if (BuildColonyMission.getXMLElementTagName().equals(tag)) {
+        if (BuildColonyMission.getTagName().equals(tag)) {
             mission = new BuildColonyMission(aiMain, this, xr);
 
-        } else if (CashInTreasureTrainMission.getXMLElementTagName().equals(tag)) {
+        } else if (CashInTreasureTrainMission.getTagName().equals(tag)) {
             mission = new CashInTreasureTrainMission(aiMain, this, xr);
 
-        } else if (DefendSettlementMission.getXMLElementTagName().equals(tag)) {
+        } else if (DefendSettlementMission.getTagName().equals(tag)) {
             mission = new DefendSettlementMission(aiMain, this, xr);
 
-        } else if (IdleAtSettlementMission.getXMLElementTagName().equals(tag)
+        } else if (IdleAtSettlementMission.getTagName().equals(tag)
             // @compat 0.10.5
             || IDLE_AT_COLONY_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
             mission = new IdleAtSettlementMission(aiMain, this, xr);
 
-        } else if (IndianBringGiftMission.getXMLElementTagName().equals(tag)) {
+        } else if (IndianBringGiftMission.getTagName().equals(tag)) {
             mission = new IndianBringGiftMission(aiMain, this, xr);
 
-        } else if (IndianDemandMission.getXMLElementTagName().equals(tag)) {
+        } else if (IndianDemandMission.getTagName().equals(tag)) {
             mission = new IndianDemandMission(aiMain, this, xr);
 
-        } else if (MissionaryMission.getXMLElementTagName().equals(tag)) {
+        } else if (MissionaryMission.getTagName().equals(tag)) {
             mission = new MissionaryMission(aiMain, this, xr);
 
-        } else if (PioneeringMission.getXMLElementTagName().equals(tag)
+        } else if (PioneeringMission.getTagName().equals(tag)
             // @compat 0.10.3
             || TILE_IMPROVEMENT_PLAN_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
             mission = new PioneeringMission(aiMain, this, xr);
 
-        } else if (PrivateerMission.getXMLElementTagName().equals(tag)) {
+        } else if (PrivateerMission.getTagName().equals(tag)) {
             mission = new PrivateerMission(aiMain, this, xr);
 
-        } else if (ScoutingMission.getXMLElementTagName().equals(tag)) {
+        } else if (ScoutingMission.getTagName().equals(tag)) {
             mission = new ScoutingMission(aiMain, this, xr);
 
-        } else if (TransportMission.getXMLElementTagName().equals(tag)) {
+        } else if (TransportMission.getTagName().equals(tag)) {
             mission = new TransportMission(aiMain, this, xr);
 
-        } else if (UnitSeekAndDestroyMission.getXMLElementTagName().equals(tag)) {
+        } else if (UnitSeekAndDestroyMission.getTagName().equals(tag)) {
             mission = new UnitSeekAndDestroyMission(aiMain, this, xr);
 
-        } else if (UnitWanderHostileMission.getXMLElementTagName().equals(tag)) {
+        } else if (UnitWanderHostileMission.getTagName().equals(tag)) {
             mission = new UnitWanderHostileMission(aiMain, this, xr);
 
-        } else if (UnitWanderMission.getXMLElementTagName().equals(tag)) {
+        } else if (UnitWanderMission.getTagName().equals(tag)) {
             mission = new UnitWanderMission(aiMain, this, xr);
 
-        } else if (WishRealizationMission.getXMLElementTagName().equals(tag)) {
+        } else if (WishRealizationMission.getTagName().equals(tag)) {
             mission = new WishRealizationMission(aiMain, this, xr);
 
-        } else if (WorkInsideColonyMission.getXMLElementTagName().equals(tag)) {
+        } else if (WorkInsideColonyMission.getTagName().equals(tag)) {
             mission = new WorkInsideColonyMission(aiMain, this, xr);
 
         } else {
@@ -946,14 +946,14 @@ public class AIUnit extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "aiUnit"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiUnit";
     }
 }

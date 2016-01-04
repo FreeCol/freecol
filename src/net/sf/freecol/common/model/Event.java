@@ -208,7 +208,7 @@ public class Event extends FreeColGameObjectType {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Limit.getXMLElementTagName().equals(tag)) {
+        if (Limit.getTagName().equals(tag)) {
             Limit limit = new Limit(xr, spec);
             // @compat 0.10.5
             if ("model.limit.independence.colonies".equals(limit.getId())) {
@@ -227,14 +227,14 @@ public class Event extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "event".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "event";
     }
 }

@@ -44,7 +44,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param colony The <code>Colony</code> that is building.
      */
     public PayForBuildingMessage(Colony colony) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyId = colony.getId();
     }
@@ -57,7 +57,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public PayForBuildingMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyId = element.getAttribute("colony");
     }
@@ -96,7 +96,7 @@ public class PayForBuildingMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "colony", colonyId).toXMLElement();
     }
 
@@ -105,7 +105,7 @@ public class PayForBuildingMessage extends DOMMessage {
      *
      * @return "payForBuilding".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "payForBuilding";
     }
 }

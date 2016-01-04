@@ -695,7 +695,7 @@ public abstract class ServerAPI {
         // null on reject.
         if (reply == null) {
             return null;
-        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
             client.handleReply(reply);
@@ -716,10 +716,10 @@ public abstract class ServerAPI {
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherUnit,
                                                           agreement),
-            DiplomacyMessage.getXMLElementTagName(), null);
+            DiplomacyMessage.getTagName(), null);
         if (reply == null) {
             return null;
-        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
             client.handleReply(reply);
@@ -740,10 +740,10 @@ public abstract class ServerAPI {
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourColony, otherUnit,
                                                           agreement),
-            DiplomacyMessage.getXMLElementTagName(), null);
+            DiplomacyMessage.getTagName(), null);
         if (reply == null) {
             return null;
-        } else if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
+        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
             client.handleReply(reply);
@@ -862,7 +862,7 @@ public abstract class ServerAPI {
         GoodsForSaleMessage message
             = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(message,
-            GoodsForSaleMessage.getXMLElementTagName(), null);
+            GoodsForSaleMessage.getTagName(), null);
         return (reply == null) ? Collections.<Goods>emptyList()
             : new GoodsForSaleMessage(game, reply).getGoods();
     }

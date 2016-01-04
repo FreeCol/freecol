@@ -180,7 +180,7 @@ public class GoodsTradeItem extends TradeItem {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (Goods.getXMLElementTagName().equals(tag)) {
+        if (Goods.getTagName().equals(tag)) {
             goods = new Goods(game, xr);
 
         } else {
@@ -204,14 +204,14 @@ public class GoodsTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "goodsTradeItem".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "goodsTradeItem";
     }
 }

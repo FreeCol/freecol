@@ -616,7 +616,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
             addAllowedWorker(xr.readId());
             xr.closeTag(WORKER_TAG);
 
-        } else if (Scope.getXMLElementTagName().equals(tag)) {
+        } else if (Scope.getTagName().equals(tag)) {
             addScope(new Scope(xr));
 
         } else {
@@ -628,14 +628,14 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tile-improvement-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tile-improvement-type";
     }
 }

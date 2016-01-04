@@ -581,7 +581,7 @@ public class StringTemplate extends FreeColObject {
             addKey(xr.getAttribute(VALUE_TAG, (String)null));
             xr.closeTag(KEY_TAG);
 
-        } else if (StringTemplate.getXMLElementTagName().equals(tag)) {
+        } else if (StringTemplate.getTagName().equals(tag)) {
             addReplacement(new StringTemplate(xr));
         
         } else {
@@ -638,14 +638,14 @@ public class StringTemplate extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "stringTemplate".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "stringTemplate";
     }
 }

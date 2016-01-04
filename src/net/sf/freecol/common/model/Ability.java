@@ -562,14 +562,14 @@ public final class Ability extends Feature {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the XML tag name for this element.
      *
      * @return "ability".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "ability";
     }
 }

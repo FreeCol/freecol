@@ -1372,7 +1372,7 @@ public abstract class FreeColObject
      *
      * @return <code>null</code>.
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return null;
     }
 }

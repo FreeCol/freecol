@@ -531,7 +531,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         for (GoodsType goodsType : getSortedCopy(storage.keySet())) {
 
-            xw.writeStartElement(Goods.getXMLElementTagName());
+            xw.writeStartElement(Goods.getTagName());
 
             xw.writeAttribute(TYPE_TAG, goodsType);
 
@@ -587,7 +587,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = xr.getLocalName();
 
-            if (Goods.getXMLElementTagName().equals(tag)) {
+            if (Goods.getTagName().equals(tag)) {
                 GoodsType goodsType = xr.getType(spec, TYPE_TAG,
                     GoodsType.class, (GoodsType)null);
 
@@ -630,14 +630,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "goodsContainer".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "goodsContainer";
     }
 }

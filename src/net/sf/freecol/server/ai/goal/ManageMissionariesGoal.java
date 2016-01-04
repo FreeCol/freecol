@@ -188,5 +188,5 @@ public class ManageMissionariesGoal extends Goal {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 }

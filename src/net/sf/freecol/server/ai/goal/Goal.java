@@ -547,7 +547,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      *
      * @return "aiGoal"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiGoal";
     }
 

@@ -347,7 +347,7 @@ public abstract class GoodsLocation extends UnitLocation {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (GoodsContainer.getXMLElementTagName().equals(tag)) {
+        if (GoodsContainer.getTagName().equals(tag)) {
             goodsContainer = xr.readFreeColGameObject(getGame(),
                                                       GoodsContainer.class);
             goodsContainer.setLocation(this);

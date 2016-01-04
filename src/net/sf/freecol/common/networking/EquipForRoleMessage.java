@@ -52,7 +52,7 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param roleCount The role count.
      */
     public EquipForRoleMessage(Unit unit, Role role, int roleCount) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.roleId = role.getId();
@@ -66,7 +66,7 @@ public class EquipForRoleMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EquipForRoleMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.roleId = element.getAttribute("role");
@@ -131,7 +131,7 @@ public class EquipForRoleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "role", roleId,
             "count", roleCount).toXMLElement();
@@ -142,7 +142,7 @@ public class EquipForRoleMessage extends DOMMessage {
      *
      * @return "equipForRole".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "equipForRole";
     }
 }

@@ -476,22 +476,22 @@ public class DiplomaticTrade extends FreeColObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (ColonyTradeItem.getXMLElementTagName().equals(tag)) {
+        if (ColonyTradeItem.getTagName().equals(tag)) {
             add(new ColonyTradeItem(game, xr));
 
-        } else if (GoldTradeItem.getXMLElementTagName().equals(tag)) {
+        } else if (GoldTradeItem.getTagName().equals(tag)) {
             add(new GoldTradeItem(game, xr));
 
-        } else if (GoodsTradeItem.getXMLElementTagName().equals(tag)) {
+        } else if (GoodsTradeItem.getTagName().equals(tag)) {
             add(new GoodsTradeItem(game, xr));
 
-        } else if (InciteTradeItem.getXMLElementTagName().equals(tag)) {
+        } else if (InciteTradeItem.getTagName().equals(tag)) {
             add(new InciteTradeItem(game, xr));
 
-        } else if (StanceTradeItem.getXMLElementTagName().equals(tag)) {
+        } else if (StanceTradeItem.getTagName().equals(tag)) {
             add(new StanceTradeItem(game, xr));
 
-        } else if (UnitTradeItem.getXMLElementTagName().equals(tag)) {
+        } else if (UnitTradeItem.getTagName().equals(tag)) {
             add(new UnitTradeItem(game, xr));
 
         } else {
@@ -522,14 +522,14 @@ public class DiplomaticTrade extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "diplomaticTrade".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "diplomaticTrade";
     }
 }

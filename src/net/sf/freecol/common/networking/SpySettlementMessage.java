@@ -52,7 +52,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param direction The <code>Direction</code> the unit is looking.
      */
     public SpySettlementMessage(Unit unit, Direction direction) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -66,7 +66,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public SpySettlementMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.directionString = element.getAttribute("direction");
@@ -129,7 +129,7 @@ public class SpySettlementMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "direction", directionString).toXMLElement();
     }
@@ -139,7 +139,7 @@ public class SpySettlementMessage extends DOMMessage {
      *
      * @return "spySettlement".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "spySettlement";
     }
 }

@@ -120,7 +120,7 @@ public final class PreGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element)element
-            .getElementsByTagName(Player.getXMLElementTagName()).item(0);
+            .getElementsByTagName(Player.getTagName()).item(0);
         String id = FreeColObject.readId(playerElement);
         FreeColGameObject fcgo = game.getFreeColGameObject(id);
         if (fcgo == null) {
@@ -235,7 +235,7 @@ public final class PreGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
 
         Element playerElement = (Element)element
-            .getElementsByTagName(Player.getXMLElementTagName()).item(0);
+            .getElementsByTagName(Player.getTagName()).item(0);
         Player player = new Player(game, playerElement);
 
         getFreeColClient().getGame().removePlayer(player);
@@ -358,7 +358,7 @@ public final class PreGameInputHandler extends InputHandler {
         Game game = getFreeColClient().getGame();
 
         Element mgoElement = (Element)element
-            .getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
+            .getElementsByTagName(GameOptions.getTagName()).item(0);
         Specification spec = game.getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
         gameOptions.readFromXMLElement(mgoElement);
@@ -378,7 +378,7 @@ public final class PreGameInputHandler extends InputHandler {
      */
     private Element updateMapGeneratorOptions(Element element) {
         Element mgoElement = (Element)element
-            .getElementsByTagName(MapGeneratorOptions.getXMLElementTagName())
+            .getElementsByTagName(MapGeneratorOptions.getTagName())
             .item(0);
         getFreeColClient().getGame().getMapGeneratorOptions()
             .readFromXMLElement(mgoElement);

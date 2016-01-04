@@ -49,7 +49,7 @@ public class ChangeStateMessage extends DOMMessage {
      * @param state The new state.
      */
     public ChangeStateMessage(Unit unit, UnitState state) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.stateString = String.valueOf(state);
@@ -63,7 +63,7 @@ public class ChangeStateMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChangeStateMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.stateString = element.getAttribute("state");
@@ -115,7 +115,7 @@ public class ChangeStateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "state", stateString).toXMLElement();
     }
@@ -125,7 +125,7 @@ public class ChangeStateMessage extends DOMMessage {
      *
      * @return "changeState".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "changeState";
     }
 }

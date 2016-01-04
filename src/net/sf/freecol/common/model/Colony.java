@@ -3022,13 +3022,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             if (ut != null) populationQueue.add(ut);
             xr.closeTag(POPULATION_QUEUE_TAG);
 
-        } else if (Building.getXMLElementTagName().equals(tag)) {
+        } else if (Building.getTagName().equals(tag)) {
             addBuilding(xr.readFreeColGameObject(game, Building.class));
 
-        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
+        } else if (ColonyTile.getTagName().equals(tag)) {
             colonyTiles.add(xr.readFreeColGameObject(game, ColonyTile.class));
 
-        } else if (ExportData.getXMLElementTagName().equals(tag)) {
+        } else if (ExportData.getTagName().equals(tag)) {
             ExportData data = new ExportData(xr);
             setExportData(data);
         
@@ -3049,14 +3049,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "colony".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "colony";
     }
 }

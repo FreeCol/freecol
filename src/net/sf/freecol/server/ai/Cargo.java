@@ -665,7 +665,7 @@ public class Cargo {
 
 
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getXMLElementTagName());
+        xw.writeStartElement(getTagName());
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
                           (AIObject)getTransportable());
@@ -709,9 +709,9 @@ public class Cargo {
         if (tid != null) {
             AIObject aio = aiMain.getAIObject(tid);
             if (aio == null) {
-                if (tid.startsWith(Unit.getXMLElementTagName())) {
+                if (tid.startsWith(Unit.getTagName())) {
                     tao = new AIUnit(aiMain, tid);
-                } else if (tid.startsWith(AIGoods.getXMLElementTagName())) {
+                } else if (tid.startsWith(AIGoods.getTagName())) {
                     tao = new AIGoods(aiMain, tid);
                 }
             } else {
@@ -749,7 +749,7 @@ public class Cargo {
 
         this.plan.fallback = xr.getAttribute(FALLBACK_TAG, false);
 
-        xr.closeTag(getXMLElementTagName());
+        xr.closeTag(getTagName());
     }
 
     /**
@@ -757,7 +757,7 @@ public class Cargo {
      *
      * @return "cargo"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "cargo";
     }
 }

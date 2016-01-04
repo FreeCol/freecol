@@ -53,7 +53,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param goods The <code>Goods</code> to deliverGift.
      */
     public DeliverGiftMessage(Unit unit, Settlement settlement, Goods goods) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -68,12 +68,12 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getXMLElementTagName()));
+            DOMMessage.getChildElement(element, Goods.getTagName()));
     }
 
 
@@ -159,7 +159,7 @@ public class DeliverGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "unit", unitId,
             "settlement", settlementId);
         result.add(goods);
@@ -171,7 +171,7 @@ public class DeliverGiftMessage extends DOMMessage {
      *
      * @return "deliverGift".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "deliverGift";
     }
 }

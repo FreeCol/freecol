@@ -454,7 +454,7 @@ public abstract class Feature extends FreeColObject implements Named {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Scope.getXMLElementTagName().equals(tag)) {
+        if (Scope.getTagName().equals(tag)) {
             addScope(new Scope(xr));
 
         } else {

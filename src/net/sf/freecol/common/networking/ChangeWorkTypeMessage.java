@@ -49,7 +49,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param workType The <code>GoodsType</code> to produce.
      */
     public ChangeWorkTypeMessage(Unit unit, GoodsType workType) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.workTypeId = workType.getId();
@@ -63,7 +63,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChangeWorkTypeMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.workTypeId = element.getAttribute("workType");
@@ -110,7 +110,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "workType", workTypeId).toXMLElement();
     }
@@ -120,7 +120,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      *
      * @return "changeWorkType".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "changeWorkType";
     }
 }

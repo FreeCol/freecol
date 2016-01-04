@@ -193,7 +193,7 @@ public class ServerInfo {
      * @return A <code>DOMMessage</code> describing this server.
      */
     public DOMMessage toMessage() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "name", name,
             "address", address,
             "port", Integer.toString(port),
@@ -228,7 +228,7 @@ public class ServerInfo {
      *
      * @return "serverInfo".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "serverInfo";
     }
 

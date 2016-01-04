@@ -392,7 +392,7 @@ public class HighScore extends FreeColObject {
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 final String tag = xr.getLocalName();
-                if (HighScore.getXMLElementTagName().equals(tag)) {
+                if (HighScore.getTagName().equals(tag)) {
                     scores.add(new HighScore(xr));
                 }
             }
@@ -598,14 +598,14 @@ public class HighScore extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "highScore".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "highScore";
     }
 }

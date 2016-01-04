@@ -48,7 +48,7 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param teacher The teacher <code>Unit</code>.
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.studentId = student.getId();
         this.teacherId = teacher.getId();
@@ -62,7 +62,7 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public AssignTeacherMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.studentId = element.getAttribute("student");
         this.teacherId = element.getAttribute("teacher");
@@ -128,7 +128,7 @@ public class AssignTeacherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "student", studentId,
             "teacher", teacherId).toXMLElement();
     }
@@ -138,7 +138,7 @@ public class AssignTeacherMessage extends DOMMessage {
      *
      * @return "assignTeacher".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "assignTeacher";
     }
 }

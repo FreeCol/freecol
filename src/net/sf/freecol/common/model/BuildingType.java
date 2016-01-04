@@ -501,14 +501,14 @@ public final class BuildingType extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "building-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "building-type";
     }
 }

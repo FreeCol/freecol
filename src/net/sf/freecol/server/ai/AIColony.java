@@ -1464,20 +1464,20 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // Serialization
 
     private static final String AI_GOODS_LIST_TAG
-        = AIGoods.getXMLElementTagName() + LIST_ELEMENT;
+        = AIGoods.getTagName() + LIST_ELEMENT;
     private static final String GOODS_WISH_LIST_TAG
-        = GoodsWish.getXMLElementTagName() + LIST_ELEMENT;
+        = GoodsWish.getTagName() + LIST_ELEMENT;
     private static final String TILE_IMPROVEMENT_PLAN_LIST_TAG
-        = TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT;
+        = TileImprovementPlan.getTagName() + LIST_ELEMENT;
     private static final String WORKER_WISH_LIST_TAG
-        = WorkerWish.getXMLElementTagName() + LIST_ELEMENT;
+        = WorkerWish.getTagName() + LIST_ELEMENT;
     // @compat 0.10.3
     private static final String OLD_GOODS_WISH_TAG
-        = GoodsWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
+        = GoodsWish.getTagName() + "Wish" + LIST_ELEMENT;
     private static final String OLD_TILE_IMPROVEMENT_PLAN_LIST_TAG
         = "tileimprovementplan" + LIST_ELEMENT;
     private static final String OLD_WORKER_WISH_TAG
-        = WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
+        = WorkerWish.getTagName() + "Wish" + LIST_ELEMENT;
     // end @compat
 
 
@@ -1600,14 +1600,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "aiColony"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiColony";
     }
 }

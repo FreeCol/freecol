@@ -51,7 +51,7 @@ public class DeclineMoundsMessage extends DOMMessage {
      * @param direction The <code>Direction</code> the unit is looking.
      */
     public DeclineMoundsMessage(Unit unit, Direction direction) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -65,7 +65,7 @@ public class DeclineMoundsMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeclineMoundsMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.directionString = element.getAttribute("direction");
@@ -118,7 +118,7 @@ public class DeclineMoundsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "direction", directionString).toXMLElement();
     }
@@ -128,7 +128,7 @@ public class DeclineMoundsMessage extends DOMMessage {
      *
      * @return "declineMounds".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "declineMounds";
     }
 }

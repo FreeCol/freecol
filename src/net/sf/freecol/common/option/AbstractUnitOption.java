@@ -279,14 +279,14 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unitOption".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "unitOption";
     }
 }

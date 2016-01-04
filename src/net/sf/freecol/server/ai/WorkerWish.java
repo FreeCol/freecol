@@ -79,7 +79,7 @@ public class WorkerWish extends Wish {
      */
     public WorkerWish(AIMain aiMain, Location destination, int value,
                       UnitType unitType, boolean expertNeeded) {
-        this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+        this(aiMain, getTagName() + ":" + aiMain.getNextId());
 
         if (destination == null) {
             throw new NullPointerException("destination == null");
@@ -245,14 +245,14 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "workerWish"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "workerWish";
     }
 }

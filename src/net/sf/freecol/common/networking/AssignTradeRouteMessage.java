@@ -48,7 +48,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The <code>TradeRoute</code> to assign.
      */
     public AssignTradeRouteMessage(Unit unit, TradeRoute tradeRoute) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.tradeRouteId = (tradeRoute == null) ? null : tradeRoute.getId();
@@ -62,7 +62,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public AssignTradeRouteMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.tradeRouteId = (element.hasAttribute("tradeRoute"))
@@ -113,7 +113,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "unit", unitId);
         if (tradeRouteId != null) {
             result.setAttribute("tradeRoute", tradeRouteId);
@@ -126,7 +126,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      *
      * @return "assignTradeRoute".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "assignTradeRoute";
     }
 }

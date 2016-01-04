@@ -968,7 +968,7 @@ public abstract class WorkLocation extends UnitLocation
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (ProductionType.getXMLElementTagName().equals(tag)) {
+        if (ProductionType.getTagName().equals(tag)) {
             productionType = new ProductionType(xr, spec);
 
         } else {

@@ -639,7 +639,7 @@ public class TileItemContainer extends FreeColGameObject {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (LostCityRumour.getXMLElementTagName().equals(tag)) {
+        if (LostCityRumour.getTagName().equals(tag)) {
             LostCityRumour lcr = xr.readFreeColGameObject(game, LostCityRumour.class);
             if (lcr != null) {
                 // @compat 0.10.4
@@ -649,10 +649,10 @@ public class TileItemContainer extends FreeColGameObject {
                 addTileItem(lcr);
             }
 
-        } else if (Resource.getXMLElementTagName().equals(tag)) {
+        } else if (Resource.getTagName().equals(tag)) {
             addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
-        } else if (TileImprovement.getXMLElementTagName().equals(tag)
+        } else if (TileImprovement.getTagName().equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -680,14 +680,14 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tileItemContainer".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tileItemContainer";
     }
 }

@@ -1042,14 +1042,14 @@ public final class UnitType extends BuildableType implements Consumer {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unit-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "unit-type";
     }
 }

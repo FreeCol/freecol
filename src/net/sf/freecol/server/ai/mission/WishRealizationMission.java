@@ -262,14 +262,14 @@ public class WishRealizationMission extends Mission {
         final String wid = xr.getAttribute(WISH_TAG, (String)null);
         wish = xr.getAttribute(aiMain, WISH_TAG, Wish.class, (Wish)null);
         if (wish == null) {
-            if (wid.startsWith(GoodsWish.getXMLElementTagName())
+            if (wid.startsWith(GoodsWish.getTagName())
                 // @compat 0.10.3
                 || wid.startsWith(OLD_GOODS_WISH_TAG)
                 // end @compat
                 ) {
                 wish = new GoodsWish(aiMain, wid);
 
-            } else if (wid.startsWith(WorkerWish.getXMLElementTagName())) {
+            } else if (wid.startsWith(WorkerWish.getTagName())) {
                 wish = new WorkerWish(aiMain, wid);
 
             } else {
@@ -282,14 +282,14 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return The <code>String</code> "wishRealizationMission".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "wishRealizationMission";
     }
 }

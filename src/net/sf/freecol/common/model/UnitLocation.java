@@ -583,7 +583,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Unit.getXMLElementTagName().equals(tag)) {
+        if (Unit.getTagName().equals(tag)) {
             Unit u = xr.readFreeColGameObject(getGame(), Unit.class);
             if (u.getLocation() != this) {
                 logger.warning("Fixing bogus unit location for " + u.getId()

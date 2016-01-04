@@ -324,7 +324,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
             addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);
 
-        } else if (Limit.getXMLElementTagName().equals(tag)) {
+        } else if (Limit.getTagName().equals(tag)) {
             Limit limit = new Limit(xr, spec);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());

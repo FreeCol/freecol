@@ -2577,10 +2577,10 @@ public class Map extends FreeColGameObject implements Location {
         final Game game = getGame();
         final String tag = xr.getLocalName();
 
-        if (Region.getXMLElementTagName().equals(tag)) {
+        if (Region.getTagName().equals(tag)) {
             addRegion(xr.readFreeColGameObject(game, Region.class));
 
-        } else if (Tile.getXMLElementTagName().equals(tag)) {
+        } else if (Tile.getTagName().equals(tag)) {
             Tile t = xr.readFreeColGameObject(game, Tile.class);
             setTile(t, t.getX(), t.getY());
 
@@ -2605,14 +2605,14 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "map".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "map";
     }
 }

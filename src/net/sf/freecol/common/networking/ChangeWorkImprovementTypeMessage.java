@@ -53,7 +53,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     public ChangeWorkImprovementTypeMessage(Unit unit,
                                             TileImprovementType type) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.improvementId = type.getId();
@@ -67,7 +67,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChangeWorkImprovementTypeMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.improvementId = element.getAttribute("improvementType");
@@ -138,7 +138,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "improvementType", improvementId).toXMLElement();
     }
@@ -148,7 +148,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      *
      * @return "changeWorkImprovementType".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "changeWorkImprovementType";
     }
 }

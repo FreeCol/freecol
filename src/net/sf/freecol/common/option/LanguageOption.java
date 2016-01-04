@@ -316,14 +316,14 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "languageOption".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "languageOption";
     }
 }

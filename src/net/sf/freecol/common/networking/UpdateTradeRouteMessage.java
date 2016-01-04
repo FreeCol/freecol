@@ -43,7 +43,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The <code>TradeRoute</code> to update.
      */
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.tradeRoute = tradeRoute;
     }
@@ -56,7 +56,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public UpdateTradeRouteMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         tradeRoute = (element.getChildNodes().getLength() != 1) ? null
             : SetTradeRoutesMessage.tradeRouteFromElement(game,
@@ -102,7 +102,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName());
+        DOMMessage result = new DOMMessage(getTagName());
         result.add(tradeRoute);
         return result.toXMLElement();
     }
@@ -112,7 +112,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      *
      * @return "updateTradeRoute".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "updateTradeRoute";
     }
 }

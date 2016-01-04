@@ -966,13 +966,13 @@ public final class FreeColServer {
                         xr.nextTag();
                     }
 
-                } else if (Game.getXMLElementTagName().equals(tag)) {
+                } else if (Game.getTagName().equals(tag)) {
                     // Read the game
                     game = new ServerGame(xr, specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
 
-                } else if (AIMain.getXMLElementTagName().equals(tag)) {
+                } else if (AIMain.getTagName().equals(tag)) {
                     if (server == null) break;
                     server.setAIMain(new AIMain(server, xr));
 

@@ -513,7 +513,7 @@ public class GameOptions {
      *
      * @return "gameOptions".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "gameOptions";
     }
 }

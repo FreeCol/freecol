@@ -231,10 +231,10 @@ public abstract class FreeColGameObjectType extends FreeColObject
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getXMLElementTagName().equals(tag)) {
+        if (Ability.getTagName().equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 removeAbilities(xr.readId());
-                xr.closeTag(Ability.getXMLElementTagName());
+                xr.closeTag(Ability.getTagName());
 
             } else {
                 Ability ability = new Ability(xr, spec); // Closes the element
@@ -243,10 +243,10 @@ public abstract class FreeColGameObjectType extends FreeColObject
                 spec.addAbility(ability);
             }
 
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+        } else if (Modifier.getTagName().equals(tag)) {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 removeModifiers(xr.readId());
-                xr.closeTag(Modifier.getXMLElementTagName());
+                xr.closeTag(Modifier.getTagName());
 
             } else {
                 Modifier modifier = new Modifier(xr, spec);// Closes the element

@@ -217,14 +217,14 @@ public class NationSummary extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "nationSummary"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "nationSummary";
     }
 }

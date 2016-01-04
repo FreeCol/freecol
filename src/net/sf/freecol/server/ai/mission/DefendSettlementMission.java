@@ -454,14 +454,14 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "defendSettlementMission".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "defendSettlementMission";
     }
 }

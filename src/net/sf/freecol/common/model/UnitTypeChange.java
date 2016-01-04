@@ -334,7 +334,7 @@ public class UnitTypeChange extends FreeColObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Scope.getXMLElementTagName().equals(tag)) {
+        if (Scope.getTagName().equals(tag)) {
             addScope(new Scope(xr));
 
         } else {
@@ -362,14 +362,14 @@ public class UnitTypeChange extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "upgrade".
      */
-    public static final String getXMLElementTagName() {
+    public static final String getTagName() {
         return "upgrade";
     }
 }

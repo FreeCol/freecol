@@ -366,14 +366,14 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "indianBringGiftMission".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "indianBringGiftMission";
     }
 }

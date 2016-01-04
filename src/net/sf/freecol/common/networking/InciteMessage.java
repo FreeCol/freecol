@@ -62,7 +62,7 @@ public class InciteMessage extends DOMMessage {
      */
     public InciteMessage(Unit unit, Direction direction, Player enemy,
                          int gold) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -78,7 +78,7 @@ public class InciteMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public InciteMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
@@ -156,7 +156,7 @@ public class InciteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unitId", unitId,
             "direction", directionString,
             "enemyId", enemyId,
@@ -168,7 +168,7 @@ public class InciteMessage extends DOMMessage {
      *
      * @return "incite".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "incite";
     }
 }

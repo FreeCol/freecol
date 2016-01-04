@@ -52,7 +52,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param carrier The <code>Unit</code> carrying the goods.
      */
     public UnloadGoodsMessage(GoodsType goodsType, int amount, Unit carrier) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.goodsTypeId = goodsType.getId();
         this.amountString = Integer.toString(amount);
@@ -67,7 +67,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public UnloadGoodsMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.goodsTypeId = element.getAttribute("type");
         this.amountString = element.getAttribute("amount");
@@ -132,7 +132,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "type", goodsTypeId,
             "amount", amountString,
             "carrier", carrierId).toXMLElement();
@@ -143,7 +143,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      *
      * @return "unloadGoods".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "unloadGoods";
     }
 }

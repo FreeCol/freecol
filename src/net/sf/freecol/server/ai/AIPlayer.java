@@ -452,7 +452,7 @@ public abstract class AIPlayer extends AIObject {
      *
      * @return the tag name.
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiPlayer";
     }
 }

@@ -132,7 +132,7 @@ public class SelectOption extends IntegerOption {
             }
             if (fallback == null) fallback = i;
         }
-        logger.warning(getXMLElementTagName() + ".setValue invalid value: "
+        logger.warning(getTagName() + ".setValue invalid value: "
             + value + ", using fallback: " + fallback);
         super.setValue(fallback);
     }
@@ -235,14 +235,14 @@ public class SelectOption extends IntegerOption {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "selectOption".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "selectOption";
     }
 }

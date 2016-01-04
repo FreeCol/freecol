@@ -51,7 +51,7 @@ public class EuropeWas {
         if (europe.getUnitCount() < unitCount+1) return null;
         Unit newUnit = null;
         int idMax = 0;
-        final String unitPrefix = Unit.getXMLElementTagName() + ":";
+        final String unitPrefix = Unit.getTagName() + ":";
         for (Unit u : europe.getUnitList()) {
             String uid = u.getId();
             if (!uid.startsWith(unitPrefix)) continue;

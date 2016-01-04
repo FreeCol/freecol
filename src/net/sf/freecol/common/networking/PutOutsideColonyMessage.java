@@ -44,7 +44,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to put outside.
      */
     public PutOutsideColonyMessage(Unit unit) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         unitId = unit.getId();
     }
@@ -57,7 +57,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public PutOutsideColonyMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         unitId = element.getAttribute("unit");
     }
@@ -101,7 +101,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId).toXMLElement();
     }
 
@@ -110,7 +110,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
      *
      * @return "putOutsideColony".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "putOutsideColony";
     }
 }

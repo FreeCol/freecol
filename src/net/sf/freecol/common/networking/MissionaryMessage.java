@@ -58,7 +58,7 @@ public class MissionaryMessage extends DOMMessage {
      */
     public MissionaryMessage(Unit unit, Direction direction,
                              boolean denounce) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -73,7 +73,7 @@ public class MissionaryMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public MissionaryMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
@@ -158,7 +158,7 @@ public class MissionaryMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unitId", unitId,
             "direction", directionString,
             "denounce", Boolean.toString(denounce)).toXMLElement();
@@ -169,7 +169,7 @@ public class MissionaryMessage extends DOMMessage {
      *
      * @return "missionary".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "missionary";
     }
 }

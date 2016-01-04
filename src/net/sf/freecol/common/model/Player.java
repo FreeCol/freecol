@@ -4105,36 +4105,36 @@ public class Player extends FreeColGameObject implements Nameable {
                         new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
-        } else if (Ability.getXMLElementTagName().equals(tag)) {
+        } else if (Ability.getTagName().equals(tag)) {
             Ability ability = new Ability(xr, spec);
             if (ability.isIndependent()) addAbility(ability);
 
-        } else if (Europe.getXMLElementTagName().equals(tag)) {
+        } else if (Europe.getTagName().equals(tag)) {
             europe = xr.readFreeColGameObject(game, Europe.class);
 
-        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
+        } else if (HighSeas.getTagName().equals(tag)) {
             highSeas = xr.readFreeColGameObject(game, HighSeas.class);
 
-        } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
+        } else if (HistoryEvent.getTagName().equals(tag)) {
             getHistory().add(new HistoryEvent(xr));
 
-        } else if (LastSale.getXMLElementTagName().equals(tag)) {
+        } else if (LastSale.getTagName().equals(tag)) {
             addLastSale(new LastSale(xr));
 
-        } else if (Market.getXMLElementTagName().equals(tag)) {
+        } else if (Market.getTagName().equals(tag)) {
             market = xr.readFreeColGameObject(game, Market.class);
 
-        } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
+        } else if (ModelMessage.getTagName().equals(tag)) {
             addModelMessage(new ModelMessage(xr));
 
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+        } else if (Modifier.getTagName().equals(tag)) {
             Modifier modifier = new Modifier(xr, spec);
             if (modifier.isIndependent()) addModifier(modifier);
 
-        } else if (Monarch.getXMLElementTagName().equals(tag)) {
+        } else if (Monarch.getTagName().equals(tag)) {
             monarch = xr.readFreeColGameObject(game, Monarch.class);
 
-        } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
+        } else if (TradeRoute.getTagName().equals(tag)) {
             tradeRoutes.add(xr.readFreeColGameObject(game, TradeRoute.class));
 
         } else {
@@ -4154,14 +4154,14 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "player"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "player";
     }
 }

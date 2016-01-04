@@ -51,7 +51,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @param tradeRoutes A list of <code>TradeRoute</code>s to set.
      */
     public SetTradeRoutesMessage(List<TradeRoute> tradeRoutes) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.tradeRoutes = tradeRoutes;
     }
@@ -64,7 +64,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public SetTradeRoutesMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         List<TradeRoute> newRoutes = new ArrayList<>();
         NodeList nodes = element.getChildNodes();
@@ -166,7 +166,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName());
+        DOMMessage result = new DOMMessage(getTagName());
         for (TradeRoute tradeRoute : tradeRoutes) {
             result.add(tradeRoute);
         }
@@ -178,7 +178,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
      *
      * @return "setTradeRoutes".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "setTradeRoutes";
     }
 }

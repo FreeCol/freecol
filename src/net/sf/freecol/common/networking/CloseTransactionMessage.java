@@ -53,7 +53,7 @@ public class CloseTransactionMessage extends DOMMessage {
      *        transaction occurs.
      */
     public CloseTransactionMessage(Unit unit, Settlement settlement) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -67,7 +67,7 @@ public class CloseTransactionMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public CloseTransactionMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
@@ -112,7 +112,7 @@ public class CloseTransactionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "settlement", settlementId).toXMLElement();
     }
@@ -122,7 +122,7 @@ public class CloseTransactionMessage extends DOMMessage {
      *
      * @return "closeTransaction".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "closeTransaction";
     }
 }

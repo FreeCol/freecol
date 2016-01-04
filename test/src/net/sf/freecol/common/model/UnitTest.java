@@ -608,7 +608,7 @@ public class UnitTest extends FreeColTestCase {
             nextId.setAccessible(true);
             int id = nextId.getInt(game);
             nextId.setInt(game, id + 1);
-            xml = xml.replace(merchantman.getId(), Unit.getXMLElementTagName() + ":" + id);
+            xml = xml.replace(merchantman.getId(), Unit.getTagName() + ":" + id);
 
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

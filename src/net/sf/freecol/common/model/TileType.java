@@ -642,12 +642,12 @@ public final class TileType extends FreeColGameObjectType {
                             xr.getAttribute(PROBABILITY_TAG, 100));
             xr.closeTag(RESOURCE_TAG);
 
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+        } else if (Modifier.getTagName().equals(tag)) {
             // @compat 0.10.7
             // the tile type no longer contains the base production modifier
             String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
             if (id.startsWith("model.goods.")) {
-                xr.closeTag(Modifier.getXMLElementTagName());
+                xr.closeTag(Modifier.getTagName());
             } else {
                 super.readChild(xr);
             }
@@ -661,14 +661,14 @@ public final class TileType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tile-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tile-type";
     }
 }

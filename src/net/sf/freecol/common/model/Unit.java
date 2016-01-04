@@ -4567,7 +4567,7 @@ public class Unit extends GoodsLocation
             }
         // end @compat 0.10.5
 
-        } else if (TileImprovement.getXMLElementTagName().equals(tag)
+        } else if (TileImprovement.getTagName().equals(tag)
                    // @compat 0.11.3
                    || OLD_TILE_IMPROVEMENT_TAG.equals(tag)
                    // end @compat 0.11.3
@@ -4619,14 +4619,14 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unit"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "unit";
     }
 }

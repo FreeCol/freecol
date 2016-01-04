@@ -52,7 +52,7 @@ public class LearnSkillMessage extends DOMMessage {
      * @param direction The <code>Direction</code> the unit is looking.
      */
     public LearnSkillMessage(Unit unit, Direction direction) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -66,7 +66,7 @@ public class LearnSkillMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public LearnSkillMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
@@ -128,7 +128,7 @@ public class LearnSkillMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unitId", unitId,
             "direction", directionString).toXMLElement();
     }
@@ -138,7 +138,7 @@ public class LearnSkillMessage extends DOMMessage {
      *
      * @return "learnSkill".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "learnSkill";
     }
 }

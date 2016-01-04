@@ -44,7 +44,7 @@ public class AbandonColonyMessage extends DOMMessage {
      * @param colony The <code>Colony</code> to abandon.
      */
     public AbandonColonyMessage(Colony colony) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyId = colony.getId();
     }
@@ -56,7 +56,7 @@ public class AbandonColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public AbandonColonyMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyId = element.getAttribute("colony");
     }
@@ -101,7 +101,7 @@ public class AbandonColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(), "colony", colonyId)
+        return new DOMMessage(getTagName(), "colony", colonyId)
             .toXMLElement();
     }
 
@@ -110,7 +110,7 @@ public class AbandonColonyMessage extends DOMMessage {
      *
      * @return "abandonColony".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "abandonColony";
     }
 }

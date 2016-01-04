@@ -232,7 +232,7 @@ public class IndianNationType extends NationType {
         }
 
         for (String region : getRegionNames()) {
-            xw.writeStartElement(Region.getXMLElementTagName());
+            xw.writeStartElement(Region.getTagName());
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, region);
 
@@ -283,9 +283,9 @@ public class IndianNationType extends NationType {
                      xr.getAttribute(PROBABILITY_TAG, 0));
             xr.closeTag(SKILL_TAG);
 
-        } else if (Region.getXMLElementTagName().equals(tag)) {
+        } else if (Region.getTagName().equals(tag)) {
             addRegion(xr.readId());
-            xr.closeTag(Region.getXMLElementTagName());
+            xr.closeTag(Region.getTagName());
 
         } else {
             super.readChild(xr);
@@ -296,14 +296,14 @@ public class IndianNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "indian-nation-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "indian-nation-type";
     }
 }

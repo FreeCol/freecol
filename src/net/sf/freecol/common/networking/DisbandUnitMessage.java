@@ -44,7 +44,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param unit The <code>Unit</code> to clear.
      */
     public DisbandUnitMessage(Unit unit) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
     }
@@ -57,7 +57,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DisbandUnitMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
     }
@@ -95,7 +95,7 @@ public class DisbandUnitMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId).toXMLElement();
     }
 
@@ -104,7 +104,7 @@ public class DisbandUnitMessage extends DOMMessage {
      *
      * @return "disbandUnit".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "disbandUnit";
     }
 }

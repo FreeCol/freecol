@@ -674,14 +674,14 @@ public class Modifier extends Feature {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the XML tag name for this element.
      *
      * @return "modifier".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "modifier";
     }
 }

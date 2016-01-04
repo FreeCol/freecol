@@ -205,7 +205,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             nextId.setAccessible(true);
             int id = nextId.getInt(game);
             nextId.setInt(game, id + 1);
-            xml = xml.replace(getId(), T.getXMLElementTagName() + ":" + id);
+            xml = xml.replace(getId(), T.getTagName() + ":" + id);
 
             return game.unserialize(xml, returnClass);
 
@@ -330,7 +330,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      *
      * @return "unknown".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "unknown";
     }
 }

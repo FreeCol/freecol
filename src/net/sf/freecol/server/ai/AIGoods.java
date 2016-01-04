@@ -82,7 +82,7 @@ public class AIGoods extends TransportableAIObject {
      */
     public AIGoods(AIMain aiMain, Location location, GoodsType type,
                    int amount, Location destination) {
-        this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
+        this(aiMain, getTagName() + ":" + aiMain.getNextId());
 
         this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
@@ -451,7 +451,7 @@ public class AIGoods extends TransportableAIObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Goods.getXMLElementTagName().equals(tag)) {
+        if (Goods.getTagName().equals(tag)) {
             if (goods != null) {
                 goods.readFromXML(xr);
             } else {
@@ -482,14 +482,14 @@ public class AIGoods extends TransportableAIObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "aiGoods"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiGoods";
     }
 }

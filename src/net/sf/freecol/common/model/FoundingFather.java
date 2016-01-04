@@ -389,10 +389,10 @@ public class FoundingFather extends FreeColGameObjectType {
         } else if (UNIT_TAG.equals(tag)) {
             addUnit(new AbstractUnit(xr));
 
-        } else if (Event.getXMLElementTagName().equals(tag)) {
+        } else if (Event.getTagName().equals(tag)) {
             addEvent(new Event(xr, spec));
 
-        } else if (Scope.getXMLElementTagName().equals(tag)) {
+        } else if (Scope.getTagName().equals(tag)) {
             addScope(new Scope(xr));
 
         } else {
@@ -404,14 +404,14 @@ public class FoundingFather extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "founding-father".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "founding-father";
     }
 }

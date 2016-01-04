@@ -766,7 +766,7 @@ public class PioneeringMission extends Mission {
             xw.writeAttribute(TARGET_TAG, target.getId());
 
             if (tileImprovementPlan != null) {
-                xw.writeAttribute(TileImprovementPlan.getXMLElementTagName(),
+                xw.writeAttribute(TileImprovementPlan.getTagName(),
                                   tileImprovementPlan);
             }
         }
@@ -784,8 +784,8 @@ public class PioneeringMission extends Mission {
         // Do not use setTarget in serialization
         target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
 
-        tileImprovementPlan = (xr.hasAttribute(TileImprovementPlan.getXMLElementTagName()))
-            ? xr.makeAIObject(aiMain, TileImprovementPlan.getXMLElementTagName(),
+        tileImprovementPlan = (xr.hasAttribute(TileImprovementPlan.getTagName()))
+            ? xr.makeAIObject(aiMain, TileImprovementPlan.getTagName(),
                 TileImprovementPlan.class, (TileImprovementPlan)null, true)
             : null;
     }
@@ -794,14 +794,14 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "pioneeringMission".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "pioneeringMission";
     }
 }

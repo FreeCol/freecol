@@ -56,7 +56,7 @@ public class EmbarkMessage extends DOMMessage {
      * @param direction An option direction to embark in.
      */
     public EmbarkMessage(Unit unit, Unit carrier, Direction direction) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.carrierId = carrier.getId();
@@ -72,7 +72,7 @@ public class EmbarkMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public EmbarkMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.carrierId = element.getAttribute("carrier");
@@ -152,7 +152,7 @@ public class EmbarkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "unit", unitId,
             "carrier", carrierId);
         if (directionString != null) {
@@ -166,7 +166,7 @@ public class EmbarkMessage extends DOMMessage {
      *
      * @return "embark".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "embark";
     }
 }

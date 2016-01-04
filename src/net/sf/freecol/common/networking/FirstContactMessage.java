@@ -60,7 +60,7 @@ public class FirstContactMessage extends DOMMessage {
      * @param tile An optional <code>Tile</code> to offer.
      */
     public FirstContactMessage(Player player, Player other, Tile tile) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.playerId = player.getId();
         this.otherId = other.getId();
@@ -78,7 +78,7 @@ public class FirstContactMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public FirstContactMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.playerId = element.getAttribute("player");
         this.otherId = element.getAttribute("other");
@@ -163,7 +163,7 @@ public class FirstContactMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "player", this.playerId,
             "other", this.otherId);
         if (this.tileId != null) {
@@ -183,7 +183,7 @@ public class FirstContactMessage extends DOMMessage {
      *
      * @return "firstContact".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "firstContact";
     }
 }

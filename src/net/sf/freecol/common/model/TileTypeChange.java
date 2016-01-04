@@ -159,7 +159,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
      *             stream.
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getXMLElementTagName());
+        xw.writeStartElement(getTagName());
 
         xw.writeAttribute(FROM_TAG, from);
 
@@ -213,18 +213,18 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     }
 
     /**
-     * Delegate to getXMLElementTagName.
+     * Delegate to getTagName.
      *
-     * @return What getXMLElementTagName does.
+     * @return What getTagName does.
      */
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "change".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "change";
     }
 }

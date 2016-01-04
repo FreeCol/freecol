@@ -329,19 +329,19 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     }
 
     /**
-     * Delegate to getXMLElementTagName.
+     * Delegate to getTagName.
      *
-     * @return What getXMLElementTagName does.
+     * @return What getTagName does.
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      * 
      * @return "tradeRouteStop".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "tradeRouteStop";
     }
 }

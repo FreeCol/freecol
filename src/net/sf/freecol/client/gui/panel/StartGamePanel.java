@@ -89,7 +89,7 @@ public final class StartGamePanel extends FreeColPanel {
         if (singlePlayer || getMyPlayer().isAdmin()) {
             Specification spec = getSpecification();
 
-            String gtag = GameOptions.getXMLElementTagName();
+            String gtag = GameOptions.getTagName();
             File gof = FreeColDirectories
                 .getOptionsFile(FreeColDirectories.GAME_OPTIONS_FILE_NAME);
             OptionGroup gog = (gof.exists()) ? OptionGroup.load(gof, gtag, spec)
@@ -98,7 +98,7 @@ public final class StartGamePanel extends FreeColPanel {
                 : spec.getOptionGroup(gtag);
             gog.save(gof);
 
-            String mtag = MapGeneratorOptions.getXMLElementTagName();
+            String mtag = MapGeneratorOptions.getTagName();
             File mof = FreeColDirectories
                 .getOptionsFile(FreeColDirectories.MAP_GENERATOR_OPTIONS_FILE_NAME);
             OptionGroup mog = (mof.exists()) ? OptionGroup.load(mof, mtag, spec)
@@ -121,10 +121,10 @@ public final class StartGamePanel extends FreeColPanel {
         start = Utility.localizedButton("startGame");
 
         gameOptions = Utility.localizedButton(Messages
-            .nameKey(GameOptions.getXMLElementTagName()));
+            .nameKey(GameOptions.getTagName()));
 
         mapGeneratorOptions = Utility.localizedButton(Messages
-            .nameKey(MapGeneratorOptions.getXMLElementTagName()));
+            .nameKey(MapGeneratorOptions.getTagName()));
 
         readyBox = new JCheckBox(Messages.message("startGamePanel.iAmReady"));
 

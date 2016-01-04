@@ -48,7 +48,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param unit A <code>Unit</code> whose stop is to be setd.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.index = String.valueOf(index);
@@ -62,7 +62,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public SetCurrentStopMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.index = element.getAttribute("index");
@@ -116,7 +116,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "index", index).toXMLElement();
     }
@@ -126,7 +126,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      *
      * @return "setCurrentStop".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "setCurrentStop";
     }
 }

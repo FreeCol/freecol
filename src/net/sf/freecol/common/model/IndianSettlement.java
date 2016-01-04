@@ -1576,14 +1576,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "indianSettlement".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "indianSettlement";
     }
 }

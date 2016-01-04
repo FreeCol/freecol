@@ -289,14 +289,14 @@ public class HistoryEvent extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "historyEvent".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "historyEvent";
     }
 }

@@ -373,14 +373,14 @@ public final class Limit extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the XML tag name for this element.
      *
      * @return "limit".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "limit";
     }
 }

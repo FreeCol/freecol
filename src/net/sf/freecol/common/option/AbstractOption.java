@@ -223,52 +223,52 @@ public abstract class AbstractOption<T> extends FreeColObject
             logger.finest("Skipping action " + xr.readId());
             xr.nextTag();
 
-        } else if (AbstractUnitOption.getXMLElementTagName().equals(tag)) {
+        } else if (AbstractUnitOption.getTagName().equals(tag)) {
             option = new AbstractUnitOption(spec);
 
-        } else if (AudioMixerOption.getXMLElementTagName().equals(tag)) {
+        } else if (AudioMixerOption.getTagName().equals(tag)) {
             option = new AudioMixerOption(spec);
 
-        } else if (BooleanOption.getXMLElementTagName().equals(tag)) {
+        } else if (BooleanOption.getTagName().equals(tag)) {
             option = new BooleanOption(spec);
 
-        } else if (FileOption.getXMLElementTagName().equals(tag)) {
+        } else if (FileOption.getTagName().equals(tag)) {
             option = new FileOption(spec);
 
-        } else if (IntegerOption.getXMLElementTagName().equals(tag)) {
+        } else if (IntegerOption.getTagName().equals(tag)) {
             option = new IntegerOption(spec);
 
-        } else if (LanguageOption.getXMLElementTagName().equals(tag)) {
+        } else if (LanguageOption.getTagName().equals(tag)) {
             option = new LanguageOption(spec);
 
-        } else if (ModListOption.getXMLElementTagName().equals(tag)) {
+        } else if (ModListOption.getTagName().equals(tag)) {
             option = new ModListOption(spec);
 
-        } else if (ModOption.getXMLElementTagName().equals(tag)) {
+        } else if (ModOption.getTagName().equals(tag)) {
             option = new ModOption(spec);
 
-        } else if (OptionGroup.getXMLElementTagName().equals(tag)) {
+        } else if (OptionGroup.getTagName().equals(tag)) {
             option = new OptionGroup(spec);
 
-        } else if (PercentageOption.getXMLElementTagName().equals(tag)) {
+        } else if (PercentageOption.getTagName().equals(tag)) {
             option = new PercentageOption(spec);
 
-        } else if (RangeOption.getXMLElementTagName().equals(tag)) {
+        } else if (RangeOption.getTagName().equals(tag)) {
             option = new RangeOption(spec);
 
-        } else if (SelectOption.getXMLElementTagName().equals(tag)) {
+        } else if (SelectOption.getTagName().equals(tag)) {
             option = new SelectOption(spec);
 
-        } else if (StringOption.getXMLElementTagName().equals(tag)) {
+        } else if (StringOption.getTagName().equals(tag)) {
             option = new StringOption(spec);
 
-        } else if (UnitListOption.getXMLElementTagName().equals(tag)) {
+        } else if (UnitListOption.getTagName().equals(tag)) {
             option = new UnitListOption(spec);
 
-        } else if (UnitTypeOption.getXMLElementTagName().equals(tag)) {
+        } else if (UnitTypeOption.getTagName().equals(tag)) {
             option = new UnitTypeOption(spec);
 
-        } else if (TextOption.getXMLElementTagName().equals(tag)) {
+        } else if (TextOption.getTagName().equals(tag)) {
             option = new TextOption(spec);
 
         } else {

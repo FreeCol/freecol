@@ -547,7 +547,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (MarketData.getXMLElementTagName().equals(tag)) {
+        if (MarketData.getTagName().equals(tag)) {
             MarketData data = xr.readFreeColGameObject(getGame(), 
                                                        MarketData.class);
             putMarketData(data.getGoodsType(), data);
@@ -576,14 +576,14 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "market".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "market";
     }
 }

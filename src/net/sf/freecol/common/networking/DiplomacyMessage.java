@@ -69,7 +69,7 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public DiplomacyMessage(FreeColGameObject our, FreeColGameObject other,
                             DiplomaticTrade agreement) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.ourId = our.getId();
         this.otherId = other.getId();
@@ -122,7 +122,7 @@ public class DiplomacyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.ourId = element.getAttribute("ourId");
         this.otherId = element.getAttribute("otherId");
@@ -366,7 +366,7 @@ public class DiplomacyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "ourId", ourId,
             "otherId", otherId);
         result.add(agreement);
@@ -379,7 +379,7 @@ public class DiplomacyMessage extends DOMMessage {
      *
      * @return "diplomacy".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "diplomacy";
     }
 }

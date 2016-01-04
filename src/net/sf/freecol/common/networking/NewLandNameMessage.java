@@ -49,7 +49,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @param newLandName The new land name.
      */
     public NewLandNameMessage(Unit unit, String newLandName) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.newLandName = newLandName;
@@ -63,7 +63,7 @@ public class NewLandNameMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public NewLandNameMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.newLandName = element.getAttribute("newLandName");
@@ -136,7 +136,7 @@ public class NewLandNameMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "newLandName", newLandName).toXMLElement();
     }
@@ -146,7 +146,7 @@ public class NewLandNameMessage extends DOMMessage {
      *
      * @return "newLandName".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "newLandName";
     }
 }

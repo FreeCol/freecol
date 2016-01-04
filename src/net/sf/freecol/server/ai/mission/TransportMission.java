@@ -1534,7 +1534,7 @@ public class TransportMission extends Mission {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Cargo.getXMLElementTagName().equals(tag)) {
+        if (Cargo.getTagName().equals(tag)) {
             tAdd(new Cargo(getAIMain(), xr), -1);
 
         // @compat 0.10.5
@@ -1564,14 +1564,14 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "transportMission".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "transportMission";
     }
 }

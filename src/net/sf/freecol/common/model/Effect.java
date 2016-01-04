@@ -192,7 +192,7 @@ public class Effect extends FreeColGameObjectType {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Scope.getXMLElementTagName().equals(tag)) {
+        if (Scope.getTagName().equals(tag)) {
             addScope(new Scope(xr));
 
         } else {
@@ -217,14 +217,14 @@ public class Effect extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the XML tag name for this element.
      *
      * @return "effect".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "effect";
     }
 }

@@ -50,7 +50,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         super(freeColClient, frame, true, freeColClient.getClientOptions(),
               freeColClient.getClientOptions().getId(),
               FreeColDirectories.CLIENT_OPTIONS_FILE_NAME,
-              ClientOptions.getXMLElementTagName());
+              ClientOptions.getTagName());
 
         List<ChoiceItem<OptionGroup>> c = choices();
         c.add(new ChoiceItem<>(Messages.message("reset"), resetCookie));

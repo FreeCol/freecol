@@ -60,7 +60,7 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     public GoodsForSaleMessage(Unit unit, Settlement settlement,
                                List<Goods> sellGoods) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -75,7 +75,7 @@ public class GoodsForSaleMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public GoodsForSaleMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
@@ -134,7 +134,7 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName(),
+        DOMMessage result = new DOMMessage(getTagName(),
             "unit", unitId,
             "settlement", settlementId);
         if (sellGoods != null) {
@@ -148,7 +148,7 @@ public class GoodsForSaleMessage extends DOMMessage {
      *
      * @return "goodsForSale".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "goodsForSale";
     }
 }

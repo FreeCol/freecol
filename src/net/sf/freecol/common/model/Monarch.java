@@ -1169,14 +1169,14 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "monarch".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "monarch";
     }
 }

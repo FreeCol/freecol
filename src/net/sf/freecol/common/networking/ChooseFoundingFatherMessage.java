@@ -54,7 +54,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.fathers = new ArrayList<>();
         this.fathers.addAll(fathers);
@@ -69,7 +69,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public ChooseFoundingFatherMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         final Specification spec = game.getSpecification();
         this.fathers = new ArrayList<>();
@@ -154,7 +154,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getXMLElementTagName());
+        DOMMessage result = new DOMMessage(getTagName());
         for (FoundingFather f : getFathers()) {
             result.setAttribute(f.getType().toString(), f.getId());
         }
@@ -169,7 +169,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      *
      * @return "chooseFoundingFather".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "chooseFoundingFather";
     }
 }

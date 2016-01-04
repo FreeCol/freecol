@@ -236,14 +236,14 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "highSeas"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "highSeas";
     }
 }

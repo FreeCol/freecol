@@ -63,7 +63,7 @@ public class IndianDemandMessage extends DOMMessage {
      */
     public IndianDemandMessage(Unit unit, Colony colony,
                                GoodsType type, int amount) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
@@ -80,7 +80,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public IndianDemandMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.colonyId = element.getAttribute("colony");
@@ -209,7 +209,7 @@ public class IndianDemandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage ret = new DOMMessage(getXMLElementTagName(),
+        DOMMessage ret = new DOMMessage(getTagName(),
             "unit", unitId,
             "colony", colonyId,
             "amount", amount);
@@ -223,7 +223,7 @@ public class IndianDemandMessage extends DOMMessage {
      *
      * @return "indianDemand".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "indianDemand";
     }
 }

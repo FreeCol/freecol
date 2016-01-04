@@ -605,10 +605,10 @@ public class Europe extends UnitLocation
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getXMLElementTagName().equals(tag)) {
+        if (Ability.getTagName().equals(tag)) {
             addAbility(new Ability(xr, spec));
 
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+        } else if (Modifier.getTagName().equals(tag)) {
             addModifier(new Modifier(xr, spec));
 
         } else if (RECRUIT_TAG.equals(tag)) {
@@ -650,14 +650,14 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "europe".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "europe";
     }
 }

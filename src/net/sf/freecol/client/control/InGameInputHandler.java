@@ -314,22 +314,22 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             final String tag = e.getTagName();
-            if (FoundingFather.getXMLElementTagName().equals(tag)) {
+            if (FoundingFather.getTagName().equals(tag)) {
                 FoundingFather father
                     = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
-            } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
+            } else if (HistoryEvent.getTagName().equals(tag)) {
                 player.getHistory().add(new HistoryEvent(e));
 
-            } else if (LastSale.getXMLElementTagName().equals(tag)) {
+            } else if (LastSale.getTagName().equals(tag)) {
                 player.addLastSale(new LastSale(e));
 
-            } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
+            } else if (ModelMessage.getTagName().equals(tag)) {
                 player.addModelMessage(new ModelMessage(e));
 
-            } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
+            } else if (TradeRoute.getTagName().equals(tag)) {
                 player.getTradeRoutes().add(new TradeRoute(game, e));
 
             } else {
@@ -647,14 +647,14 @@ public final class InGameInputHandler extends InputHandler {
             Element e = (Element) nodes.item(i);
 
             final String tag = e.getTagName();
-            if (Ability.getXMLElementTagName().equals(tag)) {
+            if (Ability.getTagName().equals(tag)) {
                 if (add) {
                     object.addAbility(new Ability(e, spec));
                 } else {
                     object.removeAbility(new Ability(e, spec));
                 }
 
-            } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            } else if (Modifier.getTagName().equals(tag)) {
                 if (add) {
                     object.addModifier(new Modifier(e, spec));
                 } else {

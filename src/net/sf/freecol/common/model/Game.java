@@ -1351,13 +1351,13 @@ public class Game extends FreeColGameObject {
             NameCache.addCityOfCibola(cibola);
             xr.closeTag(CIBOLA_TAG);
 
-        } else if (Map.getXMLElementTagName().equals(tag)) {
+        } else if (Map.getTagName().equals(tag)) {
             map = xr.readFreeColGameObject(game, Map.class);
 
-        } else if (NationOptions.getXMLElementTagName().equals(tag)) {
+        } else if (NationOptions.getTagName().equals(tag)) {
             nationOptions = new NationOptions(xr, specification);
 
-        } else if (Player.getXMLElementTagName().equals(tag)) {
+        } else if (Player.getTagName().equals(tag)) {
             Player player = xr.readFreeColGameObject(game, Player.class);
             if (player.isUnknownEnemy()) {
                 setUnknownEnemy(player);
@@ -1365,7 +1365,7 @@ public class Game extends FreeColGameObject {
                 players.add(player);
             }
 
-        } else if (Specification.getXMLElementTagName().equals(tag)) {
+        } else if (Specification.getTagName().equals(tag)) {
             logger.info(((specification == null) ? "Loading" : "Reloading")
                 + " specification.");
             specification = new Specification(xr);
@@ -1379,14 +1379,14 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "game".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "game";
     }
 }

@@ -564,13 +564,13 @@ public class AIMain extends FreeColObject
                 new EuropeanAIPlayer(this, xr);
             // end @compat
 
-            } else if (AIColony.getXMLElementTagName().equals(tag)) {
+            } else if (AIColony.getTagName().equals(tag)) {
                 new AIColony(this, xr);
 
-            } else if (AIGoods.getXMLElementTagName().equals(tag)) {
+            } else if (AIGoods.getTagName().equals(tag)) {
                 new AIGoods(this, xr);
 
-            } else if (AIPlayer.getXMLElementTagName().equals(tag)) {
+            } else if (AIPlayer.getTagName().equals(tag)) {
                 Player p = getGame().getFreeColGameObject(oid, Player.class);
                 if (p != null) {
                     if (p.isIndian()) {
@@ -584,24 +584,24 @@ public class AIMain extends FreeColObject
                     }
                 }
 
-            } else if (AIUnit.getXMLElementTagName().equals(tag)) {
+            } else if (AIUnit.getTagName().equals(tag)) {
                 new AIUnit(this, xr);
 
-            } else if (GoodsWish.getXMLElementTagName().equals(tag)
+            } else if (GoodsWish.getTagName().equals(tag)
                 // @compat 0.10.3
                 || GOODS_WISH_TAG.equals(tag)
                 // end @compat
                        ) {
                 wish = new GoodsWish(this, xr);
 
-            } else if (TileImprovementPlan.getXMLElementTagName().equals(tag)
+            } else if (TileImprovementPlan.getTagName().equals(tag)
                 // @compat 0.10.3
                 || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
                 new TileImprovementPlan(this, xr);
 
-            } else if (WorkerWish.getXMLElementTagName().equals(tag)) {
+            } else if (WorkerWish.getTagName().equals(tag)) {
                 wish = new WorkerWish(this, xr);
             
             } else {
@@ -618,7 +618,7 @@ public class AIMain extends FreeColObject
                        + tag + ", id=" + oid, e);
             // We are hosed.  Try to resynchronize at the end of the tag
             // or aiMain.
-            final String mainTag = getXMLElementTagName();
+            final String mainTag = getTagName();
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT
                 || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }
@@ -628,14 +628,14 @@ public class AIMain extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "aiMain"
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "aiMain";
     }
 }

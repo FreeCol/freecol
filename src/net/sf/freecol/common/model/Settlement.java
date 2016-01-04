@@ -796,11 +796,11 @@ public abstract class Settlement extends GoodsLocation
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (Ability.getXMLElementTagName().equals(tag)) {
+        if (Ability.getTagName().equals(tag)) {
             Ability ability = new Ability(xr, spec);
             if (ability.isIndependent()) addAbility(ability);
 
-        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+        } else if (Modifier.getTagName().equals(tag)) {
             Modifier modifier = new Modifier(xr, spec);
             if (modifier.isIndependent()) addModifier(modifier);
 

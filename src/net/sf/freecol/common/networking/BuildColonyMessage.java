@@ -49,7 +49,7 @@ public class BuildColonyMessage extends DOMMessage {
      * @param builder The <code>Unit</code> to do the building.
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyName = colonyName;
         this.builderId = builder.getId();
@@ -62,7 +62,7 @@ public class BuildColonyMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public BuildColonyMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.colonyName = element.getAttribute("name");
         this.builderId = element.getAttribute("unit");
@@ -122,7 +122,7 @@ public class BuildColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "name", colonyName,
             "unit", builderId).toXMLElement();
     }
@@ -132,7 +132,7 @@ public class BuildColonyMessage extends DOMMessage {
      *
      * @return "buildColony".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "buildColony";
     }
 }

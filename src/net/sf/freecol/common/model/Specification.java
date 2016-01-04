@@ -654,8 +654,8 @@ public final class Specification {
      */
     public void disableEditing() {
         for (String s : new String[] {
-                GameOptions.getXMLElementTagName(),
-                MapGeneratorOptions.getXMLElementTagName(),
+                GameOptions.getTagName(),
+                MapGeneratorOptions.getTagName(),
                 DIFFICULTY_LEVELS
             }) {
             OptionGroup og = allOptionGroups.get(s);
@@ -803,7 +803,7 @@ public final class Specification {
 
             boolean recursive = xr.getAttribute(RECURSIVE_TAG, true);
 
-            if (OptionGroup.getXMLElementTagName().equals(tag)) {
+            if (OptionGroup.getTagName().equals(tag)) {
                 String id = xr.readId();
                 OptionGroup group = allOptionGroups.get(id);
                 if (group == null) {
@@ -814,7 +814,7 @@ public final class Specification {
                 Specification.this.addOptionGroup(group, recursive);
 
             } else {
-                logger.warning(OptionGroup.getXMLElementTagName()
+                logger.warning(OptionGroup.getTagName()
                     + " expected in OptionReader, not: " + tag);
                 xr.nextTag();
             }
@@ -1628,20 +1628,20 @@ public final class Specification {
     }
 
     public OptionGroup getGameOptions() {
-        return getOptionGroup(GameOptions.getXMLElementTagName());
+        return getOptionGroup(GameOptions.getTagName());
     }
 
     public void setGameOptions(OptionGroup go) {
-        allOptionGroups.put(GameOptions.getXMLElementTagName(), go);
+        allOptionGroups.put(GameOptions.getTagName(), go);
         addOptionGroup(go, true);
     }
 
     public OptionGroup getMapGeneratorOptions() {
-        return getOptionGroup(MapGeneratorOptions.getXMLElementTagName());
+        return getOptionGroup(MapGeneratorOptions.getTagName());
     }
 
     public void setMapGeneratorOptions(OptionGroup mgo) {
-        allOptionGroups.put(MapGeneratorOptions.getXMLElementTagName(), mgo);
+        allOptionGroups.put(MapGeneratorOptions.getTagName(), mgo);
         addOptionGroup(mgo, true);
     }
 
@@ -2696,7 +2696,7 @@ public final class Specification {
      */
     protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         // Start element
-        xw.writeStartElement(getXMLElementTagName());
+        xw.writeStartElement(getTagName());
 
         // Add attributes
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
@@ -2812,7 +2812,7 @@ public final class Specification {
      *
      * @return "freecol-specification".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "freecol-specification";
     }
 }

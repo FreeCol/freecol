@@ -517,7 +517,7 @@ public class ClientOptions extends OptionGroup {
      * specification as it is needed before the specification is available.
      */
     public ClientOptions() {
-        super(getXMLElementTagName());
+        super(getTagName());
     }
 
 
@@ -778,7 +778,7 @@ public class ClientOptions extends OptionGroup {
      *
      * @return "clientOptions".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "clientOptions";
     }
 }

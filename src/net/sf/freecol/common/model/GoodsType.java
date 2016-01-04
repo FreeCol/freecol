@@ -696,14 +696,14 @@ public final class GoodsType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public String getXMLTagName() { return getXMLElementTagName(); }
+    public String getXMLTagName() { return getTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "goods-type".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "goods-type";
     }
 }

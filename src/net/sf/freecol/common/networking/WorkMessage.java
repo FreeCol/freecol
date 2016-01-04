@@ -49,7 +49,7 @@ public class WorkMessage extends DOMMessage {
      * @param workLocation The <code>WorkLocation</code> to change to.
      */
     public WorkMessage(Unit unit, WorkLocation workLocation) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.workLocationId = workLocation.getId();
@@ -62,7 +62,7 @@ public class WorkMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public WorkMessage(Game game, Element element) {
-        super(getXMLElementTagName());
+        super(getTagName());
 
         this.unitId = element.getAttribute("unit");
         this.workLocationId = element.getAttribute("workLocation");
@@ -127,7 +127,7 @@ public class WorkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getXMLElementTagName(),
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "workLocation", workLocationId).toXMLElement();
     }
@@ -137,7 +137,7 @@ public class WorkMessage extends DOMMessage {
      *
      * @return "work".
      */
-    public static String getXMLElementTagName() {
+    public static String getTagName() {
         return "work";
     }
 }
