@@ -800,14 +800,9 @@ public class Game extends FreeColGameObject {
      * @return A list of available <code>Nation</code>s.
      */
     public final List<Nation> getVacantNations() {
-        List<Nation> result = new ArrayList<>();
-        for (Entry<Nation, NationState> entry
-                 : nationOptions.getNations().entrySet()) {
-            if (entry.getValue() == NationState.AVAILABLE) {
-                result.add(entry.getKey());
-            }
-        }
-        return result;
+        return transform(nationOptions.getNations().entrySet(),
+            e -> e.getValue() == NationState.AVAILABLE,
+            Entry::getKey, Collectors.toList());
     }
 
     /**

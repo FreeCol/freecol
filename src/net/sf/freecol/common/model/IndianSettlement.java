@@ -944,12 +944,13 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        final java.util.Map<GoodsType, Integer> prices = new HashMap<>();
-        for (GoodsType gt : spec.getGoodsTypeList()) {
-            // The natives do not trade military or non-storable goods.
-            if (gt.isMilitaryGoods() || !gt.isStorable()) continue;
-            prices.put(gt, getNormalGoodsPriceToBuy(gt, GoodsContainer.CARGO_SIZE));
-        }
+        final java.util.Map<GoodsType, Integer> prices
+            = transform(spec.getGoodsTypeList(),
+                        gt -> !gt.isMilitaryGoods() && gt.isStorable(),
+                        Collectors.toMap(gt -> gt,
+                            gt -> getNormalGoodsPriceToBuy(gt,
+                                GoodsContainer.CARGO_SIZE)));
+
         int wantedIndex = 0;
         for (Entry<GoodsType, Integer> e
                  : mapEntriesByValue(prices, descendingIntegerComparator)) {

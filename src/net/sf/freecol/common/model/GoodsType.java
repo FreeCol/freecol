@@ -24,11 +24,13 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -463,12 +465,9 @@ public final class GoodsType extends FreeColGameObjectType {
      *     must include this one.
      */
     public Set<GoodsType> getEquivalentTypes() {
-        Set<GoodsType> result = new HashSet<>();
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type == this
-                || type.getStoredAs() == this) result.add(type);
-        }
-        return result;
+        return transform(getSpecification().getGoodsTypeList(),
+                         gt -> gt == this || gt.getStoredAs() == this,
+                         Collectors.toSet());
     }
         
     /**

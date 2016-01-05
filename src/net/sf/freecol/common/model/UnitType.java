@@ -512,13 +512,9 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return A list of unit types.
      */
     public List<UnitType> getUnitTypesLearntInLostCity() {
-        List<UnitType> unitTypes = new ArrayList<>();
-        for (UnitTypeChange change : getTypeChanges()) {
-            if (change.asResultOf(ChangeType.LOST_CITY)) {
-                unitTypes.add(change.getNewUnitType());
-            }
-        }
-        return unitTypes;
+        return transform(getTypeChanges(),
+                         c -> c.asResultOf(ChangeType.LOST_CITY),
+                         c -> c.getNewUnitType(), Collectors.toList());
     }
 
     /**
@@ -648,14 +644,11 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
-        List<AbstractGoods> result = new ArrayList<>();
-        if (consumption != null) {
-            for (GoodsType goodsType : consumption.keySet()) {
-                result.add(new AbstractGoods(goodsType,
-                        consumption.getCount(goodsType)));
-            }
-        }
-        return result;
+        return (consumption == null) ? Collections.<AbstractGoods>emptyList()
+            : transform(consumption.keySet(),
+                        gt -> consumption.getCount(gt) != 0,
+                        gt -> new AbstractGoods(gt, consumption.getCount(gt)),
+                        Collectors.toList());
     }
 
     /**

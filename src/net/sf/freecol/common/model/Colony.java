@@ -1039,15 +1039,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The map to completion.
      */
     public List<AbstractGoods> getRequiredGoods(BuildableType type) {
-        List<AbstractGoods> result = new ArrayList<>();
-        for (AbstractGoods goods : type.getRequiredGoods()) {
-            GoodsType goodsType = goods.getType();
-            int remaining = goods.getAmount() - getGoodsCount(goodsType);
-            if (remaining > 0) {
-                result.add(new AbstractGoods(goodsType, remaining));
-            }
-        }
-        return result;
+        return transform(type.getRequiredGoods(),
+            ag -> ag.getAmount() > getGoodsCount(ag.getType()),
+            ag -> new AbstractGoods(ag.getType(),
+                ag.getAmount() - getGoodsCount(ag.getType())),
+            Collectors.toList());
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -113,9 +114,8 @@ public class Building extends WorkLocation
             colony.addFeatures(buildingType);
 
             // Colonists which can't work here must be put outside
-            for (Unit unit : getUnitList()) {
-                if (!canAddType(unit.getType())) eject.add(unit);
-            }
+            eject.addAll(transform(getUnitList(), u -> !canAddType(u.getType()),
+                                   Collectors.toList()));
         }
 
         // Colonists exceding units limit must be put outside

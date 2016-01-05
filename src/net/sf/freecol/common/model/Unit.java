@@ -3502,13 +3502,13 @@ public class Unit extends GoodsLocation
      * @return The missionary trade bonuses.
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
-        HashSet<Modifier> result = new HashSet<>();
-        for (Modifier m : getModifiers(Modifier.MISSIONARY_TRADE_BONUS)) {
-            Modifier modifier = new Modifier(m);
-            if (!sense) modifier.setValue(-m.getValue());
-            result.add(modifier);
-        }
-        return result;
+        return transform(getModifiers(Modifier.MISSIONARY_TRADE_BONUS),
+                         m -> m.getValue() != 0,
+                         m -> {
+                             Modifier mod = new Modifier(m);
+                             if (!sense) mod.setValue(-m.getValue());
+                             return mod;
+                         }, Collectors.toSet());
     }
 
     /**

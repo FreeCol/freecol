@@ -25,6 +25,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -32,6 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -287,13 +289,10 @@ public class TileImprovement extends TileItem implements Named {
      * @return A map of the connections.
      */
     public Map<Direction, Integer> getConnections() {
-        List<Direction> dirns = getConnectionDirections();
-        if (dirns == null) return Collections.<Direction, Integer>emptyMap();
-        Map<Direction, Integer> result = new EnumMap<>(Direction.class);
-        for (Direction d : dirns) {
-            if (isConnectedTo(d)) result.put(d, magnitude);
-        }
-        return result;
+        final List<Direction> dirns = getConnectionDirections();
+        return (dirns == null) ? Collections.<Direction, Integer>emptyMap()
+            : transform(dirns, d -> isConnectedTo(d),
+                        Collectors.toMap(d -> d, d -> magnitude));
     }
 
     /**

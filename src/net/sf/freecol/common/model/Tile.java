@@ -601,12 +601,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param contiguity The contiguity to search for.
      * @return A set of <code>Tile</code>s with the required contiguity.
      */
-    public Set<Tile> getContiguityAdjacent(int contiguity) {
-        Set<Tile> ret = new HashSet<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            if (t.getContiguity() == contiguity) ret.add(t);
-        }
-        return ret;
+    public Set<Tile> getContiguityAdjacent(final int contiguity) {
+        return transform(getSurroundingTiles(1, 1),
+                         t -> t.getContiguity() == contiguity,
+                         Collectors.toSet());
     }
 
     /**
@@ -1293,12 +1291,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of adjacent <code>Colony</code>s.
      */
     public List<Colony> getAdjacentColonies() {
-        List<Colony> result = new ArrayList<>();
-        for (Tile t : getSurroundingTiles(1)) {
-            Colony c = t.getColony();
-            if (c != null) result.add(c);
-        }
-        return result;
+        return transform(getSurroundingTiles(0, 1),
+            t -> t.getColony() != null, Tile::getColony, Collectors.toList());
     }
 
     /**

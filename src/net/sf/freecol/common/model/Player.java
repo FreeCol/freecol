@@ -1546,14 +1546,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A map of father id to <code>Turn</code>s.
      */
     public java.util.Map<String, Turn> getElectionTurns() {
-        java.util.Map<String, Turn> result = new HashMap<>();
-        for (HistoryEvent e : getHistory()) {
-            if (e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER) {
-                result.put(e.getReplacement("%father%").getId(),
-                           e.getTurn());
-            }
-        }
-        return result;
+        return transform(getHistory(),
+            e -> e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER,
+            Collectors.toMap(e -> e.getReplacement("%father%").getId(),
+                             e -> e.getTurn()));
     }
 
     /**
@@ -2267,15 +2263,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A fresh list of the <code>Colony</code>s this player owns.
      */
     public List<Colony> getColonies() {
-        List<Colony> colonies = new ArrayList<>();
-        for (Settlement s : getSettlements()) {
-            if (s instanceof Colony) {
-                colonies.add((Colony)s);
-            } else {
-                throw new RuntimeException("getColonies found: " + s);
-            }
-        }
-        return colonies;
+        return transform(getSettlements(), s -> s instanceof Colony,
+                         s -> (Colony)s, Collectors.toList());
     }
 
     /**
@@ -2285,9 +2274,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A fresh list of the <code>Colony</code>s this player owns.
      */
     public List<Colony> getSortedColonies(Comparator<Colony> c) {
-        List<Colony> colonies = getColonies();
-        Collections.sort(colonies, c);
-        return colonies;
+        return transformAndSort(getSettlements(), s -> s instanceof Colony,
+                                s -> (Colony)s, c, Collectors.toList());
     }
 
     /**
@@ -2297,15 +2285,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The indian settlements this player owns.
      */
     public List<IndianSettlement> getIndianSettlements() {
-        List<IndianSettlement> indianSettlements = new ArrayList<>();
-        for (Settlement s : getSettlements()) {
-            if (s instanceof IndianSettlement) {
-                indianSettlements.add((IndianSettlement)s);
-            } else {
-                throw new RuntimeException("getIndianSettlements found: " + s);
-            }
-        }
-        return indianSettlements;
+        return transform(getSettlements(), s -> s instanceof IndianSettlement,
+                         s -> (IndianSettlement)s, Collectors.toList());
     }
 
     /**
