@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -392,16 +393,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return A list of <code>Goods</code>.
      */
     public List<Goods> getCompactGoods() {
-        List<Goods> totalGoods = new ArrayList<>();
+        final Game game = getGame();
         synchronized (storedGoods) {
-            for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-                if (entry.getValue() > 0) {
-                    totalGoods.add(new Goods(getGame(), parent, entry.getKey(),
-                                             entry.getValue()));
-                }
-            }
+            return transform(storedGoods.entrySet(), e -> e.getValue() > 0,
+                e -> new Goods(game, parent, e.getKey(), e.getValue()),
+                Collectors.toList());
         }
-        return totalGoods;
     }
 
     /**
