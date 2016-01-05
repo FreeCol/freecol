@@ -61,6 +61,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -118,11 +119,10 @@ public class AIMessage {
      */
     private static boolean checkError(Element element, String tag) {
         if (element != null && "error".equals(element.getTagName())) {
-            String messageId = element.getAttribute("messageID");
-            String messageText = element.getAttribute("message");
+            String messageId = element.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
+            String messageText = element.getAttribute(ErrorMessage.MESSAGE_TAG);
             logger.warning("AIMessage." + tag + " error,"
-                + " messageId: " + messageId
-                + " message: " + messageText);
+                + " id: " + messageId + " message: " + messageText);
             return true;
         }
         return false;

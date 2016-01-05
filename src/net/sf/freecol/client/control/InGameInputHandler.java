@@ -53,6 +53,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -617,8 +618,8 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element error(Element element) {
-        final String messageId = element.getAttribute("messageID");
-        final String message = element.getAttribute("message");
+        final String messageId = element.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
+        final String message = element.getAttribute(ErrorMessage.MESSAGE_TAG);
 
         invokeLater(() -> { igc().error(messageId, message); });
         return null;

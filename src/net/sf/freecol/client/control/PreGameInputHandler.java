@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -157,10 +158,10 @@ public final class PreGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element error(Element element)  {
-        getGUI().showErrorMessage((element.hasAttribute("messageID"))
-            ? element.getAttribute("messageID")
+        getGUI().showErrorMessage((element.hasAttribute(ErrorMessage.MESSAGE_ID_TAG))
+            ? element.getAttribute(ErrorMessage.MESSAGE_ID_TAG)
             : null,
-            element.getAttribute("message"));
+            element.getAttribute(ErrorMessage.MESSAGE_TAG));
         return null;
     }
 

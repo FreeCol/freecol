@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
@@ -172,7 +173,8 @@ public abstract class ServerAPI {
     /**
      * Sends the specified message to the server and returns the reply,
      * if it has the specified tag.
-     * Handle "error" replies if they have a messageID or when in debug mode.
+     *
+     * Handle "error" replies if they have a messageId or when in debug mode.
      * This routine allows code simplification in much of the following
      * client-server communication.
      *
@@ -195,18 +197,17 @@ public abstract class ServerAPI {
         if (reply == null) return null;
 
         if ("error".equals(reply.getTagName())) {
-            String messageId = reply.getAttribute("messageID");
-            String messageText = reply.getAttribute("message");
+            String messageId = reply.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
+            String messageText = reply.getAttribute(ErrorMessage.MESSAGE_TAG);
             if (messageId != null && messageText != null
                 && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
                 // If debugging suppress the bland but i18n compliant
                 // failure message in favour of the higher detail
                 // non-i18n text.
-                reply.removeAttribute("messageID");
+                reply.removeAttribute(ErrorMessage.MESSAGE_ID_TAG);
             }
             logger.warning("ServerAPI. " + message.getType() + " error,"
-                + " messageId: " + messageId
-                + " message: " + messageText);
+                + " id: " + messageId + " message: " + messageText);
             client.handleReply(reply);
             return null;
         }

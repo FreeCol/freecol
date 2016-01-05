@@ -32,6 +32,9 @@ import org.w3c.dom.Element;
  */
 public class ErrorMessage extends DOMMessage {
 
+    public static final String MESSAGE_ID_TAG = "messageId";
+    public static final String MESSAGE_TAG = "message";
+
     /** A message identifier, if available. */
     private final String messageId;
 
@@ -63,11 +66,29 @@ public class ErrorMessage extends DOMMessage {
     public ErrorMessage(Game game, Element element) {
         super(getTagName());
 
-        this.messageId = element.getAttribute("messageId");
-        this.message = element.getAttribute("message");
+        this.messageId = element.getAttribute(MESSAGE_ID_TAG);
+        this.message = element.getAttribute(MESSAGE_TAG);
     }
 
 
+    /**
+     * Get the message identifier.
+     *
+     * @return The message identifier.
+     */
+    public String getMessageId() {
+        return this.messageId;
+    }
+    
+    /**
+     * Get the non-i18n message.
+     *
+     * @return The message.
+     */
+    public String getMessage() {
+        return this.message;
+    }
+    
     /**
      * Handle a "error"-message.
      *
@@ -93,10 +114,10 @@ public class ErrorMessage extends DOMMessage {
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName());
         if (this.messageId != null) {
-            result.setAttribute("messageId", this.messageId);
+            result.setAttribute(MESSAGE_ID_TAG, this.messageId);
         }
         if (this.message != null) {
-            result.setAttribute("message", message);
+            result.setAttribute(MESSAGE_TAG, this.message);
         }
         return result.toXMLElement();
     }

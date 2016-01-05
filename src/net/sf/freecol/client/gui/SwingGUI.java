@@ -1141,8 +1141,8 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showErrorMessage(String messageID, String message) {
-        canvas.showErrorMessage(messageID, message);
+    public void showErrorMessage(String messageId, String message) {
+        canvas.showErrorMessage(messageId, message);
     }
 
     @Override
