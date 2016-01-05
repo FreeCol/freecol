@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -156,8 +157,8 @@ public final class PreGameInputHandler extends InputHandler {
 
         // Check if launching player is an admin.
         if (!player.isAdmin()) {
-            return DOMMessage.createError("server.onlyAdminCanLaunch",
-                "Only the server admin can launch the game.");
+            return new ErrorMessage("server.onlyAdminCanLaunch",
+                "Only the server admin can launch the game.").toXMLElement();
         }
         if (launching) return null;
         launching = true;
@@ -168,22 +169,23 @@ public final class PreGameInputHandler extends InputHandler {
         for (Player p : game.getLivePlayers(null)) {
             final Nation nation = spec.getNation(p.getNationId());
             if (nations.contains(nation)) {
-                return DOMMessage.createError("server.invalidPlayerNations",
-                    "All players need to pick a unique nation before the game can start.");
+                return new ErrorMessage("server.invalidPlayerNations",
+                    "All players need to pick a unique nation before the game can start.")
+                    .toXMLElement();
             }
             nations.add(nation);
         }
 
         // Check if all players are ready.
         if (!game.allPlayersReadyToLaunch()) {
-            return DOMMessage.createError("server.notAllReady",
-                "Not all players are ready to begin the game!");
+            return new ErrorMessage("server.notAllReady",
+                "Not all players are ready to begin the game!").toXMLElement();
         }
         try {
             ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
-            return DOMMessage.createError("server.errorStartingGame",
-                                          e.getMessage());
+            return new ErrorMessage("server.errorStartingGame",
+                                    e.getMessage()).toXMLElement();
         }
 
         return null;
@@ -236,8 +238,8 @@ public final class PreGameInputHandler extends InputHandler {
                 int rgb = Integer.decode(str);
                 color = new Color(rgb);
             } catch (NumberFormatException nfe) {
-                return DOMMessage.createError("server.badColor",
-                                              "Invalid color: " + str);
+                return new ErrorMessage("server.badColor",
+                    "Invalid color: " + str).toXMLElement();
             }
             nation.setColor(color);
             freeColServer.sendToAll(new DOMMessage("updateColor",
@@ -272,8 +274,9 @@ public final class PreGameInputHandler extends InputHandler {
                         "value", nation.getId()),
                     player.getConnection());
             } else {
-                return DOMMessage.createError("server.badNation",
-                    "Selected non-selectable nation: " + nation);
+                return new ErrorMessage("server.badNation",
+                    "Selected non-selectable nation: " + nation)
+                    .toXMLElement();
             }
         } else {
             logger.warning("setNation from unknown connection.");
@@ -321,8 +324,9 @@ public final class PreGameInputHandler extends InputHandler {
                         "value", nationType.getId()),
                     player.getConnection());
             } else {
-                return DOMMessage.createError("server.badNationType",
-                    "Selected non-selectable nation type: " + nationType);
+                return new ErrorMessage("server.badNationType",
+                    "Selected non-selectable nation type: " + nationType)
+                    .toXMLElement();
             }
         } else {
             logger.warning("setNationType from unknown connection.");

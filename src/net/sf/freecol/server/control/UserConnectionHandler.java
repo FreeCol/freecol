@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
@@ -159,12 +160,14 @@ public final class UserConnectionHandler extends FreeColServerHolder
         final String version = element.getAttribute("version");
 
         if (userName == null || userName.isEmpty()) {
-            return DOMMessage.createError("server.missingUserName", null);
+            return new ErrorMessage("server.missingUserName", null)
+                .toXMLElement();
         } else if (version == null || version.isEmpty()) {
-            return DOMMessage.createError("server.missingVersion", null);
+            return new ErrorMessage("server.missingVersion", null)
+                .toXMLElement();
         } else if (!version.equals(FreeCol.getVersion())) {
-            return DOMMessage.createError("server.wrongFreeColVersion",
-                version + " != " + FreeCol.getVersion());
+            return new ErrorMessage("server.wrongFreeColVersion",
+                version + " != " + FreeCol.getVersion()).toXMLElement();
         }
 
         final FreeColServer freeColServer = getFreeColServer();
@@ -184,15 +187,17 @@ public final class UserConnectionHandler extends FreeColServerHolder
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {}
                 if ((timeOut -= 1000) <= 0) {
-                    return DOMMessage.createError("server.timeOut", null);
+                    return new ErrorMessage("server.timeOut", null)
+                        .toXMLElement();
                 }
             }
 
             if (!game.canAddNewPlayer()) {
-                return DOMMessage.createError("server.maximumPlayers", null);
+                return new ErrorMessage("server.maximumPlayers", null)
+                    .toXMLElement();
             } else if (game.playerNameInUse(userName)) {
-                return DOMMessage.createError("server.userNameInUse",
-                    userName + " is already in use.");
+                return new ErrorMessage("server.userNameInUse",
+                    userName + " is already in use.").toXMLElement();
             }
 
             // Create and add the new player:
@@ -222,11 +227,11 @@ public final class UserConnectionHandler extends FreeColServerHolder
                     sb.append(p.getName()).append(" ");
                 }
                 sb.append(")");
-                return DOMMessage.createError("server.userNameNotPresent",
-                                              sb.toString());
+                return new ErrorMessage("server.userNameNotPresent",
+                    sb.toString()).toXMLElement();
             } else if (player.isConnected() && !player.isAI()) {
-                return DOMMessage.createError("server.userNameInUse",
-                    userName + " is already in use.");
+                return new ErrorMessage("server.userNameInUse",
+                    userName + " is already in use.").toXMLElement();
             }
             player.setConnection(connection);
             player.setConnected(true);

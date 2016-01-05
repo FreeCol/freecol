@@ -363,52 +363,6 @@ public class DOMMessage {
     }
 
     /**
-     * Creates an error message.
-     *
-     * @param messageID Identifies the "i18n"-keyname. Not specified in the
-     *            message if <i>null</i>.
-     * @param message The error in plain text. Not specified in the message if
-     *            <i>null</i>.
-     * @return The root <code>Element</code> of the error message.
-     */
-    public static Element createError(String messageID, String message) {
-        DOMMessage err = new DOMMessage("error");
-        if (messageID != null && !messageID.isEmpty()) {
-            err.setAttribute("messageID", messageID);
-        }
-        if (message != null && !message.isEmpty()) {
-            err.setAttribute("message", message);
-        }
-        return err.toXMLElement();
-    }
-
-    /**
-     * Creates an error message.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param messageID Identifies the "i18n"-keyname. Not specified in the
-     *            message if <i>null</i>.
-     * @param message The error in plain text. Not specified in the message if
-     *            <i>null</i>.
-     */
-    public static void createError(FreeColXMLWriter xw, String messageID, String message) {
-        try {
-            xw.writeStartElement("error");
-
-            if (messageID != null && !messageID.isEmpty()) {
-                xw.writeAttribute("messageID", messageID);
-            }
-
-            if (message != null && !message.isEmpty()) {
-                xw.writeAttribute("message", message);
-            }
-            xw.writeEndElement();
-        } catch (XMLStreamException e) {
-            logger.log(Level.WARNING, "Could not send error message.", e);
-        }
-    }
-
-    /**
      * Creates an error message in response to bad client data.
      *
      * @param message The error in plain text.
@@ -419,9 +373,7 @@ public class DOMMessage {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             Thread.dumpStack();
         }
-        return new DOMMessage("error",
-            "messageID", "server.reject",
-            "message", message).toXMLElement();
+        return new ErrorMessage("server.reject", message).toXMLElement();
     }
 
     /**
