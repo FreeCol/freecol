@@ -88,8 +88,7 @@ public final class FreeColClient {
     private FreeColServer freeColServer = null;
 
     /** Encapsulation of the server API. */
-    private final ServerAPI serverAPI;
-
+    private final UserServerAPI userServerAPI;
 
     /** The GUI encapsulation. */
     private final GUI gui;
@@ -183,8 +182,7 @@ public final class FreeColClient {
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
 
         // Once the basic resources are in place construct other things.
-
-        serverAPI = new UserServerAPI(gui);
+        this.userServerAPI = new UserServerAPI(gui);
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
@@ -467,12 +465,11 @@ public final class FreeColClient {
     /**
      * Meaningfully named access to the ServerAPI.
      *
-     * @return A ServerAPI.
+     * @return The user wrapper for the <code>ServerAPI</code>.
      */
-    public ServerAPI askServer() {
-        return serverAPI;
+    public UserServerAPI askServer() {
+        return userServerAPI;
     }
-
 
     /**
      * Gets the GUI attached to this client.

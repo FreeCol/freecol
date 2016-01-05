@@ -264,8 +264,9 @@ public final class ConnectController {
 
         String message = null;
         try {
-            if (!freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + user,
-                    host, port, freeColClient.getPreGameInputHandler())) {
+            if (!freeColClient.askServer()
+                .connect(FreeCol.CLIENT_THREAD + user, host, port,
+                         freeColClient.getPreGameInputHandler())) {
                 message = "repeated failure";
             }
         } catch (Exception e) {

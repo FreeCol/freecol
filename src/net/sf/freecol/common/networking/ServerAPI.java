@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
@@ -75,9 +75,6 @@ public abstract class ServerAPI {
 
     private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
 
-    /** The Client used to communicate with the server. */
-    private Client client;
-
 
     /**
      * Creates a new <code>ServerAPI</code>.
@@ -99,6 +96,11 @@ public abstract class ServerAPI {
      */
     protected abstract void doRaiseErrorMessage(String complaint);
 
+    /**
+     * Get the connection to communicate with the server.
+     */
+    protected abstract Connection getConnection();
+
 
     // Internal message passing routines
 
@@ -110,7 +112,7 @@ public abstract class ServerAPI {
      */
     private boolean send(DOMMessage message) {
         try {
-            client.send(message);
+            getConnection().send(message.toXMLElement());
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
@@ -127,7 +129,7 @@ public abstract class ServerAPI {
      */
     private boolean sendAndWait(DOMMessage message) {
         try {
-            client.sendAndWait(message);
+            getConnection().sendAndWait(message.toXMLElement());
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
@@ -145,7 +147,7 @@ public abstract class ServerAPI {
     private Element ask(DOMMessage message) {
         Element reply = null;
         try {
-            reply = client.ask(message);
+            reply = getConnection().ask(message.toXMLElement());
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not ask: " + message.getType(),
                        ioe);
@@ -157,17 +159,38 @@ public abstract class ServerAPI {
      * Loop sending requests and handling replies from the server until
      * they reduce to null.
      *
-     * @param request The initial request <code>Element</code>.
+     * @param e The initial request <code>Element</code>.
      */
-    private void resolve(Element request) {
-        while (request != null) {
+    private void resolve(Element e) {
+        final Connection c = getConnection();
+        while (e != null) {
             try {
-                request = client.handleReply(client.ask(request));
+                e = handle(c.ask(e));
             } catch (IOException ioe) {
-                logger.warning("Could not resolve: " + request.getTagName());
+                logger.log(Level.WARNING, "Could not resolve: " + e.getTagName(),
+                    ioe);
                 break;
             }
         }
+    }
+
+    /**
+     * Handle an element.
+     *
+     * @param e The <code>Element</code> to handle.
+     * @return The resulting element.
+     */
+    private Element handle(Element e) {
+        if (e == null) return null;
+        final Connection c = getConnection();
+        if (c == null) return null;
+        try {
+            return c.handle(e);
+        } catch (FreeColException fce) {
+            logger.log(Level.WARNING, "Could not handle: " + e.getTagName(),
+                fce);
+        }
+        return null;
     }
 
     /**
@@ -195,6 +218,7 @@ public abstract class ServerAPI {
                                  HashMap<String, String> results) {
         Element reply = ask(message);
         if (reply == null) return null;
+        final Connection c = getConnection();
 
         if ("error".equals(reply.getTagName())) {
             String messageId = reply.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
@@ -208,7 +232,7 @@ public abstract class ServerAPI {
             }
             logger.warning("ServerAPI. " + message.getType() + " error,"
                 + " id: " + messageId + " message: " + messageText);
-            client.handleReply(reply);
+            handle(reply);
             return null;
         }
 
@@ -247,7 +271,7 @@ public abstract class ServerAPI {
                     && ((Element)nodes.item(i)).getTagName().equals(tag)) {
                     result = (Element)nodes.item(i);
                 } else {
-                    Element e = client.handleReply((Element)nodes.item(i));
+                    Element e = handle((Element)nodes.item(i));
                     if (e != null) replies.add(e);
                 }
             }
@@ -277,7 +301,7 @@ public abstract class ServerAPI {
                                 HashMap<String, String> results) {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
-        resolve(client.handleReply(reply));
+        resolve(handle(reply));
         return true;
     }
 
@@ -291,99 +315,6 @@ public abstract class ServerAPI {
         HashMap<String, String> result = new HashMap<>();
         for (String q : queries) result.put(q, null);
         return result;
-    }
-
-
-    // Public routines for manipulation of the connection to the server.
-
-    /**
-     * Get the host we are connected to.
-     *
-     * @return The current host, or null if none.
-     */
-    public String getHost() {
-        return (client == null) ? null : client.getHost();
-    }
-
-    /**
-     * Get the port we are connected to.
-     *
-     * @return The current port, or negative if none.
-     */     
-    public int getPort() {
-        return (client == null) ? -1 : client.getPort();
-    }
-
-    /**
-     * Get the raw connection.
-     *
-     * Do not use this.  It exists only for debugging purposes.
-     *
-     * @return The server <code>Connection</code>.
-     */
-    public Connection getConnection() {
-        return (client == null) ? null : client.getConnection();
-    }
-
-    /**
-     * Register a message handler to handle messages from the server.
-     * Used when switching from pre-game to in-game.
-     *
-     * @param messageHandler The new <code>MessageHandler</code>.
-     */
-    public void registerMessageHandler(MessageHandler messageHandler) {
-        if (client != null) {
-            client.setMessageHandler(messageHandler);
-        }
-    }
-
-    /**
-     * Disconnect the client.
-     */
-    public void disconnect() {
-        if (client != null) {
-            client.disconnect();
-            reset();
-        }
-    }
-
-    /**
-     * Just forget about the client.
-     * Only call this if sure it is dead.
-     */
-    public void reset() {
-        client = null;
-    }
-
-    /**
-     * Connects a client to host:port (or more).
-     *
-     * @param threadName The name for the thread.
-     * @param host The name of the machine running the
-     *     <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return True if the connection succeeded.
-     * @exception IOException on connection failure.
-     */
-    public boolean connect(String threadName, String host, int port,
-                           MessageHandler messageHandler) 
-        throws IOException {
-        int tries;
-        if (port < 0) {
-            port = FreeCol.getServerPort();
-            tries = 10;
-        } else {
-            tries = 1;
-        }
-        for (int i = tries; i > 0; i--) {
-            try {
-                client = new Client(host, port, messageHandler, threadName);
-                if (client != null) break;
-            } catch (IOException e) {
-                if (i <= 1) throw e;
-            }
-        }
-        return client != null;
     }
 
 
@@ -699,7 +630,7 @@ public abstract class ServerAPI {
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
-            client.handleReply(reply);
+            handle(reply);
             return null;
         }
     }
@@ -723,7 +654,7 @@ public abstract class ServerAPI {
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
-            client.handleReply(reply);
+            handle(reply);
             return null;
         }
     }
@@ -747,7 +678,7 @@ public abstract class ServerAPI {
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
             return new DiplomacyMessage(game, reply).getAgreement();
         } else {
-            client.handleReply(reply);
+            handle(reply);
             return null;
         }
     }

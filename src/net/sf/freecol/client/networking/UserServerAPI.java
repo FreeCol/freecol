@@ -19,37 +19,149 @@
 
 package net.sf.freecol.client.networking;
 
-import org.w3c.dom.Element;
+import java.io.IOException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.networking.Client;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
+
+import org.w3c.dom.Element;
 
 
 /**
- * Implementation of the ServerAPI.
+ * Implementation of the ServerAPI for a player with attached GUI and
+ * real connection to the server.
  */
 public class UserServerAPI extends ServerAPI {
 
+    /** The GUI to use for error and client processing. */
     private final GUI gui;
 
+    /** The Client used to communicate with the server. */
+    private Client client;
+
+
+    /**
+     * Create the new user wrapper for the server API.
+     */
     public UserServerAPI(GUI gui) {
         super();
         this.gui = gui;
     }
 
-    @Override
-    protected void doRaiseErrorMessage(String complaint) {
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            gui.showErrorMessage(null, complaint);
+
+    // Client manipulation
+
+    /**
+     * Connects a client to host:port (or more).
+     *
+     * @param threadName The name for the thread.
+     * @param host The name of the machine running the
+     *     <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return True if the connection succeeded.
+     * @exception IOException on connection failure.
+     */
+    public boolean connect(String threadName, String host, int port,
+                           MessageHandler messageHandler) 
+        throws IOException {
+        int tries;
+        if (port < 0) {
+            port = FreeCol.getServerPort();
+            tries = 10;
+        } else {
+            tries = 1;
+        }
+        for (int i = tries; i > 0; i--) {
+            try {
+                client = new Client(host, port, messageHandler, threadName);
+                if (client != null) break;
+            } catch (IOException e) {
+                if (i <= 1) throw e;
+            }
+        }
+        return client != null;
+    }
+
+    /**
+     * Disconnect the client.
+     */
+    public void disconnect() {
+        if (this.client != null) {
+            this.client.disconnect();
+            reset();
         }
     }
 
-    @Override
+    /**
+     * Get the host we are connected to.
+     *
+     * @return The current host, or null if none.
+     */
+    public String getHost() {
+        return (this.client == null) ? null : this.client.getHost();
+    }
+
+    /**
+     * Get the port we are connected to.
+     *
+     * @return The current port, or negative if none.
+     */     
+    public int getPort() {
+        return (this.client == null) ? -1 : this.client.getPort();
+    }
+
+    /**
+     * Register a message handler to handle messages from the server.
+     * Used when switching from pre-game to in-game.
+     *
+     * @param messageHandler The new <code>MessageHandler</code>.
+     */
+    public void registerMessageHandler(MessageHandler messageHandler) {
+        if (this.client != null) {
+            this.client.setMessageHandler(messageHandler);
+        }
+    }
+
+    /**
+     * Just forget about the client.
+     *
+     * Only call this if we are sure it is dead.
+     */
+    public void reset() {
+        this.client = null;
+    }
+
+
+    // Implement ServerAPI
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected void doRaiseErrorMessage(String complaint) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            this.gui.showErrorMessage(null, complaint);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected void doClientProcessingFor(Element reply) {
         String sound = reply.getAttribute("sound");
         if (sound != null && !sound.isEmpty()) {
-            gui.playSound(sound);
+            this.gui.playSound(sound);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Connection getConnection() {
+        return (this.client == null) ? null : this.client.getConnection();
     }
 }
