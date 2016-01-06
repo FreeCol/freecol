@@ -78,7 +78,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
             ? gameState(conn, element)
             : ("getVacantPlayers".equals(tag))
             ? getVacantPlayers(conn, element)
-            : ("login".equals(tag))
+            : (LoginMessage.getTagName().equals(tag))
             ? login(conn, element)
             : unknown(tag);
     }
@@ -256,7 +256,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
         connection.setMessageHandler(mh);
         freeColServer.getServer().addConnection(connection);
         freeColServer.updateMetaServer();
-        return new LoginMessage(player, userName, version, !starting,
+        return new LoginMessage(userName, version, player.isAdmin(), !starting,
                                 freeColServer.getSinglePlayer(),
                                 isCurrentPlayer, game).toXMLElement();
     }

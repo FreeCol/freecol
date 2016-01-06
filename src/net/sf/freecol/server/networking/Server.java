@@ -129,7 +129,7 @@ public final class Server extends Thread {
      * @return The <code>Connection</code>.
      */
     public Connection getConnection(Socket socket) {
-        return connections.get(socket);
+        return this.connections.get(socket);
     }
 
     /**
@@ -138,8 +138,8 @@ public final class Server extends Thread {
      * @param connection The connection to add.
      */
     public void addDummyConnection(Connection connection) {
-        if (!running) return;
-        connections.put(new Socket(), connection);
+        if (!this.running) return;
+        this.connections.put(new Socket(), connection);
     }
 
     /**
@@ -148,8 +148,8 @@ public final class Server extends Thread {
      * @param connection The connection to add.
      */
     public void addConnection(Connection connection) {
-        if (!running) return;
-        connections.put(connection.getSocket(), connection);
+        if (!this.running) return;
+        this.connections.put(connection.getSocket(), connection);
     }
 
     /**
@@ -158,7 +158,7 @@ public final class Server extends Thread {
      * @param connection The connection that should be removed.
      */
     public void removeConnection(Connection connection) {
-        connections.remove(connection.getSocket());
+        this.connections.remove(connection.getSocket());
     }
 
     /**
@@ -167,7 +167,7 @@ public final class Server extends Thread {
      * @param mh The <code>MessageHandler</code> to use.
      */
     public void setMessageHandlerToAllConnections(MessageHandler mh) {
-        for (Connection c : connections.values()) {
+        for (Connection c : this.connections.values()) {
             c.setMessageHandler(mh);
         }
     }
@@ -226,8 +226,8 @@ public final class Server extends Thread {
         // Now that the shutdown method 'hangs' until the entire
         // server thread is finished you can be certain that the
         // ServerSocket is REALLY closed after execution of shutdown.
-        synchronized (shutdownLock) {
-            while (running) {
+        synchronized (this.shutdownLock) {
+            while (this.running) {
                 Socket clientSocket = null;
                 try {
                     clientSocket = serverSocket.accept();
@@ -235,13 +235,12 @@ public final class Server extends Thread {
                     logger.info("Got client connection from "
                         + clientSocket.getInetAddress()
                         + ":" + clientSocket.getPort());
-                    Connection connection =
-                        new Connection(clientSocket,
-                            freeColServer.getUserConnectionHandler(),
-                            FreeCol.SERVER_THREAD);
+                    Connection connection = new Connection(clientSocket,
+                        this.freeColServer.getUserConnectionHandler(),
+                        FreeCol.SERVER_THREAD);
                     addConnection(connection);
                 } catch (IOException e) {
-                    if (running) {
+                    if (this.running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
                     }
                 }
@@ -256,23 +255,23 @@ public final class Server extends Thread {
         this.running = false;
  
         try {
-            serverSocket.close();
+            this.serverSocket.close();
             logger.fine("Closed server socket.");
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not close the server socket!", e);
         }
 
-        synchronized (shutdownLock) {
+        synchronized (this.shutdownLock) {
             // See run() above.
             logger.fine("Wait for Server.run to complete.");
         }
 
-        for (Connection c : connections.values()) {
+        for (Connection c : this.connections.values()) {
             if (c.isAlive()) c.close();
         }
-        connections.clear();
+        this.connections.clear();
 
-        freeColServer.removeFromMetaServer();
+        this.freeColServer.removeFromMetaServer();
         logger.fine("Server shutdown.");
     }
 }

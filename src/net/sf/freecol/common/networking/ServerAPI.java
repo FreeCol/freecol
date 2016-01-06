@@ -932,10 +932,8 @@ public abstract class ServerAPI {
      * @return A <code>LoginMessage</code> on success, or null on error.
      */
     public LoginMessage login(String userName, String version) {
-        Element reply = askExpecting(new DOMMessage("login",
-                                                    "userName", userName,
-                                                    "version", version),
-                                     "login", null);
+        Element reply = askExpecting(new LoginMessage(userName, version),
+                                     LoginMessage.getTagName(), null);
         return (reply == null) ? null : new LoginMessage(null, reply);
     }
 

@@ -278,8 +278,8 @@ public final class ConnectController {
         }
         logger.info("Connected to " + host + ":" + port);
 
-        LoginMessage msg = freeColClient.askServer().login(user,
-            FreeCol.getVersion());
+        LoginMessage msg = freeColClient.askServer()
+            .login(user, FreeCol.getVersion());
         Game game;
         if (msg == null || (game = msg.getGame()) == null) {
             gui.showErrorMessage("server.couldNotLogin");

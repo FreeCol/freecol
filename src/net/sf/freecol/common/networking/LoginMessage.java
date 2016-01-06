@@ -33,9 +33,6 @@ import org.w3c.dom.NodeList;
  */
 public class LoginMessage extends DOMMessage {
 
-    /** The Player that is logging in. */
-    private final Player player;
-
     /** The user name. */
     private final String userName;
 
@@ -59,30 +56,39 @@ public class LoginMessage extends DOMMessage {
 
         
     /**
-     * Create a new <code>LoginMessage</code> with the supplied name
-     * and version.
+     * Create a new <code>LoginMessage</code> with the supplied parameters.
      *
-     * @param player The <code>Player</code> that is logging in.
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
+     * @param admin Is the player an administrator?
      * @param startGame Whether to start the game.
      * @param singlePlayer True in single player games.
      * @param currentPlayer True if this player is the current player.
      * @param game The entire game.
      */
-    public LoginMessage(Player player, String userName, String version,
-                        boolean startGame, boolean singlePlayer,
+    public LoginMessage(String userName, String version,
+                        boolean admin, boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
         super(getTagName());
 
-        this.player = player;
         this.userName = userName;
         this.version = version;
-        this.admin = player.isAdmin();
+        this.admin = admin;
         this.startGame = startGame;
         this.singlePlayer = singlePlayer;
         this.currentPlayer = currentPlayer;
         this.game = game;
+    }
+
+    /**
+     * Create a new <code>LoginMessage</code> request with name and version
+     * only.
+     *
+     * @param userName The name of the user logging in.
+     * @param version The version of FreeCol at the client.
+     */
+    public LoginMessage(String userName, String version) {
+        this(userName, version, false, false, false, false, null);
     }
 
     /**
@@ -95,7 +101,6 @@ public class LoginMessage extends DOMMessage {
         super(getTagName());
 
         String str;
-        this.player = null; // Should not be used on client side
         this.userName = element.getAttribute("userName");
         this.version = element.getAttribute("version");
         str = element.getAttribute("admin");
@@ -145,7 +150,8 @@ public class LoginMessage extends DOMMessage {
 
     /**
      * Handle a "login"-message.
-     * This is actually done in PreGameController.
+     *
+     * This is actually done in UserConnectionHandler.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
@@ -172,7 +178,7 @@ public class LoginMessage extends DOMMessage {
             "startGame", Boolean.toString(startGame),
             "singlePlayer", Boolean.toString(singlePlayer),
             "currentPlayer", Boolean.toString(currentPlayer));
-        result.add(game, player);
+        if (game != null) result.add(game, game.getPlayerByName(userName));
         return result.toXMLElement();
     }
 
