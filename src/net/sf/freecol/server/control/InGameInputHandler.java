@@ -58,6 +58,7 @@ import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
@@ -599,10 +600,6 @@ public final class InGameInputHandler extends InputHandler
             (Connection connection, Element element) ->
             new FirstContactMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register("getHighScores",
-            (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-                .getHighScores(freeColServer.getPlayer(connection)));
         register(GetNationSummaryMessage.getTagName(),
             (Connection connection, Element element) ->
             new GetNationSummaryMessage(element)
@@ -611,6 +608,10 @@ public final class InGameInputHandler extends InputHandler
             (Connection connection, Element element) ->
             freeColServer.getInGameController()
                 .getNewTradeRoute(freeColServer.getPlayer(connection)));
+        register(HighScoreMessage.getTagName(),
+            (Connection connection, Element element) ->
+            new HighScoreMessage(getGame(), element)
+                .handle(freeColServer, connection));
         register("retire",
             (Connection connection, Element element) ->
             freeColServer.getInGameController()

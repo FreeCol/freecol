@@ -4115,21 +4115,10 @@ public final class InGameController extends Controller {
     /**
      * Gets the list of high scores.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
-     * @return An <code>Element</code> encapsulating this action.
+     * @return A list of <code>HighScore</code>.
      */
-    public Element getHighScores(ServerPlayer serverPlayer) {
-        List<HighScore> scores = HighScore.loadHighScores();
-        ChangeSet cs = new ChangeSet();
-        cs.addTrivial(See.only(serverPlayer), "getHighScores",
-                      ChangePriority.CHANGE_NORMAL);
-        Element reply = cs.build(serverPlayer);
-        if (scores != null) {
-            for (HighScore score : scores) {
-                reply.appendChild(score.toXMLElement(reply.getOwnerDocument()));
-            }
-        }
-        return reply;
+    public List<HighScore> getHighScores() {
+        return HighScore.loadHighScores();
     }
 
 

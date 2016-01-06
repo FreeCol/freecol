@@ -617,8 +617,7 @@ public abstract class ServerAPI {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Game game, Unit ourUnit,
-                                     Colony otherColony, 
+    public DiplomaticTrade diplomacy(Unit ourUnit, Colony otherColony, 
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherColony,
                                                           agreement),
@@ -628,7 +627,7 @@ public abstract class ServerAPI {
         if (reply == null) {
             return null;
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(game, reply).getAgreement();
+            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
         } else {
             handle(reply);
             return null;
@@ -643,8 +642,7 @@ public abstract class ServerAPI {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Game game, Unit ourUnit,
-                                     Unit otherUnit, 
+    public DiplomaticTrade diplomacy(Unit ourUnit, Unit otherUnit, 
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourUnit, otherUnit,
                                                           agreement),
@@ -652,7 +650,7 @@ public abstract class ServerAPI {
         if (reply == null) {
             return null;
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(game, reply).getAgreement();
+            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
         } else {
             handle(reply);
             return null;
@@ -667,8 +665,7 @@ public abstract class ServerAPI {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Game game, Colony ourColony,
-                                     Unit otherUnit, 
+    public DiplomaticTrade diplomacy(Colony ourColony, Unit otherUnit, 
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(ourColony, otherUnit,
                                                           agreement),
@@ -676,7 +673,7 @@ public abstract class ServerAPI {
         if (reply == null) {
             return null;
         } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(game, reply).getAgreement();
+            return new DiplomacyMessage(ourColony.getGame(), reply).getAgreement();
         } else {
             handle(reply);
             return null;
@@ -789,32 +786,26 @@ public abstract class ServerAPI {
      * @return The goods for sale in the settlement,
      *     or null if the server interaction failed.
      */
-    public List<Goods> getGoodsForSaleInSettlement(Game game, Unit unit,
+    public List<Goods> getGoodsForSaleInSettlement(Unit unit,
                                                    Settlement settlement) {
         GoodsForSaleMessage message
             = new GoodsForSaleMessage(unit, settlement, null);
         Element reply = askExpecting(message,
             GoodsForSaleMessage.getTagName(), null);
         return (reply == null) ? Collections.<Goods>emptyList()
-            : new GoodsForSaleMessage(game, reply).getGoods();
+            : new GoodsForSaleMessage(unit.getGame(), reply).getGoods();
     }
 
     /**
      * Server query-response for asking for the high scores list.
      *
+     * @param game The <code>Game</code> to extract scores from.
      * @return The list of high scores.
      */
-    public List<HighScore> getHighScores() {
-        Element reply = askExpecting(new DOMMessage("getHighScores"),
-            null, null);
-        if (reply == null) return Collections.<HighScore>emptyList();
-
-        List<HighScore> result = new ArrayList<>();
-        NodeList childElements = reply.getChildNodes();
-        for (int i = 0; i < childElements.getLength(); i++) {
-            result.add(new HighScore((Element)childElements.item(i)));
-        }
-        return result;
+    public List<HighScore> getHighScores(Game game) {
+        Element reply = askExpecting(new HighScoreMessage(), null, null);
+        return (reply == null) ? Collections.<HighScore>emptyList()
+            : new HighScoreMessage(game, reply).getScores();
     }
 
     /**

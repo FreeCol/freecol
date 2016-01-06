@@ -1351,7 +1351,7 @@ public final class InGameController implements NetworkConstants {
         StringTemplate nation = other.getNationLabel();
         while (dt != null) {
             // Inform server of current agreement.
-            dt = askServer().diplomacy(game, unit, colony, dt);
+            dt = askServer().diplomacy(unit, colony, dt);
             // Returned dt will be null if we sent or the other player
             // replied with an accept/reject.  Otherwise consider
             // counter proposal.
@@ -1919,7 +1919,7 @@ public final class InGameController implements NetworkConstants {
 
         // Get list of goods for sale
         List<Goods> forSale = askServer()
-            .getGoodsForSaleInSettlement(game, unit, settlement);
+            .getGoodsForSaleInSettlement(unit, settlement);
         for (;;) {
             if (forSale.isEmpty()) { // Nothing to sell to the player
                 return StringTemplate.template("trade.nothingToSell");
@@ -3398,7 +3398,8 @@ public final class InGameController implements NetworkConstants {
      * @return True, the high scores were displayed.
      */
     public boolean displayHighScores(Boolean high) {
-        List<HighScore> scores = askServer().getHighScores();
+        final Game game = freeColClient.getGame();
+        List<HighScore> scores = askServer().getHighScores(game);
         gui.showHighScoresPanel((high == null) ? null
             : (high) ? "highscores.yes" : "highscores.no",
             scores);
