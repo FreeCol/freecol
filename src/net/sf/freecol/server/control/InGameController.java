@@ -104,6 +104,7 @@ import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -1509,9 +1510,8 @@ public final class InGameController extends Controller {
         int gold = ai.buyProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        cs.addAttribute(See.only(serverPlayer),
-                        "gold", Integer.toString(gold));
-        return cs.build(serverPlayer);
+        return new BuyPropositionMessage(unit, settlement, goods, gold)
+            .toXMLElement();
     }
 
     /**

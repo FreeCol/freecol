@@ -430,14 +430,13 @@ public abstract class ServerAPI {
      */
     public int buyProposition(Unit unit, Settlement settlement,
                               Goods goods, int gold) {
-        HashMap<String, String> results = loadMap("gold");
-        if (askHandling(new BuyPropositionMessage(unit, settlement,
-                    goods, gold), null, results)) {
-            try {
-                return Integer.parseInt(results.get("gold"));
-            } catch (NumberFormatException e) {}
-        }
-        return NetworkConstants.NO_TRADE;
+        Element reply = askExpecting(new BuyPropositionMessage(unit, settlement,
+                                                               goods, gold),
+            BuyPropositionMessage.getTagName(), null);
+        return (reply == null
+            || !BuyPropositionMessage.getTagName().equals(reply.getTagName()))
+            ? NetworkConstants.NO_TRADE
+            : new BuyPropositionMessage(unit.getGame(), reply).getGold();
     }
 
     /**
