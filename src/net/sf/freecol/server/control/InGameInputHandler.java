@@ -76,6 +76,7 @@ import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
+import net.sf.freecol.common.networking.REFUnitsMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
@@ -320,14 +321,6 @@ public final class InGameInputHandler extends InputHandler
                 return new EquipForRoleMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register("getREFUnits",
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return freeColServer.getInGameController()
-                    .getREFUnits(freeColServer.getPlayer(connection));
-            }});
         register(GetTransactionMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -470,6 +463,14 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new RearrangeColonyMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(REFUnitsMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new REFUnitsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(RenameMessage.getTagName(),

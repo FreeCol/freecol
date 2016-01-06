@@ -787,9 +787,8 @@ public abstract class ServerAPI {
      */
     public List<Goods> getGoodsForSaleInSettlement(Unit unit,
                                                    Settlement settlement) {
-        GoodsForSaleMessage message
-            = new GoodsForSaleMessage(unit, settlement, null);
-        Element reply = askExpecting(message,
+        Element reply = askExpecting(new GoodsForSaleMessage(unit, settlement,
+                                                             null),
             GoodsForSaleMessage.getTagName(), null);
         return (reply == null) ? Collections.<Goods>emptyList()
             : new GoodsForSaleMessage(unit.getGame(), reply).getGoods();
@@ -802,7 +801,8 @@ public abstract class ServerAPI {
      * @return The list of high scores.
      */
     public List<HighScore> getHighScores(Game game) {
-        Element reply = askExpecting(new HighScoreMessage(), null, null);
+        Element reply = askExpecting(new HighScoreMessage(),
+                                     HighScoreMessage.getTagName(), null);
         return (reply == null) ? Collections.<HighScore>emptyList()
             : new HighScoreMessage(game, reply).getScores();
     }
@@ -834,21 +834,14 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking about a players REF.
      *
+     * @param game The <code>Game</code> to extract scores from.
      * @return A list of REF units for the player.
      */
-    public List<AbstractUnit> getREFUnits() {
-        Element reply = askExpecting(new DOMMessage("getREFUnits"),
-            null, null);
-        if (reply == null) return Collections.<AbstractUnit>emptyList();
-
-        List<AbstractUnit> result = new ArrayList<>();
-        NodeList childElements = reply.getChildNodes();
-        for (int index = 0; index < childElements.getLength(); index++) {
-            AbstractUnit unit = new AbstractUnit();
-            unit.readFromXMLElement((Element) childElements.item(index));
-            result.add(unit);
-        }
-        return result;
+    public List<AbstractUnit> getREFUnits(Game game) {
+        Element reply = askExpecting(new REFUnitsMessage(null),
+                                     REFUnitsMessage.getTagName(), null);
+        return (reply == null) ? Collections.<AbstractUnit>emptyList()
+            : new REFUnitsMessage(game, reply).getREFUnits();
     }
 
     /**

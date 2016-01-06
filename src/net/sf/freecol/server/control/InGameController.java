@@ -115,13 +115,11 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.RandomUtils.*;
-
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
@@ -4063,9 +4061,9 @@ public final class InGameController extends Controller {
      * Get a list of abstract REF units for a player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to query the REF of.
-     * @return An <code>Element</code> encapsulating this action.
+     * @return A list of <code>AbstractUnit</code>s defining the REF.
      */
-    public Element getREFUnits(ServerPlayer serverPlayer) {
+    public List<AbstractUnit> getREFUnits(ServerPlayer serverPlayer) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         List<AbstractUnit> units = new ArrayList<>();
@@ -4099,16 +4097,7 @@ public final class InGameController extends Controller {
                 }
             }
         }
-
-        ChangeSet cs = new ChangeSet();
-        cs.addTrivial(See.only(serverPlayer), "getREFUnits",
-                      ChangePriority.CHANGE_NORMAL);
-        Element reply = cs.build(serverPlayer);
-        // FIXME: eliminate explicit Element hackery
-        for (AbstractUnit unit : units) {
-            reply.appendChild(unit.toXMLElement(reply.getOwnerDocument()));
-        }
-        return reply;
+        return units;
     }
 
 
