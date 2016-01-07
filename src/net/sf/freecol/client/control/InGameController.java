@@ -3661,7 +3661,7 @@ public final class InGameController implements NetworkConstants {
      * @return A <code>Map</code> containing the server statistics.
      */
     public java.util.Map<String, String> getServerStatistics() {
-        return askServer().getStatistics();
+        return askServer().getStatistics(freeColClient.getGame());
     }
 
     /**

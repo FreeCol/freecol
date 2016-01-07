@@ -847,13 +847,16 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking for the server statistics.
      *
+     * @param game The <code>Game</code> to extract statistics from.
      * @return The server statistics.
      */
-    public java.util.Map<String, String> getStatistics() {
-        HashMap<String, String> results = loadMap("*");
-        return (askExpecting(new DOMMessage("getStatistics"),
-                "statistics", results) == null) ? null
-            : results;
+    public java.util.Map<String, String> getStatistics(Game game) {
+        Element reply = askExpecting(new StatisticsMessage(null),
+                                     StatisticsMessage.getTagName(), null);
+        return (reply == null
+            || !StatisticsMessage.getTagName().equals(reply.getTagName()))
+            ? Collections.<String, String>emptyMap()
+            : new StatisticsMessage(game, reply).getStatistics();
     }
 
     /**

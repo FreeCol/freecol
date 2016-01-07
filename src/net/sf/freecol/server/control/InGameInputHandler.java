@@ -88,6 +88,7 @@ import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SetGoodsLevelsMessage;
 import net.sf.freecol.common.networking.SetTradeRoutesMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
+import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
 import net.sf.freecol.common.networking.UnloadGoodsMessage;
 import net.sf.freecol.common.networking.UpdateTradeRouteMessage;
@@ -633,10 +634,10 @@ public final class InGameInputHandler extends InputHandler
             (Connection connection, Element element) ->
             new SpySettlementMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register("getStatistics",
+        register(StatisticsMessage.getTagName(),
             (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-                .getStatistics(freeColServer.getPlayer(connection)));
+            new StatisticsMessage(getGame(), element)
+                .handle(freeColServer, connection));
         register(UpdateTradeRouteMessage.getTagName(),
             (Connection connection, Element element) ->
             new UpdateTradeRouteMessage(getGame(), element)

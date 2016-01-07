@@ -4131,27 +4131,13 @@ public final class InGameController extends Controller {
     /**
      * Get the current game statistics.
      *
-     * @return An <code>Element</code> encapsulating this action.
+     * @return A map of statistics key,value pairs.
      */
-    public Element getStatistics(ServerPlayer serverPlayer) {
-        // Convert statistics map to a list.
+    public java.util.Map<String, String> getStatistics() {
         java.util.Map<String, String> stats = getGame()
             .getStatistics();
-
         stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
-
-        List<String> all = new ArrayList<>();
-        for (Entry<String, String> e : mapEntriesByKey(stats)) {
-            all.add(e.getKey());
-            all.add(e.getValue());
-        }
-
-        // Return as statistics element.
-        ChangeSet cs = new ChangeSet();
-        cs.addTrivial(See.only(serverPlayer), "statistics",
-                      ChangePriority.CHANGE_NORMAL,
-                      all.toArray(new String[0]));
-        return cs.build(serverPlayer);
+        return stats;
     }
 
     /**
