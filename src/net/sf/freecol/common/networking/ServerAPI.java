@@ -871,13 +871,11 @@ public abstract class ServerAPI {
      *     negative if the server interaction failed.
      */
     public int incite(Unit unit, Direction direction, Player enemy, int gold) {
-        HashMap<String, String> results = loadMap("gold");
-        if (!askHandling(new InciteMessage(unit, direction, enemy, gold),
-                null, results)) return -1;
-        try {
-            return Integer.parseInt(results.get("gold"));
-        } catch (NumberFormatException e) {}
-        return -1;
+        Element reply = askExpecting(new InciteMessage(unit, direction,
+                                                       enemy, gold),
+            null, null);
+        resolve(handle(reply));
+        return DOMMessage.getIntegerAttribute(reply, "gold", -1);
     }
 
     /**
@@ -1032,17 +1030,13 @@ public abstract class ServerAPI {
      *     or null if the server interaction failed.
      */
     public boolean[] openTransactionSession(Unit unit, Settlement settlement) {
-        HashMap<String, String> results
-            = loadMap("canBuy", "canSell", "canGift");
-        if (askExpecting(new GetTransactionMessage(unit, settlement),
-                null, results) == null
-            || results.get("canBuy") == null
-            || results.get("canSell") == null
-            || results.get("canGift") == null) return null;
+        Element reply = askExpecting(new GetTransactionMessage(unit,
+                                                               settlement),
+            null, null);
         return new boolean[] {
-            Boolean.parseBoolean(results.get("canBuy")),
-            Boolean.parseBoolean(results.get("canSell")),
-            Boolean.parseBoolean(results.get("canGift"))
+            DOMMessage.getBooleanAttribute(reply, "canBuy", false),
+            DOMMessage.getBooleanAttribute(reply, "canSell", false),
+            DOMMessage.getBooleanAttribute(reply, "canGift", false)
         };
     }
 
@@ -1119,11 +1113,12 @@ public abstract class ServerAPI {
      * @return The number of settlements of this tribe (which is
      *     needed in the dialog following), or negative on error.
      */
-    public String scoutSettlement(Unit unit, Direction direction) {
-        HashMap<String, String> results = loadMap("settlements");
-        return (askHandling(new ScoutIndianSettlementMessage(unit, direction),
-                            null, results)) ? results.get("settlements")
-            : null;
+    public int scoutSettlement(Unit unit, Direction direction) {
+        Element reply = askExpecting(new ScoutIndianSettlementMessage(unit,
+                direction),
+            null, null);
+        resolve(handle(reply));
+        return DOMMessage.getIntegerAttribute(reply, "settlements", -1);
     }
    
     /**
@@ -1135,10 +1130,11 @@ public abstract class ServerAPI {
      *     or null if the server interaction failed.
      */
     public String scoutSpeakToChief(Unit unit, Direction direction) {
-        HashMap<String, String> results = loadMap("result");
-        return (askHandling(new ScoutSpeakToChiefMessage(unit, direction),
-                null, results)) ? results.get("result")
-            : null;
+        Element reply = askExpecting(new ScoutSpeakToChiefMessage(unit,
+                direction),
+            null, null);
+        resolve(handle(reply));
+        return DOMMessage.getStringAttribute(reply, "result", (String)null);
     }
 
     /**

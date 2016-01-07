@@ -1707,8 +1707,9 @@ public final class InGameController implements NetworkConstants {
         askClearGotoOrders(unit);
 
         // Offer the choices.
-        String number = askServer().scoutSettlement(unit, direction);
-        if (number == null) number = Messages.message("many");
+        int count = askServer().scoutSettlement(unit, direction);
+        String number = (count <= 0) ? Messages.message("many")
+            : Integer.toString(count);
         ScoutIndianSettlementAction act
             = gui.getScoutIndianSettlementChoice(settlement, number);
         if (act == null) return true; // Cancelled

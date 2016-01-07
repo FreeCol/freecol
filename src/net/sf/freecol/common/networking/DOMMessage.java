@@ -397,6 +397,60 @@ public class DOMMessage {
     }
 
     /**
+     * Get a boolean attribute value from an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @param tag The attribute name.
+     * @param defaultValue A default value to return on failure.
+     * @return The boolean value found, or the default value on error.
+     */
+    public static boolean getBooleanAttribute(Element element, String tag,
+                                              boolean defaultValue) {
+        if (element != null && element.hasAttribute(tag)) {
+            String str = element.getAttribute(tag);
+            try {
+                return Boolean.parseBoolean(str);
+            } catch (NumberFormatException e) {}
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get an integer attribute value from an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @param tag The attribute name.
+     * @param defaultValue A default value to return on failure.
+     * @return The integer value found, or the default value on error.
+     */
+    public static int getIntegerAttribute(Element element, String tag,
+                                          int defaultValue) {
+        if (element != null && element.hasAttribute(tag)) {
+            String str = element.getAttribute(tag);
+            try {
+                return Integer.parseInt(str);
+            } catch (NumberFormatException e) {}
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get a string attribute value from an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @param tag The attribute name.
+     * @param defaultValue A default value to return on failure.
+     * @return The string value found, or the default value on error.
+     */
+    public static String getStringAttribute(Element element, String tag,
+                                            String defaultValue) {
+        if (element != null && element.hasAttribute(tag)) {
+            return element.getAttribute(tag);
+        }
+        return defaultValue;
+    }
+
+    /**
      * Convert an element to a string.
      *
      * @param element The <code>Element</code> to convert.
