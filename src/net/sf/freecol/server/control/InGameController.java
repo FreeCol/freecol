@@ -115,6 +115,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
+import net.sf.freecol.common.networking.SellPropositionMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -1543,9 +1544,8 @@ public final class InGameController extends Controller {
         int gold = ai.sellProposition(unit, settlement, goods, price);
 
         // Others can not see proposals.
-        cs.addAttribute(See.only(serverPlayer),
-                        "gold", Integer.toString(gold));
-        return cs.build(serverPlayer);
+        return new SellPropositionMessage(unit, settlement, goods, gold)
+            .toXMLElement();
     }
 
     /**
