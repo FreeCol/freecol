@@ -263,29 +263,27 @@ public class AIMessage {
      * Claims a tile for a colony.
      *
      * @param tile The <code>Tile</code> to claim.
-     * @param claimant The <code>AIUnit</code> or <code>AIColony</code>
-     *     that is claiming.
+     * @param aiColont The <code>AIColony</code> that is claiming.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askClaimLand(Tile tile, AIObject claimant,
-                                       int price) {
-        FreeColGameObject fcgo;
-        Player owner;
-        if (claimant instanceof AIUnit) {
-            fcgo = ((AIUnit)claimant).getUnit();
-            owner = ((Unit)fcgo).getOwner();
-        } else if (claimant instanceof AIColony) {
-            fcgo = ((AIColony)claimant).getColony();
-            owner = ((Colony)fcgo).getOwner();
-        } else {
-            throw new IllegalArgumentException("Claimant must be an AIUnit"
-                + " or AIColony: " + claimant.getId());
-        }
-        return sendMessage(claimant.getAIMain().getAIPlayer(owner)
-            .getConnection(), new ClaimLandMessage(tile, fcgo, price));
+    public static boolean askClaimLand(Tile tile, AIColony aiColony, int price) {
+        return sendMessage(aiColony.getAIOwner().getConnection(),
+            new ClaimLandMessage(tile, aiColony.getColony(), price));
     }
 
+    /**
+     * Claims a tile.
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @param aiUnit The <code>AIUnit</code> that is claiming.
+     * @param price The price to pay.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askClaimLand(Tile tile, AIUnit aiUnit, int price) {
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
+            new ClaimLandMessage(tile, aiUnit.getUnit(), price));
+    }
 
     /**
      * Clears the speciality of a unit.
