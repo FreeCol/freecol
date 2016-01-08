@@ -42,6 +42,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -419,6 +420,23 @@ public class Connection implements Closeable {
         return reply;
     }
 
+    /**
+     * Sends a message to the peer and returns a message in reply.
+     *
+     * @param game The <code>Game</code> to create the reply message in.
+     * @param message The <code>DOMMessage</code> to send.
+     * @return A <code>DOMMessage</code> created from the reply.
+     */
+    public DOMMessage ask(Game game, DOMMessage message) {
+        Element reply;
+        try {
+            reply = ask(message.toXMLElement());
+        } catch (IOException e) {
+            return null;
+        }
+        return DOMMessage.createMessage(game, reply);
+    }
+        
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
      *

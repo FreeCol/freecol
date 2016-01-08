@@ -436,15 +436,8 @@ public final class InGameController extends Controller {
 
         @Override
         public DOMMessage call() {
-            Element reply;
-            try {
-                reply = connection.ask(message.toXMLElement());
-            } catch (IOException e) {
-                return null;
-            }
-            DOMMessage replyMessage = DOMMessage.createMessage(game, reply);
-            return (replyMessage == null) ? null
-                : handler.handle(replyMessage);
+            DOMMessage reply = this.connection.ask(this.game, this.message);
+            return (reply == null) ? null : this.handler.handle(reply);
         }
     };
 
@@ -479,12 +472,7 @@ public final class InGameController extends Controller {
     private DOMMessage askTimeout(ServerPlayer serverPlayer,
                                   DOMMessage request) {
         Future<DOMMessage> future = askFuture(serverPlayer, request,
-            new DOMMessageHandler() {
-                @Override
-                public DOMMessage handle(DOMMessage message) {
-                    return message;
-                }
-            });
+                                              message -> message);
         DOMMessage reply;
         try {
             boolean single = getFreeColServer().getSinglePlayer();

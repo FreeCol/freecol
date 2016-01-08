@@ -162,8 +162,6 @@ public class DOMMessage {
     /**
      * Create a DOMMessage from an element.
      *
-     * FIXME: make this into a constructor?
-     *
      * @param game The <code>Game</code> to create the message in.
      * @param element The <code>Element</code> to create the message from.
      * @return The message created, or null on failure.
@@ -180,7 +178,8 @@ public class DOMMessage {
         try {
             message = (DOMMessage)Introspector.instantiate(tag, types, params);
         } catch (IllegalArgumentException e) {
-            logger.log(Level.WARNING, "Instantiation fail", e);
+            logger.log(Level.WARNING, "Instantiation fail for message type:"
+                + tag, e);
             message = null;
         }
         return message;
