@@ -21,12 +21,14 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -72,14 +74,12 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         super(getTagName());
 
         final Specification spec = game.getSpecification();
-        this.fathers = new ArrayList<>();
-        for (FoundingFatherType type : FoundingFatherType.values()) {
-            String id = element.getAttribute(type.toString());
-            if (id == null || id.isEmpty()) continue;
-            FoundingFather ff = spec.getFoundingFather(id);
-            this.fathers.add(ff);
-        }
-        foundingFatherId = element.getAttribute("foundingFather");
+        this.fathers = transform(map(FoundingFatherType.values(),
+                                     ft -> element.getAttribute(ft.toString())),
+            id -> id != null && !id.isEmpty(),
+            id -> spec.getFoundingFather(id),
+            Collectors.toList());
+        this.foundingFatherId = element.getAttribute("foundingFather");
     }
 
 
@@ -92,7 +92,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return The chosen <code>FoundingFather</code>, or null if none set.
      */
     public final FoundingFather getFather(Game game) {
-        return (foundingFatherId == null) ? null
+        return (this.foundingFatherId == null) ? null
             : game.getSpecification().getFoundingFather(this.foundingFatherId);
     }
 
@@ -112,7 +112,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return The offered <code>FoundingFather</code>s.
      */
     public final List<FoundingFather> getFathers() {
-        return fathers;
+        return this.fathers;
     }
 
 
