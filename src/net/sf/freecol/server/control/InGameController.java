@@ -30,13 +30,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -168,6 +161,21 @@ public final class InGameController extends Controller {
         super(freeColServer);
 
         this.random = random;
+    }
+
+
+    /**
+     * Asks a question of a player with a timeout.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param request The <code>DOMMessage</code> question.
+     * @return The response to the question, or null if none.
+     */
+    private DOMMessage askTimeout(ServerPlayer serverPlayer,
+                                  DOMMessage request) {
+        final boolean single = getFreeColServer().getSinglePlayer();
+        return getGame().askTimeout(serverPlayer, FreeCol.getTimeout(single),
+                                    request);
     }
 
     /**
@@ -408,87 +416,6 @@ public final class InGameController extends Controller {
         return refPlayer;
     }
 
-
-    // Client-server communication utilities
-
-    // A handler interface to pass to askFuture().
-    // This will change from DOMMessage to Message when DOM goes away.
-    private interface DOMMessageHandler {
-        public DOMMessage handle(DOMMessage message);
-    };
-
-    private static class DOMMessageCallable implements Callable<DOMMessage> {
-
-        private final Connection connection;
-        private final Game game;
-        private final DOMMessage message;
-        private final DOMMessageHandler handler;
-
-
-        public DOMMessageCallable(Connection connection, Game game,
-                                  DOMMessage message,
-                                  DOMMessageHandler handler) {
-            this.connection = connection;
-            this.game = game;
-            this.message = message;
-            this.handler = handler;
-        }
-
-        @Override
-        public DOMMessage call() {
-            DOMMessage reply = this.connection.ask(this.game, this.message);
-            return (reply == null) ? null : this.handler.handle(reply);
-        }
-    };
-
-    // A service to run the futures.
-    private final ExecutorService executor = Executors.newCachedThreadPool();
-
-    /**
-     * Asks a question of a player in a Future.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param question The <code>DOMMessage</code> question.
-     * @param handler The <code>DOMMessageHandler</code> handler to process
-     *     the reply with.
-     * @return A future encapsulating the result.
-     */
-    private Future<DOMMessage> askFuture(ServerPlayer serverPlayer,
-                                         DOMMessage question,
-                                         DOMMessageHandler handler) {
-        Callable<DOMMessage> callable
-            = new DOMMessageCallable(serverPlayer.getConnection(), getGame(),
-                                     question, handler);
-        return executor.submit(callable);
-    }
-
-    /**
-     * Asks a question of a player with a timeout.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param request The <code>DOMMessage</code> question.
-     * @return The response to the question, or null if none.
-     */
-    private DOMMessage askTimeout(ServerPlayer serverPlayer,
-                                  DOMMessage request) {
-        Future<DOMMessage> future = askFuture(serverPlayer, request,
-                                              message -> message);
-        DOMMessage reply;
-        try {
-            boolean single = getFreeColServer().getSinglePlayer();
-            reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
-        } catch (TimeoutException te) {
-            getGame().sendTo(serverPlayer, new ChangeSet()
-                .addTrivial(See.only(serverPlayer), "closeMenus",
-                    ChangePriority.CHANGE_NORMAL));
-            reply = null;
-        } catch (InterruptedException | ExecutionException e) {
-            reply = null;
-            logger.log(Level.WARNING, "Exception completing future", e);
-        }
-        return reply;
-    }
-
     /**
      * Visits a native settlement, possibly scouting it full if it is
      * as a result of a scout actually asking to speak to the chief,
@@ -515,184 +442,6 @@ public final class InGameController extends Controller {
         if (scout > 0 || (scout == 0 && getGame().getSpecification()
                 .getBoolean(GameOptions.SETTLEMENT_ACTIONS_CONTACT_CHIEF))) {
             is.setScouted(serverPlayer);
-        }
-    }
-
-    // Routines that follow implement the controller response to
-    // messages.
-    // The convention is to return an element to be passed back to the
-    // client by the invoking message handler.
-
-    /**
-     * Ends the turn of the given player.
-     *
-     * Note: sends messages to other players.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to end the turn of.
-     * @return An <code>Element</code> encapsulating the end of turn changes
-     *     for the given player.
-     */
-    public Element endTurn(ServerPlayer serverPlayer) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerGame game = getGame();
-        final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
-
-        ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
-        if (serverPlayer != current) {
-            throw new IllegalArgumentException("It is not "
-                + serverPlayer.getName() + "'s turn, it is "
-                + ((current == null) ? "noone" : current.getName()) + "'s!");
-        }
-
-        for (;;) {
-            logger.finest("Ending turn for " + current.getName());
-            current.clearModelMessages();
-
-            // Check for new turn
-            ChangeSet cs = new ChangeSet();
-            if (game.isNextPlayerInNewTurn()) {
-                ChangeSet next = new ChangeSet();
-                game.csNextTurn(next);
-                game.sendToAll(next);
-
-                LogBuilder lb = new LogBuilder(512);
-                lb.add("New turn ", game.getTurn(), " for ");
-                game.csNewTurn(random, lb, cs);
-                lb.shrink(", ");
-                lb.log(logger, Level.FINEST);
-                if (debugOnlyAITurns > 0) {
-                    if (--debugOnlyAITurns <= 0) {
-                        // If this was a debug run, complete it.  This will
-                        // signal the client to save and quit at the next
-                        // suitable opportunity.
-                        FreeColDebugger.signalEndDebugRun();
-                    }
-                }
-            }
-
-            if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
-                // "can not happen"
-                return DOMMessage.clientError("Can not get next player");
-            }
-
-            // Remove dead players and retry
-            switch (current.checkForDeath()) {
-            case ServerPlayer.IS_DEAD:
-                current.csWithdraw(cs);
-                logger.info("For " + serverPlayer.getSuffix()
-                    + ", " + current.getNation() + " is dead.");
-                game.sendToAll(cs, current);
-                continue;
-            case ServerPlayer.IS_ALIVE:
-                if (current.isREF() && current.checkForREFDefeat()) {
-                    for (Player p : current.getRebels()) {
-                        csGiveIndependence(current, (ServerPlayer)p, cs);
-                    }
-                    current.csWithdraw(cs);
-                    logger.info(current.getNation() + " is defeated.");
-                    game.sendToAll(cs, current);
-                    continue;
-                }
-                break;
-            default: // Need to autorecruit a unit to keep alive.
-                current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
-                break;
-            }
-            // Are there humans left?
-            // FIXME: see if this can be relaxed so we can run large
-            // AI-only simulations.
-            boolean onlyAI = all(game.getConnectedPlayers(), Player::isAI);
-            if (onlyAI) {
-                logger.info("No human player left.");
-                if (debugOnlyAITurns > 0) { // Complete debug runs
-                    FreeColDebugger.signalEndDebugRun();
-                }
-                game.setCurrentPlayer(null);
-
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL);
-                game.sendToOthers(serverPlayer, cs);
-                return cs.build(serverPlayer);
-            }
-
-            // Has the player won?
-            // Do not end single player games where an AI has won,
-            // that would stop revenge mode.
-            if (winner == current
-                && !(freeColServer.getSinglePlayer() && winner.isAI())) {
-                boolean highScore = !winner.isAI()
-                    && HighScore.newHighScore(winner);
-                cs.addTrivial(See.all(), "gameEnded",
-                              ChangePriority.CHANGE_NORMAL,
-                              "highScore", String.valueOf(highScore),
-                              "winner", winner.getId());
-            }
-
-            // Do "new turn"-like actions that need to wait until right
-            // before the player is about to move.
-            game.setCurrentPlayer(current);
-            if (current.isREF() && current.getEntryLocation() == null) {
-                // Initialize this newly created REF
-                // If the teleportREF option is enabled, teleport it in.
-                REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
-                    .getAIPlayer(current);
-                boolean teleport = game.getSpecification()
-                    .getBoolean(GameOptions.TELEPORT_REF);
-                if (refAIPlayer.initialize(teleport)) {
-                    csLaunchREF(current, teleport, cs);
-                } else {
-                    logger.severe("REF failed to initialize.");
-                }
-            }
-            current.csStartTurn(random, cs);
-
-            cs.addTrivial(See.all(), "setCurrentPlayer",
-                          ChangePriority.CHANGE_LATE,
-                          "player", current.getId());
-            if (current.getPlayerType() == PlayerType.COLONIAL) {
-                Monarch monarch = current.getMonarch();
-                MonarchAction action = null;
-                if (debugMonarchAction != null
-                    && current == debugMonarchPlayer) {
-                    action = debugMonarchAction;
-                    debugMonarchAction = null;
-                    debugMonarchPlayer = null;
-                    logger.finest("Debug monarch action: " + action);
-                } else {
-                    action = RandomChoice.getWeightedRandom(logger,
-                            "Choose monarch action",
-                        monarch.getActionChoices(), random);
-                }
-                if (action != null) {
-                    if (monarch.actionIsValid(action)) {
-                        logger.finest("Monarch action: " + action);
-                        csMonarchAction(current, action, cs);
-                    } else {
-                        logger.finest("Skipping invalid monarch action: "
-                            + action);
-                    }
-                }
-            }
-
-            // Prepare to update, with current player last so that it
-            // does not immediately start moving and cause further
-            // changes which conflict with these updates.
-            List<ServerPlayer> players = game.getConnectedPlayers(current);
-            players.add(current);
-
-            // If this is a debug run, update everyone and continue.
-            boolean debugSkip = !current.isAI()
-                && freeColServer.getSinglePlayer()
-                && debugOnlyAITurns > 0;
-            if (debugSkip) {
-                game.sendToList(players, cs);
-                continue;
-            }
-
-            // Flush accumulated changes, returning to serverPlayer.
-            players.remove(serverPlayer);
-            game.sendToList(players, cs);
-            return cs.build(serverPlayer);
         }
     }
 
@@ -1005,6 +754,193 @@ public final class InGameController extends Controller {
         }
     }
 
+    // Routines that follow implement the controller response to
+    // messages.
+    // The convention is to return an element to be passed back to the
+    // client by the invoking message handler.
+
+    /**
+     * Ends the turn of the given player.
+     *
+     * Note: sends messages to other players.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to end the turn of.
+     * @return An <code>Element</code> encapsulating the end of turn changes
+     *     for the given player.
+     */
+    public Element endTurn(ServerPlayer serverPlayer) {
+        final FreeColServer freeColServer = getFreeColServer();
+        final ServerGame game = getGame();
+        final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
+
+        ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
+        if (serverPlayer != current) {
+            throw new IllegalArgumentException("It is not "
+                + serverPlayer.getName() + "'s turn, it is "
+                + ((current == null) ? "noone" : current.getName()) + "'s!");
+        }
+
+        for (;;) {
+            logger.finest("Ending turn for " + current.getName());
+            current.clearModelMessages();
+
+            // Check for new turn
+            ChangeSet cs = new ChangeSet();
+            if (game.isNextPlayerInNewTurn()) {
+                ChangeSet next = new ChangeSet();
+                game.csNextTurn(next);
+                game.sendToAll(next);
+
+                LogBuilder lb = new LogBuilder(512);
+                lb.add("New turn ", game.getTurn(), " for ");
+                game.csNewTurn(random, lb, cs);
+                lb.shrink(", ");
+                lb.log(logger, Level.FINEST);
+                if (debugOnlyAITurns > 0) {
+                    if (--debugOnlyAITurns <= 0) {
+                        // If this was a debug run, complete it.  This will
+                        // signal the client to save and quit at the next
+                        // suitable opportunity.
+                        FreeColDebugger.signalEndDebugRun();
+                    }
+                }
+            }
+
+            if ((current = (ServerPlayer)game.getNextPlayer()) == null) {
+                // "can not happen"
+                return DOMMessage.clientError("Can not get next player");
+            }
+
+            // Remove dead players and retry
+            switch (current.checkForDeath()) {
+            case ServerPlayer.IS_DEAD:
+                current.csWithdraw(cs);
+                logger.info("For " + serverPlayer.getSuffix()
+                    + ", " + current.getNation() + " is dead.");
+                game.sendToAll(cs, current);
+                continue;
+            case ServerPlayer.IS_ALIVE:
+                if (current.isREF() && current.checkForREFDefeat()) {
+                    for (Player p : current.getRebels()) {
+                        csGiveIndependence(current, (ServerPlayer)p, cs);
+                    }
+                    current.csWithdraw(cs);
+                    logger.info(current.getNation() + " is defeated.");
+                    game.sendToAll(cs, current);
+                    continue;
+                }
+                break;
+            default: // Need to autorecruit a unit to keep alive.
+                current.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                break;
+            }
+            // Are there humans left?
+            // FIXME: see if this can be relaxed so we can run large
+            // AI-only simulations.
+            boolean onlyAI = all(game.getConnectedPlayers(), Player::isAI);
+            if (onlyAI) {
+                logger.info("No human player left.");
+                if (debugOnlyAITurns > 0) { // Complete debug runs
+                    FreeColDebugger.signalEndDebugRun();
+                }
+                game.setCurrentPlayer(null);
+
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL);
+                game.sendToOthers(serverPlayer, cs);
+                return cs.build(serverPlayer);
+            }
+
+            // Has the player won?
+            // Do not end single player games where an AI has won,
+            // that would stop revenge mode.
+            if (winner == current
+                && !(freeColServer.getSinglePlayer() && winner.isAI())) {
+                boolean highScore = !winner.isAI()
+                    && HighScore.newHighScore(winner);
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL,
+                              "highScore", String.valueOf(highScore),
+                              "winner", winner.getId());
+            }
+
+            // Do "new turn"-like actions that need to wait until right
+            // before the player is about to move.
+            game.setCurrentPlayer(current);
+            if (current.isREF() && current.getEntryLocation() == null) {
+                // Initialize this newly created REF
+                // If the teleportREF option is enabled, teleport it in.
+                REFAIPlayer refAIPlayer = (REFAIPlayer)freeColServer
+                    .getAIPlayer(current);
+                boolean teleport = game.getSpecification()
+                    .getBoolean(GameOptions.TELEPORT_REF);
+                if (refAIPlayer.initialize(teleport)) {
+                    csLaunchREF(current, teleport, cs);
+                } else {
+                    logger.severe("REF failed to initialize.");
+                }
+            }
+            current.csStartTurn(random, cs);
+
+            cs.addTrivial(See.all(), "setCurrentPlayer",
+                          ChangePriority.CHANGE_LATE,
+                          "player", current.getId());
+            if (current.getPlayerType() == PlayerType.COLONIAL) {
+                Monarch monarch = current.getMonarch();
+                MonarchAction action = null;
+                if (debugMonarchAction != null
+                    && current == debugMonarchPlayer) {
+                    action = debugMonarchAction;
+                    debugMonarchAction = null;
+                    debugMonarchPlayer = null;
+                    logger.finest("Debug monarch action: " + action);
+                } else {
+                    action = RandomChoice.getWeightedRandom(logger,
+                            "Choose monarch action",
+                        monarch.getActionChoices(), random);
+                }
+                if (action != null) {
+                    if (monarch.actionIsValid(action)) {
+                        logger.finest("Monarch action: " + action);
+                        csMonarchAction(current, action, cs);
+                    } else {
+                        logger.finest("Skipping invalid monarch action: "
+                            + action);
+                    }
+                }
+            }
+
+            // Prepare to update, with current player last so that it
+            // does not immediately start moving and cause further
+            // changes which conflict with these updates.
+            List<ServerPlayer> players = game.getConnectedPlayers(current);
+            players.add(current);
+
+            // If this is a debug run, update everyone and continue.
+            boolean debugSkip = !current.isAI()
+                && freeColServer.getSinglePlayer()
+                && debugOnlyAITurns > 0;
+            if (debugSkip) {
+                game.sendToList(players, cs);
+                continue;
+            }
+
+            // Flush accumulated changes, returning to serverPlayer.
+            players.remove(serverPlayer);
+            game.sendToList(players, cs);
+            return cs.build(serverPlayer);
+        }
+    }
+
+
+    /**
+     * Respond to a monarch action.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is to respond.
+     * @param action The <code>MonarchAction</code> to respond to.
+     * @param result The player response.
+     * @return An element containing the response.
+     */
     public Element monarchAction(ServerPlayer serverPlayer,
                                  MonarchAction action, boolean result) {
         MonarchSession session = TransactionSession.lookup(MonarchSession.class,
@@ -1020,6 +956,7 @@ public final class InGameController extends Controller {
         session.complete(result, cs);
         return cs.build(serverPlayer);
     }
+
 
     /**
      * Handle a player retiring.
@@ -4122,8 +4059,7 @@ public final class InGameController extends Controller {
      * @return A map of statistics key,value pairs.
      */
     public java.util.Map<String, String> getStatistics() {
-        java.util.Map<String, String> stats = getGame()
-            .getStatistics();
+        java.util.Map<String, String> stats = getGame().getStatistics();
         stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
         return stats;
     }

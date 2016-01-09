@@ -22,12 +22,20 @@ package net.sf.freecol.server.model;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -55,6 +63,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
@@ -71,6 +80,9 @@ public class ServerGame extends Game implements ServerModelObject {
 
     /** Timestamp of last move, if any.  Do not serialize. */
     private long lastTime = -1L;
+
+    /** An executor for askTimeout. */
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
 
     /**
@@ -161,7 +173,33 @@ public class ServerGame extends Game implements ServerModelObject {
         serverPlayer.send(cs);
     }
 
-
+    /**
+     * Asks a question of a player with a timeout.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param timeout The timeout, in seconds.
+     * @param request The <code>DOMMessage</code> question.
+     * @return The response to the question, or null if none.
+     */
+    public DOMMessage askTimeout(final ServerPlayer serverPlayer, int timeout,
+                                 final DOMMessage request) {
+        Callable<DOMMessage> callable = () -> serverPlayer.ask(this, request);
+        Future<DOMMessage> future = executor.submit(callable);
+        DOMMessage reply;
+        try {
+            reply = future.get(timeout, TimeUnit.SECONDS);
+        } catch (TimeoutException te) {
+            reply = null;
+            sendTo(serverPlayer, new ChangeSet()
+                .addTrivial(See.only(serverPlayer), "closeMenus",
+                    ChangePriority.CHANGE_NORMAL));
+        } catch (InterruptedException | ExecutionException e) {
+            reply = null;
+            logger.log(Level.WARNING, "Exception completing future", e);
+        }
+        return reply;
+    }
+    
     /**
      * Makes a trivial server object in this game given a server object tag
      * and an identifier.

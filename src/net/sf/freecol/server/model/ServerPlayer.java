@@ -92,6 +92,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -143,6 +144,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public static final int SCORE_INDEPENDENCE_BONUS_SECOND = 50;
     public static final int SCORE_INDEPENDENCE_BONUS_THIRD = 25;
 
+    // Do not serialize anything below.
+
     /** The network socket to the player's client. */
     private Socket socket;
 
@@ -158,7 +161,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /** Players with respect to which stance has changed. */
     private final List<ServerPlayer> stanceDirty = new ArrayList<>();
 
-    /** Accumulate extra trades here.  Do not serialize. */
+    /** Accumulate extra trades here. */
     private final List<AbstractGoods> extraTrades = new ArrayList<>();
 
 
@@ -299,6 +302,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void send(ChangeSet cs) {
         askElement(cs.build(this));
+    }
+
+    /**
+     * Send a message to the player, and return the resulting message.
+     *
+     * @param game The <code>Game</code> to build the return message in.
+     * @param message The <code>DOMMessage</code> to send.
+     * @return The resulting <code>DOMMessage</code>.
+     */
+    public DOMMessage ask(Game game, DOMMessage request) {
+        return (isConnected()) ? this.connection.ask(game, request) : null;
     }
     
     /**
