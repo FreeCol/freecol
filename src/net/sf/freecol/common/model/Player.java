@@ -148,9 +148,10 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private final void update() {
             units.clear();
-            units.addAll(owner.getUnits().stream()
-                .filter(u -> predicate.test(u))
-                .sorted(Unit.locComparator).collect(Collectors.toList()));
+            units.addAll(transformAndSort(owner.getUnits(),
+                                          u -> predicate.test(u),
+                                          Unit.locComparator,
+                                          Collectors.toList()));
         }
 
         /**

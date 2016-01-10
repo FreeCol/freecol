@@ -37,6 +37,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.xml.stream.XMLStreamConstants;
@@ -1156,17 +1157,14 @@ public final class FreeColServer {
         final AIMain aiMain = new AIMain(this);
         setAIMain(aiMain);
 
-        List<ServerPlayer> newAI = new ArrayList<>();
         game.setFreeColGameObjectListener(aiMain);
-        for (Entry<Nation, NationState> entry
-                 : game.getNationOptions().getNations().entrySet()) {
-            if (entry.getKey().isUnknownEnemy()) continue;
-            if (entry.getValue() != NationState.NOT_AVAILABLE
-                && game.getPlayerByNation(entry.getKey()) == null) {
-                newAI.add(makeAIPlayer(entry.getKey()));
-            }
-        }
-        Collections.sort(game.getPlayers(), Player.playerComparator);
+        List<ServerPlayer> newAI = transformAndSort(game.getNationOptions()
+            .getNations().entrySet(),
+            e -> !e.getKey().isUnknownEnemy()
+                && e.getValue() != NationState.NOT_AVAILABLE
+                && game.getPlayerByNationId(e.getKey().getId()) == null,
+            e -> makeAIPlayer(e.getKey()),
+            Player.playerComparator, Collectors.toList());
         game.updatePlayers(newAI);
 
         // We need a fake unknown enemy player

@@ -673,6 +673,23 @@ public class CollectionUtils {
      *
      * @param collection The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @param collector A <code>Collector</code> to aggregate the results.
+     */
+    public static <T extends Comparable<? super T>,C> C
+        transformAndSort(Collection<T> collection,
+                         Predicate<T> predicate,
+                         Comparator<? super T> comparator,
+                         Collector<T,?,C> collector) {
+        return fmcs(collection.stream(), predicate, i -> i, comparator,
+                    collector);
+    }
+
+    /**
+     * Transform and sort the contents of a collection.
+     *
+     * @param collection The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @param comparator A <code>Comparator</code> to sort with.
      * @param collector A <code>Collector</code> to aggregate the results.

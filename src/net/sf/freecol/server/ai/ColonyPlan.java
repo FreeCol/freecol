@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -287,10 +288,9 @@ public class ColonyPlan {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void refine(BuildableType build, LogBuilder lb) {
-        List<GoodsType> required = new ArrayList<>();
-        for (AbstractGoods ag : colony.getFullRequiredGoods(build)) {
-            required.add(ag.getType());
-        }
+        List<GoodsType> required
+            = transform(colony.getFullRequiredGoods(build), ag -> true,
+                AbstractGoods::getType, Collectors.toList());
         Map<GoodsType, List<WorkLocationPlan>> suppressed = new HashMap<>();
 
         // Examine a copy of the work plans, but operate on the
@@ -896,23 +896,24 @@ public class ColonyPlan {
 
         // If we need liberty put it before the new world production.
         if (colony.getSoL() < 100) {
-            produce.addAll(0, libertyGoodsTypes.stream()
-                .filter(gt -> production.containsKey(gt))
-                .sorted(productionComparator).collect(Collectors.toList()));
+            produce.addAll(0, transformAndSort(libertyGoodsTypes,
+                    gt -> production.containsKey(gt),
+                    productionComparator, Collectors.toList()));
         }
 
         // Always add raw/building materials first.
         Collections.sort(rawBuildingGoodsTypes, productionComparator);
-        Comparator<GoodsType> rawBuildingComparator
-            = Comparator.comparingInt(gt ->
-                rawBuildingGoodsTypes.indexOf(gt.getInputType()));
+        final ToIntFunction<GoodsType> indexer = gt ->
+            rawBuildingGoodsTypes.indexOf(gt.getInputType());
         List<GoodsType> toAdd = new ArrayList<>();
-        toAdd.addAll(buildingGoodsTypes.stream()
-            .filter(gt -> production.containsKey(gt)
-                && (colony.getGoodsCount(gt.getInputType())
-                    >= GoodsContainer.CARGO_SIZE/2
-                    || production.containsKey(gt.getInputType())))
-            .sorted(rawBuildingComparator).collect(Collectors.toList()));
+        toAdd.addAll(transformAndSort(buildingGoodsTypes,
+                gt -> production.containsKey(gt)
+                    && (colony.getGoodsCount(gt.getInputType())
+                        >= GoodsContainer.CARGO_SIZE/2
+                        || production.containsKey(gt.getInputType())),
+                Comparator.comparingInt(indexer).reversed(),
+                Collectors.toList()));
+
         for (int i = toAdd.size()-1; i >= 0; i--) {
             GoodsType make = toAdd.get(i);
             GoodsType raw = make.getInputType();
@@ -930,15 +931,15 @@ public class ColonyPlan {
         }
 
         // Military goods after lucrative production.
-        produce.addAll(militaryGoodsTypes.stream()
-            .filter(gt -> production.containsKey(gt))
-            .sorted(productionComparator).collect(Collectors.toList()));
+        produce.addAll(transformAndSort(militaryGoodsTypes,
+                gt -> production.containsKey(gt), productionComparator,
+                Collectors.toList()));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
-            produce.addAll(immigrationGoodsTypes.stream()
-                .filter(gt -> production.containsKey(gt))
-                .sorted(productionComparator).collect(Collectors.toList()));
+            produce.addAll(transformAndSort(immigrationGoodsTypes,
+                    gt -> production.containsKey(gt),
+                    productionComparator, Collectors.toList()));
         }
     }
 
