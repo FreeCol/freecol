@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -101,11 +102,8 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * @return A list of option values.
      */
     public List<T> getOptionValues() {
-        List<T> result = new ArrayList<>();
-        for (AbstractOption<T> option : value) {
-            if (option != null) result.add(option.getValue());
-        }
-        return result;
+        return transform(value, o -> o != null, o -> o.getValue(),
+                         Collectors.toList());
     }
 
     /**

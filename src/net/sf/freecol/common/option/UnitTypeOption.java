@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -30,6 +31,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -191,25 +193,16 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
                 choices.addAll(unitTypeList);
                 break;
             case IMMIGRANTS:
-                for (UnitType unitType : unitTypeList) {
-                    if (unitType.isRecruitable()) {
-                        choices.add(unitType);
-                    }
-                }
+                choices.addAll(transform(unitTypeList, UnitType::isRecruitable,
+                                         Collectors.toList()));
                 break;
             case NAVAL_UNITS:
-                for (UnitType unitType : unitTypeList) {
-                    if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                        choices.add(unitType);
-                    }
-                }
+                choices.addAll(transform(unitTypeList, UnitType::isNaval,
+                                         Collectors.toList()));
                 break;
             case LAND_UNITS:
-                for (UnitType unitType : unitTypeList) {
-                    if (!unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                        choices.add(unitType);
-                    }
-                }
+                choices.addAll(transform(unitTypeList, ut -> !ut.isNaval(),
+                                         Collectors.toList()));
                 break;
             }
             if (addNone) {
