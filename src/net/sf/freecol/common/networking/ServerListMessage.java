@@ -19,114 +19,108 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
- * The message sent when an error occurs.
+ * The message sent when to get a list of servers.
  */
-public class ErrorMessage extends DOMMessage {
+public class ServerListMessage extends DOMMessage {
 
-    public static final String MESSAGE_ID_TAG = "messageId";
-    public static final String MESSAGE_TAG = "message";
-
-    /** A message identifier, if available. */
-    private final String messageId;
-
-    /** A more detailed but non-i18n message for logging/debugging. */
-    private final String message;
+    public static final String SERVER_LIST_TAG = "serverList";
+    
+    /** The list of information about the available servers. */
+    private List<ServerInfo> serverInfo = new ArrayList<>();
 
 
     /**
-     * Create a new <code>ErrorMessage</code> with the given message
-     * identifier and message.
-     *
-     * @param messageId The message identifier.
-     * @param message The message.
+     * Create a new <code>ServerListMessage</code>.
      */
-    public ErrorMessage(String messageId, String message) {
+    public ServerListMessage() {
         super(getTagName());
-
-        this.messageId = messageId;
-        this.message = message;
     }
 
     /**
-     * Create a new <code>ErrorMessage</code> from a
+     * Create a new <code>ServerListMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public ErrorMessage(Game game, Element element) {
+    public ServerListMessage(Game game, Element element) {
         super(getTagName());
 
-        this.messageId = element.getAttribute(MESSAGE_ID_TAG);
-        this.message = element.getAttribute(MESSAGE_TAG);
+        NodeList nl = element.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            serverInfo.add(new ServerInfo((Element)nl.item(i)));
+        }
+    }
+
+
+    // Public interface
+
+    /**
+     * Get the server information.
+     *
+     * @return The list of <code>ServerInfo</code>.
+     */
+    public List<ServerInfo> getServers() {
+        return this.serverInfo;
+    }
+
+    /**
+     * Add information about a server.
+     *
+     * @param si The <code>ServerInfo</code> to add.
+     */
+    public <T extends ServerInfo> void addServer(T si) {
+        this.serverInfo.add(si);
     }
 
 
     /**
-     * Get the message identifier.
-     *
-     * @return The message identifier.
-     */
-    public String getMessageId() {
-        return this.messageId;
-    }
-    
-    /**
-     * Get the non-i18n message.
-     *
-     * @return The message.
-     */
-    public String getMessage() {
-        return this.message;
-    }
-    
-    /**
-     * Handle a "error"-message.
+     * Handle a "serverList"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return Null.
+     * @return An update containing the server info.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        // Not needed, error messages are only sent by the server
+        // Not needed, serverList messages are only sent by the server
         return null;
     }
 
     /**
-     * Convert this ErrorMessage to XML.
+     * Convert this ServerListMessage to XML.
      *
      * @return The XML representation of this message.
      */
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName());
-        if (this.messageId != null) {
-            result.setAttribute(MESSAGE_ID_TAG, this.messageId);
-        }
-        if (this.message != null) {
-            result.setAttribute(MESSAGE_TAG, this.message);
-        }
+        for (ServerInfo si : this.serverInfo) result.add(si.toMessage());
         return result.toXMLElement();
     }
 
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "error".
+     * @return "serverList".
      */
     public static String getTagName() {
-        return "error";
+        return SERVER_LIST_TAG;
     }
 }

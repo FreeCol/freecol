@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.ServerListMessage;
 
 import org.w3c.dom.Element;
 
@@ -76,8 +77,8 @@ public final class NetworkHandler implements MessageHandler {
         case "update":
             reply = update(connection, element);
             break;
-        case "getServerList":
-            reply = getServerList(connection, element);
+        case ServerListMessage.SERVER_LIST_TAG:
+            reply = serverList(connection, element);
             break;
         case "remove":
             reply = remove(connection, element);
@@ -91,14 +92,15 @@ public final class NetworkHandler implements MessageHandler {
 
     
     /**
-     * Handles a "getServerList"-request.
+     * Handles a "serverList"-request.
+     *
      * @param connection The <code>Connection</code> the message
      *       was received on.
      * @param element The element containing the request.
      * @return The reply: An <code>Element</code> with a list of the
      *      servers in the {@link MetaRegister}.
      */
-    private Element getServerList(Connection connection, Element element) {
+    private Element serverList(Connection connection, Element element) {
         return metaRegister.createServerList();
     }
 

@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ServerListMessage;
 
 import org.w3c.dom.Element;
 
@@ -178,8 +179,8 @@ public final class MetaRegister {
      * @return The server list as an XML DOM Element.
      */
     public synchronized Element createServerList() {
-        DOMMessage result = new DOMMessage("serverList");
-        for (MetaItem item : items) result.add(item.toMessage());
+        ServerListMessage result = new ServerListMessage();
+        for (MetaItem item : items) result.addServer(item);
         return result.toXMLElement();
     }
 

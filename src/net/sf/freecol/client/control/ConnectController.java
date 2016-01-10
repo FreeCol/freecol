@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
+import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
@@ -733,21 +734,17 @@ public final class ConnectController {
         ) {
             Element reply = null;
             try {
-                reply = mc.ask(new DOMMessage("getServerList").toXMLElement());
+                reply = mc.ask(new ServerListMessage().toXMLElement());
             } catch (IOException e) {
                 reply = null;
             }
-            if (reply == null) {
+            if (reply == null
+                || !ServerListMessage.getTagName().equals(reply.getTagName())) {
                 gui.showErrorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");
                 return null;
             }
-            List<ServerInfo> items = new ArrayList<>();
-            NodeList nl = reply.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
-                items.add(new ServerInfo((Element)nl.item(i)));
-            }
-            return items;
+            return new ServerListMessage((Game)null, reply).getServers();
         } catch (IOException e) {
             gui.showErrorMessage("metaServer.couldNotConnect");
             logger.log(Level.WARNING, "Could not connect to the meta-server.", e);
