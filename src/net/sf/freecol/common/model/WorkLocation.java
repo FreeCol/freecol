@@ -24,14 +24,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -577,15 +579,11 @@ public abstract class WorkLocation extends UnitLocation
         if (unit == null || unit.getWorkType() != goodsType) return 0;
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
-        int bestAmount = 0;
-        for (AbstractGoods output : getOutputs()) {
-            if (output.getType() != goodsType) continue;
-            int amount = (int)applyModifiers(getBaseProduction(getProductionType(),
-                    goodsType, unitType),
-                turn, getProductionModifiers(goodsType, unitType));
-            if (bestAmount < amount) bestAmount = amount;
-        }
-        return bestAmount;
+        return max(getOutputs(),
+            ag -> ag.getType() == goodsType,
+            ag -> (int)applyModifiers(getBaseProduction(getProductionType(),
+                                                        goodsType, unitType),
+                turn, getProductionModifiers(goodsType, unitType)));
     }
 
     /**

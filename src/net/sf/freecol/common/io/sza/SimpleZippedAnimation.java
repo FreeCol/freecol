@@ -177,9 +177,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      * @param evl The list of <code>AnimationEvent</code>s.
      */
     private SimpleZippedAnimation(final List<AnimationEvent> evl) {
-        this(evl,
-             max(evl, isIAEI, ifIAEIWidth, 0),
-             max(evl, isIAEI, ifIAEIHeight, 0));
+        this(evl, max(evl, isIAEI, ifIAEIWidth), max(evl, isIAEI, ifIAEIHeight));
     }
 
     /**

@@ -502,12 +502,11 @@ public class CollectionUtils {
      * @param c The <code>Collection</code> to check.
      * @param predicate A <code>Predicate</code> to match with.
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
-     * @param fail The result to return if the stream is empty.
-     * @return The maximum value found.
+     * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Collection<T> c, Predicate<T> predicate,
-                              ToIntFunction<T> tif, int fail) {
-        return max(c.stream(), predicate, tif, fail);
+                              ToIntFunction<T> tif) {
+        return max(c.stream(), predicate, tif);
     }
 
     /**
@@ -516,12 +515,11 @@ public class CollectionUtils {
      * @param stream The <code>Stream</code> to check.
      * @param predicate A <code>Predicate</code> to match with.
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
-     * @param fail The result to return if the stream is empty.
-     * @return The maximum value found.
+     * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Stream<T> stream, Predicate<T> predicate,
-                              ToIntFunction<T> tif, int fail) {
-        return stream.filter(predicate).mapToInt(tif).max().orElse(fail);
+                              ToIntFunction<T> tif) {
+        return stream.filter(predicate).mapToInt(tif).max().orElse(0);
     }
         
     /**
