@@ -47,11 +47,13 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
 
     private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
 
+    private static final String LOGOUT_TAG = "logout";
+
     /**
      * The handler map provides named handlers for network requests. Each
      * handler deals with a given request type.
      */
-    private final Map<String, NetworkRequestHandler> _handlerMap
+    private final Map<String, NetworkRequestHandler> handlerMap
         = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
 
 
@@ -62,68 +64,64 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      */
     public InputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
-        // All sub-classes are forced to implement this one
-        register(Connection.DISCONNECT_TAG, new DisconnectHandler());
-        register("logout", (Connection connection, Element element) ->
-            logout(connection, element));
-        register("chat", (Connection connection, Element element) ->
-            new ChatMessage(getGame(), element)
-                .handle(freeColServer, connection));
+
+        register(ChatMessage.CHAT_TAG, (Connection conn, Element e) ->
+            new ChatMessage(getGame(), e).handle(freeColServer, conn));
+
+        register(Connection.DISCONNECT_TAG, (Connection conn, Element e) ->
+            disconnect(conn, e));
+
+        register(LOGOUT_TAG, (Connection conn, Element e) ->
+            logout(conn, e));
     }
+
 
     /**
      * Register a network request handler.
      * 
-     * @param name The name.
-     * @param handler The handler.
+     * @param name The handler name.
+     * @param handler The <code>NetworkRequestHandler</code> to register.
      */
     protected final void register(String name, NetworkRequestHandler handler) {
-        _handlerMap.put(name, handler);
+        this.handlerMap.put(name, handler);
     }
 
     /**
      * Unregister a network request handler.
      * 
-     * @param name The name.
-     * @param handler The handler.
+     * @param name The handler name.
+     * @param handler The <code>NetworkRequestHandler</code> to unregister.
      * @return True if the supplied handler was actually removed.
      */
     protected final boolean unregister(String name, NetworkRequestHandler handler) {
-        // _handlerMap.remove(name, handler) would be better?
-        return _handlerMap.remove(name) == handler;
+        return this.handlerMap.remove(name, handler);
     }
 
     /**
-     * Deals with incoming messages that have just been received.
+     * Handle a "disconnect"-message.
      * 
      * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The root element of the message.
-     * @return The reply.
+     *     on.
+     * @param element The <code>Element</code> (root element in a
+     *     DOM-parsed XML tree) that holds all the information.
+     * @return Null.
      */
-    @Override
-    public final Element handle(Connection connection, Element element) {
-        if (element == null) return null;
-        String tagName = element.getTagName();
-        NetworkRequestHandler handler = _handlerMap.get(tagName);
-        if (handler != null) {
-            try {
-                logger.log(Level.FINEST, "Handling " + tagName);
-                return handler.handle(connection, element);
-            } catch (Exception e) {
-                // FIXME: should we really catch Exception? The old code did.
-                logger.log(Level.WARNING, "Handler failed", e);
-                connection.reconnect();
-            }
-        } else {
-            // Should we return an error here? The old handler returned null.
-            logger.warning("No handler installed for " + tagName);
+    protected Element disconnect(Connection connection, Element element) {
+        // The player should be logged out by now, but just in case:
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        logger.info("Disconnecting player "
+            + ((player == null) ? "null" : player.getName()));
+        if (player != null && player.isConnected()) {
+            logout(connection, null);
         }
+        connection.reallyClose();
+        Server server = getFreeColServer().getServer();
+        if (server != null) server.removeConnection(connection);
         return null;
     }
-
+    
     /**
-     * Handles a "logout"-message.
+     * Handle a "logout"-message.
      * 
      * @param connection The <code>Connection</code> the message was received
      *     on.
@@ -134,27 +132,34 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     protected abstract Element logout(Connection connection, Element element);
 
 
-    private class DisconnectHandler implements NetworkRequestHandler {
+    // Implement MessageHandler
 
-        @Override
-        public Element handle(Connection connection, Element disconnectElement) {
-            // The player should be logged out by now, but just in case:
-            ServerPlayer player = getFreeColServer().getPlayer(connection);
-            logDisconnect(connection, player);
-            if (player != null && player.isConnected()) {
-                logout(connection, null);
+    /**
+     * Deals with incoming messages that have just been received.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *     on.
+     * @param element The root element of the message.
+     * @return The reply.
+     */
+    @Override
+    public final Element handle(Connection connection, Element element) {
+        if (element == null) return null;
+        final String tagName = element.getTagName();
+        NetworkRequestHandler handler = handlerMap.get(tagName);
+        if (handler == null) {
+            // Should we return an error here? The old handler returned null.
+            logger.warning("No handler installed for " + tagName);
+        } else {
+            try {
+                logger.log(Level.FINEST, "Handling " + tagName);
+                return handler.handle(connection, element);
+            } catch (Exception e) {
+                // FIXME: should we really catch Exception? The old code did.
+                logger.log(Level.WARNING, "Handler failed", e);
+                connection.reconnect();
             }
-            connection.reallyClose();
-            Server server = getFreeColServer().getServer();
-            if (server != null) {
-                server.removeConnection(connection);
-            }
-            return null;
         }
-
-        private void logDisconnect(Connection connection, ServerPlayer player) {
-            logger.info("Disconnection by: " + connection
-                + ((player != null) ? " (" + player.getName() + ") " : ""));
-        }
+        return null;
     }
 }

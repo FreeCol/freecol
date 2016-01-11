@@ -32,6 +32,8 @@ import org.w3c.dom.Element;
  */
 public class ChatMessage extends DOMMessage {
 
+    public static final String CHAT_TAG = "chat";
+    
     /** The object identifier of the sender player. */
     private String sender;
 
@@ -143,6 +145,6 @@ public class ChatMessage extends DOMMessage {
      * @return "chat".
      */
     public static String getTagName() {
-        return "chat";
+        return CHAT_TAG;
     }
 }

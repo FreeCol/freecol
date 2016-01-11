@@ -57,6 +57,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
+import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
@@ -217,34 +218,31 @@ public final class ConnectController {
      * @param host The name of the machine running the
      *     <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @return A list of available {@link Player#getName() user names}.
+     * @return A list of available {@link Player#getName() user names}
+     *     or null on error.
      */
     private List<String> getVacantPlayers(String host, int port) {
-        List<String> items = new ArrayList<>();
-        DOMMessage message = new DOMMessage("getVacantPlayers");
+        Element reply;
         try (
             Connection mc = getConnection(host, port);
         ) {
-            if (mc == null) return null;
-            Element reply = mc.ask(message.toXMLElement());
-            if (reply == null) {
-                logger.warning("The server did not return a list.");
-                return null;
-            } else if (!"vacantPlayers".equals(reply.getTagName())) {
-                logger.warning("The reply has an unknown type: "
-                    + reply.getTagName());
-                return null;
-            }
-
-            NodeList nl = reply.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
-                items.add(((Element)nl.item(i)).getAttribute("username"));
-            }
+            reply = (mc == null) ? null
+                : mc.ask(new VacantPlayersMessage().toXMLElement());
         } catch (IOException e) {
+            reply = null;
             logger.log(Level.WARNING, "Could not send message to server.", e);
+            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
         }
-
-        return items;
+        if (reply == null
+            || !VacantPlayersMessage.VACANT_PLAYERS_TAG.equals(reply.getTagName())) {
+            logger.warning("The server did not return vacant players.");
+            gui.showErrorMessage("server.couldNotConnect",
+                "bad vacancy reply: "
+                + ((reply == null) ? null : reply.getTagName()));
+            return null;
+        }
+        final Game game = freeColClient.getGame();
+        return new VacantPlayersMessage(game, reply).getVacantPlayers();
     }
 
     /**

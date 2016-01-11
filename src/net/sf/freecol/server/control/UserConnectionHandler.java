@@ -31,6 +31,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
@@ -44,8 +45,7 @@ import org.w3c.dom.Element;
  * set as the message handler when the client has successfully logged
  * on.
  */
-public final class UserConnectionHandler extends FreeColServerHolder
-    implements MessageHandler {
+public final class UserConnectionHandler extends InputHandler {
 
     private static final Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 
@@ -57,51 +57,32 @@ public final class UserConnectionHandler extends FreeColServerHolder
      */
     public UserConnectionHandler(FreeColServer freeColServer) {
         super(freeColServer);
+
+        register("gameState", (Connection c, Element e) ->
+            gameState(c, e));
+        register(LoginMessage.LOGIN_TAG, (Connection c, Element e) ->
+            login(c, e));
+        register(VacantPlayersMessage.VACANT_PLAYERS_TAG,
+            (Connection c, Element e) ->
+            new VacantPlayersMessage(freeColServer.getGame(), e)
+               .handle(freeColServer, c));
     }
 
-
-    // Implement MessageHandler
 
     /**
-     * Handles a network message.
-     *
-     * @param conn The <code>Connection</code> the message came from.
-     * @param element The message to be processed.
-     * @return The reply.
+     * {@inheritDoc}
      */
-    @Override
-    public synchronized Element handle(Connection conn, Element element) {
-        final String tag = element.getTagName();
-        return (Connection.DISCONNECT_TAG.equals(tag)) 
-            ? disconnect(conn, element)
-            : ("gameState".equals(tag))
-            ? gameState(conn, element)
-            : ("getVacantPlayers".equals(tag))
-            ? getVacantPlayers(conn, element)
-            : (LoginMessage.getTagName().equals(tag))
-            ? login(conn, element)
-            : unknown(tag);
+    protected Element logout(
+        @SuppressWarnings("unused") Connection connection,
+        @SuppressWarnings("unused") Element element) {
+        return null; // Logout is ineffective at this point
     }
+
 
     // Individual message handlers
 
     /**
-     * Handles a "disconnect"-message.
-     *
-     * @param connection The <code>Connection</code> the message was
-     *     received on.
-     * @param element The <code>Element</code> (root element in a
-     *     DOM-parsed XML tree) that holds all the information.
-     * @return The reply.
-     */
-    private Element disconnect(Connection connection,
-        @SuppressWarnings("unused") Element element) {
-        connection.reallyClose();
-        return null;
-    }
-
-    /**
-     * Handles a "gameState"-request.
+     * Handle a "gameState"-request.
      *
      * @param connection The connection the message came from.
      * @param element The element containing the request.
@@ -118,32 +99,7 @@ public final class UserConnectionHandler extends FreeColServerHolder
     }
 
     /**
-     * Handles a "getVacantPlayers"-request.
-     *
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return Null on error (such as requesting during end game), an empty
-     *     list if the game is starting, or a list of all the inactive
-     *     European players.
-     */
-    private Element getVacantPlayers(
-        @SuppressWarnings("unused") Connection connection,
-        @SuppressWarnings("unused") Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final Game game = getGame();
-
-        DOMMessage message = new DOMMessage("vacantPlayers");
-        for (Player p : game.getLiveEuropeanPlayers(null)) {
-            if (!p.isREF()
-                && (p.isAI() || !((ServerPlayer)p).isConnected())) {
-                message.add("player", "username", p.getNationId());
-            }
-        }
-        return message.toXMLElement();
-    }
-
-    /**
-     * Handles a "login"-request.
+     * Handle a "login"-request.
      *
      * FIXME: Do not allow more than one (human) player to connect
      * to a single player game. This would be easy if we used a
@@ -259,16 +215,5 @@ public final class UserConnectionHandler extends FreeColServerHolder
         return new LoginMessage(userName, version, player.isAdmin(), !starting,
                                 freeColServer.getSinglePlayer(),
                                 isCurrentPlayer, game).toXMLElement();
-    }
-
-    /**
-     * Gripe about an unknown tag.
-     *
-     * @param tag The unknown tag.
-     * @return Null.
-     */
-    private Element unknown(String tag) {
-        logger.warning("Unknown user connection request: " + tag);
-        return null;
     }
 }
