@@ -548,8 +548,13 @@ public class Connection implements Closeable {
      */
     @Override
     public String toString() {
-        return "[Connection " + this.name
-            + " (" + this.socket.getInetAddress()
-            + ":" + this.socket.getPort() + ")]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[Connection ").append(this.name);
+        if (this.socket != null) {
+            sb.append(" (").append(this.socket.getInetAddress())
+                .append(":").append(this.socket.getPort()).append(")");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
