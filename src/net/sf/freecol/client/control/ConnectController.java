@@ -31,9 +31,6 @@ import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import net.sf.freecol.FreeCol; 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient; 
@@ -55,6 +52,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
@@ -95,9 +93,7 @@ public final class ConnectController {
     private void finish() {
         ResourceManager.setScenarioMapping(null);
 
-        if (!freeColClient.isHeadless()) {
-            freeColClient.setInGame(false);
-        }
+        if (!freeColClient.isHeadless()) freeColClient.setInGame(false);
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
         freeColClient.askServer().reset();
@@ -152,94 +148,47 @@ public final class ConnectController {
     }
 
     /**
-     * Get a connection to a server.
+     * Ask the server a question, but do not make a persistent
+     * connection yet.  Handle showing error messages on the GUI.
      *
      * @param host The name of the machine running the
      *     <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @return A <code>Connection</code> to the server.
+     * @param query The <code>DOMMessage</code> query to send.
+     * @param replyTag The expected tag of the reply, or null for anything.
+     * @param errorId An optional error message identifier.
+     * @return The reply message matching the specified tag, or null on error.
      */
-    private Connection getConnection(String host, int port) {
-        try {
-            return new Connection(host, port, null, FreeCol.CLIENT_THREAD);
-        } catch (IOException e) {
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
+    private DOMMessage ask(String host, int port, DOMMessage query,
+                           String replyTag, String errorId) {
+        DOMMessage reply;
+        try (
+            Connection c = new Connection(host, port, null,
+                                          FreeCol.CLIENT_THREAD)
+        ) {
+            reply = c.ask(freeColClient.getGame(), query, replyTag);
+        } catch (IOException ioe) {
+            gui.showErrorMessage("server.couldNotConnect", ioe.getMessage());
             logger.log(Level.WARNING, "Could not connect to " + host
-                + ":" + port, e);
+                + ":" + port, ioe);
+            return null;
+        }
+        if (reply == null) {
+            ;
+        } else if (replyTag == null || reply.isType(replyTag)) {
+            return reply;
+        } else if (reply.isType(ErrorMessage.ERROR_TAG)) {
+            ErrorMessage em = (ErrorMessage)reply;
+            if (errorId == null && em.getMessageId() != null) {
+                errorId = em.getMessageId();
+            }
+            gui.showErrorMessage(errorId, em.getMessage());
+        } else {
+            throw new IllegalStateException("Bogus tag: " + reply.getType());
         }
         return null;
     }
-
-    /**
-     * Gets a the game state on the remote server.
-     *
-     * @param host The name of the machine running the
-     *     <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return The <code>GameState</code>.
-     */
-    private GameState getGameState(String host, int port) {
-        String state = null;
-        Element reply;
-        try (
-            Connection mc = getConnection(host, port);
-        ) {
-            reply = (mc == null) ? null : mc.ask(new GameStateMessage().toXMLElement());
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send message to server.", e);
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
-            reply = null;
-        }
-        if (reply == null
-            || !GameStateMessage.GAME_STATE_TAG.equals(reply.getTagName())) {
-            gui.showErrorMessage("server.couldNotConnect",
-                "invalid state query response: "
-                + ((reply == null) ? "null" : reply.getTagName()));
-            return null;
-        }
-        try {
-            return new GameStateMessage(freeColClient.getGame(), reply)
-                .getGameState();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "State fail", e);
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * Gets a list of available players on a given server.
-     *
-     * @param host The name of the machine running the
-     *     <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return A list of available {@link Player#getName() user names}
-     *     or null on error.
-     */
-    private List<String> getVacantPlayers(String host, int port) {
-        Element reply;
-        try (
-            Connection mc = getConnection(host, port);
-        ) {
-            reply = (mc == null) ? null
-                : mc.ask(new VacantPlayersMessage().toXMLElement());
-        } catch (IOException e) {
-            reply = null;
-            logger.log(Level.WARNING, "Could not send message to server.", e);
-            gui.showErrorMessage("server.couldNotConnect", e.getMessage());
-        }
-        if (reply == null
-            || !VacantPlayersMessage.VACANT_PLAYERS_TAG.equals(reply.getTagName())) {
-            logger.warning("The server did not return vacant players.");
-            gui.showErrorMessage("server.couldNotConnect",
-                "bad vacancy reply: "
-                + ((reply == null) ? null : reply.getTagName()));
-            return null;
-        }
-        final Game game = freeColClient.getGame();
-        return new VacantPlayersMessage(game, reply).getVacantPlayers();
-    }
-
+        
     /**
      * Starts the client and connects to <i>host:port</i>.
      *
@@ -392,8 +341,13 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        GameState state = getGameState(host, port);
+        DOMMessage msg = ask(host, port, new GameStateMessage(),
+                             GameStateMessage.GAME_STATE_TAG, "client.noState");
+        GameState state = (msg instanceof GameStateMessage)
+            ? ((GameStateMessage)msg).getGameState()
+            : null;        
         if (state == null) return false;
+
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
@@ -408,11 +362,12 @@ public final class ConnectController {
                 gui.showErrorMessage("client.debugConnect");
                 return false;
             }
-            List<String> names = getVacantPlayers(host, port);
-            if (names == null || names.isEmpty()) {
-                gui.showErrorMessage("client.noPlayers");
-                return false;
-            }
+            msg = ask(host, port, new VacantPlayersMessage(),
+                VacantPlayersMessage.VACANT_PLAYERS_TAG, "client.noPlayers");
+            List<String> names = (msg instanceof VacantPlayersMessage)
+                ? ((VacantPlayersMessage)msg).getVacantPlayers()
+                : null;
+            if (names == null || names.isEmpty()) return false;
 
             String choice = gui.getChoice(null,
                 Messages.message("client.choicePlayer"),
@@ -717,31 +672,14 @@ public final class ConnectController {
     /**
      * Gets a list of servers from the meta server.
      *
-     * @return A list of {@link ServerInfo} objects.
+     * @return A list of {@link ServerInfo} objects, or null on error.
      */
     public List<ServerInfo> getServerList() {
-        try (
-            Connection mc = new Connection(FreeCol.META_SERVER_ADDRESS,
-                FreeCol.META_SERVER_PORT, null,
-                FreeCol.CLIENT_THREAD);
-        ) {
-            Element reply = null;
-            try {
-                reply = mc.ask(new ServerListMessage().toXMLElement());
-            } catch (IOException e) {
-                reply = null;
-            }
-            if (reply == null
-                || !ServerListMessage.getTagName().equals(reply.getTagName())) {
-                gui.showErrorMessage("metaServer.communicationError");
-                logger.warning("The meta-server did not return a list.");
-                return null;
-            }
-            return new ServerListMessage((Game)null, reply).getServers();
-        } catch (IOException e) {
-            gui.showErrorMessage("metaServer.couldNotConnect");
-            logger.log(Level.WARNING, "Could not connect to the meta-server.", e);
-            return null;
-        }
+        DOMMessage msg = ask(FreeCol.META_SERVER_ADDRESS,
+            FreeCol.META_SERVER_PORT, new ServerListMessage(),
+            ServerListMessage.SERVER_LIST_TAG, "metaServer.communicationError");
+        return (msg instanceof ServerListMessage)
+            ? ((ServerListMessage)msg).getServers()
+            : null;
     }
 }

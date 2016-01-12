@@ -432,11 +432,31 @@ public class Connection implements Closeable {
         try {
             reply = ask(message.toXMLElement());
         } catch (IOException e) {
-            return null;
+            return new ErrorMessage("reject", e.getMessage());
         }
         return DOMMessage.createMessage(game, reply);
     }
-        
+
+    /**
+     * Sends a message to the peer and returns a message of requested type
+     * or error in reply.
+     *
+     * @param game The <code>Game</code> to create the reply message in.
+     * @param message The <code>DOMMessage</code> to send.
+     * @param replyTag The requested tag of the reply.
+     * @return A <code>DOMMessage</code> in reply, either of the requested
+     *     type or error.
+     */
+    public DOMMessage ask(Game game, DOMMessage message, String replyTag) {
+        DOMMessage reply = ask(game, message);
+        return (reply != null && (reply.isType(replyTag)
+                || reply.isType(ErrorMessage.ERROR_TAG))) ? reply
+            : new ErrorMessage("reject", "Request: "
+                + ((message == null) ? "null" : message.getType())
+                + ", Reply: " + ((reply == null) ? "null" : reply.getType())
+                + ", Expected: " + ((replyTag == null) ? "null" : replyTag));
+    }
+
     /**
      * Handles a message using the registered <code>MessageHandler</code>.
      *
