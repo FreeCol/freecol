@@ -19,10 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -150,20 +152,119 @@ public class LoginMessage extends DOMMessage {
     }
 
 
+    // Implement MessageHandler
+
     /**
      * Handle a "login"-message.
      *
-     * This is actually done in UserConnectionHandler.
+     * FIXME: Do not allow more than one (human) player to connect
+     * to a single player game. This would be easy if we used a
+     * dummy connection for single player games.
      *
      * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return Null.
+     * @return An <code>Element</code> to update the originating player
+     *     with the result of the query.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
-        return null;
+    public Element handle(FreeColServer server, Connection connection) {
+        if (this.userName == null || this.userName.isEmpty()) {
+            return new ErrorMessage("server.missingUserName", null)
+                .toXMLElement();
+        } else if (this.version == null || this.version.isEmpty()) {
+            return new ErrorMessage("server.missingVersion", null)
+                .toXMLElement();
+        } else if (!this.version.equals(FreeCol.getVersion())) {
+            return new ErrorMessage("server.wrongFreeColVersion",
+                this.version + " != " + FreeCol.getVersion()).toXMLElement();
+        }
+
+        Game game;
+        ServerPlayer player;
+        boolean isCurrentPlayer = false;
+        MessageHandler mh;
+        boolean starting = server.getGameState()
+            == FreeColServer.GameState.STARTING_GAME;
+        if (starting) {
+            // Wait until the game has been created.
+            // FIXME: is this still needed?
+            int timeOut = 20000;
+            while ((game = server.getGame()) == null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {}
+                if ((timeOut -= 1000) <= 0) {
+                    return new ErrorMessage("server.timeOut", null)
+                        .toXMLElement();
+                }
+            }
+
+            if (!game.canAddNewPlayer()) {
+                return new ErrorMessage("server.maximumPlayers", null)
+                    .toXMLElement();
+            } else if (game.playerNameInUse(userName)) {
+                return new ErrorMessage("server.userNameInUse",
+                    userName + " is already in use.").toXMLElement();
+            }
+
+            // Create and add the new player:
+            boolean admin = game.getLivePlayers(null).isEmpty();
+            player = new ServerPlayer(game, admin, game.getVacantNation(),
+                                      connection.getSocket(), connection);
+            player.setName(userName);
+            game.addPlayer(player);
+
+            // Send message to all players except to the new player.
+            // FIXME: check visibility.
+            DOMMessage adp = new DOMMessage("addPlayer");
+            adp.add(player);
+            server.sendToAll(adp, connection);
+
+            // Ready now to handle pre-game messages.
+            mh = server.getPreGameInputHandler();
+
+        } else { // Restoring from existing game.
+            game = server.getGame();
+            player = (ServerPlayer)game.getPlayerByName(userName);
+            if (player == null) {
+                StringBuilder sb = new StringBuilder("Player \"");
+                sb.append(userName).append("\" is not present in the game.")
+                    .append("\n  Known players = ( ");
+                for (Player p : game.getLiveEuropeanPlayers(null)) {
+                    sb.append(p.getName()).append(" ");
+                }
+                sb.append(")");
+                return new ErrorMessage("server.userNameNotPresent",
+                    sb.toString()).toXMLElement();
+            } else if (player.isConnected() && !player.isAI()) {
+                return new ErrorMessage("server.userNameInUse",
+                    userName + " is already in use.").toXMLElement();
+            }
+            player.setConnection(connection);
+            player.setConnected(true);
+
+            if (player.isAI()) {
+                player.setAI(false);
+                server.sendToAll(new DOMMessage("setAI",
+                        "player", player.getId(),
+                        "ai", Boolean.toString(false)),
+                    null);
+            }
+
+            // If this player is the first to reconnect, it is the
+            // current player.
+            isCurrentPlayer = game.getCurrentPlayer() == null;
+            if (isCurrentPlayer) game.setCurrentPlayer(player);
+
+            // Go straight into the game.
+            mh = server.getInGameInputHandler();
+        }
+
+        connection.setMessageHandler(mh);
+        server.getServer().addConnection(connection);
+        server.updateMetaServer();
+        return new LoginMessage(userName, version, player.isAdmin(), !starting,
+                                server.getSinglePlayer(),
+                                isCurrentPlayer, game).toXMLElement();
     }
 
     /**

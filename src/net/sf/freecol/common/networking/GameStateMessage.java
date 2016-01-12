@@ -78,7 +78,6 @@ public class GameStateMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
-     *
      * @return An <code>Element</code> to update the originating player
      *     with the result of the query.
      */
