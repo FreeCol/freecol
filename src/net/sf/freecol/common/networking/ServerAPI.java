@@ -879,6 +879,21 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Makes demands to a colony.  One and only one of goods or gold is valid.
+     *
+     * @param unit The <code>Unit</code> that is demanding.
+     * @param colony The <code>Colony</code> to demand of.
+     * @param type The <code>GoodsType</code> to demand.
+     * @param amount The amount of goods to demand.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean indianDemand(Unit unit, Colony colony,
+                                GoodsType type, int amount) {
+        return askHandling(new IndianDemandMessage(unit, colony, type, amount),
+            null, null);
+    }
+            
+    /**
      * Server query-response for joining a colony.
      *
      * @param unit The <code>Unit</code> that will join.
@@ -1071,6 +1086,22 @@ public abstract class ServerAPI {
     public boolean putOutsideColony(Unit unit) {
         return askHandling(new PutOutsideColonyMessage(unit),
             null, null);
+    }
+
+    /**
+     * Rearrange a colony.
+     *
+     * @param colony The <code>Colony</code> to rearrange.
+     * @param workers A list of worker <code>Unit</code>s that may change.
+     * @param scratch A copy of the underlying <code>Colony</code> with the
+     *     workers arranged as required.
+     * @return True if the server interaction succeeds.
+     */
+    public boolean rearrangeColony(Colony colony, List<Unit> workers,
+                                   Colony scratch) {
+        RearrangeColonyMessage message
+            = new RearrangeColonyMessage(colony, workers, scratch);
+        return (message.isEmpty()) ? true : askHandling(message, null, null);
     }
 
     /**

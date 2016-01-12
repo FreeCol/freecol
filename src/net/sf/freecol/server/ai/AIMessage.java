@@ -19,11 +19,8 @@
 
 package net.sf.freecol.server.ai;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
@@ -44,142 +41,12 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.AttackMessage;
-import net.sf.freecol.common.networking.BuildColonyMessage;
-import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
-import net.sf.freecol.common.networking.ChangeStateMessage;
-import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
-import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
-import net.sf.freecol.common.networking.ClaimLandMessage;
-import net.sf.freecol.common.networking.ClearSpecialityMessage;
-import net.sf.freecol.common.networking.CloseTransactionMessage;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.DeliverGiftMessage;
-import net.sf.freecol.common.networking.DisbandUnitMessage;
-import net.sf.freecol.common.networking.DisembarkMessage;
-import net.sf.freecol.common.networking.EmbarkMessage;
-import net.sf.freecol.common.networking.EmigrateUnitMessage;
-import net.sf.freecol.common.networking.EquipForRoleMessage;
-import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.GetNationSummaryMessage;
-import net.sf.freecol.common.networking.GetTransactionMessage;
-import net.sf.freecol.common.networking.IndianDemandMessage;
-import net.sf.freecol.common.networking.LoadGoodsMessage;
-import net.sf.freecol.common.networking.LootCargoMessage;
-import net.sf.freecol.common.networking.MissionaryMessage;
-import net.sf.freecol.common.networking.MoveMessage;
-import net.sf.freecol.common.networking.MoveToMessage;
-import net.sf.freecol.common.networking.PutOutsideColonyMessage;
-import net.sf.freecol.common.networking.RearrangeColonyMessage;
-import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
-import net.sf.freecol.common.networking.SetBuildQueueMessage;
-import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
-import net.sf.freecol.common.networking.UnloadGoodsMessage;
-import net.sf.freecol.common.networking.WorkMessage;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
  * Wrapper class for AI message handling.
  */
 public class AIMessage {
-
-    private static final Logger logger = Logger.getLogger(AIMessage.class.getName());
-
-
-    /**
-     * Ask the server a question.
-     *
-     * @param conn The <code>Connection</code> to use when
-     *     communicating with the server.
-     * @param request The <code>Element</code> to send.
-     * @return The reply <code>Element</code>.
-     */
-    private static Element ask(Connection conn, Element request) {
-        Element reply;
-        try {
-            reply = conn.ask(request);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send \""
-                + request.getTagName() + "\"-message.", e);
-            reply = null;
-        }
-        return reply;
-    }
-
-    /**
-     * Handle error elements.
-     *
-     * @param element The <code>Element</code> to check.
-     * @param tag The tag that was originally sent.
-     * @return True if there was an error.
-     */
-    private static boolean checkError(Element element, String tag) {
-        if (element != null && "error".equals(element.getTagName())) {
-            String messageId = element.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
-            String messageText = element.getAttribute(ErrorMessage.MESSAGE_TAG);
-            logger.warning("AIMessage." + tag + " error,"
-                + " id: " + messageId + " message: " + messageText);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Ask the server a question, handling the reply.
-     *
-     * @param conn The <code>Connection</code> to use when
-     *     communicating with the server.
-     * @param request The <code>Element</code> to send.
-     * @return True if the message was sent, handled, and no error returned.
-     */
-    private static boolean askHandling(Connection conn, Element request) {
-        while (request != null) {
-            Element reply = ask(conn, request);
-            if (reply == null) break;
-            if (checkError(reply, request.getTagName())) return false;
-            try {
-                request = conn.handle(reply);
-            } catch (FreeColException fce) {
-                logger.log(Level.WARNING, "AI handler failed: " + reply, fce);
-                return false;
-            }
-        }
-        return true;
-    }
-        
-    /**
-     * Sends a DOMMessage to the server.
-     *
-     * @param connection The <code>Connection</code> to use
-     *     when communicating with the server.
-     * @param request The <code>Element</code> to send.
-     * @return True if the message was sent and a non-error reply returned.
-     */
-    private static boolean sendMessage(Connection connection,
-                                       Element request) {
-        return askHandling(connection, request);
-    }
-
-    /**
-     * Send a message to the server.
-     *
-     * @param connection The <code>Connection</code> to use
-     *     when communicating with the server.
-     * @param message The <code>Message</code> to send.
-     * @return True if the message was sent, and a non-null, non-error
-     *     reply returned.
-     */
-    private static boolean sendMessage(Connection connection,
-                                       DOMMessage message) {
-        return (connection != null && message != null)
-            ? sendMessage(connection, message.toXMLElement())
-            : false;
-    }
-
 
     /**
      * An AIUnit attacks in the given direction.
@@ -189,10 +56,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askAttack(AIUnit aiUnit, Direction direction) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new AttackMessage(aiUnit.getUnit(), direction));
+        return aiUnit.getAIOwner().askServer()
+            .attack(aiUnit.getUnit(), direction);
     }
-
 
     /**
      * An AIUnit builds a colony.
@@ -202,10 +68,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askBuildColony(AIUnit aiUnit, String name) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new BuildColonyMessage(name, aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .buildColony(name, aiUnit.getUnit());
     }
-
 
     /**
      * An AIUnit cashes in.
@@ -214,10 +79,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askCashInTreasureTrain(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new CashInTreasureTrainMessage(aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .cashInTreasureTrain(aiUnit.getUnit());
     }
-
 
     /**
      * An AIUnit changes state.
@@ -227,10 +91,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeState(AIUnit aiUnit, UnitState state) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new ChangeStateMessage(aiUnit.getUnit(), state));
+        return aiUnit.getAIOwner().askServer()
+            .changeState(aiUnit.getUnit(), state);
     }
-
 
     /**
      * An AIUnit changes its work type.
@@ -240,10 +103,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkType(AIUnit aiUnit, GoodsType type) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new ChangeWorkTypeMessage(aiUnit.getUnit(), type));
+        return aiUnit.getAIOwner().askServer()
+            .changeWorkType(aiUnit.getUnit(), type);
     }
-
 
    /**
      * An AIUnit changes its work improvement type.
@@ -253,11 +115,10 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkImprovementType(AIUnit aiUnit,
-                                                  TileImprovementType type) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new ChangeWorkImprovementTypeMessage(aiUnit.getUnit(), type));
+        TileImprovementType type) {
+        return aiUnit.getAIOwner().askServer()
+            .changeWorkImprovementType(aiUnit.getUnit(), type);
     }
-
 
     /**
      * Claims a tile for a colony.
@@ -268,8 +129,8 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askClaimLand(Tile tile, AIColony aiColony, int price) {
-        return sendMessage(aiColony.getAIOwner().getConnection(),
-            new ClaimLandMessage(tile, aiColony.getColony(), price));
+        return aiColony.getAIOwner().askServer()
+            .claimTile(tile, aiColony.getColony(), price);
     }
 
     /**
@@ -281,8 +142,8 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askClaimLand(Tile tile, AIUnit aiUnit, int price) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new ClaimLandMessage(tile, aiUnit.getUnit(), price));
+        return aiUnit.getAIOwner().askServer()
+            .claimTile(tile, aiUnit.getUnit(), price);
     }
 
     /**
@@ -292,10 +153,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askClearSpeciality(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new ClearSpecialityMessage(aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .clearSpeciality(aiUnit.getUnit());
     }
-
 
     /**
      * An AIUnit closes a transaction.
@@ -306,11 +166,9 @@ public class AIMessage {
      */
     public static boolean askCloseTransaction(AIUnit aiUnit,
                                               Settlement settlement) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new CloseTransactionMessage(aiUnit.getUnit(),
-                                                       settlement));
+        return aiUnit.getAIOwner().askServer()
+            .closeTransactionSession(aiUnit.getUnit(), settlement);
     }
-
 
     /**
      * An AIUnit delivers a gift.
@@ -322,11 +180,9 @@ public class AIMessage {
      */
     public static boolean askDeliverGift(AIUnit aiUnit, Settlement settlement,
                                          Goods goods) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new DeliverGiftMessage(aiUnit.getUnit(),
-                                                  settlement, goods));
+        return aiUnit.getAIOwner().askServer()
+            .deliverGiftToSettlement(aiUnit.getUnit(), settlement, goods);
     }
-
 
     /**
      * An AIUnit disbands.
@@ -335,10 +191,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisband(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new DisbandUnitMessage(aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .disbandUnit(aiUnit.getUnit());
     }
-
 
     /**
      * An AIUnit disembarks.
@@ -347,10 +202,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisembark(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new DisembarkMessage(aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .disembark(aiUnit.getUnit());
     }
-
 
     /**
      * An AIUnit embarks.
@@ -362,11 +216,9 @@ public class AIMessage {
      */
     public static boolean askEmbark(AIUnit aiUnit, Unit unit,
                                     Direction direction) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new EmbarkMessage(unit, aiUnit.getUnit(),
-                                             direction));
+        return aiUnit.getAIOwner().askServer()
+            .embark(unit, aiUnit.getUnit(), direction);
     }
-
 
     /**
      * A unit in Europe emigrates.
@@ -376,10 +228,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askEmigrate(AIPlayer aiPlayer, int slot) {
-        return sendMessage(aiPlayer.getConnection(),
-                           new EmigrateUnitMessage(slot));
+        return aiPlayer.askServer()
+            .emigrate(slot);
     }
-
 
     /**
      * Ends the player turn.
@@ -388,10 +239,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askEndTurn(AIPlayer aiPlayer) {
-        return sendMessage(aiPlayer.getConnection(),
-                           new DOMMessage("endTurn"));
+        return aiPlayer.askServer()
+            .endTurn();
     }
-
 
     /**
      * Change the role of a unit.
@@ -403,10 +253,9 @@ public class AIMessage {
      */
     public static boolean askEquipForRole(AIUnit aiUnit, Role role,
                                           int roleCount) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new EquipForRoleMessage(aiUnit.getUnit(), role, roleCount));
+        return aiUnit.getAIOwner().askServer()
+            .equipUnitForRole(aiUnit.getUnit(), role, roleCount);
     }
-
 
     /**
      * Establishes a mission in the given direction.
@@ -419,24 +268,21 @@ public class AIMessage {
     public static boolean askEstablishMission(AIUnit aiUnit,
                                               Direction direction,
                                               boolean denounce) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new MissionaryMessage(aiUnit.getUnit(), direction,
-                                                 denounce));
+        return aiUnit.getAIOwner().askServer()
+            .missionary(aiUnit.getUnit(), direction, denounce);
     }
-
 
     /**
      * Gets a nation summary for a player.
      *
      * @param owner The <code>AIPlayer</code> making the inquiry.
      * @param player The <code>Player</code> to summarize.
-     * @return True if the message was sent, and a non-error reply returned.
+     * @return A summary of that nation, or null on error.
      */
-    public static boolean askGetNationSummary(AIPlayer owner, Player player) {
-        return sendMessage(owner.getConnection(),
-            new GetNationSummaryMessage(player));
+    public static NationSummary askGetNationSummary(AIPlayer owner, Player player) {
+        return owner.askServer()
+            .getNationSummary(owner.getPlayer(), player);
     }
-
 
     /**
      * An AIUnit gets a transaction.
@@ -447,11 +293,9 @@ public class AIMessage {
      */
     public static boolean askGetTransaction(AIUnit aiUnit,
                                             Settlement settlement) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new GetTransactionMessage(aiUnit.getUnit(),
-                                                     settlement));
+        return aiUnit.getAIOwner().askServer()
+            .openTransactionSession(aiUnit.getUnit(), settlement) != null;
     }
-
 
     /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
@@ -465,10 +309,9 @@ public class AIMessage {
      */
     public static boolean askIndianDemand(AIUnit aiUnit, Colony colony,
                                           GoodsType type, int amount) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new IndianDemandMessage(aiUnit.getUnit(), colony, type, amount));
+        return aiUnit.getAIOwner().askServer()
+            .indianDemand(aiUnit.getUnit(), colony, type, amount);
     }
-
 
     /**
      * An AI unit loads some cargo.
@@ -481,10 +324,9 @@ public class AIMessage {
      */
     public static boolean askLoadGoods(Location loc, GoodsType type,
                                        int amount, AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new LoadGoodsMessage(loc, type, amount, aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .loadGoods(loc, type, amount, aiUnit.getUnit());
     }
-
 
     /**
      * An AI unit loots some cargo.
@@ -496,11 +338,9 @@ public class AIMessage {
      */
     public static boolean askLoot(AIUnit aiUnit, String defenderId,
                                   List<Goods> goods) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new LootCargoMessage(aiUnit.getUnit(), defenderId,
-                                                goods));
+        return aiUnit.getAIOwner().askServer()
+            .loot(aiUnit.getUnit(), defenderId, goods);
     }
-
 
     /**
      * Moves an AIUnit in the given direction.
@@ -510,10 +350,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMove(AIUnit aiUnit, Direction direction) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new MoveMessage(aiUnit.getUnit(), direction));
+        return aiUnit.getAIOwner().askServer()
+            .move(aiUnit.getUnit(), direction);
     }
-
 
     /**
      * Moves an AIUnit across the high seas.
@@ -523,10 +362,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMoveTo(AIUnit aiUnit, Location destination) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new MoveToMessage(aiUnit.getUnit(), destination));
+        return aiUnit.getAIOwner().askServer()
+            .moveTo(aiUnit.getUnit(), destination);
     }
-
 
     /**
      * An AIUnit is put outside a colony.
@@ -535,10 +373,9 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new PutOutsideColonyMessage(aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .putOutsideColony(aiUnit.getUnit());
     }
-
 
     /**
      * Rearrange an AI colony.
@@ -552,12 +389,9 @@ public class AIMessage {
     public static boolean askRearrangeColony(AIColony aiColony,
                                              List<Unit> workers,
                                              Colony scratch) {
-        RearrangeColonyMessage message
-            = new RearrangeColonyMessage(aiColony.getColony(), workers, scratch);
-        return (message.isEmpty()) ? false
-            : sendMessage(aiColony.getAIOwner().getConnection(), message);
+        return aiColony.getAIOwner().askServer()
+            .rearrangeColony(aiColony.getColony(), workers, scratch);
     }
-        
 
     /**
      * An AI unit scouts a native settlement.
@@ -568,11 +402,9 @@ public class AIMessage {
      */
     public static boolean askScoutSpeakToChief(AIUnit aiUnit,
                                                Direction direction) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new ScoutSpeakToChiefMessage(aiUnit.getUnit(), 
-                                                        direction));
+        return aiUnit.getAIOwner().askServer()
+            .scoutSpeakToChief(aiUnit.getUnit(), direction) != null;
     }
-
 
     /**
      * Set the build queue in a colony.
@@ -583,11 +415,9 @@ public class AIMessage {
      */
     public static boolean askSetBuildQueue(AIColony aiColony,
                                            List<BuildableType> queue) {
-        return sendMessage(aiColony.getAIOwner().getConnection(),
-                           new SetBuildQueueMessage(aiColony.getColony(),
-                                                    queue));
+        return aiColony.getAIOwner().askServer()
+            .setBuildQueue(aiColony.getColony(), queue);
     }
-
 
     /**
      * Train unit in Europe.
@@ -598,8 +428,8 @@ public class AIMessage {
      */
     public static boolean askTrainUnitInEurope(AIPlayer aiPlayer,
                                                UnitType type) {
-        return sendMessage(aiPlayer.getConnection(),
-                           new TrainUnitInEuropeMessage(type));
+        return aiPlayer.askServer()
+            .trainUnitInEurope(type);
     }
 
 
@@ -613,10 +443,9 @@ public class AIMessage {
      */
     public static boolean askUnloadGoods(GoodsType type, int amount,
                                          AIUnit aiUnit) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-            new UnloadGoodsMessage(type, amount, aiUnit.getUnit()));
+        return aiUnit.getAIOwner().askServer()
+            .unloadGoods(type, amount, aiUnit.getUnit());
     }
-
 
     /**
      * Set a unit to work in a work location.
@@ -626,7 +455,7 @@ public class AIMessage {
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askWork(AIUnit aiUnit, WorkLocation workLocation) {
-        return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new WorkMessage(aiUnit.getUnit(), workLocation));
+        return aiUnit.getAIOwner().askServer()
+            .work(aiUnit.getUnit(), workLocation);
     }
 }

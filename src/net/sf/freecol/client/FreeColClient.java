@@ -468,7 +468,7 @@ public final class FreeColClient {
      * @return The user wrapper for the <code>ServerAPI</code>.
      */
     public UserServerAPI askServer() {
-        return userServerAPI;
+        return this.userServerAPI;
     }
 
     /**

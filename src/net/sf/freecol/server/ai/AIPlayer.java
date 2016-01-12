@@ -74,7 +74,10 @@ public abstract class AIPlayer extends AIObject {
      */
     private Connection debuggingConnection;
 
+    /** The wrapper for the server. */
+    private AIServerAPI serverAPI;
 
+    
     /**
      * Creates a new AI player.
      *
@@ -87,6 +90,7 @@ public abstract class AIPlayer extends AIObject {
 
         this.player = player;
         this.aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
+        this.serverAPI = new AIServerAPI(this);
 
         uninitialized = false;
     }
@@ -104,6 +108,7 @@ public abstract class AIPlayer extends AIObject {
                     FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
         
+        this.serverAPI = new AIServerAPI(this);
         uninitialized = player == null;
     }
 
@@ -158,7 +163,7 @@ public abstract class AIPlayer extends AIObject {
      */
     public Connection getConnection() {
         return (debuggingConnection != null) ? debuggingConnection
-            : ((DummyConnection) player.getConnection()).getOtherConnection();
+            : ((DummyConnection)player.getConnection()).getOtherConnection();
     }
 
     /**
@@ -174,6 +179,15 @@ public abstract class AIPlayer extends AIObject {
         this.debuggingConnection = debuggingConnection;
     }
 
+    /**
+     * Meaningfully named access to the server API.
+     *
+     * @return The <code>AIServerAPI</code> wrapper.
+     */
+    public AIServerAPI askServer() {
+        return this.serverAPI;
+    }
+        
     /**
      * Gets the AI colony corresponding to a given colony, if any.
      *
