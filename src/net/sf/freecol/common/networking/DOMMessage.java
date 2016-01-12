@@ -194,6 +194,11 @@ public class DOMMessage {
         return document;
     }
 
+    /**
+     * Gets the root element of the document.
+     *
+     * @return The root element.
+     */
     private Element getElement() {
         return this.document.getDocumentElement();
     }
