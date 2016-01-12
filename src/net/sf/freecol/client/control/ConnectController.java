@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
@@ -179,34 +180,28 @@ public final class ConnectController {
      */
     private GameState getGameState(String host, int port) {
         String state = null;
-        DOMMessage message = new DOMMessage("gameState");
+        Element reply;
         try (
             Connection mc = getConnection(host, port);
         ) {
-            if (mc == null) return null;
-            Element reply = mc.ask(message.toXMLElement());
-            if (reply == null) {
-                gui.showErrorMessage("server.couldNotConnect", "no reply");
-                return null;
-            } else if (!"gameState".equals(reply.getTagName())) {
-                logger.warning("The reply has an unknown type: "
-                    + reply.getTagName());
-                gui.showErrorMessage("server.couldNotConnect",
-                    "bad reply: " + reply.getTagName());
-                return null;
-            }
-            state = reply.getAttribute("state");
-
+            reply = (mc == null) ? null : mc.ask(new GameStateMessage().toXMLElement());
         } catch (IOException e) {
             logger.log(Level.WARNING, "Could not send message to server.", e);
             gui.showErrorMessage("server.couldNotConnect", e.getMessage());
+            reply = null;
+        }
+        if (reply == null
+            || !GameStateMessage.GAME_STATE_TAG.equals(reply.getTagName())) {
+            gui.showErrorMessage("server.couldNotConnect",
+                "invalid state query response: "
+                + ((reply == null) ? "null" : reply.getTagName()));
             return null;
         }
-
         try {
-            return Enum.valueOf(GameState.class, state);
+            return new GameStateMessage(freeColClient.getGame(), reply)
+                .getGameState();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Bad state: " + state, e);
+            logger.log(Level.WARNING, "State fail", e);
             gui.showErrorMessage("server.couldNotConnect", e.getMessage());
         }
         return null;

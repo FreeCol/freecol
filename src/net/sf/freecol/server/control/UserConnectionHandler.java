@@ -25,10 +25,10 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
@@ -36,7 +36,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -51,21 +50,23 @@ public final class UserConnectionHandler extends InputHandler {
 
 
     /**
-     * The constructor to use.
+     * Build a new user connection handler.
      *
      * @param freeColServer The main control object.
      */
-    public UserConnectionHandler(FreeColServer freeColServer) {
+    public UserConnectionHandler(final FreeColServer freeColServer) {
         super(freeColServer);
 
-        register("gameState", (Connection c, Element e) ->
-            gameState(c, e));
-        register(LoginMessage.LOGIN_TAG, (Connection c, Element e) ->
+        final Game game = freeColServer.getGame();
+        register(GameStateMessage.GAME_STATE_TAG,
+            (Connection c, Element e) ->
+            new GameStateMessage(game, e).handle(freeColServer, c));
+        register(LoginMessage.LOGIN_TAG,
+            (Connection c, Element e) ->
             login(c, e));
         register(VacantPlayersMessage.VACANT_PLAYERS_TAG,
             (Connection c, Element e) ->
-            new VacantPlayersMessage(freeColServer.getGame(), e)
-               .handle(freeColServer, c));
+            new VacantPlayersMessage(game, e).handle(freeColServer, c));
     }
 
 
@@ -75,28 +76,11 @@ public final class UserConnectionHandler extends InputHandler {
     protected Element logout(
         @SuppressWarnings("unused") Connection connection,
         @SuppressWarnings("unused") Element element) {
-        return null; // Logout is ineffective at this point
+        return null; // Logout is inoperative at this point
     }
 
 
     // Individual message handlers
-
-    /**
-     * Handle a "gameState"-request.
-     *
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @return An element with a "gameState" attribute set.
-     */
-    private Element gameState(
-        @SuppressWarnings("unused") Connection connection,
-        @SuppressWarnings("unused") Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-
-        DOMMessage message = new DOMMessage("gameState",
-            "state", freeColServer.getGameState().toString());
-        return message.toXMLElement();
-    }
 
     /**
      * Handle a "login"-request.
@@ -129,7 +113,6 @@ public final class UserConnectionHandler extends InputHandler {
         final FreeColServer freeColServer = getFreeColServer();
         Game game;
         ServerPlayer player;
-        Unit active = null;
         boolean isCurrentPlayer = false;
         MessageHandler mh;
         boolean starting = freeColServer.getGameState()

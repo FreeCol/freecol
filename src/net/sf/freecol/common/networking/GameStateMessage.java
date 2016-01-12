@@ -19,74 +19,62 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.GameState;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
 
 /**
- * The message sent to discover the vacant players.
+ * The message sent to check the game state.
  */
-public class VacantPlayersMessage extends DOMMessage {
+public class GameStateMessage extends DOMMessage {
 
-    public static final String VACANT_PLAYERS_TAG = "vacantPlayers";
-    
-    /** The vacant players found. */
-    private final List<String> vacantPlayers = new ArrayList<>();
+    public static final String GAME_STATE_TAG = "gameState";
+
+    private static final String STATE_TAG = "state";
+
+    /** The string value of the game state. */
+    public String state;
 
 
     /**
-     * Create a new <code>VacantPlayersMessage</code>.
+     * Create a new <code>GameStateMessage</code>.
      */
-    public VacantPlayersMessage() {
+    public GameStateMessage() {
         super(getTagName());
 
-        this.vacantPlayers.clear();
+        this.state = null;
     }
 
     /**
-     * Create a new <code>VacantPlayersMessage</code> from a
+     * Create a new <code>GameStateMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public VacantPlayersMessage(Game game, Element element) {
+    public GameStateMessage(Game game, Element element) {
         this();
 
-        String key;
-        int i = 0;
-        for (;;) {
-            key = "x" + Integer.toString(i);
-            if (!element.hasAttribute(key)) break;
-            this.vacantPlayers.add(element.getAttribute(key));
-            i++;
-        }
+        this.state = element.getAttribute(STATE_TAG);
     }
 
 
     // Public interface
 
-    /**
-     * Get the vacant players.
-     *
-     * @return A list of vacant code player identifiers.
-     */
-    public List<String> getVacantPlayers() {
-        return this.vacantPlayers;
+    public GameState getGameState() {
+        return Enum.valueOf(GameState.class, this.state);
     }
 
 
     // Implement MessageHandler
 
     /**
-     * Handle a "vacantPlayers"-message.
+     * Handle a "gameState"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
@@ -95,41 +83,28 @@ public class VacantPlayersMessage extends DOMMessage {
      *     with the result of the query.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        final Game game = server.getGame();
-
-        this.vacantPlayers.clear();
-        for (Player p : game.getLiveEuropeanPlayers(null)) {
-            if (!p.isREF()
-                && (p.isAI() || !((ServerPlayer)p).isConnected())) {
-                this.vacantPlayers.add(p.getNationId());
-            }
-        }
+        this.state = server.getGameState().toString();
         return this.toXMLElement();
     }
 
 
     /**
-     * Convert this VacantPlayersMessage to XML.
+     * Convert this GameStateMessage to XML.
      *
      * @return The XML representation of this message.
      */
     @Override
     public Element toXMLElement() {
-        int i = 0;
-        for (String s : this.vacantPlayers) {
-            String key = "x" + Integer.toString(i);
-            this.setAttribute(key, s);
-            i++;
-        }
+        if (this.state != null) this.setAttribute(STATE_TAG, this.state);
         return super.toXMLElement();
     }
 
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "vacantPlayers".
+     * @return "gameState".
      */
     public static String getTagName() {
-        return VACANT_PLAYERS_TAG;
+        return GAME_STATE_TAG;
     }
 }
