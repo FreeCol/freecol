@@ -80,7 +80,15 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Closes this connection.
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAlive() {
+        return this.otherConnection != null;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void close() {
