@@ -269,17 +269,17 @@ public class LostCityRumour extends TileItem {
     public ModelMessage getNothingMessage(Player player, boolean mounds,
                                           Random random) {
         final Game game = getGame();
-        if (game.getTurn().getYear() % 100 == 12
+        if (mounds) {
+            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                RumourType.NOTHING.getAlternateDescriptionKey("mounds"),
+                player);
+        } else if (game.getTurn().getYear() % 100 == 12
             && randomInt(logger, "Mayans?", random, 4) == 0) {
             int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
             return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                     "model.lostCityRumour.nothing.mayans",
                                     player)
                 .addAmount("%years%", years);
-        } else if (mounds) {
-            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                    "model.lostCityRumour.nothing.mounds",
-                                    player);
         }
         int i;
         if (rumourNothing < 0) {

@@ -675,11 +675,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         >= spec.getInteger(GameOptions.BAD_RUMOUR)) break;
                     // Fall through
                 case BURIAL_GROUND:
-                    if (tile.getOwner() != null
-                        && tile.getOwner().isIndian()) {
-                        csNativeBurialGround(cs);
-                    }
-                    done = true;
+                    done = tile.getOwner() != null
+                        && tile.getOwner().isIndian();
                     break;
                 default:
                     ; // unacceptable result for mounds
