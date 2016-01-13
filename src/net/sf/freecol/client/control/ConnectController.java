@@ -203,7 +203,9 @@ public final class ConnectController {
     public boolean login(String user, String host, int port) {
         freeColClient.setMapEditor(false);
  
-        freeColClient.askServer().disconnect();
+        try {
+            freeColClient.askServer().disconnect();
+        } catch (IOException ioe) {} // Ignore            
 
         String message = null;
         try {
@@ -633,7 +635,11 @@ public final class ConnectController {
         if (notifyServer) {
             freeColClient.askServer().logout();
         }
-        freeColClient.askServer().disconnect();
+        try {
+            freeColClient.askServer().disconnect();
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Disconnection error", ioe);
+        }
         finish();
     }
 

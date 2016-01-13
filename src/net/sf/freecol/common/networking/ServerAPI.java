@@ -69,7 +69,7 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * The API for client->server messaging.
+ * The API for client/server messaging.
  */
 public abstract class ServerAPI {
 

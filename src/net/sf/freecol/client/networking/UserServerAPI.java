@@ -24,7 +24,7 @@ import java.io.IOException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.networking.Client;
+import net.sf.freecol.common.networking.ClientConnection;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerAPI;
@@ -41,8 +41,8 @@ public class UserServerAPI extends ServerAPI {
     /** The GUI to use for error and client processing. */
     private final GUI gui;
 
-    /** The Client used to communicate with the server. */
-    private Client client;
+    /** The connection used to communicate with the server. */
+    private ClientConnection clientConnection;
 
 
     /**
@@ -50,6 +50,7 @@ public class UserServerAPI extends ServerAPI {
      */
     public UserServerAPI(GUI gui) {
         super();
+
         this.gui = gui;
     }
 
@@ -78,21 +79,22 @@ public class UserServerAPI extends ServerAPI {
         }
         for (int i = tries; i > 0; i--) {
             try {
-                client = new Client(host, port, messageHandler, threadName);
-                if (client != null) break;
+                this.clientConnection = new ClientConnection(host, port,
+                    messageHandler, threadName);
+                if (this.clientConnection != null) break;
             } catch (IOException e) {
                 if (i <= 1) throw e;
             }
         }
-        return client != null;
+        return this.clientConnection != null;
     }
 
     /**
-     * Disconnect the client.
+     * Disconnect the client connection..
      */
-    public void disconnect() {
-        if (this.client != null) {
-            this.client.disconnect();
+    public void disconnect() throws IOException {
+        if (this.clientConnection != null) {
+            this.clientConnection.disconnect();
             reset();
         }
     }
@@ -103,7 +105,8 @@ public class UserServerAPI extends ServerAPI {
      * @return The current host, or null if none.
      */
     public String getHost() {
-        return (this.client == null) ? null : this.client.getHost();
+        return (this.clientConnection == null) ? null
+            : this.clientConnection.getHost();
     }
 
     /**
@@ -112,7 +115,8 @@ public class UserServerAPI extends ServerAPI {
      * @return The current port, or negative if none.
      */     
     public int getPort() {
-        return (this.client == null) ? -1 : this.client.getPort();
+        return (this.clientConnection == null) ? -1
+            : this.clientConnection.getPort();
     }
 
     /**
@@ -121,7 +125,7 @@ public class UserServerAPI extends ServerAPI {
      * Only call this if we are sure it is dead.
      */
     public void reset() {
-        this.client = null;
+        this.clientConnection = null;
     }
 
     /**
@@ -130,8 +134,9 @@ public class UserServerAPI extends ServerAPI {
      * @param messageHandler The new <code>MessageHandler</code>.
      */
     public void setMessageHandler(MessageHandler mh) {
-        Connection c = getConnection();
-        if (c != null) c.setMessageHandler(mh);
+        if (this.clientConnection != null) {
+            this.clientConnection.setMessageHandler(mh);
+        }
     }
 
 
@@ -160,6 +165,6 @@ public class UserServerAPI extends ServerAPI {
      * {@inheritDoc}
      */
     public Connection getConnection() {
-        return (this.client == null) ? null : this.client.getConnection();
+        return this.clientConnection;
     }
 }
