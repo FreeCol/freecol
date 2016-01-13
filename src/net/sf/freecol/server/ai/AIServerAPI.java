@@ -54,13 +54,6 @@ public class AIServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    protected void doRaiseErrorMessage(String complaint) {
-        logger.warning("AI comms: " + complaint);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected void doClientProcessingFor(Element reply) {}
 
     /**

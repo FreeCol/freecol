@@ -90,13 +90,6 @@ public abstract class ServerAPI {
     protected abstract void doClientProcessingFor(Element reply);
 
     /**
-     * Handle error conditions detected by the client.
-     *
-     * @param complaint The error message.
-     */
-    protected abstract void doRaiseErrorMessage(String complaint);
-
-    /**
      * Get the connection to communicate with the server.
      */
     protected abstract Connection getConnection();
@@ -265,7 +258,6 @@ public abstract class ServerAPI {
             + " which should have been " + tag
             + " to message " + message;
         logger.warning(complaint);
-        doRaiseErrorMessage(complaint);
         return null;
     }
 

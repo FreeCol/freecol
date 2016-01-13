@@ -145,15 +145,6 @@ public class UserServerAPI extends ServerAPI {
     /**
      * {@inheritDoc}
      */
-    protected void doRaiseErrorMessage(String complaint) {
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            this.gui.showErrorMessage(null, complaint);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected void doClientProcessingFor(Element reply) {
         String sound = reply.getAttribute("sound");
         if (sound != null && !sound.isEmpty()) {
