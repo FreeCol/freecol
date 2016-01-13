@@ -28,9 +28,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 
 public class GoodsTest extends FreeColTestCase {
 
@@ -249,25 +246,6 @@ public class GoodsTest extends FreeColTestCase {
         cotton.setAmount(100000);
 
         assertEquals(100000, cotton.getAmount());
-
-    }
-
-    public void testSerialize() {
-        Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
-
-        Colony colony = getStandardColony();
-        Goods goods1 = new Goods(game, colony, cottonType, 75);
-        Document document = DOMMessage.createNewDocument();
-        Element element = goods1.toXMLElement(document);
-
-        element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, "newID");
-        Goods goods2 = new Goods(colony.getGame(), element);
-
-        assertEquals(goods1.getGame(), goods2.getGame());
-        assertEquals(goods1.getLocation(), goods2.getLocation());
-        assertEquals(goods1.getType(), goods2.getType());
-        assertEquals(goods1.getAmount(), goods2.getAmount());
 
     }
 
