@@ -63,7 +63,7 @@ public final class Client {
         throws IOException {
         this.host = host;
         this.port = port;
-        c = new Connection(host, port, handler, name);
+        this.c = new Connection(host, port, handler, name);
     }
 
 
@@ -97,17 +97,6 @@ public final class Client {
      */
     public Connection getConnection() {
         return c;
-    }
-
-    /**
-     * Sets the <code>MessageHandler</code> for this <code>Client</code>.
-     * The <code>MessageHandler</code> is the class responsible for receiving
-     * and handling the network messages.
-     *
-     * @param mh The new <code>MessageHandler</code> for this client.
-     */
-    public void setMessageHandler(MessageHandler mh) {
-        c.setMessageHandler(mh);
     }
 
     /**

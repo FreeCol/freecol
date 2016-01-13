@@ -116,24 +116,22 @@ public class UserServerAPI extends ServerAPI {
     }
 
     /**
-     * Register a message handler to handle messages from the server.
-     * Used when switching from pre-game to in-game.
-     *
-     * @param messageHandler The new <code>MessageHandler</code>.
-     */
-    public void registerMessageHandler(MessageHandler messageHandler) {
-        if (this.client != null) {
-            this.client.setMessageHandler(messageHandler);
-        }
-    }
-
-    /**
      * Just forget about the client.
      *
      * Only call this if we are sure it is dead.
      */
     public void reset() {
         this.client = null;
+    }
+
+    /**
+     * Sets the message handler for the connection.
+     *
+     * @param messageHandler The new <code>MessageHandler</code>.
+     */
+    public void setMessageHandler(MessageHandler mh) {
+        Connection c = getConnection();
+        if (c != null) c.setMessageHandler(mh);
     }
 
 

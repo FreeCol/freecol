@@ -161,8 +161,7 @@ public final class PreGameController {
             freeColClient.getSoundController().playSound(
                 "sound.intro." + player.getNationId());
         }
-        freeColClient.askServer()
-            .registerMessageHandler(freeColClient.getInGameInputHandler());
+        freeColClient.setMessageHandler(freeColClient.getInGameInputHandler());
 
         freeColClient.setInGame(true);
         gui.initializeInGame((Tile)player.getEntryLocation());
