@@ -84,22 +84,4 @@ public final class ClientConnection extends Connection {
     public int getPort() {
         return this.port;
     }
-
-    /**
-     * Handle a reply element using the client input handler.
-     *
-     * @param reply The reply <code>Element</code> to handle.
-     * @return The reply <code>Element</code>.
-     */
-    public Element handleReply(Element reply) {
-        if (reply != null) {
-            try {
-                return getMessageHandler().handle(this, reply);
-            } catch (FreeColException e) {
-                logger.log(Level.WARNING, "Could not handle reply: " + reply,
-                           e);
-            }
-        }
-        return null;
-    }
 }
