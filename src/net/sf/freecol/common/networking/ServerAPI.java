@@ -105,7 +105,7 @@ public abstract class ServerAPI {
      */
     private boolean send(DOMMessage message) {
         try {
-            getConnection().send(message.toXMLElement());
+            getConnection().send(message);
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
@@ -122,7 +122,7 @@ public abstract class ServerAPI {
      */
     private boolean sendAndWait(DOMMessage message) {
         try {
-            getConnection().sendAndWait(message.toXMLElement());
+            getConnection().sendAndWait(message);
             return true;
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not send: " + message.getType(),
@@ -140,7 +140,7 @@ public abstract class ServerAPI {
     private Element ask(DOMMessage message) {
         Element reply = null;
         try {
-            reply = getConnection().ask(message.toXMLElement());
+            reply = getConnection().ask(message);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Could not ask: " + message.getType(),
                        ioe);

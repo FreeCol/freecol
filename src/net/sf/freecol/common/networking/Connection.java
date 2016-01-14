@@ -350,8 +350,9 @@ public class Connection implements Closeable {
      * @see #sendInternal(Element)
      */
     private Element askInternal(Element element) throws IOException {
-        int networkReplyId = this.receivingThread.getNextNetworkReplyId();
+        if (element == null) return null;
         final String tag = element.getTagName();
+        int networkReplyId = this.receivingThread.getNextNetworkReplyId();
 
         if (Thread.currentThread() == this.receivingThread) {
             throw new IOException("wait(ReceivingThread) for: " + tag);
@@ -375,6 +376,18 @@ public class Connection implements Closeable {
     }
 
 
+    // Wrappers, to be promoted soon
+    public void send(DOMMessage message) throws IOException {
+        send(message.toXMLElement());
+    }
+    public void sendAndWait(DOMMessage message) throws IOException {
+        sendAndWait(message.toXMLElement());
+    }
+    public Element ask(DOMMessage message) throws IOException {
+        return ask(message.toXMLElement());
+    }
+
+    
     /**
      * Main public routine to send a message over this connection.
      *
@@ -430,7 +443,7 @@ public class Connection implements Closeable {
     public DOMMessage ask(Game game, DOMMessage message) {
         Element reply;
         try {
-            reply = ask(message.toXMLElement());
+            reply = ask(message);
         } catch (IOException e) {
             return new ErrorMessage("reject", e.getMessage());
         }
@@ -547,7 +560,7 @@ public class Connection implements Closeable {
      * Send a disconnect message.
      */
     public void disconnect() throws IOException {
-        this.send(new DOMMessage(DISCONNECT_TAG).toXMLElement());
+        this.send(new DOMMessage(DISCONNECT_TAG));
     }
 
     /**
@@ -555,7 +568,7 @@ public class Connection implements Closeable {
      */
     public void reconnect() {
         try {
-            this.send(new DOMMessage(RECONNECT_TAG).toXMLElement());
+            this.send(new DOMMessage(RECONNECT_TAG));
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Reconnect failed for " + this.name,
                 ioe);
