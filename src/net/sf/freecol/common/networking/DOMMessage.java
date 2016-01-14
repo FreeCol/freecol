@@ -64,18 +64,21 @@ public class DOMMessage {
 
     private static final String INVALID_MESSAGE = "invalid";
 
+    private static DocumentBuilder builder = null, parser = null;
+    static {
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException pce) {
+            // Never seen this in practice.  Apparently thrown if a
+            // parser with specified options can not be built.
+            logger.log(Level.WARNING, "Parser failure", pce);
+        }
+    };
+
     /** The actual message data. */
     protected Document document;
 
-
-    /**
-     * Constructs a new DOMMessage with data from the given XML-document.
-     *
-     * @param document The document representing an XML-message.
-     */
-    public DOMMessage(Document document) {
-        this.document = document;
-    }
 
     /**
      * Constructs a new DOMMessage with data from the given InputStream. The
@@ -102,7 +105,6 @@ public class DOMMessage {
      */
     private DOMMessage(InputSource inputSource)
         throws SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
         boolean dumpMsgOnError = true;
         if (dumpMsgOnError) {
@@ -111,10 +113,9 @@ public class DOMMessage {
             inputSource.getByteStream().mark(1000000);
         }
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            tempDocument = builder.parse(inputSource);
-        } catch (ParserConfigurationException pce) {
-            logger.log(Level.WARNING, "Parser configuration", pce);
+            synchronized (parser) {
+                tempDocument = parser.parse(inputSource);
+            }
         } catch (IOException ex) {
             //} catch (IOException|SAXException ex) {
             throw ex;
@@ -186,15 +187,6 @@ public class DOMMessage {
     }
 
     /**
-     * Gets the <code>Document</code> holding the message data.
-     *
-     * @return The <code>Document</code> holding the message data.
-     */
-    public Document getDocument() {
-        return document;
-    }
-
-    /**
      * Gets the root element of the document.
      *
      * @return The root element.
@@ -209,7 +201,7 @@ public class DOMMessage {
      * @return The type of this DOMMessage.
      */
     public String getType() {
-        return (document != null && getElement() != null)
+        return (this.document != null && getElement() != null)
             ? getElement().getTagName()
             : INVALID_MESSAGE;
     }
@@ -266,16 +258,16 @@ public class DOMMessage {
     }
 
     public void add(FreeColObject fco) {
-        getElement().appendChild(fco.toXMLElement(document));
+        getElement().appendChild(fco.toXMLElement(this.document));
     }
     public void add(FreeColObject fco, Player player) {
-        getElement().appendChild(fco.toXMLElement(document, player));
+        getElement().appendChild(fco.toXMLElement(this.document, player));
     }
     public void add(DOMMessage msg) {
         getElement().appendChild(msg.toXMLElement());
     }
     public void add(String tag, String... attributes) {
-        Element e = document.createElement(tag);
+        Element e = this.document.createElement(tag);
         getElement().appendChild(e);
         String[] all = attributes;
         for (int i = 0; i < all.length; i += 2) {
@@ -283,22 +275,6 @@ public class DOMMessage {
         }
     }        
         
-    /**
-     * Inserts an element as a new root element to the existing
-     * element of this message.
-     *
-     * @param newRoot The new root <code>Element</code>.
-     */
-    public void insertAsRoot(Element newRoot) {
-        Element oldRoot = getElement();
-        if (oldRoot != null) {
-            document.removeChild(oldRoot);
-            newRoot.appendChild(oldRoot);
-        }
-
-        document.appendChild(newRoot);
-    }
-
     /**
      * Dummy serialization stub.
      * Must be overridden by subclasses.
@@ -328,15 +304,9 @@ public class DOMMessage {
      * @return the new XML-document.
      */
     public static Document createNewDocument() {
-        try {
-            DocumentBuilderFactory factory
-                = DocumentBuilderFactory.newInstance();
-            return factory.newDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            logger.log(Level.WARNING, "Parser failure", pce);
+        synchronized (builder) {
+            return builder.newDocument();
         }
-        return null;
     }
 
     /**
@@ -488,6 +458,6 @@ public class DOMMessage {
      */
     @Override
     public String toString() {
-        return document.getDocumentElement().toString();
+        return getElement().toString();
     }
 }

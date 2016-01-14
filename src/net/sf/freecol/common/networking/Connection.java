@@ -368,8 +368,7 @@ public class Connection implements Closeable {
             = this.receivingThread.waitForNetworkReply(networkReplyId);
         sendInternal(question);
         DOMMessage response = (DOMMessage)nro.getResponse();
-        Element reply = (response == null) ? null
-            : response.getDocument().getDocumentElement();
+        Element reply = (response == null) ? null : response.toXMLElement();
         log(reply, false);
 
         return (reply == null) ? null : (Element)reply.getFirstChild();
@@ -512,7 +511,7 @@ public class Connection implements Closeable {
         Thread t = new Thread(msg.getType()) {
                 @Override
                 public void run() {
-                    Element element = msg.getDocument().getDocumentElement();
+                    Element element = msg.toXMLElement();
                     Element reply;
                     try {
                         if (question) {
