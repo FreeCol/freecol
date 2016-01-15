@@ -285,8 +285,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Create a new <code>Map</code> from an <code>Element</code> in a
-     * DOM-parsed XML-tree.
+     * Create a new <code>Map</code> from an input stream.
      *
      * @param game The enclosing <code>Game</code>.
      * @param xr The input stream containing the XML.
@@ -299,10 +298,9 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Creates a new <code>Map</code> with the given object
-     * identifier.  The object should later be initialized by calling
-     * either {@link #readFromXML(FreeColXMLReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * Creates a new <code>Map</code> with the given object identifier.
+     *
+     * The object should be initialized later.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.

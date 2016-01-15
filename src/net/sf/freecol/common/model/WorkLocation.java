@@ -129,9 +129,8 @@ public abstract class WorkLocation extends UnitLocation
 
     /**
      * Creates a new <code>WorkLocation</code> with the given identifier.
-     * The object should later be initialized by calling either
-     * {@link #readFromXML(FreeColXMLReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     *
+     * The object should be initialized later.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.

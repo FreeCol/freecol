@@ -31,8 +31,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The superclass of all game objects in FreeCol.
@@ -82,9 +80,8 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Creates a new <code>FreeColGameObject</code>.
      * If an identifier is supplied, use that, otherwise leave it undefined.
      *
-     * This routine should be used when we intend later to call one of:
-     * - {@link #readFromXML(FreeColXMLReader)}
-     * - {@link #readFromXMLElement(Element)}
+     * This routine should be used when we intend to fully initialize
+     * the object later.
      *
      * @param game The <code>Game</code> in which this object belongs.
      * @param id The object identifier.

@@ -511,7 +511,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     /**
      * Reads an XML-representation of a list of some general type.
      *
-     * @param tag The tag for the list <code>Element</code>.
+     * @param tag The tag for the list.
      * @param type The type of the items to be added.  This type
      *     needs to have a constructor accepting a single <code>String</code>.
      * @return The list.
@@ -550,7 +550,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * Reads an XML-representation of a list of
      * <code>FreeColGameObjectType</code>s.
      *
-     * @param tag The tag for the list <code>Element</code>.
+     * @param tag The tag for the list.
      * @param spec The <code>Specification</code> to find items in.
      * @param type The type of the items to be added.  The type must exist
      *     in the supplied specification.

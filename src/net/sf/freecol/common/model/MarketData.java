@@ -26,8 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Objects of this class hold the market data for a particular type of
@@ -102,10 +100,9 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Creates a new <code>MarketData</code> with the given
-     * identifier.  The object should later be initialized by calling
-     * either {@link #readFromXML(FreeColXMLReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * Creates a new <code>MarketData</code> with the given identifier.
+     *
+     * The object should be initialized later.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.

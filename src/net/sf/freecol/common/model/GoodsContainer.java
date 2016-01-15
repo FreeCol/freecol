@@ -35,8 +35,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Contains goods and can be used by a {@link Location} to make certain
@@ -101,24 +99,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public GoodsContainer(Game game, String id) {
         super(game, id);
-    }
-
-    /**
-     * Create a new <code>GoodsContainer</code> from an
-     * <code>Element</code>.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param parent The <code>Location</code> this
-     *     <code>GoodsContainer</code> contains goods for.
-     * @param e An XML-element that will be used to initialize
-     *     this object.
-     */
-    public GoodsContainer(Game game, Location parent, Element e) {
-        super(game, null);
-
-        this.parent = parent;
-
-        readFromXMLElement(e);
     }
 
 

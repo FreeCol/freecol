@@ -440,7 +440,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param game The enclosing <code>Game</code>.
      * @param e An XML-element that will be used to initialize this object.
-     *
      */
     public Player(Game game, Element e) {
         super(game, null);
@@ -449,10 +448,9 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Creates a new <code>Player</code> with the given id.  The object
-     * should later be initialized by calling either
-     * {@link #readFromXML(FreeColXMLReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * Creates a new <code>Player</code> with the given id.
+     *
+     * The object should be initialized later.
      *
      * @param game The <code>Game</code> this object belongs to.
      * @param id The object identifier.

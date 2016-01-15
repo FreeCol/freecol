@@ -33,8 +33,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The <code>UnitLocation</code> is a place where a <code>Unit</code>
@@ -149,19 +147,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public UnitLocation(Game game, String id) {
         super(game, id);
-    }
-
-    /**
-     * Creates a new <code>UnitLocation</code> instance.
-     * Only Unit needs this.
-     *
-     * FIXME: make it go away, its a noop.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param e The <code>Element</code> to read from.
-     */
-    public UnitLocation(Game game, Element e) {
-        super(game, null);
     }
 
 

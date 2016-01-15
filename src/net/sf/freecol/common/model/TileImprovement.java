@@ -119,10 +119,9 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Create a new <code>TileImprovement</code> with the given
-     * identifier.  The object should later be initialized by calling either
-     * {@link #readFromXML(FreeColXMLReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * Create a new <code>TileImprovement</code> with the given identifier.
+     *
+     * The object should be initialized later.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.

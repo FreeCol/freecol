@@ -332,7 +332,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     /**
      * Writes an XML-representation of a collection object to the given stream.
      *
-     * @param tag The tag for the array <code>Element</code>.
+     * @param tag The tag for the array.
      * @param members The members of the array.
      * @exception XMLStreamException if a problem was encountered
      *      while writing.

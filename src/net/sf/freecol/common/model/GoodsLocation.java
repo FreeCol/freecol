@@ -31,8 +31,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A <code>GoodsLocation</code> is a place where {@link Unit}s and
@@ -56,17 +54,6 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public GoodsLocation(Game game) {
         super(game);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    // Only Unit needs this
-    public GoodsLocation(Game game, Element e) {
-        super(game, e);
     }
 
     /**
