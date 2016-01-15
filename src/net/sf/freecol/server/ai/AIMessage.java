@@ -229,7 +229,7 @@ public class AIMessage {
      */
     public static boolean askEmigrate(AIPlayer aiPlayer, int slot) {
         return aiPlayer.askServer()
-            .emigrate(slot);
+            .emigrate(aiPlayer.getGame(), slot);
     }
 
     /**
@@ -240,7 +240,7 @@ public class AIMessage {
      */
     public static boolean askEndTurn(AIPlayer aiPlayer) {
         return aiPlayer.askServer()
-            .endTurn();
+            .endTurn(aiPlayer.getGame());
     }
 
     /**
@@ -429,7 +429,7 @@ public class AIMessage {
     public static boolean askTrainUnitInEurope(AIPlayer aiPlayer,
                                                UnitType type) {
         return aiPlayer.askServer()
-            .trainUnitInEurope(type);
+            .trainUnitInEurope(aiPlayer.getGame(), type);
     }
 
 

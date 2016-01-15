@@ -455,7 +455,7 @@ public final class InGameController implements NetworkConstants {
 
         EuropeWas europeWas = new EuropeWas(europe);
         Unit newUnit = null;
-        if (askServer().emigrate(slot)
+        if (askServer().emigrate(freeColClient.getGame(), slot)
             && (newUnit = europeWas.getNewUnit()) != null) {
             europeWas.fireChanges();
         }
@@ -895,7 +895,7 @@ public final class InGameController implements NetworkConstants {
         turnReportMessages.clear();
 
         // Inform the server of end of turn.
-        return askServer().endTurn();
+        return askServer().endTurn(freeColClient.getGame());
     }
 
     /**
@@ -3295,7 +3295,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Ask server.
-        boolean ret = askServer().declareIndependence(names.get(0), names.get(1))
+        boolean ret = askServer().declareIndependence(freeColClient.getGame(),
+            names.get(0), names.get(1))
             && player.isRebel();
         if (ret) {
             gui.showDeclarationPanel();
@@ -3636,7 +3637,7 @@ public final class InGameController implements NetworkConstants {
         if (player == null) return null;
 
         final int n = player.getTradeRoutes().size();
-        return (askServer().getNewTradeRoute()
+        return (askServer().getNewTradeRoute(freeColClient.getGame())
             && player.getTradeRoutes().size() == n + 1)
             ? player.getTradeRoutes().get(n)
             : null;
@@ -3989,7 +3990,8 @@ public final class InGameController implements NetworkConstants {
         switch (action) {
         case RAISE_TAX_ACT: case RAISE_TAX_WAR:
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
-            ret = askServer().answerMonarch(action, accept);
+            ret = askServer().answerMonarch(freeColClient.getGame(),
+                                            action, accept);
             break;
         default:
             break;
@@ -4321,7 +4323,8 @@ public final class InGameController implements NetworkConstants {
             .addAmount("%amount%", arrears);
         if (!gui.confirm(null, t, type, "ok", "cancel")) return false;
 
-        boolean ret = askServer().payArrears(type) && player.canTrade(type);
+        boolean ret = askServer().payArrears(freeColClient.getGame(), type)
+            && player.canTrade(type);
         if (ret) {
             updateGUI(null);
         }
@@ -4745,7 +4748,8 @@ public final class InGameController implements NetworkConstants {
                 } else if (player.getPlayerType() != Player.PlayerType.UNDEAD
                     && gui.confirm("defeatedSinglePlayer.text",
                                    "defeatedSinglePlayer.yes", "quit")) {
-                    freeColClient.askServer().enterRevengeMode();
+                    freeColClient.askServer()
+                        .enterRevengeMode(freeColClient.getGame());
                 } else {
                     freeColClient.quit();
                 }
@@ -4840,7 +4844,7 @@ public final class InGameController implements NetworkConstants {
     public boolean setTradeRoutes(List<TradeRoute> routes) {
         if (routes == null) return false;
 
-        return askServer().setTradeRoutes(routes);
+        return askServer().setTradeRoutes(freeColClient.getGame(), routes);
     }
 
     /**
@@ -4876,7 +4880,8 @@ public final class InGameController implements NetworkConstants {
 
         EuropeWas europeWas = new EuropeWas(europe);
         Unit newUnit = null;
-        boolean ret = askServer().trainUnitInEurope(unitType)
+        boolean ret = askServer()
+            .trainUnitInEurope(freeColClient.getGame(), unitType)
             && (newUnit = europeWas.getNewUnit()) != null;
         if (ret) {
             europeWas.fireChanges();
