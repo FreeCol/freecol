@@ -91,56 +91,7 @@ public class DOMMessage {
      */
     public DOMMessage(InputStream inputStream)
         throws SAXException, IOException {
-        this(new InputSource(inputStream));
-    }
-
-    /**
-     * Constructs a new DOMMessage with data from the given InputSource. The
-     * constructor to use if this is an INCOMING message.
-     *
-     * @param inputSource The <code>InputSource</code> to get the XML-data
-     *            from.
-     * @exception IOException if thrown by the <code>InputSource</code>.
-     * @exception SAXException if thrown during parsing.
-     */
-    private DOMMessage(InputSource inputSource)
-        throws SAXException, IOException {
-        Document tempDocument = null;
-        boolean dumpMsgOnError = true;
-        if (dumpMsgOnError) {
-            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
-
-            inputSource.getByteStream().mark(1000000);
-        }
-        try {
-            synchronized (parser) {
-                tempDocument = parser.parse(inputSource);
-            }
-        } catch (IOException ex) {
-            //} catch (IOException|SAXException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
-            // some FreeCol messages. I'd like to see the messages upon which
-            // it barfs.
-            // Its also throwing SAXParseException in BR#2925
-            if (dumpMsgOnError) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                inputSource.getByteStream().reset();
-                while (true) {
-                    int i = inputSource.getByteStream().read();
-                    if (-1 == i) {
-                        break;
-                    }
-                    baos.write(i);
-                }
-                logger.log(Level.SEVERE, baos.toString("UTF-8"), ex);
-            } else {
-                logger.log(Level.WARNING, "Parse error", ex);
-            }
-            throw ex;
-        }
-        this.document = tempDocument;
+        this.document = readDocument(new InputSource(inputStream));
     }
 
     /**
@@ -266,14 +217,6 @@ public class DOMMessage {
     public void add(DOMMessage msg) {
         getElement().appendChild(msg.toXMLElement());
     }
-    public void add(String tag, String... attributes) {
-        Element e = this.document.createElement(tag);
-        getElement().appendChild(e);
-        String[] all = attributes;
-        for (int i = 0; i < all.length; i += 2) {
-            e.setAttribute(all[i], all[i+1]);
-        }
-    }        
         
     /**
      * Dummy serialization stub.
@@ -425,6 +368,54 @@ public class DOMMessage {
     }
 
     /**
+     * Read a Document from an input source.
+     * 
+     * @param An <code>InputSource</code> to read from.
+     * @return The resulting <code>Document</code>.
+     * @exception IOException if thrown by the <code>InputStream</code>.
+     * @exception SAXException if thrown during parsing.
+     */
+    public static Document readDocument(InputSource inputSource)
+        throws SAXException, IOException {
+        Document tempDocument = null;
+        boolean dumpMsgOnError = true;
+        if (dumpMsgOnError) {
+            inputSource.setByteStream(new BufferedInputStream(inputSource.getByteStream()));
+
+            inputSource.getByteStream().mark(1000000);
+        }
+        try {
+            synchronized (parser) {
+                tempDocument = parser.parse(inputSource);
+            }
+        } catch (IOException ex) {
+            //} catch (IOException|SAXException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            // Xerces throws ArrayIndexOutOfBoundsException when it barfs on
+            // some FreeCol messages. I'd like to see the messages upon which
+            // it barfs.
+            // Its also throwing SAXParseException in BR#2925
+            if (dumpMsgOnError) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                inputSource.getByteStream().reset();
+                while (true) {
+                    int i = inputSource.getByteStream().read();
+                    if (-1 == i) {
+                        break;
+                    }
+                    baos.write(i);
+                }
+                logger.log(Level.SEVERE, baos.toString("UTF-8"), ex);
+            } else {
+                logger.log(Level.WARNING, "Parse error", ex);
+            }
+            throw ex;
+        }
+        return tempDocument;
+    }
+
+    /**
      * Convert an element to a string.
      *
      * @param element The <code>Element</code> to convert.
@@ -452,6 +443,8 @@ public class DOMMessage {
         }
         return null;
     }
+
+    // Override Object
 
     /**
      * {@inheritDoc}
