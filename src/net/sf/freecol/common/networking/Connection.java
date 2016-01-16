@@ -367,6 +367,8 @@ public class Connection implements Closeable {
         NetworkReplyObject nro
             = this.receivingThread.waitForNetworkReply(networkReplyId);
         sendInternal(question);
+
+        // Wait for response
         DOMMessage response = (DOMMessage)nro.getResponse();
         Element reply = (response == null) ? null : response.toXMLElement();
         log(reply, false);
@@ -470,77 +472,37 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Handles a message using the registered <code>MessageHandler</code>.
-     *
-     * @param in The stream containing the message.
-     * @exception IOException if the streaming fails.
+     * Handle a query (has QUESTION_TAG), with given reply identifier,
+     * and send a reply (has REPLY_TAG and the given reply identifier).
+     * 
+     * @param msg The query <code>DOMMessage</code>.
+     * @param replyId The reply identifier.
+     * @exception FreeColException if there is a handler problem.
+     * @exception IOException if sending fails.
      */
-    public void handleAndSendReply(final BufferedInputStream in) 
-        throws IOException {
-        in.mark(200); // Peek at the reply identifier and tag.
+    public void handleQuery(DOMMessage msg, int replyId)
+        throws FreeColException, IOException {
+        Element element = msg.toXMLElement(), reply;
+        element = (Element)element.getFirstChild();
+        reply = handle(element);
+        msg = new DOMMessage(REPLY_TAG,
+            NETWORK_REPLY_ID_TAG, Integer.toString(replyId));
+        if (reply != null) msg.add(reply);
+        send(msg);
+    }
 
-        // Extract the reply id and check if this is a question.
-        final String networkReplyId;
-        final boolean question;
-        FreeColXMLReader xr = null;
-        try {
-            xr = new FreeColXMLReader(in);
-            xr.nextTag();
-            question = QUESTION_TAG.equals(xr.getLocalName());
-            networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
-                                             (String)null);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "XML stream failure", xse);
-            return;
-        } 
-
-        // Reset and build a message.
-        final DOMMessage msg;
-        in.reset();
-        try {
-            msg = new DOMMessage(in);
-        } catch (SAXException e) {
-            logger.log(Level.WARNING, "Unable to read message.", e);
-            return;
-        } finally {
-            if (xr != null) xr.close();
-        }
-
-        // Process the message in its own thread.
-        final Connection conn = this;
-        Thread t = new Thread(msg.getType()) {
-                @Override
-                public void run() {
-                    Element element = msg.toXMLElement();
-                    Element reply;
-                    try {
-                        if (question) {
-                            reply = (Element)element.getFirstChild();
-                            reply = conn.handle(reply);
-                            if (reply == null) {
-                                reply = new DOMMessage(REPLY_TAG,
-                                    NETWORK_REPLY_ID_TAG, networkReplyId)
-                                    .toXMLElement();
-                            } else {
-                                Element header = reply.getOwnerDocument()
-                                    .createElement(REPLY_TAG);
-                                header.setAttribute(NETWORK_REPLY_ID_TAG,
-                                                    networkReplyId);
-                                header.appendChild(reply);
-                                reply = header;
-                            }
-                        } else {
-                            reply = conn.handle(element);
-                        }
-                        if (reply != null) conn.send(reply);
-                    } catch (Exception e) {
-                        logger.log(Level.WARNING, "Handler failed: "
-                            + element, e);
-                    }
-                }
-            };
-        t.setName(name + "-MessageHandler-" + t.getName());
-        t.start();
+    /**
+     * Handle an ordinary message, and if the response is non-null send it.
+     * 
+     * @param msg The <code>DOMMessage</code> to handle.
+     * @exception FreeColException if there is a handler problem.
+     * @exception IOException if sending fails.
+     */
+    public void handleUpdate(DOMMessage msg)
+        throws FreeColException, IOException {
+        Element element = msg.toXMLElement();
+        Element reply = handle(element);
+        if (reply != null) send(reply);
     }
 
     /**

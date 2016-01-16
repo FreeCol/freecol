@@ -208,14 +208,21 @@ public class DOMMessage {
         return getElement().hasAttribute(attribute);
     }
 
-    public void add(FreeColObject fco) {
-        getElement().appendChild(fco.toXMLElement(this.document));
+    public DOMMessage add(Element element) {
+        getElement().appendChild(this.document.importNode(element, true));
+        return this;
     }
-    public void add(FreeColObject fco, Player player) {
-        getElement().appendChild(fco.toXMLElement(this.document, player));
+    public DOMMessage add(FreeColObject fco) {
+        add(fco.toXMLElement(this.document));
+        return this;
     }
-    public void add(DOMMessage msg) {
-        getElement().appendChild(msg.toXMLElement());
+    public DOMMessage add(FreeColObject fco, Player player) {
+        add(fco.toXMLElement(this.document, player));
+        return this;
+    }
+    public DOMMessage add(DOMMessage msg) {
+        add(msg.toXMLElement());
+        return this;
     }
         
     /**

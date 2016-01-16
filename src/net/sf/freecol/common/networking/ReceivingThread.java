@@ -54,7 +54,7 @@ final class ReceivingThread extends Thread {
      */
     private static class FreeColNetworkInputStream extends InputStream {
 
-        private static final int BUFFER_SIZE = 16384;
+        public static final int BUFFER_SIZE = 16384;
 
         private static final char END_OF_STREAM = '\n';
 
@@ -266,43 +266,115 @@ final class ReceivingThread extends Thread {
     private void listen() throws IOException, SAXException, XMLStreamException {
         in.enable();
 
-        final int LOOK_AHEAD = 8192;
-        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
+        // Open a rewindable stream
+        final int LOOK_AHEAD = FreeColNetworkInputStream.BUFFER_SIZE;
+        BufferedInputStream bis
+            = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
-
         FreeColXMLReader xr = new FreeColXMLReader(bis);
-        String tag;
+
+        // Peek at the tag of the first item in the stream.
         try {
-            xr.nextTag();
-            tag = xr.getLocalName();
-        } catch (XMLStreamException xse) {
-            // EOS can occur when the other end disconnects
-            tag = Connection.DISCONNECT_TAG;
-        }
-
-        if (Connection.DISCONNECT_TAG.equals(tag)) {
-            askToStop();
-
-        } else if (Connection.REPLY_TAG.equals(tag)) {
-            int id = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
-            NetworkReplyObject nro = waitingThreads.remove(id);
-            if (nro == null) {
-                logger.warning("Could not find networkReplyId: " + id);
-            } else {
-                bis.reset();
-                nro.setResponse(new DOMMessage(bis));
-            }
-        
-        } else {
+            String tag;
+            int replyId;
             try {
-                bis.reset();
-                connection.handleAndSendReply(bis);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO error for " + tag, ioe);
+                xr.nextTag();
+                tag = xr.getLocalName();
+                replyId = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+            } catch (XMLStreamException xse) {
+                // EOS can occur when the other end disconnects
+                tag = Connection.DISCONNECT_TAG;
+                replyId = -1;
             }
-        }
 
-        if (xr != null) xr.close();
+            // Respond to message according to tag, optionally defining a
+            // thread to start.
+            Thread t = null;
+            DOMMessage msg;
+            switch (tag) {
+
+            case Connection.DISCONNECT_TAG:
+                // Disconnect at once if needed.
+                askToStop();
+                return;
+
+            case Connection.REPLY_TAG:
+                // A reply.  Look up its waiting thread and set a response.
+                NetworkReplyObject nro = waitingThreads.remove(replyId);
+                if (nro == null) {
+                    logger.warning("Could not find replyId: " + replyId);
+                    return;
+                }
+                try {
+                    bis.reset();
+                    msg = new DOMMessage(bis);
+                    nro.setResponse(msg);
+                } catch (IOException|SAXException ex) {
+                    // Always respond, even when failed, so as to unblock the
+                    // waiting thread.
+                    nro.setResponse(null);
+                    throw ex;
+                }
+                return;
+
+            case Connection.QUESTION_TAG:
+                // A query.  Build a thread to handle it and send a reply.
+                bis.reset();
+                msg = new DOMMessage(bis);
+                final int finalReplyId = replyId;
+                t = new Thread(msg.getType()) {
+                        @Override
+                        public void run() {
+                            String tag = msg.getType();
+                            try {
+                                ReceivingThread.this.connection
+                                    .handleQuery(msg, finalReplyId);
+                            } catch (FreeColException fce) {
+                                logger.log(Level.WARNING, "Query "
+                                    + finalReplyId
+                                    + " handler for " + tag + " failed", fce);
+                            } catch (IOException ioe) {
+                                logger.log(Level.WARNING, "Query "
+                                    + finalReplyId
+                                    + " response send for " + tag + " failed",
+                                    ioe);
+                            }
+                        }
+                    };
+                break;
+
+            default:
+                // An ordinary update message.  Build a thread to handle
+                // it and possibly respond.
+                bis.reset();
+                msg = new DOMMessage(bis);
+                t = new Thread(msg.getType()) {
+                        @Override
+                        public void run() {
+                            String tag = msg.getType();
+                            try {
+                                ReceivingThread.this.connection.handleUpdate(msg);
+                            } catch (FreeColException fce) {
+                                logger.log(Level.WARNING, "Update handler for "
+                                    + tag + " failed", fce);
+                            } catch (IOException ioe) {
+                                logger.log(Level.WARNING, "Update send for "
+                                    + tag + " failed", ioe);
+                            }
+                        }
+                    };
+                break;
+            }
+
+            // Start the optional thread
+            if (t != null) {
+                t.setName(this.connection.getName() + "-MessageHandler-"
+                    + t.getName());
+                t.start();
+            }
+        } finally {
+            xr.close();
+        }
     }
 
     /**
