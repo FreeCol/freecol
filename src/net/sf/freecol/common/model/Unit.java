@@ -222,7 +222,7 @@ public class Unit extends GoodsLocation
      * @param e An XML-element that will be used to initialize this object.
      */
     public Unit(Game game, Element e) {
-        super(game);
+        super(game, null);// Must override identifier when called client side
 
         readFromXMLElement(e);
     }
