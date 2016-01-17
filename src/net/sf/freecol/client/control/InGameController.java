@@ -1481,13 +1481,17 @@ public final class InGameController implements NetworkConstants {
         if (!gui.confirm(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+            if (unit.getDestination() != null) {
+                askClearGotoOrders(unit);
+                return false; // Need to break out of movePath
+            }
             return true;
         }
         if (tile.getLostCityRumour().getType()== LostCityRumour.RumourType.MOUNDS
             && !gui.confirm(unit.getTile(),
                 StringTemplate.key("exploreMoundsRumour.text"), unit,
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-            askServer().declineMounds(unit, direction);
+            askServer().declineMounds(unit, direction); // LCR goes away
         }
         return moveMove(unit, direction);
     }
