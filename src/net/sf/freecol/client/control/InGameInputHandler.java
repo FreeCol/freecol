@@ -61,6 +61,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.NewTradeRouteMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -257,6 +258,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = newRegionName(element); break;
         case "newTurn":
             reply = newTurn(element); break;
+        case "newTradeRoute":
+            reply = newTradeRoute(element); break;
         case Connection.RECONNECT_TAG:
             reply = reconnect(element); break;
         case "remove":
@@ -329,9 +332,6 @@ public final class InGameInputHandler extends InputHandler {
 
             } else if (ModelMessage.getTagName().equals(tag)) {
                 player.addModelMessage(new ModelMessage(e));
-
-            } else if (TradeRoute.getTagName().equals(tag)) {
-                player.getTradeRoutes().add(new TradeRoute(game, e));
 
             } else {
                 logger.warning("addObject unrecognized: " + tag);
@@ -903,6 +903,24 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Handle a "newTradeRoute" message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element newTradeRoute(Element element) {
+        final Game game = getGame();
+        NewTradeRouteMessage message = new NewTradeRouteMessage(game, element);
+        if (message != null) {
+            final Player player = getFreeColClient().getMyPlayer();
+            TradeRoute tr = message.getTradeRoute();
+            if (tr != null) player.getTradeRoutes().add(tr);
+        }
+        return null;
+    }
+        
     /**
      * Handle a "newTurn"-message.
      *

@@ -72,6 +72,7 @@ import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
@@ -434,6 +435,14 @@ public final class InGameInputHandler extends InputHandler
                 return new NewRegionNameMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
+        register(NewTradeRouteMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new NewTradeRouteMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
         register(PayArrearsMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -606,10 +615,6 @@ public final class InGameInputHandler extends InputHandler
             (Connection connection, Element element) ->
             new GetNationSummaryMessage(element)
                 .handle(freeColServer, connection));
-        register("getNewTradeRoute",
-            (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-                .getNewTradeRoute(freeColServer.getPlayer(connection)));
         register(HighScoreMessage.getTagName(),
             (Connection connection, Element element) ->
             new HighScoreMessage(getGame(), element)

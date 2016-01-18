@@ -794,7 +794,7 @@ public abstract class ServerAPI {
      */
     public boolean getNewTradeRoute(Game game) {
         return askHandling(game,
-            new DOMMessage("getNewTradeRoute"), null);
+            new NewTradeRouteMessage(), null);
     }
 
     /**

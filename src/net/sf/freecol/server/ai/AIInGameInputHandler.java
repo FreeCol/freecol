@@ -172,7 +172,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "addObject": case "addPlayer": case "animateMove":
             case "animateAttack": case "chat":
             case "error": case "featureChange": case "gameEnded":
-            case "logout": case "newTurn": case "remove":
+            case "logout": case "newTurn": case "newTradeRoute": case "remove":
             case "removeGoods": case "setAI": case "setDead":
             case "setStance": case "startGame": case "update":
                 break;

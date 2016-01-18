@@ -3970,15 +3970,14 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> to get a trade
      *    route for.
-     * @return An <code>Element</code> encapsulating this action.
+     * @return A new <code>TradeRoute</code> for the player.
      */
-    public Element getNewTradeRoute(ServerPlayer serverPlayer) {
+    public TradeRoute getNewTradeRoute(ServerPlayer serverPlayer) {
         List<TradeRoute> routes = serverPlayer.getTradeRoutes();
         TradeRoute route = new TradeRoute(getGame(), 
             serverPlayer.getNameForTradeRoute(), serverPlayer);
         routes.add(route);
-        return new ChangeSet().addTradeRoute(serverPlayer, route)
-            .build(serverPlayer);
+        return route;
     }
 
 
