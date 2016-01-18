@@ -105,48 +105,57 @@ public class InciteMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         ServerIndianSettlement is
             = (ServerIndianSettlement)tile.getIndianSettlement();
         if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         MoveType type;
         ServerPlayer enemy = game.getFreeColGameObject(enemyId,
             ServerPlayer.class);
         if (enemy == null) {
-            return DOMMessage.clientError("Not a player: " + enemyId);
+            return serverPlayer.clientError("Not a player: " + enemyId)
+                .build(serverPlayer);
         } else if (enemy == player) {
-            return DOMMessage.clientError("Inciting against oneself!");
+            return serverPlayer.clientError("Inciting against oneself!")
+                .build(serverPlayer);
         } else if (!enemy.isEuropean()) {
-            return DOMMessage.clientError("Inciting against non-European!");
+            return serverPlayer.clientError("Inciting against non-European!")
+                .build(serverPlayer);
         } else if ((type = unit.getMoveType(is.getTile()))
             != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            return DOMMessage.clientError("Unable to enter "
-                + is.getName() + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter "
+                + is.getName() + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         int gold;
         try {
             gold = Integer.parseInt(goldString);
         } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad gold: " + goldString);
+            return serverPlayer.clientError("Bad gold: " + goldString)
+                .build(serverPlayer);
         }
 
         // Valid, proceed to incite.
         return server.getInGameController()
-            .incite(serverPlayer, unit, is, enemy, gold);
+            .incite(serverPlayer, unit, is, enemy, gold)
+            .build(serverPlayer);
     }
 
     /**

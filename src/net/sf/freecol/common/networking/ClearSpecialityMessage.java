@@ -80,12 +80,14 @@ public class ClearSpecialityMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Try to clear.
         return server.getInGameController()
-            .clearSpeciality(serverPlayer, unit);
+            .clearSpeciality(serverPlayer, unit)
+            .build(serverPlayer);
     }
 
     /**

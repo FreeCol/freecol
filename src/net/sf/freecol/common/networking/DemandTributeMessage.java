@@ -91,40 +91,46 @@ public class DemandTributeMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (unit.isArmed()
             || unit.hasAbility(Ability.DEMAND_TRIBUTE)) {
             ; // ok
         } else {
-            return DOMMessage.clientError("Unit is neither armed"
-                + " nor able to demand tribute: " + unitId);
+            return serverPlayer.clientError("Unit is neither armed"
+                + " nor able to demand tribute: " + unitId)
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         ServerIndianSettlement settlement
             = (ServerIndianSettlement)tile.getIndianSettlement();
         if (settlement == null) {
-            return DOMMessage.clientError("There is native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         MoveType type = unit.getMoveType(tile);
         if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-            return DOMMessage.clientError("Unable to demand tribute at: "
-                + settlement.getName() + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to demand tribute at: "
+                + settlement.getName() + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Do the demand
         return server.getInGameController()
-            .demandTribute(serverPlayer, unit, settlement);
+            .demandTribute(serverPlayer, unit, settlement)
+            .build(serverPlayer);
     }
 
     /**

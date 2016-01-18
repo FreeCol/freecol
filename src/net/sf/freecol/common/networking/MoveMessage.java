@@ -90,27 +90,31 @@ public class MoveMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         MoveType moveType = unit.getMoveType(tile);
         if (!moveType.isProgress()) {
-            return DOMMessage.clientError("Illegal move for: " + unitId
+            return serverPlayer.clientError("Illegal move for: " + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
-                + " to: " + tile.getId());
+                + " to: " + tile.getId())
+                .build(serverPlayer);
         }
 
         // Proceed to move.
         return server.getInGameController()
-            .move(serverPlayer, unit, tile);
+            .move(serverPlayer, unit, tile)
+            .build(serverPlayer);
     }
 
     /**

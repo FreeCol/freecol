@@ -117,25 +117,29 @@ public class SellPropositionMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         IndianSettlement settlement;
         try {
             settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Make sure we are trying to sell something that is there
         if (goods.getLocation() != unit) {
-            return DOMMessage.clientError("Goods " + goods.getId()
-                + " are not with unit " + unitId);
+            return serverPlayer.clientError("Goods " + goods.getId()
+                + " are not with unit " + unitId)
+                .build(serverPlayer);
         }
 
         // Proceed to price.
         return server.getInGameController()
-            .sellProposition(serverPlayer, unit, settlement, goods, getGold());
+            .sellProposition(serverPlayer, unit, settlement, goods, getGold())
+            .toXMLElement();
     }
 
     /**

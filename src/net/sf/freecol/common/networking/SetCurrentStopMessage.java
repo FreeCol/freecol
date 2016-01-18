@@ -85,28 +85,33 @@ public class SetCurrentStopMessage extends DOMMessage {
             serverUnit = serverPlayer.getOurFreeColGameObject(unitId,
                 ServerUnit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         TradeRoute tr = serverUnit.getTradeRoute();
         if (tr == null) {
-            return DOMMessage.clientError("Unit has no trade route: "
-                + unitId);
+            return serverPlayer.clientError("Unit has no trade route: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         int count;
         try {
             count = Integer.parseInt(this.index);
         } catch (NumberFormatException nfe) {
-            return DOMMessage.clientError("Stop index is not an integer: " +
-                this.index);
+            return serverPlayer.clientError("Stop index is not an integer: " +
+                this.index)
+                .build(serverPlayer);
         }
         if (count < 0 || count > tr.getStops().size()) {
-            return DOMMessage.clientError("Invalid stop index: " + this.index);
+            return serverPlayer.clientError("Invalid stop index: " + this.index)
+                .build(serverPlayer);
         }
 
         // Valid, set.
         return server.getInGameController()
-            .setCurrentStop(serverPlayer, serverUnit, count);
+            .setCurrentStop(serverPlayer, serverUnit, count)
+            .build(serverPlayer);
     }
 
     /**

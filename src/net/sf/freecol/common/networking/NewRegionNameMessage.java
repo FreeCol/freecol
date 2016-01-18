@@ -141,29 +141,34 @@ public class NewRegionNameMessage extends DOMMessage {
 
         Tile tile = getTile(game);
         if (!serverPlayer.hasExplored(tile)) {
-            return DOMMessage.clientError("Can not claim discovery in unexplored tile: " + tileId);
+            return serverPlayer.clientError("Can not claim discovery in unexplored tile: " + tileId)
+                .build(serverPlayer);
         }
 
         Unit unit;
         try {
             unit = getUnit(player);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
-            return DOMMessage.clientError("No discoverable region in: "
-                + tileId);
+            return serverPlayer.clientError("No discoverable region in: "
+                + tileId)
+                .build(serverPlayer);
         }
         if (!region.getId().equals(regionId)) {
-            return DOMMessage.clientError("Region mismatch, " + region.getId()
-                + " != " + regionId);
+            return serverPlayer.clientError("Region mismatch, " + region.getId()
+                + " != " + regionId)
+                .build(serverPlayer);
         }
         
         // Do the discovery
         return server.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, newRegionName);
+            .setNewRegionName(serverPlayer, unit, region, newRegionName)
+            .build(serverPlayer);
     }
 
     /**

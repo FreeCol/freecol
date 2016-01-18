@@ -81,12 +81,14 @@ public class DisembarkMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Do the disembark.
         return server.getInGameController()
-            .disembarkUnit(serverPlayer, unit);
+            .disembarkUnit(serverPlayer, unit)
+            .build(serverPlayer);
     }
 
     /**

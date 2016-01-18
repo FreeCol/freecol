@@ -100,40 +100,48 @@ public class LoadGoodsMessage extends DOMMessage {
         FreeColGameObject fcgo = player.getGame()
             .getFreeColGameObject(locationId);
         if (fcgo == null || !(fcgo instanceof Location)) {
-            return DOMMessage.clientError("Not a location: " + locationId);
+            return serverPlayer.clientError("Not a location: " + locationId)
+                .build(serverPlayer);
         }
 
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return DOMMessage.clientError("Not a goods carrier: " + carrierId);
+            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
+                .build(serverPlayer);
         } else if (carrier.getTradeLocation() == null) {
-            return DOMMessage.clientError("Not at a trade location: " + carrierId);
+            return serverPlayer.clientError("Not at a trade location: " + carrierId)
+                .build(serverPlayer);
         }
 
         GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
-            return DOMMessage.clientError("Not a goods type: " + goodsTypeId);
+            return serverPlayer.clientError("Not a goods type: " + goodsTypeId)
+                .build(serverPlayer);
         }
 
         int amount;
         try {
             amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad amount: " + amountString);
+            return serverPlayer.clientError("Bad amount: " + amountString)
+                .build(serverPlayer);
         }
         if (amount <= 0) {
-            return DOMMessage.clientError("Amount must be positive: "
-                + amountString);
+            return serverPlayer.clientError("Amount must be positive: "
+                + amountString)
+                .build(serverPlayer);
         }
 
         // Load the goods
         return server.getInGameController()
-            .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier);
+            .loadGoods(serverPlayer, (Location)fcgo, type, amount, carrier)
+            .build(serverPlayer);
     }
 
     /**

@@ -90,20 +90,23 @@ public class LearnSkillMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         // Do not use getMoveType (checking moves left) as the
@@ -112,13 +115,15 @@ public class LearnSkillMessage extends DOMMessage {
         // Consider using a transaction, so that declining restores the moves?
         MoveType type = unit.getSimpleMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
-            return DOMMessage.clientError("Unable to enter "
-                + is.getName() + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter "
+                + is.getName() + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Learn the skill if possible.
         return server.getInGameController()
-            .learnFromIndianSettlement(serverPlayer, unit, is);
+            .learnFromIndianSettlement(serverPlayer, unit, is)
+            .build(serverPlayer);
     }
 
     /**

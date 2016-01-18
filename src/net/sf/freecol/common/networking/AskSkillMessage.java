@@ -91,31 +91,36 @@ public class AskSkillMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
-            return DOMMessage.clientError("Unable to enter " + is.getName()
-                + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter " + is.getName()
+                + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Update the skill
         return server.getInGameController()
-            .askLearnSkill(serverPlayer, unit, is);
+            .askLearnSkill(serverPlayer, unit, is)
+            .build(serverPlayer);
     }
 
     /**

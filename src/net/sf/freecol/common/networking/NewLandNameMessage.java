@@ -109,24 +109,29 @@ public class NewLandNameMessage extends DOMMessage {
         try {
             unit = getUnit(player);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile = unit.getTile();
         if (tile == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+                .build(serverPlayer);
         } else if (!tile.isLand()) {
-            return DOMMessage.clientError("Unit is not in the new world: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not in the new world: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         if (newLandName == null || newLandName.isEmpty()) {
-            return DOMMessage.clientError("Empty new land name");
+            return serverPlayer.clientError("Empty new land name")
+                .build(serverPlayer);
         }
 
         // Set name.
         return server.getInGameController()
-            .setNewLandName(serverPlayer, unit, newLandName);
+            .setNewLandName(serverPlayer, unit, newLandName)
+            .build(serverPlayer);
     }
 
     /**

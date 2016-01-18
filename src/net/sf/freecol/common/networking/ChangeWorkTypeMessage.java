@@ -87,20 +87,24 @@ public class ChangeWorkTypeMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.hasTile()) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+                .build(serverPlayer);
         }
 
         GoodsType type = server.getSpecification().getGoodsType(workTypeId);
         if (type == null) {
-            return DOMMessage.clientError("Not a goods type: " + workTypeId);
+            return serverPlayer.clientError("Not a goods type: " + workTypeId)
+                .build(serverPlayer);
         }
 
         // Proceed to changeWorkType.
         return server.getInGameController()
-            .changeWorkType(serverPlayer, unit, type);
+            .changeWorkType(serverPlayer, unit, type)
+            .build(serverPlayer);
     }
 
     /**

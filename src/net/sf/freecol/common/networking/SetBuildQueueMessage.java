@@ -110,25 +110,29 @@ public class SetBuildQueueMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         if (queue == null) {
-            return DOMMessage.clientError("Empty queue");
+            return serverPlayer.clientError("Empty queue")
+                .build(serverPlayer);
         }
         List<BuildableType> buildQueue = new ArrayList<>();
         for (int i = 0; i < queue.length; i++) {
             try {
                 buildQueue.add(i, spec.getType(queue[i], BuildableType.class));
             } catch (Exception cce) {
-                return DOMMessage.clientError("Not a buildable type: "
-                    + queue[i]);
+                return serverPlayer.clientError("Not a buildable type: "
+                    + queue[i])
+                    .build(serverPlayer);
             }
         }
 
         // Proceed to set the build queue.
         return server.getInGameController()
-            .setBuildQueue(serverPlayer, colony, buildQueue);
+            .setBuildQueue(serverPlayer, colony, buildQueue)
+            .build(serverPlayer);
     }
 
     /**

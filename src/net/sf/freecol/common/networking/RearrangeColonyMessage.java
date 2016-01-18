@@ -231,31 +231,38 @@ public class RearrangeColonyMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         if (unitChanges.isEmpty()) {
-            return DOMMessage.clientError("Empty rearrangement list.");
+            return serverPlayer.clientError("Empty rearrangement list.")
+                .build(serverPlayer);
         }
         int i = 0;
         for (UnitChange uc : unitChanges) {
             if (uc.unit == null) {
-                return DOMMessage.clientError("Invalid unit " + i);
+                return serverPlayer.clientError("Invalid unit " + i)
+                    .build(serverPlayer);
             }
             if (uc.loc == null) {
-                return DOMMessage.clientError("Invalid location " + i);
+                return serverPlayer.clientError("Invalid location " + i)
+                    .build(serverPlayer);
             }
             if (uc.role == null) {
-                return DOMMessage.clientError("Invalid role " + i);
+                return serverPlayer.clientError("Invalid role " + i)
+                    .build(serverPlayer);
             }
             if (uc.roleCount < 0) {
-                return DOMMessage.clientError("Invalid role count " + i);
+                return serverPlayer.clientError("Invalid role count " + i)
+                    .build(serverPlayer);
             }
         }
 
         // Rearrange can proceed.
         return server.getInGameController()
-            .rearrangeColony(serverPlayer, colony, unitChanges);
+            .rearrangeColony(serverPlayer, colony, unitChanges)
+            .build(serverPlayer);
     }
 
     /**

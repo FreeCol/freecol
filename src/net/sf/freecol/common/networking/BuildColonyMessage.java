@@ -88,31 +88,37 @@ public class BuildColonyMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(builderId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.canBuildColony()) {
-            return DOMMessage.clientError("Unit " + builderId
-                + " can not build colony.");
+            return serverPlayer.clientError("Unit " + builderId
+                + " can not build colony.")
+                .build(serverPlayer);
         }
 
         if (colonyName == null) {
-            return DOMMessage.clientError("Null colony name");
+            return serverPlayer.clientError("Null colony name")
+                .build(serverPlayer);
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
         } else if (game.getSettlementByName(colonyName) != null) {
-            return DOMMessage.clientError("Non-unique colony name "
-                + colonyName);
+            return serverPlayer.clientError("Non-unique colony name "
+                + colonyName)
+                .build(serverPlayer);
         }
 
         Tile tile = unit.getTile();
         if (!player.canClaimToFoundSettlement(tile)) {
-            return DOMMessage.clientError("Can not build colony on tile "
-                + tile + ": " + player.canClaimToFoundSettlementReason(tile));
+            return serverPlayer.clientError("Can not build colony on tile "
+                + tile + ": " + player.canClaimToFoundSettlementReason(tile))
+                .build(serverPlayer);
         }
 
         // Build can proceed.
         return server.getInGameController()
-            .buildSettlement(serverPlayer, unit, colonyName);
+            .buildSettlement(serverPlayer, unit, colonyName)
+            .build(serverPlayer);
     }
 
     /**

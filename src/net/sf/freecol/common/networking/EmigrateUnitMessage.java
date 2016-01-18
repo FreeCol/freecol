@@ -78,43 +78,50 @@ public class EmigrateUnitMessage extends DOMMessage {
 
         Europe europe = player.getEurope();
         if (europe == null) {
-            return DOMMessage.clientError("No Europe to migrate from.");
+            return serverPlayer.clientError("No Europe to migrate from.")
+                .build(serverPlayer);
         }
         int slot;
         try {
             slot = Integer.parseInt(slotString);
         } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad slot: " + slotString);
+            return serverPlayer.clientError("Bad slot: " + slotString)
+                .build(serverPlayer);
         }
         if (!MigrationType.validMigrantSlot(slot)) {
-            return DOMMessage.clientError("Invalid slot for recruitment: "
-                + slot);
+            return serverPlayer.clientError("Invalid slot for recruitment: "
+                + slot)
+                .build(serverPlayer);
         }
             
         MigrationType type;
         if (serverPlayer.getRemainingEmigrants() > 0) {
             if (MigrationType.unspecificMigrantSlot(slot)) {
-                return DOMMessage.clientError("Specific slot expected for FoY migration.");
+                return serverPlayer.clientError("Specific slot expected for FoY migration.")
+                    .build(serverPlayer);
             }
             type = MigrationType.FOUNTAIN;
         } else if (player.checkEmigrate()) {
             if (MigrationType.specificMigrantSlot(slot)
                 && !player.hasAbility(Ability.SELECT_RECRUIT)) {
-                return DOMMessage.clientError("selectRecruit ability absent.");
+                return serverPlayer.clientError("selectRecruit ability absent.")
+                    .build(serverPlayer);
             }
             type = MigrationType.NORMAL;
         } else {
             if (!player.checkGold(europe.getRecruitPrice())) {
-                return DOMMessage.clientError("No migrants available at cost "
+                return serverPlayer.clientError("No migrants available at cost "
                     + europe.getRecruitPrice()
-                    + " for player with " + player.getGold() + " gold.");
+                    + " for player with " + player.getGold() + " gold.")
+                    .build(serverPlayer);
             }
             type = MigrationType.RECRUIT;
         }
 
         // Proceed to emigrate.
         return server.getInGameController()
-            .emigrate(serverPlayer, slot, type);
+            .emigrate(serverPlayer, slot, type)
+            .build(serverPlayer);
     }
 
     /**

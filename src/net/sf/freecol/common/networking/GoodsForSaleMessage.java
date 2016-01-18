@@ -112,19 +112,22 @@ public class GoodsForSaleMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         IndianSettlement settlement;
         try {
             settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Try to collect the goods for sale.
         return server.getInGameController()
-            .getGoodsForSale(serverPlayer, unit, settlement);
+            .getGoodsForSale(serverPlayer, unit, settlement)
+            .toXMLElement();
     }
 
     /**

@@ -80,12 +80,14 @@ public class DisbandUnitMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Try to clear.
         return server.getInGameController()
-            .disbandUnit(serverPlayer, unit);
+            .disbandUnit(serverPlayer, unit)
+            .build(serverPlayer);
     }
 
     /**

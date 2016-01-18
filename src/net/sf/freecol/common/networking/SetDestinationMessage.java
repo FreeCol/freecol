@@ -87,7 +87,8 @@ public class SetDestinationMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // destination == null is OK.
@@ -96,7 +97,8 @@ public class SetDestinationMessage extends DOMMessage {
 
         // Set destination
         return server.getInGameController()
-            .setDestination(serverPlayer, unit, destination);
+            .setDestination(serverPlayer, unit, destination)
+            .build(serverPlayer);
     }
 
     /**

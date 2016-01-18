@@ -167,17 +167,20 @@ public class IndianDemandMessage extends DOMMessage {
             if (result == null) { // Initial demand
                 unit = player.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
-                    return DOMMessage.clientError("Unit has no moves left: "
-                        + unitId);
+                    return serverPlayer.clientError("Unit has no moves left: "
+                        + unitId)
+                        .build(serverPlayer);
                 }
             } else { // Reply from colony
                 unit = game.getFreeColGameObject(unitId, Unit.class);
                 if (unit == null) {
-                    return DOMMessage.clientError("Not a unit: " + unitId);
+                    return serverPlayer.clientError("Not a unit: " + unitId)
+                        .build(serverPlayer);
                 }
             }
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Colony colony;
@@ -185,21 +188,25 @@ public class IndianDemandMessage extends DOMMessage {
             Settlement settlement
                 = unit.getAdjacentSettlementSafely(colonyId);
             if (!(settlement instanceof Colony)) {
-                return DOMMessage.clientError("Not a colony: " + colonyId);
+                return serverPlayer.clientError("Not a colony: " + colonyId)
+                    .build(serverPlayer);
             }
             colony = (Colony)settlement;
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         if (getAmount() <= 0) {
-            return DOMMessage.clientError("Bad amount: " + amount);
+            return serverPlayer.clientError("Bad amount: " + amount)
+                .build(serverPlayer);
         }
 
         // Proceed to demand.
         return server.getInGameController()
             .indianDemand(serverPlayer, unit, colony,
-                          getType(game), getAmount());
+                          getType(game), getAmount())
+            .build(serverPlayer);
     }
 
     /**

@@ -91,18 +91,21 @@ public class GetTransactionMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Settlement settlement;
         try {
             settlement = unit.getAdjacentSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         return server.getInGameController()
-            .getTransaction(serverPlayer, unit, settlement);
+            .getTransaction(serverPlayer, unit, settlement)
+            .build(serverPlayer);
     }
 
     /**

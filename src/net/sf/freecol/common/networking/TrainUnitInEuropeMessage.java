@@ -79,12 +79,14 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
 
         UnitType type = server.getSpecification().getUnitType(typeId);
         if (type == null) {
-            return DOMMessage.clientError("Not a unit type: " + typeId);
+            return serverPlayer.clientError("Not a unit type: " + typeId)
+                .build(serverPlayer);
         }
 
         // Proceed to train a unit.
         return server.getInGameController()
-            .trainUnitInEurope(serverPlayer, type);
+            .trainUnitInEurope(serverPlayer, type)
+            .build(serverPlayer);
     }
 
     /**

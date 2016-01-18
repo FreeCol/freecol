@@ -89,26 +89,30 @@ public class DeclineMoundsMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         LostCityRumour rumour = tile.getLostCityRumour();
         if (rumour == null
             || rumour.getType() != LostCityRumour.RumourType.MOUNDS) {
-            return DOMMessage.clientError("No mounds rumour on tile: "
-                + tile.getId());
+            return serverPlayer.clientError("No mounds rumour on tile: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         // Clear the mounds.
         return server.getInGameController()
-            .declineMounds(serverPlayer, tile);
+            .declineMounds(serverPlayer, tile)
+            .build(serverPlayer);
     }
 
     /**

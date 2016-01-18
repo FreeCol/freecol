@@ -81,12 +81,14 @@ public class PayForBuildingMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Proceed to pay.
         return server.getInGameController()
-            .payForBuilding(serverPlayer, colony);
+            .payForBuilding(serverPlayer, colony)
+            .build(serverPlayer);
     }
 
     /**

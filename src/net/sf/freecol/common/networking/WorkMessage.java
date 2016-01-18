@@ -87,37 +87,44 @@ public class WorkMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         if (!unit.hasTile()) {
-            return DOMMessage.clientError("Unit is not on the map: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not on the map: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         Colony colony = unit.getTile().getColony();
         if (colony == null) {
-            return DOMMessage.clientError("Unit is not at a colony: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not at a colony: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         WorkLocation workLocation
             = game.getFreeColGameObject(workLocationId, WorkLocation.class);
         if (workLocation == null) {
-            return DOMMessage.clientError("Not a work location: "
-                + workLocationId);
+            return serverPlayer.clientError("Not a work location: "
+                + workLocationId)
+                .build(serverPlayer);
         } else if (workLocation.getColony() != colony) {
-            return DOMMessage.clientError("Work location is not in the colony"
-                + " where the unit is: " + workLocationId);
+            return serverPlayer.clientError("Work location is not in the colony"
+                + " where the unit is: " + workLocationId)
+                .build(serverPlayer);
         } else if (!workLocation.canAdd(unit)) {
-            return DOMMessage.clientError("Can not add " + unit
+            return serverPlayer.clientError("Can not add " + unit
                 + " to " + workLocation
-                + ": " + workLocation.getNoAddReason(unit));
+                + ": " + workLocation.getNoAddReason(unit))
+                .build(serverPlayer);
         }
 
         // Work.
         return server.getInGameController()
-            .work(serverPlayer, unit, workLocation);
+            .work(serverPlayer, unit, workLocation)
+            .build(serverPlayer);
     }
 
     /**

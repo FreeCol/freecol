@@ -85,16 +85,19 @@ public class DeclareIndependenceMessage extends DOMMessage {
 
         if (nationName == null || nationName.isEmpty()
             || countryName == null || countryName.isEmpty()) {
-            return DOMMessage.clientError("Empty nation or country name.");
+            return serverPlayer.clientError("Empty nation or country name.")
+                .build(serverPlayer);
         }
         StringTemplate problem = player.checkDeclareIndependence();
         if (problem != null) {
-            return DOMMessage.clientError("Declaration blocked");
+            return serverPlayer.clientError("Declaration blocked")
+                .build(serverPlayer);
         }
 
         // Declare.
         return server.getInGameController()
-            .declareIndependence(serverPlayer, nationName, countryName);
+            .declareIndependence(serverPlayer, nationName, countryName)
+            .build(serverPlayer);
     }
 
     /**

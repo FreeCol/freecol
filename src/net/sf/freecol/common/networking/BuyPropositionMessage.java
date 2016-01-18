@@ -119,28 +119,33 @@ public class BuyPropositionMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.hasSpaceLeft()) {
-            return DOMMessage.clientError("No space left on unit: "
-                + unit.getId());
+            return serverPlayer.clientError("No space left on unit: "
+                + unit.getId())
+                .build(serverPlayer);
         }
  
         IndianSettlement settlement;
         try {
             settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
-            return DOMMessage.clientError("Goods " + goods.getId()
-                + " are not in settlement " + settlementId);
+            return serverPlayer.clientError("Goods " + goods.getId()
+                + " are not in settlement " + settlementId)
+                .build(serverPlayer);
         }
  
         // Proceed to price.
         return server.getInGameController()
-            .buyProposition(serverPlayer, unit, settlement, goods, getGold());
+            .buyProposition(serverPlayer, unit, settlement, goods, getGold())
+            .toXMLElement();
     }
 
     /**

@@ -66,13 +66,14 @@ public abstract class CurrentPlayerNetworkRequestHandler
      */
     @Override
     public final Element handle(Connection conn, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(conn);
-        if (!isCurrentPlayer(player)) {
-            return DOMMessage.clientError("Received message: "
-                + element.getTagName()
-                + " out of turn from player: " + player.getNation());
+        final ServerPlayer serverPlayer = getFreeColServer().getPlayer(conn);
+        if (!isCurrentPlayer(serverPlayer)) {
+            return serverPlayer.clientError("Received message: "
+                + element.getTagName() + " out of turn from player: "
+                + serverPlayer.getNation())
+                .build(serverPlayer);
         }
-        return handle(player, conn, element);
+        return handle(serverPlayer, conn, element);
     }
 
     /**

@@ -80,18 +80,21 @@ public class AbandonColonyMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (colony.getUnitCount() != 0) {
-            return DOMMessage.clientError("Attempt to abandon colony "
+            return serverPlayer.clientError("Attempt to abandon colony "
                 + colonyId + " with non-zero unit count "
-                + Integer.toString(colony.getUnitCount()));
+                + Integer.toString(colony.getUnitCount()))
+                .build(serverPlayer);
         }
 
         // Proceed to abandon
         // FIXME: Player.settlements is still being fixed on the client side.
         return server.getInGameController()
-            .abandonSettlement(serverPlayer, colony);
+            .abandonSettlement(serverPlayer, colony)
+            .build(serverPlayer);
     }
 
     /**

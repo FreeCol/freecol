@@ -91,35 +91,41 @@ public class SpySettlementMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
-            return DOMMessage.clientError("Unit lacks ability"
-                + " to spy on colony: " + unitId);
+            return serverPlayer.clientError("Unit lacks ability"
+                + " to spy on colony: " + unitId)
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Settlement settlement = tile.getSettlement();
         if (settlement == null) {
-            return DOMMessage.clientError("There is no settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         MoveType type = unit.getMoveType(settlement.getTile());
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
-            return DOMMessage.clientError("Unable to enter at: "
-                + settlement.getName() + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter at: "
+                + settlement.getName() + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Spy on the settlement
         return server.getInGameController()
-            .spySettlement(serverPlayer, unit, settlement);
+            .spySettlement(serverPlayer, unit, settlement)
+            .build(serverPlayer);
     }
 
     /**

@@ -313,7 +313,8 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return freeColServer.getInGameController()
-                    .endTurn(freeColServer.getPlayer(connection));
+                    .endTurn(freeColServer.getPlayer(connection))
+                    .build(freeColServer.getPlayer(connection));
             }});
         register(EquipForRoleMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
@@ -590,15 +591,18 @@ public final class InGameInputHandler extends InputHandler
                 return DOMMessage.collapseElements(results);
             }});
 
+        // FIXME: everything that has to getPlayer() should be moved above
         // NetworkRequestHandlers
         register(AssignTradeRouteMessage.getTagName(),
             (Connection connection, Element element) ->
             new AssignTradeRouteMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register("continuePlaying",
-            (Connection connection, Element element) ->
-            freeColServer.getInGameController()
-                .continuePlaying(freeColServer.getPlayer(connection)));
+            (Connection connection, Element element) -> {
+                freeColServer.getInGameController()
+                    .continuePlaying(freeColServer.getPlayer(connection));
+                return null;
+            });
         register(DiplomacyMessage.getTagName(),
             (Connection connection, Element element) ->
             new DiplomacyMessage(getGame(), element)
@@ -606,7 +610,8 @@ public final class InGameInputHandler extends InputHandler
         register("enterRevengeMode",
             (Connection connection, Element element) ->
             freeColServer.getInGameController()
-                .enterRevengeMode(freeColServer.getPlayer(connection)));
+               .enterRevengeMode(freeColServer.getPlayer(connection))
+               .build(freeColServer.getPlayer(connection)));
         register(FirstContactMessage.getTagName(),
             (Connection connection, Element element) ->
             new FirstContactMessage(getGame(), element)
@@ -622,7 +627,8 @@ public final class InGameInputHandler extends InputHandler
         register("retire",
             (Connection connection, Element element) ->
             freeColServer.getInGameController()
-                .retire(freeColServer.getPlayer(connection)));
+                .retire(freeColServer.getPlayer(connection))
+                .build(freeColServer.getPlayer(connection)));
         register(SetCurrentStopMessage.getTagName(),
             (Connection connection, Element element) ->
             new SetCurrentStopMessage(getGame(), element)
@@ -660,22 +666,23 @@ public final class InGameInputHandler extends InputHandler
      */
     @Override
     protected Element logout(Connection connection, Element logoutElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        if (player == null) return null;
+        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
+        if (serverPlayer == null) return null;
         logger.info("Logout by: " + connection
-                    + ((player != null) ? " (" + player.getName() + ") " : ""));
+                    + ((serverPlayer != null) ? " (" + serverPlayer.getName() + ") " : ""));
 
         /*
          * FIXME: Setting the player dead directly should be a server
          * option, but for now - allow the player to reconnect:
          */
-        Element reply = null;
-        player.setConnected(false);
-        if (getFreeColServer().getGame().getCurrentPlayer() == player
+        ChangeSet cs = null;
+        serverPlayer.setConnected(false);
+        if (getFreeColServer().getGame().getCurrentPlayer() == serverPlayer
                 && !getFreeColServer().getSinglePlayer()) {
-            reply = getFreeColServer().getInGameController().endTurn(player);
+            cs = getFreeColServer().getInGameController()
+                .endTurn(serverPlayer);
         }
         getFreeColServer().updateMetaServer();
-        return reply;
+        return cs.build(serverPlayer);
     }
 }

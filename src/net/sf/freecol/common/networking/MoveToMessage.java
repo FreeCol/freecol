@@ -88,17 +88,20 @@ public class MoveToMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Location destination = game.findFreeColLocation(destinationId);
         if (destination == null) {
-            return DOMMessage.clientError("Not a location: " + destinationId);
+            return serverPlayer.clientError("Not a location: " + destinationId)
+                .build(serverPlayer);
         }
 
         // Proceed to move.
         return server.getInGameController()
-            .moveTo(serverPlayer, unit, destination);
+            .moveTo(serverPlayer, unit, destination)
+            .build(serverPlayer);
     }
 
     /**

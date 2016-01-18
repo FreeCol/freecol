@@ -90,19 +90,22 @@ public class CloseTransactionMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Settlement settlement;
         try {
             settlement = unit.getAdjacentSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Proceed to close
         return server.getInGameController()
-            .closeTransaction(serverPlayer, unit, settlement);
+            .closeTransaction(serverPlayer, unit, settlement)
+            .build(serverPlayer);
     }
 
     /**

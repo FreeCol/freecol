@@ -91,35 +91,41 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
-            return DOMMessage.clientError("Unit lacks ability"
-                + " to speak to chief: " + unitId);
+            return serverPlayer.clientError("Unit lacks ability"
+                + " to speak to chief: " + unitId)
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
-            return DOMMessage.clientError("Unable to enter "
-                + is.getName() + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter "
+                + is.getName() + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Valid request, do the scouting.
         return server.getInGameController()
-            .scoutIndianSettlement(serverPlayer, unit, is);
+            .scoutIndianSettlement(serverPlayer, unit, is)
+            .build(serverPlayer);
     }
 
     /**

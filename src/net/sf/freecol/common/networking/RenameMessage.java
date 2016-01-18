@@ -88,15 +88,18 @@ public class RenameMessage extends DOMMessage {
         try {
             fcgo = player.getOurFreeColGameObject(id, FreeColGameObject.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!(fcgo instanceof Nameable)) {
-            return DOMMessage.clientError("Not a nameable: " + id);
+            return serverPlayer.clientError("Not a nameable: " + id)
+                .build(serverPlayer);
         }
 
         // Proceed to rename.
         return server.getInGameController()
-            .renameObject(serverPlayer, (Nameable)fcgo, newName);
+            .renameObject(serverPlayer, (Nameable)fcgo, newName)
+            .build(serverPlayer);
     }
 
     /**

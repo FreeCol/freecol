@@ -183,7 +183,8 @@ public class MonarchActionMessage extends DOMMessage {
 
         // Try to resolve the action.
         return server.getInGameController()
-            .monarchAction(serverPlayer, action, getResult());
+            .monarchAction(serverPlayer, action, getResult())
+            .build(serverPlayer);
     }
 
     /**

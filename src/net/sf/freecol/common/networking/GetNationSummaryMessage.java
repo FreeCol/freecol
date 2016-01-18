@@ -106,7 +106,8 @@ public class GetNationSummaryMessage extends DOMMessage {
 
         Player player = getPlayer(game);
         if (player == null) {
-            return DOMMessage.clientError("Not a player: " + playerId);
+            return serverPlayer.clientError("Not a player: " + playerId)
+                .build(serverPlayer);
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
             return null;
         }

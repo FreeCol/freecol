@@ -89,14 +89,16 @@ public class AttackMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         MoveType moveType = unit.getMoveType(tile);
@@ -105,22 +107,25 @@ public class AttackMessage extends DOMMessage {
             || moveType.isAttack()) {
             ; // OK
         } else {
-            return DOMMessage.clientError("Illegal attack move for: " + unitId
+            return serverPlayer.clientError("Illegal attack move for: " + unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
-                + " to: " + tile.getId());
+                + " to: " + tile.getId())
+                .build(serverPlayer);
         }
 
         Unit defender = tile.getDefendingUnit(unit);
         if (defender == null) {
-            return DOMMessage.clientError("Could not find defender"
+            return serverPlayer.clientError("Could not find defender"
                 + " in tile: " + tile.getId()
-                + " from: " + unit.getLocation().getId());
+                + " from: " + unit.getLocation().getId())
+                .build(serverPlayer);
         }
 
         // Proceed to attack.
         return server.getInGameController()
-            .combat(serverPlayer, unit, defender, null);
+            .combat(serverPlayer, unit, defender, null)
+            .build(serverPlayer);
     }
 
     /**

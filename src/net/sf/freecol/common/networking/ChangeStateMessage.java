@@ -87,7 +87,8 @@ public class ChangeStateMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         // Do not test if it is on the map, units in Europe can change state.
 
@@ -95,17 +96,20 @@ public class ChangeStateMessage extends DOMMessage {
         try {
             state = Enum.valueOf(UnitState.class, stateString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.checkSetState(state)) {
-            return DOMMessage.clientError("Unit " + unitId
+            return serverPlayer.clientError("Unit " + unitId
                 + " can not change state: " + unit.getState().toString()
-                + " -> " + stateString);
+                + " -> " + stateString)
+                .build(serverPlayer);
         }
 
         // Proceed to change.
         return server.getInGameController()
-            .changeState(serverPlayer, unit, state);
+            .changeState(serverPlayer, unit, state)
+            .build(serverPlayer);
     }
 
     /**

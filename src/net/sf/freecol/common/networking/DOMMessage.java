@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.util.Introspector;
+import net.sf.freecol.server.control.ChangeSet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -292,20 +293,6 @@ public class DOMMessage {
             result.appendChild(doc.importNode(e, true));
         }
         return result;
-    }
-
-    /**
-     * Creates an error message in response to bad client data.
-     *
-     * @param message The error in plain text.
-     * @return The root <code>Element</code> of the error message.
-     */
-    public static Element clientError(String message) {
-        logger.warning(message);
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            Thread.dumpStack();
-        }
-        return new ErrorMessage("server.reject", message).toXMLElement();
     }
 
     /**

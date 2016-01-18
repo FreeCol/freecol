@@ -142,7 +142,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
                 continue;
             }
         }
-        if (errors != null && !errors.isEmpty()) return DOMMessage.clientError(errors);
+        if (errors != null && !errors.isEmpty()) return serverPlayer.clientError(errors)
+                                                     .build(serverPlayer);
         
         List<TradeRoute> newRoutes = new ArrayList<>();
         for (TradeRoute tradeRoute : tradeRoutes) {
@@ -156,7 +157,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
 
         // Proceed to set trade routes
         return server.getInGameController()
-            .setTradeRoutes(serverPlayer, newRoutes);
+            .setTradeRoutes(serverPlayer, newRoutes)
+            .build(serverPlayer);
     }
 
     /**

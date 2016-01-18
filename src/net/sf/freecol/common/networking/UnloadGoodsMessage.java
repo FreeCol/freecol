@@ -92,37 +92,44 @@ public class UnloadGoodsMessage extends DOMMessage {
         try {
             carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return DOMMessage.clientError("Not a goods carrier: " + carrierId);
+            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
+                .build(serverPlayer);
         }
         // Do not check location, carriers can dump goods anywhere
 
         GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
         if (type == null) {
-            return DOMMessage.clientError("Not a goods type: " + goodsTypeId);
+            return serverPlayer.clientError("Not a goods type: " + goodsTypeId)
+                .build(serverPlayer);
         }
 
         int amount;
         try {
             amount = Integer.parseInt(amountString);
         } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad amount: " + amountString);
+            return serverPlayer.clientError("Bad amount: " + amountString)
+                .build(serverPlayer);
         }
         if (amount <= 0) {
-            return DOMMessage.clientError("Amount must be positive: "
-                                       + amountString);
+            return serverPlayer.clientError("Amount must be positive: "
+                + amountString)
+                .build(serverPlayer);
         }
         int present = carrier.getGoodsCount(type);
         if (present < amount) {
-            return DOMMessage.clientError("Attempt to unload " + amount
-                + " " + type.getId() + " but only " + present + " present.");
+            return serverPlayer.clientError("Attempt to unload " + amount
+                + " " + type.getId() + " but only " + present + " present.")
+                .build(serverPlayer);
         }
 
         // Try to unload.
         return server.getInGameController()
-            .unloadGoods(serverPlayer, type, amount, carrier);
+            .unloadGoods(serverPlayer, type, amount, carrier)
+            .build(serverPlayer);
     }
 
     /**

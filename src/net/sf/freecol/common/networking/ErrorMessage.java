@@ -59,6 +59,16 @@ public class ErrorMessage extends DOMMessage {
     }
 
     /**
+     * Create a new <code>ErrorMessage</code> with the standard client
+     * error message identifier and given message.
+     *
+     * @param message The message.
+     */
+    public ErrorMessage(String message) {
+        this("server.reject", message);
+    }
+    
+    /**
      * Create a new <code>ErrorMessage</code> from a
      * supplied element.
      *

@@ -87,19 +87,22 @@ public class JoinColonyMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(builderId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Colony colony;
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Try to buy.
         return server.getInGameController()
-            .joinColony(serverPlayer, unit, colony);
+            .joinColony(serverPlayer, unit, colony)
+            .build(serverPlayer);
     }
 
     /**

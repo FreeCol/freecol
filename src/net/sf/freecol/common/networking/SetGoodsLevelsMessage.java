@@ -87,12 +87,14 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Proceed to set.
         return server.getInGameController()
-            .setGoodsLevels(serverPlayer, colony, data);
+            .setGoodsLevels(serverPlayer, colony, data)
+            .build(serverPlayer);
     }
 
     /**

@@ -91,44 +91,53 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile = unit.getTile();
         if (tile == null) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+                .build(serverPlayer);
         } else if (!unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
-            return DOMMessage.clientError("Unit can not improve tiles: "
-                + unitId);
+            return serverPlayer.clientError("Unit can not improve tiles: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         TileImprovementType type = server.getSpecification()
             .getTileImprovementType(improvementId);
         TileImprovement improvement;
         if (type == null) {
-            return DOMMessage.clientError("Not a tile improvement type: "
-                + improvementId);
+            return serverPlayer.clientError("Not a tile improvement type: "
+                + improvementId)
+                .build(serverPlayer);
         } else if (type.isNatural()) {
-            return DOMMessage.clientError("ImprovementType must not be natural: "
-                + improvementId);
+            return serverPlayer.clientError("ImprovementType must not be natural: "
+                + improvementId)
+                .build(serverPlayer);
         } else if (!type.isTileTypeAllowed(tile.getType())) {
-            return DOMMessage.clientError("ImprovementType not allowed on tile: "
-                + improvementId);
+            return serverPlayer.clientError("ImprovementType not allowed on tile: "
+                + improvementId)
+                .build(serverPlayer);
         } else if ((improvement = tile.getTileImprovement(type)) == null) {
             if (!type.isWorkerAllowed(unit)) {
-                return DOMMessage.clientError("Unit can not create improvement: "
-                    + improvementId);
+                return serverPlayer.clientError("Unit can not create improvement: "
+                    + improvementId)
+                    .build(serverPlayer);
             }
         } else { // Has improvement, check if worker can contribute to it
             if (!improvement.isWorkerAllowed(unit)) {
-                return DOMMessage.clientError("Unit can not work on improvement: "
-                    + improvementId);
+                return serverPlayer.clientError("Unit can not work on improvement: "
+                    + improvementId)
+                    .build(serverPlayer);
             }
         }
 
         // Proceed to change.
         return server.getInGameController()
-            .changeWorkImprovementType(serverPlayer, unit, type);
+            .changeWorkImprovementType(serverPlayer, unit, type)
+            .build(serverPlayer);
     }
 
     /**

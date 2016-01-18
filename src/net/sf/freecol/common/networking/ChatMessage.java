@@ -122,8 +122,9 @@ public class ChatMessage extends DOMMessage {
         /* Do not trust the client-supplied sender name */
         sender = serverPlayer.getId();
 
-        return server.getInGameController().chat(serverPlayer, message,
-                                                 privateChat);
+        server.getInGameController().chat(serverPlayer, message,
+                                          privateChat);
+        return null;
     }
 
     /**

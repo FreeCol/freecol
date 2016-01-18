@@ -98,14 +98,16 @@ public class EmbarkMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Location sourceLocation = unit.getLocation();
@@ -114,35 +116,40 @@ public class EmbarkMessage extends DOMMessage {
             // carrier in the same location as the carrier, or they
             // must be on the same tile.
             if (!carrier.isAtLocation(sourceLocation)) {
-                return DOMMessage.clientError("Unit " + unitId
+                return serverPlayer.clientError("Unit " + unitId
                     + " at " + sourceLocation.getId()
                     + " and carrier " + carrierId
                     + " at " + carrier.getLocation().getId()
-                    + " are not co-located.");
+                    + " are not co-located.")
+                    .build(serverPlayer);
             }
         } else {
             // Units have to be on the map and have moves left if a
             // move is involved.
             if (unit.getMovesLeft() <= 0) {
-                return DOMMessage.clientError("Unit has no moves left: "
-                    + unitId);
+                return serverPlayer.clientError("Unit has no moves left: "
+                    + unitId)
+                    .build(serverPlayer);
             }
 
             Tile destinationTile = null;
             try {
                 destinationTile = unit.getNeighbourTile(directionString);
             } catch (Exception e) {
-                return DOMMessage.clientError(e.getMessage());
+                return serverPlayer.clientError(e.getMessage())
+                    .build(serverPlayer);
             }
             if (carrier.getTile() != destinationTile) {
-                return DOMMessage.clientError("Carrier: " + carrierId
-                    + " is not at destination tile: " + destinationTile);
+                return serverPlayer.clientError("Carrier: " + carrierId
+                    + " is not at destination tile: " + destinationTile)
+                    .build(serverPlayer);
             }
         }
 
         // Proceed to embark
         return server.getInGameController()
-            .embarkUnit(serverPlayer, unit, carrier);
+            .embarkUnit(serverPlayer, unit, carrier)
+            .build(serverPlayer);
     }
 
     /**

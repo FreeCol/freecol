@@ -80,18 +80,22 @@ public class PutOutsideColonyMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.hasTile()) {
-            return DOMMessage.clientError("Unit is not on the map: " + unitId);
+            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+                .build(serverPlayer);
         } else if (unit.getColony() == null) {
-            return DOMMessage.clientError("Unit is not in a colony: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not in a colony: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         // Proceed to put outside.
         return server.getInGameController()
-            .putOutsideColony(serverPlayer, unit);
+            .putOutsideColony(serverPlayer, unit)
+            .build(serverPlayer);
     }
 
     /**

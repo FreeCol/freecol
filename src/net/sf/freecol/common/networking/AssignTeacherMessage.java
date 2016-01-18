@@ -86,39 +86,48 @@ public class AssignTeacherMessage extends DOMMessage {
         try {
             student = player.getOurFreeColGameObject(studentId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Unit teacher;
         try {
             teacher = player.getOurFreeColGameObject(teacherId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         if (student.getColony() == null) {
-            return DOMMessage.clientError("Student not in colony: "
-                + studentId);
+            return serverPlayer.clientError("Student not in colony: "
+                + studentId)
+                .build(serverPlayer);
         } else if (!student.isInColony()) {
-            return DOMMessage.clientError("Student not working colony: "
-                + studentId);
+            return serverPlayer.clientError("Student not working colony: "
+                + studentId)
+                .build(serverPlayer);
         } else if (teacher.getColony() == null) {
-            return DOMMessage.clientError("Teacher not in colony: "
-                + teacherId);
+            return serverPlayer.clientError("Teacher not in colony: "
+                + teacherId)
+                .build(serverPlayer);
         } else if (!teacher.getColony().canTrain(teacher)) {
-            return DOMMessage.clientError("Teacher can not teach: "
-                + teacherId);
+            return serverPlayer.clientError("Teacher can not teach: "
+                + teacherId)
+                .build(serverPlayer);
         } else if (student.getColony() != teacher.getColony()) {
-            return DOMMessage.clientError("Student and teacher not in same colony: "
-                + studentId);
+            return serverPlayer.clientError("Student and teacher not in same colony: "
+                + studentId)
+                .build(serverPlayer);
         } else if (!student.canBeStudent(teacher)) {
-            return DOMMessage.clientError("Student can not be taught by teacher: "
-                + studentId);
+            return serverPlayer.clientError("Student can not be taught by teacher: "
+                + studentId)
+                .build(serverPlayer);
         }
 
         // Proceed to assign.
         return server.getInGameController()
-            .assignTeacher(serverPlayer, student, teacher);
+            .assignTeacher(serverPlayer, student, teacher)
+            .build(serverPlayer);
     }
 
     /**

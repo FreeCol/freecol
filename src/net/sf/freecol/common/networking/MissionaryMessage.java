@@ -98,57 +98,67 @@ public class MissionaryMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Tile tile;
         try {
             tile = unit.getNeighbourTile(directionString);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         ServerIndianSettlement is
             = (ServerIndianSettlement)tile.getIndianSettlement();
         if (is == null) {
-            return DOMMessage.clientError("There is no native settlement at: "
-                + tile.getId());
+            return serverPlayer.clientError("There is no native settlement at: "
+                + tile.getId())
+                .build(serverPlayer);
         }
 
         Unit missionary = is.getMissionary();
         if (denounce) {
             if (missionary == null) {
-                return DOMMessage.clientError("Denouncing an empty mission at: "
-                    + is.getId());
+                return serverPlayer.clientError("Denouncing an empty mission at: "
+                    + is.getId())
+                    .build(serverPlayer);
             } else if (missionary.getOwner() == player) {
-                return DOMMessage.clientError("Denouncing our own missionary at: "
-                    + is.getId());
+                return serverPlayer.clientError("Denouncing our own missionary at: "
+                    + is.getId())
+                    .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
-                return DOMMessage.clientError("Unit lacks denouncement ability: "
-                    + unitId);
+                return serverPlayer.clientError("Unit lacks denouncement ability: "
+                    + unitId)
+                    .build(serverPlayer);
             }
         } else {
             if (missionary != null) {
-                return DOMMessage.clientError("Establishing extra mission at: "
-                    + is.getId());
+                return serverPlayer.clientError("Establishing extra mission at: "
+                    + is.getId())
+                    .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
-                return DOMMessage.clientError("Unit lacks establish mission ability: "
-                    + unitId);
+                return serverPlayer.clientError("Unit lacks establish mission ability: "
+                    + unitId)
+                    .build(serverPlayer);
             }
         }
 
         MoveType type = unit.getMoveType(is.getTile());
         if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
-            return DOMMessage.clientError("Unable to enter " + is.getName()
-                + ": " + type.whyIllegal());
+            return serverPlayer.clientError("Unable to enter " + is.getName()
+                + ": " + type.whyIllegal())
+                .build(serverPlayer);
         }
 
         // Valid, proceed to denounce/establish.
-        return (denounce)
+        return ((denounce)
             ? server.getInGameController()
                 .denounceMission(serverPlayer, unit, is)
             : server.getInGameController()
-                .establishMission(serverPlayer, unit, is);
+                .establishMission(serverPlayer, unit, is))
+            .build(serverPlayer);
     }
 
     /**

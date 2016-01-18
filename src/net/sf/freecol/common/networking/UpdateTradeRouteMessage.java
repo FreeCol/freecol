@@ -78,7 +78,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
 
         if (tradeRoute == null || tradeRoute.getId() == null
             || !SetTradeRoutesMessage.hasPrefix(tradeRoute)) {
-            return DOMMessage.clientError("Bogus route");
+            return serverPlayer.clientError("Bogus route")
+                .build(serverPlayer);
         }
 
         String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
@@ -87,7 +88,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
             realRoute = serverPlayer.getOurFreeColGameObject(id, 
                 TradeRoute.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         realRoute.updateFrom(tradeRoute);

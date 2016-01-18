@@ -81,7 +81,8 @@ public class PayArrearsMessage extends DOMMessage {
 
         // Proceed to pay.
         return server.getInGameController()
-            .payArrears(serverPlayer, goodsType);
+            .payArrears(serverPlayer, goodsType)
+            .build(serverPlayer);
     }
 
     /**

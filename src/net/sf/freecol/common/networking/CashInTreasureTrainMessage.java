@@ -80,19 +80,23 @@ public class CashInTreasureTrainMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (!unit.canCarryTreasure()) {
-            return DOMMessage.clientError("Can not cash in unit " + unitId
-                + ", can not carry treasure.");
+            return serverPlayer.clientError("Can not cash in unit " + unitId
+                + ", can not carry treasure.")
+                .build(serverPlayer);
         } else if (!unit.canCashInTreasureTrain()) {
-            return DOMMessage.clientError("Can not cash in unit " + unitId
-                + ", unsuitable location.");
+            return serverPlayer.clientError("Can not cash in unit " + unitId
+                + ", unsuitable location.")
+                .build(serverPlayer);
         }
 
         // Cash in.
         return server.getInGameController()
-            .cashInTreasureTrain(serverPlayer, unit);
+            .cashInTreasureTrain(serverPlayer, unit)
+            .build(serverPlayer);
     }
 
     /**

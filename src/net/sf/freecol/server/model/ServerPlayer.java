@@ -94,6 +94,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -344,6 +345,24 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 break;
             }
         }
+    }
+
+    /**
+     * Convenience function to create a client error message, log it,
+     * and wrap it into a change set.
+     *
+     * @param message The non-i18n message.
+     * @return A new <code>ChangeSet</code>.
+     */
+    public ChangeSet clientError(String message) {
+        logger.warning(message);
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            Thread.dumpStack();
+        }
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(this), ChangeSet.ChangePriority.CHANGE_NORMAL,
+               new ErrorMessage(message));
+        return cs;
     }
 
     /**

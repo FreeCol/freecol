@@ -131,25 +131,29 @@ public class DeliverGiftMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         Settlement settlement;
         try {
             settlement = unit.getAdjacentSettlementSafely(settlementId);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Make sure we are trying to deliver something that is there
         if (goods.getLocation() != unit) {
-            return DOMMessage.clientError("Gift " + goods.getId()
-                + " is not with unit " + unitId);
+            return serverPlayer.clientError("Gift " + goods.getId()
+                + " is not with unit " + unitId)
+                .build(serverPlayer);
         }
 
         // Proceed to deliver.
         return server.getInGameController()
-            .deliverGiftToSettlement(serverPlayer, unit, settlement, goods);
+            .deliverGiftToSettlement(serverPlayer, unit, settlement, goods)
+            .build(serverPlayer);
     }
 
     /**

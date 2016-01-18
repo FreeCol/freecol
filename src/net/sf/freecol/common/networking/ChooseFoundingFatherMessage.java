@@ -134,13 +134,16 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         final FoundingFather ff = getFather(game);
 
         if (!serverPlayer.canRecruitFoundingFather()) {
-            return DOMMessage.clientError("Player can not recruit fathers: "
-                + serverPlayer.getId());
+            return serverPlayer.clientError("Player can not recruit fathers: "
+                + serverPlayer.getId())
+                .build(serverPlayer);
         } else if (ff == null) {
-            return DOMMessage.clientError("No founding father selected");
+            return serverPlayer.clientError("No founding father selected")
+                .build(serverPlayer);
         } else if (!offered.contains(ff)) {
-            return DOMMessage.clientError("Founding father not offered: "
-                + ff.getId());
+            return serverPlayer.clientError("Founding father not offered: "
+                + ff.getId())
+                .build(serverPlayer);
         }
 
         serverPlayer.updateCurrentFather(ff);

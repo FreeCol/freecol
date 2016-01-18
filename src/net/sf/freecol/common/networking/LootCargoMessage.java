@@ -134,7 +134,8 @@ public class LootCargoMessage extends DOMMessage {
         try {
             winner = getUnit(game);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         // Do not check loserId, as it might have sunk.  It is enough
         // that the attacker knows it.  Similarly the server is better
@@ -142,7 +143,8 @@ public class LootCargoMessage extends DOMMessage {
 
         // Try to loot.
         return server.getInGameController()
-            .lootCargo(serverPlayer, winner, loserId, goods);
+            .lootCargo(serverPlayer, winner, loserId, goods)
+            .build(serverPlayer);
     }
 
     /**

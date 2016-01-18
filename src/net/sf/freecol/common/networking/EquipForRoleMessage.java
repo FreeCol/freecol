@@ -92,36 +92,43 @@ public class EquipForRoleMessage extends DOMMessage {
         try {
             unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
-            return DOMMessage.clientError(e.getMessage());
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
         if (unit.isInEurope()) {
             ; // Always OK
         } else if (!unit.hasTile()) {
-            return DOMMessage.clientError("Unit is not on the map: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not on the map: "
+                + unitId)
+                .build(serverPlayer);
         } else if (unit.getSettlement() == null) {
-            return DOMMessage.clientError("Unit is not in a settlement: "
-                + unitId);
+            return serverPlayer.clientError("Unit is not in a settlement: "
+                + unitId)
+                .build(serverPlayer);
         }
 
         Role role = game.getSpecification().getRole(roleId);
         if (role == null) {
-            return DOMMessage.clientError("Not a role: " + roleId);
+            return serverPlayer.clientError("Not a role: " + roleId)
+                .build(serverPlayer);
         }
         int count;
         try {
             count = Integer.parseInt(roleCount);
         } catch (NumberFormatException nfe) {
-            return DOMMessage.clientError("Role count is not an integer: " +
-                roleCount);
+            return serverPlayer.clientError("Role count is not an integer: " +
+                roleCount)
+                .build(serverPlayer);
         }
         if (count < 0 || count > role.getMaximumCount()) {
-            return DOMMessage.clientError("Invalid role count: " + roleCount);
+            return serverPlayer.clientError("Invalid role count: " + roleCount)
+                .build(serverPlayer);
         }
 
         // Proceed to equip.
         return server.getInGameController()
-            .equipForRole(serverPlayer, unit, role, count); 
+            .equipForRole(serverPlayer, unit, role, count)
+            .build(serverPlayer);
     }
 
     /**

@@ -94,7 +94,8 @@ public class ClaimLandMessage extends DOMMessage {
 
         Tile tile = game.getFreeColGameObject(tileId, Tile.class);
         if (tile == null) {
-            return DOMMessage.clientError("Not a file: " + tileId);
+            return serverPlayer.clientError("Not a file: " + tileId)
+                .build(serverPlayer);
         }
 
         Unit unit = null;
@@ -108,24 +109,28 @@ public class ClaimLandMessage extends DOMMessage {
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {
-                return DOMMessage.clientError("Unit not at tile: " + tileId);
+                return serverPlayer.clientError("Unit not at tile: " + tileId)
+                    .build(serverPlayer);
             }
         } else if (settlement != null) {
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
-                return DOMMessage.clientError("Settlement can not claim tile: "
-                    + tileId);
+                return serverPlayer.clientError("Settlement can not claim tile: "
+                    + tileId)
+                    .build(serverPlayer);
             }
         } else { // ...but not both of them.
-            return DOMMessage.clientError("Not a unit or settlement: "
-                + claimantId);
+            return serverPlayer.clientError("Not a unit or settlement: "
+                + claimantId)
+                .build(serverPlayer);
         }
 
         int price;
         try {
             price = Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
-            return DOMMessage.clientError("Bad price: " + priceString);
+            return serverPlayer.clientError("Bad price: " + priceString)
+                .build(serverPlayer);
         }
 
         // Request is well formed, but there are more possibilities...
@@ -137,8 +142,9 @@ public class ClaimLandMessage extends DOMMessage {
         } else if (owner == player) { // capture vacant colony tiles only
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
-                return DOMMessage.clientError("Can not claim tile "
-                    + tile.getId() + ": already owned.");
+                return serverPlayer.clientError("Can not claim tile "
+                    + tile.getId() + ": already owned.")
+                    .build(serverPlayer);
             }
             price = 0;
         } else if (owner.isEuropean()) {
@@ -146,8 +152,9 @@ public class ClaimLandMessage extends DOMMessage {
                 || tile.getOwningSettlement() == settlement) { // pre-attached
                 price = 0;
             } else { // must fail
-                return DOMMessage.clientError("Can not claim tile " 
-                    + tile.getId() + ": European owners will not sell.");
+                return serverPlayer.clientError("Can not claim tile " 
+                    + tile.getId() + ": European owners will not sell.")
+                    .build(serverPlayer);
             }
         } else { // natives
             NoClaimReason why = player.canClaimForSettlementReason(tile);
@@ -157,19 +164,22 @@ public class ClaimLandMessage extends DOMMessage {
             case NATIVES:
                 if (price >= 0) {
                     if (price < value) {
-                        return DOMMessage.clientError("Can not claim tile "
-                            + tile.getId() + ": insufficient offer.");
+                        return serverPlayer.clientError("Can not claim tile "
+                            + tile.getId() + ": insufficient offer.")
+                            .build(serverPlayer);
                     }
                     if (!player.checkGold(price)) {
-                        return DOMMessage.clientError("Can not pay for tile: "
-                            + tile.getId() + ": insufficient funds.");
+                        return serverPlayer.clientError("Can not pay for tile: "
+                            + tile.getId() + ": insufficient funds.")
+                            .build(serverPlayer);
                     }
                     // Succeed, sufficient offer
                 } // else succeed, stealing
                 break;
             default: // Fail
-                return DOMMessage.clientError("Can not claim tile "
-                    + tile.getId() + ": " + why);
+                return serverPlayer.clientError("Can not claim tile "
+                    + tile.getId() + ": " + why)
+                    .build(serverPlayer);
             }
         }
 
@@ -177,7 +187,9 @@ public class ClaimLandMessage extends DOMMessage {
         // required for permission checking above.  Settlement is required
         // to set owning settlement.
         return server.getInGameController()
-            .claimLand(serverPlayer, tile, settlement, price);
+            .claimLand(serverPlayer, tile, settlement, price)
+
+            .build(serverPlayer);
     }
 
     /**
