@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -224,7 +225,14 @@ public class DOMMessage {
         add(msg.toXMLElement());
         return this;
     }
-        
+    public void clearChildren() {
+        Element element = getElement();
+        NodeList nl = element.getChildNodes();
+        for (int i = nl.getLength() - 1; i >= 0; i--) {
+            element.removeChild(nl.item(i));
+        }
+    }
+
     /**
      * Dummy serialization stub.
      * Must be overridden by subclasses.
@@ -320,6 +328,34 @@ public class DOMMessage {
         return null;
     }
 
+    /**
+     * Convenience method to extract a child element of a particular class.
+     *
+     * @param game The <code>Game</code> to instantiate within.
+     * @param element The parent <code>Element</code>.
+     * @param index The index of the child element.
+     * @param returnClass The expected class of the child.
+     * @return A new instance of the return class, or null on error.
+     */
+    public static <T extends FreeColGameObject> T getChild(Game game,
+        Element element, int index, Class<T> returnClass) {
+        T ret = null;
+        NodeList nl = element.getChildNodes();
+        Element e;
+        if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
+            ret = game.getFreeColGameObject(FreeColObject.readId(e), returnClass);
+            if (ret == null) { // New instance required
+                try {
+                    ret = game.newInstance(returnClass, false);
+                } catch (IOException ioe) {
+                    ret = null;
+                }
+            }
+            if (ret != null) ret.readFromXMLElement(e);
+        }
+        return ret;
+    }
+            
     /**
      * Get a boolean attribute value from an element.
      *
