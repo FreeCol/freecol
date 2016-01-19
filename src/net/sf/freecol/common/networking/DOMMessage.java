@@ -128,7 +128,7 @@ public class DOMMessage {
         Object[] params = { game, element };
         DOMMessage message;
         try {
-            message = (DOMMessage)Introspector.instantiate(tag, types, params);
+            message = Introspector.instantiate(DOMMessage.class, types, params);
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Instantiation fail for message type:"
                 + tag, e);

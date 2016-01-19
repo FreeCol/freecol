@@ -303,7 +303,23 @@ public class Introspector {
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Unable to find class " + tag, e);
         }
-        Constructor<?> constructor;
+        return instantiate(messageClass, types, params);
+    }
+
+    /**
+     * Constructs a new instance of an object of a class specified by name,
+     * with supplied parameters.
+     *
+     * @param messageClass The class to instantiate.
+     * @param types The argument types of the constructor to call.
+     * @param params The parameters to call the constructor with.
+     * @return The new instance.
+     * @exception IllegalArgumentException wraps all exceptional conditions.
+     */
+    public static <T> T instantiate(Class<T> messageClass, Class[] types,
+                                    Object[] params) {
+        final String tag = messageClass.getName();
+        Constructor<T> constructor;
         try {
             constructor = messageClass.getDeclaredConstructor(types);
         } catch (NoSuchMethodException | SecurityException e) {
@@ -312,7 +328,7 @@ public class Introspector {
             p += " )";
             throw new IllegalArgumentException(p, e);
         }
-        Object instance;
+        T instance;
         try {
             instance = constructor.newInstance(params);
         } catch (IllegalAccessException | IllegalArgumentException
