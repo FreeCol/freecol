@@ -81,7 +81,7 @@ public class NewTradeRouteMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         this.tradeRoute = server.getInGameController()
-            .getNewTradeRoute(serverPlayer);
+            .newTradeRoute(serverPlayer);
         return this.toXMLElement();
     }
 

@@ -216,7 +216,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     private void newRoute() {
         final Player player = getMyPlayer();
         final Unit u = this.unit;
-        final TradeRoute newRoute = igc().getNewTradeRoute(player);
+        final TradeRoute newRoute = igc().newTradeRoute(player);
         getGUI().showTradeRouteInputPanel(newRoute, () -> {
                 StringTemplate template = null;
                 if (newRoute.getName() == null) { // Cancelled

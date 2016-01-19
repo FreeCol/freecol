@@ -777,17 +777,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for creating a new trade route.
-     *
-     * @param game The <code>Game</code> to construct a reply message in.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean getNewTradeRoute(Game game) {
-        return askHandling(game,
-            new NewTradeRouteMessage(), null);
-    }
-
-    /**
      * Server query-response for asking about a players REF.
      *
      * @param game The <code>Game</code> to extract scores from.
@@ -990,6 +979,17 @@ public abstract class ServerAPI {
                                  String name) {
         return askHandling(unit.getGame(),
             new NewRegionNameMessage(region, tile, unit, name), null);
+    }
+
+    /**
+     * Server query-response for creating a new trade route.
+     *
+     * @param game The <code>Game</code> to construct a reply message in.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean newTradeRoute(Game game) {
+        return askHandling(game,
+            new NewTradeRouteMessage(), null);
     }
 
     /**

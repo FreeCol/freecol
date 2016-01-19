@@ -2772,22 +2772,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get a new trade route for a player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to get a trade
-     *    route for.
-     * @return The new <code>TradeRoute</code>.
-     */
-    public TradeRoute getNewTradeRoute(ServerPlayer serverPlayer) {
-        List<TradeRoute> routes = serverPlayer.getTradeRoutes();
-        TradeRoute route = new TradeRoute(getGame(), 
-            serverPlayer.getNameForTradeRoute(), serverPlayer);
-        routes.add(route);
-        return route;
-    }
-
-
-    /**
      * Get a list of abstract REF units for a player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to query the REF of.
@@ -3400,6 +3384,22 @@ public final class InGameController extends Controller {
 
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
+    }
+
+
+    /**
+     * Get a new trade route for a player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to get a trade
+     *    route for.
+     * @return The new <code>TradeRoute</code>.
+     */
+    public TradeRoute newTradeRoute(ServerPlayer serverPlayer) {
+        List<TradeRoute> routes = serverPlayer.getTradeRoutes();
+        TradeRoute route = new TradeRoute(getGame(), 
+            serverPlayer.getNameForTradeRoute(), serverPlayer);
+        routes.add(route);
+        return route;
     }
 
 

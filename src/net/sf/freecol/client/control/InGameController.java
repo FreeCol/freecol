@@ -3630,24 +3630,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Gets a new trade route for a player.
-     *
-     * Called from TradeRoutePanel.newRoute
-     *
-     * @param player The <code>Player</code> to get a new trade route for.
-     * @return A new <code>TradeRoute</code>.
-     */
-    public TradeRoute getNewTradeRoute(Player player) {
-        if (player == null) return null;
-
-        final int n = player.getTradeRoutes().size();
-        return (askServer().getNewTradeRoute(freeColClient.getGame())
-            && player.getTradeRoutes().size() == n + 1)
-            ? player.getTradeRoutes().get(n)
-            : null;
-    }
-
-    /**
      * Gathers information about the REF.
      *
      * Called from ReportNavalPanel, ReportMilitaryPanel
@@ -4241,6 +4223,24 @@ public final class InGameController implements NetworkConstants {
                     nameNewRegion(tile, unit, region, name);
                 });
         }
+    }
+
+    /**
+     * Gets a new trade route for a player.
+     *
+     * Called from TradeRoutePanel.newRoute
+     *
+     * @param player The <code>Player</code> to get a new trade route for.
+     * @return A new <code>TradeRoute</code>.
+     */
+    public TradeRoute newTradeRoute(Player player) {
+        if (player == null) return null;
+
+        final int n = player.getTradeRoutes().size();
+        return (askServer().newTradeRoute(freeColClient.getGame())
+            && player.getTradeRoutes().size() == n + 1)
+            ? player.getTradeRoutes().get(n)
+            : null;
     }
 
     /**
