@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -1783,25 +1784,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
-        if (buildings.isEmpty()) return null;
-        return getRandomMember(logger, "Select building for effect",
-                               buildings, random);
+        return (buildings.isEmpty()) ? null
+            : getRandomMember(logger, "Select building for effect",
+                              buildings, random);
     }
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
-        List<Unit> units = new ArrayList<>();
-        for (Unit unit : colony.getUnitList()) {
-            if (effect.appliesTo(unit.getType())) {
-                units.add(unit);
-            }
-        }
-        for (Unit unit : colony.getTile().getUnitList()) {
-            if (effect.appliesTo(unit.getType())) {
-                units.add(unit);
-            }
-        }
-        if (units.isEmpty()) return null;
-        return getRandomMember(logger, "Select unit for effect", units, random);
+        List<Unit> units
+            = transform(Stream.concat(colony.getUnitList().stream(),
+                                      colony.getTile().getUnitList().stream()),
+                u -> effect.appliesTo(u.getType()), Collectors.toList());
+        return (units.isEmpty()) ? null
+            : getRandomMember(logger, "Select unit for effect", units, random);
     }
 
     /**
@@ -3540,10 +3534,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Former missionary owner knows that the settlement fell.
         if (missionaryOwner != null) {
-            List<Tile> surrounding = new ArrayList<>();
-            for (Tile t : centerTile.getSurroundingTiles(1, radius)) {
-                if (!owned.contains(t)) surrounding.add(t);
-            }
+            List<Tile> surrounding = transform(centerTile.getSurroundingTiles(1, radius),
+                t -> !owned.contains(t), Collectors.toList());
             cs.add(See.only(missionaryOwner), owned);
             cs.add(See.only(missionaryOwner), surrounding);
             cs.addRemove(See.only(missionaryOwner), centerTile, settlement);
