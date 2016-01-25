@@ -769,17 +769,20 @@ public class Map extends FreeColGameObject implements Location {
      * Destination argument test for path searches.  Find the actual
      * destination of a path.
      *
+     * @param unit An optional <code>Unit</code> to search for.
      * @param end The candidate end <code>Location</code>.
      * @return The actual end location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
-    private Location findRealEnd(Location end) {
+    private Location findRealEnd(Unit unit, Location end) {
         if (end == null) {
             throw new IllegalArgumentException("Null end.");
         } else if (end instanceof Europe) {
             return end;
         } else if (end.getTile() != null) {
             return end.getTile();
+        } else if (unit != null) {
+            return unit.resolveDestination();
         } else {
             throw new IllegalArgumentException("Invalid end: " + end);
         }
@@ -950,7 +953,7 @@ public class Map extends FreeColGameObject implements Location {
         final Location realStart = findRealStart(unit, start, carrier);
         final Location realEnd;
         try {
-            realEnd = findRealEnd(end);
+            realEnd = findRealEnd(unit, end);
         } catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("Path fail: " + unit
                 + " from " + start + " to " + end + " with " + carrier, iae);
