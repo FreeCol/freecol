@@ -25,7 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +42,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
 
@@ -144,28 +147,23 @@ public class HighScore extends FreeColObject {
      */
     public HighScore(Player player, Date theDate) {
         Game game = player.getGame();
-        date = theDate;
-        retirementTurn = game.getTurn().getNumber();
-        score = player.getScore();
-        for (ScoreLevel someLevel : ScoreLevel.values()) {
-            if (score >= someLevel.getMinimumScore()) {
-                level = someLevel;
-                break;
-            }
-        }
-        playerName = player.getName();
-        nationId = player.getNationId();
-        nationTypeId = player.getNationType().getId();
-        colonies = player.getColonies().size();
-        units = player.getUnits().size();
-        if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
-            independenceTurn = game.getTurn().getNumber();
-            nationName = player.getIndependentNationName();
-        } else {
-            independenceTurn = -1;
-        }
-        difficulty = game.getSpecification().getDifficultyLevel();
-        newLandName = player.getNewLandName();
+        this.date = theDate;
+        this.retirementTurn = game.getTurn().getNumber();
+        this.score = player.getScore();
+        this.level = find(ScoreLevel.values(),
+                          sl -> sl.getMinimumScore() <= this.score,
+                          ScoreLevel.PARASITIC_WORM);
+        this.playerName = player.getName();
+        this.nationId = player.getNationId();
+        this.nationTypeId = player.getNationType().getId();
+        this.colonies = player.getColonies().size();
+        this.units = player.getUnits().size();
+        this.independenceTurn = (player.getPlayerType()
+            == Player.PlayerType.INDEPENDENT) ? game.getTurn().getNumber()
+            : -1;
+        this.nationName = Messages.message(player.getNationLabel());
+        this.difficulty = game.getSpecification().getDifficultyLevel();
+        this.newLandName = player.getNewLandName();
     }
 
     /**
@@ -265,7 +263,7 @@ public class HighScore extends FreeColObject {
      *
      * @return The independent nation name.
      */
-    public final String getNationLabel() {
+    public final String getNationName() {
         return nationName;
     }
 
