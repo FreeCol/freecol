@@ -56,8 +56,6 @@ final class ReceivingThread extends Thread {
 
         public static final int BUFFER_SIZE = 16384;
 
-        private static final char END_OF_STREAM = '\n';
-
         private static final int EOS_RESULT = -1;
 
         private final InputStream in;
@@ -131,8 +129,9 @@ final class ReceivingThread extends Thread {
          * @param b The buffer to put the data in.
          * @param off The offset to use when writing the data.
          * @param len The maximum number of bytes to read.
-         * @return The actual number of bytes read, or EOS_RESULT if the 
-         *     message has ended ({@link #END_OF_STREAM} was encountered).
+         * @return The actual number of bytes read, or EOS_RESULT if
+         *     the message has ended
+         *     ({@link #Connection.END_OF_STREAM} was encountered).
          */
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
@@ -148,7 +147,7 @@ final class ReceivingThread extends Thread {
                 byte value = buffer[this.bStart];
                 this.bStart++;
                 this.bSize--;
-                if (value == END_OF_STREAM) {
+                if (value == Connection.END_OF_STREAM) {
                     this.wait = true;
                     break;
                 }

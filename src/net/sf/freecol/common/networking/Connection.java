@@ -61,6 +61,8 @@ public class Connection implements Closeable {
 
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
+    public static final byte END_OF_STREAM = '\n';
+    
     public static final String DISCONNECT_TAG = "disconnect";
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
     public static final String QUESTION_TAG = "question";
@@ -334,7 +336,7 @@ public class Connection implements Closeable {
             } catch (TransformerException e) {
                 te = e;
             }
-            this.out.write('\n');
+            this.out.write(END_OF_STREAM);
             this.out.flush();
         }
         log(element, true);
