@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -39,6 +40,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.UnitListOption;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -191,15 +193,11 @@ public class ServerEurope extends Europe implements ServerModelObject {
      */
     public List<RandomChoice<UnitType>> generateRecruitablesList() {
         final Player owner = getOwner();
-        List<RandomChoice<UnitType>> recruits = new ArrayList<>();
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.isRecruitable()
-                && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
-                recruits.add(new RandomChoice<>(unitType,
-                        unitType.getRecruitProbability()));
-            }
-        }
-        return recruits;
+        return transform(getSpecification().getUnitTypeList(),
+            ut -> ut.isRecruitable()
+                && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, ut),
+            ut -> new RandomChoice<>(ut, ut.getRecruitProbability()),
+            Collectors.toList());
     }
 
     /**
