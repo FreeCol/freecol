@@ -59,6 +59,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
+import net.sf.freecol.common.networking.DOMMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -767,7 +768,7 @@ public abstract class FreeColObject
      * @return An XML-representation of this object.
      */
     public Element toXMLElement(Document document) {
-        return toXMLElement(document, WriteScope.toServer());
+        return DOMMessage.toXMLElement(this, document, WriteScope.toServer());
     }
 
     /**
@@ -786,87 +787,7 @@ public abstract class FreeColObject
         if (player == null) {
             throw new IllegalArgumentException("Null player for toXMLElement(doc, player)");
         }
-        return toXMLElement(document, WriteScope.toClient(player));
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param document The <code>Document</code>.
-     * @param writeScope The <code>WriteScope</code> to apply.
-     * @return An XML-representation of this object.
-     */
-    public Element toXMLElement(Document document, WriteScope writeScope) {
-        if (!writeScope.isValid()) {
-            throw new IllegalStateException("Invalid write scope: "
-                + writeScope);
-        }
-        return toXMLElement(document, writeScope, null);
-    }
-
-    /**
-     * This method writes a partial XML-representation of this object to
-     * an element using only the mandatory and specified fields.
-     *
-     * @param document The <code>Document</code>.
-     * @param fields The fields to write.
-     * @return An XML-representation of this object.
-     */
-    public Element toXMLElementPartial(Document document, String... fields) {
-        return toXMLElement(document, WriteScope.toServer(), fields);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param document The <code>Document</code>.
-     * @param writeScope The <code>WriteScope</code> to apply.
-     * @param fields An array of field names, which if non-null
-     *               indicates this should be a partial write.
-     * @return An XML-representation of this object.
-     */
-    private Element toXMLElement(Document document, WriteScope writeScope,
-                                 String[] fields) {
-        StringWriter sw = new StringWriter();
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(sw, writeScope);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
-            return null;
-        }
-
-        try {
-            if (fields == null) {
-                toXML(xw);
-            } else {
-                toXMLPartial(xw, fields);
-            }
-            xw.close();
-
-            DocumentBuilderFactory factory
-                = DocumentBuilderFactory.newInstance();
-            Document tempDocument = null;
-            try {
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
-                return (Element)document.importNode(tempDocument.getDocumentElement(), true);
-            } catch (IOException|ParserConfigurationException|SAXException ex) {
-                throw new RuntimeException("Parse fail", ex);
-            }
-        } catch (XMLStreamException e) {
-            throw new IllegalStateException("Error writing stream", e);
-        }
+        return DOMMessage.toXMLElement(this, document, WriteScope.toClient(player));
     }
 
 

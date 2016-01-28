@@ -860,7 +860,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(fcgo.toXMLElementPartial(doc, fields));
+            element.appendChild(DOMMessage.toXMLElementPartial(fcgo, doc, fields));
             return element;
         }
 
@@ -1014,12 +1014,12 @@ public class ChangeSet {
             // only visible if the deeper ownership test succeeds.
             if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
                 for (FreeColGameObject o : contents) {
-                    element.appendChild(o.toXMLElementPartial(doc));
+                    element.appendChild(DOMMessage.toXMLElementPartial(o, doc));
                 }
                 element.setAttribute("divert", (tile != null) ? tile.getId()
                                      : serverPlayer.getId());
             }
-            element.appendChild(fcgo.toXMLElementPartial(doc));
+            element.appendChild(DOMMessage.toXMLElementPartial(fcgo, doc));
             return element;
         }
 

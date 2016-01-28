@@ -41,6 +41,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -519,6 +520,92 @@ public class DOMMessage {
             }
         } catch (IOException|TransformerException ex) {
             throw new RuntimeException("Read failure", ex);
+        }
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param fco The <code>FreeColObject</code> to write.
+     * @param document The <code>Document</code>.
+     * @param writeScope The <code>WriteScope</code> to apply.
+     * @return An XML-representation of this object.
+     */
+    public static Element toXMLElement(FreeColObject fco, Document document,
+                                       WriteScope writeScope) {
+        if (!writeScope.isValid()) {
+            throw new IllegalStateException("Invalid write scope: "
+                + writeScope);
+        }
+        return toXMLElement(fco, document, writeScope, null);
+    }
+
+    /**
+     * This method writes a partial XML-representation of this object to
+     * an element using only the mandatory and specified fields.
+     *
+     * @param fco The <code>FreeColObject</code> to write.
+     * @param document The <code>Document</code>.
+     * @param fields The fields to write.
+     * @return An XML-representation of this object.
+     */
+    public static Element toXMLElementPartial(FreeColObject fco,
+                                              Document document,
+                                              String... fields) {
+        return toXMLElement(fco, document, WriteScope.toServer(), fields);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param fco The <code>FreeColObject</code> to write.
+     * @param document The <code>Document</code>.
+     * @param writeScope The <code>WriteScope</code> to apply.
+     * @param fields An array of field names, which if non-null
+     *               indicates this should be a partial write.
+     * @return An XML-representation of this object.
+     */
+    private static Element toXMLElement(FreeColObject fco, Document document,
+                                        WriteScope writeScope, String[] fields) {
+        StringWriter sw = new StringWriter();
+        FreeColXMLWriter xw = null;
+        try {
+            xw = new FreeColXMLWriter(sw, writeScope);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
+            return null;
+        }
+
+        try {
+            if (fields == null) {
+                fco.toXML(xw);
+            } else {
+                fco.toXMLPartial(xw, fields);
+            }
+            xw.close();
+
+            DocumentBuilderFactory factory
+                = DocumentBuilderFactory.newInstance();
+            Document tempDocument = null;
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));
+                return (Element)document.importNode(tempDocument.getDocumentElement(), true);
+            } catch (IOException|ParserConfigurationException|SAXException ex) {
+                throw new RuntimeException("Parse fail", ex);
+            }
+        } catch (XMLStreamException e) {
+            throw new IllegalStateException("Error writing stream", e);
         }
     }
 
