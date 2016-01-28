@@ -602,35 +602,26 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : (0.0f < naval && naval < 0.5f)
             ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
-        List<RandomChoice<UnitType>> rc = new ArrayList<>();
         if (randoms[cheatIndex++] < nNaval) {
-            rc.clear();
-            for (UnitType unitType : spec.getUnitTypeList()) {
-                if (unitType.hasAbility(Ability.NAVAL_UNIT)
-                    && unitType.isAvailableTo(player)
-                    && unitType.hasPrice()
-                    && unitType.isOffensive()) {
-                    int weight = 100000 / europe.getUnitPrice(unitType);
-                    rc.add(new RandomChoice<>(unitType, weight));
-                }
-            }
-            cheatUnit(rc, "offensive-naval", lb);
+            cheatUnit(transform(spec.getUnitTypeList(),
+                    ut -> ut.hasAbility(Ability.NAVAL_UNIT)
+                        && ut.isAvailableTo(player)
+                        && ut.hasPrice()
+                        && ut.isOffensive(),
+                    ut -> new RandomChoice<>(ut, 100000 / europe.getUnitPrice(ut)),
+                    Collectors.toList()), "offensive-naval", lb);
         }
         // Only cheat carriers if they have work to do.
         int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
             : -1;
         if (randoms[cheatIndex++] < nCarrier) {
-            rc.clear();
-            for (UnitType unitType : spec.getUnitTypeList()) {
-                if (unitType.hasAbility(Ability.NAVAL_UNIT)
-                    && unitType.isAvailableTo(player)
-                    && unitType.hasPrice()
-                    && unitType.getSpace() > 0) {
-                    int weight = 100000 / europe.getUnitPrice(unitType);
-                    rc.add(new RandomChoice<>(unitType, weight));
-                }
-            }
-            cheatUnit(rc, "transport-naval", lb);
+            cheatUnit(transform(spec.getUnitTypeList(),
+                    ut -> ut.hasAbility(Ability.NAVAL_UNIT)
+                        && ut.isAvailableTo(player)
+                        && ut.hasPrice()
+                        && ut.getSpace() > 0,
+                    ut -> new RandomChoice<>(ut, 100000 / europe.getUnitPrice(ut)),
+                    Collectors.toList()), "transport-naval", lb);
         }
 
         if (lb.grew("\n  Cheats: ")) lb.shrink(", ");
@@ -1154,15 +1145,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public List<WorkerWish> getWorkerWishesAt(Location loc, UnitType type) {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
-        if (demand == null) return Collections.<WorkerWish>emptyList();
-        List<WorkerWish> result = new ArrayList<>();
-        for (Wish w : demand) {
-            if (w instanceof WorkerWish
-                && ((WorkerWish)w).getUnitType() == type) {
-                result.add((WorkerWish)w);
-            }
-        }
-        return result;
+        return (demand == null) ? Collections.<WorkerWish>emptyList()
+            : transform(demand,
+                w -> w instanceof WorkerWish
+                    && ((WorkerWish)w).getUnitType() == type,
+                w -> (WorkerWish)w, Collectors.toList());
     }
 
     /**
@@ -1174,15 +1161,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      */
     public List<GoodsWish> getGoodsWishesAt(Location loc, GoodsType type) {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
-        if (demand == null) return Collections.<GoodsWish>emptyList();
-        List<GoodsWish> result = new ArrayList<>();
-        for (Wish w : demand) {
-            if (w instanceof GoodsWish
-                && ((GoodsWish)w).getGoodsType() == type) {
-                result.add((GoodsWish)w);
-            }
-        }
-        return result;
+        return (demand == null) ? Collections.<GoodsWish>emptyList()
+            : transform(demand,
+                w -> w instanceof GoodsWish
+                    && ((GoodsWish)w).getGoodsType() == type,
+                w -> (GoodsWish)w, Collectors.toList());
     }
 
     /**
