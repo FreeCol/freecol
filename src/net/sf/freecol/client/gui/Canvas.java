@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -1882,7 +1883,7 @@ public final class Canvas extends JDesktopPane {
      *
      * @param messageId The i18n-keyname of the error message to display.
      */
-    void showErrorMessage(String messageId) {
+    public void showErrorMessage(String messageId) {
         showErrorMessage(messageId, "Unspecified error: " + messageId);
     }
 
@@ -1894,14 +1895,22 @@ public final class Canvas extends JDesktopPane {
      *     display if the resource specified by <code>messageId</code>
      *     is unavailable.
      */
-    void showErrorMessage(String messageId, String message) {
-        String display = null;
-        if (messageId != null) {
-            display = Messages.message(messageId);
+    public void showErrorMessage(String messageId, String message) {
+        String display = (messageId == null) ? null
+            : Messages.message(messageId);
+        if (message != null
+            && (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)
+                || display == null)) {
+            // If debugging suppress the bland but i18n compliant
+            // failure message in favour of the higher detail non-i18n text.
+            // Otherwise use the message if the messageId failed to provide
+            // anything useful.
+            display = message;
         }
-        if (display == null || display.isEmpty()) display = message;
-        ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
-        showSubPanel(errorPanel, true);
+        if (display != null) {
+            ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
+            showSubPanel(errorPanel, true);
+        }
     }
 
     /**

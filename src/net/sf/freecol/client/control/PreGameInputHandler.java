@@ -82,7 +82,7 @@ public final class PreGameInputHandler extends InputHandler {
             ? addPlayer(element)
             : ("chat".equals(type))
             ? chat(element)
-            : ("error".equals(type))
+            : (ErrorMessage.ERROR_TAG.equals(type))
             ? error(element)
             : ("logout".equals(type))
             ? logout(element)
@@ -159,10 +159,9 @@ public final class PreGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element error(Element element)  {
-        getGUI().showErrorMessage((element.hasAttribute(ErrorMessage.MESSAGE_ID_TAG))
-            ? element.getAttribute(ErrorMessage.MESSAGE_ID_TAG)
-            : null,
-            element.getAttribute(ErrorMessage.MESSAGE_TAG));
+        final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
+        getGUI().showErrorMessage(errorMessage.getMessageId(),
+                                  errorMessage.getMessage());
         return null;
     }
 

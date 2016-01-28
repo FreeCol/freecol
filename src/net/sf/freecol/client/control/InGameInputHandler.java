@@ -211,8 +211,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         Element reply;
-        String type = element.getTagName();
-        logger.log(Level.FINEST, "Received: " + type);
+        final String type = element.getTagName();
         switch (type) {
         case Connection.DISCONNECT_TAG:
             reply = disconnect(element); break; // Inherited
@@ -232,7 +231,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = closeMenus(); break;
         case "diplomacy":
             reply = diplomacy(element); break;
-        case "error":
+        case ErrorMessage.ERROR_TAG:
             reply = error(element); break;
         case "featureChange":
             reply = featureChange(element); break;
@@ -277,12 +276,11 @@ public final class InGameInputHandler extends InputHandler {
         case "update":
             reply = update(element); break;
         default:
-            logger.warning("Unsupported message type: " + type);
+            logger.warning("Received unsupported message type: " + type);
             return null;
         }
-        logger.log(Level.FINEST, "Handled message: " + type
-            + " replying with: "
-            + ((reply == null) ? "null" : reply.getTagName()));
+        logger.log(Level.FINEST, "Client handled: " + type
+            + " with: " + ((reply == null) ? "null" : reply.getTagName()));
 
         // If there is a "flush" attribute present, encourage the client
         // to display any new messages.
@@ -618,10 +616,11 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element error(Element element) {
-        final String messageId = element.getAttribute(ErrorMessage.MESSAGE_ID_TAG);
-        final String message = element.getAttribute(ErrorMessage.MESSAGE_TAG);
-
-        invokeLater(() -> { igc().error(messageId, message); });
+        final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
+        invokeLater(() -> {
+                igc().error(errorMessage.getMessageId(),
+                            errorMessage.getMessage());
+            });
         return null;
     }
 

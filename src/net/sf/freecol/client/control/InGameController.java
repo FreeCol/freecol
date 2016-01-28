@@ -3529,11 +3529,11 @@ public final class InGameController implements NetworkConstants {
      * Called from IGIH.error.
      *
      * @param messageId The i18n-keyname of the error message to display.
-     * @param message An alternative (possibly non-i18n) message to
-     *     display if the resource specified by <code>messageId</code>
-     *     is unavailable.
+     * @param message An alternative non-i18n message to display if
+     *     the resource specified by <code>messageId</code> is unavailable.
      */
     public void error(String messageId, String message) {
+        logger.warning("Error: " + messageId + "/" + message);
         gui.showErrorMessage(messageId, message);
     }
 

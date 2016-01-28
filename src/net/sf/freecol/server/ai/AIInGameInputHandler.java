@@ -43,6 +43,7 @@ import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -169,12 +170,24 @@ public final class AIInGameInputHandler implements MessageHandler {
             // Therefore most of these messages are useless.  This
             // may change one day.
             case Connection.DISCONNECT_TAG:                
-            case "addObject": case "addPlayer": case "animateMove":
-            case "animateAttack": case "chat":
-            case "error": case "featureChange": case "gameEnded":
-            case "logout": case "newTurn": case "newTradeRoute": case "remove":
-            case "removeGoods": case "setAI": case "setDead":
-            case "setStance": case "startGame": case "update":
+            case "addObject":
+            case "addPlayer":
+            case "animateMove":
+            case "animateAttack":
+            case "chat":
+            case ErrorMessage.ERROR_TAG:
+            case "featureChange":
+            case "gameEnded":
+            case "logout":
+            case "newTurn":
+            case "newTradeRoute":
+            case "remove":
+            case "removeGoods":
+            case "setAI":
+            case "setDead":
+            case "setStance":
+            case "startGame":
+            case "update":
                 break;
             default:
                 logger.warning("Unknown message type: " + tag);

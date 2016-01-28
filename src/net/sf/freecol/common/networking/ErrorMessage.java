@@ -100,7 +100,8 @@ public class ErrorMessage extends DOMMessage {
     public String getMessage() {
         return this.message;
     }
-    
+
+        
     /**
      * Handle a "error"-message.
      *
