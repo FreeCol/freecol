@@ -37,7 +37,9 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockPseudoRandom;
 
@@ -80,7 +82,7 @@ public class ServerPlayerTest extends FreeColTestCase {
      * test that selling reduces the price for other players.
      */
     public void testMarketRecovery() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerGame game = ServerTestHelper.startServerGame(getTestMap());
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = (ServerPlayer) game.getPlayerByNationId("model.nation.french");
@@ -124,12 +126,17 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerTestHelper.setRandom(mockRandom);
         boolean frenchRecovered = false;
         boolean englishRecovered = false;
+        ChangeSet cs;
         for (int i = 0; i < 100; i++) {
-            igc.yearlyGoodsAdjust((ServerPlayer) french);
+            cs = new ChangeSet();
+            french.csYearlyGoodsAdjust(random, cs);
+            game.sendTo(french, cs);
             if (frenchMarket.getSalePrice(silverType, 1) >= silverPrice) {
                 frenchRecovered = true;
             }
-            igc.yearlyGoodsAdjust((ServerPlayer) english);
+            cs = new ChangeSet();
+            english.csYearlyGoodsAdjust(random, cs);
+            game.sendTo(english, cs);
             if (englishMarket.getSalePrice(silverType, 1) >= silverPrice) {
                 englishRecovered = true;
             }

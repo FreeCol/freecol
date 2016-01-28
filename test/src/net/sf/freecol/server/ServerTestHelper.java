@@ -166,7 +166,7 @@ public final class ServerTestHelper {
      * @param map The <code>Map</code> to copy.
      * @return The new running server game.
      */
-    public static Game startServerGame(Map map) {
+    public static ServerGame startServerGame(Map map) {
         return startServerGame(map, FreeColTestCase.spec());
     }
 
@@ -175,9 +175,9 @@ public final class ServerTestHelper {
      *
      * @param map The <code>Map</code> to copy.
      * @param spec The <code>Specification</code> to use.
-     * @return The new running server game.
+     * @return The new running <code>ServerGame</code>.
      */
-    public static Game startServerGame(Map map, Specification spec) {
+    public static ServerGame startServerGame(Map map, Specification spec) {
         stopServerGame();
         FreeColServer serv = startServer(false, true, spec);
         serv.setMapGenerator(new MockMapGenerator(serv.getGame(), map));
@@ -188,7 +188,7 @@ public final class ServerTestHelper {
             fail("Failed to start game: " + e.getMessage());
         }
 
-        Game game = serv.getGame();
+        ServerGame game = serv.getGame();
         FreeColTestCase.setGame(game);
         if (game.getCurrentPlayer() == null) {
             game.setCurrentPlayer(game.getFirstPlayer());

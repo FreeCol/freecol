@@ -177,6 +177,9 @@ public final class InGameController extends Controller {
                                     request);
     }
 
+
+    // Debug support
+
     /**
      * Gets the number of AI turns to skip through.
      *
@@ -220,20 +223,6 @@ public final class InGameController extends Controller {
      */
     public int stepRandom() {
         return randomInt(logger, "step random", random, 100);
-    }
-
-    /**
-     * Public version of the yearly goods adjust (public so it can be
-     * use in the Market test code).  Sends the market and change
-     * messages to the player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> whose market
-     *            is to be updated.
-     */
-    public void yearlyGoodsAdjust(ServerPlayer serverPlayer) {
-        ChangeSet cs = new ChangeSet();
-        serverPlayer.csYearlyGoodsAdjust(random, cs);
-        getGame().sendTo(serverPlayer, cs);
     }
 
     /**
@@ -330,35 +319,8 @@ public final class InGameController extends Controller {
         return messages.size();
     }
 
-    /**
-     * Move goods from one location to another.
-     *
-     * @param src The source <code>GoodsLocation</code>.
-     * @param goodsType The <code>GoodsType</code> to move.
-     * @param amount The amount of goods to move.
-     * @param dst The new <code>GoodsLocation</code>.
-     */
-    private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
-                           GoodsLocation dst) {
-        src.getGoodsContainer().saveState();
-        src.removeGoods(goodsType, amount);
-        if (dst != null) {
-            dst.getGoodsContainer().saveState();
-            dst.addGoods(goodsType, amount);
-        }
-    }
 
-    /**
-     * Gets a nation summary.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
-     * @param player The <code>Player</code> to summarize.
-     * @return The requested <code>NationSummary</code>.
-     */
-    public NationSummary getNationSummary(ServerPlayer serverPlayer,
-                                          Player player) {
-        return new NationSummary(player, serverPlayer);
-    }
+    // Internal utilities
 
     /**
      * Create the Royal Expeditionary Force player corresponding to
@@ -413,6 +375,24 @@ public final class InGameController extends Controller {
                                                       europe);//-vis: safe!map
         refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
         return refPlayer;
+    }
+
+    /**
+     * Move goods from one location to another.
+     *
+     * @param src The source <code>GoodsLocation</code>.
+     * @param goodsType The <code>GoodsType</code> to move.
+     * @param amount The amount of goods to move.
+     * @param dst The new <code>GoodsLocation</code>.
+     */
+    private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
+                           GoodsLocation dst) {
+        src.getGoodsContainer().saveState();
+        src.removeGoods(goodsType, amount);
+        if (dst != null) {
+            dst.getGoodsContainer().saveState();
+            dst.addGoods(goodsType, amount);
+        }
     }
 
     /**
@@ -1024,9 +1004,9 @@ public final class InGameController extends Controller {
 
 
     // Routines that follow implement the controller response to
-    // messages.
-    // The convention is to return an element to be passed back to the
-    // client by the invoking message handler.
+    // messages.  The convention is to return a change set back to the
+    // invoking message handler, but handle changes for other players
+    // directly here.
 
 
     /**

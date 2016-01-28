@@ -113,8 +113,7 @@ public class GetNationSummaryMessage extends DOMMessage {
         }
 
         // Proceed to get the summary.
-        summary = server.getInGameController()
-            .getNationSummary(serverPlayer, player);
+        this.summary = new NationSummary(player, serverPlayer);
         return toXMLElement();
     }
 
