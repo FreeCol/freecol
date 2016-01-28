@@ -169,7 +169,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            if (key.equals(FreeColObject.readId(e))) return e;
+            if (key.equals(DOMMessage.readId(e))) return e;
         }
         return null;
     }
@@ -320,7 +320,7 @@ public final class InGameInputHandler extends InputHandler {
             final String tag = e.getTagName();
             if (FoundingFather.getTagName().equals(tag)) {
                 FoundingFather father
-                    = spec.getFoundingFather(FreeColObject.readId(e));
+                    = spec.getFoundingFather(DOMMessage.readId(e));
                 if (father != null) player.addFather(father);
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
@@ -352,7 +352,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element playerElement = (Element)nodes.item(i);
-            String id = FreeColObject.readId(playerElement);
+            String id = DOMMessage.readId(playerElement);
             Player p = game.getFreeColGameObject(id, Player.class);
             if (p == null) {
                 game.addPlayer(new Player(game, playerElement));
@@ -599,7 +599,7 @@ public final class InGameInputHandler extends InputHandler {
             // server may have already done so and its view will only
             // mislead us here in the client.
             Element e = (Element) nodes.item(i);
-            String id = FreeColObject.readId(e);
+            String id = DOMMessage.readId(e);
             Unit u = game.getFreeColGameObject(id, Unit.class);
             if (u == null) {
                 logger.warning("Object is not a unit");
@@ -636,7 +636,7 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
         boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
-        String id = FreeColObject.readId(element);
+        String id = DOMMessage.readId(element);
         FreeColGameObject object = game.getFreeColGameObject(id);
         if (object == null) {
             logger.warning("featureChange with null object");
@@ -968,7 +968,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodeList = element.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element e = (Element)nodeList.item(i);
-            String idString = FreeColObject.readId(e);
+            String idString = DOMMessage.readId(e);
             FreeColGameObject fcgo = game.getFreeColGameObject(idString);
             if (fcgo == null) {
                 // This can happen legitimately when an update that
@@ -1131,7 +1131,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodeList = element.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element e = (Element)nodeList.item(i);
-            String id = FreeColObject.readId(e);
+            String id = DOMMessage.readId(e);
             FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
             if (fcgo == null) {
                 logger.warning("Update object not present in client: " + id);

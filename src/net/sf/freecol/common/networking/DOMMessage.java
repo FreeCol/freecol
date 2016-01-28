@@ -330,7 +330,7 @@ public class DOMMessage {
         NodeList nl = element.getChildNodes();
         Element e;
         if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
-            ret = game.getFreeColGameObject(FreeColObject.readId(e), returnClass);
+            ret = game.getFreeColGameObject(readId(e), returnClass);
             if (ret == null) { // New instance required
                 try {
                     ret = game.newInstance(returnClass, false);
@@ -473,6 +473,24 @@ public class DOMMessage {
         }
         return null;
     }
+
+    // @compat 0.10.x
+    /**
+     * Version of readId(FreeColXMLReader) that reads from an element.
+     *
+     * To be replaced with just:
+     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+     *
+     * @param element An element to read the id attribute from.
+     * @return The identifier attribute value.
+     */
+    public static String readId(Element element) {
+        String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+        if (id == null) id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        return id;
+    }
+    // end @compat
+
 
     // Override Object
 

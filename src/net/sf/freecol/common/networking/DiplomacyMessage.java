@@ -135,7 +135,7 @@ public class DiplomacyMessage extends DOMMessage {
             this.extraUnit = null;
         } else {
             Element ue = (Element)nodes.item(1);
-            String id = FreeColObject.readId(ue);
+            String id = readId(ue);
             this.extraUnit = game.getFreeColGameObject(id, Unit.class);
             if (this.extraUnit == null) this.extraUnit = new Unit(game, ue);
         }

@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -122,7 +123,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         Element playerElement = (Element)element
             .getElementsByTagName(Player.getTagName()).item(0);
-        String id = FreeColObject.readId(playerElement);
+        String id = DOMMessage.readId(playerElement);
         FreeColGameObject fcgo = game.getFreeColGameObject(id);
         if (fcgo == null) {
             game.addPlayer(new Player(game, playerElement));

@@ -869,23 +869,6 @@ public abstract class FreeColObject
         }
     }
 
-    // @compat 0.10.x
-    /**
-     * Version of readId(FreeColXMLReader) that reads from an element.
-     *
-     * To be replaced with just:
-     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-     *
-     * @param element An element to read the id attribute from.
-     * @return The identifier attribute value.
-     */
-    public static String readId(Element element) {
-        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
-        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
-        return id;
-    }
-    // end @compat
-
     /**
      * Initialize this object from an XML-representation of this object.
      *
