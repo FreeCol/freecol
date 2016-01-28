@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -276,7 +277,7 @@ public class Modifier extends Feature {
      */
     public Modifier(Element e, Specification specification) {
         setSpecification(specification);
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
 

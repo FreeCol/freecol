@@ -869,33 +869,6 @@ public abstract class FreeColObject
         }
     }
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param element An XML-element that will be used to initialize
-     *      this object.
-     */
-    public void readFromXMLElement(Element element) {
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element),
-                                     new StreamResult(stringWriter));
-            String xml = stringWriter.toString();
-            try (
-                FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
-            ) {
-                xr.nextTag();
-                readFromXML(xr);
-            } catch (XMLStreamException xe) {
-                throw new IllegalStateException("XML failure", xe);
-            }
-        } catch (IOException|TransformerException ex) {
-            throw new RuntimeException("Read failure", ex);
-        }
-    }
-
 
     // Override Object
 

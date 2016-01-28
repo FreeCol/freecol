@@ -77,7 +77,7 @@ public class ServerInfo {
      *        used for the new object.
      */
     public ServerInfo(Element element) {
-        readFromXMLElement(element);
+        readFromElement(element);
     }
 
 
@@ -219,7 +219,7 @@ public class ServerInfo {
      * @param element The XML DOM Element containing information that
      *     should be read by this object.
      */
-    public void readFromXMLElement(Element element) {
+    public void readFromElement(Element element) {
         update(element);
     }
 

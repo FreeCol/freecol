@@ -70,7 +70,7 @@ public class REFUnitsMessage extends DOMMessage {
         NodeList childElements = element.getChildNodes();
         for (int index = 0; index < childElements.getLength(); index++) {
             AbstractUnit unit = new AbstractUnit();
-            unit.readFromXMLElement((Element)childElements.item(index));
+            readFromXMLElement(unit, (Element)childElements.item(index));
             this.refUnits.add(unit);
         }
     }

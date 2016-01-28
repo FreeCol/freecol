@@ -40,6 +40,7 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -216,7 +217,7 @@ public class Game extends FreeColGameObject {
      
         this.clientUserName = clientUserName;
         this.combatModel = new SimpleCombatModel();
-        readFromXMLElement(element);
+        DOMMessage.readFromXMLElement(this, element);
         // setId() does not add Games to the freeColGameObjects
         this.setFreeColGameObject(getId(), this);
     }

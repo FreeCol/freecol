@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.networking.DOMMessage;
 
 import org.w3c.dom.Element;
 
@@ -100,7 +101,7 @@ public class NationSummary extends FreeColObject {
      * @param element An <code>Element</code> value.
      */
     public NationSummary(Element element) {
-        readFromXMLElement(element);
+        DOMMessage.readFromXMLElement(this, element);
     }
 
 

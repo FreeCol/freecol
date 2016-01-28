@@ -26,6 +26,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.DOMMessage;
 
 import org.w3c.dom.Element;
 
@@ -75,7 +76,8 @@ public class GoToMission extends AbstractMission {
      */
     public GoToMission(Game game, Element e) {
         super(game, e);
-        readFromXMLElement(e);
+
+        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**

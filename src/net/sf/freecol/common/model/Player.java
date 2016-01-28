@@ -43,6 +43,7 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -444,7 +445,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public Player(Game game, Element e) {
         super(game, null);
 
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**

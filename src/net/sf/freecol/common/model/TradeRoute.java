@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
@@ -94,7 +95,7 @@ public class TradeRoute extends FreeColGameObject
     public TradeRoute(Game game, Element e) {
         super(game, null);
 
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
 

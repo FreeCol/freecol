@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,12 +39,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.server.control.ChangeSet;
 
@@ -338,7 +341,7 @@ public class DOMMessage {
                     ret = null;
                 }
             }
-            if (ret != null) ret.readFromXMLElement(e);
+            if (ret != null) readFromXMLElement(ret, e);
         }
         return ret;
     }
@@ -490,6 +493,34 @@ public class DOMMessage {
         return id;
     }
     // end @compat
+
+    /**
+     * Initialize a FreeColObject from an Element.
+     *
+     * @param fco The <code>FreeColObject</code> to read into.
+     * @param element An XML-element that will be used to initialize
+     *      the object.
+     */
+    public static void readFromXMLElement(FreeColObject fco, Element element) {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element),
+                                     new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            try (
+                FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+            ) {
+                xr.nextTag();
+                fco.readFromXML(xr);
+            } catch (XMLStreamException xe) {
+                throw new IllegalStateException("XML failure", xe);
+            }
+        } catch (IOException|TransformerException ex) {
+            throw new RuntimeException("Read failure", ex);
+        }
+    }
 
 
     // Override Object

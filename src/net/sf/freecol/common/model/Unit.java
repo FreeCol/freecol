@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -224,7 +225,7 @@ public class Unit extends GoodsLocation
     public Unit(Game game, Element e) {
         super(game, null);// Must override identifier when called client side
 
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**

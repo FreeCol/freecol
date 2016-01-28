@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -196,7 +197,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public AIColony(AIMain aiMain, Element element) {
         this(aiMain, (String)null);
 
-        readFromXMLElement(element);
+        DOMMessage.readFromXMLElement(this, element);
         addAIObjectWithId();
 
         uninitialized = getColony() == null;

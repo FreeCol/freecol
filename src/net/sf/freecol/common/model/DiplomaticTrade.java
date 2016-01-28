@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -120,7 +121,7 @@ public class DiplomaticTrade extends FreeColObject {
     public DiplomaticTrade(Game game, Element element) {
         this.game = game;
 
-        readFromXMLElement(element);
+        DOMMessage.readFromXMLElement(this, element);
     }
 
 

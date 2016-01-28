@@ -355,7 +355,7 @@ public final class InGameInputHandler extends InputHandler {
             if (p == null) {
                 game.addPlayer(new Player(game, playerElement));
             } else {
-                p.readFromXMLElement(playerElement);
+                DOMMessage.readFromXMLElement(p, playerElement);
             }
         }
         return null;
@@ -1107,10 +1107,10 @@ public final class InGameInputHandler extends InputHandler {
         // is closed.
         final Element fullElement = (Element)nodeList.item(0);
         final Element normalElement = (Element)nodeList.item(1);
-        tile.readFromXMLElement(fullElement);
+        DOMMessage.readFromXMLElement(tile, fullElement);
         invokeLater(() -> {
                 igc().spyColony(tile, () -> {
-                        tile.readFromXMLElement(normalElement);
+                        DOMMessage.readFromXMLElement(tile, normalElement);
                     });
             });
         return null;
@@ -1135,7 +1135,7 @@ public final class InGameInputHandler extends InputHandler {
             if (fcgo == null) {
                 logger.warning("Update object not present in client: " + id);
             } else {
-                fcgo.readFromXMLElement(e);
+                DOMMessage.readFromXMLElement(fcgo, e);
             }
             if ((fcgo instanceof Player && (fcgo == player))
                 || ((fcgo instanceof Settlement || fcgo instanceof Unit)

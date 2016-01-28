@@ -42,6 +42,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
@@ -182,7 +183,7 @@ public class HighScore extends FreeColObject {
      * @param element The <code>Element</code> to read.
      */
     public HighScore(Element element) {
-        readFromXMLElement(element);
+        DOMMessage.readFromXMLElement(this, element);
     }
 
 

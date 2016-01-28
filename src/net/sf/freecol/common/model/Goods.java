@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -110,7 +111,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     public Goods(Game game, Element e) {
         this.game = game;
         setSpecification(game.getSpecification());
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
 

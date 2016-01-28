@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
@@ -74,7 +75,8 @@ public class ImprovementMission extends AbstractMission {
      */
     public ImprovementMission(Game game, Element e) {
         super(game, e);
-        readFromXMLElement(e);
+
+        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**

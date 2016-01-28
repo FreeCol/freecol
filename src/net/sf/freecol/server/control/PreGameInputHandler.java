@@ -351,7 +351,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
         OptionGroup gameOptions = spec.getGameOptions();
         Element child = (Element)element.getChildNodes().item(0);
-        gameOptions.readFromXMLElement(child);
+        DOMMessage.readFromXMLElement(gameOptions, child);
         spec.clean("update game options (server)");
 
         DOMMessage up = new DOMMessage("updateGameOptions");
@@ -378,7 +378,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
         OptionGroup mgo = spec.getMapGeneratorOptions();
         Element child = (Element)element.getChildNodes().item(0);
-        mgo.readFromXMLElement(child);
+        DOMMessage.readFromXMLElement(mgo, child);
         DOMMessage umge = new DOMMessage("updateMapGeneratorOptions");
         umge.add(mgo);
         freeColServer.sendToAll(umge, connection);

@@ -26,6 +26,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.DOMMessage;
 
 import org.w3c.dom.Element;
 
@@ -95,7 +96,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     public AbstractMission(Game game, Element e) {
         super(game, null);
 
-        readFromXMLElement(e);
+        DOMMessage.readFromXMLElement(this, e);
     }
 
     /**

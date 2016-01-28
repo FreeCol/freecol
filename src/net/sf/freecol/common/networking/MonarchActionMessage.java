@@ -87,7 +87,7 @@ public class MonarchActionMessage extends DOMMessage {
         NodeList children = element.getChildNodes();
         if (children.getLength() == 1) {
             this.template = StringTemplate.label(" ");
-            this.template.readFromXMLElement((Element) children.item(0));
+            readFromXMLElement(this.template, (Element)children.item(0));
         } else {
             this.template = null;
         }
