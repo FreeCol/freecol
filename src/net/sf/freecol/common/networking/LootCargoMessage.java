@@ -30,7 +30,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -77,15 +76,7 @@ public class LootCargoMessage extends DOMMessage {
 
         this.winnerId = element.getAttribute("winner");
         this.loserId = element.getAttribute("loser");
-        NodeList children = element.getChildNodes();
-        if (children.getLength() == 0) {
-            this.goods = null;
-        } else {
-            this.goods = new ArrayList<>();
-            for (int i = 0; i < children.getLength(); i++) {
-                this.goods.add(new Goods(game, (Element) children.item(i)));
-            }
-        }
+        this.goods = getChildren(game, element, Goods.class);
     }
 
 
