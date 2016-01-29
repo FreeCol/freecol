@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class AssignTeacherMessage extends DOMMessage {
 
+    public static final String TAG = "assignTeacher";
+
     /** The identifier of the student. */
     private final String studentId;
 
@@ -148,6 +150,6 @@ public class AssignTeacherMessage extends DOMMessage {
      * @return "assignTeacher".
      */
     public static String getTagName() {
-        return "assignTeacher";
+        return TAG;
     }
 }

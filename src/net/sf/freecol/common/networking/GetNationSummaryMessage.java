@@ -34,6 +34,8 @@ import org.w3c.dom.NodeList;
  */
 public class GetNationSummaryMessage extends DOMMessage {
 
+    public static final String TAG = "getNationSummary";
+
     /** The identifier of the player to summarize. */
     private final String playerId;
 
@@ -136,6 +138,6 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @return "getNationSummary".
      */
     public static String getTagName() {
-        return "getNationSummary";
+        return TAG;
     }
 }

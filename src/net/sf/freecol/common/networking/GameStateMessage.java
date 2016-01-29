@@ -33,8 +33,7 @@ import org.w3c.dom.Element;
  */
 public class GameStateMessage extends DOMMessage {
 
-    public static final String GAME_STATE_TAG = "gameState";
-
+    public static final String TAG = "gameState";
     private static final String STATE_TAG = "state";
 
     /** The string value of the game state. */
@@ -104,6 +103,6 @@ public class GameStateMessage extends DOMMessage {
      * @return "gameState".
      */
     public static String getTagName() {
-        return GAME_STATE_TAG;
+        return TAG;
     }
 }

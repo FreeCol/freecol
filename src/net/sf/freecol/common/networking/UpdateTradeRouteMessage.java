@@ -32,6 +32,8 @@ import org.w3c.dom.Element;
  */
 public class UpdateTradeRouteMessage extends DOMMessage {
 
+    public static final String TAG = "updateTradeRoute";
+
     /** The trade route to update. */
     private final TradeRoute tradeRoute;
 
@@ -115,6 +117,6 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @return "updateTradeRoute".
      */
     public static String getTagName() {
-        return "updateTradeRoute";
+        return TAG;
     }
 }

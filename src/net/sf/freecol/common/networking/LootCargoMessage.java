@@ -38,6 +38,8 @@ import org.w3c.dom.NodeList;
  */
 public class LootCargoMessage extends DOMMessage {
 
+    public static final String TAG = "lootCargo";
+
     /** The object identifier of the unit that is looting. */
     private final String winnerId;
 
@@ -169,6 +171,6 @@ public class LootCargoMessage extends DOMMessage {
      * @return "lootCargo".
      */
     public static String getTagName() {
-        return "lootCargo";
+        return TAG;
     }
 }

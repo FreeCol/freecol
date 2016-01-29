@@ -37,8 +37,7 @@ import org.w3c.dom.NodeList;
  */
 public class REFUnitsMessage extends DOMMessage {
 
-    public static final String MESSAGE_ID_TAG = "messageId";
-    public static final String MESSAGE_TAG = "message";
+    public static final String TAG = "REFUnits";
 
     /** The units defining the REF. */
     private final List<AbstractUnit> refUnits = new ArrayList<>();
@@ -122,6 +121,6 @@ public class REFUnitsMessage extends DOMMessage {
      * @return "REFUnits".
      */
     public static String getTagName() {
-        return "REFUnits";
+        return TAG;
     }
 }

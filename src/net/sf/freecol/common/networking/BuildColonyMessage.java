@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class BuildColonyMessage extends DOMMessage {
 
+    public static final String TAG = "buildColony";
+
     /** The name of the new colony. */
     private final String colonyName;
 
@@ -139,6 +141,6 @@ public class BuildColonyMessage extends DOMMessage {
      * @return "buildColony".
      */
     public static String getTagName() {
-        return "buildColony";
+        return TAG;
     }
 }

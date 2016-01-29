@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
  */
 public class MissionaryMessage extends DOMMessage {
 
+    public static final String TAG = "missionary";
+
     /** The identifier of the missionary. */
     private final String unitId;
 
@@ -180,6 +182,6 @@ public class MissionaryMessage extends DOMMessage {
      * @return "missionary".
      */
     public static String getTagName() {
-        return "missionary";
+        return TAG;
     }
 }

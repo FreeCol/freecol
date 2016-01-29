@@ -65,7 +65,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
     public InputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
 
-        register(ChatMessage.CHAT_TAG, (Connection conn, Element e) ->
+        register(ChatMessage.TAG, (Connection conn, Element e) ->
             new ChatMessage(getGame(), e).handle(freeColServer, conn));
 
         register(Connection.DISCONNECT_TAG, (Connection conn, Element e) ->

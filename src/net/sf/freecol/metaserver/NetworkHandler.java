@@ -77,7 +77,7 @@ public final class NetworkHandler implements MessageHandler {
         case "update":
             reply = update(connection, element);
             break;
-        case ServerListMessage.SERVER_LIST_TAG:
+        case ServerListMessage.TAG:
             reply = serverList(connection, element);
             break;
         case "remove":

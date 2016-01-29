@@ -40,6 +40,8 @@ import org.w3c.dom.NodeList;
  */
 public class GoodsForSaleMessage extends DOMMessage {
 
+    public static final String TAG = "goodsForSale";
+
     /** The identifier of the unit that is trading. */
     private final String unitId;
 
@@ -152,6 +154,6 @@ public class GoodsForSaleMessage extends DOMMessage {
      * @return "goodsForSale".
      */
     public static String getTagName() {
-        return "goodsForSale";
+        return TAG;
     }
 }

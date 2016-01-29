@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
  */
 public class ScoutIndianSettlementMessage extends DOMMessage {
 
+    public static final String TAG = "scoutIndianSettlement";
+
     /** The identifier of the unit that is scouting. */
     private final String unitId;
 
@@ -146,6 +148,6 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
      * @return "scoutIndianSettlement".
      */
     public static String getTagName() {
-        return "scoutIndianSettlement";
+        return TAG;
     }
 }

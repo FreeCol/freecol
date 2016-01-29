@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class AbandonColonyMessage extends DOMMessage {
 
+    public static final String TAG = "abandonColony";
+
     /** The identifier of the colony to abandon. */
     private final String colonyId;
 
@@ -114,6 +116,6 @@ public class AbandonColonyMessage extends DOMMessage {
      * @return "abandonColony".
      */
     public static String getTagName() {
-        return "abandonColony";
+        return TAG;
     }
 }

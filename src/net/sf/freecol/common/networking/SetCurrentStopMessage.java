@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class SetCurrentStopMessage extends DOMMessage {
 
+    public static final String TAG = "setCurrentStop";
+
     /** The identifier of the unit whose stop is to be set. */
     private final String unitId;
 
@@ -132,6 +134,6 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @return "setCurrentStop".
      */
     public static String getTagName() {
-        return "setCurrentStop";
+        return TAG;
     }
 }

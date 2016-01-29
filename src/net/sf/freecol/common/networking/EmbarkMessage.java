@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class EmbarkMessage extends DOMMessage {
 
+    public static final String TAG = "embark";
+
     /** The identifier of the unit embarking. */
     private final String unitId;
 
@@ -174,6 +176,6 @@ public class EmbarkMessage extends DOMMessage {
      * @return "embark".
      */
     public static String getTagName() {
-        return "embark";
+        return TAG;
     }
 }

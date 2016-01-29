@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class GetTransactionMessage extends DOMMessage {
 
+    public static final String TAG = "getTransaction";
+
     /** The object identifier of the unit performing the transaction. */
     private final String unitId;
 
@@ -126,6 +128,6 @@ public class GetTransactionMessage extends DOMMessage {
      * @return "getTransaction".
      */
     public static String getTagName() {
-        return "getTransaction";
+        return TAG;
     }
 }

@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class DeclareIndependenceMessage extends DOMMessage {
 
+    public static final String TAG = "declareIndependence";
+
     /** The new name for the rebelling nation. */
     private final String nationName;
 
@@ -118,6 +120,6 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @return "declareIndependence".
      */
     public static String getTagName() {
-        return "declareIndependence";
+        return TAG;
     }
 }

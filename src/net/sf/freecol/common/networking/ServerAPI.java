@@ -213,7 +213,7 @@ public abstract class ServerAPI {
         final Connection c = getConnection();
 
         // Shortcut error processing
-        if (ErrorMessage.ERROR_TAG.equals(reply.getTagName())) {
+        if (ErrorMessage.TAG.equals(reply.getTagName())) {
             handle(reply);
             return null;
         }

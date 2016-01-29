@@ -38,6 +38,8 @@ import org.w3c.dom.NodeList;
  */
 public class SetTradeRoutesMessage extends DOMMessage {
 
+    public static final String TAG = "setTradeRoutes";
+
     private static final String idPrefix = "shadow-";
 
     /** The trade routes to set. */
@@ -181,6 +183,6 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @return "setTradeRoutes".
      */
     public static String getTagName() {
-        return "setTradeRoutes";
+        return TAG;
     }
 }

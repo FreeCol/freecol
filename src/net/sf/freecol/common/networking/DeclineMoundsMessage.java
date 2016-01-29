@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class DeclineMoundsMessage extends DOMMessage {
 
+    public static final String TAG = "declineMounds";
+
     /** The identifier of the unit that is exploring. */
     private final String unitId;
 
@@ -133,6 +135,6 @@ public class DeclineMoundsMessage extends DOMMessage {
      * @return "declineMounds".
      */
     public static String getTagName() {
-        return "declineMounds";
+        return TAG;
     }
 }

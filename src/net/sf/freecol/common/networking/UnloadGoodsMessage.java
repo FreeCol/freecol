@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class UnloadGoodsMessage extends DOMMessage {
 
+    public static final String TAG = "unloadGoods";
+
     /** The identifier of the type of goods to unload.  */
     private final String goodsTypeId;
 
@@ -151,6 +153,6 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @return "unloadGoods".
      */
     public static String getTagName() {
-        return "unloadGoods";
+        return TAG;
     }
 }

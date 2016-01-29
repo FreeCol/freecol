@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class CloseTransactionMessage extends DOMMessage {
 
+    public static final String TAG = "closeTransaction";
+
     /** The object identifier of the unit performing the transaction. */
     private final String unitId;
 
@@ -126,6 +128,6 @@ public class CloseTransactionMessage extends DOMMessage {
      * @return "closeTransaction".
      */
     public static String getTagName() {
-        return "closeTransaction";
+        return TAG;
     }
 }

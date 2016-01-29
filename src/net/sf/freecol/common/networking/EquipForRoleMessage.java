@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class EquipForRoleMessage extends DOMMessage {
 
+    public static final String TAG = "equipForRole";
+
     /** The identifier of the unit to equip. */
     private final String unitId;
 
@@ -150,6 +152,6 @@ public class EquipForRoleMessage extends DOMMessage {
      * @return "equipForRole".
      */
     public static String getTagName() {
-        return "equipForRole";
+        return TAG;
     }
 }

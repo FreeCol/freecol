@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
  */
 public class ScoutSpeakToChiefMessage extends DOMMessage {
 
+    public static final String TAG = "scoutSpeakToChief";
+
     /** The identifier of the unit that is speaking. */
     private final String unitId;
 
@@ -146,6 +148,6 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      * @return "scoutSpeakToChief".
      */
     public static String getTagName() {
-        return "scoutSpeakToChief";
+        return TAG;
     }
 }

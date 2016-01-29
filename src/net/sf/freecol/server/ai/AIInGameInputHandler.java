@@ -175,7 +175,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "animateMove":
             case "animateAttack":
             case "chat":
-            case ErrorMessage.ERROR_TAG:
+            case ErrorMessage.TAG:
             case "featureChange":
             case "gameEnded":
             case "logout":

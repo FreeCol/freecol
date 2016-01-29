@@ -40,6 +40,8 @@ import org.w3c.dom.Element;
  */
 public class ChooseFoundingFatherMessage extends DOMMessage {
 
+    public static final String TAG = "chooseFoundingFather";
+
     /** The fathers to offer. */
     private final List<FoundingFather> fathers;
 
@@ -173,6 +175,6 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @return "chooseFoundingFather".
      */
     public static String getTagName() {
-        return "chooseFoundingFather";
+        return TAG;
     }
 }

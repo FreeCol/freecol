@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class SellPropositionMessage extends DOMMessage {
 
+    public static final String TAG = "sellProposition";
+
     /** The object identifier of the unit that is selling. */
     private final String unitId;
 
@@ -163,6 +165,6 @@ public class SellPropositionMessage extends DOMMessage {
      * @return "sellProposition".
      */
     public static String getTagName() {
-        return "sellProposition";
+        return TAG;
     }
 }

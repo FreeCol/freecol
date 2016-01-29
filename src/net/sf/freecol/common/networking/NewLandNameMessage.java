@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class NewLandNameMessage extends DOMMessage {
 
+    public static final String TAG = "newLandName";
+
     /** The unit that has come ashore. */
     private final String unitId;
 
@@ -152,6 +154,6 @@ public class NewLandNameMessage extends DOMMessage {
      * @return "newLandName".
      */
     public static String getTagName() {
-        return "newLandName";
+        return TAG;
     }
 }

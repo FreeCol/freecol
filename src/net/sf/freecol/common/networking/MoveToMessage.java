@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class MoveToMessage extends DOMMessage {
 
+    public static final String TAG = "moveTo";
+
     /** The identifier of the object to be moved. */
     private final String unitId;
 
@@ -122,6 +124,6 @@ public class MoveToMessage extends DOMMessage {
      * @return "moveTo".
      */
     public static String getTagName() {
-        return "moveTo";
+        return TAG;
     }
 }

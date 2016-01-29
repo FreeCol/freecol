@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
  */
 public class LoginMessage extends DOMMessage {
 
-    public static final String LOGIN_TAG = "login";
+    public static final String TAG = "login";
 
     /** The user name. */
     private final String userName;
@@ -291,6 +291,6 @@ public class LoginMessage extends DOMMessage {
      * @return "login".
      */
     public static String getTagName() {
-        return LOGIN_TAG;
+        return TAG;
     }
 }

@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class FirstContactMessage extends DOMMessage {
 
+    public static final String TAG = "firstContact";
+
     /** The identifier for the player making contact. */
     private final String playerId;
 
@@ -189,6 +191,6 @@ public class FirstContactMessage extends DOMMessage {
      * @return "firstContact".
      */
     public static String getTagName() {
-        return "firstContact";
+        return TAG;
     }
 }

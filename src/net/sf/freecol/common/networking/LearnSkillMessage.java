@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class LearnSkillMessage extends DOMMessage {
 
+    public static final String TAG = "learnSkill";
+
     /** The identifier of the unit that is learning. */
     private final String unitId;
 
@@ -144,6 +146,6 @@ public class LearnSkillMessage extends DOMMessage {
      * @return "learnSkill".
      */
     public static String getTagName() {
-        return "learnSkill";
+        return TAG;
     }
 }

@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  */
 public class VacantPlayersMessage extends DOMMessage {
 
-    public static final String VACANT_PLAYERS_TAG = "vacantPlayers";
+    public static final String TAG = "vacantPlayers";
     
     /** The vacant players found. */
     private final List<String> vacantPlayers = new ArrayList<>();
@@ -130,6 +130,6 @@ public class VacantPlayersMessage extends DOMMessage {
      * @return "vacantPlayers".
      */
     public static String getTagName() {
-        return VACANT_PLAYERS_TAG;
+        return TAG;
     }
 }

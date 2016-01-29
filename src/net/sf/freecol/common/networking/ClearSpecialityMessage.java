@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class ClearSpecialityMessage extends DOMMessage {
 
+    public static final String TAG = "clearSpeciality";
+
     /** The identifier of the unit to be cleared. */
     private final String unitId;
 
@@ -107,6 +109,6 @@ public class ClearSpecialityMessage extends DOMMessage {
      * @return "clearSpeciality".
      */
     public static String getTagName() {
-        return "clearSpeciality";
+        return TAG;
     }
 }

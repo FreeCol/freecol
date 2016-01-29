@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class SpySettlementMessage extends DOMMessage {
 
+    public static final String TAG = "spySettlement";
+
     /** The identifier of the object doing the spying. */
     private final String unitId;
 
@@ -146,6 +148,6 @@ public class SpySettlementMessage extends DOMMessage {
      * @return "spySettlement".
      */
     public static String getTagName() {
-        return "spySettlement";
+        return TAG;
     }
 }

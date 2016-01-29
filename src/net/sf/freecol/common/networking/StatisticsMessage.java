@@ -38,6 +38,8 @@ import org.w3c.dom.Node;
  */
 public class StatisticsMessage extends DOMMessage {
 
+    public static final String TAG = "statistics";
+
     /** A map of statistics key,value pairs. */
     private final Map<String, String> stats = new HashMap<>();
 
@@ -118,6 +120,6 @@ public class StatisticsMessage extends DOMMessage {
      * @return "statistics".
      */
     public static String getTagName() {
-        return "statistics";
+        return TAG;
     }
 }

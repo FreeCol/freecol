@@ -466,7 +466,7 @@ public class Connection implements Closeable {
     public DOMMessage ask(Game game, DOMMessage message, String replyTag) {
         DOMMessage reply = ask(game, message);
         return (reply != null && (reply.isType(replyTag)
-                || reply.isType(ErrorMessage.ERROR_TAG))) ? reply
+                || reply.isType(ErrorMessage.TAG))) ? reply
             : new ErrorMessage("reject", "Request: "
                 + ((message == null) ? "null" : message.getType())
                 + ", Reply: " + ((reply == null) ? "null" : reply.getType())

@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
  */
 public class DeliverGiftMessage extends DOMMessage {
 
+    public static final String TAG = "deliverGift";
+
     /** The object identifier of the unit that is delivering the gift. */
     private final String unitId;
 
@@ -176,6 +178,6 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return "deliverGift".
      */
     public static String getTagName() {
-        return "deliverGift";
+        return TAG;
     }
 }

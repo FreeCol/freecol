@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class InciteMessage extends DOMMessage {
 
+    public static final String TAG = "incite";
+
     /** The identifier of the unit inciting. */
     private final String unitId;
 
@@ -178,6 +180,6 @@ public class InciteMessage extends DOMMessage {
      * @return "incite".
      */
     public static String getTagName() {
-        return "incite";
+        return TAG;
     }
 }

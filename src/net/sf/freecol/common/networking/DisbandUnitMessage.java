@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class DisbandUnitMessage extends DOMMessage {
 
+    public static final String TAG = "disbandUnit";
+
     /** The identifier of the unit to be disbanded. */
     private final String unitId;
 
@@ -107,6 +109,6 @@ public class DisbandUnitMessage extends DOMMessage {
      * @return "disbandUnit".
      */
     public static String getTagName() {
-        return "disbandUnit";
+        return TAG;
     }
 }

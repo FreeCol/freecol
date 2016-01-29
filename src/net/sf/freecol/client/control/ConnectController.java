@@ -177,7 +177,7 @@ public final class ConnectController {
             ;
         } else if (replyTag == null || reply.isType(replyTag)) {
             return reply;
-        } else if (reply.isType(ErrorMessage.ERROR_TAG)) {
+        } else if (reply.isType(ErrorMessage.TAG)) {
             ErrorMessage em = (ErrorMessage)reply;
             if (errorId == null && em.getMessageId() != null) {
                 errorId = em.getMessageId();
@@ -344,7 +344,7 @@ public final class ConnectController {
         if (freeColClient.isLoggedIn()) logout(true);
 
         DOMMessage msg = ask(host, port, new GameStateMessage(),
-                             GameStateMessage.GAME_STATE_TAG, "client.noState");
+                             GameStateMessage.TAG, "client.noState");
         GameState state = (msg instanceof GameStateMessage)
             ? ((GameStateMessage)msg).getGameState()
             : null;        
@@ -365,7 +365,7 @@ public final class ConnectController {
                 return false;
             }
             msg = ask(host, port, new VacantPlayersMessage(),
-                VacantPlayersMessage.VACANT_PLAYERS_TAG, "client.noPlayers");
+                VacantPlayersMessage.TAG, "client.noPlayers");
             List<String> names = (msg instanceof VacantPlayersMessage)
                 ? ((VacantPlayersMessage)msg).getVacantPlayers()
                 : null;
@@ -683,7 +683,7 @@ public final class ConnectController {
     public List<ServerInfo> getServerList() {
         DOMMessage msg = ask(FreeCol.META_SERVER_ADDRESS,
             FreeCol.META_SERVER_PORT, new ServerListMessage(),
-            ServerListMessage.SERVER_LIST_TAG, "metaServer.communicationError");
+            ServerListMessage.TAG, "metaServer.communicationError");
         return (msg instanceof ServerListMessage)
             ? ((ServerListMessage)msg).getServers()
             : null;

@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class LoadGoodsMessage extends DOMMessage {
 
+    public static final String TAG = "loadGoods";
+
     /** The identifier for the location of the goods. */
     private final String locationId;
     
@@ -164,6 +166,6 @@ public class LoadGoodsMessage extends DOMMessage {
      * @return "loadGoods".
      */
     public static String getTagName() {
-        return "loadGoods";
+        return TAG;
     }
 }

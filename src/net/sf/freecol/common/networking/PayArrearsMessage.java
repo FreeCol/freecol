@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class PayArrearsMessage extends DOMMessage {
 
+    public static final String TAG = "payArrears";
+
     /** The identifier of the GoodsType to pay arrears for. */
     private final String goodsTypeId;
 
@@ -102,6 +104,6 @@ public class PayArrearsMessage extends DOMMessage {
      * @return "payArrears".
      */
     public static String getTagName() {
-        return "payArrears";
+        return TAG;
     }
 }

@@ -35,6 +35,8 @@ import org.w3c.dom.NodeList;
  */
 public class MonarchActionMessage extends DOMMessage {
 
+    public static final String TAG = "monarchAction";
+
     /** The monarch action. */
     private final MonarchAction action;
 
@@ -209,6 +211,6 @@ public class MonarchActionMessage extends DOMMessage {
      * @return "monarchAction".
      */
     public static String getTagName() {
-        return "monarchAction";
+        return TAG;
     }
 }

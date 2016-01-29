@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class AssignTradeRouteMessage extends DOMMessage {
 
+    public static final String TAG = "assignTradeRoute";
+
     /** The identifier of the unit. */
     private final String unitId;
 
@@ -130,6 +132,6 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @return "assignTradeRoute".
      */
     public static String getTagName() {
-        return "assignTradeRoute";
+        return TAG;
     }
 }

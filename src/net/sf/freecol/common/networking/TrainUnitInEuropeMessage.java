@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class TrainUnitInEuropeMessage extends DOMMessage {
 
+    public static final String TAG = "trainUnitInEurope";
+
     /** The identifier of the unit type. */
     private final String typeId;
 
@@ -106,6 +108,6 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @return "trainUnitInEurope".
      */
     public static String getTagName() {
-        return "trainUnitInEurope";
+        return TAG;
     }
 }

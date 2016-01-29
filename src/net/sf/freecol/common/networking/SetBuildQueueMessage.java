@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
  */
 public class SetBuildQueueMessage extends DOMMessage {
 
+    public static final String TAG = "setBuildQueue";
+
     /** The identifier of the colony containing the queue. */
     private final String colonyId;
 
@@ -157,6 +159,6 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @return "setBuildQueue".
      */
     public static String getTagName() {
-        return "setBuildQueue";
+        return TAG;
     }
 }

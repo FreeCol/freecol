@@ -82,7 +82,7 @@ public final class PreGameInputHandler extends InputHandler {
             ? addPlayer(element)
             : ("chat".equals(type))
             ? chat(element)
-            : (ErrorMessage.ERROR_TAG.equals(type))
+            : (ErrorMessage.TAG.equals(type))
             ? error(element)
             : ("logout".equals(type))
             ? logout(element)

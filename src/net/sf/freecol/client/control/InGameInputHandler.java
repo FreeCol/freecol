@@ -231,7 +231,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = closeMenus(); break;
         case "diplomacy":
             reply = diplomacy(element); break;
-        case ErrorMessage.ERROR_TAG:
+        case ErrorMessage.TAG:
             reply = error(element); break;
         case "featureChange":
             reply = featureChange(element); break;

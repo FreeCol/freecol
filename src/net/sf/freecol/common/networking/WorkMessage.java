@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class WorkMessage extends DOMMessage {
 
+    public static final String TAG = "work";
+
     /** The identifier of the unit. */
     private final String unitId;
 
@@ -145,6 +147,6 @@ public class WorkMessage extends DOMMessage {
      * @return "work".
      */
     public static String getTagName() {
-        return "work";
+        return TAG;
     }
 }

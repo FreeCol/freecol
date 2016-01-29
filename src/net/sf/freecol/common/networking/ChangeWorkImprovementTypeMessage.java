@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
+    public static final String TAG = "changeWorkImprovementType";
+
     /** The identifier of the unit that is working. */
     private final String unitId;
 
@@ -158,6 +160,6 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      * @return "changeWorkImprovementType".
      */
     public static String getTagName() {
-        return "changeWorkImprovementType";
+        return TAG;
     }
 }

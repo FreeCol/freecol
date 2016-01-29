@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class DisembarkMessage extends DOMMessage {
 
+    public static final String TAG = "disembark";
+
     /** The identifier of the object disembarking. */
     private final String unitId;
 
@@ -108,6 +110,6 @@ public class DisembarkMessage extends DOMMessage {
      * @return "disembark".
      */
     public static String getTagName() {
-        return "disembark";
+        return TAG;
     }
 }

@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
  */
 public class NewRegionNameMessage extends DOMMessage {
 
+    public static final String TAG = "newRegionName";
+
     /** The object identifier of the region being discovered. */
     private final String regionId;
 
@@ -191,6 +193,6 @@ public class NewRegionNameMessage extends DOMMessage {
      * @return "newRegionName".
      */
     public static String getTagName() {
-        return "newRegionName";
+        return TAG;
     }
 }

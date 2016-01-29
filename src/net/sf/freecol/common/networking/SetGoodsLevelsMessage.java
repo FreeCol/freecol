@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class SetGoodsLevelsMessage extends DOMMessage {
 
+    public static final String TAG = "setGoodsLevels";
+
     /** The identifier of the colony where the goods levels are set. */
     private final String colonyId;
 
@@ -116,6 +118,6 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @return "setGoodsLevels".
      */
     public static String getTagName() {
-        return "setGoodsLevels";
+        return TAG;
     }
 }

@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class SetDestinationMessage extends DOMMessage {
 
+    public static final String TAG = "setDestination";
+
     /** The object identifier of the unit whose destination is to be set. */
     private final String unitId;
 
@@ -122,6 +124,6 @@ public class SetDestinationMessage extends DOMMessage {
      * @return "setDestination".
      */
     public static String getTagName() {
-        return "setDestination";
+        return TAG;
     }
 }

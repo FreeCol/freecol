@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class ChangeStateMessage extends DOMMessage {
 
+    public static final String TAG = "changeState";
+
     /** The identifier of the unit to change. */
     private final String unitId;
 
@@ -130,6 +132,6 @@ public class ChangeStateMessage extends DOMMessage {
      * @return "changeState".
      */
     public static String getTagName() {
-        return "changeState";
+        return TAG;
     }
 }

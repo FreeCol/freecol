@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class PutOutsideColonyMessage extends DOMMessage {
 
+    public static final String TAG = "putOutsideColony";
+
     /** The identifier of the unit to be put out. */
     private final String unitId;
 
@@ -115,6 +117,6 @@ public class PutOutsideColonyMessage extends DOMMessage {
      * @return "putOutsideColony".
      */
     public static String getTagName() {
-        return "putOutsideColony";
+        return TAG;
     }
 }

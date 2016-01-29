@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class BuyMessage extends DOMMessage {
 
+    public static final String TAG = "buy";
+
     /** The object identifier of the unit that is buying. */
     private final String unitId;
 
@@ -168,6 +170,6 @@ public class BuyMessage extends DOMMessage {
      * @return "buy".
      */
     public static String getTagName() {
-        return "buy";
+        return TAG;
     }
 }

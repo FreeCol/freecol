@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class NewTradeRouteMessage extends DOMMessage {
 
-    public static final String NEW_TRADE_ROUTE_TAG = "newTradeRoute";
+    public static final String TAG = "newTradeRoute";
 
     private TradeRoute tradeRoute;
 
@@ -103,6 +103,6 @@ public class NewTradeRouteMessage extends DOMMessage {
      * @return "newTradeRoute".
      */
     public static String getTagName() {
-        return NEW_TRADE_ROUTE_TAG;
+        return TAG;
     }
 }

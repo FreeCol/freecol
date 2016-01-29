@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class ClaimLandMessage extends DOMMessage {
 
+    public static final String TAG = "claimLand";
+
     /** The tile to claim. */
     private final String tileId;
 
@@ -211,6 +213,6 @@ public class ClaimLandMessage extends DOMMessage {
      * @return "claimLand".
      */
     public static String getTagName() {
-        return "claimLand";
+        return TAG;
     }
 }

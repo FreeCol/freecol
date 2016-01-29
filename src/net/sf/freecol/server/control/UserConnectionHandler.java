@@ -54,14 +54,11 @@ public final class UserConnectionHandler extends InputHandler {
         super(freeColServer);
 
         final Game game = freeColServer.getGame();
-        register(GameStateMessage.GAME_STATE_TAG,
-            (Connection c, Element e) ->
+        register(GameStateMessage.TAG, (Connection c, Element e) ->
             new GameStateMessage(game, e).handle(freeColServer, c));
-        register(LoginMessage.LOGIN_TAG,
-            (Connection c, Element e) ->
+        register(LoginMessage.TAG, (Connection c, Element e) ->
             new LoginMessage(game, e).handle(freeColServer, c));
-        register(VacantPlayersMessage.VACANT_PLAYERS_TAG,
-            (Connection c, Element e) ->
+        register(VacantPlayersMessage.TAG, (Connection c, Element e) ->
             new VacantPlayersMessage(game, e).handle(freeColServer, c));
     }
 

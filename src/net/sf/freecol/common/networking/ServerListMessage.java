@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
  */
 public class ServerListMessage extends DOMMessage {
 
-    public static final String SERVER_LIST_TAG = "serverList";
+    public static final String TAG = "serverList";
     
     /** The list of information about the available servers. */
     private List<ServerInfo> serverInfo = new ArrayList<>();
@@ -121,6 +121,6 @@ public class ServerListMessage extends DOMMessage {
      * @return "serverList".
      */
     public static String getTagName() {
-        return SERVER_LIST_TAG;
+        return TAG;
     }
 }

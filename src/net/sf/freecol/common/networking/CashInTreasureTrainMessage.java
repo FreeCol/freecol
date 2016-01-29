@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class CashInTreasureTrainMessage extends DOMMessage {
 
+    public static final String TAG = "cashInTreasureTrain";
+
     /** The identifier of the treasure train unit. */
     private final String unitId;
 
@@ -116,6 +118,6 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @return "cashInTreasureTrain".
      */
     public static String getTagName() {
-        return "cashInTreasureTrain";
+        return TAG;
     }
 }

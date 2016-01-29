@@ -42,6 +42,8 @@ import org.w3c.dom.NodeList;
  */
 public class DiplomacyMessage extends DOMMessage {
 
+    public static final String TAG = "diplomacy";
+
     /**
      * The identifier of our entity that is conducting diplomacy
      * (either a unit or a settlement).
@@ -408,6 +410,6 @@ public class DiplomacyMessage extends DOMMessage {
      * @return "diplomacy".
      */
     public static String getTagName() {
-        return "diplomacy";
+        return TAG;
     }
 }

@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class JoinColonyMessage extends DOMMessage {
 
+    public static final String TAG = "joinColony";
+
     /** The identifier of the colony. */
     private final String colonyId;
 
@@ -123,6 +125,6 @@ public class JoinColonyMessage extends DOMMessage {
      * @return "joinColony".
      */
     public static String getTagName() {
-        return "joinColony";
+        return TAG;
     }
 }

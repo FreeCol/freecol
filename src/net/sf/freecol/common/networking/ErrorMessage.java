@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  */
 public class ErrorMessage extends DOMMessage {
 
-    public static final String ERROR_TAG = "error";
+    public static final String TAG = "error";
     
     public static final String MESSAGE_ID_TAG = "messageId";
     public static final String MESSAGE_TAG = "message";
@@ -140,6 +140,6 @@ public class ErrorMessage extends DOMMessage {
      * @return "error".
      */
     public static String getTagName() {
-        return ERROR_TAG;
+        return TAG;
     }
 }

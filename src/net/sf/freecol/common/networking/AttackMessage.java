@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class AttackMessage extends DOMMessage {
 
+    public static final String TAG = "attack";
+
     /** The identifier of the attacker. */
     private final String unitId;
 
@@ -146,6 +148,6 @@ public class AttackMessage extends DOMMessage {
      * @return "attack".
      */
     public static String getTagName() {
-        return "attack";
+        return TAG;
     }
 }

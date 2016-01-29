@@ -37,6 +37,8 @@ import org.w3c.dom.NodeList;
  */
 public class HighScoreMessage extends DOMMessage {
 
+    public static final String TAG = "highScore";
+
     /** The high scores. */
     private final List<HighScore> scores = new ArrayList<>();
     
@@ -105,6 +107,6 @@ public class HighScoreMessage extends DOMMessage {
      * @return "highScore".
      */
     public static String getTagName() {
-        return "highScore";
+        return TAG;
     }
 }

@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class RenameMessage extends DOMMessage {
 
+    public static final String TAG = "rename";
+
     /** The identifier of the object to be renamed. */
     private final String id;
 
@@ -120,6 +122,6 @@ public class RenameMessage extends DOMMessage {
      * @return "rename".
      */
     public static String getTagName() {
-        return "rename";
+        return TAG;
     }
 }

@@ -42,6 +42,8 @@ import org.w3c.dom.Element;
  */
 public class RearrangeColonyMessage extends DOMMessage {
 
+    public static final String TAG = "rearrangeColony";
+
     /** Container for the unit change information. */
     public static class UnitChange implements Comparable<UnitChange> {
 
@@ -295,6 +297,6 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @return "rearrangeColony".
      */
     public static String getTagName() {
-        return "rearrangeColony";
+        return TAG;
     }
 }

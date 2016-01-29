@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
  */
 public class ChangeWorkTypeMessage extends DOMMessage {
 
+    public static final String TAG = "changeWorkType";
+
     /** The identifier of the unit that is working. */
     private final String unitId;
 
@@ -125,7 +127,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
      * @return "changeWorkType".
      */
     public static String getTagName() {
-        return "changeWorkType";
+        return TAG;
     }
 }
 

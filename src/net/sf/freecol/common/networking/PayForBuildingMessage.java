@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
  */
 public class PayForBuildingMessage extends DOMMessage {
 
+    public static final String TAG = "payForBuilding";
+
     /** The identifier of the colony that is building. */
     private final String colonyId;
 
@@ -108,6 +110,6 @@ public class PayForBuildingMessage extends DOMMessage {
      * @return "payForBuilding".
      */
     public static String getTagName() {
-        return "payForBuilding";
+        return TAG;
     }
 }

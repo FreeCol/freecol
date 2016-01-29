@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
  */
 public class EmigrateUnitMessage extends DOMMessage {
 
+    public static final String TAG = "emigrateUnit";
+
     /** The slot from which to select the unit. */
     private final String slotString;
 
@@ -141,6 +143,6 @@ public class EmigrateUnitMessage extends DOMMessage {
      * @return "emigrateUnit".
      */
     public static String getTagName() {
-        return "emigrateUnit";
+        return TAG;
     }
 }
