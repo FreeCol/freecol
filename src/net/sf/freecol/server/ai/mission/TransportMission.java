@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
@@ -213,9 +214,7 @@ public class TransportMission extends Mission {
         List<Cargo> old = tCopy();
         synchronized (cargoes) {
             cargoes.clear();
-            for (Cargo c : nxt) {
-                if (c.isValid()) cargoes.add(c);
-            }
+            cargoes.addAll(transform(nxt, Cargo::isValid, Collectors.toList()));
             if (setSpace) tSpace();
         }
         tRetarget();
