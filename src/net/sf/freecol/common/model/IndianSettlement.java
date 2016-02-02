@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -746,10 +747,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             unitType, spec.getMilitaryRoles());
 
         if (type.isMilitaryGoods()) { // Retain enough goods to fully arm
-            return ownedUnits.stream()
-                .filter(u -> !militaryRoles.contains(u.getRole()))
-                .mapToInt(u -> AbstractGoods.getCount(type, 
-                        u.getGoodsDifference(militaryRoles.get(0), 1))).sum();
+            return sum(ownedUnits, u -> !militaryRoles.contains(u.getRole()),
+                       u -> AbstractGoods.getCount(type, 
+                           u.getGoodsDifference(militaryRoles.get(0), 1)));
         }
 
         int consumption = getConsumptionOf(type);
@@ -927,11 +927,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *         be produced in one turn.
      */
     public int getMaximumProduction(GoodsType goodsType) {
-        return getTile().getSurroundingTiles(0, getRadius()).stream()
-            .filter(t -> t.getOwningSettlement() == null
-                    || t.getOwningSettlement() == this)
+        return sum(getTile().getSurroundingTiles(0, getRadius()),
+            t -> t.getOwningSettlement() == null
+                || t.getOwningSettlement() == this,
             // FIXME: make unitType brave
-            .mapToInt(t -> t.getPotentialProduction(goodsType, null)).sum();
+            t -> t.getPotentialProduction(goodsType, null));
     }
 
 

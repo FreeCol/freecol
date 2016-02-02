@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.CachingFunction;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -312,9 +313,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
                     bonus = (float)tension.getLevel().ordinal()
                         - Tension.Level.CONTENT.ordinal();
                 }
-                value += t.getUnitList().stream()
-                    .filter(u -> cm.getOffencePower(u, is) > threshold)
-                    .mapToDouble(u -> cm.getOffencePower(u, is) + bonus).sum();
+                value += sumDouble(t.getUnitList(),
+                                   u -> cm.getOffencePower(u, is) > threshold,
+                                   u -> cm.getOffencePower(u, is) + bonus);
                 if (value > 0.0) threats.put(t, value);
             }
         }

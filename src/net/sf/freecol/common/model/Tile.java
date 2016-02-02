@@ -1575,9 +1575,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (landLocked) {
             ret.add("warning.landLocked");
         }
-        int food = goodsMap.entrySet().stream()
-            .filter(e -> e.getKey().isFoodType())
-            .mapToInt(Entry::getValue).sum();
+        int food = sum(goodsMap.entrySet(), e -> e.getKey().isFoodType(),
+                       Entry::getValue);
         if (food < 8) {
             ret.add("warning.noFood");
         }

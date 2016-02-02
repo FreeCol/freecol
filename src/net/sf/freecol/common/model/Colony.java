@@ -1026,9 +1026,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int priceGoodsForBuilding(List<AbstractGoods> required) {
         final Market market = getOwner().getMarket();
         // FIXME: magic number!
-        return required.stream().mapToInt(ag -> (ag.getType().isStorable())
-            ? (market.getBidPrice(ag.getType(), ag.getAmount()) * 110) / 100
-            : ag.getType().getPrice() * ag.getAmount()).sum();
+        return sum(required,
+            ag -> (ag.getType().isStorable())
+                ? (market.getBidPrice(ag.getType(), ag.getAmount()) * 110)/100
+                : ag.getType().getPrice() * ag.getAmount());
     }
 
     /**
@@ -1601,9 +1602,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public double getTotalDefencePower() {
         final CombatModel cm = getGame().getCombatModel();
-        return getTile().getUnitList().stream()
-            .filter(Unit::isDefensiveUnit)
-            .mapToDouble(u -> cm.getDefencePower(null, u)).sum();
+        return sumDouble(getTile().getUnitList(), Unit::isDefensiveUnit,
+                         u -> cm.getDefencePower(null, u));
     }
 
     /**
@@ -1900,8 +1900,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return an <code>int</code> value
      */
     public int getFoodProduction() {
-        return getSpecification().getFoodGoodsTypeList().stream()
-            .mapToInt(ft -> getTotalProductionOf(ft)).sum();
+        return sum(getSpecification().getFoodGoodsTypeList(),
+                   ft -> getTotalProductionOf(ft));
     }
 
     /**
@@ -2507,8 +2507,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUnitCount() {
-        return getCurrentWorkLocations().stream()
-            .mapToInt(UnitLocation::getUnitCount).sum();
+        return sum(getCurrentWorkLocations(), UnitLocation::getUnitCount);
     }
 
     /**
@@ -2685,8 +2684,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUpkeep() {
-        return buildingMap.values().stream()
-            .mapToInt(b -> b.getType().getUpkeep()).sum();
+        return sum(buildingMap.values(), b -> b.getType().getUpkeep());
     }
 
     /**
@@ -2694,8 +2692,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getTotalProductionOf(GoodsType goodsType) {
-        return getCurrentWorkLocations().stream()
-            .mapToInt(wl -> wl.getTotalProductionOf(goodsType)).sum();
+        return sum(getCurrentWorkLocations(),
+                   wl -> wl.getTotalProductionOf(goodsType));
     }
 
     /**

@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -83,8 +84,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 Messages.getDescription(currentFather));
             recruitingPanel.add(currentFatherLabel);
             for (GoodsType gt : getSpecification().getLibertyGoodsTypeList()) {
-                int total = player.getColonies().stream()
-                    .mapToInt(c -> c.getNetProductionOf(gt)).sum();
+                int total = sum(player.getColonies(),
+                                c -> c.getNetProductionOf(gt));
                 FreeColProgressBar progressBar = new FreeColProgressBar(gt, 0,
                     player.getTotalFoundingFatherCost(), player.getLiberty(),
                     total);

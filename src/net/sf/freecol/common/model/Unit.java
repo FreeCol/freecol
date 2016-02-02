@@ -3272,8 +3272,7 @@ public class Unit extends GoodsLocation
      * @return The number of cargo slots occupied by units.
      */
     public int getUnitSpaceTaken() {
-        return (canCarryUnits())
-            ? getUnitList().stream().mapToInt(u -> u.getSpaceTaken()).sum()
+        return (canCarryUnits()) ? sum(getUnitList(), u -> u.getSpaceTaken())
             : 0;
     }
 

@@ -491,8 +491,7 @@ public class ColonyPlan {
         List<GoodsType> rawMaterials = new ArrayList<>(rawLuxuryGoodsTypes);
         rawMaterials.addAll(otherRawGoodsTypes);
         for (GoodsType g : rawMaterials) {
-            int value = production.get(g).entrySet().stream()
-                .mapToInt(Entry::getValue).sum();
+            int value = sum(production.get(g).entrySet(), Entry::getValue);
             if (value <= LOW_PRODUCTION_THRESHOLD) {
                 production.remove(g);
                 continue;
@@ -808,17 +807,16 @@ public class ColonyPlan {
 
         // Weight by lower required goods.
         for (BuildPlan bp : buildPlans) {
-            double difficulty = bp.type.getRequiredGoods().stream()
-                .filter(ag -> ag.getAmount() > colony.getGoodsCount(ag.getType()))
-                .mapToDouble(ag -> {
-                        final GoodsType type = ag.getType();
-                        return (ag.getAmount() - colony.getGoodsCount(type))
-                            // Penalize building with type that can not be
-                            // made locally.
-                            * ((produce.contains(type.getInputType())) ? 1.0
-                                : 5.0);
-                    }).sum();
-            bp.difficulty = Math.max(1.0f, Math.sqrt(difficulty));
+            int difficulty = sum(bp.type.getRequiredGoods(),
+                ag -> ag.getAmount() > colony.getGoodsCount(ag.getType()),
+                ag -> {
+                    final GoodsType type = ag.getType();
+                    return (ag.getAmount() - colony.getGoodsCount(type))
+                    // Penalize building with type that can not be
+                    // made locally.
+                        * ((produce.contains(type.getInputType())) ? 1 : 5);
+                });
+            bp.difficulty = Math.max(1.0f, Math.sqrt((double)difficulty));
         }
 
         Collections.sort(buildPlans, buildPlanComparator);
@@ -890,8 +888,7 @@ public class ColonyPlan {
     private void updateProductionList(final Map<GoodsType, Map<WorkLocation, Integer>> production) {
         final Comparator<GoodsType> productionComparator
             = Comparator.comparingInt((GoodsType gt) ->
-                production.get(gt).values().stream().mapToInt(Integer::intValue)
-                    .sum())
+                    sum(production.get(gt).values(), Integer::intValue))
                 .reversed();
 
         // If we need liberty put it before the new world production.
@@ -1327,9 +1324,8 @@ public class ColonyPlan {
                 // what is needed for a building--- e.g. prevent
                 // musket production from hogging the tools.
                 GoodsType raw = goodsType.getInputType();
-                int rawNeeded = buildGoods.stream()
-                    .filter(ag -> ag.getType() == raw)
-                    .mapToInt(AbstractGoods::getAmount).sum();
+                int rawNeeded = sum(buildGoods, ag -> ag.getType() == raw,
+                                    AbstractGoods::getAmount);
                 if (raw == null
                     || col.getAdjustedNetProductionOf(raw) >= 0
                     || (((col.getGoodsCount(raw) - rawNeeded)

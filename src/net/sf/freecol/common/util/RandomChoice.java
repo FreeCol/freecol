@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 
@@ -62,7 +63,7 @@ public class RandomChoice<T> {
     }
 
     public static <T> int getTotalProbability(Collection<RandomChoice<T>> input) {
-        return input.stream().mapToInt(RandomChoice::getProbability).sum();
+        return sum(input, RandomChoice::getProbability);
     }
 
     public static <T> T getWeightedRandom(Logger logger, String logMe,

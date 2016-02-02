@@ -327,8 +327,8 @@ public abstract class Settlement extends GoodsLocation
      * @return an <code>int</code> value
      */
     public int getConsumptionOf(GoodsType goodsType) {
-        return Math.max(0, getUnitList().stream()
-                .mapToInt(u -> u.getType().getConsumptionOf(goodsType)).sum());
+        return Math.max(0, sum(getUnitList(),
+                               u -> u.getType().getConsumptionOf(goodsType)));
     }
 
     /**
@@ -340,8 +340,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public int getConsumptionOf(List<GoodsType> goodsTypes) {
         return (goodsTypes == null) ? 0
-            : goodsTypes.stream()
-                .mapToInt(gt -> getConsumptionOf(gt)).sum();
+            : sum(goodsTypes, gt -> getConsumptionOf(gt));
     }
 
     /**

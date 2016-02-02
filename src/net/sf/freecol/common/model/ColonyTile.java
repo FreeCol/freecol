@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.NoClaimReason;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -173,8 +174,8 @@ public class ColonyTile extends WorkLocation {
         } else {
             for (AbstractGoods output : getOutputs()) {
                 final GoodsType goodsType = output.getType();
-                int amount = getUnitList().stream()
-                    .mapToInt(u -> getUnitProduction(u, goodsType)).sum();
+                int amount = sum(getUnitList(),
+                                 u -> getUnitProduction(u, goodsType));
                 if (amount > 0) {
                     pi.addProduction(new AbstractGoods(goodsType, amount));
                 }
@@ -210,16 +211,15 @@ public class ColonyTile extends WorkLocation {
         if (productionType.getUnattended()) {
             if (newType == null) {
                 // Tile type stays the same, return the sum of any food bonues.
-                return getSpecification().getFoodGoodsTypeList().stream()
-                    .mapToInt(gt -> ti.getBonus(gt)).sum();
+                return sum(getSpecification().getFoodGoodsTypeList(),
+                           gt -> ti.getBonus(gt));
             }
 
             // Tile type change.
             final List<AbstractGoods> newProd
                 = newType.getPossibleProduction(true);
-            int food = newProd.stream()
-                .filter(ag -> ag.getType().isFoodType())
-                .mapToInt(AbstractGoods::getAmount).sum();
+            int food = sum(newProd, ag -> ag.getType().isFoodType(),
+                           ag -> ag.getAmount());
             // Get the current food production.  Otherwise for goods
             // that are being passively produced and consumed, check
             // if production remains in surplus following a negative change.
@@ -266,8 +266,8 @@ public class ColonyTile extends WorkLocation {
     @Override
     public int evaluateFor(Player player) {
         return super.evaluateFor(player)
-            + getProductionInfo().getProduction().stream()
-                .mapToInt(ag -> ag.evaluateFor(player)).sum();
+            + sum(getProductionInfo().getProduction(),
+                  ag -> ag.evaluateFor(player));
     }
 
 

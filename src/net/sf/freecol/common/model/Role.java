@@ -232,9 +232,9 @@ public class Role extends BuildableType {
      * @return The price of the goods for this role.
      */
     public int getRequiredGoodsPrice(Market market) {
-        return getRequiredGoods().stream()
-            .mapToInt(ag -> market.getBidPrice(ag.getType(),
-                    ag.getAmount() * getMaximumCount())).sum();
+        return sum(getRequiredGoods(),
+            ag -> market.getBidPrice(ag.getType(),
+                                     ag.getAmount() * getMaximumCount()));
     }
         
     /**

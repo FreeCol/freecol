@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -521,7 +522,108 @@ public class CollectionUtils {
                               ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).max().orElse(0);
     }
-        
+
+    /**
+     * Take the sum of the members of a collection.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Collection<T> c, ToIntFunction<T> tif) {
+        return sum(c.stream(), x -> true, tif);
+    }
+
+    /**
+     * Take the sum of the members of a collection.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     *     to a double.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(Collection<T> c,
+                                       ToDoubleFunction<T> tdf) {
+        return sumDouble(c.stream(), x -> true, tdf);
+    }
+
+    /**
+     * Take the sum of the members of a collection.
+     *
+     * @param c The <code>Collection</code> to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Collection<T> c, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return sum(c.stream(), predicate, tif);
+    }
+
+    /**
+     * Take the sum of the members of a collection.
+     *
+     * @param c The <code>Collection</code> to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tdf A <code>ToDoubleFunction</code> to map the stream to
+     *     double with.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(Collection<T> c, Predicate<T> predicate,
+                                       ToDoubleFunction<T> tdf) {
+        return sumDouble(c.stream(), predicate, tdf);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Stream<T> stream, ToIntFunction<T> tif) {
+        return sum(stream, x -> true, tif);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     *     to a double.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(Stream<T> stream,
+                                       ToDoubleFunction<T> tdf) {
+        return sumDouble(stream, x -> true, tdf);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param predicate A <code>Predicate</code> to select members.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Stream<T> stream, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return stream.filter(predicate).mapToInt(tif).sum();
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param stream The <code>Stream</code> to sum.
+     * @param predicate A <code>Predicate</code> to select members.
+     * @param tdf A <code>ToIntFunction</code> to convert members to a double.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(Stream<T> stream, Predicate<T> predicate,
+                                       ToDoubleFunction<T> tdf) {
+        return stream.filter(predicate).mapToDouble(tdf).sum();
+    }
+
     /**
      * Transform the contents of an array.
      *

@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -469,7 +470,7 @@ public class Cargo {
         ret += (getMode().isCollection()) ? getTransportable().getSpaceTaken()
             : -getTransportable().getSpaceTaken();
         if (hasWrapped()) {
-            ret += wrapped.stream().mapToInt(Cargo::getNewSpace).sum();
+            ret += sum(wrapped, Cargo::getNewSpace);
         }
         return ret;
     }

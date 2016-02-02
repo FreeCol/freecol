@@ -101,11 +101,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
 
         public final int getSpaceRequired() {
-            return spaceRequired;
+            return this.spaceRequired;
         }
 
         public final int getCapacity() {
-            return capacity;
+            return this.capacity;
         }
 
         /**
@@ -113,13 +113,11 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public final void updateSpaceAndCapacity() {
             final Specification spec = getSpecification();
-            capacity = navalUnits.stream()
-                .filter(nu -> nu.getType(spec).canCarryUnits())
-                .mapToInt(nu -> nu.getType(spec).getSpace()
-                    * nu.getNumber()).sum();
-            spaceRequired = landUnits.stream()
-                .mapToInt(lu -> lu.getType(spec).getSpaceTaken()
-                    * lu.getNumber()).sum();
+            this.capacity = sum(this.navalUnits,
+                nu -> nu.getType(spec).canCarryUnits(),
+                nu -> nu.getType(spec).getSpace() * nu.getNumber());
+            this.spaceRequired = sum(this.landUnits,
+                lu -> lu.getType(spec).getSpaceTaken() * lu.getNumber());
         }
 
         /**
@@ -139,7 +137,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @return A copy of the list of the naval units.
          */
         public final List<AbstractUnit> getNavalUnits() {
-            return AbstractUnit.deepCopy(navalUnits);
+            return AbstractUnit.deepCopy(this.navalUnits);
         }
 
         /**
@@ -148,7 +146,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @return A list of the  land units.
          */
         public final List<AbstractUnit> getLandUnits() {
-            return AbstractUnit.deepCopy(landUnits);
+            return AbstractUnit.deepCopy(this.landUnits);
         }
 
         /**
@@ -157,7 +155,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          * @return True if there are no land or naval units.
          */
         public final boolean isEmpty() {
-            return landUnits.isEmpty() && navalUnits.isEmpty();
+            return this.landUnits.isEmpty() && this.navalUnits.isEmpty();
         }
 
         /**
@@ -175,7 +173,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                     if (spec.getUnitType(refUnit.getId()) == unitType) {
                         refUnit.setNumber(refUnit.getNumber() + n);
                         if (unitType.canCarryUnits()) {
-                            capacity += unitType.getSpace() * n;
+                            this.capacity += unitType.getSpace() * n;
                         }
                         added = true;
                         break;
@@ -192,7 +190,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                         break;
                     }
                 }
-                if (!added) landUnits.add(au);
+                if (!added) this.landUnits.add(au);
             }
             updateSpaceAndCapacity();
         }
@@ -206,7 +204,7 @@ public final class Monarch extends FreeColGameObject implements Named {
          */
         public double calculateStrength(boolean naval) {
             return AbstractUnit.calculateStrength(getSpecification(),
-                (naval) ? navalUnits : landUnits);
+                (naval) ? this.navalUnits : this.landUnits);
         }
 
         // @compat 0.10.x

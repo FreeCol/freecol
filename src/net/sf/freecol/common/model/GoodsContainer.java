@@ -325,10 +325,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public int getSpaceTaken() {
         synchronized (storedGoods) {
-            return storedGoods.values().stream()
-                .mapToInt(amount -> (amount % CARGO_SIZE == 0)
+            return sum(storedGoods.values(),
+                amount -> (amount % CARGO_SIZE == 0)
                     ? amount/CARGO_SIZE
-                    : amount/CARGO_SIZE + 1).sum();
+                    : amount/CARGO_SIZE + 1);
         }
     }
 

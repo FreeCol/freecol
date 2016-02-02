@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -411,8 +412,8 @@ public final class TilePopup extends JPopupMenu {
         menuItem.setEnabled(enabled);
         menu.add(menuItem);
 
-        int lineCount = 1 + unit.getUnitList().stream()
-            .mapToInt(u -> addUnit(menu, u, true, true)).sum();
+        int lineCount = 1 + sum(unit.getUnitList(),
+                                u -> addUnit(menu, u, true, true));
         boolean hasGoods = false;
         for (Goods goods: unit.getGoodsList()) {
             text = (indent ? "         " : "     ")

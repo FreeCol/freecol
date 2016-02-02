@@ -595,10 +595,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 // Pick the best tile to steal, considering mainly the
                 // building goods needed, but including food at a lower
                 // weight.
-                double s = needed.stream()
-                        .mapToInt(gt -> t.getPotentialProduction(gt, unitType)).sum()
-                    + spec.getFoodGoodsTypeList().stream()
-                        .mapToDouble(ft -> 0.1 * t.getPotentialProduction(ft, unitType)).sum();
+                double s = sumDouble(needed,
+                        gt -> t.getPotentialProduction(gt, unitType))
+                    + sumDouble(spec.getFoodGoodsTypeList(),
+                        ft -> 0.1 * t.getPotentialProduction(ft, unitType));
                 if (s > score) {
                     score = s;
                     steal = t;

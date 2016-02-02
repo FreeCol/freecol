@@ -634,12 +634,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Still not defeated as long as military strength is greater
         // than the rebels.
-        int rebelPower = 0;
-        for (Player rebel : getRebels()) {
-            rebelPower += rebel.getUnits().stream()
-                .filter(u -> !u.isNaval())
-                .mapToDouble(u -> cm.getOffencePower(u, null)).sum();
-        }
+        Stream<Unit> us = getRebels().stream()
+            .flatMap(rebel -> rebel.getUnits().stream());
+        int rebelPower = (int)sumDouble(us, u -> !u.isNaval(),
+                                        u -> cm.getOffencePower(u, null));
         if (power > rebelPower) return false;
 
         // REF is defeated
@@ -868,14 +866,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return True if the player score changed.
      */
     public boolean updateScore() {
-        int oldScore = score;
-        score = getUnits().stream()
-                .mapToInt(u -> u.getType().getScoreValue()).sum()
-            + getColonies().stream().mapToInt(Colony::getLiberty).sum()
+        int oldScore = this.score;
+        this.score = sum(getUnits(), u -> u.getType().getScoreValue())
+            + sum(getColonies(), Colony::getLiberty)
             + SCORE_FOUNDING_FATHER * getFathers().size();
         int gold = getGold();
         if (gold != GOLD_NOT_ACCOUNTED) {
-            score += (int)Math.floor(SCORE_GOLD * gold);
+            this.score += (int)Math.floor(SCORE_GOLD * gold);
         }
         
         int bonus = 0;
@@ -891,14 +888,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                     break;
                 default:
-                    score += h.getScore();
+                    this.score += h.getScore();
                     break;
                 }
             }
         }
-        score += (score * bonus) / 100;
+        this.score += (this.score * bonus) / 100;
 
-        return score != oldScore;
+        return this.score != oldScore;
     }
 
     /**
@@ -1203,13 +1200,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The price.
      */
     public int priceMercenaries(List<AbstractUnit> mercenaries) {
-        int price = 0;
-        for (AbstractUnit au : mercenaries) {
-            int auPrice = getPrice(au);
-            if (auPrice == INFINITY) continue;
-            price += auPrice;
-        }
-        return (checkGold(price)) ? price : getGold();
+        int mercPrice = sum(mercenaries, au -> getPrice(au));
+        if (!checkGold(mercPrice)) mercPrice = getGold();
+        return mercPrice;
     }
 
     /**
@@ -1572,8 +1565,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         final Disaster bankruptcy = spec.getDisaster(Disaster.BANKRUPTCY);
 
         boolean changed = false;
-        int upkeep = getSettlements().stream()
-            .mapToInt(Settlement::getUpkeep).sum();
+        int upkeep = sum(getSettlements(), Settlement::getUpkeep);
         if (checkGold(upkeep)) {
             modifyGold(-upkeep);
             if (getBankrupt()) {
@@ -1961,9 +1953,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         if (enemy.isEuropean()) {
                             Integer alarm = extra.get(enemy);
                             if (alarm == null) continue;
-                            alarm += (int)tile.getUnitList().stream()
-                                .filter(u -> u.isOffensiveUnit() && !u.isNaval())
-                                .mapToDouble(u -> u.getType().getOffence()).sum();
+                            alarm += (int)sumDouble(tile.getUnitList(),
+                                u -> u.isOffensiveUnit() && !u.isNaval(),
+                                u -> u.getType().getOffence());
                             extra.put(enemy, alarm);
                         }
                     } else if (colony != null) { // Colonies

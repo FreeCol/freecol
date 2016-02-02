@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
@@ -1313,10 +1315,8 @@ public class Player extends FreeColGameObject implements Nameable {
         
         final List<GoodsType> immigrationGoodsTypes = getSpecification()
             .getImmigrationGoodsTypeList();
-        int production = getColonies().stream()
-            .mapToInt(c -> immigrationGoodsTypes.stream()
-                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
-            .sum();
+        int production = sum(getColonies(),
+            c -> sum(immigrationGoodsTypes, gt -> c.getTotalProductionOf(gt)));
         final Europe europe = getEurope();
         if (europe != null) production += europe.getImmigration(production);
         return production;
@@ -1402,10 +1402,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getLibertyProductionNextTurn() {
         final Specification spec = getSpecification();
-        int nextTurn = getColonies().stream()
-            .mapToInt(c -> spec.getLibertyGoodsTypeList().stream()
-                .mapToInt(gt -> c.getTotalProductionOf(gt)).sum())
-            .sum();
+        int nextTurn = sum(getColonies(),
+            c -> sum(spec.getLibertyGoodsTypeList(),
+                     gt -> c.getTotalProductionOf(gt)));
         return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
                                    Modifier.LIBERTY);
     }
@@ -1418,8 +1417,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getSoL() {
         final List<Colony> colonies = getColonies();
         return (colonies.isEmpty()) ? 0
-            : colonies.stream().mapToInt(Colony::getSoL).sum()
-                / colonies.size();
+            : sum(colonies, Colony::getSoL) / colonies.size();
     }
 
     /**
@@ -1578,9 +1576,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int calculateStrength(boolean naval) {
         final CombatModel cm = getGame().getCombatModel();
-        return (int)getUnits().stream()
-            .filter(u -> u.isNaval() == naval)
-            .mapToDouble(u -> cm.getOffencePower(u, null)).sum();
+        return (int)sumDouble(getUnits(), u -> u.isNaval() == naval,
+                              u -> cm.getOffencePower(u, null));
     }
 
     /**
@@ -2231,7 +2228,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The sum of the units currently working in the colonies.
      */
     public int getColoniesPopulation() {
-        return getColonies().stream().mapToInt(Colony::getUnitCount).sum();
+        return sum(getColonies(), Colony::getUnitCount);
     }
 
     /**
@@ -2906,10 +2903,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         } // Else, native ownership
         int price = spec.getInteger(GameOptions.LAND_PRICE_FACTOR)
-            * spec.getGoodsTypeList().stream()
+            * sum(spec.getGoodsTypeList(),
                 // Only consider specific food types, not the aggregation.
-                .filter(gt -> gt != spec.getPrimaryFoodType())
-                .mapToInt(gt -> tile.getPotentialProduction(gt, null)).sum()
+                gt -> gt != spec.getPrimaryFoodType(),
+                gt -> tile.getPotentialProduction(gt, null))
             + 100;
         return (int)applyModifiers(price, getGame().getTurn(),
                                    Modifier.LAND_PAYMENT_MODIFIER);
