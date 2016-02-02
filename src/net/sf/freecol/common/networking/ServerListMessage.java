@@ -62,7 +62,16 @@ public class ServerListMessage extends DOMMessage {
 
         NodeList nl = element.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
-            serverInfo.add(new ServerInfo((Element)nl.item(i)));
+            Element e = (Element)nl.item(i);
+            ServerInfo si = new ServerInfo(element.getAttribute("name"),
+                element.getAttribute("address"),
+                Integer.parseInt(element.getAttribute("port")),
+                Integer.parseInt(element.getAttribute("slotsAvailable")),
+                Integer.parseInt(element.getAttribute("currentlyPlaying")),
+                Boolean.parseBoolean(element.getAttribute("slotsAvailable")),
+                element.getAttribute("version"),
+                Integer.parseInt(element.getAttribute("gameState")));
+            serverInfo.add(si);
         }
     }
 
@@ -111,7 +120,17 @@ public class ServerListMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName());
-        for (ServerInfo si : this.serverInfo) result.add(si.toMessage());
+        for (ServerInfo si : this.serverInfo) {
+            result.add(new DOMMessage(si.getTagName(),
+                    "name", si.getName(),
+                    "address", si.getAddress(),
+                    "port", Integer.toString(si.getPort()),
+                    "slotsAvailable", Integer.toString(si.getSlotsAvailable()),
+                    "currentlyPlaying", Integer.toString(si.getCurrentlyPlaying()),
+                    "isGameStarted", Boolean.toString(si.getIsGameStarted()),
+                    "version", si.getVersion(),
+                    "gameState", Integer.toString(si.getGameState())));
+        }
         return result.toXMLElement();
     }
 

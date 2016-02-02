@@ -19,8 +19,6 @@
 
 package net.sf.freecol.metaserver;
 
-import java.util.logging.Logger;
-
 import net.sf.freecol.common.ServerInfo;
 
 
@@ -28,9 +26,6 @@ import net.sf.freecol.common.ServerInfo;
  * This object stores information about a single running server.
  */
 public class MetaItem extends ServerInfo {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MetaItem.class.getName());
 
     /** Timestamp for last update. */
     private long lastUpdated;
@@ -74,7 +69,7 @@ public class MetaItem extends ServerInfo {
                        boolean isGameStarted, String version, int gameState) {
         super.update(name, address, port, slotsAvailable, currentlyPlaying,
                      isGameStarted, version, gameState);
-        lastUpdated = System.currentTimeMillis();
+        this.lastUpdated = System.currentTimeMillis();
     }
     
     /**
@@ -84,6 +79,6 @@ public class MetaItem extends ServerInfo {
      *     as returned by <code>System.currentTimeMillis()</code>.
      */
     public long getLastUpdated() {
-        return lastUpdated;
+        return this.lastUpdated;
     }
 }

@@ -20,10 +20,6 @@
 package net.sf.freecol.common;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.networking.DOMMessage;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -69,17 +65,6 @@ public class ServerInfo {
                isGameStarted, version, gameState);
     }
 
-    
-    /**
-     * Creates an object from the given <code>Element</code>.
-     *
-     * @param element The XML DOM Element containing the information that will be
-     *        used for the new object.
-     */
-    public ServerInfo(Element element) {
-        readFromElement(element);
-    }
-
 
     /**
      * Updates the object with the given information.
@@ -106,21 +91,6 @@ public class ServerInfo {
         this.gameState = gameState;
     }
 
-    /**
-     * Update the server info from an element.
-     *
-     * @param element The <code>Element</code> to update from.
-     */
-    public final void update(Element element) {
-        update(element.getAttribute("name"), element.getAttribute("address"),
-               Integer.parseInt(element.getAttribute("port")),
-               Integer.parseInt(element.getAttribute("slotsAvailable")),
-               Integer.parseInt(element.getAttribute("currentlyPlaying")),
-               Boolean.parseBoolean(element.getAttribute("slotsAvailable")),
-               element.getAttribute("version"),
-               Integer.parseInt(element.getAttribute("gameState")));
-    }
-    
     /**
      * Returns the name of the server that is beeing represented 
      * by this object.
@@ -166,6 +136,15 @@ public class ServerInfo {
     public int getSlotsAvailable() {
         return slotsAvailable;
     }
+
+    /**
+     * Get the game start state.
+     *
+     * @return True if the game is started.
+     */
+    public boolean getIsGameStarted() {
+        return this.isGameStarted;
+    }
     
     /**
      * Returns the FreeCol version of the server.
@@ -185,42 +164,6 @@ public class ServerInfo {
      */
     public int getGameState() {
         return gameState;
-    }
-
-    /**
-     * Convert this to a message.
-     *
-     * @return A <code>DOMMessage</code> describing this server.
-     */
-    public DOMMessage toMessage() {
-        return new DOMMessage(getTagName(),
-            "name", name,
-            "address", address,
-            "port", Integer.toString(port),
-            "slotsAvailable", Integer.toString(slotsAvailable),
-            "currentlyPlaying", Integer.toString(currentlyPlaying),
-            "isGameStarted", Boolean.toString(isGameStarted),
-            "version", version,
-            "gameState", Integer.toString(gameState));
-    }
-
-    /**
-     * Creates an XML-representation of this object.
-     *
-     * @return The XML DOM Element representing this object.
-     */
-    public Element toXMLElement() {
-        return toMessage().toXMLElement();
-    }
-
-    /**
-     * Reads attributes from the given element.
-     *
-     * @param element The XML DOM Element containing information that
-     *     should be read by this object.
-     */
-    public void readFromElement(Element element) {
-        update(element);
     }
 
     /**
