@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -111,7 +110,7 @@ public class Operand extends Scope {
      * @return The <code>OperandType</code>.
      */
     public final OperandType getOperandType() {
-        return operandType;
+        return this.operandType;
     }
 
     /**
@@ -129,7 +128,7 @@ public class Operand extends Scope {
      * @return The scope level.
      */
     public final ScopeLevel getScopeLevel() {
-        return scopeLevel;
+        return this.scopeLevel;
     }
 
     /**
@@ -147,7 +146,7 @@ public class Operand extends Scope {
      * @return The operand value.
      */
     public final Integer getValue() {
-        return value;
+        return this.value;
     }
 
     /**
@@ -166,135 +165,9 @@ public class Operand extends Scope {
      * @return The operand value or null if inapplicable.
      */
     public Integer getValue(Game game) {
-        return (value != null) ? value
-            : (scopeLevel == ScopeLevel.GAME) ? calculateGameValue(game)
+        return (this.value != null) ? this.value
+            : (this.scopeLevel == ScopeLevel.GAME) ? calculateGameValue(game)
             : null;
-    }
-
-    /**
-     * Calculate the operand value within a given game.
-     *
-     * @param game The <code>Game</code> to check.
-     * @return The operand value.
-     */
-    private Integer calculateGameValue(Game game) {
-        final String methodName = getMethodName();
-        switch (operandType) {
-        case NONE:
-            return game.invokeMethod(methodName, Integer.class, 0);
-        case YEAR:
-            return game.getTurn().getYear();
-        case OPTION:
-            return game.getSpecification().getInteger(getType());
-        default:
-            List<FreeColObject> list = new LinkedList<>();
-            for (Player player : game.getLivePlayers(null)) {
-                switch (operandType) {
-                case UNITS:
-                    list.addAll(player.getUnits());
-                    break;
-                case BUILDINGS:
-                    for (Colony colony : player.getColonies()) {
-                        list.addAll(colony.getBuildings());
-                    }
-                    break;
-                case SETTLEMENTS:
-                    list.addAll(player.getSettlements());
-                    break;
-                case FOUNDING_FATHERS:
-                    list.addAll(player.getFathers());
-                    break;
-                default:
-                    return null;
-                }
-            }
-            return ourCount(list);
-        }
-    }
-
-    /**
-     * Gets the operand value if it is applicable to the given Player.
-     *
-     * @param player The <code>Player</code> to check.
-     * @return The operand value, or null if inapplicable.
-     */
-    public Integer getValue(Player player) {
-        if (value != null) return value;
-        switch (scopeLevel) {
-        case GAME:
-            return getValue(player.getGame());
-        case PLAYER: // Real case, handled below
-            break;
-        default: // Inapplicable
-            return null;
-        }
-
-        final Specification spec = player.getSpecification();
-        final String methodName = getMethodName();
-        List<FreeColObject> list = new LinkedList<>();
-        switch (operandType) {
-        case UNITS:
-            return ourCount(player.getUnits());
-        case BUILDINGS:
-            for (Colony colony : player.getColonies()) {
-                list.addAll(colony.getBuildings());
-            }
-            return ourCount(list);
-        case SETTLEMENTS:
-            if (methodName == null) {
-                return ourCount(player.getSettlements())
-                    + spec.getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
-            } else {
-                final String methodValue = getMethodValue();
-                int result = 0;
-                for (Settlement settlement : player.getSettlements()) {
-                    Boolean b = settlement.invokeMethod(methodName,
-                        Boolean.class, Boolean.FALSE);
-                    if (String.valueOf(b).equals(methodValue)) result++;
-                }
-                return result;
-            }
-        case FOUNDING_FATHERS:
-            list.addAll(player.getFathers());
-            return ourCount(list);
-        default:
-            return player.invokeMethod(methodName, Integer.class,
-                                       (Integer)null);
-        }
-    }
-
-    /**
-     * Gets the operand value if it is applicable to the given Settlement.
-     *
-     * @param settlement The <code>Settlement</code> to check.
-     * @return The operand value, or null if inapplicable.
-     */
-    public Integer getValue(Settlement settlement) {
-        if (value == null) {
-            if (scopeLevel == ScopeLevel.SETTLEMENT
-                && settlement instanceof Colony) {
-                Colony colony = (Colony) settlement;
-                List<FreeColObject> list = new LinkedList<>();
-                switch(operandType) {
-                case UNITS:
-                    list.addAll(colony.getUnitList());
-                    break;
-                case BUILDINGS:
-                    list.addAll(colony.getBuildings());
-                    break;
-                default:
-                    return colony.invokeMethod(getMethodName(), Integer.class,
-                                               (Integer)null);
-                }
-                return ourCount(list);
-            } else {
-                // in future, we might expand this to handle native
-                // settlements
-                return null;
-            }
-        } else {
-            return value;
-        }
     }
 
     /**
@@ -308,6 +181,115 @@ public class Operand extends Scope {
         return count(objects, o -> this.appliesTo(o));
     }
 
+    /**
+     * Calculate the operand value within a given game.
+     *
+     * @param game The <code>Game</code> to check.
+     * @return The operand value.
+     */
+    private Integer calculateGameValue(Game game) {
+        final String methodName = getMethodName();
+        int result = 0;
+        switch (this.operandType) {
+        case NONE:
+            result = game.invokeMethod(methodName, Integer.class, 0);
+            break;
+        case YEAR:
+            result = game.getTurn().getYear();
+            break;
+        case OPTION:
+            result = game.getSpecification().getInteger(getType());
+            break;
+        default:
+            for (Player player : game.getLivePlayers(null)) {
+                switch (this.operandType) {
+                case UNITS:
+                    result += ourCount(player.getUnits());
+                    break;
+                case BUILDINGS:
+                    result += sum(player.getColonies(),
+                                  c -> ourCount(c.getBuildings()));
+                    break;
+                case SETTLEMENTS:
+                    result += ourCount(player.getSettlements());
+                    break;
+                case FOUNDING_FATHERS:
+                    result += ourCount(player.getFathers());
+                    break;
+                default:
+                    return null;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the operand value if it is applicable to the given Player.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return The operand value, or null if inapplicable.
+     */
+    public Integer getValue(Player player) {
+        if (this.value != null) return this.value;
+        switch (this.scopeLevel) {
+        case GAME:
+            return getValue(player.getGame());
+        case PLAYER: // Real case, handled below
+            break;
+        default: // Inapplicable
+            return null;
+        }
+
+        final Specification spec = player.getSpecification();
+        final String methodName = getMethodName();
+        switch (this.operandType) {
+        case UNITS:
+            return ourCount(player.getUnits());
+        case BUILDINGS:
+            return sum(player.getColonies(), c -> ourCount(c.getBuildings()));
+        case SETTLEMENTS:
+            if (methodName == null) {
+                return ourCount(player.getSettlements())
+                    + spec.getInteger(GameOptions.SETTLEMENT_LIMIT_MODIFIER);
+            }
+            final String methodValue = getMethodValue();
+            return count(player.getSettlements(),
+                s -> String.valueOf(s.invokeMethod(methodName,
+                        Boolean.class, Boolean.FALSE)).equals(methodValue));
+        case FOUNDING_FATHERS:
+            return ourCount(player.getFathers());
+        default:
+            break;
+        }
+        return player.invokeMethod(methodName, Integer.class, (Integer)null);
+    }
+
+    /**
+     * Gets the operand value if it is applicable to the given Settlement.
+     *
+     * @param settlement The <code>Settlement</code> to check.
+     * @return The operand value, or null if inapplicable.
+     */
+    public Integer getValue(Settlement settlement) {
+        if (this.value != null) return this.value;
+        
+        // In future, we might expand this to handle native settlements
+        if (this.scopeLevel != ScopeLevel.SETTLEMENT
+            || !(settlement instanceof Colony)) return null;
+
+        final Colony colony = (Colony)settlement;
+        switch (this.operandType) {
+        case UNITS:
+            return ourCount(colony.getUnitList());
+        case BUILDINGS:
+            return ourCount(colony.getBuildings());
+        default:
+            break;
+        }
+        return colony.invokeMethod(getMethodName(), Integer.class, (Integer)null);
+    }
+
 
     // Interface Object
 
@@ -318,9 +300,9 @@ public class Operand extends Scope {
     public boolean equals(Object o) {
         return this == o
             || (o instanceof Operand
-                && operandType == ((Operand)o).operandType
-                && scopeLevel == ((Operand)o).scopeLevel
-                && Utils.equals(value, ((Operand)o).value)
+                && this.operandType == ((Operand)o).operandType
+                && this.scopeLevel == ((Operand)o).scopeLevel
+                && Utils.equals(this.value, ((Operand)o).value)
                 && super.equals(o));
     }
 
@@ -342,12 +324,12 @@ public class Operand extends Scope {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(OPERAND_TYPE_TAG, operandType);
+        xw.writeAttribute(OPERAND_TYPE_TAG, this.operandType);
 
-        xw.writeAttribute(SCOPE_LEVEL_TAG, scopeLevel);
+        xw.writeAttribute(SCOPE_LEVEL_TAG, this.scopeLevel);
 
-        if (value != null) {
-            xw.writeAttribute(VALUE_TAG, value);
+        if (this.value != null) {
+            xw.writeAttribute(VALUE_TAG, this.value);
         }
     }
 
@@ -360,24 +342,24 @@ public class Operand extends Scope {
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_OPERAND_TYPE_TAG)) {
-            operandType = xr.getAttribute(OLD_OPERAND_TYPE_TAG,
-                                          OperandType.class, OperandType.NONE);
+            this.operandType = xr.getAttribute(OLD_OPERAND_TYPE_TAG,
+                OperandType.class, OperandType.NONE);
         } else            
         // end @compat 0.11.3
-            operandType = xr.getAttribute(OPERAND_TYPE_TAG,
-                                          OperandType.class, OperandType.NONE);
+            this.operandType = xr.getAttribute(OPERAND_TYPE_TAG,
+                OperandType.class, OperandType.NONE);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_SCOPE_LEVEL_TAG)) {
-            scopeLevel = xr.getAttribute(OLD_SCOPE_LEVEL_TAG,
-                                         ScopeLevel.class, ScopeLevel.NONE);
+            this.scopeLevel = xr.getAttribute(OLD_SCOPE_LEVEL_TAG,
+                ScopeLevel.class, ScopeLevel.NONE);
         } else
         // end @compat 0.11.3
-            scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
-                                         ScopeLevel.class, ScopeLevel.NONE);
+            this.scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
+                ScopeLevel.class, ScopeLevel.NONE);
 
         int val = xr.getAttribute(VALUE_TAG, INFINITY);
-        if (val != INFINITY) value = val;
+        if (val != INFINITY) this.value = val;
     }
 
     /**
@@ -385,10 +367,10 @@ public class Operand extends Scope {
      */
     @Override
     public String toString() {
-        if (value != null) return Integer.toString(value);
+        if (this.value != null) return Integer.toString(value);
         StringBuffer sb = new StringBuffer();
-        sb.append("[Operand type=").append(operandType)
-            .append(" scopeLevel=").append(scopeLevel);
+        sb.append("[Operand type=").append(this.operandType)
+            .append(" scopeLevel=").append(this.scopeLevel);
         return super.toString().replaceFirst("^[^ ]*", sb.toString());
     }
 
