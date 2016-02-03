@@ -618,7 +618,7 @@ public final class InGameInputHandler extends InputHandler
                 .handle(freeColServer, connection));
         register(GetNationSummaryMessage.getTagName(),
             (Connection connection, Element element) ->
-            new GetNationSummaryMessage(element)
+            new GetNationSummaryMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register(HighScoreMessage.getTagName(),
             (Connection connection, Element element) ->

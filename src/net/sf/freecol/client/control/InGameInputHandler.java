@@ -756,7 +756,8 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final Player player = getFreeColClient().getMyPlayer();
 
-        GetNationSummaryMessage message = new GetNationSummaryMessage(element);
+        GetNationSummaryMessage message
+            = new GetNationSummaryMessage(game, element);
         Player other = message.getPlayer(game);
         NationSummary ns = message.getNationSummary();
         player.putNationSummary(other, ns);

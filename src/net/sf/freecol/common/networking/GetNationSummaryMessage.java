@@ -52,17 +52,18 @@ public class GetNationSummaryMessage extends DOMMessage {
     public GetNationSummaryMessage(Player player) {
         super(getTagName());
 
-        playerId = player.getId();
-        summary = null;
+        this.playerId = player.getId();
+        this.summary = null;
     }
 
     /**
      * Create a new <code>GetNationSummaryMessage</code> from a
      * supplied element.
      *
+     * @param game The <code>Game</code> containing the nation to summarize.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public GetNationSummaryMessage(Element element) {
+    public GetNationSummaryMessage(Game game, Element element) {
         super(getTagName());
 
         playerId = element.getAttribute("player");

@@ -302,7 +302,8 @@ public final class AIInGameInputHandler implements MessageHandler {
         final Game game = aiMain.getGame();
         final AIPlayer aiPlayer = getAIPlayer();
 
-        GetNationSummaryMessage message = new GetNationSummaryMessage(element);
+        GetNationSummaryMessage message
+            = new GetNationSummaryMessage(game, element);
         Player player = aiPlayer.getPlayer();
         Player other = message.getPlayer(game);
         NationSummary ns = message.getNationSummary();
