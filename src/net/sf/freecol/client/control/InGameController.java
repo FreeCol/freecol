@@ -4537,7 +4537,11 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        return askServer().rename((FreeColGameObject)object, name);
+        if (askServer().rename((FreeColGameObject)object, name)) {
+            updateGUI(null);
+            return true;
+        }
+        return false;
     }
 
     /**
