@@ -78,7 +78,7 @@ public final class NetworkHandler implements MessageHandler {
             reply = update(connection, element);
             break;
         case ServerListMessage.TAG:
-            reply = serverList(connection, element);
+            reply = new ServerListMessage(metaRegister).toXMLElement();
             break;
         case "remove":
             reply = remove(connection, element);
@@ -91,20 +91,6 @@ public final class NetworkHandler implements MessageHandler {
     }
 
     
-    /**
-     * Handles a "serverList"-request.
-     *
-     * @param connection The <code>Connection</code> the message
-     *       was received on.
-     * @param element The element containing the request.
-     * @return The reply: An <code>Element</code> with a list of the
-     *      servers in the {@link MetaRegister}.
-     */
-    private Element serverList(Connection connection, Element element) {
-        return metaRegister.createServerList();
-    }
-
-
     /**
      * Handles a "register"-request.
      * 

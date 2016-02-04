@@ -19,12 +19,10 @@
 
 package net.sf.freecol.common;
 
-import net.sf.freecol.FreeCol;
-
 
 /**
- * Contains information about a single server.  This information is
- * normally retrieved from a meta-server.
+ * Container class for information about a single server.  This
+ * information is normally retrieved from a meta-server.
  * 
  * @see net.sf.freecol.metaserver
  */
@@ -45,25 +43,6 @@ public class ServerInfo {
      * Empty constructor that can be used by subclasses.
      */
     protected ServerInfo() {}
-
-    /**
-     * Creates a new object with the given information.
-     *
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version of the server.
-     * @param gameState The current state of the game.
-     */
-    public ServerInfo(String name, String address, int port,
-                      int slotsAvailable, int currentlyPlaying,
-                      boolean isGameStarted, String version, int gameState) {
-        update(name, address, port, slotsAvailable, currentlyPlaying,
-               isGameStarted, version, gameState);
-    }
 
 
     /**

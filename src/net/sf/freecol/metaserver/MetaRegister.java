@@ -21,15 +21,12 @@ package net.sf.freecol.metaserver;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.ServerListMessage;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -40,6 +37,7 @@ public final class MetaRegister {
 
     private static final Logger logger = Logger.getLogger(MetaRegister.class.getName());
 
+    /** The current list of servers. */
     private final ArrayList<MetaItem> items = new ArrayList<>();
     
     
@@ -79,19 +77,32 @@ public final class MetaRegister {
     }
 
     /**
-     * Removes servers that have not sent an update for some time.
+     * Updates a given <code>MetaItem</code>.
+     *
+     * @param mi The <code>MetaItem</code> that should be updated.
+     * @param name The name of the server.
+     * @param address The IP-address of the server.
+     * @param port The port number in which clients may connect.
+     * @param slotsAvailable Number of players that may conncet.
+     * @param currentlyPlaying Number of players that are currently connected.
+     * @param isGameStarted <i>true</i> if the game has started.
+     * @param version The version of the server.
+     * @param gameState The current state of the game:
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#STARTING_GAME},
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
+     *     {@link net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
      */
-    public synchronized void removeDeadServers() {
-        logger.info("Removing dead servers.");
-
-        long time = System.currentTimeMillis() - MetaServer.REMOVE_OLDER_THAN;
-        for (int i=0; i<items.size(); i++) {
-            if (items.get(i).getLastUpdated() < time) {
-                logger.info("Removing: " + items.get(i));
-                items.remove(i);
-            }
-        }
+    private void updateServer(MetaItem mi, String name, String address,
+                              int port, int slotsAvailable,
+                              int currentlyPlaying, boolean isGameStarted,
+                              String version, int gameState) {
+        mi.update(name, address, port, slotsAvailable, currentlyPlaying,
+                  isGameStarted, version, gameState);
+        logger.info("Server updated:" + mi.toString());
     }
+
+
+    // Public interface
 
     /**
      * Adds a new server with the given attributes.
@@ -120,12 +131,54 @@ public final class MetaRegister {
                 logger.log(Level.WARNING, "Server rejected disconnect.", ioe);
                 throw ioe;
             }
-            items.add(new MetaItem(name, address, port, slotsAvailable,
-                    currentlyPlaying, isGameStarted, version, gameState));
+            mi = new MetaItem();
+            mi.update(name, address, port, slotsAvailable, currentlyPlaying,
+                      isGameStarted, version, gameState);
+            items.add(mi);
             logger.info("Server added:" + address + ":" + port);
         } else {
             updateServer(mi, name, address, port, slotsAvailable,
                 currentlyPlaying, isGameStarted, version, gameState);
+        }
+    }
+
+    /**
+     * Get the list of servers.
+     *
+     * @return The list of servers.
+     */
+    public synchronized List<MetaItem> getServers() {
+        return new ArrayList<MetaItem>(items);
+    }
+
+    /**
+     * Removes servers that have not sent an update for some time.
+     */
+    public synchronized void removeDeadServers() {
+        logger.info("Removing dead servers.");
+
+        long time = System.currentTimeMillis() - MetaServer.REMOVE_OLDER_THAN;
+        for (int i=0; i<items.size(); i++) {
+            if (items.get(i).getLastUpdated() < time) {
+                logger.info("Removing: " + items.get(i));
+                items.remove(i);
+            }
+        }
+    }
+
+    /**
+     * Removes a server from the register.
+     *
+     * @param address The IP-address of the server to remove.
+     * @param port The port number of the server to remove.
+     */
+    public synchronized void removeServer(String address, int port) {
+        int index = indexOf(address, port);
+        if (index >= 0) {
+            items.remove(index);
+            logger.info("Removing server:" + address + ":" + port);
+        } else {
+            logger.info("Trying to remove non-existing server:" + address + ":" + port);
         }
     }
 
@@ -155,57 +208,5 @@ public final class MetaRegister {
             updateServer(mi, name, address, port, slotsAvailable,
                          currentlyPlaying, isGameStarted, version, gameState);
         }
-    }
-
-    /**
-     * Removes a server from the register.
-     *
-     * @param address The IP-address of the server to remove.
-     * @param port The port number of the server to remove.
-     */
-    public synchronized void removeServer(String address, int port) {
-        int index = indexOf(address, port);
-        if (index >= 0) {
-            items.remove(index);
-            logger.info("Removing server:" + address + ":" + port);
-        } else {
-            logger.info("Trying to remove non-existing server:" + address + ":" + port);
-        }
-    }
-
-    /**
-     * Creates a server list.
-     *
-     * @return The server list as an XML DOM Element.
-     */
-    public synchronized Element createServerList() {
-        ServerListMessage result = new ServerListMessage();
-        for (MetaItem item : items) result.addServer(item);
-        return result.toXMLElement();
-    }
-
-    /**
-     * Updates a given <code>MetaItem</code>.
-     *
-     * @param mi The <code>MetaItem</code> that should be updated.
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may conncet.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version of the server.
-     * @param gameState The current state of the game:
-     *     {@link net.sf.freecol.server.FreeColServer.GameState#STARTING_GAME},
-     *     {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
-     *     {@link net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
-     */
-    private void updateServer(MetaItem mi, String name, String address,
-                              int port, int slotsAvailable,
-                              int currentlyPlaying, boolean isGameStarted,
-                              String version, int gameState) {
-        mi.update(name, address, port, slotsAvailable, currentlyPlaying,
-                  isGameStarted, version, gameState);
-        logger.info("Server updated:" + mi.toString());
     }
 }

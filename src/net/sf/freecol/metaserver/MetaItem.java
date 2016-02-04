@@ -32,36 +32,7 @@ public class MetaItem extends ServerInfo {
 
 
     /**
-     * Creates a new object with the given information.
-     *
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may connect.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
-     * @param version The version the server is running.
-     * @param gameState The current state of the game.
-     */
-    public MetaItem(String name, String address, int port,
-                    int slotsAvailable, int currentlyPlaying,
-                    boolean isGameStarted, String version, int gameState) {
-        super();
-
-        update(name, address, port, slotsAvailable, currentlyPlaying,
-               isGameStarted, version, gameState);
-    }
-
-
-    /**
-     * Updates this object with the given information.
-     *
-     * @param name The name of the server.
-     * @param address The IP-address of the server.
-     * @param port The port number in which clients may connect.
-     * @param slotsAvailable Number of players that may connect.
-     * @param currentlyPlaying Number of players that are currently connected.
-     * @param isGameStarted <i>true</i> if the game has started.
+     * {@inheritDoc}
      */
     @Override
     public void update(String name, String address, int port,

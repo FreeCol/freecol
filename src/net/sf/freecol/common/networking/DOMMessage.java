@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.function.Function;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -346,7 +348,28 @@ public class DOMMessage {
         }
         return ret;
     }
-            
+
+    /**
+     * Convenience method to map a function over the children of an Element.
+     *
+     * @param game The <code>Game</code> to instantiate within.
+     * @param element The <code>Element</code> to extract children from.
+     * @param mapper A mapper function.
+     * @return A list of results of the mapping.
+     */
+    public static <T> List<T> mapChildren(Game game, Element element,
+        Function<? super Element, ? extends T> mapper) {
+        List<T> ret = new ArrayList<>();
+        NodeList nl = element.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            Element e = (Element)nl.item(i);
+            if (e == null) continue;
+            T x = mapper.apply((Element)nl.item(i));
+            if (x != null) ret.add(x);
+        }
+        return ret;
+    }
+
     /**
      * Get a boolean attribute value from an element.
      *

@@ -25,11 +25,11 @@ import java.util.List;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.metaserver.MetaItem;
+import net.sf.freecol.metaserver.MetaRegister;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -38,13 +38,14 @@ import org.w3c.dom.NodeList;
 public class ServerListMessage extends DOMMessage {
 
     public static final String TAG = "serverList";
-    
+
     /** The list of information about the available servers. */
-    private List<ServerInfo> serverInfo = new ArrayList<>();
+    private List<ServerInfo> servers = new ArrayList<>();
 
 
     /**
-     * Create a new <code>ServerListMessage</code>.
+     * Create a new <code>ServerListMessage</code>.  Used to generate
+     * a request for servers.
      */
     public ServerListMessage() {
         super(getTagName());
@@ -52,7 +53,20 @@ public class ServerListMessage extends DOMMessage {
 
     /**
      * Create a new <code>ServerListMessage</code> from a
-     * supplied element.
+     * <code>MetaRegister</code>.  Used to generate the reply.
+     *
+     * @param mr The <code>MetaRegister</code> to query for servers.
+     */
+    public ServerListMessage(MetaRegister mr) {
+        super(getTagName());
+
+        this.servers.clear();
+        this.servers.addAll(mr.getServers());
+    }
+        
+    /**
+     * Create a new <code>ServerListMessage</code> from a
+     * supplied element.  Used to read the reply.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
@@ -60,21 +74,29 @@ public class ServerListMessage extends DOMMessage {
     public ServerListMessage(Game game, Element element) {
         super(getTagName());
 
-        NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element)nl.item(i);
-            ServerInfo si = new ServerInfo(element.getAttribute("name"),
-                element.getAttribute("address"),
-                Integer.parseInt(element.getAttribute("port")),
-                Integer.parseInt(element.getAttribute("slotsAvailable")),
-                Integer.parseInt(element.getAttribute("currentlyPlaying")),
-                Boolean.parseBoolean(element.getAttribute("slotsAvailable")),
-                element.getAttribute("version"),
-                Integer.parseInt(element.getAttribute("gameState")));
-            serverInfo.add(si);
-        }
+        this.servers.clear();
+        this.servers.addAll(mapChildren(game, element,
+                                        ServerListMessage::elementToServer));
     }
 
+    /**
+     * Convert an element to a server.
+     *
+     * @param e The <code>Element</code> to examine.
+     * @return A new <code>MetaItem</code> describing a server.
+     */     
+    private static MetaItem elementToServer(Element e) {
+        MetaItem mi = new MetaItem();
+        mi.update(e.getAttribute("name"),
+            e.getAttribute("address"),
+            Integer.parseInt(e.getAttribute("port")),
+            Integer.parseInt(e.getAttribute("slotsAvailable")),
+            Integer.parseInt(e.getAttribute("currentlyPlaying")),
+            Boolean.parseBoolean(e.getAttribute("slotsAvailable")),
+            e.getAttribute("version"),
+            Integer.parseInt(e.getAttribute("gameState")));
+        return mi;
+    }
 
     // Public interface
 
@@ -84,7 +106,7 @@ public class ServerListMessage extends DOMMessage {
      * @return The list of <code>ServerInfo</code>.
      */
     public List<ServerInfo> getServers() {
-        return this.serverInfo;
+        return this.servers;
     }
 
     /**
@@ -93,9 +115,8 @@ public class ServerListMessage extends DOMMessage {
      * @param si The <code>ServerInfo</code> to add.
      */
     public <T extends ServerInfo> void addServer(T si) {
-        this.serverInfo.add(si);
+        this.servers.add(si);
     }
-
 
     /**
      * Handle a "serverList"-message.
@@ -104,11 +125,12 @@ public class ServerListMessage extends DOMMessage {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return An update containing the server info.
+     * @return Null.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        // Not needed, serverList messages are only sent by the server
+        // Not needed, serverList messages are handled trivially in
+        // metaregister.NetworkHandler.
         return null;
     }
 
@@ -120,7 +142,7 @@ public class ServerListMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName());
-        for (ServerInfo si : this.serverInfo) {
+        for (ServerInfo si : this.servers) {
             result.add(new DOMMessage(si.getTagName(),
                     "name", si.getName(),
                     "address", si.getAddress(),
