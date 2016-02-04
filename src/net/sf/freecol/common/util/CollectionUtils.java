@@ -625,6 +625,40 @@ public class CollectionUtils {
     }
 
     /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param stream The <code>Stream</code> to collect.
+     * @return A list of the stream contents.
+     */
+    public static <T> List<T> toList(Stream<T> stream) {
+        return stream.collect(Collectors.toList());
+    }
+
+    /**
+     * Convenience function to collect a stream to a map.
+     *
+     * @param stream The <code>Stream</code> to collect.
+     * @param keyMapper A mapping function from datum to key.
+     * @param valueMapper A mapping function from datum to value.
+     * @return A map of the stream contents.
+     */
+    public static <T,K,V> Map<K,V> toMap(Stream<T> stream,
+        Function<? super T,? extends K> keyMapper,
+        Function<? super T,? extends V> valueMapper) {
+        return stream.collect(Collectors.toMap(keyMapper, valueMapper));
+    }
+
+    /**
+     * Convenience function to collect a stream to a set.
+     *
+     * @param stream The <code>Stream</code> to collect.
+     * @return A set of the stream contents.
+     */
+    public static <T> Set<T> toSet(Stream<T> stream) {
+        return stream.collect(Collectors.toSet());
+    }
+
+    /**
      * Transform the contents of an array.
      *
      * @param array The array to transform.
