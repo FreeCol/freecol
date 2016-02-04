@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -181,12 +182,9 @@ public class IndianNationType extends NationType {
      * @return A random choice set of skills.
      */
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
-        List<RandomChoice<UnitType>> skills = getSkills();
-        Map<GoodsType, Integer> scale = new HashMap<>();
-
-        for (RandomChoice<UnitType> skill : skills) {
-            scale.put(skill.getObject().getExpertProduction(), 1);
-        }
+        final List<RandomChoice<UnitType>> skills = getSkills();
+        final Map<GoodsType, Integer> scale = toMap(getSkills().stream(),
+            rc -> rc.getObject().getExpertProduction(), rc -> 1);
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
@@ -196,15 +194,11 @@ public class IndianNationType extends NationType {
             }
         }
 
-        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<>();
-        for (RandomChoice<UnitType> skill : skills) {
-            UnitType unitType = skill.getObject();
-            int scaleValue = scale.get(unitType.getExpertProduction());
-            scaledSkills.add(new RandomChoice<>(unitType,
-                    skill.getProbability() * scaleValue));
-        }
-
-        return scaledSkills;
+        return toList(map(skills, rc -> {
+                    UnitType ut = rc.getObject();
+                    int scaleValue = scale.get(ut.getExpertProduction());
+                    return new RandomChoice<>(ut, rc.getProbability() * scaleValue);
+                }));
     }
 
 
