@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -43,6 +42,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.Introspector;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -1094,20 +1094,13 @@ public class Game extends FreeColGameObject {
      * @param returnClass The required FreeColObject class.
      * @param server Create a server object if possible.
      * @return The new uninitialized object, or null on error.
-     * @exception IOException on error.
      */
     public <T extends FreeColObject> T newInstance(Class<T> returnClass,
-        boolean server) throws IOException {
+                                                   boolean server) {
         Class<T> rc = (server) ? serverClass(returnClass) : returnClass;
-        try {
-            Constructor<T> c = rc.getConstructor(Game.class, String.class);
-            return c.newInstance(this, (String)null);
-
-        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
-            throw new IOException(nsme);
-        } catch (Exception e) { // Handles multiple fails from newInstance
-            throw new IOException(e);
-        }
+        Class[] types = new Class[] { Game.class, String.class };
+        Object[] params = new Object[] { this, (String)null };
+        return Introspector.instantiate(rc, types, params);
     }
 
     /**
@@ -1120,7 +1113,7 @@ public class Game extends FreeColGameObject {
      *     the stream.
      */
     public <T extends FreeColObject> T unserialize(String xml,
-                                                   Class<T> returnClass) throws XMLStreamException {
+        Class<T> returnClass) throws XMLStreamException {
         try {
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
@@ -1128,8 +1121,8 @@ public class Game extends FreeColGameObject {
             ret.readFromXML(xr);
             return ret;
 
-        } catch (IOException ioe) {
-            throw new XMLStreamException(ioe);
+        } catch (Exception ex) {
+            throw new XMLStreamException(ex);
         }
     }
 

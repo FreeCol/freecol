@@ -337,13 +337,7 @@ public class DOMMessage {
         Element e;
         if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
             ret = game.getFreeColGameObject(readId(e), returnClass);
-            if (ret == null) { // New instance required
-                try {
-                    ret = game.newInstance(returnClass, false);
-                } catch (IOException ioe) {
-                    ret = null;
-                }
-            }
+            if (ret == null) ret = game.newInstance(returnClass, false);
             if (ret != null) readFromXMLElement(ret, e);
         }
         return ret;

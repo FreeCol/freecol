@@ -640,23 +640,24 @@ public class FreeColXMLReader extends StreamReaderDelegate
         } else {
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
-                try {
-                    T ret = game.newInstance(returnClass,
-                        getReadScope() == ReadScope.SERVER);
+                T ret = game.newInstance(returnClass,
+                    getReadScope() == ReadScope.SERVER);
+                if (ret == null) {
+                    String err = "Failed to create " + returnClass.getName()
+                        + " with id: " + id;
+                    if (required) {
+                        throw new XMLStreamException(err);
+                    } else {
+                        logger.warning(err);
+                    }
+                } else {
                     if (shouldIntern()) {
                         ret.internId(id);
                     } else {
                         uninterned.put(id, ret);
                     }
-                    return ret;
-                } catch (IOException e) {
-                    if (required) {
-                        throw new XMLStreamException(e);
-                    } else {
-                        logger.log(Level.WARNING, "Failed to create FCGO: "
-                            + id, e);
-                    }
                 }
+                return ret;
             } else {
                 try {
                     return returnClass.cast(fco);
@@ -698,11 +699,10 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private <T extends FreeColObject> T uninternedRead(Game game,
         Class<T> returnClass) throws XMLStreamException {
 
-        T ret;
-        try {
-            ret = game.newInstance(returnClass, false);
-        } catch (IOException e) {
-            throw new XMLStreamException(e);
+        T ret = game.newInstance(returnClass, false);
+        if (ret == null) {
+            throw new XMLStreamException("Could not create instance of "
+                + returnClass.getName());
         }
         String id = readId();
         if (id == null) {
