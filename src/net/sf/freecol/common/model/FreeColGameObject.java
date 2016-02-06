@@ -53,27 +53,29 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Creates a new <code>FreeColGameObject</code>.  Automatically
-     * assign an object identifier and register this object at the
-     * specified <code>Game</code>, unless this object is a
-     * <code>Game</code> in which case it is given an identifier of
-     * zero.
+     * Creates a new <code>FreeColGameObject</code>.
+     *
+     * Automatically assign an object identifier and register this
+     * object at the specified <code>Game</code>, unless this object
+     * is the <code>Game</code> itself in which case it is given an
+     * identifier of zero.
      *
      * @param game The <code>Game</code> in which this object belongs.
      */
     public FreeColGameObject(Game game) {
         if (game != null) {
-            this.game = game;
+            setGame(game);
             internId(getXMLTagName() + ":" + game.getNextId());
 
         } else if (this instanceof Game) {
-            this.game = (Game)this;
+            setGame((Game)this);
             setId("0");
 
         } else {
             throw new IllegalArgumentException("FCGO with null game.");
         }
         this.uninitialized = getId() == null;
+        this.disposed = false;
     }
 
     /**
@@ -87,34 +89,13 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
-        if (game == null) {
-            throw new IllegalArgumentException("FCGO(id=" + id
-                + ") with null game");
-        }
-
-        this.game = game;
+        setGame(game);
         if (id != null) internId(id);
+
         this.uninitialized = true;
+        this.disposed = false;
     }
 
-
-    /**
-     * Gets the game object this <code>FreeColGameObject</code> belongs to.
-     *
-     * @return The <code>Game</code> this object belongs to.
-     */
-    public Game getGame() {
-        return game;
-    }
-
-    /**
-     * Sets the game object this <code>FreeColGameObject</code> belongs to.
-     *
-     * @param game The <code>Game</code> to set.
-     */
-    public void setGame(Game game) {
-        this.game = game;
-    }
 
     /**
      * Has this object not yet been initialized?
@@ -244,6 +225,22 @@ public abstract class FreeColGameObject extends FreeColObject {
     // Override FreeColObject
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    /**
      * Sets the unique identifier of this object and registers it in its
      * <code>Game</code> with that identifier, i.e. "intern" this object.
      *
@@ -251,15 +248,15 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public final void internId(final String newId) {
-        if (game != null && !(this instanceof Game)) {
+        if (this.game != null && !(this instanceof Game)) {
             if (!newId.equals(getId())) {
                 FreeColObject ret = null;
                 if (getId() != null) {
-                    game.removeFreeColGameObject(getId(), "override");
+                    this.game.removeFreeColGameObject(getId(), "override");
                 }
 
                 setId(newId);
-                game.setFreeColGameObject(newId, this);
+                this.game.setFreeColGameObject(newId, this);
             }
         } else {
             setId(newId);
@@ -273,7 +270,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public Specification getSpecification() {
-        return (game == null) ? null : game.getSpecification();
+        return (this.game == null) ? null : this.game.getSpecification();
     }
 
 

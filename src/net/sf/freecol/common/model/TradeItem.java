@@ -33,7 +33,7 @@ import net.sf.freecol.common.util.Utils;
 public abstract class TradeItem extends FreeColObject {
 
     /** The game this TradeItem belongs to. */
-    protected final Game game;
+    private Game game;
 
     /** The player who is to provide this item. */
     private Player source;
@@ -51,8 +51,8 @@ public abstract class TradeItem extends FreeColObject {
      * @param destination The destination <code>Player</code>.
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
+        setGame(game);
         setId(id);
-        this.game = game;
         this.source = source;
         this.destination = destination;
     }
@@ -65,20 +65,10 @@ public abstract class TradeItem extends FreeColObject {
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        this.game = game;
-
+        setGame(game);
         readFromXML(xr);
     }
 
-
-    /**
-     * Gets the game.  The subclasses need this.
-     *
-     * @return The game.
-     */
-    protected final Game getGame() {
-        return game;
-    }
 
     /**
      * Get the source player.
@@ -86,7 +76,7 @@ public abstract class TradeItem extends FreeColObject {
      * @return The source <code>Player</code>.
      */
     public final Player getSource() {
-        return source;
+        return this.source;
     }
 
     /**
@@ -104,7 +94,7 @@ public abstract class TradeItem extends FreeColObject {
      * @return The destination <code>Player</code>.
      */
     public final Player getDestination() {
-        return destination;
+        return this.destination;
     }
 
     /**
@@ -123,7 +113,7 @@ public abstract class TradeItem extends FreeColObject {
      * @return The <code>Player</code> we want.
      */
     public final Player getOther(Player player) {
-        return (player == source) ? destination : source;
+        return (player == this.source) ? this.destination : this.source;
     }
 
 
@@ -232,6 +222,25 @@ public abstract class TradeItem extends FreeColObject {
     public abstract int evaluateFor(Player player);
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    
     // Override Object
 
     /**
@@ -253,8 +262,8 @@ public abstract class TradeItem extends FreeColObject {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(source);
-        return 37 * hash + Utils.hashCode(destination);
+        hash = 37 * hash + Utils.hashCode(this.source);
+        return 37 * hash + Utils.hashCode(this.destination);
     }
 
 
@@ -271,9 +280,9 @@ public abstract class TradeItem extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(SOURCE_TAG, source);
+        xw.writeAttribute(SOURCE_TAG, this.source);
 
-        xw.writeAttribute(DESTINATION_TAG, destination);
+        xw.writeAttribute(DESTINATION_TAG, this.destination);
     }
 
     /**
@@ -283,10 +292,10 @@ public abstract class TradeItem extends FreeColObject {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        source = xr.getAttribute(game, SOURCE_TAG,
-                                 Player.class, (Player)null);
-
-        destination = xr.getAttribute(game, DESTINATION_TAG,
+        this.source = xr.getAttribute(getGame(), SOURCE_TAG,
                                       Player.class, (Player)null);
+
+        this.destination = xr.getAttribute(getGame(), DESTINATION_TAG,
+                                           Player.class, (Player)null);
     }
 }

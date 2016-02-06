@@ -72,8 +72,8 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public boolean isValid() {
-        return victim != null && victim != getSource()
-            && victim != getDestination();
+        return this.victim != null && this.victim != getSource()
+            && this.victim != getDestination();
     }
 
     /**
@@ -90,7 +90,7 @@ public class InciteTradeItem extends TradeItem {
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.template(Messages.descriptionKey("model.tradeItem.incite"))
-            .addStringTemplate("%nation%", victim.getNationLabel());
+            .addStringTemplate("%nation%", this.victim.getNationLabel());
     }
 
     /**
@@ -98,7 +98,7 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public Player getVictim() {
-        return victim;
+        return this.victim;
     }
 
     /**
@@ -155,7 +155,7 @@ public class InciteTradeItem extends TradeItem {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(VICTIM_TAG, victim);
+        xw.writeAttribute(VICTIM_TAG, this.victim);
     }
     
     /**
@@ -165,8 +165,8 @@ public class InciteTradeItem extends TradeItem {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        victim = xr.findFreeColGameObject(game, VICTIM_TAG,
-                                          Player.class, (Player)null, true);
+        this.victim = xr.findFreeColGameObject(getGame(), VICTIM_TAG,
+                                               Player.class, (Player)null, true);
     }
 
     /**
@@ -176,7 +176,7 @@ public class InciteTradeItem extends TradeItem {
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
         sb.append("[").append(getId())
-            .append(" ").append(victim.getId()).append("]");
+            .append(" ").append(this.victim.getId()).append("]");
         return sb.toString();
     }
 

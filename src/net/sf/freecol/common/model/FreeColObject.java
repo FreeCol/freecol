@@ -94,7 +94,6 @@ public abstract class FreeColObject
      *
      * @return The identifier.
      */
-    @Override
     public String getId() {
         return id;
     }
@@ -164,7 +163,28 @@ public abstract class FreeColObject
         this.specification = specification;
     }
 
+    /**
+     * Gets the game this object belongs to.
+     *
+     * Returns null here because FreeColObjects are not specific to a game.
+     * However, decendant classes are another matter.
+     *
+     * @return The <code>Game</code> this object belongs to.
+     */
+    public Game getGame() {
+        return null;
+    }
 
+    /**
+     * Sets the game object this object belongs to.
+     *
+     * Does nothing here, see above.
+     *
+     * @param game The <code>Game</code> to set.
+     */
+    public void setGame(Game game) {}
+        
+    
     // Identifier manipulation
 
     /**
