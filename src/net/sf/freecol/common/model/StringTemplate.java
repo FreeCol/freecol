@@ -73,9 +73,9 @@ public class StringTemplate extends FreeColObject {
 
 
     /**
-     * Deliberately empty constructor.
+     * Trivial constructor to allow creation with Game.newInstance.
      */
-    protected StringTemplate() {}
+    public StringTemplate() {}
 
     /**
      * Copy an existing template, but with a new identifier.
