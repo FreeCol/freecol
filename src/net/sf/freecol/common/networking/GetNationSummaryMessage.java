@@ -26,7 +26,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -66,10 +65,8 @@ public class GetNationSummaryMessage extends DOMMessage {
     public GetNationSummaryMessage(Game game, Element element) {
         super(getTagName());
 
-        playerId = element.getAttribute("player");
-        NodeList nodes = element.getChildNodes();
-        summary = (nodes == null || nodes.getLength() != 1) ? null
-            : new NationSummary((Element) nodes.item(0));
+        this.playerId = element.getAttribute("player");
+        this.summary = getChild(game, element, 0, NationSummary.class);
     }
 
 

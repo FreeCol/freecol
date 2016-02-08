@@ -24,13 +24,10 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.networking.DOMMessage;
-
-import org.w3c.dom.Element;
 
 
 /**
- * A summary of an enemy nation.
+ * A container class summarizing an enemy nation.
  */
 public class NationSummary extends FreeColObject {
 
@@ -63,13 +60,20 @@ public class NationSummary extends FreeColObject {
 
 
     /**
+     * Trivial constructor allowing creation by Game.newInstance().
+     */
+    public NationSummary() {
+        setId(""); // Identifiers unnecessary
+    }
+
+    /**
      * Creates a nation summary for the specified player.
      *
      * @param player The <code>Player</code> to create the summary for.
      * @param requester The <code>Player</code> making the request.
      */
     public NationSummary(Player player, Player requester) {
-        setId("");
+        this();
 
         stance = player.getStance(requester);
         if (stance == Stance.UNCONTACTED) stance = Stance.PEACE;
@@ -93,15 +97,6 @@ public class NationSummary extends FreeColObject {
             numberOfUnits = militaryStrength = navalStrength = gold = soL
                 = foundingFathers = tax = -1;
         }
-    }
-
-    /**
-     * Creates a new <code>NationSummary</code> instance.
-     *
-     * @param element An <code>Element</code> value.
-     */
-    public NationSummary(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
     }
 
 

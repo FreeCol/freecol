@@ -762,7 +762,7 @@ public final class InGameInputHandler extends InputHandler {
         NationSummary ns = message.getNationSummary();
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
-            + " for " + player.getSuffix());
+            + " for " + player.getSuffix() + " with " + ns);
         return null;
     }
         
