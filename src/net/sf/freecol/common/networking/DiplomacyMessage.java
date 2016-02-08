@@ -32,9 +32,7 @@ import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -129,18 +127,8 @@ public class DiplomacyMessage extends DOMMessage {
 
         this.ourId = element.getAttribute("ourId");
         this.otherId = element.getAttribute("otherId");
-        
-        NodeList nodes = element.getChildNodes();
-        this.agreement = (nodes.getLength() < 1) ? null
-            : new DiplomaticTrade(game, (Element)nodes.item(0));
-        if (nodes.getLength() < 2) {
-            this.extraUnit = null;
-        } else {
-            Element ue = (Element)nodes.item(1);
-            String id = readId(ue);
-            this.extraUnit = game.getFreeColGameObject(id, Unit.class);
-            if (this.extraUnit == null) this.extraUnit = new Unit(game, ue);
-        }
+        this.agreement = getChild(game, element, 0, DiplomaticTrade.class);
+        this.extraUnit = getChild(game, element, 1, Unit.class);
     }
 
 
@@ -181,7 +169,7 @@ public class DiplomacyMessage extends DOMMessage {
      * @return The agreement in this message.
      */
     public DiplomaticTrade getAgreement() {
-        return agreement;
+        return this.agreement;
     }
 
     /**
@@ -200,9 +188,9 @@ public class DiplomacyMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> that handles the message.
      * @param connection The <code>Connection</code> the message is from.
-     * @return An <code>Element</code> describing the trade with either
-     *         "accept" or "reject" status, null on trade failure,
-     *         or an error <code>Element</code> on outright error.
+     * @return An <code>Element</code> describing the trade with
+     *     either "accept" or "reject" status, null on trade failure,
+     *     or an error <code>Element</code> on outright error.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
@@ -217,22 +205,22 @@ public class DiplomacyMessage extends DOMMessage {
         Colony ourColony = null;
         FreeColGameObject our = getOurFCGO(game);
         if (our == null) {
-            return serverPlayer.clientError("Missing our object: " + ourId)
+            return serverPlayer.clientError("Missing our object: " + this.ourId)
                 .build(serverPlayer);
         } if (our instanceof Unit) {
             ourUnit = (Unit)our;
             if (!serverPlayer.owns(ourUnit)) {
-                return serverPlayer.clientError("Not our unit: " + ourId)
+                return serverPlayer.clientError("Not our unit: " + this.ourId)
                     .build(serverPlayer);
             } else if (!ourUnit.hasTile()) {
                 return serverPlayer.clientError("Our unit is not on the map: "
-                    + ourId)
+                    + this.ourId)
                     .build(serverPlayer);
             }
         } else if (our instanceof Colony) {
             ourColony = (Colony)our;
             if (!serverPlayer.owns(ourColony)) {
-                return serverPlayer.clientError("Not our settlement: " + ourId)
+                return serverPlayer.clientError("Not our settlement: " + this.ourId)
                     .build(serverPlayer);
             }
         } else {
@@ -245,43 +233,43 @@ public class DiplomacyMessage extends DOMMessage {
         Player otherPlayer = null;
         FreeColGameObject other = getOtherFCGO(game);
         if (other == null) {
-            return serverPlayer.clientError("Missing other object: " + otherId)
+            return serverPlayer.clientError("Missing other object: " + this.otherId)
                 .build(serverPlayer);
-        } if (other instanceof Unit) {
+        } else if (other instanceof Unit) {
             otherUnit = (Unit)other;
             if (serverPlayer.owns(otherUnit)) {
-                return serverPlayer.clientError("Contacting our unit? " + otherId)
+                return serverPlayer.clientError("Contacting our unit? " + this.otherId)
                     .build(serverPlayer);
             } else if (!otherUnit.hasTile()) {
                 return serverPlayer.clientError("Other unit is not on the map: "
-                    + otherId)
+                    + this.otherId)
                     .build(serverPlayer);
             } else if (ourUnit != null
                 && !ourUnit.getTile().isAdjacent(otherUnit.getTile())) {
-                return serverPlayer.clientError("Our unit " + ourId
-                    + " is not adjacent to other unit " + otherId)
+                return serverPlayer.clientError("Our unit " + this.ourId
+                    + " is not adjacent to other unit " + this.otherId)
                     .build(serverPlayer);
             } else if (ourColony != null
                 && !ourColony.getTile().isAdjacent(otherUnit.getTile())) {
-                return serverPlayer.clientError("Our colony " + ourId
-                    + " is not adjacent to other unit " + otherId)
+                return serverPlayer.clientError("Our colony " + this.ourId
+                    + " is not adjacent to other unit " + this.otherId)
                     .build(serverPlayer);
             }
             otherPlayer = otherUnit.getOwner();
         } else if (other instanceof Colony) {
             otherColony = (Colony)other;
             if (serverPlayer.owns(otherColony)) {
-                return serverPlayer.clientError("Contacting our colony? " + otherId)
+                return serverPlayer.clientError("Contacting our colony? " + this.otherId)
                     .build(serverPlayer);
             } else if (ourUnit != null
                 && !ourUnit.getTile().isAdjacent(otherColony.getTile())) {
-                return serverPlayer.clientError("Our unit " + ourId
-                    + " is not adjacent to other colony " + otherId)
+                return serverPlayer.clientError("Our unit " + this.ourId
+                    + " is not adjacent to other colony " + this.otherId)
                     .build(serverPlayer);
             } else if (ourColony != null
                 && !ourColony.getTile().isAdjacent(otherColony.getTile())) {
-                return serverPlayer.clientError("Our colony " + ourId
-                    + " is not adjacent to other colony " + otherId)
+                return serverPlayer.clientError("Our colony " + this.ourId
+                    + " is not adjacent to other colony " + this.otherId)
                     .build(serverPlayer);
             }
             otherPlayer = otherColony.getOwner();
@@ -294,8 +282,8 @@ public class DiplomacyMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Player senderPlayer = agreement.getSender();
-        Player recipientPlayer = agreement.getRecipient();
+        Player senderPlayer = this.agreement.getSender();
+        Player recipientPlayer = this.agreement.getRecipient();
         Player refPlayer = serverPlayer.getREFPlayer();
         if (senderPlayer == null) {
             return serverPlayer.clientError("Null sender in agreement.")
@@ -319,16 +307,16 @@ public class DiplomacyMessage extends DOMMessage {
 
         final InGameController igc = server.getInGameController();
         ChangeSet cs = null;
-        switch (agreement.getContext()) {
+        switch (this.agreement.getContext()) {
         case CONTACT:
             cs = (ourColony != null)
                 ? igc.europeanFirstContact(serverPlayer, ourColony, otherUnit,
-                                           agreement)
+                                           this.agreement)
                 : (otherUnit != null)
                 ? igc.europeanFirstContact(serverPlayer, ourUnit, otherUnit,
-                                           agreement)
+                                           this.agreement)
                 : igc.europeanFirstContact(serverPlayer, ourUnit, otherColony,
-                                           agreement);
+                                           this.agreement);
             break;
         case DIPLOMATIC:
             cs = (ourUnit != null) 
@@ -338,12 +326,12 @@ public class DiplomacyMessage extends DOMMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    agreement))
+                                    this.agreement))
                 : ((!otherUnit.hasAbility(Ability.NEGOTIATE))
                     ? serverPlayer.clientError("Unit lacks ability"
                         + " to negotiate: " + otherUnit)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    agreement));
+                                    this.agreement));
             break;
         case TRADE:
             cs = (ourUnit != null)
@@ -356,7 +344,7 @@ public class DiplomacyMessage extends DOMMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    agreement))
+                                    this.agreement))
                 : ((!otherUnit.isCarrier())
                     ? serverPlayer.clientError("Unit is not a carrier: "
                         + otherUnit)
@@ -364,7 +352,7 @@ public class DiplomacyMessage extends DOMMessage {
                     ? serverPlayer.clientError("Player lacks ability"
                         + " to trade with other Europeans: " + otherPlayer)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    agreement));
+                                    this.agreement));
             break;
         case TRIBUTE:
             cs = (ourUnit != null)
@@ -374,18 +362,18 @@ public class DiplomacyMessage extends DOMMessage {
                     : (otherColony == null)
                     ? serverPlayer.clientError("Null other settlement")
                     : igc.diplomacy(serverPlayer, ourUnit, otherColony,
-                                    agreement))
+                                    this.agreement))
                 : ((!otherUnit.isOffensiveUnit() || otherUnit.isNaval())
                     ? serverPlayer.clientError("Unit is not an offensive"
                         + " land unit: " + otherUnit)
                     : igc.diplomacy(serverPlayer, ourColony, otherUnit,
-                                    agreement));
+                                    this.agreement));
             break;
         default:
             break;
         }
         if (cs == null) cs = serverPlayer.clientError("Invalid diplomacy for "
-            + agreement.getContext());
+            + this.agreement.getContext());
         return cs.build(serverPlayer);
     }
 
@@ -397,10 +385,10 @@ public class DiplomacyMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "ourId", ourId,
-            "otherId", otherId);
-        result.add(agreement);
-        if (extraUnit != null) result.add(extraUnit);
+            "ourId", this.ourId,
+            "otherId", this.otherId);
+        result.add(this.agreement);
+        if (this.extraUnit != null) result.add(this.extraUnit);
         return result.toXMLElement();
     }
 

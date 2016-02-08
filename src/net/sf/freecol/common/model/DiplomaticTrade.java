@@ -33,8 +33,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The class <code>DiplomaticTrade</code> represents an offer one player can
@@ -68,19 +66,19 @@ public class DiplomaticTrade extends FreeColObject {
 
 
     /** The game in play. */
-    private final Game game;
-
-    /** The player who proposed agreement. */
-    private Player sender;
-
-    /** The player who is to accept this agreement. */
-    private Player recipient;
+    private Game game;
 
     /** The context of this agreement. */
     private TradeContext context;
 
     /** The status of this agreement. */
     private TradeStatus status;
+
+    /** The player who proposed agreement. */
+    private Player sender;
+
+    /** The player who is to accept this agreement. */
+    private Player recipient;
 
     /** The individual items the trade consists of. */
     private final List<TradeItem> items = new ArrayList<>();
@@ -89,6 +87,17 @@ public class DiplomaticTrade extends FreeColObject {
     private int version;
 
 
+    /**
+     * Simple constructor, used in Game.newInstance.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The identifier (ignored).
+     */
+    public DiplomaticTrade(Game game, String id) {
+        setGame(game);
+        setId(""); // Identifier not required
+    }
+        
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
@@ -101,8 +110,7 @@ public class DiplomaticTrade extends FreeColObject {
     public DiplomaticTrade(Game game, TradeContext context,
                            Player sender, Player recipient,
                            List<TradeItem> items, int version) {
-        setId("");
-        this.game = game;
+        this(game, "");
         this.context = context;
         this.sender = sender;
         this.recipient = recipient;
@@ -112,18 +120,6 @@ public class DiplomaticTrade extends FreeColObject {
         this.version = version;
     }
 
-    /**
-     * Creates a new <code>DiplomaticTrade</code> instance.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param element an <code>Element</code> value
-     */
-    public DiplomaticTrade(Game game, Element element) {
-        this.game = game;
-
-        DOMMessage.readFromXMLElement(this, element);
-    }
-
 
     /**
      * Get the trade context.
@@ -131,7 +127,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The context of this agreement.
      */
     public TradeContext getContext() {
-        return context;
+        return this.context;
     }
 
     /**
@@ -140,7 +136,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The status of this agreement.
      */
     public TradeStatus getStatus() {
-        return status;
+        return this.status;
     }
 
     /**
@@ -158,7 +154,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The sending <code>Player</code>.
      */
     public final Player getSender() {
-        return sender;
+        return this.sender;
     }
 
     /**
@@ -176,7 +172,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The recipient <code>Player</code>.
      */
     public final Player getRecipient() {
-        return recipient;
+        return this.recipient;
     }
 
     /**
@@ -195,7 +191,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The other player, not the supplied known one.
      */
     public Player getOtherPlayer(Player player) {
-        return (sender == player) ? recipient : sender;
+        return (this.sender == player) ? this.recipient : this.sender;
     }
 
     /**
@@ -234,10 +230,8 @@ public class DiplomaticTrade extends FreeColObject {
      * @param newItem The <code>TradeItem</code> to add.
      */
     public void add(TradeItem newItem) {
-        if (newItem.isUnique()) {
-            removeType(newItem.getClass());
-        }
-        items.add(newItem);
+        if (newItem.isUnique()) removeType(newItem.getClass());
+        this.items.add(newItem);
     }
 
     /**
@@ -246,7 +240,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @param newItem The <code>TradeItem</code> to remove.
      */
     public void remove(TradeItem newItem) {
-        items.remove(newItem);
+        this.items.remove(newItem);
     }
 
     /**
@@ -255,7 +249,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @param index The index of the <code>TradeItem</code> to remove
      */
     public void remove(int index) {
-        items.remove(index);
+        this.items.remove(index);
     }
 
     /**
@@ -265,7 +259,7 @@ public class DiplomaticTrade extends FreeColObject {
      *     <code>TradeItem</code> to remove.
      */
     public void removeType(Class<? extends TradeItem> itemClass) {
-        Iterator<TradeItem> itemIterator = items.iterator();
+        Iterator<TradeItem> itemIterator = this.items.iterator();
         while (itemIterator.hasNext()) {
             if (itemIterator.next().getClass() == itemClass) {
                 itemIterator.remove();
@@ -277,7 +271,7 @@ public class DiplomaticTrade extends FreeColObject {
      * Remove all trade items from this agreement.
      */
     public void clear() {
-        items.clear();
+        this.items.clear();
     }
 
     /**
@@ -286,7 +280,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of all the TradeItems.
      */
     public final List<TradeItem> getTradeItems() {
-        return items;
+        return this.items;
     }
 
     /**
@@ -295,7 +289,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return True if there are no trade items present.
      */
     public final boolean isEmpty() {
-        return items.isEmpty();
+        return this.items.isEmpty();
     }
 
     /**
@@ -304,7 +298,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return An iterator for all TradeItems.
      */
     public Iterator<TradeItem> iterator() {
-        return items.iterator();
+        return this.items.iterator();
     }
 
     /**
@@ -314,7 +308,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        return transform(items, ti -> ti.getSource() == player,
+        return transform(this.items, ti -> ti.getSource() == player,
             Collectors.toList());
     }
 
@@ -324,7 +318,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The <code>Stance</code> offered in this trade, or null if none.
      */
     public Stance getStance() {
-        TradeItem ti = find(items, i -> i instanceof StanceTradeItem);
+        TradeItem ti = find(this.items, i -> i instanceof StanceTradeItem);
         return (ti == null) ? null : ti.getStance();
     }
 
@@ -334,7 +328,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Colony</code>s offered in this trade.
      */
     public List<Colony> getColoniesGivenBy(final Player player) {
-        return transform(items,
+        return transform(this.items,
             ti -> ti instanceof ColonyTradeItem && ti.getSource() == player,
             ti -> ti.getColony(player.getGame()), Collectors.toList());
     }
@@ -346,7 +340,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The gold offered in this trade.
      */
     public int getGoldGivenBy(Player player) {
-        TradeItem ti = find(items, i -> i instanceof GoldTradeItem
+        TradeItem ti = find(this.items, i -> i instanceof GoldTradeItem
             && player == i.getSource());
         return (ti == null) ? -1 : ti.getGold();
     }
@@ -357,7 +351,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Goods</code> offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player) {
-        return transform(items,
+        return transform(this.items,
             ti -> ti instanceof GoodsTradeItem && ti.getSource() == player,
             TradeItem::getGoods, Collectors.toList());
     }
@@ -368,7 +362,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The <code>Player</code> to be incited against.
      */
     public Player getVictim() {
-        TradeItem ti = find(items, i -> i instanceof InciteTradeItem);
+        TradeItem ti = find(this.items, i -> i instanceof InciteTradeItem);
         return (ti == null) ? null : ti.getVictim();
     }
 
@@ -378,7 +372,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return A list of <code>Unit</code>s offered in this trade.
      */
     public List<Unit> getUnitsGivenBy(Player player) {
-        return transform(items,
+        return transform(this.items,
             ti -> ti instanceof UnitTradeItem && ti.getSource() == player,
             TradeItem::getUnit, Collectors.toList());
     }
@@ -389,7 +383,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @return The version number.
      */
     public int getVersion() {
-        return version;
+        return this.version;
     }
 
     /**
@@ -397,6 +391,23 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public void incrementVersion() {
         this.version++;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setGame(Game game) {
+        this.game = game;
     }
 
 
@@ -416,15 +427,15 @@ public class DiplomaticTrade extends FreeColObject {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(CONTEXT_TAG, context);
+        xw.writeAttribute(CONTEXT_TAG, this.context);
 
-        xw.writeAttribute(SENDER_TAG, sender);
+        xw.writeAttribute(SENDER_TAG, this.sender);
 
-        xw.writeAttribute(RECIPIENT_TAG, recipient);
+        xw.writeAttribute(RECIPIENT_TAG, this.recipient);
 
-        xw.writeAttribute(STATUS_TAG, status);
+        xw.writeAttribute(STATUS_TAG, this.status);
 
-        xw.writeAttribute(VERSION_TAG, version);
+        xw.writeAttribute(VERSION_TAG, this.version);
     }
 
     /**
@@ -434,7 +445,7 @@ public class DiplomaticTrade extends FreeColObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (TradeItem item : items) item.toXML(xw);
+        for (TradeItem item : this.items) item.toXML(xw);
     }
 
     /**
@@ -444,19 +455,19 @@ public class DiplomaticTrade extends FreeColObject {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        context = xr.getAttribute(CONTEXT_TAG, TradeContext.class,
-                                  (TradeContext)null);
+        this.context = xr.getAttribute(CONTEXT_TAG, TradeContext.class,
+                                       (TradeContext)null);
 
-        sender = xr.getAttribute(game, SENDER_TAG,
-                                 Player.class, (Player)null);
+        this.sender = xr.getAttribute(getGame(), SENDER_TAG,
+                                      Player.class, (Player)null);
 
-        recipient = xr.getAttribute(game, RECIPIENT_TAG,
-                                    Player.class, (Player)null);
+        this.recipient = xr.getAttribute(getGame(), RECIPIENT_TAG,
+                                         Player.class, (Player)null);
 
-        status = xr.getAttribute(STATUS_TAG, TradeStatus.class,
-                                 TradeStatus.REJECT_TRADE);
+        this.status = xr.getAttribute(STATUS_TAG, TradeStatus.class,
+                                      TradeStatus.REJECT_TRADE);
 
-        version = xr.getAttribute(VERSION_TAG, 0);
+        this.version = xr.getAttribute(VERSION_TAG, 0);
     }
 
     /**
@@ -465,7 +476,7 @@ public class DiplomaticTrade extends FreeColObject {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        items.clear();
+        this.items.clear();
 
         super.readChildren(xr);
     }
@@ -478,22 +489,22 @@ public class DiplomaticTrade extends FreeColObject {
         final String tag = xr.getLocalName();
 
         if (ColonyTradeItem.getTagName().equals(tag)) {
-            add(new ColonyTradeItem(game, xr));
+            add(new ColonyTradeItem(getGame(), xr));
 
         } else if (GoldTradeItem.getTagName().equals(tag)) {
-            add(new GoldTradeItem(game, xr));
+            add(new GoldTradeItem(getGame(), xr));
 
         } else if (GoodsTradeItem.getTagName().equals(tag)) {
-            add(new GoodsTradeItem(game, xr));
+            add(new GoodsTradeItem(getGame(), xr));
 
         } else if (InciteTradeItem.getTagName().equals(tag)) {
-            add(new InciteTradeItem(game, xr));
+            add(new InciteTradeItem(getGame(), xr));
 
         } else if (StanceTradeItem.getTagName().equals(tag)) {
-            add(new StanceTradeItem(game, xr));
+            add(new StanceTradeItem(getGame(), xr));
 
         } else if (UnitTradeItem.getTagName().equals(tag)) {
-            add(new UnitTradeItem(game, xr));
+            add(new UnitTradeItem(getGame(), xr));
 
         } else {
             super.readChild(xr);
@@ -508,10 +519,10 @@ public class DiplomaticTrade extends FreeColObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId())
-            .append(" ").append(context)
-            .append(" ").append(status)
-            .append(" from=").append(sender.getId())
-            .append(" to=").append(recipient.getId())
+            .append(" ").append(getContext())
+            .append(" ").append(getStatus())
+            .append(" from=").append(getSender().getId())
+            .append(" to=").append(getRecipient().getId())
             .append(" version=").append(getVersion())
             .append(" [");
         for (TradeItem item : getTradeItems()) sb.append(" ").append(item);

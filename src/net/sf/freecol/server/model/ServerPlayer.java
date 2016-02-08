@@ -4411,7 +4411,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         final Game game = getGame();
 
         ServerPlayer other;
-        if (settlement != null) {
+        if (settlement instanceof Colony) {
             other = (ServerPlayer)settlement.getOwner();
         } else if (otherUnit != null) {
             other = (ServerPlayer)otherUnit.getOwner();
@@ -4429,7 +4429,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         session.setAgreement(agreement);
         cs.add(See.only(this), ChangePriority.CHANGE_LATE, (settlement == null)
             ? new DiplomacyMessage(unit, otherUnit, agreement)
-            : new DiplomacyMessage(unit, settlement, agreement));
+            : new DiplomacyMessage(unit, (Colony)settlement, agreement));
     }
 
     /**
