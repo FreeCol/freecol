@@ -137,9 +137,9 @@ public class DOMMessage {
         DOMMessage message;
         try {
             message = (DOMMessage)Introspector.instantiate(tag, types, params);
-        } catch (IllegalArgumentException e) {
+        } catch (Introspector.IntrospectorException ex) {
             logger.log(Level.WARNING, "Instantiation fail for message type:"
-                + tag, e);
+                + tag, ex);
             message = null;
         }
         return message;

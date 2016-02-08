@@ -1100,7 +1100,13 @@ public class Game extends FreeColGameObject {
         Class<T> rc = (server) ? serverClass(returnClass) : returnClass;
         Class[] types = new Class[] { Game.class, String.class };
         Object[] params = new Object[] { this, (String)null };
-        return Introspector.instantiate(rc, types, params);
+        try {
+            return Introspector.instantiate(rc, types, params);
+        } catch (Introspector.IntrospectorException ex) {
+            logger.log(Level.WARNING, "Unable to instantiate: "
+                + rc.getName(), ex);
+        }
+        return null;
     }
 
     /**

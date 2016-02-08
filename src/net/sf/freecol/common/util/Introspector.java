@@ -23,6 +23,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.stream.Collectors;
+
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -33,6 +37,12 @@ import java.lang.reflect.Modifier;
  */
 public class Introspector {
 
+    public static class IntrospectorException extends ReflectiveOperationException {
+        public IntrospectorException(String err, Throwable cause) {
+            super(err, cause);
+        }
+    }
+    
     /** The class whose field we are to operate on. */
     private final Class<?> theClass;
 
@@ -59,16 +69,17 @@ public class Introspector {
      * Get a get-method for this Introspector.
      *
      * @return A <code>Method</code> representing getField().
+     * @exception IntrospectorException if the get-method is not available.
      */
-    private Method getGetMethod() {
+    private Method getGetMethod() throws IntrospectorException {
         String methodName = "get" + field.substring(0, 1).toUpperCase()
             + field.substring(1);
 
         try {
             return theClass.getMethod(methodName);
         } catch (NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException(theClass.getName()
-                                               + "." + methodName, e);
+            throw new IntrospectorException(theClass.getName()
+                + "." + methodName, e);
         }
     }
 
@@ -78,16 +89,17 @@ public class Introspector {
      * @param argType A <code>Class</code> that is the argument to
      *        the set-method
      * @return A <code>Method</code> representing setField().
+     * @exception IntrospectorException if the set-method is not available.
      */
-    private Method getSetMethod(Class<?> argType) {
+    private Method getSetMethod(Class<?> argType) throws IntrospectorException {
         String methodName = "set" + field.substring(0, 1).toUpperCase()
             + field.substring(1);
 
         try {
             return theClass.getMethod(methodName, argType);
         } catch (NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException(theClass.getName()
-                                               + "." + methodName, e);
+            throw new IntrospectorException(theClass.getName()
+                + "." + methodName, e);
         }
     }
 
@@ -96,16 +108,17 @@ public class Introspector {
      *
      * @param method The <code>Method</code> to examine.
      * @return The method return type, or null on error.
+     * @exception IntrospectorException if the return type is not available.
      */
-    private Class<?> getMethodReturnType(Method method) {
+    private Class<?> getMethodReturnType(Method method)
+        throws IntrospectorException {
         Class<?> ret;
 
         try {
             ret = method.getReturnType();
         } catch (Exception e) {
-            throw new IllegalArgumentException(theClass.getName()
-                                               + "." + method.getName()
-                                               + " return type.", e);
+            throw new IntrospectorException(theClass.getName()
+                + "." + method.getName() + " return type.", e);
         }
         return ret;
     }
@@ -116,26 +129,12 @@ public class Introspector {
      *
      * @param argType A <code>Class</code> to find a converter for.
      * @return A conversion function, or null on error.
+     * @exception NoSuchMethodException if no converter is found.
      */
-    private Method getToStringConverter(Class<?> argType) {
-        Method method;
-
-        if (argType.isEnum()) {
-            try {
-                method = argType.getMethod("name");
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException(argType.getName()
-                                                   + ".getMethod(name())", e);
-            }
-        } else {
-            try {
-                method = String.class.getMethod("valueOf", argType);
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException("String.getMethod(valueOf("
-                                                   + argType.getName() + "))", e);
-            }
-        }
-        return method;
+    private Method getToStringConverter(Class<?> argType)
+        throws NoSuchMethodException {
+        return (argType.isEnum()) ? argType.getMethod("name")
+            : String.class.getMethod("valueOf", argType);
     }
 
     /**
@@ -189,8 +188,9 @@ public class Introspector {
      *        whose get-method is to be invoked.
      * @return A <code>String</code> containing the result of invoking
      *         the get-method.
+     * @exception IntrospectorException encompasses many failures.
      */
-    public String getter(Object obj) {
+    public String getter(Object obj) throws IntrospectorException {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
 
@@ -199,8 +199,8 @@ public class Introspector {
                 return (String) getMethod.invoke(obj);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                throw new IllegalArgumentException(getMethod.getName()
-                                                   + "(obj)", e);
+                throw new IntrospectorException(getMethod.getName() + "(obj)",
+                    e);
             }
         } else {
             Object result = null;
@@ -208,25 +208,31 @@ public class Introspector {
                 result = getMethod.invoke(obj);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                throw new IllegalArgumentException(getMethod.getName()
-                                                   + "(obj)", e);
+                throw new IntrospectorException(getMethod.getName() + "(obj)",
+                    e);
             }
-            Method convertMethod = getToStringConverter(fieldType);
+            Method convertMethod;
+            try {
+                convertMethod = getToStringConverter(fieldType);
+            } catch (NoSuchMethodException nsme) {
+                throw new IntrospectorException("No String converter found for "
+                    + fieldType, nsme);
+            }
             if (Modifier.isStatic(convertMethod.getModifiers())) {
                 try {
                     return (String) convertMethod.invoke(null, result);
                 } catch (IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(null, result)", e);
+                    throw new IntrospectorException(convertMethod.getName()
+                        + "(null, result)", e);
                 }
             } else {
                 try {
                     return (String) convertMethod.invoke(result);
                 } catch (IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(result)", e);
+                    throw new IntrospectorException(convertMethod.getName()
+                        + "(result)", e);
                 }
             }
         }
@@ -238,8 +244,9 @@ public class Introspector {
      * @param obj An <code>Object</code> (really of type theClass)
      *        whose set-method is to be invoked.
      * @param value A <code>String</code> containing the value to be set.
+     * @exception IntrospectorException encompasses many failures.
      */
-    public void setter(Object obj, String value) {
+    public void setter(Object obj, String value) throws IntrospectorException {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
         Method setMethod = getSetMethod(fieldType);
@@ -249,8 +256,8 @@ public class Introspector {
                 setMethod.invoke(obj, value);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                throw new IllegalArgumentException(setMethod.getName()
-                                                   + "(obj, " + value + ")", e);
+                throw new IntrospectorException(setMethod.getName()
+                    + "(obj, " + value + ")", e);
             }
         } else {
             Method convertMethod = getFromStringConverter(fieldType);
@@ -261,25 +268,25 @@ public class Introspector {
                     result = convertMethod.invoke(null, fieldType, value);
                 } catch (IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(null, " + fieldType.getName()
-                                                       + ", " + value + ")", e);
+                    throw new IntrospectorException(convertMethod.getName()
+                        + "(null, " + fieldType.getName()
+                        + ", " + value + ")", e);
                 }
             } else {
                 try {
                     result = convertMethod.invoke(null, value);
                 } catch (IllegalAccessException | IllegalArgumentException
                         | InvocationTargetException e) {
-                    throw new IllegalArgumentException(convertMethod.getName()
-                                                       + "(null, " + value + ")", e);
+                    throw new IntrospectorException(convertMethod.getName()
+                        + "(null, " + value + ")", e);
                 }
             }
             try {
                 setMethod.invoke(obj, result);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException e) {
-                throw new IllegalArgumentException(setMethod.getName()
-                                                   + "(result)", e);
+                throw new IntrospectorException(setMethod.getName()
+                    + "(result)", e);
             }
         }
     }
@@ -293,15 +300,16 @@ public class Introspector {
      * @param types The argument types of the constructor to call.
      * @param params The parameters to call the constructor with.
      * @return The new object instance.
-     * @exception IllegalArgumentException wraps all exceptional conditions.
+     * @exception IntrospectorException wraps all exceptional conditions.
      */
     public static Object instantiate(String tag, Class[] types,
-                                     Object[] params) {
+                                     Object[] params)
+        throws IntrospectorException {
         Class<?> messageClass;
         try {
             messageClass = Class.forName(tag);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unable to find class " + tag, e);
+        } catch (ClassNotFoundException ex) {
+            throw new IntrospectorException("Unable to find class " + tag, ex);
         }
         return instantiate(messageClass, types, params);
     }
@@ -314,26 +322,28 @@ public class Introspector {
      * @param types The argument types of the constructor to call.
      * @param params The parameters to call the constructor with.
      * @return The new instance.
-     * @exception IllegalArgumentException wraps all exceptional conditions.
+     * @exception IntrospectorException wraps all exceptional conditions.
      */
     public static <T> T instantiate(Class<T> messageClass, Class[] types,
-                                    Object[] params) {
+                                    Object[] params)
+        throws IntrospectorException {
         final String tag = messageClass.getName();
         Constructor<T> constructor;
         try {
             constructor = messageClass.getDeclaredConstructor(types);
-        } catch (NoSuchMethodException | SecurityException e) {
-            String p = "Unable to find constructor " + tag + "(";
-            for (Class type : types) p += " " + type;
-            p += " )";
-            throw new IllegalArgumentException(p, e);
+        } catch (NoSuchMethodException | SecurityException ex) {
+            throw new IntrospectorException("Unable to find constructor "
+                + lastPart(tag, ".") + "("
+                + map(types, t -> t.getName()).collect(Collectors.joining(","))
+                + ")", ex);
         }
         T instance;
         try {
             instance = constructor.newInstance(params);
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InstantiationException | InvocationTargetException e) {
-            throw new IllegalArgumentException("Failed to construct " + tag, e);
+        } catch (IllegalAccessException | InstantiationException
+                 | InvocationTargetException ex) {
+            throw new IntrospectorException("Failed to construct "
+                + lastPart(tag, "."), ex);
         }
         return instance;
     }
