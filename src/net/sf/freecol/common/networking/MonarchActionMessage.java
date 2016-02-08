@@ -27,7 +27,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -54,7 +53,8 @@ public class MonarchActionMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>MonarchActionMessage</code> with the given action.
+     * Create a new <code>MonarchActionMessage</code> with the given action
+     * to be sent to the client to solicit a response.
      *
      * @param action The <code>MonarchAction</code> to do.
      * @param template A <code>StringTemplate</code> describing the action.
@@ -86,13 +86,7 @@ public class MonarchActionMessage extends DOMMessage {
         this.monarchKey = element.getAttribute("monarch");
         this.tax = element.getAttribute("tax");
         this.resultString = element.getAttribute("result");
-        NodeList children = element.getChildNodes();
-        if (children.getLength() == 1) {
-            this.template = StringTemplate.label(" ");
-            readFromXMLElement(this.template, (Element)children.item(0));
-        } else {
-            this.template = null;
-        }
+        this.template = getChild(game, element, 0, StringTemplate.class);
     }
 
 
@@ -177,7 +171,7 @@ public class MonarchActionMessage extends DOMMessage {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return Null.  This should not be called.
+     * @return An <code>Element</code> containing the response.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -185,7 +179,7 @@ public class MonarchActionMessage extends DOMMessage {
 
         // Try to resolve the action.
         return server.getInGameController()
-            .monarchAction(serverPlayer, action, getResult())
+            .monarchAction(serverPlayer, getAction(), getResult())
             .build(serverPlayer);
     }
 
@@ -197,11 +191,12 @@ public class MonarchActionMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "action", action.toString(),
-            "monarch", monarchKey);
-        if (tax != null) result.setAttribute("tax", tax);
-        if (resultString != null) result.setAttribute("result", resultString);
-        if (template != null) result.add(template);
+            "action", this.action.toString(),
+            "monarch", this.monarchKey);
+        if (this.tax != null) result.setAttribute("tax", this.tax);
+        if (this.resultString != null)
+            result.setAttribute("result", this.resultString);
+        if (this.template != null) result.add(this.template);
         return result.toXMLElement();
     }
 
