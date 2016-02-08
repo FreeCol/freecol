@@ -1098,10 +1098,15 @@ public class Game extends FreeColGameObject {
     public <T extends FreeColObject> T newInstance(Class<T> returnClass,
                                                    boolean server) {
         Class<T> rc = (server) ? serverClass(returnClass) : returnClass;
-        Class[] types = new Class[] { Game.class, String.class };
-        Object[] params = new Object[] { this, (String)null };
         try {
-            return Introspector.instantiate(rc, types, params);
+            return Introspector.instantiate(rc,
+                new Class[] { Game.class, String.class },
+                new Object[] { this, (String)null });
+        } catch (Introspector.IntrospectorException ex) {}
+        // OK, did not work, try the trivial constructor
+        try {
+            return Introspector.instantiate(rc,
+                new Class[] {}, new Object[] {});
         } catch (Introspector.IntrospectorException ex) {
             logger.log(Level.WARNING, "Unable to instantiate: "
                 + rc.getName(), ex);
