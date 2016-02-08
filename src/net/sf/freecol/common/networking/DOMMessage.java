@@ -358,6 +358,27 @@ public class DOMMessage {
     }
 
     /**
+     * Convenience method to extract all child elements of a
+     * particular class.
+     *
+     * @param game The <code>Game</code> to instantiate within.
+     * @param element The parent <code>Element</code>.
+     * @param returnClass The expected class of the child.
+     * @return A list of new instances of the return class.
+     */
+    public static <T extends FreeColObject> List<T> getChildren(Game game,
+        Element element, Class<T> returnClass) {
+        List<T> ret = new ArrayList<>();
+        NodeList nl = element.getChildNodes();
+        for (int i = 0; i < nl.getLength(); i++) {
+            T t = getChild(game, element, i, returnClass);
+            if (t != null) ret.add(t);
+        }
+        return ret;
+    }
+
+
+    /**
      * Convenience method to map a function over the children of an Element.
      *
      * @param game The <code>Game</code> to instantiate within.
