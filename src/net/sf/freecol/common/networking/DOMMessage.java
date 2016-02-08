@@ -330,13 +330,18 @@ public class DOMMessage {
      * @param returnClass The expected class of the child.
      * @return A new instance of the return class, or null on error.
      */
-    public static <T extends FreeColGameObject> T getChild(Game game,
+    public static <T extends FreeColObject> T getChild(Game game,
         Element element, int index, Class<T> returnClass) {
         T ret = null;
         NodeList nl = element.getChildNodes();
         Element e;
         if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
-            ret = game.getFreeColGameObject(readId(e), returnClass);
+            if (ret instanceof FreeColGameObject) {
+                FreeColGameObject fcgo = game.getFreeColGameObject(readId(e));
+                try {
+                    ret = returnClass.cast(fcgo);
+                } catch (ClassCastException cce) {}
+            }
             if (ret == null) ret = game.newInstance(returnClass, false);
             if (ret != null) readFromXMLElement(ret, e);
         }
