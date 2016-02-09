@@ -29,7 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -60,11 +59,8 @@ public class HighScoreMessage extends DOMMessage {
     public HighScoreMessage(Game game, Element element) {
         super(getTagName());
 
-        scores.clear();
-        NodeList childElements = element.getChildNodes();
-        for (int i = 0; i < childElements.getLength(); i++) {
-            scores.add(new HighScore((Element)childElements.item(i)));
-        }
+        this.scores.clear();
+        this.scores.addAll(getChildren(game, element, HighScore.class));
     }
 
 

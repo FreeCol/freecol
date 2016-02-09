@@ -45,8 +45,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A FreeCol high score record.
@@ -141,6 +139,11 @@ public class HighScore extends FreeColObject {
 
 
     /**
+     * Trivial constructor, for Game.newInstance.
+     */
+    public HighScore() {}
+
+    /**
      * Create a new high score record.
      *
      * @param player The <code>Player</code> the score is for.
@@ -175,15 +178,6 @@ public class HighScore extends FreeColObject {
      */
     public HighScore(FreeColXMLReader xr) throws XMLStreamException {
         readFromXML(xr);
-    }
-
-    /**
-     * Create a new <code>HighScore</code> by reading an element.
-     *
-     * @param element The <code>Element</code> to read.
-     */
-    public HighScore(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
     }
 
 
