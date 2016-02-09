@@ -44,11 +44,11 @@ public class BuyPropositionMessage extends DOMMessage {
     /** The object identifier of the settlement that is selling. */
     private final String settlementId;
 
-    /** The goods to be bought. */
-    private final Goods goods;
-
     /** The price being negotiated. */
     private final String goldString;
+
+    /** The goods to be bought. */
+    private final Goods goods;
 
 
     /**
@@ -65,8 +65,8 @@ public class BuyPropositionMessage extends DOMMessage {
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
-        this.goods = goods;
         this.goldString = Integer.toString(gold);
+        this.goods = goods;
     }
 
     /**
@@ -81,9 +81,8 @@ public class BuyPropositionMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getTagName()));
         this.goldString = element.getAttribute("gold");
+        this.goods = getChild(game, element, 0, Goods.class);
     }
 
 
