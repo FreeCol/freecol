@@ -29,7 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -66,12 +65,7 @@ public class REFUnitsMessage extends DOMMessage {
         super(getTagName());
 
         this.refUnits.clear();
-        NodeList childElements = element.getChildNodes();
-        for (int index = 0; index < childElements.getLength(); index++) {
-            AbstractUnit unit = new AbstractUnit();
-            readFromXMLElement(unit, (Element)childElements.item(index));
-            this.refUnits.add(unit);
-        }
+        this.refUnits.addAll(getChildren(game, element, AbstractUnit.class));
     }
 
 
@@ -111,8 +105,9 @@ public class REFUnitsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        for (AbstractUnit au : this.refUnits) this.add(au);
-        return super.toXMLElement();
+        DOMMessage result = new DOMMessage(getTagName());
+        for (AbstractUnit au : this.refUnits) result.add(au);
+        return result.toXMLElement();
     }
 
     /**
