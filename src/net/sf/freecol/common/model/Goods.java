@@ -43,7 +43,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
     /** The game containing these goods. */
-    private final Game game;
+    private Game game;
 
     /**
      * Where the goods are.  This should always be non-null except for the
@@ -55,37 +55,39 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
 
     /**
-     * Creates a standard <code>Goods</code>-instance given the place where
-     * the goods is.
+     * Constructor for Game.newInstance.
      *
-     * This constructor only asserts that the game and
-     * that the location (if given) can store goods. The goods will not
-     * be added to the location (use Location.add for this).
+     * @param game The enclosing <code>Game</code>.
+     * @param id The identifier (ignored, type gives identifier here).
+     */
+    public Goods(Game game, @SuppressWarnings("unused") String id) {
+        initializeGame(game);
+    }
+    
+    /**
+     * Creates a standard <code>Goods</code>-instance given the place
+     * where the goods is.
+     *
+     * This constructor only asserts that the game and that the
+     * location (if given) can store goods. The goods will not be
+     * added to the location (use Location.add for this).
      *
      * @param game The enclosing <code>Game</code>.
      * @param location The <code>Location</code> of the goods (may be null).
-     * @param type The type of the goods.
+     * @param type The <code>GoodsType</code> for the goods.
      * @param amount The amount of the goods.
-     *
-     * @throws IllegalArgumentException if the location cannot store any goods.
+     * @exception IllegalArgumentException if the game is null or the
+     *     location cannot store any goods.
      */
     public Goods(Game game, Location location, GoodsType type, int amount) {
-        if (game == null) {
-            throw new IllegalArgumentException("Null game.");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Null type.");
-        }
+        super(type, amount);
+
+        initializeGame(game);
+
         if (location != null && location.getGoodsContainer() == null) {
             throw new IllegalArgumentException("Can not store goods at: "
                 + location);
         }
-
-        this.game = game;
-        setId(type.getId());
-        setSpecification(game.getSpecification());
-        setType(type);
-        setAmount(amount);
         this.location = location;
     }
 
@@ -97,8 +99,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @exception XMLStreamException if an error occurs
      */
     public Goods(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        this.game = game;
-        setSpecification(game.getSpecification());
+        initializeGame(game);
         readFromXML(xr);
     }
 
@@ -109,19 +110,19 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @param e an <code>Element</code> value
      */
     public Goods(Game game, Element e) {
-        this.game = game;
-        setSpecification(game.getSpecification());
+        initializeGame(game);
         DOMMessage.readFromXMLElement(this, e);
     }
 
 
     /**
-     * Get the game containing these goods.
+     * Initialize the game.
      *
-     * @return The <code>Game</code> containing these <code>Goods</code>.
+     * @param game The <code>Game</code> to initialize.
      */
-    public Game getGame() {
-        return game;
+    private void initializeGame(Game game) {
+        setGame(game);
+        setSpecification(game.getSpecification());
     }
 
     /**
@@ -129,8 +130,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * then this method adjusts the amount to the maximum amount possible.
      */
     public void adjustAmount() {
-        if (location == null) return;
-        GoodsContainer gc = location.getGoodsContainer();
+        if (this.location == null) return;
+        GoodsContainer gc = this.location.getGoodsContainer();
         if (gc != null) {
             int maxAmount = gc.getGoodsCount(getType());
             if (getAmount() > maxAmount) setAmount(maxAmount);
@@ -145,7 +146,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     /**
@@ -162,8 +163,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public boolean isInEurope() {
-        return (location instanceof Europe)
-            || (location instanceof Unit && ((Unit)location).isInEurope());
+        return (this.location instanceof Europe)
+            || (this.location instanceof Unit
+                && ((Unit)this.location).isInEurope());
     }
 
     /**
@@ -171,7 +173,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Tile getTile() {
-        return (location == null) ? null : location.getTile();
+        return (this.location == null) ? null : this.location.getTile();
     }
 
     /**
@@ -190,7 +192,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Player getOwner() {
-        return (location instanceof Ownable) ? ((Ownable)location).getOwner()
+        return (this.location instanceof Ownable)
+            ? ((Ownable)this.location).getOwner()
             : null;
     }
 
@@ -203,6 +206,23 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
 
 
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setGame(Game game) {
+        this.game = game;
+    }
+    
+    
     // Override Object
 
     /**
@@ -239,8 +259,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (location != null) {
-            xw.writeLocationAttribute(LOCATION_TAG, location);
+        if (this.location != null) {
+            xw.writeLocationAttribute(LOCATION_TAG, this.location);
         }
     }
 
@@ -251,7 +271,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        location = xr.getLocationAttribute(game, LOCATION_TAG, true);
+        this.location = xr.getLocationAttribute(game, LOCATION_TAG, true);
     }
 
     /**
