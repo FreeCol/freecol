@@ -32,7 +32,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -49,7 +48,7 @@ public class GoodsForSaleMessage extends DOMMessage {
     private final String settlementId;
 
     /** The list of goods for sale. */
-    private final List<Goods> sellGoods;
+    private final List<Goods> sellGoods = new ArrayList<>();
 
 
     /**
@@ -66,7 +65,8 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
-        this.sellGoods = sellGoods;
+        this.sellGoods.clear();
+        if (sellGoods != null) this.sellGoods.addAll(sellGoods);
     }
 
     /**
@@ -81,11 +81,8 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.sellGoods = new ArrayList<>();
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            this.sellGoods.add(new Goods(game, (Element) children.item(i)));
-        }
+        this.sellGoods.clear();
+        this.sellGoods.addAll(getChildren(game, element, Goods.class));
     }
 
 
@@ -112,7 +109,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -120,7 +117,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         IndianSettlement settlement;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
+            settlement = unit.getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -140,11 +137,9 @@ public class GoodsForSaleMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "settlement", settlementId);
-        if (sellGoods != null) {
-            for (Goods goods : sellGoods) result.add(goods);
-        }
+            "unit", this.unitId,
+            "settlement", this.settlementId);
+        for (Goods goods : this.sellGoods) result.add(goods);
         return result.toXMLElement();
     }
 
