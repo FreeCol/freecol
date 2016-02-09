@@ -74,8 +74,7 @@ public class DeliverGiftMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getTagName()));
+        this.goods = getChild(game, element, 0, Goods.class);
     }
 
 
@@ -89,7 +88,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The <code>Unit</code>, or null if none.
      */
     public Unit getUnit() {
-        return goods.getGame().getFreeColGameObject(unitId, Unit.class);
+        return this.goods.getGame().getFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -100,8 +99,8 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The <code>Settlement</code>, or null if none.
      */
     public Settlement getSettlement() {
-        return goods.getGame().getFreeColGameObject(settlementId,
-                                                    Settlement.class);
+        return this.goods.getGame().getFreeColGameObject(settlementId,
+                                                         Settlement.class);
     }
 
     /**
@@ -112,7 +111,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The <code>Goods</code>, or null if none.
      */
     public Goods getGoods() {
-        return goods;
+        return this.goods;
     }
 
 
@@ -131,7 +130,7 @@ public class DeliverGiftMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -139,16 +138,16 @@ public class DeliverGiftMessage extends DOMMessage {
 
         Settlement settlement;
         try {
-            settlement = unit.getAdjacentSettlementSafely(settlementId);
+            settlement = unit.getAdjacentSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // Make sure we are trying to deliver something that is there
-        if (goods.getLocation() != unit) {
-            return serverPlayer.clientError("Gift " + goods.getId()
-                + " is not with unit " + unitId)
+        if (this.goods.getLocation() != unit) {
+            return serverPlayer.clientError("Gift " + this.goods.getId()
+                + " is not with unit " + this.unitId)
                 .build(serverPlayer);
         }
 
@@ -166,9 +165,9 @@ public class DeliverGiftMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "settlement", settlementId);
-        result.add(goods);
+            "unit", this.unitId,
+            "settlement", this.settlementId);
+        result.add(this.goods);
         return result.toXMLElement();
     }
 
