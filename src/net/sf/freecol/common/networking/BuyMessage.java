@@ -81,9 +81,8 @@ public class BuyMessage extends DOMMessage {
 
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
-        this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getTagName()));
         this.goldString = element.getAttribute("gold");
+        this.goods = getChild(game, element, 0, Goods.class);
     }
 
 
