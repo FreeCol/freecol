@@ -462,19 +462,22 @@ public class FreeColDirectories {
      * @return True if the directory is now there.
      */
     private static boolean insistDirectory(File file) {
+        boolean ret;
         if (file.exists()) {
-            if (file.isDirectory()) return true;
-            System.err.println("Could not create directory " + file.getPath()
-                + " because a non-directory with that name is already there.");
-            return false;
+            if (!(ret = file.isDirectory())) {
+                System.err.println("Could not create directory "
+                    + file.getPath() + " because a non-directory with that name is already there.");
+            }
+        } else {
+            try {
+                ret = file.mkdir();
+            } catch (Exception e) {
+                ret = false;
+                System.err.println("Could not make directory " + file.getPath()
+                    + ": " + e.getMessage());
+            }
         }
-        try {
-            return file.mkdir();
-        } catch (Exception e) {
-            System.err.println("Could not make directory " + file.getPath()
-                + ": " + e.getMessage());
-            return false;
-        }
+        return ret;
     }
 
     /**
