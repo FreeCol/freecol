@@ -324,6 +324,10 @@ public class DOMMessage {
     /**
      * Convenience method to extract a child element of a particular class.
      *
+     * Special handling for null game, so that
+     * <code>LoginMessage</code> can bootstrap itself despite no game
+     * existing yet.
+     *
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param index The index of the child element.
@@ -336,13 +340,18 @@ public class DOMMessage {
         NodeList nl = element.getChildNodes();
         Element e;
         if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
-            if (ret instanceof FreeColGameObject) {
-                FreeColGameObject fcgo = game.getFreeColGameObject(readId(e));
+            if (FreeColGameObject.class.isAssignableFrom(returnClass)) {
+                FreeColGameObject fcgo = (game == null)
+                    ? ((Game.class.isAssignableFrom(returnClass)) ? new Game()
+                        : null)
+                    : game.getFreeColGameObject(readId(e));
                 try {
                     ret = returnClass.cast(fcgo);
                 } catch (ClassCastException cce) {}
             }
-            if (ret == null) ret = game.newInstance(returnClass, false);
+            if (ret == null && game != null) {
+                ret = game.newInstance(returnClass, false);
+            }
             if (ret != null) readFromXMLElement(ret, e);
         }
         return ret;

@@ -27,7 +27,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -37,6 +36,13 @@ public class LoginMessage extends DOMMessage {
 
     public static final String TAG = "login";
 
+    private static final String ADMIN_TAG = "admin";
+    private static final String CURRENT_PLAYER_TAG = "currentPlayer";
+    private static final String SINGLE_PLAYER_TAG = "singlePlayer";
+    private static final String START_GAME_TAG = "startGame";
+    private static final String USER_NAME_TAG = "userName";
+    private static final String VERSION_TAG = "version";
+    
     /** The user name. */
     private final String userName;
 
@@ -99,56 +105,55 @@ public class LoginMessage extends DOMMessage {
      * Create a new <code>LoginMessage</code> from a supplied element.
      *
      * @param game A <code>Game</code> (not used).
-     * @param element The <code>Element</code> to use to create the message.
+     * @param e The <code>Element</code> to use to create the message.
      */
-    public LoginMessage(Game game, Element element) {
+    public LoginMessage(Game game, Element e) {
         super(getTagName());
 
-        String str;
-        this.userName = element.getAttribute("userName");
-        this.version = element.getAttribute("version");
-        str = element.getAttribute("admin");
-        this.admin = Boolean.parseBoolean(str);
-        str = element.getAttribute("startGame");
-        this.startGame = Boolean.parseBoolean(str);
-        str = element.getAttribute("singlePlayer");
-        this.singlePlayer = Boolean.parseBoolean(str);
-        str = element.getAttribute("currentPlayer");
-        this.currentPlayer = Boolean.parseBoolean(str);
-        NodeList children = element.getChildNodes();
-        this.game = (children.getLength() != 1) ? null
-            : new Game((Element)children.item(0), this.userName);
+        this.userName = DOMMessage.getStringAttribute(e,
+            USER_NAME_TAG, (String)null);
+        this.version = DOMMessage.getStringAttribute(e,
+            VERSION_TAG, (String)null);
+        this.admin = DOMMessage.getBooleanAttribute(e,
+            ADMIN_TAG, false);
+        this.startGame = DOMMessage.getBooleanAttribute(e,
+            START_GAME_TAG, false);
+        this.singlePlayer = DOMMessage.getBooleanAttribute(e,
+            SINGLE_PLAYER_TAG, true);
+        this.currentPlayer = DOMMessage.getBooleanAttribute(e,
+            CURRENT_PLAYER_TAG, false);
+        this.game = getChild(game, e, 0, Game.class);
     }
 
 
     // Public interface
 
     public String getUserName() {
-        return userName;
+        return this.userName;
     }
 
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     public boolean isAdmin() {
-        return admin;
+        return this.admin;
     }
 
     public boolean getStartGame() {
-        return startGame;
+        return this.startGame;
     }
 
     public boolean isSinglePlayer() {
-        return singlePlayer;
+        return this.singlePlayer;
     }
 
     public boolean isCurrentPlayer() {
-        return currentPlayer;
+        return this.currentPlayer;
     }
 
     public Game getGame() {
-        return game;
+        return this.game;
     }
 
 
@@ -201,9 +206,9 @@ public class LoginMessage extends DOMMessage {
             if (!game.canAddNewPlayer()) {
                 return new ErrorMessage("server.maximumPlayers", null)
                     .toXMLElement();
-            } else if (game.playerNameInUse(userName)) {
+            } else if (game.playerNameInUse(this.userName)) {
                 return new ErrorMessage("server.userNameInUse",
-                    userName + " is already in use.").toXMLElement();
+                    this.userName + " is already in use.").toXMLElement();
             }
 
             // Create and add the new player:
@@ -224,7 +229,7 @@ public class LoginMessage extends DOMMessage {
 
         } else { // Restoring from existing game.
             game = server.getGame();
-            player = (ServerPlayer)game.getPlayerByName(userName);
+            player = (ServerPlayer)game.getPlayerByName(this.userName);
             if (player == null) {
                 StringBuilder sb = new StringBuilder("Player \"");
                 sb.append(userName).append("\" is not present in the game.")
@@ -237,7 +242,7 @@ public class LoginMessage extends DOMMessage {
                     sb.toString()).toXMLElement();
             } else if (player.isConnected() && !player.isAI()) {
                 return new ErrorMessage("server.userNameInUse",
-                    userName + " is already in use.").toXMLElement();
+                    this.userName + " is already in use.").toXMLElement();
             }
             player.setConnection(connection);
             player.setConnected(true);
@@ -262,8 +267,8 @@ public class LoginMessage extends DOMMessage {
         connection.setMessageHandler(mh);
         server.getServer().addConnection(connection);
         server.updateMetaServer();
-        return new LoginMessage(userName, version, player.isAdmin(), !starting,
-                                server.getSinglePlayer(),
+        return new LoginMessage(this.userName, this.version, player.isAdmin(),
+                                !starting, server.getSinglePlayer(),
                                 isCurrentPlayer, game).toXMLElement();
     }
 
@@ -275,13 +280,15 @@ public class LoginMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "userName", userName,
-            "version", version,
-            "admin", Boolean.toString(admin),
-            "startGame", Boolean.toString(startGame),
-            "singlePlayer", Boolean.toString(singlePlayer),
-            "currentPlayer", Boolean.toString(currentPlayer));
-        if (game != null) result.add(game, game.getPlayerByName(userName));
+            USER_NAME_TAG, this.userName,
+            VERSION_TAG, this.version,
+            ADMIN_TAG, Boolean.toString(this.admin),
+            START_GAME_TAG, Boolean.toString(this.startGame),
+            SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
+            CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer));
+        if (this.game != null) {
+            result.add(this.game, this.game.getPlayerByName(this.userName));
+        }
         return result.toXMLElement();
     }
 

@@ -47,8 +47,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The main component of the game model.
@@ -194,32 +192,32 @@ public class Game extends FreeColGameObject {
 
 
     /**
+     * Trivial constructor for use in Game.newInstance.
+     */
+    public Game() {
+        super(null);
+        
+        this.clientUserName = null;
+        this.players.clear();
+        this.unknownEnemy = null;
+        this.map = null;
+        this.nationOptions = null;
+        this.currentPlayer = null;
+        this.spanishSuccession = false;
+        this.initialActiveUnitId = null;
+        this.specification = null;
+        this.combatModel = new SimpleCombatModel();
+    }
+
+    /**
      * Constructor used by the ServerGame constructor.
      *
      * @param specification The <code>Specification</code> for this game.
      */
     protected Game(Specification specification) {
-        super(null);
+        this();
 
         this.specification = specification;
-        this.clientUserName = null;
-    }
-
-    /**
-     * Creates a new <code>Game</code> object from a <code>Element</code>
-     * in a DOM-parsed XML-tree.
-     *
-     * @param element The <code>Element</code> containing the game.
-     * @param clientUserName The name of the owner of this view of the game.
-     */
-    public Game(Element element, String clientUserName) {
-        super(null);
-     
-        this.clientUserName = clientUserName;
-        this.combatModel = new SimpleCombatModel();
-        DOMMessage.readFromXMLElement(this, element);
-        // setId() does not add Games to the freeColGameObjects
-        this.setFreeColGameObject(getId(), this);
     }
 
 
