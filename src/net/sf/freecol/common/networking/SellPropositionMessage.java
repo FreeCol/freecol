@@ -44,11 +44,11 @@ public class SellPropositionMessage extends DOMMessage {
     /** The object identifier of the settlement that is buying. */
     private final String settlementId;
 
-    /** The goods to be sold. */
-    private final Goods goods;
-
     /** The price being negotiated. */
     private final String goldString;
+
+    /** The goods to be sold. */
+    private final Goods goods;
 
 
     /**
@@ -59,13 +59,13 @@ public class SellPropositionMessage extends DOMMessage {
      * @param gold The price of the goods (negative if unknown).
      */
     public SellPropositionMessage(Unit unit, Settlement settlement,
-                                   Goods goods, int gold) {
+                                  Goods goods, int gold) {
         super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
-        this.goods = goods;
         this.goldString = Integer.toString(gold);
+        this.goods = goods;
     }
 
     /**
@@ -81,8 +81,7 @@ public class SellPropositionMessage extends DOMMessage {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.goldString = element.getAttribute("gold");
-        this.goods = new Goods(game,
-            DOMMessage.getChildElement(element, Goods.getTagName()));
+        this.goods = getChild(game, element, 0, Goods.class);
     }
 
 
@@ -95,7 +94,7 @@ public class SellPropositionMessage extends DOMMessage {
      */
     public int getGold() {
         try {
-            return Integer.parseInt(goldString);
+            return Integer.parseInt(this.goldString);
         } catch (NumberFormatException e) {
             return -1;
         }
@@ -117,7 +116,7 @@ public class SellPropositionMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -125,22 +124,22 @@ public class SellPropositionMessage extends DOMMessage {
 
         IndianSettlement settlement;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(settlementId);
+            settlement = unit.getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // Make sure we are trying to sell something that is there
-        if (goods.getLocation() != unit) {
-            return serverPlayer.clientError("Goods " + goods.getId()
-                + " are not with unit " + unitId)
+        if (this.goods.getLocation() != unit) {
+            return serverPlayer.clientError("Goods " + this.goods.getId()
+                + " are not with unit " + this.unitId)
                 .build(serverPlayer);
         }
 
         // Proceed to price.
         return server.getInGameController()
-            .sellProposition(serverPlayer, unit, settlement, goods, getGold())
+            .sellProposition(serverPlayer, unit, settlement, this.goods, getGold())
             .toXMLElement();
     }
 
@@ -152,10 +151,10 @@ public class SellPropositionMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "settlement", settlementId,
-            "gold", goldString);
-        result.add(goods);
+            "unit", this.unitId,
+            "settlement", this.settlementId,
+            "gold", this.goldString);
+        result.add(this.goods);
         return result.toXMLElement();
     }
 
