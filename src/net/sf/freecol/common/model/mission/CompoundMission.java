@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The CompoundMission provides a wrapper for several more basic
@@ -75,23 +73,12 @@ public class CompoundMission extends AbstractMission {
      * Creates a new <code>CompoundMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public CompoundMission(Game game, Element e) {
-        super(game, e);
-
-        DOMMessage.readFromXMLElement(this, e);
-    }
-
-    /**
-     * Creates a new <code>CompoundMission</code> instance.
-     *
-     * @param game a <code>Game</code> value
      * @param id The object identifier.
      */
     public CompoundMission(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Get the <code>Missions</code> value.

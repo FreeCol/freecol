@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The GoToMission causes a Unit to move towards its destination.
@@ -72,23 +70,12 @@ public class GoToMission extends AbstractMission {
      * Creates a new <code>GoToMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public GoToMission(Game game, Element e) {
-        super(game, e);
-
-        DOMMessage.readFromXMLElement(this, e);
-    }
-
-    /**
-     * Creates a new <code>GoToMission</code> instance.
-     *
-     * @param game a <code>Game</code> value
      * @param id The object identifier.
      */
     public GoToMission(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Get the <code>Destination</code> value.

@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The ImprovementMission causes a Unit to add a TileImprovement to a
@@ -71,23 +69,12 @@ public class ImprovementMission extends AbstractMission {
      * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public ImprovementMission(Game game, Element e) {
-        super(game, e);
-
-        DOMMessage.readFromXMLElement(this, e);
-    }
-
-    /**
-     * Creates a new <code>ImprovementMission</code> instance.
-     *
-     * @param game a <code>Game</code> value
      * @param id The object identifier.
      */
     public ImprovementMission(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Get the <code>Improvement</code> value.

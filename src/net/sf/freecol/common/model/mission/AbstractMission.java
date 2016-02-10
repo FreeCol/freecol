@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.DOMMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * The AbstractMission provides basic methods for building Missions.
@@ -91,23 +89,12 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * Creates a new <code>AbstractMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
-     */
-    public AbstractMission(Game game, Element e) {
-        super(game, null);
-
-        DOMMessage.readFromXMLElement(this, e);
-    }
-
-    /**
-     * Creates a new <code>AbstractMission</code> instance.
-     *
-     * @param game a <code>Game</code> value
      * @param id The object identifier.
      */
     public AbstractMission(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Set the <code>Unit</code> value.
