@@ -411,6 +411,30 @@ public final class Ability extends Feature {
 
 
     /**
+     * Deliberately trivial constructor.
+     *
+     * @param specification The <code>Specification</code> to use.
+     */
+    protected Ability(Specification specification) {
+        super(specification);
+    }
+
+    /**
+     * Creates a new <code>Ability</code> instance.
+     *
+     * @param id The object identifier.
+     * @param source The source <code>FreeColGameObjectType</code>.
+     * @param value The ability value.
+     */
+    public Ability(String id, FreeColGameObjectType source, boolean value) {
+        this((source == null) ? null : source.getSpecification());
+
+        setId(id);
+        setSource(source);
+        this.value = value;
+    }
+
+    /**
      * Creates a new <code>Ability</code> instance.
      *
      * @param id The object identifier.
@@ -432,22 +456,11 @@ public final class Ability extends Feature {
     /**
      * Creates a new <code>Ability</code> instance.
      *
-     * @param id The object identifier.
-     * @param source The source <code>FreeColGameObjectType</code>.
-     * @param value The ability value.
-     */
-    public Ability(String id, FreeColGameObjectType source, boolean value) {
-        setId(id);
-        setSource(source);
-        this.value = value;
-    }
-
-    /**
-     * Creates a new <code>Ability</code> instance.
-     *
      * @param template An <code>Ability</code> to copy from.
      */
     public Ability(Ability template) {
+        this((Specification)null);
+        
         copyFrom(template);
         this.value = template.value;
     }
@@ -461,7 +474,8 @@ public final class Ability extends Feature {
      */
     public Ability(FreeColXMLReader xr,
                    Specification specification) throws XMLStreamException {
-        setSpecification(specification);
+        this(specification);
+
         readFromXML(xr);
     }
 
@@ -472,7 +486,8 @@ public final class Ability extends Feature {
      * @param specification A <code>Specification</code> to refer to.
      */
     public Ability(Element e, Specification specification) {
-        setSpecification(specification);
+        this(specification);
+
         DOMMessage.readFromXMLElement(this, e);
     }
 

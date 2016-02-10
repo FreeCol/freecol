@@ -56,23 +56,14 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Creates a new <code>FreeColGameObject</code>.
      *
      * Automatically assign an object identifier and register this
-     * object at the specified <code>Game</code>, unless this object
-     * is the <code>Game</code> itself in which case it is given an
-     * identifier of zero.
+     * object at the specified <code>Game</code>.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      */
     public FreeColGameObject(Game game) {
         if (game != null) {
-            setGame(game);
+            setGame(game); // Set game before calling internId
             internId(getXMLTagName() + ":" + game.getNextId());
-
-        } else if (this instanceof Game) {
-            setGame((Game)this);
-            setId("0");
-
-        } else {
-            throw new IllegalArgumentException("FCGO with null game.");
         }
         this.uninitialized = getId() == null;
         this.disposed = false;
@@ -82,27 +73,46 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Creates a new <code>FreeColGameObject</code>.
      * If an identifier is supplied, use that, otherwise leave it undefined.
      *
-     * This routine should be used when we intend to fully initialize
-     * the object later.
+     * This routine should be used when we know that the object will need
+     * further initialization.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
-        setGame(game);
+        setGame(game); // Set game before calling internId
         if (id != null) internId(id);
-
         this.uninitialized = true;
         this.disposed = false;
     }
 
 
     /**
+     * Sets the unique identifier of this object and registers it in its
+     * <code>Game</code> with that identifier, i.e. "intern" this object.
+     *
+     * @param newId The unique identifier of this object.
+     */
+    public final void internId(final String newId) {
+        final Game game = getGame();
+        if (game != null && newId != null) {
+            final String oldId = getId();
+            if (!newId.equals(oldId)) {
+                if (oldId != null) game.removeFreeColGameObject(oldId, "override");
+                setId(newId);
+                if (newId != null) game.setFreeColGameObject(newId, this);
+            }
+        } else {
+            setId(newId);
+        }
+    }
+
+    /**
      * Has this object not yet been initialized?
      *
      * @return True if this object is not initialized.
      */
-    public boolean isUninitialized() {
+    public final boolean isUninitialized() {
         return this.uninitialized;
     }
 
@@ -114,40 +124,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public final boolean isDisposed() {
         return this.disposed;
-    }
-
-    /**
-     * Collect a list of this object and all its subparts that should be
-     * disposed of when this object goes away.  Arrange that the object
-     * itself is last.
-     *
-     * To be overridden in subclasses, but reference this routine.
-     *
-     * @return A list of <code>FreeColGameObject</code>s to dispose of.
-     */
-    public List<FreeColGameObject> getDisposeList() {
-        List<FreeColGameObject> fcgos = new ArrayList<>();
-        fcgos.add(this);
-        return fcgos;
-    }
-
-    /**
-     * Low level base dispose, removing the object from the game.
-     */
-    public final void fundamentalDispose() {
-        getGame().removeFreeColGameObject(getId(), "dispose");
-        this.disposed = true;
-    }
-
-    /**
-     * Dispose of the resources of this object, and finally remove it from the
-     * game.
-     *
-     * To be extended by subclasses, but they must tail call up
-     * towards this.
-     */
-    public void disposeResources() {
-        fundamentalDispose();
     }
 
     /**
@@ -163,6 +139,43 @@ public abstract class FreeColGameObject extends FreeColObject {
             fcgo.disposeResources();
         }
         lb.log(logger, Level.INFO);
+    }
+
+    /**
+     * Low level base dispose, removing the object from the game.
+     */
+    public final void fundamentalDispose() {
+        getGame().removeFreeColGameObject(getId(), "dispose");
+        this.disposed = true;
+    }
+
+
+    // Routines to be overridden where meaningful by subclasses.
+
+    /**
+     * Collect a list of this object and all its subparts that should be
+     * disposed of when this object goes away.
+     *
+     * Overriding routines should reference this routine, and arrange
+     * that the object itself is last.
+     *
+     * @return A list of <code>FreeColGameObject</code>s to dispose of.
+     */
+    public List<FreeColGameObject> getDisposeList() {
+        List<FreeColGameObject> fcgos = new ArrayList<>();
+        fcgos.add(this);
+        return fcgos;
+    }
+
+    /**
+     * Dispose of the resources of this object, and finally remove it from the
+     * game.
+     *
+     * To be extended by subclasses, but they must tail call up
+     * towards this.
+     */
+    public void disposeResources() {
+        fundamentalDispose();
     }
 
     /**
@@ -183,8 +196,6 @@ public abstract class FreeColGameObject extends FreeColObject {
     /**
      * Checks the integrity of this game object.
      *
-     * To be overridden by subclasses where this is meaningful.
-     * 
      * @param fix If true, fix problems if possible.
      * @return Negative if there are problems remaining, zero if
      *     problems were fixed, positive if no problems found at all.
@@ -200,6 +211,22 @@ public abstract class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
+    public Specification getSpecification() {
+        return (this.game == null) ? null : this.game.getSpecification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSpecification(Specification specification) {
+        throw new RuntimeException("Can not set specification");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Game getGame() {
         return this.game;
     }
@@ -209,40 +236,8 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public void setGame(Game game) {
+        if (game == null) throw new RuntimeException("Null game");
         this.game = game;
-    }
-
-    /**
-     * Sets the unique identifier of this object and registers it in its
-     * <code>Game</code> with that identifier, i.e. "intern" this object.
-     *
-     * @param newId The unique identifier of this object.
-     */
-    @Override
-    public final void internId(final String newId) {
-        if (this.game != null && !(this instanceof Game)) {
-            if (!newId.equals(getId())) {
-                FreeColObject ret = null;
-                if (getId() != null) {
-                    this.game.removeFreeColGameObject(getId(), "override");
-                }
-
-                setId(newId);
-                this.game.setFreeColGameObject(newId, this);
-            }
-        } else {
-            setId(newId);
-        }
-    }
-
-    /**
-     * Get the specification for this game object.
-     *
-     * @return The <code>Specification</code> of this game.
-     */
-    @Override
-    public Specification getSpecification() {
-        return (this.game == null) ? null : this.game.getSpecification();
     }
 
 
@@ -278,25 +273,21 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param xr The input <code>FreeColXMLReader</code>.
-     * @exception XMLStreamException if there problems reading the stream.
+     * {@inheritDoc}
      */
     @Override
-    public final void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        uninitialized = false;
-        super.readFromXML(xr);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        if (xr.shouldIntern()) internId(getId());
     }
 
     /**
-     * Gets the tag name of the root element representing this object.
-     * This method should be overwritten by any sub-class, preferably
-     * with the name of the class with the first letter in lower case.
-     *
-     * @return "unknown".
+     * {@inheritDoc}
      */
-    public static String getTagName() {
-        return "unknown";
+    @Override
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        this.uninitialized = false;
+        super.readFromXML(xr);
     }
 }

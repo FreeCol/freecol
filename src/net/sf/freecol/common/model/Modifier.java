@@ -177,42 +177,8 @@ public class Modifier extends Feature {
     /**
      * Deliberately empty constructor.
      */
-    protected Modifier() {}
-
-    /**
-     * Use this only for reading from DOM Elements.
-     *
-     * @param specification The <code>Specification</code> to refer to.
-     */
-    public Modifier(Specification specification) {
-        setSpecification(specification);
-    }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id The object identifier.
-     * @param value The modifier value.
-     * @param type The type of the modifier.
-     */
-    public Modifier(String id, float value, ModifierType type) {
-        setId(id);
-        setType(type);
-        setValue(value);
-    }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id The object identifier.
-     * @param value The modifier value.
-     * @param type The type of the modifier.
-     * @param source The source <code>FreeColObject</code>.
-     */
-    public Modifier(String id, float value, ModifierType type,
-                    FreeColObject source) {
-        this(id, value, type);
-        setSource(source);
+    protected Modifier(Specification specification) {
+        super(specification);
     }
 
     /**
@@ -226,8 +192,37 @@ public class Modifier extends Feature {
      */
     public Modifier(String id, float value, ModifierType type,
                     FreeColObject source, int modifierIndex) {
-        this(id, value, type, source);
+        this((source == null) ? null : source.getSpecification());
+
+        setId(id);
+        setValue(value);
+        setType(type);
+        setSource(source);
         setModifierIndex(modifierIndex);
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param id The object identifier.
+     * @param value The modifier value.
+     * @param type The type of the modifier.
+     * @param source The source <code>FreeColObject</code>.
+     */
+    public Modifier(String id, float value, ModifierType type,
+                    FreeColObject source) {
+        this(id, value, type, source, DEFAULT_MODIFIER_INDEX);
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param id The object identifier.
+     * @param value The modifier value.
+     * @param type The type of the modifier.
+     */
+    public Modifier(String id, float value, ModifierType type) {
+        this(id, value, type, null);
     }
 
     /**
@@ -236,6 +231,8 @@ public class Modifier extends Feature {
      * @param template A <code>Modifier</code> to copy.
      */
     public Modifier(Modifier template) {
+        this(template.getSpecification());
+
         copyFrom(template);
         setType(template.getType());
         setValue(template.getValue());
@@ -265,7 +262,8 @@ public class Modifier extends Feature {
      *     stream.
      */
     public Modifier(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
-        setSpecification(specification);
+        this(specification);
+
         readFromXML(xr);
     }
 
@@ -276,7 +274,8 @@ public class Modifier extends Feature {
      * @param specification The <code>Specification</code> to refer to.
      */
     public Modifier(Element e, Specification specification) {
-        setSpecification(specification);
+        this(specification);
+
         DOMMessage.readFromXMLElement(this, e);
     }
 

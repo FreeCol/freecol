@@ -43,7 +43,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
     /** The game containing these goods. */
-    private Game game;
+    private final Game game;
 
     /**
      * Where the goods are.  This should always be non-null except for the
@@ -55,13 +55,26 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
 
     /**
-     * Constructor for Game.newInstance.
+     * Fundamental constructor.
+     *
+     * @param game The enclosing <code>Game</code>.
+     */
+    private Goods(Game game) {
+        if (game == null) throw new RuntimeException("Null game");
+        this.game = game;
+    }
+    
+    /**
+     * Creates a standard <code>Goods</code>-instance given the place where
+     * the goods is.
+     *
+     * Used by Game.newInstance.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The identifier (ignored, type gives identifier here).
      */
     public Goods(Game game, @SuppressWarnings("unused") String id) {
-        initializeGame(game);
+        this(game);
     }
     
     /**
@@ -76,18 +89,19 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @param location The <code>Location</code> of the goods (may be null).
      * @param type The <code>GoodsType</code> for the goods.
      * @param amount The amount of the goods.
-     * @exception IllegalArgumentException if the game is null or the
-     *     location cannot store any goods.
      */
     public Goods(Game game, Location location, GoodsType type, int amount) {
-        super(type, amount);
-
-        initializeGame(game);
-
-        if (location != null && location.getGoodsContainer() == null) {
-            throw new IllegalArgumentException("Can not store goods at: "
-                + location);
+        this(game);
+        if (type == null) {
+            throw new RuntimeException("Null type");
         }
+        if (location != null && location.getGoodsContainer() == null) {
+            throw new RuntimeException("Can not store goods at: " + location);
+        }
+
+        setId(type.getId());
+        setType(type);
+        setAmount(amount);
         this.location = location;
     }
 
@@ -99,7 +113,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @exception XMLStreamException if an error occurs
      */
     public Goods(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        initializeGame(game);
+        this(game);
+
         readFromXML(xr);
     }
 
@@ -110,20 +125,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * @param e an <code>Element</code> value
      */
     public Goods(Game game, Element e) {
-        initializeGame(game);
+        this(game);
+
         DOMMessage.readFromXMLElement(this, e);
     }
 
-
-    /**
-     * Initialize the game.
-     *
-     * @param game The <code>Game</code> to initialize.
-     */
-    private void initializeGame(Game game) {
-        setGame(game);
-        setSpecification(game.getSpecification());
-    }
 
     /**
      * If the amount of goods is greater than the container can hold,
@@ -211,6 +217,23 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public Specification getSpecification() {
+        return getGame().getSpecification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSpecification(Specification specification) {
+        throw new RuntimeException("Can not set specification");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Game getGame() {
         return this.game;
     }
@@ -218,8 +241,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setGame(Game game) {
-        this.game = game;
+        throw new RuntimeException("Can not set game");
     }
     
     
@@ -249,7 +273,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     // Serialization
 
+    private static final String AMOUNT_TAG = "amount";
     private static final String LOCATION_TAG = "location";
+    private static final String TYPE_TAG = "type";
 
 
     /**
@@ -258,6 +284,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
+
+        xw.writeAttribute(TYPE_TAG, this.type);
+
+        xw.writeAttribute(AMOUNT_TAG, this.amount);
 
         if (this.location != null) {
             xw.writeLocationAttribute(LOCATION_TAG, this.location);
@@ -269,7 +299,18 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(xr);
+
+        this.type = xr.getType(spec, TYPE_TAG, GoodsType.class, (GoodsType)null);
+        if (this.type == null) {
+            throw new XMLStreamException("Null goods type.");
+        } else {
+            setId(this.type.getId());
+        }
+
+        this.amount = xr.getAttribute(AMOUNT_TAG, 0);
 
         this.location = xr.getLocationAttribute(game, LOCATION_TAG, true);
     }

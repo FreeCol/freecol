@@ -43,7 +43,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * to derive other types, but can not be instantiated.  They will be
  * removed from the Specification after it has loaded completely.
  */
-public abstract class FreeColGameObjectType extends FreeColObject
+public abstract class FreeColGameObjectType extends FreeColSpecObject
     implements Named {
 
     /** Whether the type is abstract, or can be instantiated. */
@@ -70,7 +70,9 @@ public abstract class FreeColGameObjectType extends FreeColObject
     /**
      * Deliberately empty constructor.
      */
-    protected FreeColGameObjectType() {}
+    protected FreeColGameObjectType() {
+        super(null);
+    }
 
     /**
      * Create a simple FreeColGameObjectType without a specification.
@@ -99,21 +101,11 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * @param specification The <code>Specification</code> to refer to.
      */
     public FreeColGameObjectType(String id, Specification specification) {
+        super(specification);
+
         setId(id);
-        setSpecification(specification);
     }
 
-
-    /**
-     * Gets the feature container.
-     *
-     * @return The <code>FeatureContainer</code>.
-     */
-    @Override
-    public final FeatureContainer getFeatureContainer() {
-        if (featureContainer == null) featureContainer = new FeatureContainer();
-        return featureContainer;
-    }
 
     /**
      * Gets the index of this FreeColGameObjectType.
@@ -167,6 +159,20 @@ public abstract class FreeColGameObjectType extends FreeColObject
     @Override
     public final String getNameKey() {
         return Messages.nameKey(getId());
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * Gets the feature container.
+     *
+     * @return The <code>FeatureContainer</code>.
+     */
+    @Override
+    public final FeatureContainer getFeatureContainer() {
+        if (featureContainer == null) featureContainer = new FeatureContainer();
+        return featureContainer;
     }
 
 

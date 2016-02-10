@@ -49,10 +49,10 @@ public class AbstractGoods extends FreeColObject implements Named {
                            GoodsType.goodsTypeComparator);
 
     /** The type of goods. */
-    private GoodsType type;
+    protected GoodsType type;
 
     /** The amount of goods. */
-    private int amount;
+    protected int amount;
 
 
     /**
@@ -258,44 +258,6 @@ public class AbstractGoods extends FreeColObject implements Named {
         return hash;
     }
 
-
-    // Serialization
-
-    private static final String AMOUNT_TAG = "amount";
-    private static final String TYPE_TAG = "type";
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(TYPE_TAG, type);
-
-        xw.writeAttribute(AMOUNT_TAG, amount);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
-        super.readAttributes(xr);
-
-        type = xr.getType(spec, TYPE_TAG, GoodsType.class, (GoodsType)null);
-        if (type == null) {
-            throw new XMLStreamException("Null goods type.");
-        } else {
-            setId(type.getId());
-        }
-
-        amount = xr.getAttribute(AMOUNT_TAG, 0);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -329,15 +291,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getXMLTagName() { return getTagName(); }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "abstractGoods".
-     */
-    public static String getTagName() {
-        return "abstractGoods";
+    public String getXMLTagName() {
+        return null; // AbstractGoods are never serialized directly
     }
 }

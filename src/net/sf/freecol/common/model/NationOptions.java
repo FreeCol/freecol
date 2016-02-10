@@ -37,7 +37,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * The options specific to a nation.
  */
-public class NationOptions extends FreeColObject {
+public class NationOptions extends FreeColSpecObject {
 
     private static final Logger logger = Logger.getLogger(NationOptions.class.getName());
 
@@ -104,9 +104,6 @@ public class NationOptions extends FreeColObject {
         }
     }
 
-    /** The specification to refer to. */
-    private final Specification specification;
-
     /** The type of European national advantages. */
     private Advantages nationalAdvantages;
 
@@ -120,7 +117,8 @@ public class NationOptions extends FreeColObject {
      * @param specification The <code>Specification</code> to refer to.
      */
     public NationOptions(Specification specification) {
-        this.specification = specification;
+        super(specification);
+        
         this.nationalAdvantages = FreeCol.getAdvantages();
         if (specification != null) {
             int counter = 0, maxEuropeans = FreeCol.getEuropeanCount();
@@ -271,7 +269,7 @@ public class NationOptions extends FreeColObject {
      */
     private Nation readNation(FreeColXMLReader xr) {
         try {
-            return xr.getType(specification, ID_ATTRIBUTE_TAG,
+            return xr.getType(getSpecification(), ID_ATTRIBUTE_TAG,
                               Nation.class, (Nation)null);
         } catch (IllegalArgumentException iae) {
             logger.warning("Bad nation tag: " + xr.readId());

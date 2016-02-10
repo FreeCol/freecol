@@ -37,7 +37,7 @@ import net.sf.freecol.common.util.Utils;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public abstract class Feature extends FreeColObject implements Named {
+public abstract class Feature extends FreeColSpecObject implements Named {
 
     /** The source of this Feature, e.g. a UnitType. */
     private FreeColObject source;
@@ -66,12 +66,23 @@ public abstract class Feature extends FreeColObject implements Named {
 
 
     /**
+     * Deliberately trivial constructor.
+     *
+     * @param specification The <code>Specification</code> to use.
+     */
+    public Feature(Specification specification) {
+        super(specification);
+    }
+
+
+    /**
      * Copy another Feature.
      *
      * @param other The other <code>Feature</code> to copy.
      */
     protected void copyFrom(Feature other) {
         setId(other.getId());
+        setSpecification(other.getSpecification());
         this.source = other.source;
         this.firstTurn = other.firstTurn;
         this.lastTurn = other.lastTurn;

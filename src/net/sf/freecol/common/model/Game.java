@@ -164,8 +164,7 @@ public class Game extends FreeColGameObject {
      * Serialization is not needed directly as these must be completely
      * within { players, unknownEnemy, map } which are directly serialized.
      */
-    protected final HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
-        = new HashMap<>(10000);
+    protected final HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -195,8 +194,8 @@ public class Game extends FreeColGameObject {
      * Trivial constructor for use in Game.newInstance.
      */
     public Game() {
-        super(null);
-        
+        super((Game)null);
+
         this.clientUserName = null;
         this.players.clear();
         this.unknownEnemy = null;
@@ -206,7 +205,10 @@ public class Game extends FreeColGameObject {
         this.spanishSuccession = false;
         this.initialActiveUnitId = null;
         this.specification = null;
+        this.freeColGameObjects = new HashMap<>(10000);
         this.combatModel = new SimpleCombatModel();
+        this.removeCount = 0;
+        internId("0");
     }
 
     /**
@@ -217,19 +219,9 @@ public class Game extends FreeColGameObject {
     protected Game(Specification specification) {
         this();
 
-        this.specification = specification;
+        setSpecification(specification);
     }
 
-
-    /**
-     * Get the specification for this game.
-     *
-     * @return The <code>Specification</code> for this game.
-     */
-    @Override
-    public Specification getSpecification() {
-        return specification;
-    }
 
     /**
      * Get the difficulty level of this game.
@@ -1180,6 +1172,43 @@ public class Game extends FreeColGameObject {
         return result;
     }
 
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Specification getSpecification() {
+        return this.specification;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Game getGame() {
+        return this; // The game must be itself!
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGame(Game game) {
+        // Do nothing, however do not complain at attempts to set as
+        // the constructor will try to initialize to null, because we
+        // can not yet pass "this" to the FreeColGameObject constructor.
+    }
+    
 
     // Override Object
     //

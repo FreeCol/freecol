@@ -34,7 +34,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * This class describes a possible production type of a tile or building.
  */
-public class ProductionType extends FreeColObject {
+public class ProductionType extends FreeColSpecObject {
 
     /** Whether this production type applies only to colony center tiles. */
     private boolean unattended;
@@ -58,7 +58,7 @@ public class ProductionType extends FreeColObject {
      * @param specification The <code>Specification</code> to refer to.
      */
     public ProductionType(Specification specification) {
-        setSpecification(specification);
+        super(specification);
     }
 
     /**
@@ -68,6 +68,8 @@ public class ProductionType extends FreeColObject {
      * @param outputs A list of the <code>AbstractGoods</code> produced.
      */
     public ProductionType(List<AbstractGoods> outputs) {
+        this((Specification)null);
+
         this.outputs = outputs;
     }
 
@@ -80,8 +82,9 @@ public class ProductionType extends FreeColObject {
      */
     public ProductionType(List<AbstractGoods> inputs,
                           List<AbstractGoods> outputs) {
+        this(outputs);
+
         this.inputs = inputs;
-        this.outputs = outputs;
     }
 
     /**
@@ -93,7 +96,8 @@ public class ProductionType extends FreeColObject {
      */
     public ProductionType(AbstractGoods output, boolean unattended,
                           String level) {
-        this.outputs = new ArrayList<>();
+        this(new ArrayList<AbstractGoods>());
+
         this.outputs.add(output);
         this.unattended = unattended;
         this.productionLevel = level;
@@ -108,13 +112,15 @@ public class ProductionType extends FreeColObject {
      * @param amount The amount of goods both produced and consumed.
      */
     public ProductionType(GoodsType input, GoodsType output, int amount) {
+        this((Specification)null);
+        
         if (input != null) {
-            inputs = new ArrayList<>();
-            inputs.add(new AbstractGoods(input, amount));
+            this.inputs = new ArrayList<>();
+            this.inputs.add(new AbstractGoods(input, amount));
         }
         if (output != null) {
-            outputs = new ArrayList<>();
-            outputs.add(new AbstractGoods(output, amount));
+            this.outputs = new ArrayList<>();
+            this.outputs.add(new AbstractGoods(output, amount));
         }
     }
 

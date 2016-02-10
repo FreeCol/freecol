@@ -34,7 +34,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
 
     public void testEmptyScope() {
-        UnitTypeChange change = new UnitTypeChange();
+        UnitTypeChange change = new UnitTypeChange(spec());
 
         assertTrue("A new change has empty scopes",
                    change.getScopes().isEmpty());
@@ -57,7 +57,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         scope.setAbilityId(Ability.NATIVE);
 
         UnitTypeChange.ChangeType education = UnitTypeChange.ChangeType.EDUCATION;
-        UnitTypeChange change = new UnitTypeChange();
+        UnitTypeChange change = new UnitTypeChange(game.getSpecification());
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(education, 100);
         List<Scope> scopes = new ArrayList<>(change.getScopes());
@@ -89,7 +89,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitType gardener = new UnitType("gardener", spec());
 
         UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
-        UnitTypeChange change = new UnitTypeChange();
+        UnitTypeChange change = new UnitTypeChange(game.getSpecification());
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(creation, 100);
 

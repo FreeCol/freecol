@@ -2105,7 +2105,7 @@ public class InGameControllerTest extends FreeColTestCase {
         gardenerType.addAbility(new Ability(Ability.PERSON));
 
         ChangeType enterColony = ChangeType.ENTER_COLONY;
-        UnitTypeChange change = new UnitTypeChange();
+        UnitTypeChange change = new UnitTypeChange(game.getSpecification());
         change.setNewUnitType(farmerType);
         change.getChangeTypes().put(enterColony, 100);
         List<UnitTypeChange> ch = new ArrayList<>(gardenerType.getTypeChanges());

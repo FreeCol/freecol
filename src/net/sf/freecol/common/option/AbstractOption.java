@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.FreeColSpecObject;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -36,7 +36,7 @@ import net.sf.freecol.common.model.Specification;
  * is null, followed by the identifier of the option object, followed
  * by a ".", followed by "name" or "shortDescription".
  */
-public abstract class AbstractOption<T> extends FreeColObject
+public abstract class AbstractOption<T> extends FreeColSpecObject
     implements Option<T> {
 
     private static final Logger logger = Logger.getLogger(AbstractOption.class.getName());
@@ -55,9 +55,21 @@ public abstract class AbstractOption<T> extends FreeColObject
      * Creates a new <code>AbstractOption</code>.
      *
      * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public AbstractOption(String id, Specification specification) {
+        super(specification);
+
+        setId(id);
+    }
+
+    /**
+     * Creates a new <code>AbstractOption</code>.
+     *
+     * @param id The object identifier.
      */
     public AbstractOption(String id) {
-        setId(id);
+        this(id, null);
     }
 
     /**
@@ -67,17 +79,6 @@ public abstract class AbstractOption<T> extends FreeColObject
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
-    }
-
-    /**
-     * Creates a new <code>AbstractOption</code>.
-     *
-     * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
-     */
-    public AbstractOption(String id, Specification specification) {
-        setId(id);
-        setSpecification(specification);
     }
 
 

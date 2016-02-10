@@ -155,7 +155,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final Specification getSpecification() {
-        return getGame().getSpecification();
+        return this.aiMain.getSpecification();
     }
 
 

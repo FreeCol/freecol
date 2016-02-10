@@ -72,15 +72,19 @@ public abstract class FreeColObject
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
 
-    /** The unique identifier of an object. */
+    /** The identifier of an object. */
     private String id;
-
-    /** The <code>Specification</code> this object uses, which may be null. */
-    private Specification specification;
 
     /** An optional property change container, allocated on demand. */
     private PropertyChangeSupport pcs = null;
 
+
+    // Note: no constructors here.  There are some nasty cases where
+    // we can not easily determine the identifier at construction
+    // time, so it is better to just let things call setId() when
+    // ready.
+
+    // Identifier handling
 
     /**
      * Get the object unique identifier.
@@ -98,17 +102,6 @@ public abstract class FreeColObject
      */
     public void setId(final String newId) {
         this.id = newId;
-    }
-
-    /**
-     * Version of setId() for FreeColGameObject to override and intern the
-     * id into the enclosing game.  Just equivalent to setId() at the
-     * FreeColObject level.
-     *
-     * @param newId The new object identifier.
-     */
-    public void internId(final String newId) {
-        setId(newId);
     }
 
     /**
@@ -135,50 +128,6 @@ public abstract class FreeColObject
         String id = getId();
         return (id == null) ? null : lastPart(id, ".");
     }
-
-    /**
-     * Get the specification.  It may be null.
-     *
-     * @return The <code>Specification</code> used by this object.
-     */
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Sets the specification for this object. 
-     *
-     * This method should only ever be used by the object's constructor.
-     *
-     * @param specification The <code>Specification</code> to use.
-     */
-    protected void setSpecification(Specification specification) {
-        this.specification = specification;
-    }
-
-    /**
-     * Gets the game this object belongs to.
-     *
-     * Returns null here because FreeColObjects are not specific to a game.
-     * However, decendant classes are another matter.
-     *
-     * @return The <code>Game</code> this object belongs to.
-     */
-    public Game getGame() {
-        return null;
-    }
-
-    /**
-     * Sets the game object this object belongs to.
-     *
-     * Does nothing here, see above.
-     *
-     * @param game The <code>Game</code> to set.
-     */
-    public void setGame(Game game) {}
-        
-    
-    // Identifier manipulation
 
     /**
      * Get the type part of the identifier.
@@ -245,65 +194,61 @@ public abstract class FreeColObject
         return cmp;
     }
 
-    /**
-     * Base for Comparable implementations.
-     *
-     * @param other The other <code>FreeColObject</code> subclass to compare.
-     * @return The comparison result.
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        return compareIds(this, other);
-    }
 
-    /**
-     * Log a collection of <code>FreeColObject</code>s.
-     *
-     * @param c The <code>Collection</code> to log.
-     * @param lb A <code>LogBuilder</code> to log to.
-     */
-    public static <T extends FreeColObject> void logFreeColObjects(Collection<T> c, LogBuilder lb) {
-        lb.add("[");
-        for (T t : c) lb.add(t.getSuffix(), " ");
-        lb.shrink(" ");
-        lb.add("]");
-    }
-
-    /**
-     * Invoke a method for this object.
-     *
-     * @param methodName The name of the method.
-     * @param returnClass The class of the return value.
-     * @param defaultValue The default value.
-     * @return The result of invoking the method, or the default value
-     *     on failure.
-     */
-    protected <T> T invokeMethod(String methodName, Class<T> returnClass,
-                                 T defaultValue) {
-        if (methodName != null && returnClass != null) {
-            try {
-                return Introspector.invokeMethod(this, methodName, returnClass);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
-            }
-        }
-        return defaultValue;
-    }
-
+    // Specification handling.
+    //
+    // Base FreeColObjects do not contain a Specification, but
+    // FreeColSpecObjects do, and FreeColGameObjects have access to
+    // the Specification in the Game.  Noop implementations here, to
+    // be overridden by subclasses.
     
+    /**
+     * Get the specification.
+     *
+     * @return The <code>Specification</code> used by this object.
+     */
+    public Specification getSpecification() {
+        return null;
+    }
+
+    /**
+     * Sets the specification for this object. 
+     *
+     * @param specification The <code>Specification</code> to use.
+     */
+    protected void setSpecification(@SuppressWarnings("unused") Specification specification) {}
+
+
+    // Game handling.
+    // Base FreeColObjects do not contain a Game, but several subclasses
+    // (like FreeColGameObject) do.
+    
+    /**
+     * Gets the game this object belongs to.
+     *
+     * @return The <code>Game</code> this object belongs to.
+     */
+    public Game getGame() {
+        return null;
+    }
+
+    /**
+     * Sets the game object this object belongs to.
+     *
+     * @param game The <code>Game</code> to set.
+     */
+    public void setGame(@SuppressWarnings("unused") Game game) {}
+        
+
     // Property change support
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (pcs == null) {
-            pcs = new PropertyChangeSupport(this);
-        }
+        if (pcs == null) pcs = new PropertyChangeSupport(this);
         pcs.addPropertyChangeListener(listener);
     }
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (pcs == null) {
-            pcs = new PropertyChangeSupport(this);
-        }
+        if (pcs == null) pcs = new PropertyChangeSupport(this);
         pcs.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -350,27 +295,17 @@ public abstract class FreeColObject
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners() {
-        if (pcs == null) {
-            return new PropertyChangeListener[0];
-        } else {
-            return pcs.getPropertyChangeListeners();
-        }
+        return (pcs == null) ? new PropertyChangeListener[0]
+            : pcs.getPropertyChangeListeners();
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-        if (pcs == null) {
-            return new PropertyChangeListener[0];
-        } else {
-            return pcs.getPropertyChangeListeners(propertyName);
-        }
+        return (pcs == null) ? new PropertyChangeListener[0]
+            : pcs.getPropertyChangeListeners(propertyName);
     }
 
     public boolean hasListeners(String propertyName) {
-        if (pcs == null) {
-            return false;
-        } else {
-            return pcs.hasListeners(propertyName);
-        }
+        return (pcs == null) ? false : pcs.hasListeners(propertyName);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -386,13 +321,16 @@ public abstract class FreeColObject
     }
 
 
-    // Feature container handling.
+    // Feature container support
+    //
+    // Base FreeColObjects do not directly implement a feature container,
+    // but some subclasses provide them.  As long as getFeatureContainer()
+    // works, these routines should too.
 
     /**
      * Gets the feature container for this object, if any.
-     * None is provided here, but select subclasses will override.
      *
-     * @return Null.
+     * @return The <code>FeatureContainer</code> for this object.
      */
     public FeatureContainer getFeatureContainer() {
         return null;
@@ -758,6 +696,57 @@ public abstract class FreeColObject
     }
 
 
+    // Comparison support
+
+    /**
+     * Base for Comparable implementations.
+     *
+     * @param other The other <code>FreeColObject</code> subclass to compare.
+     * @return The comparison result.
+     */
+    @Override
+    public int compareTo(FreeColObject other) {
+        return compareIds(this, other);
+    }
+
+
+    // Miscellaneous routines
+
+    /**
+     * Log a collection of <code>FreeColObject</code>s.
+     *
+     * @param c The <code>Collection</code> to log.
+     * @param lb A <code>LogBuilder</code> to log to.
+     */
+    public static <T extends FreeColObject> void logFreeColObjects(Collection<T> c, LogBuilder lb) {
+        lb.add("[");
+        for (T t : c) lb.add(t.getSuffix(), " ");
+        lb.shrink(" ");
+        lb.add("]");
+    }
+
+    /**
+     * Invoke a method for this object.
+     *
+     * @param methodName The name of the method.
+     * @param returnClass The class of the return value.
+     * @param defaultValue The default value.
+     * @return The result of invoking the method, or the default value
+     *     on failure.
+     */
+    protected <T> T invokeMethod(String methodName, Class<T> returnClass,
+                                 T defaultValue) {
+        if (methodName != null && returnClass != null) {
+            try {
+                return Introspector.invokeMethod(this, methodName, returnClass);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
+            }
+        }
+        return defaultValue;
+    }
+
+
     // Override Object
 
     /**
@@ -1099,13 +1088,7 @@ public abstract class FreeColObject
      */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         String newId = xr.readId();
-        if (newId != null) {
-            if (xr.shouldIntern()) {
-                internId(newId);
-            } else {
-                setId(newId);
-            }
-        }
+        if (newId != null) setId(newId);
     }
 
     /**
@@ -1167,7 +1150,7 @@ public abstract class FreeColObject
         final String tag = xr.getLocalName();
         int n = xr.getAttributeCount();
 
-        internId(xr.readId());
+        setId(xr.readId());
 
         for (int i = 0; i < n; i++) {
             String name = xr.getAttributeLocalName(i);

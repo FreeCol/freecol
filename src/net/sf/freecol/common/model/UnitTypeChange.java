@@ -35,7 +35,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * The possible changes of a unit type.
  */
-public class UnitTypeChange extends FreeColObject {
+public class UnitTypeChange extends FreeColSpecObject {
 
     public static enum ChangeType {
         EDUCATION,
@@ -96,9 +96,13 @@ public class UnitTypeChange extends FreeColObject {
 
 
     /**
-     * Deliberately empty constructor.
+     * Deliberately trivial constructor.
+     *
+     * @param specification The <code>Specification</code> to use.
      */
-    public UnitTypeChange() {}
+    public UnitTypeChange(Specification specification) {
+        super(specification);
+    }
 
     /**
      * Creates a new <code>UnitTypeChange</code> instance.
@@ -109,7 +113,8 @@ public class UnitTypeChange extends FreeColObject {
      */
     public UnitTypeChange(FreeColXMLReader xr,
                           Specification specification) throws XMLStreamException {
-        setSpecification(specification);
+        this(specification);
+
         readFromXML(xr);
     }
 

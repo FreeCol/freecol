@@ -228,6 +228,22 @@ public abstract class TradeItem extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
+    public Specification getSpecification() {
+        return getGame().getSpecification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSpecification(Specification specification) {
+        throw new RuntimeException("Can not set specification.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Game getGame() {
         return this.game;
     }

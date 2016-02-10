@@ -48,15 +48,24 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
 
 
     /**
+     * Create an empty trade route stop.
+     *
+     * @param game The enclosing <code>Game</code>.
+     */
+    public TradeRouteStop(Game game) {
+        setId("");
+        this.game = game;
+    }
+
+    /**
      * Create a stop for the given location from a stream.
      *
+     * @param game The enclosing <code>Game</code>.
      * @param location The <code>Location</code> of this stop.
      */
     public TradeRouteStop(Game game, Location location) {
-        setId("");
-        setSpecification(game.getSpecification());
+        this(game);
 
-        this.game = game;
         this.location = location;
         this.cargo.clear();
     }
@@ -68,6 +77,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      */
     public TradeRouteStop(TradeRouteStop other) {
         this(other.game, other.location);
+
         this.setCargo(other.cargo);
     }
 
@@ -79,7 +89,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeRouteStop(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        this(game, (Location)null);
+        this(game);
 
         readFromXML(xr);
     }
@@ -242,6 +252,41 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
         return (location instanceof TradeLocation)
             ? ((TradeLocation)location).getImportAmount(goodsType, turns)
             : 0;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Specification getSpecification() {
+        return getGame().getSpecification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSpecification(Specification specification) {
+        throw new RuntimeException("Can not set specification.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Game getGame() {
+        return this.game;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setGame(Game game) {
+        throw new RuntimeException("Can not set game");
     }
 
 
