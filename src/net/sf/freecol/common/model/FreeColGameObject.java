@@ -166,34 +166,6 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * "Clone" this FreeColGameObject by serializing it and creating a
-     * new object from the resulting XML.  We need to pass the result
-     * class, since the object we are about to "clone" is likely a
-     * server object.
-     *
-     * @param returnClass The class to clone.
-     * @return The "clone" of the <code>FreeColGameObject</code>.
-     */
-    public <T extends FreeColGameObject> T cloneFreeColGameObject(Class<T> returnClass) {
-        final Game game = getGame();
-        try {
-            String xml = this.serialize();
-
-            Field nextId = Game.class.getDeclaredField("nextId");
-            nextId.setAccessible(true);
-            int id = nextId.getInt(game);
-            nextId.setInt(game, id + 1);
-            xml = xml.replace(getId(), T.getTagName() + ":" + id);
-
-            return game.unserialize(xml, returnClass);
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to clone " + getId(), e);
-        }
-        return null;
-    }
-
-    /**
      * Get a suitable game object to use as a clickable link in messages
      * to a player.
      *
