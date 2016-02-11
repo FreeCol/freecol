@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -289,12 +288,9 @@ public abstract class FreeColObject
                                  T defaultValue) {
         if (methodName != null && returnClass != null) {
             try {
-                Method method = getClass().getMethod(methodName);
-                if (method != null) {
-                    return returnClass.cast(method.invoke(this));
-                }
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Invoke failed: " + methodName, e);
+                return Introspector.invokeMethod(this, methodName, returnClass);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
             }
         }
         return defaultValue;

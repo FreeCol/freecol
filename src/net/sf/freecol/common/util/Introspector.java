@@ -347,4 +347,22 @@ public class Introspector {
         }
         return instance;
     }
+
+    /**
+     * Invoke an object method by name.
+     *
+     * @param object The base object.
+     * @param methodName The name of the method to invoke.
+     * @param returnClass The expected class to return.
+     * @return The result of invoking the method.
+     * @exception IllegalAccessException, InvocationTargetException,
+     *     NoSuchMethodException if the invocation fails.
+     */
+    public static <T> T invokeMethod(Object object, String methodName,
+                                     Class<T> returnClass)
+        throws IllegalAccessException, InvocationTargetException,
+               NoSuchMethodException {
+        return returnClass.cast(object.getClass().getMethod(methodName)
+            .invoke(object));
+    }
 }
