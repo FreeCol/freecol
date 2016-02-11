@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
@@ -117,20 +115,6 @@ public class AIUnit extends TransportableAIObject {
         this.unit = unit;
         this.mission = null;
         this.goal = null;
-
-        uninitialized = unit == null;
-    }
-
-    /**
-     * Creates a new <code>AIUnit</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *       of a <code>Wish</code>.
-     */
-    public AIUnit(AIMain aiMain, Element element) {
-        super(aiMain, element);
 
         uninitialized = unit == null;
     }

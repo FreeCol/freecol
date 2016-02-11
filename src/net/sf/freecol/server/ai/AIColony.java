@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
@@ -184,23 +182,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
 
         uninitialized = false;
-    }
-
-    /**
-     * Creates a new <code>AIColony</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *       of a <code>Wish</code>.
-     */
-    public AIColony(AIMain aiMain, Element element) {
-        this(aiMain, (String)null);
-
-        DOMMessage.readFromXMLElement(this, element);
-        addAIObjectWithId();
-
-        uninitialized = getColony() == null;
     }
 
     /**

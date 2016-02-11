@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A single item in a carrier's transport list.  Any {@link Locatable}
@@ -101,18 +99,6 @@ public abstract class TransportableAIObject extends ValuedAIObject {
         this.transport = null;
     }
 
-    /**
-     * Creates a new transportable AI object from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
-     *     of the object.
-     */
-    public TransportableAIObject(AIMain aiMain, Element element) {
-        super(aiMain, element);
-    }
-    
     /**
      * Creates a new transportable AI object from the given
      * XML-representation.

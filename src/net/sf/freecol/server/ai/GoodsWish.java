@@ -32,8 +32,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.LogBuilder;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents the need for goods within a <code>Colony</code>.
@@ -89,20 +87,6 @@ public class GoodsWish extends Wish {
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
         uninitialized = false;
-    }
-
-    /**
-     * Creates a new <code>GoodsWish</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *       of a <code>Wish</code>.
-     */
-    public GoodsWish(AIMain aiMain, Element element) {
-        super(aiMain, element);
-
-        uninitialized = goodsType == null;
     }
 
     /**

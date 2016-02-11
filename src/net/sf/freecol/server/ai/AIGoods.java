@@ -40,8 +40,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.Mission;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Objects of this class contains AI-information for a single {@link Goods}.
@@ -90,20 +88,6 @@ public class AIGoods extends TransportableAIObject {
         uninitialized = false;
     }
 
-    /**
-     * Creates a new <code>AIGoods</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
-     *       of a <code>Wish</code>.
-     */
-    public AIGoods(AIMain aiMain, Element element) {
-        super(aiMain, element);
-
-        uninitialized = getGoods() == null;
-    }
-    
     /**
      * Creates a new <code>AIGoods</code> from the given
      * XML-representation.

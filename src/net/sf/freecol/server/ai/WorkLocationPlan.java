@@ -24,8 +24,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.WorkLocation;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Objects of this class contains AI-information for a single
@@ -60,17 +58,6 @@ public class WorkLocationPlan extends AIObject {
         this.goodsType = goodsType;
 
         uninitialized = false;
-    }
-
-    /**
-     * Creates a new <code>WorkLocationPlan</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an
-     *      XML-representation of this object.
-     */
-    public WorkLocationPlan(AIMain aiMain, Element element) {
-        super(aiMain, element);
     }
 
 

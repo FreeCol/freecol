@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a need for something at a given <code>Location</code>.
@@ -62,18 +60,6 @@ public abstract class Wish extends ValuedAIObject {
         this.transportable = null;
     }
 
-    /**
-     * Creates a new <code>Wish</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
-     *       of a <code>Wish</code>.
-     */
-    public Wish(AIMain aiMain, Element element) {
-        super(aiMain, element);
-    }
-    
     /**
      * Creates a new <code>Wish</code> from the given
      * XML-representation.

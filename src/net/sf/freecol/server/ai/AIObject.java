@@ -29,8 +29,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.DOMMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * An <code>AIObject</code> contains AI-related information and methods.
@@ -75,20 +73,6 @@ public abstract class AIObject extends FreeColObject {
             aiMain.addAIObject(id, this);
         }
         uninitialized = true;
-    }
-
-    /**
-     * Creates a new <code>AIObject</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public AIObject(AIMain aiMain, Element element) {
-        this(aiMain);
-
-        DOMMessage.readFromXMLElement(this, element);
-        addAIObjectWithId();
     }
 
     /**

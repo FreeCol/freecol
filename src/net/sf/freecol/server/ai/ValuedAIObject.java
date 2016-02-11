@@ -27,8 +27,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Abstract class of AI object with a simple enclosed comparable
@@ -65,18 +63,6 @@ public abstract class ValuedAIObject extends AIObject {
         this.value = 0;
     }
 
-    /**
-     * Creates a new <code>ValuedAIObject</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
-     *     of the object.
-     */
-    public ValuedAIObject(AIMain aiMain, Element element) {
-        super(aiMain, element);
-    }
-    
     /**
      * Creates a new <code>ValuedAIObject</code> from the given
      * XML-representation.

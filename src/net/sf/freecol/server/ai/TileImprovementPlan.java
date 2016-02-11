@@ -30,8 +30,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents a plan to improve a <code>Tile</code> in some way.
@@ -92,20 +90,6 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         this.pioneer = null;
         setValue(value);
-        uninitialized = getType() == null || getTarget() == null;
-    }
-
-    /**
-     * Creates a new <code>TileImprovementPlan</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation
-     *     of a <code>Wish</code>.
-     */
-    public TileImprovementPlan(AIMain aiMain, Element element) {
-        super(aiMain, element);
-
         uninitialized = getType() == null || getTarget() == null;
     }
 

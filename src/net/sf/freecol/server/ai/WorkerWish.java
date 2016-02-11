@@ -31,8 +31,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.LogBuilder;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents the need for a worker within a <code>Colony</code>.
@@ -92,20 +90,6 @@ public class WorkerWish extends Wish {
         uninitialized = false;
     }
 
-    /**
-     * Creates a new <code>WorkerWish</code> from the given
-     * XML-representation.
-     *
-     * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
-     *       of a <code>Wish</code>.
-     */
-    public WorkerWish(AIMain aiMain, Element element) {
-        super(aiMain, element);
-
-        uninitialized = unitType == null;
-    }
-    
     /**
      * Creates a new <code>WorkerWish</code> from the given
      * XML-representation.
