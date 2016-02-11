@@ -2921,7 +2921,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 e.getValue().toXML(xw);
             }
 
-            for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {
+            for (WorkLocation workLocation : sortedCopy(getAllWorkLocations())) {
                 workLocation.toXML(xw);
             }
 

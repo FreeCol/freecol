@@ -30,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -226,7 +227,7 @@ public class NationOptions extends FreeColObject {
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Nation nation : getSortedCopy(nations.keySet())) {
+        for (Nation nation : sortedCopy(nations.keySet())) {
             xw.writeStartElement(NATION_OPTION_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, nation);

@@ -898,4 +898,14 @@ public class CollectionUtils {
             public Iterator<T> iterator() { return stream.iterator(); }
         };
     }
+
+    /**
+     * Sort a collection.
+     *
+     * @param c The <code>Collection</code> to sort.
+     * @return A sorted copy of the collection as a list.
+     */
+    public static <T> List<T> sortedCopy(Collection<T> c) {
+        return c.stream().sorted().collect(Collectors.toList());
+    }
 }

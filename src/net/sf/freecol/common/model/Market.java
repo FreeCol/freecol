@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -509,7 +510,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         if (xw.validFor(owner)) {
 
-            for (MarketData data : getSortedCopy(marketData.values())) {
+            for (MarketData data : sortedCopy(marketData.values())) {
                 data.toXML(xw);
             }
         }
@@ -562,7 +563,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
             .append(" owner=").append(owner.getId());
-        for (MarketData md : getSortedCopy(marketData.values())) {
+        for (MarketData md : sortedCopy(marketData.values())) {
             sb.append(" ").append(md);
         }
         sb.append("]");

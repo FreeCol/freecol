@@ -518,7 +518,7 @@ public class Europe extends UnitLocation
                 modifier.toXML(xw);
             }
 
-            for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
+            for (UnitType unitType : sortedCopy(unitPrices.keySet())) {
                 xw.writeStartElement(UNIT_PRICE_TAG);
 
                 xw.writeAttribute(UNIT_TYPE_TAG, unitType);

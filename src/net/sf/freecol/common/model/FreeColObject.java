@@ -264,16 +264,6 @@ public abstract class FreeColObject
     }
 
     /**
-     * Sort a collection of <code>FreeColObject</code>s.
-     *
-     * @param c The <code>Collection</code> to sort.
-     * @return A sorted copy of the collection.
-     */
-    public static <T extends FreeColObject> List<T> getSortedCopy(Collection<T> c) {
-        return c.stream().sorted().collect(Collectors.toList());
-    }
-
-    /**
      * Log a collection of <code>FreeColObject</code>s.
      *
      * @param c The <code>Collection</code> to log.

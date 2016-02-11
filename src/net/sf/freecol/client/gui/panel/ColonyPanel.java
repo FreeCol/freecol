@@ -91,6 +91,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -940,7 +941,7 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public List<Unit> getUnitList() {
-        return FreeColObject.getSortedCopy(colony.getTile().getUnitList());
+        return sortedCopy(colony.getTile().getUnitList());
     }
 
 

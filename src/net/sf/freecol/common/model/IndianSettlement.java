@@ -1396,7 +1396,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         if (xw.validFor(getOwner())) {
 
-            for (Player p : getSortedCopy(contactLevels.keySet())) {
+            for (Player p : sortedCopy(contactLevels.keySet())) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
                 xw.writeAttribute(LEVEL_TAG, contactLevels.get(p));
@@ -1406,7 +1406,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 xw.writeEndElement();
             }
 
-            for (Player p : getSortedCopy(alarm.keySet())) {
+            for (Player p : sortedCopy(alarm.keySet())) {
                 xw.writeStartElement(ALARM_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, p);
@@ -1416,7 +1416,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 xw.writeEndElement();
             }
 
-            for (Unit unit : getSortedCopy(ownedUnits)) {
+            for (Unit unit : sortedCopy(ownedUnits)) {
                 xw.writeStartElement(OWNED_UNITS_TAG);
 
                 xw.writeAttribute(ID_ATTRIBUTE_TAG, unit);

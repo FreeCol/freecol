@@ -3841,7 +3841,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            for (Player p : getSortedCopy(tension.keySet())) {
+            for (Player p : sortedCopy(tension.keySet())) {
                 xw.writeStartElement(TENSION_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, p);
@@ -3852,7 +3852,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             
             if (bannedMissions != null) {
-                for (Player p : getSortedCopy(bannedMissions)) {
+                for (Player p : sortedCopy(bannedMissions)) {
                     xw.writeStartElement(BAN_MISSIONS_TAG);
 
                     xw.writeAttribute(PLAYER_TAG, p.getId());
@@ -3878,7 +3878,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 event.toXML(xw);
             }
 
-            for (TradeRoute route : getSortedCopy(tradeRoutes)) {
+            for (TradeRoute route : sortedCopy(tradeRoutes)) {
                 route.toXML(xw);
             }
 
@@ -3895,7 +3895,7 @@ public class Player extends FreeColGameObject implements Nameable {
             for (ModelMessage m : getModelMessages()) m.toXML(xw);
 
             if (lastSales != null) {
-                for (LastSale ls : getSortedCopy(lastSales.values())) {
+                for (LastSale ls : sortedCopy(lastSales.values())) {
                     ls.toXML(xw);
                 }
             }

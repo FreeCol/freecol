@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -190,7 +191,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : getSortedCopy(getAbilities())) {
+        for (Ability ability : sortedCopy(getAbilities())) {
             ability.toXML(xw);
         }
 

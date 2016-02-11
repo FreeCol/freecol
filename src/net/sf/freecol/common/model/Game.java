@@ -1266,7 +1266,7 @@ public class Game extends FreeColGameObject {
 
         nationOptions.toXML(xw);
 
-        List<Player> players = getSortedCopy(getPlayers());
+        List<Player> players = sortedCopy(getPlayers());
         Player unknown = getUnknownEnemy();
         if (unknown != null) players.add(unknown);
         for (Player p : players) p.toXML(xw);

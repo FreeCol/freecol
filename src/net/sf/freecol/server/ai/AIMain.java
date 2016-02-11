@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
@@ -487,7 +488,7 @@ public class AIMain extends FreeColObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (AIObject aio : FreeColObject.getSortedCopy(aiObjects.values())) {
+        for (AIObject aio : sortedCopy(aiObjects.values())) {
             if (aio.checkIntegrity(false) < 0) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its
