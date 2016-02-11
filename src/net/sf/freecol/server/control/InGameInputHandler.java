@@ -683,6 +683,6 @@ public final class InGameInputHandler extends InputHandler
                 .endTurn(serverPlayer);
         }
         getFreeColServer().updateMetaServer();
-        return cs.build(serverPlayer);
+        return (cs == null) ? null : cs.build(serverPlayer);
     }
 }
