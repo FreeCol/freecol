@@ -404,15 +404,17 @@ public class ChangeSet {
             element.setAttribute("defenderTile", defender.getTile().getId());
             element.setAttribute("success", Boolean.toString(success));
             if (!canSeeUnit(serverPlayer, attacker)) {
-                element.appendChild(attacker.toXMLElement(doc));
+                element.appendChild(DOMMessage.toXMLElement(attacker, doc,
+                                                            (Player)null));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
-                    element.appendChild(loc.toXMLElement(doc, serverPlayer));
+                    element.appendChild(DOMMessage.toXMLElement(loc, doc, serverPlayer));
                 }
             }
             if (!canSeeUnit(serverPlayer, defender)
                 || this.defenderInSettlement) {
-                element.appendChild(defender.toXMLElement(doc));
+                element.appendChild(DOMMessage.toXMLElement(defender, doc,
+                                                            (Player)null));
             }
             return element;
         }
@@ -686,7 +688,7 @@ public class ChangeSet {
                 // being present on the client side, and it is needed
                 // before we can run the animation, so it is attached
                 // to animateMove.
-                element.appendChild(unit.toXMLElement(doc, serverPlayer));
+                element.appendChild(DOMMessage.toXMLElement(unit, doc, serverPlayer));
             }
             return element;
         }
@@ -794,7 +796,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(fcgo.toXMLElement(doc, serverPlayer));
+            element.appendChild(DOMMessage.toXMLElement(fcgo, doc, serverPlayer));
             return element;
         }
 
@@ -922,7 +924,7 @@ public class ChangeSet {
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             final Game game = serverPlayer.getGame();
             Element element = doc.createElement("addPlayer");
-            element.appendChild(this.player.toXMLElement(doc, serverPlayer));
+            element.appendChild(DOMMessage.toXMLElement(this.player, doc, serverPlayer));
             return element;
         }
 
@@ -1085,7 +1087,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addObject");
-            Element child = fco.toXMLElement(doc, serverPlayer);
+            Element child = DOMMessage.toXMLElement(fco, doc, serverPlayer);
             child.setAttribute("owner", serverPlayer.getId());
             element.appendChild(child);
             return element;
@@ -1159,7 +1161,7 @@ public class ChangeSet {
             Element element = doc.createElement("featureChange");
             element.setAttribute("add", Boolean.toString(add));
             element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, object.getId());
-            Element child = feature.toXMLElement(doc);
+            Element child = DOMMessage.toXMLElement(feature, doc, (Player)null);
             element.appendChild(child);
             return element;
         }
@@ -1228,9 +1230,10 @@ public class ChangeSet {
             element.setAttribute("tile", tile.getId());
             // Have to tack on two copies of the settlement tile.
             // One full version, one ordinary version to restore.
-            element.appendChild(tile.toXMLElement(doc));
-            element.appendChild(tile.getCachedTile(serverPlayer)
-                .toXMLElement(doc, serverPlayer));
+            element.appendChild(DOMMessage.toXMLElement(tile, doc,
+                                                        (Player)null));
+            element.appendChild(DOMMessage.toXMLElement(tile.getCachedTile(serverPlayer),
+                                                        doc, serverPlayer));
             return element;
         }
 

@@ -58,12 +58,6 @@ import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
-import net.sf.freecol.common.networking.DOMMessage;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 
 /**
  * The FreeCol root class.  Maintains an identifier, and an optional link
@@ -761,39 +755,6 @@ public abstract class FreeColObject
      */
     public Set<Modifier> getDefenceModifiers() {
         return getModifiers(Modifier.DEFENCE);
-    }
-
-
-    // DOM handling.  Beware, this needs to go away.
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param document The <code>Document</code>.
-     * @return An XML-representation of this object.
-     */
-    public Element toXMLElement(Document document) {
-        return DOMMessage.toXMLElement(this, document, WriteScope.toServer());
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param document The <code>Document</code>.
-     * @param player The <code>Player</code> to write to.
-     * @return An XML-representation of this object.
-     */
-    public Element toXMLElement(Document document, Player player) {
-        if (player == null) {
-            throw new IllegalArgumentException("Null player for toXMLElement(doc, player)");
-        }
-        return DOMMessage.toXMLElement(this, document, WriteScope.toClient(player));
     }
 
 

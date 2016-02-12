@@ -221,11 +221,11 @@ public class DOMMessage {
         return this;
     }
     public DOMMessage add(FreeColObject fco) {
-        add(fco.toXMLElement(this.document));
+        add(toXMLElement(fco, this.document, (Player)null));
         return this;
     }
     public DOMMessage add(FreeColObject fco, Player player) {
-        add(fco.toXMLElement(this.document, player));
+        add(toXMLElement(fco, this.document, player));
         return this;
     }
     public DOMMessage add(DOMMessage msg) {
@@ -573,6 +573,26 @@ public class DOMMessage {
         } catch (IOException|TransformerException ex) {
             throw new RuntimeException("Read failure", ex);
         }
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param fco The <code>FreeColObject</code> to write.
+     * @param document The <code>Document</code>.
+     * @param player The <code>Player</code> to send to, or to server if null.
+     * @return An XML-representation of this object.
+     */
+    public static Element toXMLElement(FreeColObject fco, Document document,
+                                       Player player) {
+        return toXMLElement(fco, document, ((player == null)
+                ? WriteScope.toServer()
+                : WriteScope.toClient(player)), null);
     }
 
     /**
