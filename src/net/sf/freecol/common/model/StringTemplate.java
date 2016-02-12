@@ -173,11 +173,29 @@ public class StringTemplate extends FreeColObject {
     /**
      * Set the default identifier.
      *
-     * @param newDefaultId The new default identifier
+     * @param id The new default identifier.
      */
-    public final void setDefaultId(final String newDefaultId) {
-        this.defaultId = newDefaultId;
+    public final void setDefaultId(String id) {
+        this.defaultId = id;
     }
+
+    /**
+     * Wrapper for subclasses to set the default identifier and return the
+     * setting object.
+     *
+     * @param id The new default identifier
+     * @param returnClass The expected return class.
+     * @return The setting object.
+     */
+    protected <T extends StringTemplate> T setDefaultId(final String id,
+                                                        Class<T> returnClass) {
+        setDefaultId(id);
+        try {
+            return returnClass.cast(this);
+        } catch (ClassCastException cce) {}
+        return null;            
+    }
+
 
     /**
      * Get the keys.

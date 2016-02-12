@@ -68,6 +68,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Market.Access;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
@@ -307,10 +308,10 @@ public final class InGameController extends Controller {
             = owner.csApplyDisaster(random, colony, disaster, cs);
         if (!messages.isEmpty()) {
             cs.addMessage(See.all(),
-                new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                    "model.disaster.strikes", owner)
-                .addName("%colony%", colony.getName())
-                .addName("%disaster%", disaster));
+                new ModelMessage(MessageType.DEFAULT,
+                                 "model.disaster.strikes", owner)
+                    .addName("%colony%", colony.getName())
+                    .addName("%disaster%", disaster));
             for (ModelMessage message : messages) {
                 cs.addMessage(See.all(), message);
             }
@@ -502,9 +503,9 @@ public final class InGameController extends Controller {
         h.setScore(n);
         cs.addGlobalHistory(game, h);
         cs.addMessage(See.only(independent),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "giveIndependence.announce", independent)
-            .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                             "giveIndependence.announce", independent)
+                .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
 
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<>();
@@ -520,10 +521,10 @@ public final class InGameController extends Controller {
         }
         if (!surrenderUnits.isEmpty()) {
             cs.addMessage(See.only(independent),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "giveIndependence.unitsAcquired", independent)
-                .addStringTemplate("%units%",
-                    unitTemplate(", ", surrenderUnits)));
+                new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                 "giveIndependence.unitsAcquired", independent)
+                    .addStringTemplate("%units%",
+                         unitTemplate(", ", surrenderUnits)));
             independent.invalidateCanSeeTiles();//+vis(independent)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         }
@@ -532,8 +533,8 @@ public final class InGameController extends Controller {
         // player update, but a partial update works for other players.
         cs.addPartial(See.all().except(independent), independent, "playerType");
         cs.addMessage(See.all().except(independent),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "giveIndependence.otherAnnounce", independent)
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                             "giveIndependence.otherAnnounce", independent)
                 .addStringTemplate("%nation%", independent.getNationLabel())
                 .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
         cs.add(See.only(independent), independent);
@@ -879,8 +880,9 @@ public final class InGameController extends Controller {
                     // have visibility of stance changes between other nations.
                     cs.addStance(See.only(dest), source, Stance.WAR, victim);
                     cs.addMessage(See.only(dest),
-                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            Stance.WAR.getOtherStanceChangeKey(), source)
+                        new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                         Stance.WAR.getOtherStanceChangeKey(),
+                                         source)
                             .addStringTemplate("%attacker%",
                                 source.getNationLabel())
                             .addStringTemplate("%defender%",
@@ -1177,7 +1179,7 @@ public final class InGameController extends Controller {
                 cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
-                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "buildColony.others", settlement)
                         .addStringTemplate("%nation%", nation)
                         .addStringTemplate("%colony%",
@@ -1387,7 +1389,8 @@ public final class InGameController extends Controller {
         serverPlayer.modifyGold(cashInAmount);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
         cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(messageId, serverPlayer, unit)
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                             messageId, serverPlayer, unit)
                 .addAmount("%amount%", fullAmount)
                 .addAmount("%cashInAmount%", cashInAmount));
         messageId = (serverPlayer.isRebel()
@@ -1395,7 +1398,7 @@ public final class InGameController extends Controller {
             ? "cashInTreasureTrain.otherIndependent"
             : "cashInTreasureTrain.otherColonial";
         cs.addMessage(See.all().except(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              messageId, serverPlayer)
                 .addAmount("%amount%", fullAmount)
                 .addStringTemplate("%nation%", serverPlayer.getNationLabel()));
@@ -1699,8 +1702,8 @@ public final class InGameController extends Controller {
         cs.addGlobalHistory(game, h);
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "declareIndependence.resolution", serverPlayer));
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                             "declareIndependence.resolution", serverPlayer));
 
         // Dispose of units in or heading to Europe.
         Europe europe = serverPlayer.getEurope();
@@ -1722,7 +1725,7 @@ public final class InGameController extends Controller {
         }
         if (lost) {
             cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                new ModelMessage(MessageType.UNIT_LOST,
                                  "declareIndependence.unitsSeized",
                                  serverPlayer)
                     .addStringTemplate("%units%", seized));
@@ -1737,7 +1740,7 @@ public final class InGameController extends Controller {
         monarch.updateInterventionForce();
         String otherKey = Nation.getRandomNonPlayerNationNameKey(game, random);
         cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "declareIndependence.interventionForce",
                              serverPlayer)
                 .add("%nation%", otherKey)
@@ -1783,13 +1786,13 @@ public final class InGameController extends Controller {
                     n++;
                 }
                 cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                        "declareIndependence.continentalArmyMuster",
-                        serverPlayer, colony)
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%number%", n)
-                    .addNamed("%oldUnit%", type)
-                    .addNamed("%unit%", upgrades.get(type)));
+                    new ModelMessage(MessageType.UNIT_IMPROVED,
+                                     "declareIndependence.continentalArmyMuster",
+                                     serverPlayer, colony)
+                        .addName("%colony%", colony.getName())
+                        .addAmount("%number%", n)
+                        .addNamed("%oldUnit%", type)
+                        .addNamed("%unit%", upgrades.get(type)));
                 limit -= n;
             }
         }
@@ -1808,11 +1811,10 @@ public final class InGameController extends Controller {
             ServerPlayer good = (ServerPlayer)natives.get(0);
             logger.info("Native ally following independence: " + good);
             cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "declareIndependence.nativeSupport", good)
                     .addStringTemplate("%nation%", good.getNationLabel())
-                    .add("%ruler%", serverPlayer.getRulerNameKey())
-                          );
+                    .add("%ruler%", serverPlayer.getRulerNameKey()));
             int delta;
             switch (good.getStance(serverPlayer)) {
             case ALLIANCE: case PEACE: default:
@@ -1852,7 +1854,7 @@ public final class InGameController extends Controller {
                     break;
                 }
                 cs.addMessage(See.only(serverPlayer),
-                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                    new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "declareIndependence.nativeHostile", bad)
                         .addStringTemplate("%nation%", bad.getNationLabel()));
                 if (delta != 0) bad.csModifyTension(serverPlayer, delta, cs);
@@ -1876,7 +1878,7 @@ public final class InGameController extends Controller {
         cs.addPartial(See.all().except(serverPlayer), serverPlayer,
                       "playerType", "independentNationName", "newLandName");
         cs.addMessage(See.all().except(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "declareIndependence.announce",
                              serverPlayer)
                 .addStringTemplate("%oldNation%", oldNation)
@@ -1951,7 +1953,7 @@ public final class InGameController extends Controller {
         session.setGift();
 
         // Inform the receiver of the gift.
-        ModelMessage m = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
+        ModelMessage m = new ModelMessage(MessageType.GIFT_GOODS,
                                           "deliverGift.goods",
                                           settlement, goods.getType())
             .addStringTemplate("%player%", serverPlayer.getNationLabel())
@@ -2023,12 +2025,12 @@ public final class InGameController extends Controller {
             indianPlayer.modifyGold(-gold);
             serverPlayer.modifyGold(gold);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
-            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "scoutSettlement.tributeAgree",
                                  unit, settlement)
                 .addAmount("%amount%", gold);
         } else {
-            m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "scoutSettlement.tributeDisagree",
                                  unit, settlement);
         }
@@ -2081,12 +2083,12 @@ public final class InGameController extends Controller {
         Player owner = settlement.getOwner();
         cs.add(See.only(serverPlayer), settlement);
         cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.noDenounce",
                              serverPlayer, unit)
                 .addStringTemplate("%nation%", owner.getNationLabel()));
         cs.addMessage(See.only(enemy),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.enemyDenounce",
                              enemy, settlement)
                 .addStringTemplate("%enemy%", serverPlayer.getNationLabel())
@@ -2608,7 +2610,7 @@ public final class InGameController extends Controller {
         // Add the descriptive message.
         final StringTemplate nation = settlement.getOwner().getNationLabel();
         cs.addMessage(See.only(serverPlayer),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+            new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission." + tension.getKey(),
                              serverPlayer, unit)
                 .addStringTemplate("%nation%", nation));
@@ -2916,10 +2918,11 @@ public final class InGameController extends Controller {
                             "gold", Integer.toString(goldToPay));
         } else if (gold < goldToPay || !serverPlayer.checkGold(gold)) {
             cs.addMessage(See.only(serverPlayer),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "indianSettlement.inciteGoldFail",
                                  serverPlayer, settlement)
-                    .addStringTemplate("%player%", enemyPlayer.getNationLabel())
+                    .addStringTemplate("%player%",
+                        enemyPlayer.getNationLabel())
                     .addAmount("%amount%", goldToPay));
             cs.addAttribute(See.only(serverPlayer), "gold", "0");
             unit.setMovesLeft(0);

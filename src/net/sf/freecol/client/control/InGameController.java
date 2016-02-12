@@ -3754,7 +3754,7 @@ public final class InGameController implements NetworkConstants {
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                    "indianDemand.gold.text", colony, unit)
+                                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
                     .addAmount("%amount%", amount);
@@ -3762,7 +3762,7 @@ public final class InGameController implements NetworkConstants {
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                    "indianDemand.gold.text", colony, unit)
+                                     "indianDemand.gold.text", colony, unit)
                     .addName("%nation%", nation)
                     .addName("%colony%", colony.getName())
                     .addAmount("%amount%", amount);
@@ -3777,30 +3777,32 @@ public final class InGameController implements NetworkConstants {
                 if (type.isFoodType()) {
                     accepted = gui.confirm(colony.getTile(),
                         StringTemplate.template("indianDemand.food.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount),
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount),
                         unit, "indianDemand.food.yes", "indianDemand.food.no");
                 } else {
                     accepted = gui.confirm(colony.getTile(),
                         StringTemplate.template("indianDemand.other.text")
-                        .addName("%nation%", nation)
-                        .addName("%colony%", colony.getName())
-                        .addAmount("%amount%", amount)
-                        .addNamed("%goods%", type),
+                            .addName("%nation%", nation)
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%amount%", amount)
+                            .addNamed("%goods%", type),
                         unit, "accept", "indianDemand.other.no");
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 if (type.isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.food.text", colony, unit)
+                                         "indianDemand.food.text",
+                                         colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount);
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.other.text", colony, unit)
+                                         "indianDemand.other.text",
+                                         colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount)
@@ -3811,13 +3813,15 @@ public final class InGameController implements NetworkConstants {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 if (type.isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.food.text", colony, unit)
+                                         "indianDemand.food.text",
+                                         colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount);
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.DEMANDS,
-                        "indianDemand.other.text", colony, unit)
+                                         "indianDemand.other.text",
+                                         colony, unit)
                         .addName("%nation%", nation)
                         .addName("%colony%", colony.getName())
                         .addAmount("%amount%", amount)
@@ -4166,7 +4170,7 @@ public final class InGameController implements NetworkConstants {
             .getActionManager().getFreeColAction("buildColonyAction")
             .getAccelerator());
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                "buildColony.tutorial", player)
+                               "buildColony.tutorial", player)
             .addName("%colonyKey%", key)
             .add("%colonyMenuItem%", "buildColonyAction.name")
             .add("%ordersMenuItem%", "menuBar.orders"));

@@ -459,15 +459,14 @@ public class ServerGame extends Game implements ServerModelObject {
         StringTemplate winner = strongestAIPlayer.getNationLabel();
         cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "model.game.spanishSuccession",
-                strongestAIPlayer)
+                             "model.game.spanishSuccession", strongestAIPlayer)
                 .addStringTemplate("%loserNation%", loser)
                 .addStringTemplate("%nation%", winner));
         cs.addGlobalHistory(this,
             new HistoryEvent(getTurn(),
                 HistoryEvent.HistoryEventType.SPANISH_SUCCESSION, null)
-                .addStringTemplate("%loserNation%", loser)
-                .addStringTemplate("%nation%", winner));
+                   .addStringTemplate("%loserNation%", loser)
+                   .addStringTemplate("%nation%", winner));
         setSpanishSuccession(true);
         cs.addPartial(See.all(), this, "spanishSuccession");
         cs.add(See.perhaps(), tiles);

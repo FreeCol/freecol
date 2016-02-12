@@ -522,13 +522,15 @@ public class ServerIndianSettlement extends IndianSettlement
             if (destroy) {
                 cs.addMessage(See.only(missionaryOwner),
                     new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                        "model.indianSettlement.mission.destroyed", this)
+                                     "model.indianSettlement.mission.destroyed",
+                                     this)
                         .addStringTemplate("%settlement%",
                             getLocationLabelFor(missionaryOwner)));
             } else {
                 cs.addMessage(See.only(missionaryOwner),
                     new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                        "model.indianSettlement.mission.denounced", this)
+                                     "model.indianSettlement.mission.denounced",
+                                     this)
                         .addStringTemplate("%settlement%",
                             getLocationLabelFor(missionaryOwner)));
             }

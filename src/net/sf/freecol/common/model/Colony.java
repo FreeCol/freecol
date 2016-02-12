@@ -1345,7 +1345,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public ModelMessage getUnbuildableMessage(BuildableType buildable) {
         return new ModelMessage(ModelMessage.MessageType.WARNING,
-            "model.colony.unbuildable", this, buildable)
+                                "model.colony.unbuildable", this, buildable)
             .addName("%colony%", getName())
             .addNamed("%object%", buildable);
     }
@@ -1469,8 +1469,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         GoodsType bells = getSpecification().getGoodsType("model.goods.bells");
         return (msgId == null) ? null
             : new ModelMessage(msgType, msgId, this, bells)
-            .addName("%colony%", getName())
-            .addAmount("%number%", number);
+                .addName("%colony%", getName())
+                .addAmount("%number%", number);
     }
 
     /**

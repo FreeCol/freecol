@@ -269,10 +269,11 @@ public class LostCityRumour extends TileItem {
     public ModelMessage getNothingMessage(Player player, boolean mounds,
                                           Random random) {
         final Game game = getGame();
+        String key;
         if (mounds) {
+            key = RumourType.NOTHING.getAlternateDescriptionKey("mounds");
             return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                RumourType.NOTHING.getAlternateDescriptionKey("mounds"),
-                player);
+                                    key, player);
         } else if (game.getTurn().getYear() % 100 == 12
             && randomInt(logger, "Mayans?", random, 4) == 0) {
             int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
@@ -285,16 +286,16 @@ public class LostCityRumour extends TileItem {
         if (rumourNothing < 0) {
             i = 0;
             for (;;) {
-                String key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
+                key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
                 if (!Messages.containsKey(key)) break;
                 i++;
             }
             rumourNothing = i;
         }
         i = randomInt(logger, "Nothing rumour", random, rumourNothing);
+        key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
         return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-            Messages.descriptionKey("model.lostCityRumour.nothing." + i),
-            player);
+                                key, player);
     }
     
     // Interface Named

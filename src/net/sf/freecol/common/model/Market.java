@@ -390,8 +390,8 @@ public final class Market extends FreeColGameObject implements Ownable {
         return (oldPrice == newPrice) ? null
             : new ModelMessage(ModelMessage.MessageType.MARKET_PRICES,
                                ((newPrice > oldPrice)
-                                ? "model.market.priceIncrease"
-                                : "model.market.priceDecrease"),
+                                   ? "model.market.priceIncrease"
+                                   : "model.market.priceDecrease"),
                                this, goodsType)
                 .addStringTemplate("%market%", owner.getMarketName())
                 .addNamed("%goods%", goodsType)

@@ -197,10 +197,9 @@ public class ServerBuilding extends Building implements ServerModelObject {
         if (student == null) {
             cs.addMessage(See.only(owner),
                 new ModelMessage(ModelMessage.MessageType.WARNING,
-                                 "model.building.noStudent",
-                                 colony, teacher)
-                          .addStringTemplate("%teacher%", teacher.getLabel())
-                          .addName("%colony%", colony.getName()));
+                                 "model.building.noStudent", colony, teacher)
+                    .addStringTemplate("%teacher%", teacher.getLabel())
+                    .addName("%colony%", colony.getName()));
             return false;
         }
         teacher.setStudent(student);
