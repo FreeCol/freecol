@@ -216,20 +216,20 @@ public class DOMMessage {
         return getElement().hasAttribute(attribute);
     }
 
-    public DOMMessage add(Element element) {
-        getElement().appendChild(this.document.importNode(element, true));
+    public DOMMessage add(Element e) {
+        if (e != null) getElement().appendChild(this.document.importNode(e, true));
         return this;
     }
     public DOMMessage add(FreeColObject fco) {
-        add(toXMLElement(fco, this.document, (Player)null));
+        if (fco != null) add(toXMLElement(fco, this.document, (Player)null));
         return this;
     }
     public DOMMessage add(FreeColObject fco, Player player) {
-        add(toXMLElement(fco, this.document, player));
+        if (fco != null) add(toXMLElement(fco, this.document, player));
         return this;
     }
     public DOMMessage add(DOMMessage msg) {
-        add(msg.toXMLElement());
+        if (msg != null) add(msg.toXMLElement());
         return this;
     }
     public void clearChildren() {
