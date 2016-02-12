@@ -28,8 +28,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Represents locatable goods of a specified type and amount. Use
@@ -116,18 +114,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         this(game);
 
         readFromXML(xr);
-    }
-
-    /**
-     * Creates a new <code>Goods</code> instance.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param e an <code>Element</code> value
-     */
-    public Goods(Game game, Element e) {
-        this(game);
-
-        DOMMessage.readFromXMLElement(this, e);
     }
 
 
