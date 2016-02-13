@@ -209,6 +209,7 @@ public class Game extends FreeColGameObject {
         this.combatModel = new SimpleCombatModel();
         this.removeCount = 0;
         internId("0");
+        this.initialized = true;
     }
 
     /**
@@ -1144,7 +1145,7 @@ public class Game extends FreeColGameObject {
             FreeColGameObject fcgo = iterator.next();
             if (fcgo == null) {
                 lb.add(" null-fcgo");
-            } else if (fcgo.isUninitialized()) {
+            } else if (!fcgo.isInitialized()) {
                 lb.add(" ", fcgo.getId(),
                     "(", lastPart(fcgo.getClass().getName(), "."), ")");
             } else {

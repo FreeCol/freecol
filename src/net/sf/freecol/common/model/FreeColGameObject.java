@@ -45,11 +45,11 @@ public abstract class FreeColGameObject extends FreeColObject {
     /** The game this object belongs to. */
     private Game game;
 
-    /** Has this object been disposed. */
+    /** Has this object been disposed? */
     private boolean disposed = false;
 
-    /** Has this object been initialized. */
-    private boolean uninitialized;
+    /** Has this object been initialized? */
+    protected boolean initialized;
 
 
     /**
@@ -65,7 +65,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             setGame(game); // Set game before calling internId
             internId(getXMLTagName() + ":" + game.getNextId());
         }
-        this.uninitialized = getId() == null;
+        this.initialized = getId() != null;
         this.disposed = false;
     }
 
@@ -82,7 +82,7 @@ public abstract class FreeColGameObject extends FreeColObject {
     public FreeColGameObject(Game game, String id) {
         setGame(game); // Set game before calling internId
         if (id != null) internId(id);
-        this.uninitialized = true;
+        this.initialized = false;
         this.disposed = false;
     }
 
@@ -108,12 +108,12 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Has this object not yet been initialized?
+     * Has this object been initialized?
      *
-     * @return True if this object is not initialized.
+     * @return True if this object is initialized.
      */
-    public final boolean isUninitialized() {
-        return this.uninitialized;
+    public final boolean isInitialized() {
+        return this.initialized;
     }
 
     /**
@@ -287,7 +287,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        this.uninitialized = false;
+        this.initialized = true;
         super.readFromXML(xr);
     }
 }

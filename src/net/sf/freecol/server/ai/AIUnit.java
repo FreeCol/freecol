@@ -831,7 +831,7 @@ public class AIUnit extends TransportableAIObject {
 
         unit = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
                                         Unit.class, (Unit)null, true);
-        if (unit.isUninitialized()) {
+        if (!unit.isInitialized()) {
             xr.nextTag(); // Move off the opening <AIUnit> tag
             throw new XMLStreamException("AIUnit for uninitialized Unit: "
                 + unit.getId());

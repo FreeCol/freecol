@@ -1659,7 +1659,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             m = aiUnit.getMission();
             final Location oldTarget = (m == null) ? null : m.getTarget();
 
-            if (unit.isUninitialized() || unit.isDisposed()) {
+            if (!unit.isInitialized() || unit.isDisposed()) {
                 reasons.put(unit, "Invalid");
 
             } else if (unit.isDamaged()) { // Damaged units must wait

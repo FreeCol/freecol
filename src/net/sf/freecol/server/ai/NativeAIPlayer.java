@@ -408,7 +408,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             final Unit unit = aiUnit.getUnit();
             Mission m = aiUnit.getMission();
 
-            if (unit.isUninitialized() || unit.isDisposed()) {
+            if (!unit.isInitialized() || unit.isDisposed()) {
                 reasons.put(unit, "Invalid");
 
             } else if (m != null && m.isValid() && !m.isOneTime()) {

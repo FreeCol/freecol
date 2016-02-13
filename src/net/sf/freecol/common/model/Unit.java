@@ -4113,7 +4113,7 @@ public class Unit extends GoodsLocation
             }
         }
         if (this.destination != null) {
-            if (((FreeColGameObject)this.destination).isUninitialized()) {
+            if (!((FreeColGameObject)this.destination).isInitialized()) {
                 if (fix) {
                     this.destination = null;
                     logger.warning("Cleared uninitialized destination for: "
@@ -4589,7 +4589,7 @@ public class Unit extends GoodsLocation
     public String toString(String prefix) {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(prefix).append(getId());
-        if (isUninitialized()) {
+        if (!isInitialized()) {
             sb.append(" uninitialized");
         } else if (isDisposed()) {
             sb.append(" disposed");
