@@ -33,12 +33,9 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * A stop along a trade route.
  */
-public class TradeRouteStop extends FreeColObject implements TradeLocation {
+public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
 
     private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
-
-    /** The game in play. */
-    private final Game game;
 
     /** The trade location of the stop. */
     private Location location;
@@ -53,8 +50,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      * @param game The enclosing <code>Game</code>.
      */
     public TradeRouteStop(Game game) {
-        setId("");
-        this.game = game;
+        super(game, ""); // Identifier not required
     }
 
     /**
@@ -76,7 +72,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      * @param other The other <code>TradeRouteStop</code>.
      */
     public TradeRouteStop(TradeRouteStop other) {
-        this(other.game, other.location);
+        this(other.getGame(), other.location);
 
         this.setCargo(other.cargo);
     }
@@ -255,38 +251,14 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
     }
 
 
-    // Override FreeColObject
+    // Override FreeColGameObject
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Specification getSpecification() {
-        return getGame().getSpecification();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Game getGame() {
-        return this.game;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setGame(Game game) {
-        throw new RuntimeException("Can not set game");
+    public boolean isInternable() {
+        return false;
     }
 
 
@@ -324,7 +296,7 @@ public class TradeRouteStop extends FreeColObject implements TradeLocation {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        location = xr.getLocationAttribute(game, LOCATION_TAG, true);
+        location = xr.getLocationAttribute(getGame(), LOCATION_TAG, true);
     }
 
     /**

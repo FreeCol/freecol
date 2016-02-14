@@ -35,10 +35,13 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
- * The class <code>DiplomaticTrade</code> represents an offer one player can
- * make another.
+ * The class <code>DiplomaticTrade</code> represents an offer one
+ * player can make another.
+ *
+ * This has to be a FCGO so that it can be serialized, but instances are not
+ * interned.
  */
-public class DiplomaticTrade extends FreeColObject {
+public class DiplomaticTrade extends FreeColGameObject {
 
     /** A context for the trade. */
     public static enum TradeContext {
@@ -64,9 +67,6 @@ public class DiplomaticTrade extends FreeColObject {
         REJECT_TRADE
     }
 
-
-    /** The game in play. */
-    private Game game;
 
     /** The context of this agreement. */
     private TradeContext context;
@@ -94,8 +94,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @param id The identifier (ignored).
      */
     public DiplomaticTrade(Game game, String id) {
-        setGame(game);
-        setId(""); // Identifier not required
+        super(game, ""); // Identifier not required
     }
         
     /**
@@ -394,38 +393,13 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
 
-    // Override FreeColObject
+    // Override FreeColGameObject
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Specification getSpecification() {
-        return getGame().getSpecification();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Game getGame() {
-        return this.game;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setGame(Game game) {
-        this.game = game;
+    public boolean isInternable() {
+        return false;
     }
 
 

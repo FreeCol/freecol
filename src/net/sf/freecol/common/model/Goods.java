@@ -40,7 +40,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     private static final Logger logger = Logger.getLogger(Goods.class.getName());
 
-    /** The game containing these goods. */
+    /** 
+     * The game containing these goods.  It would be nice to make this
+     * a FreeColGameObject, but then it could not extend AbstractGoods.
+     */
     private final Game game;
 
     /**

@@ -30,10 +30,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * One of the items a DiplomaticTrade consists of.
  */
-public abstract class TradeItem extends FreeColObject {
-
-    /** The game this TradeItem belongs to. */
-    private Game game;
+public abstract class TradeItem extends FreeColGameObject {
 
     /** The player who is to provide this item. */
     private Player source;
@@ -51,8 +48,8 @@ public abstract class TradeItem extends FreeColObject {
      * @param destination The destination <code>Player</code>.
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
-        setGame(game);
-        setId(id);
+        super(game, id);
+
         this.source = source;
         this.destination = destination;
     }
@@ -65,7 +62,8 @@ public abstract class TradeItem extends FreeColObject {
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
-        setGame(game);
+        super(game, "");
+
         readFromXML(xr);
     }
 
@@ -222,38 +220,14 @@ public abstract class TradeItem extends FreeColObject {
     public abstract int evaluateFor(Player player);
 
 
-    // Override FreeColObject
+    // Override FreeColGameObject
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Specification getSpecification() {
-        return getGame().getSpecification();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSpecification(Specification specification) {
-        throw new RuntimeException("Can not set specification.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Game getGame() {
-        return this.game;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setGame(Game game) {
-        this.game = game;
+    public boolean isInternable() {
+        return false;
     }
 
     

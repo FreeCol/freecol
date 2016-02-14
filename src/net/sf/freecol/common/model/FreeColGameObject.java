@@ -36,7 +36,12 @@ import net.sf.freecol.common.util.Utils;
  * The superclass of all game objects in FreeCol.
  *
  * All FreeColGameObjects need to be able to refer to the game they belong
- * to.  Therefore, the game attribute must not be null.
+ * to.  Therefore, the game attribute must not be null, except in the special
+ * case where a Game is being initially created.
+ *
+ * Most FreeColGameObjects are intended to be accessible by identifier (@see
+ * Game#getFreeColObject) but some are not, and should override isInternable
+ * to return false.
  */
 public abstract class FreeColGameObject extends FreeColObject {
 
@@ -95,7 +100,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public final void internId(final String newId) {
         final Game game = getGame();
-        if (game != null && newId != null) {
+        if (game != null && newId != null && isInternable()) {
             final String oldId = getId();
             if (!newId.equals(oldId)) {
                 if (oldId != null) game.removeFreeColGameObject(oldId, "override");
@@ -151,6 +156,19 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     // Routines to be overridden where meaningful by subclasses.
+
+    /**
+     * Should this object be interned into its Game?
+     *
+     * Usually true, but there are some special containers that have to be
+     * FCGOs but are unsuitable to be interned.  These classes will override
+     * this routine.
+     *
+     * @return True if this object should be interned.
+     */
+    public boolean isInternable() {
+        return true;
+    }
 
     /**
      * Collect a list of this object and all its subparts that should be
