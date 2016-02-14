@@ -2690,10 +2690,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         } else if (goodsType.isBreedable()) {
             // Refuse if we already have this type under production in
             // multiple places.
-            int n = 0;
-            for (Settlement s : getPlayer().getSettlements()) {
-                if (s.getGoodsCount(goodsType) > 0) n++;
-            }
+            int n = count(getPlayer().getSettlements(),
+                s -> s.getGoodsCount(goodsType) > 0);
             ret = n < 2;
             if (ret) {
                 lb.add("accepted: breedable-type-", goodsType.getSuffix(), 
