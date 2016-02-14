@@ -2715,9 +2715,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             // don't want these goods to be boycotted.
             final List<GoodsType> goodsTypes = getSpecification()
                 .getStorableGoodsTypeList();
-            int averageIncome = goodsTypes.stream()
-                .mapToInt(gt -> getPlayer().getIncomeAfterTaxes(gt)).sum()
-                    / goodsTypes.size();
+            int averageIncome = sum(goodsTypes,
+                gt -> getPlayer().getIncomeAfterTaxes(gt)) / goodsTypes.size();
             int income = getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType());
             ret = income <= 0 || income > averageIncome;
             lb.add(((ret) ? "accepted" : "rejected"),
