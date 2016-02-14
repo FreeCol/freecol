@@ -3623,16 +3623,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getMaximumFoodConsumption() {
         if (maximumFoodConsumption < 0) {
-            Specification spec = getSpecification();
-            for (UnitType unitType : spec.getUnitTypeList()) {
-                if (unitType.isAvailableTo(this)) {
-                    int foodConsumption = spec.getFoodGoodsTypeList().stream()
-                        .mapToInt(ft -> unitType.getConsumptionOf(ft)).sum();
-                    if (foodConsumption > maximumFoodConsumption) {
-                        maximumFoodConsumption = foodConsumption;
-                    }
-                }
-            }
+            final Specification spec = getSpecification();
+            maximumFoodConsumption = max(spec.getUnitTypeList(),
+                ut -> ut.isAvailableTo(this),
+                ut -> sum(spec.getFoodGoodsTypeList(),
+                    ft -> ut.getConsumptionOf(ft)));
         }
         return maximumFoodConsumption;
     }
