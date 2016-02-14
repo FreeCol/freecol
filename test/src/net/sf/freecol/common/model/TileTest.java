@@ -522,7 +522,7 @@ public class TileTest extends FreeColTestCase {
     }
 
     private boolean hasBonusFrom(List<Modifier> modifierSet,
-                                 FreeColGameObjectType source) {
+                                 FreeColSpecObjectType source) {
         for (Modifier modifier : modifierSet) {
             if (source.equals(modifier.getSource())) {
                 return true;

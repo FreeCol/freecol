@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * A type of goods, derived from the specification.
  */
-public final class GoodsType extends FreeColGameObjectType {
+public final class GoodsType extends FreeColSpecObjectType {
 
     private static final float DEFAULT_PRODUCTION_WEIGHT = 1.0f;
     private static final float DEFAULT_LOW_PRODUCTION_THRESHOLD = 0.0f;

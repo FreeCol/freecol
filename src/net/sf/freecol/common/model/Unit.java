@@ -3601,7 +3601,7 @@ public class Unit extends GoodsLocation
      * values.
      */
     public Set<Modifier> getCombatModifiers(String id,
-        FreeColGameObjectType fcgot, Turn turn) {
+        FreeColSpecObjectType fcgot, Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
         Set<Modifier> result = new HashSet<>();
@@ -4136,7 +4136,7 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
                                      Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
@@ -4179,7 +4179,7 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
                                       Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();

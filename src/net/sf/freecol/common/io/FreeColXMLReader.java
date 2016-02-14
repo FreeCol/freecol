@@ -45,7 +45,7 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Role;
@@ -548,7 +548,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
 
     /**
      * Reads an XML-representation of a list of
-     * <code>FreeColGameObjectType</code>s.
+     * <code>FreeColSpecObjectType</code>s.
      *
      * @param tag The tag for the list.
      * @param spec The <code>Specification</code> to find items in.
@@ -558,7 +558,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public <T extends FreeColGameObjectType> List<T> readList(Specification spec,
+    public <T extends FreeColSpecObjectType> List<T> readList(Specification spec,
         String tag, Class<T> type) throws XMLStreamException {
 
         expectTag(tag);
@@ -827,24 +827,24 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * @return True if the containers should be cleared.
      */
     public boolean shouldClearContainers() {
-        return !hasAttribute(FreeColGameObjectType.EXTENDS_TAG)
-            && !hasAttribute(FreeColGameObjectType.PRESERVE_TAG);
+        return !hasAttribute(FreeColSpecObjectType.EXTENDS_TAG)
+            && !hasAttribute(FreeColSpecObjectType.PRESERVE_TAG);
     }
 
     /**
-     * Get a FreeColGameObjectType by identifier from a stream from a
+     * Get a FreeColSpecObjectType by identifier from a stream from a
      * specification.
      *
      * @param spec The <code>Specification</code> to look in.
      * @param attributeName the name of the attribute identifying the
-     *     <code>FreeColGameObjectType</code>.
+     *     <code>FreeColSpecObjectType</code>.
      * @param returnClass The expected class of the return value.
      * @param defaultValue A default value to return if the attributeName 
      *     attribute is not present.
-     * @return The <code>FreeColGameObjectType</code> found, or the
+     * @return The <code>FreeColSpecObjectType</code> found, or the
      *     <code>defaultValue</code>.
      */
-    public <T extends FreeColGameObjectType> T getType(Specification spec,
+    public <T extends FreeColSpecObjectType> T getType(Specification spec,
         String attributeName, Class<T> returnClass, T defaultValue) {
 
         final String attrib =
@@ -858,7 +858,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     // @compat 0.10.7
-    public <T extends FreeColGameObjectType> T getRole(Specification spec,
+    public <T extends FreeColSpecObjectType> T getRole(Specification spec,
         String attributeName, Class<T> returnClass, T defaultValue) {
 
         String attrib =

@@ -41,7 +41,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  *
  * @see Disaster
  */
-public class Effect extends FreeColGameObjectType {
+public class Effect extends FreeColSpecObjectType {
 
     public static final String DAMAGED_UNIT
         = "model.disaster.effect.damagedUnit";
@@ -128,10 +128,10 @@ public class Effect extends FreeColGameObjectType {
     /**
      * Does at least one of this effect's scopes apply to an object.
      *
-     * @param objectType The <code>FreeColGameObjectType</code> to check.
+     * @param objectType The <code>FreeColSpecObjectType</code> to check.
      * @return True if this effect applies.
      */
-    public boolean appliesTo(final FreeColGameObjectType objectType) {
+    public boolean appliesTo(final FreeColSpecObjectType objectType) {
         return (scopes == null || scopes.isEmpty()) ? true
             : any(scopes, s -> s.appliesTo(objectType));
     }

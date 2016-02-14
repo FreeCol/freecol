@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Feature;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
@@ -99,7 +99,7 @@ public class ModifierFormat {
     }
 
     public static JLabel[] getModifierLabels(Modifier modifier,
-                                             FreeColGameObjectType fcgot,
+                                             FreeColSpecObjectType fcgot,
                                              Turn turn) {
         String sourceName = getSourceName(modifier.getSource());
         if (fcgot != null && modifier.appliesTo(fcgot)) {

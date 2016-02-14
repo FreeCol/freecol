@@ -38,7 +38,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 /**
  * Represents one of the nations present in the game.
  */
-public class Nation extends FreeColGameObjectType {
+public class Nation extends FreeColSpecObjectType {
 
     /** The unknown enemy id. */
     public static final String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";

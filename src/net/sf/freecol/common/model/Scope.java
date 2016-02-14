@@ -28,12 +28,12 @@ import net.sf.freecol.common.util.Utils;
 
 /**
  * The <code>Scope</code> class determines whether a given
- * <code>FreeColGameObjectType</code> fulfills certain requirements.
+ * <code>FreeColSpecObjectType</code> fulfills certain requirements.
  */
 public class Scope extends FreeColObject {
 
     /** 
-     * The identifier of a <code>FreeColGameObjectType</code>, or
+     * The identifier of a <code>FreeColSpecObjectType</code>, or
      * <code>Option</code>.
      */
     private String type = null;
@@ -167,7 +167,7 @@ public class Scope extends FreeColObject {
     /**
      * Does this scope apply to a given object?
      *
-     * @param object The <code>FreeColGameObjectType</code> to test.
+     * @param object The <code>FreeColSpecObjectType</code> to test.
      * @return True if the scope is applicable.
      */
     public boolean appliesTo(FreeColObject object) {
@@ -175,13 +175,13 @@ public class Scope extends FreeColObject {
             return matchesNull;
         }
         if (type != null) {
-            if (object instanceof FreeColGameObjectType) {
+            if (object instanceof FreeColSpecObjectType) {
                 if (!type.equals(object.getId())) {
                     return matchNegated;
                 }
             } else if (object instanceof FreeColObject) {
-                FreeColGameObjectType fcgot = object.invokeMethod("getType",
-                    FreeColGameObjectType.class, (FreeColGameObjectType)null);
+                FreeColSpecObjectType fcgot = object.invokeMethod("getType",
+                    FreeColSpecObjectType.class, (FreeColSpecObjectType)null);
                 if (fcgot == null || !type.equals(fcgot.getId())) {
                     return matchNegated;
                 }

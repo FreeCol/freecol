@@ -177,7 +177,7 @@ public class LostCityRumour extends TileItem {
      * @param random A random number source.
      * @return The type of rumour.
      *
-     * FIXME: Make RumourType a FreeColGameObjectType and move all the
+     * FIXME: Make RumourType a FreeColSpecObjectType and move all the
      * magic numbers in here to the specification.
      */
     public RumourType chooseType(Unit unit, Random random) {

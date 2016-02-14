@@ -33,17 +33,17 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * abilities that are provided by the code rather than defined in the
  * specification, such as the "artillery in the open" penalty.
  *
- * In general, a FreeColGameObjectType does not need a reference to
- * the specification.  However, if it has attributes or children that
- * are themselves FreeColGameObjectTypes, then the specification must
- * be set before the type is de-serialized, otherwise the identifiers
- * can not be resolved.
+ * A FreeColSpecObjectType does not always need a reference to the
+ * specification. However, if it has attributes or children that are
+ * themselves FreeColSpecObjectTypes, then the specification must be
+ * set before the type is de-serialized, otherwise the identifiers can
+ * not be resolved.
  *
- * FreeColGameObjectTypes can be abstract.  Abstract types can be used
+ * FreeColSpecObjectTypes can be abstract. Abstract types can be used
  * to derive other types, but can not be instantiated.  They will be
  * removed from the Specification after it has loaded completely.
  */
-public abstract class FreeColGameObjectType extends FreeColSpecObject
+public abstract class FreeColSpecObjectType extends FreeColSpecObject
     implements Named {
 
     /** Whether the type is abstract, or can be instantiated. */
@@ -59,7 +59,7 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
 
     /**
      * The index imposes a total ordering consistent with equals on
-     * each class extending FreeColGameObjectType, but this ordering
+     * each class extending FreeColSpecObjectType, but this ordering
      * is nothing but the order in which the objects of the respective
      * class were defined.  It is guaranteed to remain stable only for
      * a particular revision of a particular specification.
@@ -70,37 +70,37 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
     /**
      * Deliberately empty constructor.
      */
-    protected FreeColGameObjectType() {
+    protected FreeColSpecObjectType() {
         super(null);
     }
 
     /**
-     * Create a simple FreeColGameObjectType without a specification.
+     * Create a simple FreeColSpecObjectType without a specification.
      *
      * @param id The object identifier.
      */
-    public FreeColGameObjectType(String id) {
+    public FreeColSpecObjectType(String id) {
         this(id, null);
     }
 
     /**
-     * Create a FreeColGameObjectType with a given specification but
+     * Create a FreeColSpecObjectType with a given specification but
      * no object identifier.
      *
      * @param specification The <code>Specification</code> to refer to.
      */
-    public FreeColGameObjectType(Specification specification) {
+    public FreeColSpecObjectType(Specification specification) {
         this(null, specification);
     }
 
     /**
-     * Create a FreeColGameObjectType with a given identifier and
+     * Create a FreeColSpecObjectType with a given identifier and
      * specification.
      *
      * @param id The object identifier.
      * @param specification The <code>Specification</code> to refer to.
      */
-    public FreeColGameObjectType(String id, Specification specification) {
+    public FreeColSpecObjectType(String id, Specification specification) {
         super(specification);
 
         setId(id);
@@ -108,10 +108,10 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
 
 
     /**
-     * Gets the index of this FreeColGameObjectType.
+     * Gets the index of this FreeColSpecObjectType.
      *
      * The index imposes a total ordering consistent with equals on
-     * each class extending FreeColGameObjectType, but this ordering
+     * each class extending FreeColSpecObjectType, but this ordering
      * is nothing but the order in which the objects of the respective
      * class were defined.  It is guaranteed to remain stable only for
      * a particular revision of a particular specification.
@@ -119,11 +119,11 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
      * @return The game object index.
      */
     protected int getIndex() {
-        return index;
+        return this.index;
     }
 
     /**
-     * Sets the index of this FreeColGameObjectType.
+     * Sets the index of this FreeColSpecObjectType.
      *
      * @param index The new index value.
      */
@@ -147,7 +147,7 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
      * @return True if this is an abstract game object type.
      */
     public final boolean isAbstractType() {
-        return abstractType;
+        return this.abstractType;
     }
 
 
@@ -165,14 +165,14 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
     // Override FreeColObject
 
     /**
-     * Gets the feature container.
-     *
-     * @return The <code>FeatureContainer</code>.
+     * {@inheritDoc}
      */
     @Override
     public final FeatureContainer getFeatureContainer() {
-        if (featureContainer == null) featureContainer = new FeatureContainer();
-        return featureContainer;
+        if (this.featureContainer == null) {
+            this.featureContainer = new FeatureContainer();
+        }
+        return this.featureContainer;
     }
 
 
@@ -214,7 +214,7 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
         super.readAttributes(xr);
         if (getId() == null) throw new XMLStreamException("Null id");
 
-        abstractType = xr.getAttribute(ABSTRACT_TAG, false);
+        this.abstractType = xr.getAttribute(ABSTRACT_TAG, false);
     }
 
     /**
@@ -224,7 +224,7 @@ public abstract class FreeColGameObjectType extends FreeColSpecObject
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (xr.shouldClearContainers()) {
-            if (featureContainer != null) featureContainer.clear();
+            if (this.featureContainer != null) this.featureContainer.clear();
         }
 
         super.readChildren(xr);

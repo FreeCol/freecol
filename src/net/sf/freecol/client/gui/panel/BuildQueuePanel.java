@@ -77,7 +77,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
@@ -759,7 +759,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     && this.featureContainer.hasAbility(entry.getKey(),
                             null, null)
                     != entry.getValue()) {
-                    List<FreeColGameObjectType> sources
+                    List<FreeColSpecObjectType> sources
                         = spec.getTypesProviding(entry.getKey(),
                                                  entry.getValue());
                     if (sources.isEmpty()) {
@@ -831,7 +831,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     && this.featureContainer.hasAbility(entry.getKey(),
                             null, null)
                     != entry.getValue()) {
-                    List<FreeColGameObjectType> sources = getSpecification()
+                    List<FreeColSpecObjectType> sources = getSpecification()
                         .getTypesProviding(entry.getKey(), entry.getValue());
                     if (sources.isEmpty()) {
                         // no type provides the required ability

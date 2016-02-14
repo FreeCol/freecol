@@ -86,7 +86,7 @@ public final class Specification {
     public static final int NUMBER_OF_AGES = 3;
 
 
-    public static class Source extends FreeColGameObjectType {
+    public static class Source extends FreeColSpecObjectType {
 
         /**
          * Trivial constructor.
@@ -243,7 +243,7 @@ public final class Specification {
     public final Map<String, String> fatherGoodsFixMap = new HashMap<>();
     // end @compat 0.10.7
 
-    private final Map<String, FreeColGameObjectType> allTypes = new HashMap<>();
+    private final Map<String, FreeColSpecObjectType> allTypes = new HashMap<>();
 
     private final Map<String, List<Ability>> allAbilities = new HashMap<>();
 
@@ -465,10 +465,10 @@ public final class Specification {
     public void clean(String why) {
         logger.finest("Cleaning up specification following " + why + ".");
 
-        Iterator<FreeColGameObjectType> typeIterator
+        Iterator<FreeColSpecObjectType> typeIterator
             = allTypes.values().iterator();
         while (typeIterator.hasNext()) {
-            FreeColGameObjectType type = typeIterator.next();
+            FreeColSpecObjectType type = typeIterator.next();
             if (type.isAbstractType()) {
                 typeIterator.remove();
             }
@@ -628,7 +628,7 @@ public final class Specification {
             + ", season year=" + Turn.getSeasonYear()
             + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
             + ", seasons=" + Turn.getSeasonNumber()
-            + ", " + allTypes.size() + " FreeColGameObjectTypes"
+            + ", " + allTypes.size() + " FreeColSpecObjectTypes"
             + ", " + allAbilities.size() + " Abilities"
             + ", " + buildingTypeList.size() + " BuildingTypes"
             + ", " + disasters.size() + " Disasters"
@@ -700,7 +700,7 @@ public final class Specification {
                 spread.setMaximumValue(100);
                 prices.add(spread);
                 addAbstractOption(spread);
-            } else if (goodsType.getPrice() < FreeColGameObjectType.INFINITY) {
+            } else if (goodsType.getPrice() < FreeColSpecObjectType.INFINITY) {
                 IntegerOption price
                     = new IntegerOption(base + "price", this);
                 price.setValue(goodsType.getPrice());
@@ -730,7 +730,7 @@ public final class Specification {
         }
     }
 
-    private class TypeReader<T extends FreeColGameObjectType> implements ChildReader {
+    private class TypeReader<T extends FreeColSpecObjectType> implements ChildReader {
 
         private final Class<T> type;
         private final List<T> result;
@@ -750,8 +750,8 @@ public final class Specification {
                 if (id == null) {
                     logger.warning("Null identifier, tag: " + tag);
 
-                } else if (FreeColGameObjectType.DELETE_TAG.equals(tag)) {
-                    FreeColGameObjectType object = allTypes.remove(id);
+                } else if (FreeColSpecObjectType.DELETE_TAG.equals(tag)) {
+                    FreeColSpecObjectType object = allTypes.remove(id);
                     if (object != null) result.remove(object);
 
                 } else {
@@ -766,7 +766,7 @@ public final class Specification {
                     // extensions to not have to re-specify all the
                     // attributes when just changing the children.
                     if (object.getId() != null
-                        && xr.getAttribute(FreeColGameObjectType.PRESERVE_TAG,
+                        && xr.getAttribute(FreeColSpecObjectType.PRESERVE_TAG,
                                            (String)null) != null) {
                         object.readChildren(xr);
                     } else {
@@ -856,7 +856,7 @@ public final class Specification {
     /**
      * Registers an Ability's id as defined.  This is useful for
      * abilities that are required rather than provided by
-     * FreeColGameObjectTypes.
+     * FreeColSpecObjectTypes.
      *
      * @param id The object identifier.
      */
@@ -1698,14 +1698,14 @@ public final class Specification {
     // General type retrieval
 
     /**
-     * Get the <code>FreeColGameObjectType</code> with the given identifier.
+     * Get the <code>FreeColSpecObjectType</code> with the given identifier.
      *
      * @param id The object identifier to look for.
      * @param type The expected <code>Class</code>.
-     * @return The <code>FreeColGameObjectType</code> found.
+     * @return The <code>FreeColSpecObjectType</code> found.
      */
-    public <T extends FreeColGameObjectType> T getType(String id, Class<T> type) {
-        FreeColGameObjectType o = findType(id);
+    public <T extends FreeColSpecObjectType> T getType(String id, Class<T> type) {
+        FreeColSpecObjectType o = findType(id);
         if (o != null) {
             return type.cast(allTypes.get(id));
 
@@ -1727,12 +1727,12 @@ public final class Specification {
     }
 
     /**
-     * Find a <code>FreeColGameObjectType</code> by id.
+     * Find a <code>FreeColSpecObjectType</code> by id.
      *
      * @param id The identifier to look for, which must not be null.
-     * @return The <code>FreeColGameObjectType</code> found if any.
+     * @return The <code>FreeColSpecObjectType</code> found if any.
      */
-    public FreeColGameObjectType findType(String id) throws IllegalArgumentException {
+    public FreeColSpecObjectType findType(String id) throws IllegalArgumentException {
         if (id == null) {
             throw new IllegalArgumentException("Null id");
 
@@ -1745,29 +1745,29 @@ public final class Specification {
     }
 
     /**
-     * Get the FreeColGameObjectTypes that provide the required ability.
+     * Get the FreeColSpecObjectTypes that provide the required ability.
      *
      * @param id The object identifier.
      * @param value The ability value to check.
-     * @return A list of <code>FreeColGameObjectType</code>s that
+     * @return A list of <code>FreeColSpecObjectType</code>s that
      *     provide the required ability.
      */
-    public List<FreeColGameObjectType> getTypesProviding(String id,
+    public List<FreeColSpecObjectType> getTypesProviding(String id,
                                                          boolean value) {
         return transform(getAbilities(id),
             a -> a.getValue() == value
-                && a.getSource() instanceof FreeColGameObjectType,
-            a -> (FreeColGameObjectType)a.getSource(), Collectors.toList());
+                && a.getSource() instanceof FreeColSpecObjectType,
+            a -> (FreeColSpecObjectType)a.getSource(), Collectors.toList());
     }
 
     /**
      * Get all types which have any of the given abilities.
      *
      * @param abilities The abilities for the search
-     * @return A list of <code>FreeColGameObjectType</code>s with at
+     * @return A list of <code>FreeColSpecObjectType</code>s with at
      *     least one of the given abilities.
      */
-    public <T extends FreeColGameObjectType> List<T>
+    public <T extends FreeColSpecObjectType> List<T>
                       getTypesWithAbility(Class<T> resultType,
                                           String... abilities) {
         return transform(allTypes.values(),
@@ -1780,10 +1780,10 @@ public final class Specification {
      * Get all types which have none of the given abilities.
      *
      * @param abilities The abilities for the search
-     * @return A list of <code>FreeColGameObjectType</code>s without the
+     * @return A list of <code>FreeColSpecObjectType</code>s without the
      *     given abilities.
      */
-    public <T extends FreeColGameObjectType> List<T>
+    public <T extends FreeColSpecObjectType> List<T>
                       getTypesWithoutAbility(Class<T> resultType,
                                              String... abilities) {
         return transform(allTypes.values(),
@@ -2773,7 +2773,7 @@ public final class Specification {
             + " difficulty=" + difficultyLevel
             + " version=" + version);
 
-        String parentId = xr.getAttribute(FreeColGameObjectType.EXTENDS_TAG,
+        String parentId = xr.getAttribute(FreeColSpecObjectType.EXTENDS_TAG,
                                           (String)null);
         if (parentId != null) {
             try {

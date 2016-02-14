@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
  *
- * - FreeColGameObjectType, Europe, Player, Settlement are current
+ * - FreeColSpecObjectType, Europe, Player, Settlement are current
  *   implementors.
  *
  * - Building delegates some functionality to its type.
@@ -118,12 +118,12 @@ public final class FeatureContainer {
      * false-valued members?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return True if the ability is present.
      */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+    public boolean hasAbility(String id, FreeColSpecObjectType fcgot,
                               Turn turn) {
         return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
     }
@@ -143,12 +143,12 @@ public final class FeatureContainer {
      * container.
      *
      * @param id The object identifier (null matches all).
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
                                      Turn turn) {
         Set<Ability> result = new HashSet<>();
         if (abilitiesPresent()) {
@@ -227,12 +227,12 @@ public final class FeatureContainer {
      * container.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
                                       Turn turn) {
         Set<Modifier> result = new HashSet<>();
         if (modifiersPresent()) {
@@ -262,12 +262,12 @@ public final class FeatureContainer {
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @return The modified number.
      */
     public final float applyModifiers(float number, Turn turn,
-                                      String id, FreeColGameObjectType fcgot) {
+                                      String id, FreeColSpecObjectType fcgot) {
         return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
     }
 
@@ -452,11 +452,11 @@ public final class FeatureContainer {
      * Replaces the source field. This is necessary because objects
      * may inherit Features from other abstract objects.
      *
-     * @param oldSource The old source <code>FreeColGameObjectType</code>.
-     * @param newSource The new source <code>FreeColGameObjectType</code>.
+     * @param oldSource The old source <code>FreeColSpecObjectType</code>.
+     * @param newSource The new source <code>FreeColSpecObjectType</code>.
      */
-    public void replaceSource(FreeColGameObjectType oldSource,
-                              FreeColGameObjectType newSource) {
+    public void replaceSource(FreeColSpecObjectType oldSource,
+                              FreeColSpecObjectType newSource) {
         for (Ability ability : getAbilities(null, null, null)) {
             if (oldSource == null || ability.getSource() == oldSource) {
                 removeAbility(ability);

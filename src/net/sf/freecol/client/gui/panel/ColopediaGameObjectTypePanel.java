@@ -43,7 +43,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
@@ -55,7 +55,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This panel displays details of game objects in the Colopedia.
  */
-public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
+public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
 
@@ -107,7 +107,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * Builds a subtree including all the given objects.
      *
      * @param root a <code>DefaultMutableTreeNode</code>
-     * @param types a List of FreeColGameObjectTypes
+     * @param types a List of FreeColSpecObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, List<T> types) {
         addSubTrees(root, id, types);
@@ -118,7 +118,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      *
      * @param root a <code>DefaultMutableTreeNode</code>
      * @param id The object identifier of the new branch node.
-     * @param types a List of FreeColGameObjectTypes
+     * @param types a List of FreeColSpecObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, String id,
                             List<T> types) {
@@ -127,7 +127,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(cti);
         int width = ImageLibrary.ICON_SIZE.width;
         int height = ImageLibrary.ICON_SIZE.height;
-        for (FreeColGameObjectType type : types) {
+        for (FreeColSpecObjectType type : types) {
             Image image = (type instanceof GoodsType)
                 ? ImageLibrary.getMiscImage("image.icon." + type.getId(),
                                             ImageLibrary.ICON_SIZE)
@@ -153,14 +153,14 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         root.add(node);
     }
 
-    protected DefaultMutableTreeNode buildItem(FreeColGameObjectType type,
+    protected DefaultMutableTreeNode buildItem(FreeColSpecObjectType type,
                                                ImageIcon icon) {
         String name = Messages.getName(type);
         return new DefaultMutableTreeNode(new ColopediaTreeItem(this, 
                 type.getId(), name, icon));
     }
 
-    protected JButton getButton(FreeColGameObjectType type, String text,
+    protected JButton getButton(FreeColSpecObjectType type, String text,
                                 ImageIcon icon) {
         JButton button = Utility.getLinkButton((text != null) ? text
             : Messages.getName(type), icon, type.getId());
@@ -176,7 +176,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
         return button;
     }
 
-    protected JButton getButton(FreeColGameObjectType type) {
+    protected JButton getButton(FreeColSpecObjectType type) {
         return getButton(type, null, null);
     }
 
@@ -254,7 +254,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
                              Messages.getName(entry.getKey()),
                              doc.getStyle("regular"));
             requiredTypes.clear();
-            for (FreeColGameObjectType type : getSpecification()
+            for (FreeColSpecObjectType type : getSpecification()
                      .getTypesProviding(entry.getKey(), entry.getValue())) {
                 JButton typeButton = getButton(type);
                 typeButton.addActionListener(this);

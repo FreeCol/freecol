@@ -28,7 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 /**
  * The types of resources (e.g. fish bonus) found on a tile.
  */
-public final class ResourceType extends FreeColGameObjectType {
+public final class ResourceType extends FreeColSpecObjectType {
 
     /** Maximum and minimum values for this resource type. */
     private int maxValue, minValue;

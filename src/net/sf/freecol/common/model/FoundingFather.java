@@ -38,7 +38,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * The FoundingFather is able to grant new abilities or bonuses to the
  * player, or to cause certain events.
  */
-public class FoundingFather extends FreeColGameObjectType {
+public class FoundingFather extends FreeColSpecObjectType {
 
     public static enum FoundingFatherType {
         TRADE,

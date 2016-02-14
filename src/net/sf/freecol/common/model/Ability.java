@@ -423,10 +423,10 @@ public final class Ability extends Feature {
      * Creates a new <code>Ability</code> instance.
      *
      * @param id The object identifier.
-     * @param source The source <code>FreeColGameObjectType</code>.
+     * @param source The source <code>FreeColSpecObjectType</code>.
      * @param value The ability value.
      */
-    public Ability(String id, FreeColGameObjectType source, boolean value) {
+    public Ability(String id, FreeColSpecObjectType source, boolean value) {
         this((source == null) ? null : source.getSpecification());
 
         setId(id);

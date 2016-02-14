@@ -39,7 +39,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * Contains information on buildable types.
  */
-public abstract class BuildableType extends FreeColGameObjectType {
+public abstract class BuildableType extends FreeColSpecObjectType {
 
     /** The required population for an ordinary buildable. */
     private static final int DEFAULT_REQUIRED_POPULATION = 1;

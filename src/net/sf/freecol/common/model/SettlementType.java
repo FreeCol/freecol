@@ -32,7 +32,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * The various types of settlements in the game.
  */
-public class SettlementType extends FreeColGameObjectType {
+public class SettlementType extends FreeColSpecObjectType {
 
     /** Whether this SettlementType is a capital. */
     private boolean capital = false;

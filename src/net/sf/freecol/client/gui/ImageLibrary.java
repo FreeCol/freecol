@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColSpecObjectType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -399,38 +399,38 @@ public final class ImageLibrary {
             + buildingType.getId(), size);
     }
 
-    public BufferedImage getSmallerIconImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallerIconImage(FreeColSpecObjectType type) {
         return getMiscImage("image.icon." + type.getId(),
             scaleDimension(ICON_SIZE, scaleFactor * 0.5f));
     }
 
-    public BufferedImage getSmallIconImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallIconImage(FreeColSpecObjectType type) {
         return getMiscImage("image.icon." + type.getId(),
             scaleDimension(ICON_SIZE, scaleFactor * 0.75f));
     }
 
-    public BufferedImage getIconImage(FreeColGameObjectType type) {
+    public BufferedImage getIconImage(FreeColSpecObjectType type) {
         return getMiscImage("image.icon." + type.getId(),
             scaleDimension(ICON_SIZE, scaleFactor));
     }
 
-    public BufferedImage getSmallerMiscIconImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallerMiscIconImage(FreeColSpecObjectType type) {
         return getMiscIconImage(type, scaleFactor * 0.5f);
     }
 
-    public BufferedImage getSmallMiscIconImage(FreeColGameObjectType type) {
+    public BufferedImage getSmallMiscIconImage(FreeColSpecObjectType type) {
         return getMiscIconImage(type, scaleFactor * 0.75f);
     }
 
-    public BufferedImage getMiscIconImage(FreeColGameObjectType type) {
+    public BufferedImage getMiscIconImage(FreeColSpecObjectType type) {
         return getMiscIconImage(type, scaleFactor);
     }
 
-    public static BufferedImage getMiscIconImage(FreeColGameObjectType type, float scale) {
+    public static BufferedImage getMiscIconImage(FreeColSpecObjectType type, float scale) {
         return ResourceManager.getImage("image.miscicon." + type.getId(), scale);
     }
 
-    public static BufferedImage getMiscIconImage(FreeColGameObjectType type, Dimension size) {
+    public static BufferedImage getMiscIconImage(FreeColSpecObjectType type, Dimension size) {
         return ResourceManager.getImage("image.miscicon." + type.getId(), size);
     }
 
@@ -483,10 +483,10 @@ public final class ImageLibrary {
             } else if (display instanceof LostCityRumour) {
                 image = getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, size);
             } else if (display instanceof GoodsType) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                FreeColSpecObjectType type = (FreeColSpecObjectType)display;
                 image = getIconImage(type);
             } else if (display instanceof Nation) {
-                FreeColGameObjectType type = (FreeColGameObjectType)display;
+                FreeColSpecObjectType type = (FreeColSpecObjectType)display;
                 image = getMiscIconImage(type, size);
             } else if (display instanceof BuildingType) {
                 BuildingType type = (BuildingType)display;

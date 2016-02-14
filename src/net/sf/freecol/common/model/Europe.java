@@ -459,7 +459,7 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColGameObjectType fcgot,
+    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
                                      Turn turn) {
         Set<Ability> result = super.getAbilities(id, fcgot, turn);
         // Always able to dress a missionary.

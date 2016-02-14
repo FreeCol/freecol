@@ -577,7 +577,7 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColGameObjectType type,
+    public Set<Ability> getAbilities(String id, FreeColSpecObjectType type,
                                      Turn turn) {
         // Buildings have no abilities independent of their type (for now).
         return getType().getAbilities(id, type, turn);
@@ -587,7 +587,7 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifiers(String id, FreeColGameObjectType fcgot,
+    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
                                       Turn turn) {
         // Buildings have no modifiers independent of type
         return getType().getModifiers(id, fcgot, turn);

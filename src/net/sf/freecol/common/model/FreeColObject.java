@@ -350,11 +350,11 @@ public abstract class FreeColObject
      * Is an ability present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @return True if the ability is present.
      */
-    public final boolean hasAbility(String id, FreeColGameObjectType fcgot) {
+    public final boolean hasAbility(String id, FreeColSpecObjectType fcgot) {
         return hasAbility(id, fcgot, null);
     }
 
@@ -362,12 +362,12 @@ public abstract class FreeColObject
      * Is an ability present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return True if the ability is present.
      */
-    public final boolean hasAbility(String id, FreeColGameObjectType fcgot,
+    public final boolean hasAbility(String id, FreeColSpecObjectType fcgot,
                                     Turn turn) {
         return FeatureContainer.hasAbility(getAbilities(id, fcgot, turn));
     }
@@ -417,12 +417,12 @@ public abstract class FreeColObject
      * Gets the set of abilities with the given identifier from this object.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @return A set of abilities.
      */
     public final Set<Ability> getAbilities(String id,
-                                           FreeColGameObjectType fcgot) {
+                                           FreeColSpecObjectType fcgot) {
         return getAbilities(id, fcgot, null);
     }
 
@@ -432,13 +432,13 @@ public abstract class FreeColObject
      * override this as all prior routines are derived from it.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
     public Set<Ability> getAbilities(String id,
-                                     FreeColGameObjectType fcgot,
+                                     FreeColSpecObjectType fcgot,
                                      Turn turn) {
         FeatureContainer fc = getFeatureContainer();
         return (fc == null) ? Collections.<Ability>emptySet()
@@ -492,11 +492,11 @@ public abstract class FreeColObject
      * Is an modifier present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @return True if the modifier is present.
      */
-    public final boolean hasModifier(String id, FreeColGameObjectType fcgot) {
+    public final boolean hasModifier(String id, FreeColSpecObjectType fcgot) {
         return hasModifier(id, fcgot, null);
     }
 
@@ -504,12 +504,12 @@ public abstract class FreeColObject
      * Is an modifier present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return True if the modifier is present.
      */
-    public boolean hasModifier(String id, FreeColGameObjectType fcgot,
+    public boolean hasModifier(String id, FreeColSpecObjectType fcgot,
                                Turn turn) {
         return !getModifiers(id, fcgot, turn).isEmpty();
     }
@@ -560,12 +560,12 @@ public abstract class FreeColObject
      * Gets the set of modifiers with the given identifier from this object.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @return A set of modifiers.
      */
     public final Set<Modifier> getModifiers(String id,
-                                            FreeColGameObjectType fcgot) {
+                                            FreeColSpecObjectType fcgot) {
         return getModifiers(id, fcgot, null);
     }
 
@@ -576,13 +576,13 @@ public abstract class FreeColObject
      * routine.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
     public Set<Modifier> getModifiers(String id,
-                                      FreeColGameObjectType fcgot,
+                                      FreeColSpecObjectType fcgot,
                                       Turn turn) {
         FeatureContainer fc = getFeatureContainer();
         return (fc == null) ? Collections.<Modifier>emptySet()
@@ -609,12 +609,12 @@ public abstract class FreeColObject
      * @param number The number to modify.
      * @param turn An optional applicable <code>Turn</code>.
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @return The modified number.
      */
     public final float applyModifiers(float number, Turn turn,
-                                      String id, FreeColGameObjectType fcgot) {
+                                      String id, FreeColSpecObjectType fcgot) {
         return applyModifiers(number, turn, getModifiers(id, fcgot, turn));
     }
 

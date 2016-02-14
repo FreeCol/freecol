@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * FIXME: implement entire Map interface
  */
-public class TypeCountMap<T extends FreeColGameObjectType> {
+public class TypeCountMap<T extends FreeColSpecObjectType> {
 
     private final Map<T, Integer> values = new HashMap<>();
 

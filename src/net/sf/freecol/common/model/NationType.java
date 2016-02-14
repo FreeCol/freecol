@@ -34,7 +34,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 /**
  * Represents the type of one of the nations present in the game.
  */
-public abstract class NationType extends FreeColGameObjectType {
+public abstract class NationType extends FreeColSpecObjectType {
 
     public static enum SettlementNumber {
         LOW, AVERAGE, HIGH;

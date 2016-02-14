@@ -231,11 +231,11 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     /**
      * Does this feature apply to a given object type?
      *
-     * @param objectType The <code>FreeColGameObjectType</code> to test.
+     * @param objectType The <code>FreeColSpecObjectType</code> to test.
      * @return True if there are no scopes, or at least one scope is
      *     applicable to the object.
      */
-    public boolean appliesTo(final FreeColGameObjectType objectType) {
+    public boolean appliesTo(final FreeColSpecObjectType objectType) {
         return (!hasScope()) ? true
             : any(scopes, s -> s.appliesTo(objectType));
     }
@@ -255,11 +255,11 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     /**
      * Does this feature apply to a given object type and turn.
      *
-     * @param objectType The <code>FreeColGameObjectType</code> to test.
+     * @param objectType The <code>FreeColSpecObjectType</code> to test.
      * @param turn The <code>Turn</code> to test.
      * @return True if the feature applies.
      */
-    protected boolean appliesTo(final FreeColGameObjectType objectType,
+    protected boolean appliesTo(final FreeColSpecObjectType objectType,
                                 final Turn turn) {
         return appliesTo(turn) && appliesTo(objectType);
     }

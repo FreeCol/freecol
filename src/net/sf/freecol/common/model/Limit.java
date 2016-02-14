@@ -34,7 +34,7 @@ import net.sf.freecol.common.model.Operand.OperandType;
  * number of a player's colonies, for example. The left hand side must
  * apply to the object on which a limit is to be placed.
  */
-public final class Limit extends FreeColGameObjectType {
+public final class Limit extends FreeColSpecObjectType {
 
     /** The basic operation used in evaluating this limit. */
     public static enum Operator {

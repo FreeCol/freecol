@@ -147,7 +147,7 @@ public final class BuildingType extends BuildableType {
      *
      * @return This.
      */
-    public FreeColGameObjectType getType() {
+    public FreeColSpecObjectType getType() {
         return this;
     }
 

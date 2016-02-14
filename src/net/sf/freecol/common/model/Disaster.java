@@ -34,7 +34,7 @@ import net.sf.freecol.common.util.RandomChoice;
  * This class describes disasters that can happen to a Colony, such as
  * flooding, disease or Indian raids.
  */
-public class Disaster extends FreeColGameObjectType {
+public class Disaster extends FreeColSpecObjectType {
 
     /**
      * Bankruptcy occurs if upkeep is enabled and a player is unable

@@ -39,7 +39,7 @@ import net.sf.freecol.common.util.RandomChoice;
 /**
  * An improvement to make to a tile.
  */
-public final class TileImprovementType extends FreeColGameObjectType {
+public final class TileImprovementType extends FreeColSpecObjectType {
 
     /** Is this improvement natural or man-made? */
     private boolean natural;

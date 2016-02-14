@@ -33,7 +33,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 /**
  * A special game event.
  */
-public class Event extends FreeColGameObjectType {
+public class Event extends FreeColSpecObjectType {
 
     /** A restriction on the scope of the event. */
     private String value;

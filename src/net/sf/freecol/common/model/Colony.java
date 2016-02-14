@@ -2415,7 +2415,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColGameObjectType type,
+    public Set<Ability> getAbilities(String id, FreeColSpecObjectType type,
                                      Turn turn) {
         if (turn == null) turn = getGame().getTurn();
         Set<Ability> result = super.getAbilities(id, type, turn);
