@@ -38,6 +38,10 @@ import org.w3c.dom.Element;
  */
 public class DemandTributeMessage extends DOMMessage {
 
+    public static final String TAG = "demandTribute";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
+
     /** The identifier of the object demanding tribute. */
     private final String unitId;
 
@@ -69,8 +73,8 @@ public class DemandTributeMessage extends DOMMessage {
     public DemandTributeMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.directionString = element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -89,7 +93,7 @@ public class DemandTributeMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -105,7 +109,7 @@ public class DemandTributeMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -141,8 +145,8 @@ public class DemandTributeMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "direction", directionString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

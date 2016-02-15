@@ -39,6 +39,9 @@ import org.w3c.dom.Element;
 public class MissionaryMessage extends DOMMessage {
 
     public static final String TAG = "missionary";
+    private static final String DENOUNCE_TAG = "denounce";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the missionary. */
     private final String unitId;
@@ -77,9 +80,9 @@ public class MissionaryMessage extends DOMMessage {
     public MissionaryMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unitId");
-        this.directionString = element.getAttribute("direction");
-        this.denounce = Boolean.parseBoolean(element.getAttribute("denounce"));
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        this.denounce = getBooleanAttribute(element, DENOUNCE_TAG, false);
     }
 
 
@@ -98,7 +101,7 @@ public class MissionaryMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -106,7 +109,7 @@ public class MissionaryMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -121,7 +124,7 @@ public class MissionaryMessage extends DOMMessage {
         }
 
         Unit missionary = is.getMissionary();
-        if (denounce) {
+        if (this.denounce) {
             if (missionary == null) {
                 return serverPlayer.clientError("Denouncing an empty mission at: "
                     + is.getId())
@@ -132,7 +135,7 @@ public class MissionaryMessage extends DOMMessage {
                     .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.DENOUNCE_HERESY)) {
                 return serverPlayer.clientError("Unit lacks denouncement ability: "
-                    + unitId)
+                    + this.unitId)
                     .build(serverPlayer);
             }
         } else {
@@ -142,7 +145,7 @@ public class MissionaryMessage extends DOMMessage {
                     .build(serverPlayer);
             } else if (!unit.hasAbility(Ability.ESTABLISH_MISSION)) {
                 return serverPlayer.clientError("Unit lacks establish mission ability: "
-                    + unitId)
+                    + this.unitId)
                     .build(serverPlayer);
             }
         }
@@ -155,7 +158,7 @@ public class MissionaryMessage extends DOMMessage {
         }
 
         // Valid, proceed to denounce/establish.
-        return ((denounce)
+        return ((this.denounce)
             ? server.getInGameController()
                 .denounceMission(serverPlayer, unit, is)
             : server.getInGameController()
@@ -171,9 +174,9 @@ public class MissionaryMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unitId", unitId,
-            "direction", directionString,
-            "denounce", Boolean.toString(denounce)).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString,
+            DENOUNCE_TAG, Boolean.toString(this.denounce)).toXMLElement();
     }
 
     /**

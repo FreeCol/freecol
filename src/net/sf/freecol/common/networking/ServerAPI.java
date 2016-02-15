@@ -1125,7 +1125,7 @@ public abstract class ServerAPI {
             new ScoutSpeakToChiefMessage(unit, direction),
             null);
         resolve(handle(reply));
-        return DOMMessage.getStringAttribute(reply, "result", (String)null);
+        return DOMMessage.getStringAttribute(reply, "result");
     }
 
     /**

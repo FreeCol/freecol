@@ -36,6 +36,13 @@ import org.w3c.dom.Element;
  */
 public class IndianDemandMessage extends DOMMessage {
 
+    public static final String TAG = "indianDemand";
+    private static final String AMOUNT_TAG = "amount";
+    private static final String COLONY_TAG = "colony";
+    private static final String RESULT_TAG = "result";
+    private static final String TYPE_TAG = "type";
+    private static final String UNIT_TAG = "unit";
+    
     /** The identifier of the unit that is demanding. */
     private final String unitId;
 
@@ -82,12 +89,11 @@ public class IndianDemandMessage extends DOMMessage {
     public IndianDemandMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.colonyId = element.getAttribute("colony");
-        this.typeId = (!element.hasAttribute("type")) ? null
-            : element.getAttribute("type");
-        this.amount = element.getAttribute("amount");
-        this.result = element.getAttribute("result");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        this.typeId = getStringAttribute(element, TYPE_TAG);
+        this.amount = getStringAttribute(element, AMOUNT_TAG);
+        this.result = getStringAttribute(element, RESULT_TAG);
     }
 
 
@@ -165,16 +171,17 @@ public class IndianDemandMessage extends DOMMessage {
         Unit unit;
         try {
             if (result == null) { // Initial demand
-                unit = player.getOurFreeColGameObject(unitId, Unit.class);
+                unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return serverPlayer.clientError("Unit has no moves left: "
-                        + unitId)
+                        + this.unitId)
                         .build(serverPlayer);
                 }
             } else { // Reply from colony
                 unit = game.getFreeColGameObject(unitId, Unit.class);
                 if (unit == null) {
-                    return serverPlayer.clientError("Not a unit: " + unitId)
+                    return serverPlayer.clientError("Not a unit: "
+                        + this.unitId)
                         .build(serverPlayer);
                 }
             }
@@ -186,9 +193,10 @@ public class IndianDemandMessage extends DOMMessage {
         Colony colony;
         try {
             Settlement settlement
-                = unit.getAdjacentSettlementSafely(colonyId);
+                = unit.getAdjacentSettlementSafely(this.colonyId);
             if (!(settlement instanceof Colony)) {
-                return serverPlayer.clientError("Not a colony: " + colonyId)
+                return serverPlayer.clientError("Not a colony: "
+                    + this.colonyId)
                     .build(serverPlayer);
             }
             colony = (Colony)settlement;
@@ -198,7 +206,7 @@ public class IndianDemandMessage extends DOMMessage {
         }
 
         if (getAmount() <= 0) {
-            return serverPlayer.clientError("Bad amount: " + amount)
+            return serverPlayer.clientError("Bad amount: " + this.amount)
                 .build(serverPlayer);
         }
 
@@ -216,13 +224,12 @@ public class IndianDemandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage ret = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "colony", colonyId,
-            "amount", amount);
-        if (typeId != null) ret.setAttribute("type", typeId);
-        if (result != null) ret.setAttribute("result", result);
-        return ret.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            COLONY_TAG, this.colonyId,
+            AMOUNT_TAG, this.amount,
+            TYPE_TAG, this.typeId,
+            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**
@@ -231,6 +238,6 @@ public class IndianDemandMessage extends DOMMessage {
      * @return "indianDemand".
      */
     public static String getTagName() {
-        return "indianDemand";
+        return TAG;
     }
 }

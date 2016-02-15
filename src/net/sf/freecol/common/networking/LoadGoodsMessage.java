@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -37,6 +38,10 @@ import org.w3c.dom.Element;
 public class LoadGoodsMessage extends DOMMessage {
 
     public static final String TAG = "loadGoods";
+    private static final String AMOUNT_TAG = "amount";
+    private static final String CARRIER_TAG = "carrier";
+    private static final String LOCATION_TAG = "location";
+    private static final String TYPE_TAG = "type";
 
     /** The identifier for the location of the goods. */
     private final String locationId;
@@ -79,10 +84,10 @@ public class LoadGoodsMessage extends DOMMessage {
     public LoadGoodsMessage(Game game, Element element) {
         super(getTagName());
 
-        this.locationId = element.getAttribute("location");
-        this.goodsTypeId = element.getAttribute("type");
-        this.amountString = element.getAttribute("amount");
-        this.carrierId = element.getAttribute("carrier");
+        this.locationId = getStringAttribute(element, LOCATION_TAG);
+        this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
+        this.amountString = getStringAttribute(element, AMOUNT_TAG);
+        this.carrierId = getStringAttribute(element, CARRIER_TAG);
     }
 
 
@@ -98,45 +103,50 @@ public class LoadGoodsMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Specification spec = server.getSpecification();
 
         FreeColGameObject fcgo = player.getGame()
-            .getFreeColGameObject(locationId);
+            .getFreeColGameObject(this.locationId);
         if (fcgo == null || !(fcgo instanceof Location)) {
-            return serverPlayer.clientError("Not a location: " + locationId)
+            return serverPlayer.clientError("Not a location: "
+                + this.locationId)
                 .build(serverPlayer);
         }
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
+            return serverPlayer.clientError("Not a goods carrier: "
+                + this.carrierId)
                 .build(serverPlayer);
         } else if (carrier.getTradeLocation() == null) {
-            return serverPlayer.clientError("Not at a trade location: " + carrierId)
+            return serverPlayer.clientError("Not at a trade location: "
+                + this.carrierId)
                 .build(serverPlayer);
         }
 
-        GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
+        GoodsType type = spec.getGoodsType(this.goodsTypeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: " + goodsTypeId)
+            return serverPlayer.clientError("Not a goods type: "
+                + this.goodsTypeId)
                 .build(serverPlayer);
         }
 
         int amount;
         try {
-            amount = Integer.parseInt(amountString);
+            amount = Integer.parseInt(this.amountString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + amountString)
+            return serverPlayer.clientError("Bad amount: " + this.amountString)
                 .build(serverPlayer);
         }
         if (amount <= 0) {
             return serverPlayer.clientError("Amount must be positive: "
-                + amountString)
+                + this.amountString)
                 .build(serverPlayer);
         }
 
@@ -154,10 +164,10 @@ public class LoadGoodsMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "location", locationId,
-            "type", goodsTypeId,
-            "amount", amountString,
-            "carrier", carrierId).toXMLElement();
+            LOCATION_TAG, this.locationId,
+            TYPE_TAG, this.goodsTypeId,
+            AMOUNT_TAG, this.amountString,
+            CARRIER_TAG, this.carrierId).toXMLElement();
     }
 
     /**

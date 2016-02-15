@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
 public class SpySettlementMessage extends DOMMessage {
 
     public static final String TAG = "spySettlement";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the object doing the spying. */
     private final String unitId;
@@ -70,8 +72,8 @@ public class SpySettlementMessage extends DOMMessage {
     public SpySettlementMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.directionString = element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -91,20 +93,20 @@ public class SpySettlementMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasAbility(Ability.SPY_ON_COLONY)) {
             return serverPlayer.clientError("Unit lacks ability"
-                + " to spy on colony: " + unitId)
+                + " to spy on colony: " + this.unitId)
                 .build(serverPlayer);
         }
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -138,8 +140,8 @@ public class SpySettlementMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "direction", directionString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

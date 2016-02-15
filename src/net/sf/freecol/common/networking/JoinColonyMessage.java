@@ -35,12 +35,14 @@ import org.w3c.dom.Element;
 public class JoinColonyMessage extends DOMMessage {
 
     public static final String TAG = "joinColony";
+    private static final String COLONY_TAG = "colony";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the colony. */
     private final String colonyId;
 
     /** The identifier of the unit that is building the colony. */
-    private final String builderId;
+    private final String unitId;
 
 
     /**
@@ -54,7 +56,7 @@ public class JoinColonyMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = colony.getId();
-        this.builderId = builder.getId();
+        this.unitId = builder.getId();
     }
 
     /**
@@ -66,8 +68,8 @@ public class JoinColonyMessage extends DOMMessage {
     public JoinColonyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
-        this.builderId = element.getAttribute("unit");
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -87,7 +89,7 @@ public class JoinColonyMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(builderId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -95,7 +97,7 @@ public class JoinColonyMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -115,8 +117,8 @@ public class JoinColonyMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "colony", colonyId,
-            "unit", builderId).toXMLElement();
+            COLONY_TAG, this.colonyId,
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

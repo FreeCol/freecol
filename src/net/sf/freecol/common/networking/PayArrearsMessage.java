@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class PayArrearsMessage extends DOMMessage {
 
     public static final String TAG = "payArrears";
+    private static final String GOODS_TYPE_TAG = "goodsType";
 
     /** The identifier of the GoodsType to pay arrears for. */
     private final String goodsTypeId;
@@ -61,7 +62,7 @@ public class PayArrearsMessage extends DOMMessage {
     public PayArrearsMessage(Game game, Element element) {
         super(getTagName());
 
-        this.goodsTypeId = element.getAttribute("goodsType");
+        this.goodsTypeId = getStringAttribute(element, GOODS_TYPE_TAG);
     }
 
 
@@ -79,7 +80,7 @@ public class PayArrearsMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         GoodsType goodsType = server.getSpecification()
-            .getGoodsType(goodsTypeId);
+            .getGoodsType(this.goodsTypeId);
 
         // Proceed to pay.
         return server.getInGameController()
@@ -95,7 +96,7 @@ public class PayArrearsMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "goodsType", goodsTypeId).toXMLElement();
+            GOODS_TYPE_TAG, this.goodsTypeId).toXMLElement();
     }
 
     /**

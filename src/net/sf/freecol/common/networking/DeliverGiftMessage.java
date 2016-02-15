@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
 public class DeliverGiftMessage extends DOMMessage {
 
     public static final String TAG = "deliverGift";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit that is delivering the gift. */
     private final String unitId;
@@ -72,8 +74,8 @@ public class DeliverGiftMessage extends DOMMessage {
     public DeliverGiftMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
         this.goods = getChild(game, element, 0, Goods.class);
     }
 
@@ -88,7 +90,8 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The <code>Unit</code>, or null if none.
      */
     public Unit getUnit() {
-        return this.goods.getGame().getFreeColGameObject(unitId, Unit.class);
+        return this.goods.getGame().getFreeColGameObject(this.unitId,
+                                                         Unit.class);
     }
 
     /**
@@ -99,7 +102,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @return The <code>Settlement</code>, or null if none.
      */
     public Settlement getSettlement() {
-        return this.goods.getGame().getFreeColGameObject(settlementId,
+        return this.goods.getGame().getFreeColGameObject(this.settlementId,
                                                          Settlement.class);
     }
 
@@ -164,11 +167,10 @@ public class DeliverGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", this.unitId,
-            "settlement", this.settlementId);
-        result.add(this.goods);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId)
+            .add(this.goods).toXMLElement();
     }
 
     /**

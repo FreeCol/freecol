@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class MoveToMessage extends DOMMessage {
 
     public static final String TAG = "moveTo";
+    private static final String DESTINATION_TAG = "destination";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the object to be moved. */
     private final String unitId;
@@ -67,8 +69,8 @@ public class MoveToMessage extends DOMMessage {
     public MoveToMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.destinationId = element.getAttribute("destination");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.destinationId = getStringAttribute(element, DESTINATION_TAG);
     }
 
 
@@ -88,15 +90,16 @@ public class MoveToMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        Location destination = game.findFreeColLocation(destinationId);
+        Location destination = game.findFreeColLocation(this.destinationId);
         if (destination == null) {
-            return serverPlayer.clientError("Not a location: " + destinationId)
+            return serverPlayer.clientError("Not a location: "
+                + this.destinationId)
                 .build(serverPlayer);
         }
 
@@ -114,8 +117,8 @@ public class MoveToMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "destination", destinationId).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DESTINATION_TAG, this.destinationId).toXMLElement();
     }
 
     /**

@@ -35,6 +35,10 @@ import org.w3c.dom.Element;
 public class MonarchActionMessage extends DOMMessage {
 
     public static final String TAG = "monarchAction";
+    private static final String ACTION_TAG = "action";
+    private static final String MONARCH_TAG = "monarch";
+    private static final String RESULT_TAG = "result";
+    private static final String TAX_TAG = "tax";
 
     /** The monarch action. */
     private final MonarchAction action;
@@ -81,11 +85,11 @@ public class MonarchActionMessage extends DOMMessage {
     public MonarchActionMessage(Game game, Element element) {
         super(getTagName());
 
-        this.action = Enum.valueOf(MonarchAction.class,
-                                   element.getAttribute("action"));
-        this.monarchKey = element.getAttribute("monarch");
-        this.tax = element.getAttribute("tax");
-        this.resultString = element.getAttribute("result");
+        this.action = getEnumAttribute(element, ACTION_TAG,
+            MonarchAction.class, (MonarchAction)null);
+        this.monarchKey = getStringAttribute(element, MONARCH_TAG);
+        this.tax = getStringAttribute(element, TAX_TAG);
+        this.resultString = getStringAttribute(element, RESULT_TAG);
         this.template = getChild(game, element, 0, StringTemplate.class);
     }
 
@@ -190,14 +194,12 @@ public class MonarchActionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "action", this.action.toString(),
-            "monarch", this.monarchKey);
-        if (this.tax != null) result.setAttribute("tax", this.tax);
-        if (this.resultString != null)
-            result.setAttribute("result", this.resultString);
-        if (this.template != null) result.add(this.template);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            ACTION_TAG, this.action.toString(),
+            MONARCH_TAG, this.monarchKey,
+            TAX_TAG, this.tax,
+            RESULT_TAG, this.resultString)
+            .add(this.template).toXMLElement();
     }
 
     /**

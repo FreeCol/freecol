@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 public class AssignTradeRouteMessage extends DOMMessage {
 
     public static final String TAG = "assignTradeRoute";
+    private static final String TRADE_ROUTE_TAG = "tradeRoute";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit. */
     private final String unitId;
@@ -66,10 +68,8 @@ public class AssignTradeRouteMessage extends DOMMessage {
     public AssignTradeRouteMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.tradeRouteId = (element.hasAttribute("tradeRoute"))
-            ? element.getAttribute("tradeRoute")
-            : null;
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
     }
 
 
@@ -118,12 +118,9 @@ public class AssignTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId);
-        if (tradeRouteId != null) {
-            result.setAttribute("tradeRoute", tradeRouteId);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            "unit", unitId,
+            "tradeRoute", tradeRouteId).toXMLElement();
     }
 
     /**

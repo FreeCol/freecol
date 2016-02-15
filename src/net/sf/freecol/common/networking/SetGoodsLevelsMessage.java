@@ -68,7 +68,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
     public SetGoodsLevelsMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.data = getChild(game, element, 0, ExportData.class);
     }
 
@@ -88,7 +88,8 @@ public class SetGoodsLevelsMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId,
+                                                    Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

@@ -78,13 +78,13 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        if (tradeRoute == null || tradeRoute.getId() == null
-            || !SetTradeRoutesMessage.hasPrefix(tradeRoute)) {
+        if (this.tradeRoute == null || this.tradeRoute.getId() == null
+            || !SetTradeRoutesMessage.hasPrefix(this.tradeRoute)) {
             return serverPlayer.clientError("Bogus route")
                 .build(serverPlayer);
         }
 
-        String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
+        String id = SetTradeRoutesMessage.removePrefix(this.tradeRoute);
         TradeRoute realRoute;
         try {
             realRoute = serverPlayer.getOurFreeColGameObject(id, 
@@ -94,8 +94,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        realRoute.updateFrom(tradeRoute);
-        tradeRoute.dispose();
+        realRoute.updateFrom(this.tradeRoute);
+        this.tradeRoute.dispose();
         return null;
     }
 
@@ -106,9 +106,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        result.add(tradeRoute);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName())
+            .add(this.tradeRoute).toXMLElement();
     }
 
     /**

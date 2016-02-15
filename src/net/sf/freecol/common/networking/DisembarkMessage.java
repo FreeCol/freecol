@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
 public class DisembarkMessage extends DOMMessage {
 
     public static final String TAG = "disembark";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the object disembarking. */
     private final String unitId;
@@ -62,7 +63,7 @@ public class DisembarkMessage extends DOMMessage {
     public DisembarkMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -81,7 +82,7 @@ public class DisembarkMessage extends DOMMessage {
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -101,7 +102,7 @@ public class DisembarkMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId).toXMLElement();
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

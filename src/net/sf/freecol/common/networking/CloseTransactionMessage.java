@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class CloseTransactionMessage extends DOMMessage {
 
     public static final String TAG = "closeTransaction";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit performing the transaction. */
     private final String unitId;
@@ -71,8 +73,8 @@ public class CloseTransactionMessage extends DOMMessage {
     public CloseTransactionMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
     }
 
 
@@ -90,7 +92,7 @@ public class CloseTransactionMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -98,7 +100,7 @@ public class CloseTransactionMessage extends DOMMessage {
 
         Settlement settlement;
         try {
-            settlement = unit.getAdjacentSettlementSafely(settlementId);
+            settlement = unit.getAdjacentSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -118,8 +120,8 @@ public class CloseTransactionMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "settlement", settlementId).toXMLElement();
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId).toXMLElement();
     }
 
     /**

@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -35,6 +36,8 @@ import org.w3c.dom.Element;
 public class ChangeWorkTypeMessage extends DOMMessage {
 
     public static final String TAG = "changeWorkType";
+    private static final String UNIT_TAG = "unit";
+    private static final String WORK_TYPE_TAG = "workType";
 
     /** The identifier of the unit that is working. */
     private final String unitId;
@@ -67,8 +70,8 @@ public class ChangeWorkTypeMessage extends DOMMessage {
     public ChangeWorkTypeMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.workTypeId = element.getAttribute("workType");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.workTypeId = getStringAttribute(element, WORK_TYPE_TAG);
     }
 
 
@@ -84,22 +87,25 @@ public class ChangeWorkTypeMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Specification spec = server.getSpecification();
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+            return serverPlayer.clientError("Unit is not on the map: "
+                + this.unitId)
                 .build(serverPlayer);
         }
 
-        GoodsType type = server.getSpecification().getGoodsType(workTypeId);
+        GoodsType type = spec.getGoodsType(this.workTypeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: " + workTypeId)
+            return serverPlayer.clientError("Not a goods type: "
+                + this.workTypeId)
                 .build(serverPlayer);
         }
 
@@ -117,8 +123,8 @@ public class ChangeWorkTypeMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "workType", workTypeId).toXMLElement();
+            UNIT_TAG, this.unitId,
+            WORK_TYPE_TAG, this.workTypeId).toXMLElement();
     }
 
     /**

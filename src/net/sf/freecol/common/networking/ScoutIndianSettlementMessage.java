@@ -39,6 +39,8 @@ import org.w3c.dom.Element;
 public class ScoutIndianSettlementMessage extends DOMMessage {
 
     public static final String TAG = "scoutIndianSettlement";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit that is scouting. */
     private final String unitId;
@@ -71,8 +73,8 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
     public ScoutIndianSettlementMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unitId");
-        this.directionString = element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -91,20 +93,20 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasAbility(Ability.SPEAK_WITH_CHIEF)) {
             return serverPlayer.clientError("Unit lacks ability"
-                + " to speak to chief: " + unitId)
+                + " to speak to chief: " + this.unitId)
                 .build(serverPlayer);
         }
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -138,8 +140,8 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unitId", unitId,
-            "direction", directionString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

@@ -27,7 +27,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.function.Function;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +59,8 @@ import net.sf.freecol.server.control.ChangeSet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -114,7 +120,7 @@ public class DOMMessage {
         this.document.appendChild(root);
         String[] all = attributes;
         for (int i = 0; i < all.length; i += 2) {
-            root.setAttribute(all[i], all[i+1]);
+            if (all[i+1] != null) root.setAttribute(all[i], all[i+1]);
         }
     }
 
@@ -207,6 +213,57 @@ public class DOMMessage {
     }
 
     /**
+     * Set a list of attributes as an array.
+     *
+     * @param attributes The list of attribute strings.
+     * @return This message.
+     */
+    public DOMMessage setArrayAttributes(List<String> attributes) {
+        if (!attributes.isEmpty()) {
+            int i = 0;
+            String key;
+            for (String a : attributes) {
+                key = "x" + Integer.toString(i);
+                setAttribute(key, a);
+                i++;
+            }
+        }
+        return this;
+    }                
+
+    /**
+     * Set a array of attributes.
+     *
+     * @param attributes The array of attribute strings.
+     * @return This message.
+     */
+    public DOMMessage setArrayAttributes(String[] attributes) {
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length; i++) {
+                String key = "x" + Integer.toString(i);
+                setAttribute(key, attributes[i]);
+                i++;
+            }
+        }
+        return this;
+    }                
+    
+    /**
+     * Set all the attributes in a map.
+     *
+     * @param attributes The map of attribute strings.
+     * @return This message.
+     */
+    public DOMMessage setAttributes(Map<String, String> attributes) {
+        if (!attributes.isEmpty()) {
+            for (Entry<String, String> e : attributes.entrySet()) {
+                setAttribute(e.getKey(), e.getValue());
+            }
+        }
+        return this;
+    }
+
+    /**
      * Checks if an attribute is set on the root element.
      *
      * @param attribute The attribute in which to verify the existence of.
@@ -228,10 +285,19 @@ public class DOMMessage {
         if (fco != null) add(toXMLElement(fco, this.document, player));
         return this;
     }
+    public DOMMessage add(List<? extends FreeColObject> fcos) {
+        if (fcos != null) for (FreeColObject fco : fcos) add(fco);
+        return this;
+    }
     public DOMMessage add(DOMMessage msg) {
         if (msg != null) add(msg.toXMLElement());
         return this;
     }
+    public DOMMessage addMessages(List<DOMMessage> msgs) {
+        if (msgs != null) for (DOMMessage msg : msgs) add(msg);
+        return this;
+    }
+
     public void clearChildren() {
         Element element = getElement();
         NodeList nl = element.getChildNodes();
@@ -444,15 +510,68 @@ public class DOMMessage {
      *
      * @param element The <code>Element</code> to query.
      * @param tag The attribute name.
+     * @return The string value found, or the default value on error.
+     */
+    public static String getStringAttribute(Element element, String tag) {
+        return (element != null && element.hasAttribute(tag))
+            ? element.getAttribute(tag)
+            : (String)null;
+    }
+
+    /**
+     * Get an enum attribute value from an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @param tag The attribute name.
+     * @param returnClass The class of the return value.
      * @param defaultValue A default value to return on failure.
      * @return The string value found, or the default value on error.
      */
-    public static String getStringAttribute(Element element, String tag,
-                                            String defaultValue) {
-        if (element != null && element.hasAttribute(tag)) {
-            return element.getAttribute(tag);
+    public static <T extends Enum<T>> T getEnumAttribute(Element element,
+        String tag, Class<T> returnClass, T defaultValue) {
+        String value = getStringAttribute(element, tag);
+        if (value != null) {
+            try {
+                return Enum.valueOf(returnClass, value.toUpperCase(Locale.US));
+            } catch (Exception ex) {}
         }
         return defaultValue;
+    }
+
+    /**
+     * Get all the attributes of an element as a map.
+     *
+     * @param element The <code>Element</code> to query.
+     * @return A map of the attribute pairs found.
+     */
+    public static Map<String, String> getAttributes(Element element) {
+        Map<String, String> result = new HashMap<>();
+        final NamedNodeMap map = element.getAttributes();
+        final int n = map.getLength();
+        for (int i = 0; i < n; i++) {
+            Node node = map.item(i);
+            result.put(node.getNodeName(), node.getNodeValue());
+        }
+        return result;
+    }
+        
+    /**
+     * Get an array of string attributes from an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @return A list of the attributes found.
+     */
+    public static List<String> getArrayAttributes(Element element) {
+        List<String> result = new ArrayList<>();
+        String key;
+        int i = 0;
+        for (;;) {
+            key = "x" + Integer.toString(i);
+            if (!element.hasAttribute(key)) break;
+            result.add(element.getAttribute(key));
+            i++;
+        }
+        return result;
     }
 
     /**

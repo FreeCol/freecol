@@ -38,6 +38,9 @@ import org.w3c.dom.Element;
 public class EmbarkMessage extends DOMMessage {
 
     public static final String TAG = "embark";
+    private static final String CARRIER_TAG = "carrier";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit embarking. */
     private final String unitId;
@@ -76,10 +79,9 @@ public class EmbarkMessage extends DOMMessage {
     public EmbarkMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.carrierId = element.getAttribute("carrier");
-        this.directionString = (!element.hasAttribute("direction")) ? null
-            : element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.carrierId = getStringAttribute(element, CARRIER_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -98,7 +100,7 @@ public class EmbarkMessage extends DOMMessage {
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -106,21 +108,21 @@ public class EmbarkMessage extends DOMMessage {
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         Location sourceLocation = unit.getLocation();
-        if (directionString == null) {
+        if (this.directionString == null) {
             // Locations must be the same, or the source is also a
             // carrier in the same location as the carrier, or they
             // must be on the same tile.
             if (!carrier.isAtLocation(sourceLocation)) {
-                return serverPlayer.clientError("Unit " + unitId
+                return serverPlayer.clientError("Unit " + this.unitId
                     + " at " + sourceLocation.getId()
-                    + " and carrier " + carrierId
+                    + " and carrier " + this.carrierId
                     + " at " + carrier.getLocation().getId()
                     + " are not co-located.")
                     .build(serverPlayer);
@@ -130,19 +132,19 @@ public class EmbarkMessage extends DOMMessage {
             // move is involved.
             if (unit.getMovesLeft() <= 0) {
                 return serverPlayer.clientError("Unit has no moves left: "
-                    + unitId)
+                    + this.unitId)
                     .build(serverPlayer);
             }
 
             Tile destinationTile = null;
             try {
-                destinationTile = unit.getNeighbourTile(directionString);
+                destinationTile = unit.getNeighbourTile(this.directionString);
             } catch (Exception e) {
                 return serverPlayer.clientError(e.getMessage())
                     .build(serverPlayer);
             }
             if (carrier.getTile() != destinationTile) {
-                return serverPlayer.clientError("Carrier: " + carrierId
+                return serverPlayer.clientError("Carrier: " + this.carrierId
                     + " is not at destination tile: " + destinationTile)
                     .build(serverPlayer);
             }
@@ -161,13 +163,10 @@ public class EmbarkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "carrier", carrierId);
-        if (directionString != null) {
-            result.setAttribute("direction", directionString);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            CARRIER_TAG, this.carrierId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**

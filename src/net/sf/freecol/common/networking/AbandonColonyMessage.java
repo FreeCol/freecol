@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class AbandonColonyMessage extends DOMMessage {
 
     public static final String TAG = "abandonColony";
+    private static final String COLONY_TAG = "colony";
 
     /** The identifier of the colony to abandon. */
     private final String colonyId;
@@ -60,7 +61,7 @@ public class AbandonColonyMessage extends DOMMessage {
     public AbandonColonyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
     }
 
 
@@ -80,14 +81,14 @@ public class AbandonColonyMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (colony.getUnitCount() != 0) {
             return serverPlayer.clientError("Attempt to abandon colony "
-                + colonyId + " with non-zero unit count "
+                + this.colonyId + " with non-zero unit count "
                 + Integer.toString(colony.getUnitCount()))
                 .build(serverPlayer);
         }
@@ -106,8 +107,8 @@ public class AbandonColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(), "colony", colonyId)
-            .toXMLElement();
+        return new DOMMessage(getTagName(),
+            COLONY_TAG, this.colonyId).toXMLElement();
     }
 
     /**

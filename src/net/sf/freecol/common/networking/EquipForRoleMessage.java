@@ -35,6 +35,9 @@ import org.w3c.dom.Element;
 public class EquipForRoleMessage extends DOMMessage {
 
     public static final String TAG = "equipForRole";
+    private static final String COUNT_TAG = "count";
+    private static final String ROLE_TAG = "role";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit to equip. */
     private final String unitId;
@@ -71,9 +74,9 @@ public class EquipForRoleMessage extends DOMMessage {
     public EquipForRoleMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.roleId = element.getAttribute("role");
-        this.roleCount = element.getAttribute("count");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.roleId = getStringAttribute(element, ROLE_TAG);
+        this.roleCount = getStringAttribute(element, COUNT_TAG);
     }
 
 
@@ -93,7 +96,7 @@ public class EquipForRoleMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -102,29 +105,30 @@ public class EquipForRoleMessage extends DOMMessage {
             ; // Always OK
         } else if (!unit.hasTile()) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         } else if (unit.getSettlement() == null) {
             return serverPlayer.clientError("Unit is not in a settlement: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
-        Role role = game.getSpecification().getRole(roleId);
+        Role role = game.getSpecification().getRole(this.roleId);
         if (role == null) {
-            return serverPlayer.clientError("Not a role: " + roleId)
+            return serverPlayer.clientError("Not a role: " + this.roleId)
                 .build(serverPlayer);
         }
         int count;
         try {
-            count = Integer.parseInt(roleCount);
+            count = Integer.parseInt(this.roleCount);
         } catch (NumberFormatException nfe) {
             return serverPlayer.clientError("Role count is not an integer: " +
-                roleCount)
+                this.roleCount)
                 .build(serverPlayer);
         }
         if (count < 0 || count > role.getMaximumCount()) {
-            return serverPlayer.clientError("Invalid role count: " + roleCount)
+            return serverPlayer.clientError("Invalid role count: "
+                + this.roleCount)
                 .build(serverPlayer);
         }
 
@@ -142,9 +146,9 @@ public class EquipForRoleMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "role", roleId,
-            "count", roleCount).toXMLElement();
+            UNIT_TAG, this.unitId,
+            ROLE_TAG, this.roleId,
+            COUNT_TAG, this.roleCount).toXMLElement();
     }
 
     /**

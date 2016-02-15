@@ -41,6 +41,8 @@ import org.w3c.dom.Element;
 public class DiplomacyMessage extends DOMMessage {
 
     public static final String TAG = "diplomacy";
+    private static final String OTHER_ID_TAG = "otherId";
+    private static final String OUR_ID_TAG = "ourId";
 
     /**
      * The identifier of our entity that is conducting diplomacy
@@ -125,8 +127,8 @@ public class DiplomacyMessage extends DOMMessage {
     public DiplomacyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.ourId = element.getAttribute("ourId");
-        this.otherId = element.getAttribute("otherId");
+        this.ourId = getStringAttribute(element, OUR_ID_TAG);
+        this.otherId = getStringAttribute(element, OTHER_ID_TAG);
         this.agreement = getChild(game, element, 0, false, DiplomaticTrade.class);
         this.extraUnit = getChild(game, element, 1, true, Unit.class);
     }
@@ -205,7 +207,8 @@ public class DiplomacyMessage extends DOMMessage {
         Colony ourColony = null;
         FreeColGameObject our = getOurFCGO(game);
         if (our == null) {
-            return serverPlayer.clientError("Missing our object: " + this.ourId)
+            return serverPlayer.clientError("Missing our object: "
+                + this.ourId)
                 .build(serverPlayer);
         } if (our instanceof Unit) {
             ourUnit = (Unit)our;
@@ -220,7 +223,8 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (our instanceof Colony) {
             ourColony = (Colony)our;
             if (!serverPlayer.owns(ourColony)) {
-                return serverPlayer.clientError("Not our settlement: " + this.ourId)
+                return serverPlayer.clientError("Not our settlement: "
+                    + this.ourId)
                     .build(serverPlayer);
             }
         } else {
@@ -233,12 +237,14 @@ public class DiplomacyMessage extends DOMMessage {
         Player otherPlayer = null;
         FreeColGameObject other = getOtherFCGO(game);
         if (other == null) {
-            return serverPlayer.clientError("Missing other object: " + this.otherId)
+            return serverPlayer.clientError("Missing other object: "
+                + this.otherId)
                 .build(serverPlayer);
         } else if (other instanceof Unit) {
             otherUnit = (Unit)other;
             if (serverPlayer.owns(otherUnit)) {
-                return serverPlayer.clientError("Contacting our unit? " + this.otherId)
+                return serverPlayer.clientError("Contacting our unit? "
+                    + this.otherId)
                     .build(serverPlayer);
             } else if (!otherUnit.hasTile()) {
                 return serverPlayer.clientError("Other unit is not on the map: "
@@ -259,7 +265,8 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (other instanceof Colony) {
             otherColony = (Colony)other;
             if (serverPlayer.owns(otherColony)) {
-                return serverPlayer.clientError("Contacting our colony? " + this.otherId)
+                return serverPlayer.clientError("Contacting our colony? "
+                    + this.otherId)
                     .build(serverPlayer);
             } else if (ourUnit != null
                 && !ourUnit.getTile().isAdjacent(otherColony.getTile())) {
@@ -384,12 +391,11 @@ public class DiplomacyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "ourId", this.ourId,
-            "otherId", this.otherId);
-        result.add(this.agreement);
-        if (this.extraUnit != null) result.add(this.extraUnit);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            OUR_ID_TAG, this.ourId,
+            OTHER_ID_TAG, this.otherId)
+            .add(this.agreement)
+            .add(this.extraUnit).toXMLElement();
     }
 
     /**

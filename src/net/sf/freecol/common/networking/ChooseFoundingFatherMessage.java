@@ -41,6 +41,7 @@ import org.w3c.dom.Element;
 public class ChooseFoundingFatherMessage extends DOMMessage {
 
     public static final String TAG = "chooseFoundingFather";
+    private static final String FOUNDING_FATHER_TAG = "foundingFather";
 
     /** The fathers to offer. */
     private final List<FoundingFather> fathers;
@@ -81,7 +82,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
             id -> id != null && !id.isEmpty(),
             id -> spec.getFoundingFather(id),
             Collectors.toList());
-        this.foundingFatherId = element.getAttribute("foundingFather");
+        this.foundingFatherId = getStringAttribute(element, FOUNDING_FATHER_TAG);
     }
 
 
@@ -159,14 +160,11 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        for (FoundingFather f : getFathers()) {
-            result.setAttribute(f.getType().toString(), f.getId());
-        }
-        if (this.foundingFatherId != null) {
-            result.setAttribute("foundingFather", foundingFatherId);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            FOUNDING_FATHER_TAG, this.foundingFatherId)
+            .setAttributes(toMap(getFathers(),
+                    f -> f.getType().toString(), f -> f.getId()))
+            .toXMLElement();
     }
 
     /**

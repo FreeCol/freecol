@@ -105,9 +105,8 @@ public class REFUnitsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        for (AbstractUnit au : this.refUnits) result.add(au);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName())
+            .add(this.refUnits).toXMLElement();
     }
 
     /**

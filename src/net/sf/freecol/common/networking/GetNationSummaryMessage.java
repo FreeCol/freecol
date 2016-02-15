@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class GetNationSummaryMessage extends DOMMessage {
 
     public static final String TAG = "getNationSummary";
+    private static final String PLAYER_TAG = "player";
 
     /** The identifier of the player to summarize. */
     private final String playerId;
@@ -65,7 +66,7 @@ public class GetNationSummaryMessage extends DOMMessage {
     public GetNationSummaryMessage(Game game, Element element) {
         super(getTagName());
 
-        this.playerId = element.getAttribute("player");
+        this.playerId = getStringAttribute(element, PLAYER_TAG);
         this.summary = getChild(game, element, 0, NationSummary.class);
     }
 
@@ -106,7 +107,7 @@ public class GetNationSummaryMessage extends DOMMessage {
 
         Player player = getPlayer(game);
         if (player == null) {
-            return serverPlayer.clientError("Not a player: " + playerId)
+            return serverPlayer.clientError("Not a player: " + this.playerId)
                 .build(serverPlayer);
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
             return null;
@@ -124,10 +125,9 @@ public class GetNationSummaryMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "player", playerId);
-        if (summary != null) result.add(summary);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            PLAYER_TAG, this.playerId)
+            .add(summary).toXMLElement();
     }
 
     /**

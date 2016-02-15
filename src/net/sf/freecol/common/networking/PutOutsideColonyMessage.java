@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class PutOutsideColonyMessage extends DOMMessage {
 
     public static final String TAG = "putOutsideColony";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit to be put out. */
     private final String unitId;
@@ -48,7 +49,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
     public PutOutsideColonyMessage(Unit unit) {
         super(getTagName());
 
-        unitId = unit.getId();
+        this.unitId = unit.getId();
     }
 
     /**
@@ -61,7 +62,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
     public PutOutsideColonyMessage(Game game, Element element) {
         super(getTagName());
 
-        unitId = element.getAttribute("unit");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -80,17 +81,18 @@ public class PutOutsideColonyMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.hasTile()) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+            return serverPlayer.clientError("Unit is not on the map: "
+                + this.unitId)
                 .build(serverPlayer);
         } else if (unit.getColony() == null) {
             return serverPlayer.clientError("Unit is not in a colony: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
@@ -108,7 +110,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId).toXMLElement();
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

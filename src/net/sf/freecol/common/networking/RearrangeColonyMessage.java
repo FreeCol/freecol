@@ -43,6 +43,7 @@ import org.w3c.dom.Element;
 public class RearrangeColonyMessage extends DOMMessage {
 
     public static final String TAG = "rearrangeColony";
+    private static final String COLONY_TAG = "colony";
 
     /** Container for the unit change information. */
     public static class UnitChange implements Comparable<UnitChange> {
@@ -87,11 +88,11 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         public UnitChange readFromElement(Game game, Element e, int i) {
             init(game,
-                e.getAttribute(unitKey(i)),
-                e.getAttribute(locKey(i)),
-                e.getAttribute(workKey(i)),
-                e.getAttribute(roleKey(i)),
-                e.getAttribute(roleCountKey(i)));
+                getStringAttribute(e, unitKey(i)),
+                getStringAttribute(e, locKey(i)),
+                getStringAttribute(e, workKey(i)),
+                getStringAttribute(e, roleKey(i)),
+                getStringAttribute(e, roleCountKey(i)));
             return this;
         }
 
@@ -138,7 +139,7 @@ public class RearrangeColonyMessage extends DOMMessage {
     private final String colonyId;
 
     /** A list of unitChanges to make. */
-    private List<UnitChange> unitChanges = null;
+    private final List<UnitChange> unitChanges = new ArrayList<>();
 
 
     /**
@@ -154,7 +155,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = colony.getId();
-        this.unitChanges = new ArrayList<>();
+        this.unitChanges.clear();
         for (Unit u : workers) {
             Unit su = scratch.getCorresponding(u);
             if (u.getLocation().getId().equals(su.getLocation().getId())
@@ -177,16 +178,16 @@ public class RearrangeColonyMessage extends DOMMessage {
     public RearrangeColonyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
         int n;
         try {
             n = Integer.parseInt(element.getAttribute(FreeColObject.ARRAY_SIZE_TAG));
         } catch (NumberFormatException nfe) {
             n = 0;
         }
-        this.unitChanges = new ArrayList<>();
+        this.unitChanges.clear();
         for (int i = 0; i < n; i++) {
-            unitChanges.add(new UnitChange().readFromElement(game, element, i));
+            this.unitChanges.add(new UnitChange().readFromElement(game, element, i));
         }
     }
 
@@ -199,7 +200,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @return True if no changes have been added.
      */
     public boolean isEmpty() {
-        return unitChanges == null || unitChanges.isEmpty();
+        return this.unitChanges.isEmpty();
     }
 
     /**
@@ -213,9 +214,10 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public void addChange(Unit unit, Location loc, GoodsType work,
                           Role role, int roleCount) {
-        unitChanges.add(new UnitChange(unit, loc, work, role, roleCount));
+        this.unitChanges.add(new UnitChange(unit, loc, work, role, roleCount));
     }
 
+    
     /**
      * Handle a "rearrangeColony"-message.
      *
@@ -231,13 +233,13 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        if (unitChanges.isEmpty()) {
+        if (isEmpty()) {
             return serverPlayer.clientError("Empty rearrangement list.")
                 .build(serverPlayer);
         }
@@ -263,7 +265,7 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         // Rearrange can proceed.
         return server.getInGameController()
-            .rearrangeColony(serverPlayer, colony, unitChanges)
+            .rearrangeColony(serverPlayer, colony, this.unitChanges)
             .build(serverPlayer);
     }
 
@@ -275,7 +277,7 @@ public class RearrangeColonyMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
-            "colony", colonyId,
+            COLONY_TAG, this.colonyId,
             FreeColObject.ARRAY_SIZE_TAG, Integer.toString(unitChanges.size()));
         int i = 0;
         for (UnitChange uc : unitChanges) {

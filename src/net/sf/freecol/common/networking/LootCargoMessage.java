@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
 public class LootCargoMessage extends DOMMessage {
 
     public static final String TAG = "lootCargo";
+    private static final String LOSER_TAG = "loser";
+    private static final String WINNER_TAG = "winner";
 
     /** The object identifier of the unit that is looting. */
     private final String winnerId;
@@ -74,8 +76,8 @@ public class LootCargoMessage extends DOMMessage {
     public LootCargoMessage(Game game, Element element) {
         super(getTagName());
 
-        this.winnerId = element.getAttribute("winner");
-        this.loserId = element.getAttribute("loser");
+        this.winnerId = getStringAttribute(element, WINNER_TAG);
+        this.loserId = getStringAttribute(element, LOSER_TAG);
         this.goods = getChildren(game, element, Goods.class);
     }
 
@@ -136,7 +138,7 @@ public class LootCargoMessage extends DOMMessage {
 
         // Try to loot.
         return server.getInGameController()
-            .lootCargo(serverPlayer, winner, loserId, goods)
+            .lootCargo(serverPlayer, winner, this.loserId, goods)
             .build(serverPlayer);
     }
 
@@ -147,13 +149,10 @@ public class LootCargoMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "winner", winnerId,
-            "loser", loserId);
-        if (goods != null) {
-            for (Goods g : goods) result.add(g);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            WINNER_TAG, this.winnerId,
+            LOSER_TAG, this.loserId)
+            .add(this.goods).toXMLElement();
     }
 
     /**

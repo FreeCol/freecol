@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class RenameMessage extends DOMMessage {
 
     public static final String TAG = "rename";
+    private static final String NAMEABLE_TAG = "nameable";
+    private static final String NAME_TAG = "name";
 
     /** The identifier of the object to be renamed. */
     private final String id;
@@ -67,8 +69,8 @@ public class RenameMessage extends DOMMessage {
     public RenameMessage(Game game, Element element) {
         super(getTagName());
 
-        this.id = element.getAttribute("nameable");
-        this.newName = element.getAttribute("name");
+        this.id = getStringAttribute(element, NAMEABLE_TAG);
+        this.newName = getStringAttribute(element, NAME_TAG);
     }
 
 
@@ -88,19 +90,19 @@ public class RenameMessage extends DOMMessage {
 
         FreeColGameObject fcgo;
         try {
-            fcgo = player.getOurFreeColGameObject(id, FreeColGameObject.class);
+            fcgo = player.getOurFreeColGameObject(this.id, FreeColGameObject.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!(fcgo instanceof Nameable)) {
-            return serverPlayer.clientError("Not a nameable: " + id)
+            return serverPlayer.clientError("Not a nameable: " + this.id)
                 .build(serverPlayer);
         }
 
         // Proceed to rename.
         return server.getInGameController()
-            .renameObject(serverPlayer, (Nameable)fcgo, newName)
+            .renameObject(serverPlayer, (Nameable)fcgo, this.newName)
             .build(serverPlayer);
     }
 
@@ -112,8 +114,8 @@ public class RenameMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "nameable", id,
-            "name", newName).toXMLElement();
+            NAMEABLE_TAG, this.id,
+            NAME_TAG, this.newName).toXMLElement();
     }
 
     /**

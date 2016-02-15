@@ -308,7 +308,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            String owner = DOMMessage.getStringAttribute(e, "owner", (String)null);
+            String owner = DOMMessage.getStringAttribute(e, "owner");
             Player player = game.getFreeColGameObject(owner, Player.class);
             if (player == null) {
                 logger.warning("addObject with broken owner: " + owner);

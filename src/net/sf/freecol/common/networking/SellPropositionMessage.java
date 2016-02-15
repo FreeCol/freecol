@@ -37,6 +37,9 @@ import org.w3c.dom.Element;
 public class SellPropositionMessage extends DOMMessage {
 
     public static final String TAG = "sellProposition";
+    private static final String GOLD_TAG = "gold";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit that is selling. */
     private final String unitId;
@@ -78,9 +81,9 @@ public class SellPropositionMessage extends DOMMessage {
     public SellPropositionMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
-        this.goldString = element.getAttribute("gold");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
+        this.goldString = getStringAttribute(element, GOLD_TAG);
         this.goods = getChild(game, element, 0, Goods.class);
     }
 
@@ -124,7 +127,8 @@ public class SellPropositionMessage extends DOMMessage {
 
         IndianSettlement settlement;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(this.settlementId);
+            settlement = unit
+                .getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -139,7 +143,8 @@ public class SellPropositionMessage extends DOMMessage {
 
         // Proceed to price.
         return server.getInGameController()
-            .sellProposition(serverPlayer, unit, settlement, this.goods, getGold())
+            .sellProposition(serverPlayer, unit, settlement,
+                             this.goods, getGold())
             .toXMLElement();
     }
 
@@ -150,12 +155,11 @@ public class SellPropositionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", this.unitId,
-            "settlement", this.settlementId,
-            "gold", this.goldString);
-        result.add(this.goods);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId,
+            GOLD_TAG, this.goldString)
+            .add(this.goods).toXMLElement();
     }
 
     /**

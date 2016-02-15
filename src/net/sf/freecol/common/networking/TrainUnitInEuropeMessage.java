@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class TrainUnitInEuropeMessage extends DOMMessage {
 
     public static final String TAG = "trainUnitInEurope";
+    private static final String UNIT_TYPE_TAG = "unitType";
 
     /** The identifier of the unit type. */
     private final String typeId;
@@ -61,7 +62,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
     public TrainUnitInEuropeMessage(Game game, Element element) {
         super(getTagName());
 
-        this.typeId = element.getAttribute("unitType");
+        this.typeId = getStringAttribute(element, UNIT_TYPE_TAG);
     }
 
 
@@ -79,9 +80,9 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        UnitType type = server.getSpecification().getUnitType(typeId);
+        UnitType type = server.getSpecification().getUnitType(this.typeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a unit type: " + typeId)
+            return serverPlayer.clientError("Not a unit type: " + this.typeId)
                 .build(serverPlayer);
         }
 
@@ -99,7 +100,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unitType", typeId).toXMLElement();
+            UNIT_TYPE_TAG, typeId).toXMLElement();
     }
 
     /**

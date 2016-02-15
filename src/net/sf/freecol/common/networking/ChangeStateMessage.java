@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class ChangeStateMessage extends DOMMessage {
 
     public static final String TAG = "changeState";
+    private static final String STATE_TAG = "state";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit to change. */
     private final String unitId;
@@ -67,8 +69,8 @@ public class ChangeStateMessage extends DOMMessage {
     public ChangeStateMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.stateString = element.getAttribute("state");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.stateString = getStringAttribute(element, STATE_TAG);
     }
 
 
@@ -87,7 +89,7 @@ public class ChangeStateMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -96,15 +98,15 @@ public class ChangeStateMessage extends DOMMessage {
 
         UnitState state;
         try {
-            state = Enum.valueOf(UnitState.class, stateString);
+            state = Enum.valueOf(UnitState.class, this.stateString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.checkSetState(state)) {
-            return serverPlayer.clientError("Unit " + unitId
+            return serverPlayer.clientError("Unit " + this.unitId
                 + " can not change state: " + unit.getState().toString()
-                + " -> " + stateString)
+                + " -> " + this.stateString)
                 .build(serverPlayer);
         }
 
@@ -122,8 +124,8 @@ public class ChangeStateMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "state", stateString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            STATE_TAG, this.stateString).toXMLElement();
     }
 
     /**

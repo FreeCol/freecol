@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 public class SetBuildQueueMessage extends DOMMessage {
 
     public static final String TAG = "setBuildQueue";
+    private static final String COLONY_TAG = "colony";
 
     /** The identifier of the colony containing the queue. */
     private final String colonyId;
@@ -74,21 +75,11 @@ public class SetBuildQueueMessage extends DOMMessage {
     public SetBuildQueueMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
-        int size;
-        try {
-            size = Integer.parseInt(element.getAttribute("size"));
-        } catch (NumberFormatException e) {
-            size = -1;
-        }
-        if (size >= 0) {
-            this.queue = new String[size];
-            for (int i = 0; i < size; i++) {
-                this.queue[i] = element.getAttribute("x" + Integer.toString(i));
-            }
-        } else {
-            this.queue = null;
-        }
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
+        List<String> q = getArrayAttributes(element);
+        this.queue = new String[q.size()];
+        int i = 0;
+        for (String s : q) this.queue[i++] = s;
     }
 
 
@@ -110,7 +101,7 @@ public class SetBuildQueueMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -121,12 +112,12 @@ public class SetBuildQueueMessage extends DOMMessage {
                 .build(serverPlayer);
         }
         List<BuildableType> buildQueue = new ArrayList<>();
-        for (int i = 0; i < queue.length; i++) {
+        for (int i = 0; i < this.queue.length; i++) {
             try {
-                buildQueue.add(i, spec.getType(queue[i], BuildableType.class));
+                buildQueue.add(i, spec.getType(this.queue[i], BuildableType.class));
             } catch (Exception cce) {
                 return serverPlayer.clientError("Not a buildable type: "
-                    + queue[i])
+                    + this.queue[i])
                     .build(serverPlayer);
             }
         }
@@ -144,13 +135,9 @@ public class SetBuildQueueMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "colony", colonyId,
-            "size", Integer.toString(queue.length));
-        for (int i = 0; i < queue.length; i++) {
-            result.setAttribute("x" + Integer.toString(i), queue[i]);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            COLONY_TAG, this.colonyId)
+            .setArrayAttributes(this.queue).toXMLElement();
     }
 
     /**

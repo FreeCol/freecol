@@ -33,7 +33,10 @@ import org.w3c.dom.Element;
 public class ChatMessage extends DOMMessage {
 
     public static final String TAG = "chat";
-    
+    private static final String MESSAGE_TAG = "message";
+    private static final String PRIVATE_TAG = "private";
+    private static final String SENDER_TAG = "sender";
+
     /** The object identifier of the sender player. */
     private String sender;
 
@@ -71,9 +74,9 @@ public class ChatMessage extends DOMMessage {
     public ChatMessage(Game game, Element element) {
         super(getTagName());
 
-        sender = element.getAttribute("sender");
-        message = element.getAttribute("message");
-        privateChat = Boolean.parseBoolean(element.getAttribute("privateChat"));
+        this.sender = getStringAttribute(element, SENDER_TAG);
+        this.message = getStringAttribute(element, MESSAGE_TAG);
+        this.privateChat = getBooleanAttribute(element, PRIVATE_TAG, false);
     }
 
 
@@ -86,7 +89,7 @@ public class ChatMessage extends DOMMessage {
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
-        return game.getFreeColGameObject(sender, Player.class);
+        return game.getFreeColGameObject(this.sender, Player.class);
     }
 
     /**
@@ -95,7 +98,7 @@ public class ChatMessage extends DOMMessage {
      * @return The text of this ChatMessage.
      */
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     /**
@@ -104,7 +107,7 @@ public class ChatMessage extends DOMMessage {
      * @return True if this ChatMessage is private.
      */
     public boolean isPrivate() {
-        return privateChat;
+        return this.privateChat;
     }
 
 
@@ -120,10 +123,10 @@ public class ChatMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         /* Do not trust the client-supplied sender name */
-        sender = serverPlayer.getId();
+        this.sender = serverPlayer.getId();
 
-        server.getInGameController().chat(serverPlayer, message,
-                                          privateChat);
+        server.getInGameController().chat(serverPlayer, this.message,
+                                          this.privateChat);
         return null;
     }
 
@@ -135,9 +138,9 @@ public class ChatMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "sender", sender,
-            "message", message,
-            "privateChat", String.valueOf(privateChat)).toXMLElement();
+            SENDER_TAG, this.sender,
+            MESSAGE_TAG, this.message,
+            PRIVATE_TAG, String.valueOf(this.privateChat)).toXMLElement();
     }
 
     /**

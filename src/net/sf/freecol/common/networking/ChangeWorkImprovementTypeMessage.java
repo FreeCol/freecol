@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
 public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
     public static final String TAG = "changeWorkImprovementType";
+    private static final String IMPROVEMENT_TYPE_TAG = "improvementType";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit that is working. */
     private final String unitId;
@@ -71,8 +73,8 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
     public ChangeWorkImprovementTypeMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.improvementId = element.getAttribute("improvementType");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.improvementId = getStringAttribute(element, IMPROVEMENT_TYPE_TAG);
     }
 
 
@@ -91,7 +93,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -99,39 +101,40 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
         Tile tile = unit.getTile();
         if (tile == null) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+            return serverPlayer.clientError("Unit is not on the map: "
+                + this.unitId)
                 .build(serverPlayer);
         } else if (!unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
             return serverPlayer.clientError("Unit can not improve tiles: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
         TileImprovementType type = server.getSpecification()
-            .getTileImprovementType(improvementId);
+            .getTileImprovementType(this.improvementId);
         TileImprovement improvement;
         if (type == null) {
             return serverPlayer.clientError("Not a tile improvement type: "
-                + improvementId)
+                + this.improvementId)
                 .build(serverPlayer);
         } else if (type.isNatural()) {
             return serverPlayer.clientError("ImprovementType must not be natural: "
-                + improvementId)
+                + this.improvementId)
                 .build(serverPlayer);
         } else if (!type.isTileTypeAllowed(tile.getType())) {
             return serverPlayer.clientError("ImprovementType not allowed on tile: "
-                + improvementId)
+                + this.improvementId)
                 .build(serverPlayer);
         } else if ((improvement = tile.getTileImprovement(type)) == null) {
             if (!type.isWorkerAllowed(unit)) {
                 return serverPlayer.clientError("Unit can not create improvement: "
-                    + improvementId)
+                    + this.improvementId)
                     .build(serverPlayer);
             }
         } else { // Has improvement, check if worker can contribute to it
             if (!improvement.isWorkerAllowed(unit)) {
                 return serverPlayer.clientError("Unit can not work on improvement: "
-                    + improvementId)
+                    + this.improvementId)
                     .build(serverPlayer);
             }
         }
@@ -150,8 +153,8 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "improvementType", improvementId).toXMLElement();
+            UNIT_TAG, this.unitId,
+            IMPROVEMENT_TYPE_TAG, this.improvementId).toXMLElement();
     }
 
     /**

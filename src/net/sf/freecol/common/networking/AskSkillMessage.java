@@ -37,6 +37,10 @@ import org.w3c.dom.Element;
  */
 public class AskSkillMessage extends DOMMessage {
 
+    public static final String TAG = "askSkill";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
+
     /** The identifier of the unit that is asking. */
     private final String unitId;
 
@@ -68,8 +72,8 @@ public class AskSkillMessage extends DOMMessage {
     public AskSkillMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unitId");
-        this.directionString = element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -89,7 +93,7 @@ public class AskSkillMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -97,7 +101,7 @@ public class AskSkillMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -131,8 +135,8 @@ public class AskSkillMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unitId", unitId,
-            "direction", directionString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**
@@ -141,6 +145,6 @@ public class AskSkillMessage extends DOMMessage {
      * @return "askSkill".
      */
     public static String getTagName() {
-        return "askSkill";
+        return TAG;
     }
 }

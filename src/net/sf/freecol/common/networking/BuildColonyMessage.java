@@ -35,12 +35,14 @@ import org.w3c.dom.Element;
 public class BuildColonyMessage extends DOMMessage {
 
     public static final String TAG = "buildColony";
+    private static final String NAME_TAG = "name";
+    private static final String UNIT_TAG = "unit";
 
     /** The name of the new colony. */
     private final String colonyName;
 
     /** The unit that is building the colony. */
-    private final String builderId;
+    private final String unitId;
 
 
     /**
@@ -54,7 +56,7 @@ public class BuildColonyMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyName = colonyName;
-        this.builderId = builder.getId();
+        this.unitId = builder.getId();
     }
 
     /**
@@ -66,8 +68,8 @@ public class BuildColonyMessage extends DOMMessage {
     public BuildColonyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyName = element.getAttribute("name");
-        this.builderId = element.getAttribute("unit");
+        this.colonyName = getStringAttribute(element, NAME_TAG);
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -88,25 +90,25 @@ public class BuildColonyMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(builderId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.canBuildColony()) {
-            return serverPlayer.clientError("Unit " + builderId
+            return serverPlayer.clientError("Unit " + this.unitId
                 + " can not build colony.")
                 .build(serverPlayer);
         }
 
-        if (colonyName == null) {
+        if (this.colonyName == null) {
             return serverPlayer.clientError("Null colony name")
                 .build(serverPlayer);
-        } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
+        } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(this.colonyName)) {
             ; // ok
-        } else if (game.getSettlementByName(colonyName) != null) {
+        } else if (game.getSettlementByName(this.colonyName) != null) {
             return serverPlayer.clientError("Non-unique colony name "
-                + colonyName)
+                + this.colonyName)
                 .build(serverPlayer);
         }
 
@@ -131,8 +133,8 @@ public class BuildColonyMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "name", colonyName,
-            "unit", builderId).toXMLElement();
+            NAME_TAG, this.colonyName,
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

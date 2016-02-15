@@ -59,7 +59,7 @@ public class GameStateMessage extends DOMMessage {
     public GameStateMessage(Game game, Element element) {
         this();
 
-        this.state = element.getAttribute(STATE_TAG);
+        this.state = getStringAttribute(element, STATE_TAG);
     }
 
 
@@ -69,8 +69,6 @@ public class GameStateMessage extends DOMMessage {
         return Enum.valueOf(GameState.class, this.state);
     }
 
-
-    // Implement MessageHandler
 
     /**
      * Handle a "gameState"-message.
@@ -93,8 +91,8 @@ public class GameStateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        if (this.state != null) this.setAttribute(STATE_TAG, this.state);
-        return super.toXMLElement();
+        return new DOMMessage(getTagName(),
+            STATE_TAG, this.state).toXMLElement();
     }
 
     /**

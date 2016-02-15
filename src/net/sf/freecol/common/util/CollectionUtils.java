@@ -625,6 +625,18 @@ public class CollectionUtils {
     }
 
     /**
+     * Convenience function to convert a collection to a map.
+     *
+     * @param collection The <code>Collection</code> to convert.
+     * @param keyMapper A mapping function from datum to key.
+     * @param valueMapper A mapping function from datum to value.
+     * @return A map of the stream contents.
+     */
+    public static <T> Collection<T> toList(Collection<T> collection) {
+        return toList(collection.stream());
+    }
+
+    /**
      * Convenience function to collect a stream to a list.
      *
      * @param stream The <code>Stream</code> to collect.
@@ -632,6 +644,20 @@ public class CollectionUtils {
      */
     public static <T> List<T> toList(Stream<T> stream) {
         return stream.collect(Collectors.toList());
+    }
+
+    /**
+     * Convenience function to convert a collection to a map.
+     *
+     * @param collection The <code>Collection</code> to convert.
+     * @param keyMapper A mapping function from datum to key.
+     * @param valueMapper A mapping function from datum to value.
+     * @return A map of the stream contents.
+     */
+    public static <T,K,V> Map<K,V> toMap(Collection<T> collection,
+        Function<? super T,? extends K> keyMapper,
+        Function<? super T,? extends V> valueMapper) {
+        return toMap(collection.stream(), keyMapper, valueMapper);
     }
 
     /**

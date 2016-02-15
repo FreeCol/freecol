@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 public class EmigrateUnitMessage extends DOMMessage {
 
     public static final String TAG = "emigrateUnit";
+    private static final String SLOT_TAG = "slot";
 
     /** The slot from which to select the unit. */
     private final String slotString;
@@ -61,7 +62,7 @@ public class EmigrateUnitMessage extends DOMMessage {
     public EmigrateUnitMessage(Game game, Element element) {
         super(getTagName());
 
-        this.slotString = element.getAttribute("slot");
+        this.slotString = getStringAttribute(element, SLOT_TAG);
     }
 
 
@@ -85,9 +86,9 @@ public class EmigrateUnitMessage extends DOMMessage {
         }
         int slot;
         try {
-            slot = Integer.parseInt(slotString);
+            slot = Integer.parseInt(this.slotString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad slot: " + slotString)
+            return serverPlayer.clientError("Bad slot: " + this.slotString)
                 .build(serverPlayer);
         }
         if (!MigrationType.validMigrantSlot(slot)) {
@@ -134,7 +135,7 @@ public class EmigrateUnitMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "slot", slotString).toXMLElement();
+            SLOT_TAG, this.slotString).toXMLElement();
     }
 
     /**

@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class WorkMessage extends DOMMessage {
 
     public static final String TAG = "work";
+    private static final String UNIT_TAG = "unit";
+    private static final String WORK_LOCATION_TAG = "workLocation";
 
     /** The identifier of the unit. */
     private final String unitId;
@@ -66,8 +68,8 @@ public class WorkMessage extends DOMMessage {
     public WorkMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.workLocationId = element.getAttribute("workLocation");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.workLocationId = getStringAttribute(element, WORK_LOCATION_TAG);
     }
 
 
@@ -87,7 +89,7 @@ public class WorkMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -95,26 +97,27 @@ public class WorkMessage extends DOMMessage {
 
         if (!unit.hasTile()) {
             return serverPlayer.clientError("Unit is not on the map: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
         Colony colony = unit.getTile().getColony();
         if (colony == null) {
             return serverPlayer.clientError("Unit is not at a colony: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
-        WorkLocation workLocation
-            = game.getFreeColGameObject(workLocationId, WorkLocation.class);
+        WorkLocation workLocation = game
+            .getFreeColGameObject(this.workLocationId, WorkLocation.class);
         if (workLocation == null) {
             return serverPlayer.clientError("Not a work location: "
-                + workLocationId)
+                + this.workLocationId)
                 .build(serverPlayer);
         } else if (workLocation.getColony() != colony) {
-            return serverPlayer.clientError("Work location is not in the colony"
-                + " where the unit is: " + workLocationId)
+            return serverPlayer.clientError("Work location is not in colony"
+                + colony.getId() + " where the unit is: "
+                + this.workLocationId)
                 .build(serverPlayer);
         } else if (!workLocation.canAdd(unit)) {
             return serverPlayer.clientError("Can not add " + unit
@@ -137,8 +140,8 @@ public class WorkMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "workLocation", workLocationId).toXMLElement();
+            UNIT_TAG, unitId,
+            WORK_LOCATION_TAG, workLocationId).toXMLElement();
     }
 
     /**

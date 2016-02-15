@@ -60,14 +60,7 @@ public class VacantPlayersMessage extends DOMMessage {
     public VacantPlayersMessage(Game game, Element element) {
         this();
 
-        String key;
-        int i = 0;
-        for (;;) {
-            key = "x" + Integer.toString(i);
-            if (!element.hasAttribute(key)) break;
-            this.vacantPlayers.add(element.getAttribute(key));
-            i++;
-        }
+        this.vacantPlayers.addAll(getArrayAttributes(element));
     }
 
 
@@ -115,13 +108,8 @@ public class VacantPlayersMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        int i = 0;
-        for (String s : this.vacantPlayers) {
-            String key = "x" + Integer.toString(i);
-            this.setAttribute(key, s);
-            i++;
-        }
-        return super.toXMLElement();
+        return new DOMMessage(getTagName())
+            .setArrayAttributes(this.vacantPlayers).toXMLElement();
     }
 
     /**

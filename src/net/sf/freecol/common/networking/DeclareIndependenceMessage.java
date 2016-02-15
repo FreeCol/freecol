@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 public class DeclareIndependenceMessage extends DOMMessage {
 
     public static final String TAG = "declareIndependence";
+    private static final String COUNTRY_NAME_TAG = "countryName";
+    private static final String NATION_NAME_TAG = "nationName";
 
     /** The new name for the rebelling nation. */
     private final String nationName;
@@ -64,10 +66,8 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeclareIndependenceMessage(Game game, Element element) {
-        super(getTagName());
-
-        this.nationName = element.getAttribute("nationName");
-        this.countryName = element.getAttribute("countryName");
+        this(getStringAttribute(element, NATION_NAME_TAG),
+            getStringAttribute(element, COUNTRY_NAME_TAG));
     }
 
 
@@ -85,9 +85,12 @@ public class DeclareIndependenceMessage extends DOMMessage {
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        if (nationName == null || nationName.isEmpty()
-            || countryName == null || countryName.isEmpty()) {
-            return serverPlayer.clientError("Empty nation or country name.")
+        if (this.nationName == null || this.nationName.isEmpty()) {
+            return serverPlayer.clientError("Empty nation name.")
+                .build(serverPlayer);
+        }
+        if (this.countryName == null || this.countryName.isEmpty()) {
+            return serverPlayer.clientError("Empty country name.")
                 .build(serverPlayer);
         }
         StringTemplate problem = player.checkDeclareIndependence();
@@ -110,8 +113,8 @@ public class DeclareIndependenceMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "nationName", nationName,
-            "countryName", countryName).toXMLElement();
+            NATION_NAME_TAG, this.nationName,
+            COUNTRY_NAME_TAG, this.countryName).toXMLElement();
     }
 
     /**

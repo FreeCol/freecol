@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class SetCurrentStopMessage extends DOMMessage {
 
     public static final String TAG = "setCurrentStop";
+    private static final String INDEX_TAG = "index";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit whose stop is to be set. */
     private final String unitId;
@@ -66,8 +68,8 @@ public class SetCurrentStopMessage extends DOMMessage {
     public SetCurrentStopMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.index = element.getAttribute("index");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.index = getStringAttribute(element, INDEX_TAG);
     }
 
 
@@ -84,7 +86,7 @@ public class SetCurrentStopMessage extends DOMMessage {
 
         ServerUnit serverUnit;
         try {
-            serverUnit = serverPlayer.getOurFreeColGameObject(unitId,
+            serverUnit = serverPlayer.getOurFreeColGameObject(this.unitId,
                 ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
@@ -93,7 +95,7 @@ public class SetCurrentStopMessage extends DOMMessage {
         TradeRoute tr = serverUnit.getTradeRoute();
         if (tr == null) {
             return serverPlayer.clientError("Unit has no trade route: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
@@ -106,7 +108,8 @@ public class SetCurrentStopMessage extends DOMMessage {
                 .build(serverPlayer);
         }
         if (count < 0 || count > tr.getStops().size()) {
-            return serverPlayer.clientError("Invalid stop index: " + this.index)
+            return serverPlayer.clientError("Invalid stop index: "
+                + this.index)
                 .build(serverPlayer);
         }
 
@@ -124,8 +127,8 @@ public class SetCurrentStopMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "index", index).toXMLElement();
+            UNIT_TAG, this.unitId,
+            INDEX_TAG, this.index).toXMLElement();
     }
 
     /**

@@ -40,6 +40,8 @@ import org.w3c.dom.Element;
 public class GoodsForSaleMessage extends DOMMessage {
 
     public static final String TAG = "goodsForSale";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit that is trading. */
     private final String unitId;
@@ -79,8 +81,8 @@ public class GoodsForSaleMessage extends DOMMessage {
     public GoodsForSaleMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
         this.sellGoods.clear();
         this.sellGoods.addAll(getChildren(game, element, Goods.class));
     }
@@ -136,11 +138,10 @@ public class GoodsForSaleMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", this.unitId,
-            "settlement", this.settlementId);
-        for (Goods goods : this.sellGoods) result.add(goods);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId)
+            .add(this.sellGoods).toXMLElement();
     }
 
     /**

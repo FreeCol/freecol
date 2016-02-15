@@ -35,6 +35,7 @@ public class NewTradeRouteMessage extends DOMMessage {
 
     public static final String TAG = "newTradeRoute";
 
+    /** The new trade route. */
     private TradeRoute tradeRoute;
 
 
@@ -73,8 +74,7 @@ public class NewTradeRouteMessage extends DOMMessage {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return Null.
+     * @return An update setting the trade route.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -92,9 +92,8 @@ public class NewTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        clearChildren();
-        if (this.tradeRoute != null) this.add(this.tradeRoute);
-        return super.toXMLElement();
+        return new DOMMessage(getTagName())
+            .add(this.tradeRoute).toXMLElement();
     }
 
     /**

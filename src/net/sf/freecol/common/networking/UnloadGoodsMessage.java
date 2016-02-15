@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -35,6 +36,9 @@ import org.w3c.dom.Element;
 public class UnloadGoodsMessage extends DOMMessage {
 
     public static final String TAG = "unloadGoods";
+    private static final String AMOUNT_TAG = "amount";
+    private static final String CARRIER_TAG = "carrier";
+    private static final String TYPE_TAG = "type";
 
     /** The identifier of the type of goods to unload.  */
     private final String goodsTypeId;
@@ -71,9 +75,9 @@ public class UnloadGoodsMessage extends DOMMessage {
     public UnloadGoodsMessage(Game game, Element element) {
         super(getTagName());
 
-        this.goodsTypeId = element.getAttribute("type");
-        this.amountString = element.getAttribute("amount");
-        this.carrierId = element.getAttribute("carrier");
+        this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
+        this.amountString = getStringAttribute(element, AMOUNT_TAG);
+        this.carrierId = getStringAttribute(element, CARRIER_TAG);
     }
 
 
@@ -89,36 +93,39 @@ public class UnloadGoodsMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Specification spec = server.getSpecification();
 
         Unit carrier;
         try {
-            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!carrier.canCarryGoods()) {
-            return serverPlayer.clientError("Not a goods carrier: " + carrierId)
+            return serverPlayer.clientError("Not a goods carrier: "
+                + this.carrierId)
                 .build(serverPlayer);
         }
         // Do not check location, carriers can dump goods anywhere
 
-        GoodsType type = server.getSpecification().getGoodsType(goodsTypeId);
+        GoodsType type = spec.getGoodsType(this.goodsTypeId);
         if (type == null) {
-            return serverPlayer.clientError("Not a goods type: " + goodsTypeId)
+            return serverPlayer.clientError("Not a goods type: "
+                + this.goodsTypeId)
                 .build(serverPlayer);
         }
 
         int amount;
         try {
-            amount = Integer.parseInt(amountString);
+            amount = Integer.parseInt(this.amountString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad amount: " + amountString)
+            return serverPlayer.clientError("Bad amount: " + this.amountString)
                 .build(serverPlayer);
         }
         if (amount <= 0) {
             return serverPlayer.clientError("Amount must be positive: "
-                + amountString)
+                + this.amountString)
                 .build(serverPlayer);
         }
         int present = carrier.getGoodsCount(type);
@@ -142,9 +149,9 @@ public class UnloadGoodsMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "type", goodsTypeId,
-            "amount", amountString,
-            "carrier", carrierId).toXMLElement();
+            TYPE_TAG, this.goodsTypeId,
+            AMOUNT_TAG, this.amountString,
+            CARRIER_TAG, this.carrierId).toXMLElement();
     }
 
     /**

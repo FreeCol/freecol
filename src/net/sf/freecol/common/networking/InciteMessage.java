@@ -38,6 +38,10 @@ import org.w3c.dom.Element;
 public class InciteMessage extends DOMMessage {
 
     public static final String TAG = "incite";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String ENEMY_TAG = "enemy";
+    private static final String GOLD_TAG = "gold";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit inciting. */
     private final String unitId;
@@ -82,10 +86,10 @@ public class InciteMessage extends DOMMessage {
     public InciteMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unitId");
-        this.directionString = element.getAttribute("direction");
-        this.enemyId = element.getAttribute("enemyId");
-        this.goldString = element.getAttribute("gold");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        this.enemyId = getStringAttribute(element, ENEMY_TAG);
+        this.goldString = getStringAttribute(element, GOLD_TAG);
     }
 
 
@@ -105,7 +109,7 @@ public class InciteMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -113,7 +117,7 @@ public class InciteMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -128,10 +132,10 @@ public class InciteMessage extends DOMMessage {
         }
 
         MoveType type;
-        ServerPlayer enemy = game.getFreeColGameObject(enemyId,
+        ServerPlayer enemy = game.getFreeColGameObject(this.enemyId,
             ServerPlayer.class);
         if (enemy == null) {
-            return serverPlayer.clientError("Not a player: " + enemyId)
+            return serverPlayer.clientError("Not a player: " + this.enemyId)
                 .build(serverPlayer);
         } else if (enemy == player) {
             return serverPlayer.clientError("Inciting against oneself!")
@@ -148,9 +152,9 @@ public class InciteMessage extends DOMMessage {
 
         int gold;
         try {
-            gold = Integer.parseInt(goldString);
+            gold = Integer.parseInt(this.goldString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad gold: " + goldString)
+            return serverPlayer.clientError("Bad gold: " + this.goldString)
                 .build(serverPlayer);
         }
 
@@ -168,10 +172,10 @@ public class InciteMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unitId", unitId,
-            "direction", directionString,
-            "enemyId", enemyId,
-            "gold", goldString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString,
+            ENEMY_TAG, this.enemyId,
+            GOLD_TAG, this.goldString).toXMLElement();
     }
 
     /**

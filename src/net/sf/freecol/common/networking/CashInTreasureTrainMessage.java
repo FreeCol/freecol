@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class CashInTreasureTrainMessage extends DOMMessage {
 
     public static final String TAG = "cashInTreasureTrain";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the treasure train unit. */
     private final String unitId;
@@ -61,7 +62,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
     public CashInTreasureTrainMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -80,22 +81,22 @@ public class CashInTreasureTrainMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         if (!unit.canCarryTreasure()) {
-            return serverPlayer.clientError("Can not cash in unit " + unitId
-                + ", can not carry treasure.")
+            return serverPlayer.clientError("Can not cash in unit "
+                + this.unitId + ", can not carry treasure.")
                 .build(serverPlayer);
         } else if (!unit.canCashInTreasureTrain()) {
-            return serverPlayer.clientError("Can not cash in unit " + unitId
-                + ", unsuitable location.")
+            return serverPlayer.clientError("Can not cash in unit "
+                + this.unitId + ", unsuitable location.")
                 .build(serverPlayer);
         }
 
-        // Cash in.
+        // Cash in
         return server.getInGameController()
             .cashInTreasureTrain(serverPlayer, unit)
             .build(serverPlayer);
@@ -109,7 +110,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId).toXMLElement();
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

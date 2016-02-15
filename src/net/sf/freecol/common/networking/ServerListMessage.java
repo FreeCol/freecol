@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.metaserver.MetaItem;
 import net.sf.freecol.metaserver.MetaRegister;
 import net.sf.freecol.server.FreeColServer;
@@ -38,6 +39,14 @@ import org.w3c.dom.Element;
 public class ServerListMessage extends DOMMessage {
 
     public static final String TAG = "serverList";
+    private static final String ADDRESS_TAG = "address";
+    private static final String CURRENTLY_PLAYING_TAG = "currentlyPlaying";
+    private static final String GAME_STATE_TAG = "gameState";
+    private static final String IS_GAME_STARTED_TAG = "isGameStarted";
+    private static final String NAME_TAG = "name";
+    private static final String PORT_TAG = "port";
+    private static final String SLOTS_AVAILABLE_TAG = "slotsAvailable";
+    private static final String VERSION_TAG = "version";
 
     /** The list of information about the available servers. */
     private List<ServerInfo> servers = new ArrayList<>();
@@ -79,6 +88,7 @@ public class ServerListMessage extends DOMMessage {
                                         ServerListMessage::elementToServer));
     }
 
+
     /**
      * Convert an element to a server.
      *
@@ -87,16 +97,35 @@ public class ServerListMessage extends DOMMessage {
      */     
     private static MetaItem elementToServer(Element e) {
         MetaItem mi = new MetaItem();
-        mi.update(e.getAttribute("name"),
-            e.getAttribute("address"),
-            Integer.parseInt(e.getAttribute("port")),
-            Integer.parseInt(e.getAttribute("slotsAvailable")),
-            Integer.parseInt(e.getAttribute("currentlyPlaying")),
-            Boolean.parseBoolean(e.getAttribute("slotsAvailable")),
-            e.getAttribute("version"),
-            Integer.parseInt(e.getAttribute("gameState")));
+        mi.update(getStringAttribute(e, NAME_TAG),
+            getStringAttribute(e, ADDRESS_TAG),
+            getIntegerAttribute(e, PORT_TAG, -1),
+            getIntegerAttribute(e, SLOTS_AVAILABLE_TAG, -1),
+            getIntegerAttribute(e, CURRENTLY_PLAYING_TAG, -1),
+            getBooleanAttribute(e, IS_GAME_STARTED_TAG, false),
+            getStringAttribute(e, VERSION_TAG),
+            getIntegerAttribute(e, GAME_STATE_TAG, -1));
         return mi;
     }
+
+    /**
+     * Convert a ServerInfo record to a message.
+     *
+     * @param si The <code>ServerInfo</code> to convert.
+     * @return A new <code>DOMMessage</code>.
+     */
+    private static DOMMessage serverInfoToMessage(ServerInfo si) {
+        return new DOMMessage(si.getTagName(),
+            NAME_TAG, si.getName(),
+            ADDRESS_TAG, si.getAddress(),
+            PORT_TAG, Integer.toString(si.getPort()),
+            SLOTS_AVAILABLE_TAG, Integer.toString(si.getSlotsAvailable()),
+            CURRENTLY_PLAYING_TAG, Integer.toString(si.getCurrentlyPlaying()),
+            IS_GAME_STARTED_TAG, Boolean.toString(si.getIsGameStarted()),
+            VERSION_TAG, si.getVersion(),
+            GAME_STATE_TAG, Integer.toString(si.getGameState()));
+    }
+
 
     // Public interface
 
@@ -118,13 +147,13 @@ public class ServerListMessage extends DOMMessage {
         this.servers.add(si);
     }
 
+    
     /**
      * Handle a "serverList"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
      * @return Null.
      */
     public Element handle(FreeColServer server, Player player,
@@ -141,19 +170,10 @@ public class ServerListMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        for (ServerInfo si : this.servers) {
-            result.add(new DOMMessage(si.getTagName(),
-                    "name", si.getName(),
-                    "address", si.getAddress(),
-                    "port", Integer.toString(si.getPort()),
-                    "slotsAvailable", Integer.toString(si.getSlotsAvailable()),
-                    "currentlyPlaying", Integer.toString(si.getCurrentlyPlaying()),
-                    "isGameStarted", Boolean.toString(si.getIsGameStarted()),
-                    "version", si.getVersion(),
-                    "gameState", Integer.toString(si.getGameState())));
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName())
+            .addMessages(toList(map(this.servers,
+                        ServerListMessage::serverInfoToMessage)))
+            .toXMLElement();
     }
 
     /**

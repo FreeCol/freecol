@@ -36,6 +36,10 @@ import org.w3c.dom.Element;
 public class NewRegionNameMessage extends DOMMessage {
 
     public static final String TAG = "newRegionName";
+    private static final String NEW_REGION_NAME_TAG = "newRegionName";
+    private static final String REGION_TAG = "region";
+    private static final String TILE_TAG = "tile";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the region being discovered. */
     private final String regionId;
@@ -79,10 +83,10 @@ public class NewRegionNameMessage extends DOMMessage {
     public NewRegionNameMessage(Game game, Element element) {
         super(getTagName());
 
-        this.regionId = element.getAttribute("region");
-        this.tileId = element.getAttribute("tile");
-        this.unitId = element.getAttribute("unit");
-        this.newRegionName = element.getAttribute("newRegionName");
+        this.regionId = getStringAttribute(element, REGION_TAG);
+        this.tileId = getStringAttribute(element, TILE_TAG);
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.newRegionName = getStringAttribute(element, NEW_REGION_NAME_TAG);
     }
 
 
@@ -127,14 +131,15 @@ public class NewRegionNameMessage extends DOMMessage {
         return newRegionName;
     }
 
+
     /**
      * Handle a "newRegionName"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return Null.
+     * @return An update setting the new region name, or an error
+     *     <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
@@ -161,15 +166,15 @@ public class NewRegionNameMessage extends DOMMessage {
                 + tileId)
                 .build(serverPlayer);
         }
-        if (!region.getId().equals(regionId)) {
-            return serverPlayer.clientError("Region mismatch, " + region.getId()
-                + " != " + regionId)
+        if (!region.getId().equals(this.regionId)) {
+            return serverPlayer.clientError("Region mismatch, "
+                + region.getId() + " != " + this.regionId)
                 .build(serverPlayer);
         }
         
         // Do the discovery
         return server.getInGameController()
-            .setNewRegionName(serverPlayer, unit, region, newRegionName)
+            .setNewRegionName(serverPlayer, unit, region, this.newRegionName)
             .build(serverPlayer);
     }
 
@@ -181,10 +186,10 @@ public class NewRegionNameMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "region", regionId,
-            "tile", tileId,
-            "unit", unitId,
-            "newRegionName", newRegionName).toXMLElement();
+            REGION_TAG, this.regionId,
+            TILE_TAG, this.tileId,
+            UNIT_TAG, this.unitId,
+            NEW_REGION_NAME_TAG, this.newRegionName).toXMLElement();
     }
 
     /**

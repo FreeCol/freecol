@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class PayForBuildingMessage extends DOMMessage {
 
     public static final String TAG = "payForBuilding";
+    private static final String COLONY_TAG = "colony";
 
     /** The identifier of the colony that is building. */
     private final String colonyId;
@@ -61,7 +62,7 @@ public class PayForBuildingMessage extends DOMMessage {
     public PayForBuildingMessage(Game game, Element element) {
         super(getTagName());
 
-        this.colonyId = element.getAttribute("colony");
+        this.colonyId = getStringAttribute(element, COLONY_TAG);
     }
 
 
@@ -81,7 +82,8 @@ public class PayForBuildingMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(this.colonyId,
+                                                    Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -101,7 +103,7 @@ public class PayForBuildingMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "colony", colonyId).toXMLElement();
+            COLONY_TAG, this.colonyId).toXMLElement();
     }
 
     /**

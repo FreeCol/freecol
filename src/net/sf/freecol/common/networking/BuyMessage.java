@@ -37,6 +37,9 @@ import org.w3c.dom.Element;
 public class BuyMessage extends DOMMessage {
 
     public static final String TAG = "buy";
+    private static final String GOLD_TAG = "gold";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit that is buying. */
     private final String unitId;
@@ -79,9 +82,9 @@ public class BuyMessage extends DOMMessage {
     public BuyMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
-        this.goldString = element.getAttribute("gold");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
+        this.goldString = getStringAttribute(element, GOLD_TAG);
         this.goods = getChild(game, element, 0, Goods.class);
     }
 
@@ -95,7 +98,7 @@ public class BuyMessage extends DOMMessage {
      */
     public int getGold() {
         try {
-            return Integer.parseInt(goldString);
+            return Integer.parseInt(this.goldString);
         } catch (NumberFormatException e) {
             return -1;
         }
@@ -117,7 +120,7 @@ public class BuyMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -125,7 +128,8 @@ public class BuyMessage extends DOMMessage {
 
         ServerIndianSettlement settlement;
         try {
-            settlement = (ServerIndianSettlement)unit.getAdjacentIndianSettlementSafely(settlementId);
+            settlement = (ServerIndianSettlement)unit
+                .getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -133,14 +137,16 @@ public class BuyMessage extends DOMMessage {
 
         // Make sure we are trying to buy something that is there
         if (goods.getLocation() != settlement) {
-            return serverPlayer.clientError("Goods " + goods.getId()
-                + " is not at settlement " + settlementId)
+            return serverPlayer.clientError("Goods " + goods
+                + " is not at settlement " + this.settlementId)
                 .build(serverPlayer);
         }
 
         int gold = getGold();
-        if (gold < 0) return serverPlayer.clientError("Bad gold: " + goldString)
-                          .build(serverPlayer);
+        if (gold < 0) {
+            return serverPlayer.clientError("Bad gold: " + this.goldString)
+                .build(serverPlayer);
+        }
 
         // Try to buy.
         return server.getInGameController()
@@ -155,12 +161,11 @@ public class BuyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId,
-            "settlement", settlementId,
-            "gold", goldString);
-        result.add(goods);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId,
+            GOLD_TAG, this.goldString)
+            .add(goods).toXMLElement();
     }
 
     /**

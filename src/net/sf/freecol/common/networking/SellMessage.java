@@ -37,6 +37,9 @@ import org.w3c.dom.Element;
 public class SellMessage extends DOMMessage {
 
     public static final String TAG = "sell";
+    private static final String GOLD_TAG = "gold";
+    private static final String SETTLEMENT_TAG = "settlement";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit that is selling. */
     private final String unitId;
@@ -79,9 +82,9 @@ public class SellMessage extends DOMMessage {
     public SellMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.settlementId = element.getAttribute("settlement");
-        this.goldString = element.getAttribute("gold");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
+        this.goldString = getStringAttribute(element, GOLD_TAG);
         this.goods = getChild(game, element, 0, Goods.class);
     }
 
@@ -125,7 +128,8 @@ public class SellMessage extends DOMMessage {
 
         ServerIndianSettlement settlement;
         try {
-            settlement = (ServerIndianSettlement)unit.getAdjacentIndianSettlementSafely(this.settlementId);
+            settlement = (ServerIndianSettlement)unit
+                .getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -139,8 +143,10 @@ public class SellMessage extends DOMMessage {
         }
 
         int gold = getGold();
-        if (gold < 0) return serverPlayer.clientError("Bad gold: " + this.goldString)
-                          .build(serverPlayer);
+        if (gold < 0) {
+            return serverPlayer.clientError("Bad gold: " + this.goldString)
+                .build(serverPlayer);
+        }
 
         // Proceed to sell
         return server.getInGameController()
@@ -155,12 +161,11 @@ public class SellMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", this.unitId,
-            "settlement", this.settlementId,
-            "gold", this.goldString);
-        result.add(goods);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            SETTLEMENT_TAG, this.settlementId,
+            GOLD_TAG, this.goldString)
+            .add(goods).toXMLElement();
     }
 
     /**

@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 public class AssignTeacherMessage extends DOMMessage {
 
     public static final String TAG = "assignTeacher";
+    private static final String STUDENT_TAG = "student";
+    private static final String TEACHER_TAG = "teacher";
 
     /** The identifier of the student. */
     private final String studentId;
@@ -66,8 +68,8 @@ public class AssignTeacherMessage extends DOMMessage {
     public AssignTeacherMessage(Game game, Element element) {
         super(getTagName());
 
-        this.studentId = element.getAttribute("student");
-        this.teacherId = element.getAttribute("teacher");
+        this.studentId = getStringAttribute(element, STUDENT_TAG);
+        this.teacherId = getStringAttribute(element, TEACHER_TAG);
     }
 
 
@@ -86,7 +88,7 @@ public class AssignTeacherMessage extends DOMMessage {
 
         Unit student;
         try {
-            student = player.getOurFreeColGameObject(studentId, Unit.class);
+            student = player.getOurFreeColGameObject(this.studentId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -94,7 +96,7 @@ public class AssignTeacherMessage extends DOMMessage {
 
         Unit teacher;
         try {
-            teacher = player.getOurFreeColGameObject(teacherId, Unit.class);
+            teacher = player.getOurFreeColGameObject(this.teacherId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -102,27 +104,27 @@ public class AssignTeacherMessage extends DOMMessage {
 
         if (student.getColony() == null) {
             return serverPlayer.clientError("Student not in colony: "
-                + studentId)
+                + this.studentId)
                 .build(serverPlayer);
         } else if (!student.isInColony()) {
             return serverPlayer.clientError("Student not working colony: "
-                + studentId)
+                + this.studentId)
                 .build(serverPlayer);
         } else if (teacher.getColony() == null) {
             return serverPlayer.clientError("Teacher not in colony: "
-                + teacherId)
+                + this.teacherId)
                 .build(serverPlayer);
         } else if (!teacher.getColony().canTrain(teacher)) {
             return serverPlayer.clientError("Teacher can not teach: "
-                + teacherId)
+                + this.teacherId)
                 .build(serverPlayer);
         } else if (student.getColony() != teacher.getColony()) {
             return serverPlayer.clientError("Student and teacher not in same colony: "
-                + studentId)
+                + this.studentId)
                 .build(serverPlayer);
         } else if (!student.canBeStudent(teacher)) {
             return serverPlayer.clientError("Student can not be taught by teacher: "
-                + studentId)
+                + this.studentId)
                 .build(serverPlayer);
         }
 
@@ -140,8 +142,8 @@ public class AssignTeacherMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "student", studentId,
-            "teacher", teacherId).toXMLElement();
+            STUDENT_TAG, this.studentId,
+            TEACHER_TAG, this.teacherId).toXMLElement();
     }
 
     /**

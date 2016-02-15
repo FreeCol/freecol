@@ -64,6 +64,8 @@ public class HighScoreMessage extends DOMMessage {
     }
 
 
+    // Public interface
+
     /**
      * Accessor for the scores list.
      *
@@ -73,6 +75,7 @@ public class HighScoreMessage extends DOMMessage {
         return this.scores;
     }
 
+    
     /**
      * Handle a "highScore"-message.
      *
@@ -92,9 +95,8 @@ public class HighScoreMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        for (HighScore hs : this.scores) result.add(hs);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName())
+            .add(this.scores).toXMLElement();
     }
 
     /**

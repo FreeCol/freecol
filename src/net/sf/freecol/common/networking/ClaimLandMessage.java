@@ -38,6 +38,9 @@ import org.w3c.dom.Element;
 public class ClaimLandMessage extends DOMMessage {
 
     public static final String TAG = "claimLand";
+    private static final String CLAIMANT_TAG = "claimant";
+    private static final String PRICE_TAG = "price";
+    private static final String TILE_TAG = "tile";
 
     /** The tile to claim. */
     private final String tileId;
@@ -74,9 +77,9 @@ public class ClaimLandMessage extends DOMMessage {
     public ClaimLandMessage(Game game, Element element) {
         super(getTagName());
 
-        this.tileId = element.getAttribute("tile");
-        this.claimantId = element.getAttribute("claimant");
-        this.priceString = element.getAttribute("price");
+        this.tileId = getStringAttribute(element, TILE_TAG);
+        this.claimantId = getStringAttribute(element, CLAIMANT_TAG);
+        this.priceString = getStringAttribute(element, PRICE_TAG);
     }
 
 
@@ -94,44 +97,45 @@ public class ClaimLandMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
         final Game game = server.getGame();
 
-        Tile tile = game.getFreeColGameObject(tileId, Tile.class);
+        Tile tile = game.getFreeColGameObject(this.tileId, Tile.class);
         if (tile == null) {
-            return serverPlayer.clientError("Not a file: " + tileId)
+            return serverPlayer.clientError("Not a file: " + this.tileId)
                 .build(serverPlayer);
         }
 
         Unit unit = null;
         try {
-            unit = player.getOurFreeColGameObject(claimantId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.claimantId, Unit.class);
         } catch (IllegalStateException e) {} // Expected to fail sometimes...
         Settlement settlement = null;
         try {
-            settlement = player.getOurFreeColGameObject(claimantId,
+            settlement = player.getOurFreeColGameObject(this.claimantId,
                                                         Settlement.class);
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {
-                return serverPlayer.clientError("Unit not at tile: " + tileId)
+                return serverPlayer.clientError("Unit not at tile: "
+                    + this.tileId)
                     .build(serverPlayer);
             }
         } else if (settlement != null) {
             if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return serverPlayer.clientError("Settlement can not claim tile: "
-                    + tileId)
+                    + this.tileId)
                     .build(serverPlayer);
             }
         } else { // ...but not both of them.
             return serverPlayer.clientError("Not a unit or settlement: "
-                + claimantId)
+                + this.claimantId)
                 .build(serverPlayer);
         }
 
         int price;
         try {
-            price = Integer.parseInt(priceString);
+            price = Integer.parseInt(this.priceString);
         } catch (NumberFormatException e) {
-            return serverPlayer.clientError("Bad price: " + priceString)
+            return serverPlayer.clientError("Bad price: " + this.priceString)
                 .build(serverPlayer);
         }
 
@@ -190,7 +194,6 @@ public class ClaimLandMessage extends DOMMessage {
         // to set owning settlement.
         return server.getInGameController()
             .claimLand(serverPlayer, tile, settlement, price)
-
             .build(serverPlayer);
     }
 
@@ -202,9 +205,9 @@ public class ClaimLandMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "tile", tileId,
-            "claimant", claimantId,
-            "price", priceString).toXMLElement();
+            TILE_TAG, this.tileId,
+            CLAIMANT_TAG, this.claimantId,
+            PRICE_TAG, this.priceString).toXMLElement();
     }
 
     /**

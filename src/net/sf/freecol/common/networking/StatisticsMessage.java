@@ -29,8 +29,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 
 /**
@@ -66,12 +64,7 @@ public class StatisticsMessage extends DOMMessage {
     public StatisticsMessage(Game game, Element element) {
         super(getTagName());
 
-        final NamedNodeMap map = element.getAttributes();
-        final int n = map.getLength();
-        for (int i = 0; i < n; i++) {
-            Node node = map.item(i);
-            this.stats.put(node.getNodeName(), node.getNodeValue());
-        }
+        this.stats.putAll(getAttributes(element));
     }
 
 
@@ -108,10 +101,8 @@ public class StatisticsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        for (Entry<String, String> e : stats.entrySet()) {
-            this.setAttribute(e.getKey(), e.getValue());
-        }
-        return super.toXMLElement();
+        return new DOMMessage(getTagName())
+            .setAttributes(this.stats).toXMLElement();
     }
 
     /**

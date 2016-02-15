@@ -33,9 +33,8 @@ import org.w3c.dom.Element;
 public class ErrorMessage extends DOMMessage {
 
     public static final String TAG = "error";
-    
-    public static final String MESSAGE_ID_TAG = "messageId";
-    public static final String MESSAGE_TAG = "message";
+    private static final String MESSAGE_ID_TAG = "messageId";
+    private static final String MESSAGE_TAG = "message";
 
     /** A message identifier, if available. */
     private final String messageId;
@@ -83,6 +82,8 @@ public class ErrorMessage extends DOMMessage {
     }
 
 
+    // Public interface
+
     /**
      * Get the message identifier.
      *
@@ -124,14 +125,9 @@ public class ErrorMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName());
-        if (this.messageId != null) {
-            result.setAttribute(MESSAGE_ID_TAG, this.messageId);
-        }
-        if (this.message != null) {
-            result.setAttribute(MESSAGE_TAG, this.message);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            MESSAGE_ID_TAG, this.messageId,
+            MESSAGE_TAG, this.message).toXMLElement();
     }
 
     /**

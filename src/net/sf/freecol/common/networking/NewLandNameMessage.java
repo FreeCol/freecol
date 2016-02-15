@@ -35,6 +35,8 @@ import org.w3c.dom.Element;
 public class NewLandNameMessage extends DOMMessage {
 
     public static final String TAG = "newLandName";
+    private static final String NEW_LAND_NAME_TAG = "newLandName";
+    private static final String UNIT_TAG = "unit";
 
     /** The unit that has come ashore. */
     private final String unitId;
@@ -67,8 +69,8 @@ public class NewLandNameMessage extends DOMMessage {
     public NewLandNameMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.newLandName = element.getAttribute("newLandName");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.newLandName = getStringAttribute(element, NEW_LAND_NAME_TAG);
     }
 
 
@@ -117,22 +119,23 @@ public class NewLandNameMessage extends DOMMessage {
 
         Tile tile = unit.getTile();
         if (tile == null) {
-            return serverPlayer.clientError("Unit is not on the map: " + unitId)
+            return serverPlayer.clientError("Unit is not on the map: "
+                + this.unitId)
                 .build(serverPlayer);
         } else if (!tile.isLand()) {
             return serverPlayer.clientError("Unit is not in the new world: "
-                + unitId)
+                + this.unitId)
                 .build(serverPlayer);
         }
 
-        if (newLandName == null || newLandName.isEmpty()) {
+        if (this.newLandName == null || this.newLandName.isEmpty()) {
             return serverPlayer.clientError("Empty new land name")
                 .build(serverPlayer);
         }
 
         // Set name.
         return server.getInGameController()
-            .setNewLandName(serverPlayer, unit, newLandName)
+            .setNewLandName(serverPlayer, unit, this.newLandName)
             .build(serverPlayer);
     }
 
@@ -144,8 +147,8 @@ public class NewLandNameMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId,
-            "newLandName", newLandName).toXMLElement();
+            UNIT_TAG, this.unitId,
+            NEW_LAND_NAME_TAG, this.newLandName).toXMLElement();
     }
 
     /**

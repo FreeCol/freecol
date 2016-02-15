@@ -35,7 +35,6 @@ import org.w3c.dom.Element;
 public class LoginMessage extends DOMMessage {
 
     public static final String TAG = "login";
-
     private static final String ADMIN_TAG = "admin";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String SINGLE_PLAYER_TAG = "singlePlayer";
@@ -110,18 +109,12 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(Game game, Element e) {
         super(getTagName());
 
-        this.userName = DOMMessage.getStringAttribute(e,
-            USER_NAME_TAG, (String)null);
-        this.version = DOMMessage.getStringAttribute(e,
-            VERSION_TAG, (String)null);
-        this.admin = DOMMessage.getBooleanAttribute(e,
-            ADMIN_TAG, false);
-        this.startGame = DOMMessage.getBooleanAttribute(e,
-            START_GAME_TAG, false);
-        this.singlePlayer = DOMMessage.getBooleanAttribute(e,
-            SINGLE_PLAYER_TAG, true);
-        this.currentPlayer = DOMMessage.getBooleanAttribute(e,
-            CURRENT_PLAYER_TAG, false);
+        this.userName = getStringAttribute(e, USER_NAME_TAG);
+        this.version = getStringAttribute(e, VERSION_TAG);
+        this.admin = getBooleanAttribute(e, ADMIN_TAG, false);
+        this.startGame = getBooleanAttribute(e, START_GAME_TAG, false);
+        this.singlePlayer = getBooleanAttribute(e, SINGLE_PLAYER_TAG, true);
+        this.currentPlayer = getBooleanAttribute(e, CURRENT_PLAYER_TAG, false);
         this.game = getChild(game, e, 0, true, Game.class);
     }
 
@@ -156,8 +149,6 @@ public class LoginMessage extends DOMMessage {
         return this.game;
     }
 
-
-    // Implement MessageHandler
 
     /**
      * Handle a "login"-message.
@@ -279,17 +270,17 @@ public class LoginMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
+        Player player = (this.game == null || this.userName == null) ? null
+            : this.game.getPlayerByName(this.userName);
+        return new DOMMessage(getTagName(),
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
             ADMIN_TAG, Boolean.toString(this.admin),
             START_GAME_TAG, Boolean.toString(this.startGame),
             SINGLE_PLAYER_TAG, Boolean.toString(this.singlePlayer),
-            CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer));
-        if (this.game != null) {
-            result.add(this.game, this.game.getPlayerByName(this.userName));
-        }
-        return result.toXMLElement();
+            CURRENT_PLAYER_TAG, Boolean.toString(this.currentPlayer))
+            .add(this.game, player)
+            .toXMLElement();
     }
 
     /**

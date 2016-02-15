@@ -34,6 +34,11 @@ import org.w3c.dom.Element;
 public class FirstContactMessage extends DOMMessage {
 
     public static final String TAG = "firstContact";
+    private static final String CAMPS_TAG = "camps";
+    private static final String OTHER_TAG = "other";
+    private static final String PLAYER_TAG = "player";
+    private static final String RESULT_TAG = "result";
+    private static final String TILE_TAG = "tile";
 
     /** The identifier for the player making contact. */
     private final String playerId;
@@ -82,14 +87,11 @@ public class FirstContactMessage extends DOMMessage {
     public FirstContactMessage(Game game, Element element) {
         super(getTagName());
 
-        this.playerId = element.getAttribute("player");
-        this.otherId = element.getAttribute("other");
-        this.tileId = (!element.hasAttribute("tile")) ? null
-            : element.getAttribute("tile");
-        this.settlementCount = (!element.hasAttribute("camps")) ? null
-            : element.getAttribute("camps");
-        this.result = (!element.hasAttribute("result")) ? null
-            : element.getAttribute("result");
+        this.playerId = getStringAttribute(element, PLAYER_TAG);
+        this.otherId = getStringAttribute(element, OTHER_TAG);
+        this.tileId = getStringAttribute(element, TILE_TAG);
+        this.settlementCount = getStringAttribute(element, CAMPS_TAG);
+        this.result = getStringAttribute(element, RESULT_TAG);
     }
 
 
@@ -138,18 +140,19 @@ public class FirstContactMessage extends DOMMessage {
 
         Player first = getPlayer(game);
         if (first == null) {
-            return serverPlayer.clientError("Invalid player: " + playerId)
+            return serverPlayer.clientError("Invalid player: " + this.playerId)
                 .build(serverPlayer);
-        } else if (serverPlayer.getId().equals(playerId)) {
+        } else if (serverPlayer.getId().equals(this.playerId)) {
             ; // OK
         } else {
-            return serverPlayer.clientError("Not our player: " + playerId)
+            return serverPlayer.clientError("Not our player: " + this.playerId)
                 .build(serverPlayer);
         }
 
         ServerPlayer otherPlayer = (ServerPlayer)getOtherPlayer(game);
         if (otherPlayer == null) {
-            return serverPlayer.clientError("Invalid other player: " + otherId)
+            return serverPlayer.clientError("Invalid other player: "
+                + this.otherId)
                 .build(serverPlayer);
         } else if (otherPlayer == serverPlayer) {
             return serverPlayer.clientError("First contact with self!?!")
@@ -170,19 +173,12 @@ public class FirstContactMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "player", this.playerId,
-            "other", this.otherId);
-        if (this.tileId != null) {
-            result.setAttribute("tile", this.tileId);
-        }
-        if (this.settlementCount != null) {
-            result.setAttribute("camps", this.settlementCount);
-        }
-        if (this.result != null) {
-            result.setAttribute("result", this.result);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            PLAYER_TAG, this.playerId,
+            OTHER_TAG, this.otherId,
+            TILE_TAG, this.tileId,
+            CAMPS_TAG, this.settlementCount,
+            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**

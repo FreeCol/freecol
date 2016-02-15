@@ -34,6 +34,8 @@ import org.w3c.dom.Element;
 public class SetDestinationMessage extends DOMMessage {
 
     public static final String TAG = "setDestination";
+    private static final String DESTINATION_TAG = "destination";
+    private static final String UNIT_TAG = "unit";
 
     /** The object identifier of the unit whose destination is to be set. */
     private final String unitId;
@@ -66,10 +68,8 @@ public class SetDestinationMessage extends DOMMessage {
     public SetDestinationMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.destinationId = (element.hasAttribute("destination"))
-            ? element.getAttribute("destination")
-            : null;
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.destinationId = getStringAttribute(element, DESTINATION_TAG);
     }
 
 
@@ -87,15 +87,16 @@ public class SetDestinationMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(this.unitId,
+                                                        Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // destination == null is OK.
-        Location destination = (destinationId == null) ? null
-            : game.findFreeColLocation(destinationId);
+        Location destination = (this.destinationId == null) ? null
+            : game.findFreeColLocation(this.destinationId);
 
         // Set destination
         return server.getInGameController()
@@ -110,12 +111,9 @@ public class SetDestinationMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "unit", unitId);
-        if (destinationId != null) {
-            result.setAttribute("destination", destinationId);
-        }
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            UNIT_TAG, this.unitId,
+            DESTINATION_TAG, this.destinationId).toXMLElement();
     }
 
     /**

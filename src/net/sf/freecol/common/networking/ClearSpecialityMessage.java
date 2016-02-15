@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 public class ClearSpecialityMessage extends DOMMessage {
 
     public static final String TAG = "clearSpeciality";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit to be cleared. */
     private final String unitId;
@@ -61,7 +62,7 @@ public class ClearSpecialityMessage extends DOMMessage {
     public ClearSpecialityMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
     }
 
 
@@ -80,7 +81,7 @@ public class ClearSpecialityMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -100,7 +101,7 @@ public class ClearSpecialityMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", unitId).toXMLElement();
+            UNIT_TAG, this.unitId).toXMLElement();
     }
 
     /**

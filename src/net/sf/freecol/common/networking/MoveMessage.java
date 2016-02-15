@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
 public class MoveMessage extends DOMMessage {
 
     public static final String TAG = "move";
+    private static final String DIRECTION_TAG = "direction";
+    private static final String UNIT_TAG = "unit";
 
     /** The identifier of the object to be moved. */
     private final String unitId;
@@ -70,8 +72,8 @@ public class MoveMessage extends DOMMessage {
     public MoveMessage(Game game, Element element) {
         super(getTagName());
 
-        this.unitId = element.getAttribute("unit");
-        this.directionString = element.getAttribute("direction");
+        this.unitId = getStringAttribute(element, UNIT_TAG);
+        this.directionString = getStringAttribute(element, DIRECTION_TAG);
     }
 
 
@@ -90,7 +92,7 @@ public class MoveMessage extends DOMMessage {
 
         ServerUnit unit;
         try {
-            unit = player.getOurFreeColGameObject(unitId, ServerUnit.class);
+            unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -98,7 +100,7 @@ public class MoveMessage extends DOMMessage {
 
         Tile tile;
         try {
-            tile = unit.getNeighbourTile(directionString);
+            tile = unit.getNeighbourTile(this.directionString);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -106,7 +108,7 @@ public class MoveMessage extends DOMMessage {
 
         MoveType moveType = unit.getMoveType(tile);
         if (!moveType.isProgress()) {
-            return serverPlayer.clientError("Illegal move for: " + unitId
+            return serverPlayer.clientError("Illegal move for: " + this.unitId
                 + " type: " + moveType
                 + " from: " + unit.getLocation().getId()
                 + " to: " + tile.getId())
@@ -127,8 +129,8 @@ public class MoveMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            "unit", this.unitId,
-            "direction", this.directionString).toXMLElement();
+            UNIT_TAG, this.unitId,
+            DIRECTION_TAG, this.directionString).toXMLElement();
     }
 
     /**
