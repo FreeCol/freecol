@@ -731,7 +731,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         }
         this.newRoute.setSilent(this.messagesBox.isSelected());
 
-        StringTemplate err = this.newRoute.verify();
+        StringTemplate err = this.newRoute.verify(true);
         if (err != null) {
             getGUI().showInformationMessage(err);
             this.newRoute.setName(null); // Mark as unacceptable

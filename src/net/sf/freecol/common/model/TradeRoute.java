@@ -31,10 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-
-import org.w3c.dom.Element;
 
 
 /**
@@ -84,18 +81,6 @@ public class TradeRoute extends FreeColGameObject
      */
     public TradeRoute(Game game, String id) {
         super(game, id);
-    }
-
-    /**
-     * Creates a new <code>TradeRoute</code> instance.
-     *
-     * @param game The enclosing <code>Game</code>.
-     * @param e An <code>Element</code> to read from.
-     */
-    public TradeRoute(Game game, Element e) {
-        super(game, null);
-
-        DOMMessage.readFromXMLElement(this, e);
     }
 
 
@@ -257,16 +242,17 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Check that the trade route is valid.
      *
+     * @param nameCollisions Complain about name collisions.
      * @return Null if the route is valid, or a <code>StringTemplate</code>
      *     explaining the problem if invalid.
      */
-    public StringTemplate verify() {
+    public StringTemplate verify(boolean nameCollisions) {
         if (owner == null) {
             return StringTemplate.template("model.tradeRoute.nullOwner");
         }
 
         // Check that the name is unique
-        if (any(owner.getTradeRoutes(),
+        if (nameCollisions && any(owner.getTradeRoutes(),
                 tr -> tr != this && tr.getName().equals(name))) {
             return StringTemplate.template("model.tradeRoute.duplicateName")
                 .addName("%name%", name);

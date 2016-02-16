@@ -4053,12 +4053,14 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> to set trade
      *    routes for.
-     * @param routes The new list of <code>TradeRoute</code>s.
+     * @param routes The list of <code>TradeRoute</code>s.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet setTradeRoutes(ServerPlayer serverPlayer,
                                     List<TradeRoute> routes) {
-        serverPlayer.setTradeRoutes(routes);
+        for (TradeRoute tr : routes) {
+            serverPlayer.updateTradeRoute(tr);
+        }
         // Have to update the whole player alas.
         return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
     }
@@ -4146,6 +4148,23 @@ public final class InGameController extends Controller {
             getGame().sendToOthers(serverPlayer, cs);
         }
         return cs;
+    }
+
+
+    /**
+     * Update a trade route for a player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to set trade
+     *    routes for.
+     * @param tradeRoute An uninterned <code>TradeRoute</code> to update.
+     * @return A <code>ChangeSet</code> encapsulating this action.
+     */
+    public ChangeSet updateTradeRoute(ServerPlayer serverPlayer,
+                                      TradeRoute tradeRoute) {
+        serverPlayer.updateTradeRoute(tradeRoute);
+
+        // Have to update the whole player alas.
+        return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
     }
 
 

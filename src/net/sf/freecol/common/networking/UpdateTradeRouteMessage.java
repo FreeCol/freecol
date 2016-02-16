@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -60,9 +62,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     public UpdateTradeRouteMessage(Game game, Element element) {
         super(getTagName());
 
-        tradeRoute = (element.getChildNodes().getLength() != 1) ? null
-            : SetTradeRoutesMessage.tradeRouteFromElement(game,
-                  (Element) element.getChildNodes().item(0));
+        this.tradeRoute = getChild(game, element, 0, false, TradeRoute.class);
     }
 
 
@@ -71,31 +71,25 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
-     *
-     * @return An update containing the updateTradeRouted unit,
-     *         or an error <code>Element</code> on failure.
+     * @return Null, or an error message on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        if (this.tradeRoute == null || this.tradeRoute.getId() == null
-            || !SetTradeRoutesMessage.hasPrefix(this.tradeRoute)) {
+        if (this.tradeRoute == null || this.tradeRoute.getId() == null) {
             return serverPlayer.clientError("Bogus route")
                 .build(serverPlayer);
+        } else {
+            StringTemplate fail = this.tradeRoute.verify(false);
+            if (fail != null) {
+                return serverPlayer.clientError(Messages.message(fail))
+                    .build(serverPlayer);
+            }
         }
 
-        String id = SetTradeRoutesMessage.removePrefix(this.tradeRoute);
-        TradeRoute realRoute;
-        try {
-            realRoute = serverPlayer.getOurFreeColGameObject(id, 
-                TradeRoute.class);
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
-        }
-
-        realRoute.updateFrom(this.tradeRoute);
-        this.tradeRoute.dispose();
+        // Add this route to the game
+        this.tradeRoute.insert();
+        
         return null;
     }
 

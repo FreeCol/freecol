@@ -135,6 +135,20 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
+     * Insert this object into the game using its existing identifier.
+     */
+    public final void insert() {
+        final Game game = getGame();
+        if (game == null) throw new RuntimeException("Null game");
+        String id = getId();
+        FreeColGameObject fcgo = game.getFreeColGameObject(id);
+        if (fcgo != null && fcgo != this) {
+            game.removeFreeColGameObject(id, "update");
+        }
+        game.setFreeColGameObject(id, this);
+    }
+
+    /**
      * Has this object been initialized?
      *
      * @return True if this object is initialized.

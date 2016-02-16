@@ -143,7 +143,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                         StringTemplate template = null;
                         if (selected.getName() == null) { // Cancelled
                             selected.setName(name);
-                        } else if ((template = selected.verify()) == null) {
+                        } else if ((template = selected.verify(true)) == null) {
                             igc().updateTradeRoute(selected);
                             updateList(selected);
                         } else {
@@ -222,7 +222,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                 if (newRoute.getName() == null) { // Cancelled
                     deleteTradeRoute(newRoute);
                     updateList(null);
-                } else if ((template = newRoute.verify()) == null) {
+                } else if ((template = newRoute.verify(true)) == null) {
                     igc().updateTradeRoute(newRoute);
                     if (u != null) igc().assignTradeRoute(u, newRoute);
                     updateList(newRoute);
