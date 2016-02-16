@@ -324,10 +324,6 @@ public class DOMMessage {
     /**
      * Convenience method to extract a child element of a particular class.
      *
-     * Special handling for null game, so that
-     * <code>LoginMessage</code> can bootstrap itself despite no game
-     * existing yet.
-     *
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param index The index of the child element.
@@ -336,25 +332,12 @@ public class DOMMessage {
      */
     public static <T extends FreeColObject> T getChild(Game game,
         Element element, int index, Class<T> returnClass) {
-        T ret = null;
         NodeList nl = element.getChildNodes();
         Element e;
-        if (index < nl.getLength() && (e = (Element)nl.item(index)) != null) {
-            if (FreeColGameObject.class.isAssignableFrom(returnClass)) {
-                FreeColGameObject fcgo = (game == null)
-                    ? ((Game.class.isAssignableFrom(returnClass)) ? new Game()
-                        : null)
-                    : game.getFreeColGameObject(readId(e));
-                try {
-                    ret = returnClass.cast(fcgo);
-                } catch (ClassCastException cce) {}
-            }
-            if (ret == null && game != null) {
-                ret = game.newInstance(returnClass, false);
-            }
-            if (ret != null) readFromXMLElement(ret, e);
-        }
-        return ret;
+        return (index < nl.getLength()
+            && (e = (Element)nl.item(index)) != null)
+            ? readChild(game, e, returnClass)
+            : null;
     }
 
     /**
@@ -546,6 +529,37 @@ public class DOMMessage {
         return id;
     }
     // end @compat
+
+    /**
+     * Read a new FreeCol object from an element.
+     *
+     * Special handling for null game, so that
+     * <code>LoginMessage</code> can bootstrap itself despite no game
+     * existing yet.
+     *
+     * @param game The <code>Game</code> to check for existing objects.
+     * @param element The <code>Element</code> to read from.
+     * @param returnClass The expected return class.
+     * @return The object found or instantiated, or null on error.
+     */
+    public static <T extends FreeColObject> T readChild(Game game,
+        Element element, Class<T> returnClass) {
+        T ret = null;
+        if (FreeColGameObject.class.isAssignableFrom(returnClass)) {
+            FreeColGameObject fcgo = (game == null)
+                ? ((Game.class.isAssignableFrom(returnClass)) ? new Game()
+                    : null)
+                : game.getFreeColGameObject(readId(element));
+            try {
+                ret = returnClass.cast(fcgo);
+            } catch (ClassCastException cce) {}
+        }
+        if (ret == null && game != null) {
+            ret = game.newInstance(returnClass, false);
+        }
+        if (ret != null) readFromXMLElement(ret, element);
+        return ret;
+    }
 
     /**
      * Initialize a FreeColObject from an Element.

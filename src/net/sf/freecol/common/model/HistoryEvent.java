@@ -29,8 +29,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 import static net.sf.freecol.common.util.StringUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * A notable event in the history of a game.
@@ -98,6 +96,11 @@ public class HistoryEvent extends StringTemplate {
 
 
     /**
+     * Trivial constructor to allow creation with Game.newInstance.
+     */
+    public HistoryEvent() {}
+
+    /**
      * Create a new history event of given turn and type.
      *
      * @param turn The <code>Turn</code> of the event.
@@ -122,16 +125,6 @@ public class HistoryEvent extends StringTemplate {
     public HistoryEvent(FreeColXMLReader xr) throws XMLStreamException {
         readFromXML(xr);
     }
-
-    /**
-     * Create a new history event by reading a element.
-     *
-     * @param element The <code>Element</code> to read from.
-     */
-    public HistoryEvent(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
-    }
-
 
     /**
      * Get the turn of this history event.

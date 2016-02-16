@@ -308,7 +308,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            String owner = e.getAttribute("owner");
+            String owner = DOMMessage.getStringAttribute(e, "owner", (String)null);
             Player player = game.getFreeColGameObject(owner, Player.class);
             if (player == null) {
                 logger.warning("addObject with broken owner: " + owner);
@@ -323,13 +323,13 @@ public final class InGameInputHandler extends InputHandler {
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
             } else if (HistoryEvent.getTagName().equals(tag)) {
-                player.getHistory().add(new HistoryEvent(e));
+                player.getHistory().add(DOMMessage.readChild(game, e, HistoryEvent.class));
 
             } else if (LastSale.getTagName().equals(tag)) {
-                player.addLastSale(new LastSale(e));
+                player.addLastSale(DOMMessage.readChild(game, e, LastSale.class));
 
             } else if (ModelMessage.getTagName().equals(tag)) {
-                player.addModelMessage(new ModelMessage(e));
+                player.addModelMessage(DOMMessage.readChild(game, e, ModelMessage.class));
 
             } else {
                 logger.warning("addObject unrecognized: " + tag);

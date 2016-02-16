@@ -25,8 +25,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.DOMMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * This class contains the last sale a player has made, by Settlement
@@ -40,6 +38,11 @@ public final class LastSale extends FreeColObject {
     /** The price per unit returned from the sale. */
     private int price;
 
+
+    /**
+     * Trivial constructor to allow creation with Game.newInstance.
+     */
+    public LastSale() {}
 
     /**
      * Make a new LastSale record.
@@ -75,15 +78,6 @@ public final class LastSale extends FreeColObject {
      */
     public LastSale(FreeColXMLReader xr) throws XMLStreamException {
         readFromXML(xr);
-    }
-
-    /**
-     * Create a new last sale by reading an element.
-     *
-     * @param element The <code>Element</code> to read from.
-     */
-    public LastSale(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
     }
 
 

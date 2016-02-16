@@ -32,8 +32,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 import static net.sf.freecol.common.util.StringUtils.*;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Contains a message about a change in the model.
@@ -100,6 +98,11 @@ public class ModelMessage extends StringTemplate {
 
 
     /**
+     * Trivial constructor to allow creation with Game.newInstance.
+     */
+    public ModelMessage() {}
+        
+    /**
      * Creates a new <code>ModelMessage</code>.
      *
      * @param messageType The type of this model message.
@@ -112,25 +115,11 @@ public class ModelMessage extends StringTemplate {
     public ModelMessage(MessageType messageType, String id, String defaultId,
                         FreeColGameObject source, FreeColObject display) {
         super(id, defaultId, TemplateType.TEMPLATE);
+
         this.messageType = messageType;
         this.sourceId = source.getId();
         this.displayId = (display != null) ? display.getId() : source.getId();
     }
-
-    /**
-     * Creates a new <code>ModelMessage</code>.
-     *
-     * @param messageType The type of this model message.
-     * @param id The object identifier.
-     * @param defaultId The default identifier.
-     * @param source The source of the message. This is what the
-     *               message should be associated with.
-    public ModelMessage(MessageType messageType, String id, String defaultId,
-                        FreeColGameObject source) {
-        this(messageType, id, defaultId, source,
-             getDefaultDisplay(messageType, source));
-    }
-     */
 
     /**
      * Creates a new <code>ModelMessage</code>.
@@ -168,15 +157,6 @@ public class ModelMessage extends StringTemplate {
     public ModelMessage(FreeColXMLReader xr) throws XMLStreamException {
 
         readFromXML(xr);
-    }
-
-    /**
-     * Create a new model message by reading a element.
-     *
-     * @param element The <code>Element</code> to read from.
-     */
-    public ModelMessage(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
     }
 
 
