@@ -103,15 +103,6 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Convenience accessor for the game.
-     *
-     * @return The <code>Game</code>.
-     */
-    public final Game getGame() {
-        return aiMain.getGame();
-    }
-
-    /**
      * Checks if this <code>AIObject</code>
      * is uninitialized. That is: it has been referenced
      * by another object, but has not yet been updated with
@@ -148,17 +139,6 @@ public abstract class AIObject extends FreeColObject {
     }
 
 
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Specification getSpecification() {
-        return this.aiMain.getSpecification();
-    }
-
-
     // Other low level
 
     /**
@@ -171,5 +151,40 @@ public abstract class AIObject extends FreeColObject {
      */
     public int checkIntegrity(boolean fix) {
         return (isUninitialized()) ? -1 : 1;
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Specification getSpecification() {
+        return getAIMain().getSpecification();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void setSpecification(Specification specification) {
+        throw new RuntimeException("Can not set specification");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Game getGame() {
+        return getAIMain().getGame();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void setGame(Game game) {
+        throw new RuntimeException("Can not set game");
     }
 }
