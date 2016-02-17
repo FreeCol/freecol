@@ -35,6 +35,7 @@ import org.w3c.dom.Element;
 public class SetGoodsLevelsMessage extends DOMMessage {
 
     public static final String TAG = "setGoodsLevels";
+    private static final String COLONY_TAG = "colony";
 
     /** The identifier of the colony where the goods levels are set. */
     private final String colonyId;
@@ -67,8 +68,8 @@ public class SetGoodsLevelsMessage extends DOMMessage {
     public SetGoodsLevelsMessage(Game game, Element element) {
         super(getTagName());
 
-        colonyId = element.getAttribute("colony");
-        data = new ExportData((Element)element.getChildNodes().item(0));
+        this.colonyId = element.getAttribute("colony");
+        this.data = getChild(game, element, 0, ExportData.class);
     }
 
 
@@ -95,7 +96,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
 
         // Proceed to set.
         return server.getInGameController()
-            .setGoodsLevels(serverPlayer, colony, data)
+            .setGoodsLevels(serverPlayer, colony, this.data)
             .build(serverPlayer);
     }
 
@@ -106,10 +107,9 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
-            "colony", colonyId);
-        result.add(data);
-        return result.toXMLElement();
+        return new DOMMessage(getTagName(),
+            COLONY_TAG, this.colonyId)
+            .add(data).toXMLElement();
     }
 
     /**

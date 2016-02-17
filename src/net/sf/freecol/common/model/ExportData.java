@@ -59,6 +59,11 @@ public class ExportData extends FreeColObject {
 
 
     /**
+     * Trivial constructor for Game.newInstance.
+     */
+    public ExportData() {}
+
+    /**
      * Creates a new <code>ExportData</code> instance with default settings.
      *
      * @param goodsType The <code>GoodsType</code> this data refers to.
@@ -77,15 +82,6 @@ public class ExportData extends FreeColObject {
      */
     public ExportData(FreeColXMLReader xr) throws XMLStreamException {
         readFromXML(xr);
-    }
-
-    /**
-     * Create a new <code>ExportData</code> by reading an element.
-     *
-     * @param element The <code>Element</code> to read.
-     */
-    public ExportData(Element element) {
-        DOMMessage.readFromXMLElement(this, element);
     }
 
 
