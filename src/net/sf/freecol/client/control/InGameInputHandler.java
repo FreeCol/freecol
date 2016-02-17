@@ -323,13 +323,13 @@ public final class InGameInputHandler extends InputHandler {
                 player.invalidateCanSeeTiles();// Might be coronado?
                 
             } else if (HistoryEvent.getTagName().equals(tag)) {
-                player.getHistory().add(DOMMessage.readChild(game, e, HistoryEvent.class));
+                player.getHistory().add(DOMMessage.readElement(game, e, HistoryEvent.class));
 
             } else if (LastSale.getTagName().equals(tag)) {
-                player.addLastSale(DOMMessage.readChild(game, e, LastSale.class));
+                player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
 
             } else if (ModelMessage.getTagName().equals(tag)) {
-                player.addModelMessage(DOMMessage.readChild(game, e, ModelMessage.class));
+                player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
 
             } else {
                 logger.warning("addObject unrecognized: " + tag);

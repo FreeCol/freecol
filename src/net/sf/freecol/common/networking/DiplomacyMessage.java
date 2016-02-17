@@ -127,8 +127,8 @@ public class DiplomacyMessage extends DOMMessage {
 
         this.ourId = element.getAttribute("ourId");
         this.otherId = element.getAttribute("otherId");
-        this.agreement = getChild(game, element, 0, DiplomaticTrade.class);
-        this.extraUnit = getChild(game, element, 1, Unit.class);
+        this.agreement = getChild(game, element, 0, false, DiplomaticTrade.class);
+        this.extraUnit = getChild(game, element, 1, true, Unit.class);
     }
 
 

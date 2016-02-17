@@ -139,7 +139,7 @@ public class HighScore extends FreeColObject {
 
 
     /**
-     * Trivial constructor, for Game.newInstance.
+     * Trivial constructor, for FreeColObject.newInstance.
      */
     public HighScore() {}
 

@@ -98,7 +98,7 @@ public class ModelMessage extends StringTemplate {
 
 
     /**
-     * Trivial constructor to allow creation with Game.newInstance.
+     * Trivial constructor to allow creation with FreeColObject.newInstance.
      */
     public ModelMessage() {}
         

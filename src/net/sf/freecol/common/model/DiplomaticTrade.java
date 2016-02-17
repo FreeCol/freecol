@@ -88,7 +88,7 @@ public class DiplomaticTrade extends FreeColGameObject {
 
 
     /**
-     * Simple constructor, used in Game.newInstance.
+     * Simple constructor, used in FreeColGameObject.newInstance.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The identifier (ignored).

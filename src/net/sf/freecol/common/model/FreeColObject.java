@@ -82,7 +82,25 @@ public abstract class FreeColObject
     // Note: no constructors here.  There are some nasty cases where
     // we can not easily determine the identifier at construction
     // time, so it is better to just let things call setId() when
-    // ready.
+    // ready.  However we do have this utility.
+
+    /**
+     * Instantiate a FreeColObject class with its trivial constructor.
+     *
+     * @param returnClass The required FreeColObject class.
+     * @return The new object or null on error.
+     */
+    public static <T extends FreeColObject> T newInstance(Class<T> returnClass) {
+        try {
+            return Introspector.instantiate(returnClass,
+                new Class[] {}, new Object[] {});
+        } catch (Introspector.IntrospectorException ex) {
+            logger.log(Level.WARNING, "Unable to instantiate: "
+                + returnClass.getName(), ex);
+        }
+        return null;
+    }
+
 
     // Identifier handling
 

@@ -69,7 +69,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * Creates a standard <code>Goods</code>-instance given the place where
      * the goods is.
      *
-     * Used by Game.newInstance.
+     * Used by FreeColGameObject.newInstance.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The identifier (ignored, type gives identifier here).

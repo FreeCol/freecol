@@ -56,7 +56,7 @@ public class NewTradeRouteMessage extends DOMMessage {
     public NewTradeRouteMessage(Game game, Element element) {
         super(getTagName());
 
-        this.tradeRoute = getChild(game, element, 0, TradeRoute.class);
+        this.tradeRoute = getChild(game, element, 0, true, TradeRoute.class);
     }
 
 

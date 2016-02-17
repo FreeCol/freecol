@@ -44,7 +44,7 @@ public class AbstractUnit extends FreeColObject {
 
 
     /**
-     * Deliberately empty constructor, allowing use by Game.newInstance.
+     * Deliberately empty constructor, for FreeColObject.newInstance.
      */
     public AbstractUnit() {}
 

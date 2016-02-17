@@ -128,7 +128,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (fcgo == null) {
             game.addPlayer(new Player(game, playerElement));
         } else {
-            DOMMessage.readFromXMLElement(fcgo, playerElement);
+            DOMMessage.readFromXMLElement(fcgo, playerElement, true);
         }
         getGUI().refreshPlayersTable();
 
@@ -340,7 +340,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (children.getLength() == 1) {
             FreeColClient fcc = getFreeColClient();
             Game game = fcc.getGame();
-            DOMMessage.readFromXMLElement(game, (Element)children.item(0));
+            DOMMessage.readFromXMLElement(game, (Element)children.item(0), true);
             fcc.addSpecificationActions(game.getSpecification());
         } else {
             logger.warning("Child node expected: " + element.getTagName());
@@ -362,7 +362,7 @@ public final class PreGameInputHandler extends InputHandler {
             .getElementsByTagName(GameOptions.getTagName()).item(0);
         Specification spec = game.getSpecification();
         OptionGroup gameOptions = spec.getGameOptions();
-        DOMMessage.readFromXMLElement(gameOptions, mgoElement);
+        DOMMessage.readFromXMLElement(gameOptions, mgoElement, false);
         spec.clean("update game options (server initiated)");
 
         getGUI().updateGameOptions();
@@ -382,7 +382,7 @@ public final class PreGameInputHandler extends InputHandler {
             .getElementsByTagName(MapGeneratorOptions.getTagName())
             .item(0);
         DOMMessage.readFromXMLElement(getFreeColClient().getGame()
-            .getMapGeneratorOptions(), mgoElement);
+            .getMapGeneratorOptions(), mgoElement, false);
 
         getGUI().updateMapGeneratorOptions();
 

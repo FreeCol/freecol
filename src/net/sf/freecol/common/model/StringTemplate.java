@@ -73,7 +73,7 @@ public class StringTemplate extends FreeColObject {
 
 
     /**
-     * Trivial constructor to allow creation with Game.newInstance.
+     * Trivial constructor to allow creation with FreeColObject.newInstance.
      */
     public StringTemplate() {}
 

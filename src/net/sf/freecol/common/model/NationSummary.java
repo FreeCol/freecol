@@ -60,7 +60,7 @@ public class NationSummary extends FreeColObject {
 
 
     /**
-     * Trivial constructor allowing creation by Game.newInstance().
+     * Trivial constructor allowing creation by FreeColObject.newInstance().
      */
     public NationSummary() {
         setId(""); // Identifiers unnecessary

@@ -171,11 +171,13 @@ public class FreeColXMLReader extends StreamReaderDelegate
      * Set the read scope.
      *
      * @param readScope The new <code>ReadScope</code>.
+     * @return This reader.
      */
-    public void setReadScope(ReadScope readScope) {
+    public FreeColXMLReader setReadScope(ReadScope readScope) {
         this.readScope = readScope;
         this.uninterned = (shouldIntern()) ? null
             : new HashMap<String, FreeColObject>();
+        return this;
     }
 
     /**
@@ -699,7 +701,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
     private <T extends FreeColObject> T uninternedRead(Game game,
         Class<T> returnClass) throws XMLStreamException {
 
-        T ret = game.newInstance(returnClass, false);
+        T ret = FreeColGameObject.newInstance(game, returnClass);
         if (ret == null) {
             throw new XMLStreamException("Could not create instance of "
                 + returnClass.getName());

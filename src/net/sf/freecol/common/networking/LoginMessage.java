@@ -122,7 +122,7 @@ public class LoginMessage extends DOMMessage {
             SINGLE_PLAYER_TAG, true);
         this.currentPlayer = DOMMessage.getBooleanAttribute(e,
             CURRENT_PLAYER_TAG, false);
-        this.game = getChild(game, e, 0, Game.class);
+        this.game = getChild(game, e, 0, true, Game.class);
     }
 
 

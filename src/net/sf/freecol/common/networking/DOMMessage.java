@@ -327,6 +327,26 @@ public class DOMMessage {
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param index The index of the child element.
+     * @param intern Whether to intern the object found.
+     * @param returnClass The expected class of the child.
+     * @return A new instance of the return class, or null on error.
+     */
+    public static <T extends FreeColGameObject> T getChild(Game game,
+        Element element, int index, boolean intern, Class<T> returnClass) {
+        NodeList nl = element.getChildNodes();
+        Element e;
+        return (index < nl.getLength()
+            && (e = (Element)nl.item(index)) != null)
+            ? readGameElement(game, e, intern, returnClass)
+            : null;
+    }
+
+    /**
+     * Convenience method to extract a child element of a particular class.
+     *
+     * @param game The <code>Game</code> to instantiate within.
+     * @param element The parent <code>Element</code>.
+     * @param index The index of the child element.
      * @param returnClass The expected class of the child.
      * @return A new instance of the return class, or null on error.
      */
@@ -336,7 +356,7 @@ public class DOMMessage {
         Element e;
         return (index < nl.getLength()
             && (e = (Element)nl.item(index)) != null)
-            ? readChild(game, e, returnClass)
+            ? readElement(game, e, returnClass)
             : null;
     }
 
@@ -359,7 +379,6 @@ public class DOMMessage {
         }
         return ret;
     }
-
 
     /**
      * Convenience method to map a function over the children of an Element.
@@ -531,7 +550,7 @@ public class DOMMessage {
     // end @compat
 
     /**
-     * Read a new FreeCol object from an element.
+     * Read a new FreeCol game object from an element.
      *
      * Special handling for null game, so that
      * <code>LoginMessage</code> can bootstrap itself despite no game
@@ -539,13 +558,16 @@ public class DOMMessage {
      *
      * @param game The <code>Game</code> to check for existing objects.
      * @param element The <code>Element</code> to read from.
+     * @param intern Whether to intern the instantiated object.
      * @param returnClass The expected return class.
      * @return The object found or instantiated, or null on error.
      */
-    public static <T extends FreeColObject> T readChild(Game game,
-        Element element, Class<T> returnClass) {
+    public static <T extends FreeColGameObject> T readGameElement(Game game,
+        Element element, boolean intern, Class<T> returnClass) {
         T ret = null;
-        if (FreeColGameObject.class.isAssignableFrom(returnClass)) {
+        if (intern) {
+            // Check if the object is already in the game, but only if
+            // interning
             FreeColGameObject fcgo = (game == null)
                 ? ((Game.class.isAssignableFrom(returnClass)) ? new Game()
                     : null)
@@ -555,9 +577,24 @@ public class DOMMessage {
             } catch (ClassCastException cce) {}
         }
         if (ret == null && game != null) {
-            ret = game.newInstance(returnClass, false);
+            ret = FreeColGameObject.newInstance(game, returnClass);
         }
-        if (ret != null) readFromXMLElement(ret, element);
+        if (ret != null) readFromXMLElement(ret, element, intern);
+        return ret;
+    }
+
+    /**
+     * Read a new FreeCol object from an element.
+     *
+     * @param game The <code>Game</code> to check for existing objects.
+     * @param element The <code>Element</code> to read from.
+     * @param returnClass The expected return class.
+     * @return The object found or instantiated, or null on error.
+     */
+    public static <T extends FreeColObject> T readElement(Game game,
+        Element element, Class<T> returnClass) {
+        T ret = FreeColGameObject.newInstance(game, returnClass);
+        if (ret != null) readFromXMLElement(ret, element, true);
         return ret;
     }
 
@@ -569,6 +606,19 @@ public class DOMMessage {
      *      the object.
      */
     public static void readFromXMLElement(FreeColObject fco, Element element) {
+        readFromXMLElement(fco, element, true);
+    }
+
+    /**
+     * Initialize a FreeColObject from an Element.
+     *
+     * @param fco The <code>FreeColObject</code> to read into.
+     * @param intern Whether to intern the instantiated object.
+     * @param element An XML-element that will be used to initialize
+     *      the object.
+     */
+    public static void readFromXMLElement(FreeColObject fco, Element element,
+                                          boolean intern) {
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
@@ -577,8 +627,11 @@ public class DOMMessage {
                                      new StreamResult(stringWriter));
             String xml = stringWriter.toString();
             try (
-                FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+                FreeColXMLReader xr
+                    = new FreeColXMLReader(new StringReader(xml));
             ) {
+                xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
+                    : FreeColXMLReader.ReadScope.NOINTERN);
                 xr.nextTag();
                 fco.readFromXML(xr);
             } catch (XMLStreamException xe) {

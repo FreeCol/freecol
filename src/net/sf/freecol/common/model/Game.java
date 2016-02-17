@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
@@ -224,6 +225,22 @@ public class Game extends FreeColGameObject {
     }
 
 
+    /**
+     * Instantiate an uninitialized FreeColGameObject within this game.
+     *
+     * @param returnClass The required <code>FreeColObject</code> class.
+     * @param server Create a server object if possible.
+     * @return The new uninitialized object, or null on error.
+     */
+    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
+                                                   boolean server) {
+        @SuppressWarnings("unchecked")
+        Class<T> rc = (server) ? (Class<T>)serverClasses.get(returnClass)
+            : null;
+        return FreeColGameObject.newInstance(this,
+            (rc == null) ? returnClass : rc);
+    }
+    
     /**
      * Get the difficulty level of this game.
      *
@@ -1067,45 +1084,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the equivalent server class to the given class.
-     *
-     * @param c The class to look up.
-     * @return The corresponding server class, or the original class
-     *     if none found.
-     */
-    private static <T extends FreeColObject> Class<T> serverClass(Class<T> c) {
-        @SuppressWarnings("unchecked")
-        Class<T> rc = (Class<T>)serverClasses.get(c);
-        return (rc == null) ? c : rc;
-    }
-
-    /**
-     * Instantiate an uninitialized FreeColGameObject class within this game.
-     *
-     * @param returnClass The required FreeColObject class.
-     * @param server Create a server object if possible.
-     * @return The new uninitialized object, or null on error.
-     */
-    public <T extends FreeColObject> T newInstance(Class<T> returnClass,
-                                                   boolean server) {
-        Class<T> rc = (server) ? serverClass(returnClass) : returnClass;
-        try {
-            return Introspector.instantiate(rc,
-                new Class[] { Game.class, String.class },
-                new Object[] { this, (String)null });
-        } catch (Introspector.IntrospectorException ex) {}
-        // OK, did not work, try the trivial constructor
-        try {
-            return Introspector.instantiate(rc,
-                new Class[] {}, new Object[] {});
-        } catch (Introspector.IntrospectorException ex) {
-            logger.log(Level.WARNING, "Unable to instantiate: "
-                + rc.getName(), ex);
-        }
-        return null;
-    }
-
-    /**
      * Unserialize from XML to a FreeColObject in this game.
      *
      * @param xml The xml serialized version of an object.
@@ -1119,7 +1097,7 @@ public class Game extends FreeColGameObject {
         try {
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            T ret = newInstance(returnClass, false);
+            T ret = FreeColGameObject.newInstance(this, returnClass);
             ret.readFromXML(xr);
             return ret;
 
