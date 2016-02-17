@@ -63,6 +63,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
+import net.sf.freecol.common.networking.SpySettlementMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -272,8 +273,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = setDead(element); break;
         case "setStance":
             reply = setStance(element); break;
-        case "spyResult":
-            reply = spyResult(element); break;
+        case SpySettlementMessage.TAG:
+            reply = spySettlement(element); break;
         case "update":
             reply = update(element); break;
         default:
@@ -1070,40 +1071,12 @@ public final class InGameInputHandler extends InputHandler {
      *     tree) that holds all the information.
      * @return Null.
      */
-    private Element spyResult(Element element) {
-        // The element contains two children, being the full and
-        // normal versions of the settlement-being-spied-upon's tile.
-        // It has to be the tile, as otherwise we do not see the units
-        // defending the settlement.  So, we have to unpack, update
-        // with the first, display, then update with the second.  This
-        // is hacky as the client could retain the settlement
-        // information, but the potential abuses are limited.
-        NodeList nodeList = element.getChildNodes();
-        if (nodeList.getLength() != 2) {
-            logger.warning("spyResult length = " + nodeList.getLength());
-            return null;
-        }
-
+    private Element spySettlement(Element element) {
         final Game game = getGame();
-        final String tileId = element.getAttribute("tile");
-        final Tile tile = game.getFreeColGameObject(tileId, Tile.class);
-        if (tile == null) {
-            logger.warning("spyResult bad tile = " + tileId);
-            return null;
-        }
-
-        // Read the privileged tile information from fullElement, and
-        // pass a runnable to the display routine that restores the
-        // normal view of the tile, which happens when the colony panel
-        // is closed.
-        final Element fullElement = (Element)nodeList.item(0);
-        final Element normalElement = (Element)nodeList.item(1);
-        DOMMessage.readFromXMLElement(tile, fullElement);
-        invokeLater(() -> {
-                igc().spyColony(tile, () -> {
-                        DOMMessage.readFromXMLElement(tile, normalElement);
-                    });
-            });
+        final SpySettlementMessage message
+            = new SpySettlementMessage(game, element);
+        final Tile spyTile = message.getSpyTile();
+        invokeLater(() -> igc().spyColony(spyTile));
         return null;
     }
 
@@ -1118,7 +1091,6 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = getFreeColClient().getMyPlayer();
         final Game game = getGame();
         boolean visibilityChange = false;
-        
         for (FreeColGameObject fcgo : DOMMessage.mapChildren(game, element,
                 e -> DOMMessage.updateFromElement(game, e))) {
             if ((fcgo instanceof Player && (fcgo == player))
@@ -1128,7 +1100,6 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
-
         return null;
     }
 }

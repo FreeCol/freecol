@@ -1316,9 +1316,8 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showSpyColonyPanel(final Tile tile, Runnable callback) {
-        ColonyPanel panel = canvas.showSpyColonyPanel(tile);
-        panel.addClosingCallback(callback);
+    public void showSpyColonyPanel(final Tile tile) {
+        canvas.showSpyColonyPanel(tile);
     }
 
     @Override

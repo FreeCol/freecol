@@ -20,8 +20,10 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -38,28 +40,35 @@ import org.w3c.dom.Element;
 public class SpySettlementMessage extends DOMMessage {
 
     public static final String TAG = "spySettlement";
-    private static final String DIRECTION_TAG = "direction";
+    private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
     /** The identifier of the object doing the spying. */
     private final String unitId;
 
-    /** The direction the spy is looking. */
-    private final String directionString;
+    /** The identifier of the settlement to spy on. */
+    private final String settlementId;
+
+    /**
+     * A copy of the tile with the settlement on it, but including all
+     * the extra (normally invisible) information.
+     */
+    private Tile spyTile;
 
 
     /**
-     * Create a new <code>SpySettlementMessage</code> with the
-     * supplied unit and direction.
+     * Create a new <code>SpySettlementMessage</code> request with the
+     * supplied unit and settlement
      *
      * @param unit The <code>Unit</code> that is spying.
-     * @param direction The <code>Direction</code> the unit is looking.
+     * @param settlement The <code>Settlement</code> the unit is looking at.
      */
-    public SpySettlementMessage(Unit unit, Direction direction) {
+    public SpySettlementMessage(Unit unit, Settlement settlement) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        this.settlementId = settlement.getId();
+        this.spyTile = null;
     }
 
     /**
@@ -73,7 +82,23 @@ public class SpySettlementMessage extends DOMMessage {
         super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
+        this.spyTile = getChild(game, element, 0, false, Tile.class);
+    }
+
+
+    // Public interface
+
+    public Tile getSpyTile() {
+        return this.spyTile;
+    }
+
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(this.unitId, Unit.class);
+    }
+
+    public Colony getColony(Game game) {
+        return game.getFreeColGameObject(this.settlementId, Colony.class);
     }
 
 
@@ -90,10 +115,11 @@ public class SpySettlementMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
+        final Game game = serverPlayer.getGame();
 
         Unit unit;
         try {
-            unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = getUnit(serverPlayer);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -104,31 +130,29 @@ public class SpySettlementMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Tile tile;
-        try {
-            tile = unit.getNeighbourTile(this.directionString);
-        } catch (Exception e) {
-            return serverPlayer.clientError(e.getMessage())
+        Colony colony = getColony(game);
+        if (colony == null) {
+            return serverPlayer.clientError("Not a colony: "
+                + this.settlementId)
+                .build(serverPlayer);
+        }
+        Tile tile = colony.getTile();
+        if (!unit.getTile().isAdjacent(tile)) {
+            return serverPlayer.clientError("Unit " + this.unitId
+                + " not adjacent to colony: " + this.settlementId)
                 .build(serverPlayer);
         }
 
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) {
-            return serverPlayer.clientError("There is no settlement at: "
-                + tile.getId())
-                .build(serverPlayer);
-        }
-
-        MoveType type = unit.getMoveType(settlement.getTile());
+        MoveType type = unit.getMoveType(tile);
         if (type != MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
             return serverPlayer.clientError("Unable to enter at: "
-                + settlement.getName() + ": " + type.whyIllegal())
+                + colony.getName() + ": " + type.whyIllegal())
                 .build(serverPlayer);
         }
 
         // Spy on the settlement
         return server.getInGameController()
-            .spySettlement(serverPlayer, unit, settlement)
+            .spySettlement(serverPlayer, unit, colony)
             .build(serverPlayer);
     }
 
@@ -141,7 +165,7 @@ public class SpySettlementMessage extends DOMMessage {
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
+            SETTLEMENT_TAG, this.settlementId).toXMLElement();
     }
 
     /**

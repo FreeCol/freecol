@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -1194,17 +1195,20 @@ public class ChangeSet {
      * Encapsulates a spying action.
      */
     private static class SpyChange extends Change {
-        private final Tile tile;
+        private final Unit unit;
+        private final Settlement settlement;
 
         /**
          * Build a new SpyChange.
          *
          * @param see The visibility of this change.
+         * @param unit The <code>Unit</code> that is spying.
          * @param settlement The <code>Settlement</code> to spy on.
          */
-        public SpyChange(See see, Settlement settlement) {
+        public SpyChange(See see, Unit unit, Settlement settlement) {
             super(see);
-            tile = settlement.getTile();
+            this.unit = unit;
+            this.settlement = settlement;
         }
 
         /**
@@ -1226,14 +1230,13 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("spyResult");
-            element.setAttribute("tile", tile.getId());
-            // Have to tack on two copies of the settlement tile.
-            // One full version, one ordinary version to restore.
+            Element element = (Element)doc
+                .adoptNode(new SpySettlementMessage(unit, settlement)
+                    .toXMLElement());
+            // Tack on a copy of the settlement tile with full visibility.
+            Tile tile = settlement.getTile();
             element.appendChild(DOMMessage.toXMLElement(tile, doc,
                                                         (Player)null));
-            element.appendChild(DOMMessage.toXMLElement(tile.getCachedTile(serverPlayer),
-                                                        doc, serverPlayer));
             return element;
         }
 
@@ -1252,7 +1255,7 @@ public class ChangeSet {
             sb.append("[").append(getClass().getName())
                 .append(" ").append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(tile.getId())
+                .append(" ").append(settlement.getId())
                 .append("]");
             return sb.toString();
         }
@@ -1729,11 +1732,12 @@ public class ChangeSet {
      * Helper function to add a spying change to a ChangeSet.
      *
      * @param see The visibility of this change.
+     * @param unit The <code>Unit</code> that is spying.
      * @param settlement The <code>Settlement</code> to spy on.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addSpy(See see, Settlement settlement) {
-        changes.add(new SpyChange(see, settlement));
+    public ChangeSet addSpy(See see, Unit unit, Settlement settlement) {
+        changes.add(new SpyChange(see, unit, settlement));
         return this;
     }
 

@@ -1767,8 +1767,10 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit can move further.
      */
     private boolean moveSpy(Unit unit, Direction direction) {
-        askServer().spy(unit, direction);
-        return false;
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
+        return (settlement instanceof Colony)
+            ? askServer().spy(unit, settlement)
+            : false;
     }
 
     /**
@@ -4864,12 +4866,10 @@ public final class InGameController implements NetworkConstants {
      *
      * Called from IGIH.spyResult.
      *
-     * @param tile The <code>Tile</code> to find the colony on.
-     * @param recover A <code>Runnable</code> to restore the normal
-     *     player view of the tile when the spying colony panel is closed.
+     * @param tile A special copy of the <code>Tile</code> with the colony.
      */
-    public void spyColony(Tile tile, Runnable recover) {
-        gui.showSpyColonyPanel(tile, recover);
+    public void spyColony(Tile tile) {
+        gui.showSpyColonyPanel(tile);
     }
     
     /**

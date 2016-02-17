@@ -4041,7 +4041,7 @@ public final class InGameController extends Controller {
                                    Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        cs.addSpy(See.only(serverPlayer), settlement);
+        cs.addSpy(See.only(serverPlayer), unit, settlement);
         unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         return cs;

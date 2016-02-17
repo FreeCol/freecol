@@ -1294,12 +1294,12 @@ public abstract class ServerAPI {
      * Server query-response for spying on a colony.
      *
      * @param unit The <code>Unit</code> that is spying.
-     * @param direction The <code>Direction</code> of a colony to spy on.
+     * @param settlement The <code>Settlement</code> to spy on.
      * @return True if the client/server interaction succeeded.
      */
-    public boolean spy(Unit unit, Direction direction) {
+    public boolean spy(Unit unit, Settlement settlement) {
         return askHandling(unit.getGame(),
-            new SpySettlementMessage(unit, direction), null);
+            new SpySettlementMessage(unit, settlement), null);
     }
 
     /**

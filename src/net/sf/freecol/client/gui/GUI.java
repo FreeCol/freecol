@@ -1306,8 +1306,7 @@ public class GUI {
     public void showNewPanel(Specification specification) {
     }
 
-    public void showSpyColonyPanel(final Tile tile, Runnable callback) {
-    }
+    public void showSpyColonyPanel(final Tile tile) {}
 
     public Parameters showParametersDialog() {
         return null;
