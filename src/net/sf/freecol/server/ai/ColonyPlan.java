@@ -229,9 +229,7 @@ public class ColonyPlan {
      * @return A copy of the of <code>BuildableType</code>s list.
      */
     public List<BuildableType> getBuildableTypes() {
-        List<BuildableType> build = new ArrayList<>();
-        for (BuildPlan b : buildPlans) build.add(b.type);
-        return build;
+        return toList(map(buildPlans, bp -> bp.type));
     }
 
     /**

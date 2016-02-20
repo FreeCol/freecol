@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -31,6 +32,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -192,11 +194,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     @Override
     public void generateChoices() {
         unitType.generateChoices();
-        List<String> roles = new ArrayList<>();
-        for (Role r : getSpecification().getRoles()) {
-            roles.add(r.getId());
-        }
-        role.setChoices(roles);
+        role.setChoices(toList(map(getSpecification().getRoles(), Role::getId)));
     }
 
 

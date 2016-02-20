@@ -113,9 +113,10 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
+import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.common.util.Utils;
+
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.REFAIPlayer;
@@ -3714,12 +3715,9 @@ public final class InGameController extends Controller {
 
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
-            Set<Tile> tiles = new HashSet<>();
-            for (Tile t : tile.getSurroundingTiles(1, radius)) {
-                if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
-                    tiles.add(t);
-                }
-            }
+            Set<Tile> tiles = transform(tile.getSurroundingTiles(1, radius),
+                t -> !serverPlayer.canSee(t) && (t.isLand() || t.isShore()),
+                Collectors.toSet());
             cs.add(See.only(serverPlayer), serverPlayer.exploreTiles(tiles));
 
             // If the unit was promoted, update it completely, otherwise just
