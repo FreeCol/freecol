@@ -19,8 +19,11 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.Comparator;
 import java.util.Random;
+import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -45,8 +48,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-
 import static net.sf.freecol.common.util.StringUtils.*;
 
 import net.sf.freecol.server.ai.AIMain;
@@ -604,22 +607,17 @@ public abstract class Mission extends AIObject {
      * @return A good settlement to restart a Mission from.
      */
     protected static Settlement getBestSettlement(Player player) {
-        int bestValue = -1;
-        Settlement best = null;
-        for (Settlement settlement : player.getSettlements()) {
-            int value = settlement.getUnitCount()
-                + settlement.getTile().getUnitCount();
-            if (settlement instanceof Colony) {
-                Colony colony = (Colony)settlement;
-                value += ((colony.isConnectedPort()) ? 10 : 0) // Favour coastal
-                    + colony.getAvailableWorkLocations().size();
-            }
-            if (value > bestValue) {
-                bestValue = value;
-                best = settlement;
-            }
-        }
-        return (best == null) ? null : best;
+        final Comparator<Settlement> comp = cachingIntComparator(s -> {
+                int value = s.getUnitCount() + s.getTile().getUnitCount();
+                if (s instanceof Colony) {
+                    Colony colony = (Colony)s;
+                    // Favour coastal
+                    value += ((colony.isConnectedPort()) ? 10 : 0)
+                        + colony.getAvailableWorkLocations().size();
+                }
+                return value;
+            });
+        return maximize(player.getSettlements(), s -> true, comp);
     }
 
     /**

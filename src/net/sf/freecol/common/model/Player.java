@@ -2409,16 +2409,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return This players closest port.
      */
     public Settlement getClosestPortForEurope() {
-        int bestValue = INFINITY;
-        Settlement best = null;
-        for (Settlement settlement : getSettlements()) {
-            int value = settlement.getHighSeasCount();
-            if (bestValue > value) {
-                bestValue = value;
-                best = settlement;
-            }
-        }
-        return best;
+        final Comparator<Settlement> comp
+            = Comparator.comparingInt(Settlement::getHighSeasCount);
+        return minimize(getSettlements(), s -> true, comp);
     }
 
 
@@ -3516,16 +3509,14 @@ public class Player extends FreeColGameObject implements Nameable {
         TypeCountMap<GoodsType> production = new TypeCountMap<>();
 
         // Initialize tile value with food production.
-        int initialFood = 0;
         final GoodsType foodType = spec.getPrimaryFoodType();
-        for (ProductionType productionType : tile.getType()
-                 .getAvailableProductionTypes(true)) {
-            for (AbstractGoods output : productionType.getOutputs()) {
-                if (!output.getType().isFoodType()) continue;
-                int amount = tile.getPotentialProduction(output.getType(), null);
-                if (amount > initialFood) initialFood = amount;
-            }
-        }
+        final Comparator<AbstractGoods> comp = Comparator.comparingInt(ag ->
+            tile.getPotentialProduction(ag.getType(), null));
+        AbstractGoods bestFood = maximize(tile.getType()
+                .getAvailableProductionTypes(true).stream()
+                .flatMap(pt -> pt.getOutputs().stream()),
+            ag -> ag.getType().isFoodType(), comp);
+        int initialFood = (bestFood == null) ? 0 : bestFood.getAmount();
         if (initialFood <= FOOD_VERY_LOW) {
             values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                        NoValueType.FOOD.getDouble());

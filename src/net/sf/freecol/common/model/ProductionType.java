@@ -22,13 +22,18 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.common.model.AbstractGoods;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -219,17 +224,10 @@ public class ProductionType extends FreeColSpecObject {
      * @return The <code>GoodsType</code> of the most productive output.
      */
     public GoodsType getBestOutputType() {
-        AbstractGoods best = null;
-        if (outputs != null) {
-            int amount = 0;
-            for (AbstractGoods output : outputs) {
-                if (amount < output.getAmount()) {
-                    amount = output.getAmount();
-                    best = output;
-                }
-            }
-        }
-        return (best == null) ? null : best.getType();
+        AbstractGoods goods;
+        return (outputs == null || (goods = maximize(outputs, ag -> true,
+                    AbstractGoods.amountComparator)) == null) ? null
+            : goods.getType();
     }
 
     /**

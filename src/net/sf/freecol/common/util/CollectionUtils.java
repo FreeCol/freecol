@@ -39,6 +39,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.freecol.common.util.CachingFunction;
+
 
 /**
  * Collection of small static helper methods using Collections.
@@ -371,6 +373,46 @@ public class CollectionUtils {
     }
 
     /**
+     * Helper to create a caching ToIntFunction.
+     *
+     * @param f The integer valued function to cache.
+     * @return A caching <code>ToIntFunction</code>.
+     */
+    public static <T> ToIntFunction<T> cacheInt(Function<T, Integer> f) {
+        return t -> new CachingFunction<T, Integer>(f).apply(t);
+    }
+
+    /**
+     * Helper to create a caching comparator.
+     *
+     * @param f The integer valued function to use in comparison.
+     * @return A caching <code>Comparator</code>.
+     */
+    public static <T> Comparator<T> cachingIntComparator(Function<T, Integer> f) {
+        return Comparator.comparingInt(cacheInt(f));
+    }
+
+    /**
+     * Helper to create a caching ToDoubleFunction.
+     *
+     * @param f The double valued function to cache.
+     * @return A caching <code>ToDoubleFunction</code>.
+     */
+    public static <T> ToDoubleFunction<T> cacheDouble(Function<T, Double> f) {
+        return t -> new CachingFunction<T, Double>(f).apply(t);
+    }
+
+    /**
+     * Helper to create a caching comparator.
+     *
+     * @param f The double valued function to use in comparison.
+     * @return A caching <code>Comparator</code>.
+     */
+    public static <T> Comparator<T> cachingDoubleComparator(Function<T, Double> f) {
+        return Comparator.comparingDouble(cacheDouble(f));
+    }
+
+    /**
      * Does a collection contain at least one element that matches a predicate?
      *
      * @param c The <code>Collection</code> to search.
@@ -521,6 +563,64 @@ public class CollectionUtils {
     public static <T> int max(Stream<T> stream, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).max().orElse(0);
+    }
+
+    /**
+     * Find the selected member of a collection that maximizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to maximize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(Collection<T> c, Predicate<T> predicate,
+                                 Comparator<T> comparator) {
+        return maximize(c.stream(), predicate, comparator);
+    }
+
+    /**
+     * Find the selected member of a stream that maximizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to maximize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(Stream<T> stream, Predicate<T> predicate,
+                                 Comparator<T> comparator) {
+        return stream.filter(predicate).collect(Collectors.maxBy(comparator))
+            .orElse(null);
+    }
+
+    /**
+     * Find the selected member of a collection that minimizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to minimize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(Collection<T> c, Predicate<T> predicate,
+                                 Comparator<T> comparator) {
+        return minimize(c.stream(), predicate, comparator);
+    }
+
+    /**
+     * Find the selected member of a stream that minimizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to minimize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(Stream<T> stream, Predicate<T> predicate,
+                                 Comparator<T> comparator) {
+        return stream.filter(predicate).collect(Collectors.minBy(comparator))
+            .orElse(null);
     }
 
     /**

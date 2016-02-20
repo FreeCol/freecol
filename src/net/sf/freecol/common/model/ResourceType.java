@@ -19,10 +19,15 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -71,17 +76,11 @@ public final class ResourceType extends FreeColSpecObjectType {
      */
     public GoodsType getBestGoodsType() {
         final Specification spec = getSpecification();
-        GoodsType bestType = null;
-        float bestValue = 0f;
-        for (Modifier modifier : getModifiers()) {
-            GoodsType goodsType = spec.getGoodsType(modifier.getId());
-            float value = spec.getInitialPrice(goodsType) * modifier.applyTo(100);
-            if (bestType == null || value > bestValue) {
-                bestType = goodsType;
-                bestValue = value;
-            }
-        }
-        return bestType;
+        final Comparator<Modifier> comp = cachingDoubleComparator(m ->
+            spec.getInitialPrice(spec.getGoodsType(m.getId()))
+                * (double)m.applyTo(100));
+        Modifier best = maximize(getModifiers(), m -> true, comp);
+        return (best == null) ? null : spec.getGoodsType(best.getId());
     }
 
 

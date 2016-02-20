@@ -19,14 +19,19 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.Comparator;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -37,6 +42,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import net.sf.freecol.server.ai.AIColony;
@@ -436,17 +442,11 @@ public class BuildColonyMission extends Mission {
                 }
 
                 // Go to the nearest smaller colony?
-                Colony best = null;
-                int bestValue = INFINITY;
-                for (Colony c : player.getColonies()) {
-                    if (c == colony) continue;
-                    if (c.getUnitCount() < colony.getUnitCount()) continue;
-                    PathNode path = unit.findPath(c);
-                    if (path != null && path.getTotalTurns() < bestValue) {
-                        bestValue = path.getTotalTurns();
-                        best = c;
-                    }
-                }
+                final Predicate<Colony> pred = c ->
+                    c != colony && c.getUnitCount() < colony.getUnitCount();
+                final Comparator<Colony> comp = cachingIntComparator(c ->
+                    unit.getTurnsToReach(c));
+                Colony best = minimize(player.getColonies(), pred, comp);
                 if (best != null) {
                     lb.add(", going to smaller ", best.getUnitCount(), "<",
                         colony.getUnitCount(), " colony");

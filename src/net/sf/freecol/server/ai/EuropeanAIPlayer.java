@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -75,12 +77,12 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
+import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -95,6 +97,8 @@ import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
+import net.sf.freecol.server.ai.ValuedAIObject;
+import net.sf.freecol.server.ai.WorkerWish;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -474,31 +478,21 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
 
         if (randoms[cheatIndex++] < landUnitCheatPercent) {
-            WorkerWish bestWish = null;
-            int bestValue = Integer.MIN_VALUE;
-            for (UnitType ut : workerWishes.keySet()) {
-                List<WorkerWish> wl = workerWishes.get(ut);
-                if (wl == null
-                    || wl.isEmpty()
-                    || ut == null
-                    || !ut.isAvailableTo(player)
-                    || europe.getUnitPrice(ut) == UNDEFINED) continue;
-                WorkerWish ww = wl.get(0);
-                if (bestValue < ww.getValue()) {
-                    bestValue = ww.getValue();
-                    bestWish = ww;
-                }
-            }
+            final Comparator<WorkerWish> comp
+                = Comparator.comparingInt(ValuedAIObject::getValue);
+            Stream<WorkerWish> values = workerWishes.keySet().stream()
+                .filter(ut -> ut != null && ut.isAvailableTo(player)
+                    && europe.getUnitPrice(ut) != UNDEFINED)
+                .map(ut -> workerWishes.get(ut))
+                .filter(wl -> wl != null && !wl.isEmpty())
+                .map(wl -> wl.get(0));
+            WorkerWish bestWish = maximize(values, ww -> true, comp);
 
-            int cost;
-            if (bestWish != null) {
-                cost = europe.getUnitPrice(bestWish.getUnitType());
-            } else if (player.getImmigration()
-                < player.getImmigrationRequired() / 2) {
-                cost = player.getRecruitPrice();
-            } else {
-                cost = INFINITY;
-            }
+            int cost = (bestWish != null)
+                ? europe.getUnitPrice(bestWish.getUnitType())
+                : (player.getImmigration() < player.getImmigrationRequired() / 2)
+                ? player.getRecruitPrice()
+                : INFINITY;
             if (cost != INFINITY) {
                 cheatGold(cost, lb);
                 AIUnit aiu;
@@ -524,8 +518,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         if (game.getTurn().getNumber() > 300
             && player.isAtWar()
             && randoms[cheatIndex++] < offensiveLandUnitCheatPercent) {
-            // Find a target to attack.
-            Location target = null;
             // - collect enemies, prefer not to antagonize the strong or
             //   crush the weak
             List<Player> enemies = new ArrayList<>();
@@ -544,25 +536,21 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 enemies.addAll(preferred);
             }
             List<Colony> colonies = player.getColonies();
+            // Find a target to attack.
+            Location target = null;
             // Few colonies?  Attack the weakest European port
             if (colonies.size() < 3) {
-                List<Colony> targets = new ArrayList<>();
-                for (Player p : enemies) {
-                    if (p.isEuropean()) targets.addAll(p.getColonies());
-                }
-                double targetScore = -1;
-                for (Colony c : targets) {
-                    if (c.isConnectedPort()) {
-                        double score = 100000.0 / c.getUnitCount();
-                        Building stockade = c.getStockade();
-                        score /= (stockade == null) ? 1.0
-                            : (stockade.getLevel() + 1.5);
-                        if (targetScore < score) {
-                            targetScore = score;
-                            target = c;
-                        }
-                    }
-                }
+                final Comparator<Colony> targetScore
+                    = cachingDoubleComparator(c -> {
+                            double score = 100000.0 / c.getUnitCount();
+                            Building stockade = c.getStockade();
+                            return (stockade == null) ? 1.0
+                                : score / (stockade.getLevel() + 1.5);
+                        });
+                target = maximize(enemies.stream()
+                    .filter(Player::isEuropean)
+                    .flatMap(p -> p.getColonies().stream()),
+                    Colony::isConnectedPort, targetScore);
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
@@ -835,15 +823,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The tile with the best plan for a colony, or null if none found.
      */
     public Tile getBestPlanTile(Colony colony) {
-        TileImprovementPlan best = null;
-        int bestValue = Integer.MIN_VALUE;
-        for (Tile t : colony.getOwnedTiles()) {
-            TileImprovementPlan tip = tipMap.get(t);
-            if (tip != null && tip.getValue() > bestValue) {
-                bestValue = tip.getValue();
-                best = tip;
-            }
-        }
+        final Comparator<TileImprovementPlan> comp
+            = Comparator.comparingInt(TileImprovementPlan::getValue);
+        TileImprovementPlan best
+            = maximize(map(colony.getOwnedTiles(), t -> tipMap.get(t)),
+                       tip -> tip != null, comp);
         return (best == null) ? null : best.getTarget();
     }
 
@@ -1208,23 +1192,20 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The best <code>GoodsWish</code> for the unit.
      */
     public GoodsWish getBestGoodsWish(AIUnit aiUnit, GoodsType goodsType) {
-        List<GoodsWish> wishes = goodsWishes.get(goodsType);
-        if (wishes == null) return null;
-
         final Unit carrier = aiUnit.getUnit();
-        double bestValue = 0.0f;
-        GoodsWish best = null;
-        for (GoodsWish w : wishes) {
-            int turns = carrier.getTurnsToReach(carrier.getLocation(),
-                                                w.getDestination());
-            if (turns >= Unit.MANY_TURNS) continue;
-            double value = (double)w.getValue() / turns;
-            if (bestValue < value) {
-                bestValue = value;
-                best = w;
-            }
-        }
-        return best;
+        final ToDoubleFunction<GoodsWish> wishValue
+            = cacheDouble(gw -> {
+                    int turns = carrier.getTurnsToReach(carrier.getLocation(),
+                                                        gw.getDestination());
+                    return (turns >= Unit.MANY_TURNS) ? -1.0
+                        : (double)gw.getValue() / turns;
+                });
+        final Comparator<GoodsWish> comp
+            = Comparator.comparingDouble(wishValue);
+
+        List<GoodsWish> wishes = goodsWishes.get(goodsType);
+        return (wishes == null) ? null
+            : maximize(wishes, gw -> wishValue.applyAsDouble(gw) > 0.0, comp);
     }
 
     /**

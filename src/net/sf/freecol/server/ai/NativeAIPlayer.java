@@ -25,11 +25,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -57,7 +61,6 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -325,15 +328,11 @@ public class NativeAIPlayer extends MissionAIPlayer {
         // Also favour units native to the settlement.
         final int homeBonus = 3;
         final Tile isTile = is.getTile();
-        final ToIntFunction<Unit> scoreHome = u ->
-            new CachingFunction<Unit, Integer>(unit -> {
-                    final Tile t = unit.getTile();
-                    return t.getDistanceTo(isTile)
-                        - ((unit.getHomeIndianSettlement() == is) ? homeBonus
-                            : 0);
-                }).apply(u);
-        final Comparator<Unit> isComparator
-            = Comparator.comparingInt(scoreHome);
+        final Comparator<Unit> isComparator = cachingIntComparator(u -> {
+                final Tile t = u.getTile();
+                return t.getDistanceTo(isTile)
+                    - ((u.getHomeIndianSettlement() == is) ? homeBonus : 0);
+            });
 
         // Do we need more or less defenders?
         int needed = minimumDefence + threats.size();
@@ -371,18 +370,14 @@ public class NativeAIPlayer extends MissionAIPlayer {
         // Assign units to attack the threats, greedily chosing closest unit.
         while (!threatTiles.isEmpty() && !units.isEmpty()) {
             Tile tile = threatTiles.remove(0);
-            int bestDistance = Integer.MAX_VALUE;
-            Unit unit = null;
-            for (Unit u : units) {
-                AIUnit aiu = aiMain.getAIUnit(u);
-                if (UnitSeekAndDestroyMission.invalidReason(aiu,
-                        tile.getDefendingUnit(u)) != null) continue;
-                int distance = u.getTile().getDistanceTo(tile);
-                if (bestDistance > distance) {
-                    bestDistance = distance;
-                    unit = u;
-                }
-            }
+            final ToIntFunction<Unit> score = cacheInt(u ->
+                u.getTile().getDistanceTo(tile));
+            final Predicate<Unit> pred = u ->
+                UnitSeekAndDestroyMission.invalidReason(aiMain.getAIUnit(u),
+                    tile.getDefendingUnit(u)) == null
+                && score.applyAsInt(u) >= 0;
+            final Comparator<Unit> comp = Comparator.comparingInt(score);
+            Unit unit = minimize(units, pred, comp);
             if (unit == null) continue; // Declined to attack.
             units.remove(unit);
             AIUnit aiUnit = aiMain.getAIUnit(unit);

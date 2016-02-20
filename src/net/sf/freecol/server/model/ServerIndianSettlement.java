@@ -19,9 +19,12 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
@@ -39,8 +42,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-
 import static net.sf.freecol.common.util.RandomUtils.*;
 
 import net.sf.freecol.server.control.ChangeSet;
@@ -360,20 +363,16 @@ public class ServerIndianSettlement extends IndianSettlement
      * @return True if the most hated nation changed.
      */
     public boolean updateMostHated() {
-        Player old = mostHated;
-        mostHated = null;
-        int bestValue = Integer.MIN_VALUE;
-        for (Player p : getGame().getLiveEuropeanPlayers(null)) {
+        final Player old = this.mostHated;
+        final Predicate<Player> pred = p -> {
             Tension alarm = getAlarm(p);
-            if (alarm == null
-                || alarm.getLevel() == Tension.Level.HAPPY) continue;
-            int value = alarm.getValue();
-            if (bestValue < value) {
-                bestValue = value;
-                mostHated = p;
-            }
-        }
-        return mostHated != old;
+            return alarm != null && alarm.getLevel() != Tension.Level.HAPPY;
+        };
+        final Comparator<Player> comp
+            = Comparator.comparingInt(p -> getAlarm(p).getValue());
+        this.mostHated = maximize(getGame().getLiveEuropeanPlayers(null),
+                                  pred, comp);
+        return this.mostHated != old;
     }
 
     /**

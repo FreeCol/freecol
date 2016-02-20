@@ -19,8 +19,11 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,6 +39,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -109,15 +113,9 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Pick the closest carrier and queue this unit.
         final Location here = unit.getLocation();
-        int turns = Unit.MANY_TURNS;
-        Unit closest = null;
-        for (Unit c : carriers) {
-            int t = c.getTurnsToReach(here);
-            if (turns > t) {
-                turns = t;
-                closest = c;
-            }
-        }
+        final Comparator<Unit> comp = cachingIntComparator(u ->
+            u.getTurnsToReach(here));
+        Unit closest = minimize(carriers, u -> true, comp);
         final AIMain aiMain = getAIMain();
         TransportMission tm;
         AIUnit aiCarrier;

@@ -63,7 +63,6 @@ import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -1056,10 +1055,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             }
         }
-        Collections.sort(producing, Comparator.comparingInt(gt ->
-                new CachingFunction<GoodsType, Integer>(goodsType ->
-                    colony.getAdjustedNetProductionOf(goodsType))
-                .apply(gt)));
+        final Comparator<GoodsType> comp = cachingIntComparator(gt ->
+            colony.getAdjustedNetProductionOf(gt));
+        Collections.sort(producing, comp);
         TypeCountMap<UnitType> experts = new TypeCountMap<>();
         for (Unit unit : colony.getUnitList()) {
             GoodsType goods = unit.getWorkType();

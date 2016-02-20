@@ -19,7 +19,9 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.Comparator;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,6 +43,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -307,21 +310,18 @@ public class PioneeringMission extends Mission {
      * @return The colony with the most outstanding tile improvement plans.
      */
     private static Colony getBestPioneeringColony(AIUnit aiUnit) {
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)aiUnit.getAIOwner();
-        AIColony bestColony = null;
-        int bestValue = -1;
-        for (AIColony aic : aiPlayer.getAIColonies()) {
-            int value = aic.getTileImprovementPlans().size();
-            if (value > bestValue) {
-                bestValue = value;
-                bestColony = aic;
-            }
-        }
-        if (bestColony == null) return null;
-        Colony colony = bestColony.getColony();
-        if (colony.isConnectedPort()) return colony;
-        PathNode path = aiUnit.getUnit().findOurNearestPort();
-        return (path == null) ? colony
+        final Comparator<AIColony> comp = Comparator.comparingInt(c ->
+            c.getTileImprovementPlans().size());
+        final EuropeanAIPlayer owner = (EuropeanAIPlayer)aiUnit.getAIOwner();
+        AIColony bestColony = maximize(owner.getAIColonies(), c -> true, comp);
+            
+        PathNode path;
+        Colony colony;
+        return (bestColony == null)
+            ? null
+            : ((colony = bestColony.getColony()).isConnectedPort()
+                || (path = aiUnit.getUnit().findOurNearestPort()) == null)
+            ? colony
             : path.getLastNode().getLocation().getColony();
     }
 

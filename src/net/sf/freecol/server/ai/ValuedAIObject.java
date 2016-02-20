@@ -34,6 +34,10 @@ import net.sf.freecol.common.model.FreeColObject;
  */
 public abstract class ValuedAIObject extends AIObject {
 
+    /** A comparator by AI object value. */
+    public static final Comparator<? extends ValuedAIObject> valueComparator
+        = Comparator.comparingInt(ValuedAIObject::getValue);
+    
     /** A comparator by descending AI object value. */
     public static final Comparator<ValuedAIObject> valuedComparator
         = Comparator.comparingInt(ValuedAIObject::getValue).reversed();

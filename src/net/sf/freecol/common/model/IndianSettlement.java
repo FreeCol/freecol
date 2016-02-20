@@ -28,8 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Logger;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -975,22 +976,17 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *      none suitable.
      */
     private GoodsType goodsToMake() {
-        GoodsType wantGoods = null;
-        int diff, wantAmount = -1;
-        for (GoodsType g : getSpecification().getGoodsTypeList()) {
-            GoodsType produced;
-            if (g.isRawMaterial()
-                && (produced = g.getOutputType()) != null
-                && !produced.isBreedable()
-                && produced.isStorable()
-                && getGoodsCount(g) > getWantedGoodsAmount(g)
-                && (diff = getWantedGoodsAmount(produced)
-                    - getGoodsCount(produced)) > wantAmount) {
-                wantGoods = produced;
-                wantAmount = diff;
-            }
-        }
-        return wantGoods;
+        final ToIntFunction<GoodsType> deficit = cacheInt(gt ->
+            getWantedGoodsAmount(gt) - getGoodsCount(gt));
+        final Predicate<GoodsType> pred = gt ->
+            gt.isRawMaterial()
+                && gt.getOutputType() != null
+                && !gt.getOutputType().isBreedable()
+                && gt.getOutputType().isStorable()
+                && deficit.applyAsInt(gt) < 0
+                && deficit.applyAsInt(gt.getOutputType()) > 0;
+        final Comparator<GoodsType> comp = Comparator.comparingInt(deficit);
+        return maximize(getSpecification().getGoodsTypeList(), pred, comp);
     }
 
     /**

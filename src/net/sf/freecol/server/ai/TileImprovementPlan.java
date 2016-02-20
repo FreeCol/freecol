@@ -19,7 +19,10 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.Comparator;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -29,6 +32,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -173,30 +177,27 @@ public class TileImprovementPlan extends ValuedAIObject {
      *
      * @param tile The <code>Tile</code> that will be improved.
      * @param goodsType The <code>GoodsType</code> to be prioritized.
-     * @return The best TileImprovementType available to be done.
+     * @return The best <code>TileImprovementType</code> available to be done.
      */
     public static TileImprovementType getBestTileImprovementType(Tile tile,
         GoodsType goodsType) {
-        int bestValue = 0;
-        TileImprovementType bestType = null;
-        for (TileImprovementType impType
-                 : tile.getSpecification().getTileImprovementTypeList()) {
-            if (!impType.isNatural()
-                && impType.isTileTypeAllowed(tile.getType())
+        final Specification spec = tile.getSpecification();
+        final Predicate<TileImprovementType> pred = it ->
+            !it.isNatural()
+                && it.isTileTypeAllowed(tile.getType())
                 // FIXME: For now, disable any exotic non-Col1
                 // improvement types that expend more than one parcel
                 // of tools (e.g. plantForest), because
                 // PioneeringMission assumes this does not happen.
-                && impType.getExpendedAmount() <= 1
-                && tile.getTileImprovement(impType) == null) {
-                int value = impType.getImprovementValue(tile, goodsType);
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestType = impType;
-                }
-            }
-        }
-        return bestType;
+                && it.getExpendedAmount() <= 1
+                && tile.getTileImprovement(it) == null;
+        final Comparator<TileImprovementType> comp = cachingIntComparator(it ->
+            it.getImprovementValue(tile, goodsType));
+        TileImprovementType best = maximize(spec.getTileImprovementTypeList(),
+                                            pred, comp);
+        return (best == null || best.getImprovementValue(tile, goodsType) <= 0)
+            ? null
+            : best;
     }
 
     /**

@@ -50,7 +50,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -500,12 +499,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
         if (transports.size() < nt) {
             // Sort by longest distance to target
-            final ToIntFunction<AIUnit> targetDistance = aiu ->
-                new CachingFunction<AIUnit, Integer>(aiUnit -> {
-                        Unit target = (Unit)aiUnit.getMission().getTarget();
-                        Tile tile = aiUnit.getUnit().getTile();
+            final ToIntFunction<AIUnit> targetDistance
+                = cacheInt(aiu -> {
+                        Unit target = (Unit)aiu.getMission().getTarget();
+                        Tile tile = aiu.getUnit().getTile();
                         return tile.getDistanceTo(target.getTile());
-                    }).apply(aiu);
+                    });
             Collections.sort(naval, Comparator.comparingInt(targetDistance));
             while (!naval.isEmpty()) {
                 AIUnit aiu = naval.remove(0);

@@ -19,13 +19,22 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -39,6 +48,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -58,6 +68,16 @@ public class IndianDemandMission extends Mission {
     /** The tag for this mission. */
     private static final String tag = "AI native demander";
 
+    /** Predicates for demand goods selection. */
+    private static final List<Predicate<GoodsType>> selectPredicates
+        = new ArrayList<>();
+    static {
+        selectPredicates.add(gt -> gt.isMilitaryGoods());
+        selectPredicates.add(gt -> gt.isBuildingMaterial());
+        selectPredicates.add(gt -> gt.isTradeGoods());
+        selectPredicates.add(gt -> gt.isRefined());
+    };
+    
     /** The colony to demand from. */
     private Colony colony;
 
@@ -130,92 +150,54 @@ public class IndianDemandMission extends Mission {
     /**
      * Selects the most desirable goods from the colony.
      *
-     * @param target The colony.
+     * @param target The target <code>Colony</code>.
      * @return The goods to demand.
      */
     public Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
-        Tension.Level tension = getUnit().getOwner()
+        final int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
+        final Game game = target.getGame();
+        final Market market = target.getOwner().getMarket();
+        final Comparator<Goods> marketPrice
+            = Comparator.comparingInt(g -> market.getSalePrice(g));
+        final Function<Goods, Goods> makeGoods = g ->
+            new Goods(game, target, g.getType(), capAmount(g.getAmount(), dx));
+        final Tension.Level tension = getUnit().getOwner()
             .getTension(target.getOwner()).getLevel();
-        int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
         final GoodsType food = spec.getPrimaryFoodType();
+        final int cutoff = capAmount(target.getGoodsCount(food), dx);
         Goods goods = null;
-        int amount = capAmount(target.getGoodsCount(food), dx);
+
+        // When content ask for food at cutoff
         if (tension.compareTo(Tension.Level.CONTENT) <= 0
-            && target.getGoodsCount(food) >= amount) {
-            return new Goods(getGame(), target, food, amount);
-        } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
-            Market market = target.getOwner().getMarket();
-            int value = 0;
-            for (Goods currentGoods : target.getCompactGoods()) {
-                int goodsValue = market.getSalePrice(currentGoods);
-                if (!currentGoods.getType().isFoodType()
-                    && !currentGoods.getType().isMilitaryGoods()
-                    && (goodsValue > value)) {
-                    value = goodsValue;
-                    goods = currentGoods;
-                }
-            }
-            if (goods != null) {
-                goods.setAmount(capAmount(goods.getAmount(), dx));
-                return goods;
-            }
-        } else {
-            // Military goods
-            for (GoodsType preferred : spec.getGoodsTypeList()) {
-                if (preferred.isMilitaryGoods()) {
-                    amount = target.getGoodsCount(preferred);
-                    if (amount > 0) {
-                        return new Goods(getGame(), target, preferred,
-                                         capAmount(amount, dx));
-                    }
-                }
-            }
-            // Storable building materials (what do the natives need tools for?)
-            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
-                if (preferred.isBuildingMaterial()) {
-                    amount = target.getGoodsCount(preferred);
-                    if (amount > 0) {
-                        return new Goods(getGame(), target, preferred,
-                                         capAmount(amount, dx));
-                    }
-                }
-            }
-            // Trade goods
-            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
-                if (preferred.isTradeGoods()) {
-                    amount = target.getGoodsCount(preferred);
-                    if (amount > 0) {
-                        return new Goods(getGame(), target, preferred,
-                                         capAmount(amount, dx));
-                    }
-                }
-            }
-            // Refined goods
-            for (GoodsType preferred : spec.getStorableGoodsTypeList()) {
-                if (preferred.isRefined()) {
-                    amount = target.getGoodsCount(preferred);
-                    if (amount > 0) {
-                        return new Goods(getGame(), target, preferred,
-                                         capAmount(amount, dx));
-                    }
-                }
-            }
+            && target.getGoodsCount(food) >= cutoff) {
+            goods = new Goods(getGame(), target, food, cutoff);
         }
 
-        // Have not found what we want
-        Market market = target.getOwner().getMarket();
-        int value = 0;
-        for (Goods currentGoods : target.getCompactGoods()) {
-            int goodsValue = market.getSalePrice(currentGoods);
-            if (goodsValue > value) {
-                value = goodsValue;
-                goods = currentGoods;
-            }
+        // When displeased, ask for expensive non-food or military
+        if (goods == null
+            && tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
+            Predicate<Goods> pred = g ->
+                !g.getType().isFoodType() && !g.getType().isMilitaryGoods();
+            goods = maximize(target.getCompactGoods(), pred, marketPrice);
+            if (goods != null) goods = makeGoods.apply(goods);
         }
-        if (goods != null) {
-            goods.setAmount(capAmount(goods.getAmount(), dx));
+
+        // Otherwise try military, building, trade, refined goods in order,
+        if (goods == null) {
+            goods = selectPredicates.stream()
+                .flatMap(pred -> spec.getGoodsTypeList().stream()
+                    .filter(gt -> pred.test(gt) && target.getGoodsCount(gt) > 0))
+                .findFirst().map(gt -> new Goods(getGame(), target, gt,
+                        capAmount(target.getGoodsCount(gt), dx))).orElse(null);
         }
+
+        // Finally just go for expense
+        if (goods == null) {
+            goods = maximize(target.getCompactGoods(), g -> true, marketPrice);
+            if (goods != null) goods = makeGoods.apply(goods);
+        }
+
         return goods;
     }
 

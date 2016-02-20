@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -39,9 +40,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Occupation;
 import net.sf.freecol.common.model.Stance;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
-
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -1582,17 +1581,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The best available defender type.
      */
     public UnitType getBestDefenderType() {
-        UnitType bestDefender = null;
-        for (UnitType unitType : getSpecification().getUnitTypeList()) {
-            if (unitType.getDefence() > 0
-                && (bestDefender == null
-                    || bestDefender.getDefence() < unitType.getDefence())
-                && !unitType.hasAbility(Ability.NAVAL_UNIT)
-                && unitType.isAvailableTo(getOwner())) {
-                bestDefender = unitType;
-            }
-        }
-        return bestDefender;
+        final Predicate<UnitType> pred = ut ->
+            ut.getDefence() > 0
+            && !ut.isNaval()
+            && ut.isAvailableTo(getOwner());
+        final Comparator<UnitType> comp
+            = Comparator.comparingDouble(UnitType::getDefence);
+        return maximize(getSpecification().getUnitTypeList(), pred, comp);
     }
 
     /**
@@ -1808,26 +1803,21 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public Unit findStudent(final Unit teacher) {
         if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
             return null; // No automatic assignment
-        Unit student = null;
-        GoodsType expertProduction = teacher.getType().getExpertProduction();
-        int skillLevel = INFINITY;
-        for (Unit potentialStudent : getUnitList()) {
-            /**
-             * Always pick the student with the least skill first.
-             * Break ties by favouring the one working in the teacher's trade,
-             * otherwise first applicant wins.
-             */
-            if (potentialStudent.getTeacher() == null
-                && potentialStudent.canBeStudent(teacher)
-                && (student == null
-                    || potentialStudent.getSkillLevel() < skillLevel
-                    || (potentialStudent.getSkillLevel() == skillLevel
-                        && potentialStudent.getWorkType() == expertProduction))) {
-                student = potentialStudent;
-                skillLevel = student.getSkillLevel();
-            }
-        }
-        return student;
+        final GoodsType expertProduction
+            = teacher.getType().getExpertProduction();
+        final Predicate<Unit> pred = u ->
+            u.getTeacher() == null && u.canBeStudent(teacher);
+        // Always pick the student with the least skill first.
+        // Break ties by favouring the one working in the teacher's trade,
+        // otherwise first applicant wins.
+        final Comparator<Unit> skillComparator
+            = Comparator.comparingInt(Unit::getSkillLevel);
+        final Comparator<Unit> tradeComparator
+            = Comparator.comparingInt(u ->
+                (u.getWorkType() == expertProduction) ? 0 : 1);
+        final Comparator<Unit> fullComparator
+            = skillComparator.thenComparing(tradeComparator);
+        return minimize(getUnitList(), pred, fullComparator);
     }
 
 
@@ -2619,28 +2609,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         // by units outside the colony on the same tile.  To consider
         // units outside the colony as well, use
         // @see Tile#getDefendingUnit instead.
-        // 
-        // Returns an arbitrary unarmed land unit unless Paul Revere
-        // is present as founding father, in which case the unit can
-        // be armed as well.
-        List<Unit> unitList = getUnitList();
-
-        Unit defender = null;
-        double defencePower = -1.0;
-        for (Unit nextUnit : unitList) {
-            double unitPower = getGame().getCombatModel()
-                .getDefencePower(attacker, nextUnit);
-            if (Unit.betterDefender(defender, defencePower,
-                    nextUnit, unitPower)) {
-                defender = nextUnit;
-                defencePower = unitPower;
-            }
-        }
-        if (defender == null) {
-            throw new IllegalStateException("Colony " + getName()
-                + " contains no units!");
-        }
-        return defender;
+        final CombatModel cm = getGame().getCombatModel();
+        final Comparator<Unit> comp
+            = cachingDoubleComparator(u -> cm.getDefencePower(attacker, u));
+        return maximize(getUnitList(), e -> true, comp);
     }
 
     /**

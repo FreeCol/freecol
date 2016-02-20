@@ -39,6 +39,10 @@ import net.sf.freecol.common.util.Utils;
  */
 public class AbstractGoods extends FreeColObject implements Named {
 
+    /** Compare the amount of abstract goods. */
+    public static final Comparator<AbstractGoods> amountComparator
+        = Comparator.comparingInt(AbstractGoods::getAmount);
+
     /**
      * A comparator to sort by descending goods amount and then by a
      * predictable goods type order.

@@ -19,9 +19,12 @@
 
 package net.sf.freecol.common.util;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 
 
 /**

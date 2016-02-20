@@ -20,16 +20,20 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Tile;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -309,14 +313,12 @@ public abstract class Settlement extends GoodsLocation
      * @return A high seas count, INFINITY if not connected.
      */
     public int getHighSeasCount() {
-        int best = INFINITY;
-        for (Tile t : getTile().getSurroundingTiles(1)) {
-            if (t.isLand() || t.getHighSeasCount() < 0) continue;
-            if (best > t.getHighSeasCount()) {
-                best = t.getHighSeasCount();
-            }
-        }
-        return best;
+        final Predicate<Tile> pred = t ->
+            !t.isLand() && t.getHighSeasCount() >= 0;
+        final Comparator<Tile> comp
+            = Comparator.comparingInt(Tile::getHighSeasCount);
+        Tile best = minimize(getTile().getSurroundingTiles(1, 1), pred, comp);
+        return (best == null) ? INFINITY : best.getHighSeasCount();
     }
 
     /**
