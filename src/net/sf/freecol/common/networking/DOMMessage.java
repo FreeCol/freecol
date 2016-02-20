@@ -680,26 +680,17 @@ public class DOMMessage {
     public static <T extends FreeColGameObject> T readGameElement(Game game,
         Element element, boolean intern, Class<T> returnClass) {
         T ret = null;
-        if (intern) {
-            String id = readId(element);
-            FreeColGameObject fcgo = game.getFreeColGameObject(id);
-            if (fcgo != null) {
-                try {
-                    ret = returnClass.cast(fcgo);
-                } catch (ClassCastException cce) {
-                    logger.log(Level.WARNING, "Casting existing " + id
-                        + " to " + returnClass.getName() + " failed", cce);
-                    return null;
-                }
-            }
-            if (ret == null) {
-                ret = FreeColGameObject.newInstance(game, returnClass);
-                ret.internId(id);
-            }
-        } else {
-            ret = FreeColGameObject.newInstance(game, returnClass);
+        try (
+            FreeColXMLReader xr = makeElementReader(element);
+        ) {
+            xr.setReadScope((intern)
+                ? FreeColXMLReader.ReadScope.NORMAL
+                : FreeColXMLReader.ReadScope.NOINTERN);
+            xr.nextTag();
+            ret = xr.readFreeColGameObject(game, returnClass);
+        } catch (XMLStreamException|IOException ex) {
+            logger.log(Level.WARNING, "Reader fail", ex);
         }
-        if (ret != null) readFromXMLElement(ret, element, intern);
         return ret;
     }
 
@@ -749,6 +740,31 @@ public class DOMMessage {
     }
 
     /**
+     * Make a new reader for an element.
+     *
+     * @param element The <code>Element</code> to read.
+     * @return A new <code>FreeColXMLReader</code> to read from.
+     * @exception IOException if the reader can not be created,
+     *     and miscellaneous run time exceptions for problems with the
+     *     transformer mechanisms.
+     */
+    private static FreeColXMLReader makeElementReader(Element element)
+        throws IOException {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element),
+                                     new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            StringReader sr = new StringReader(xml);
+            return new FreeColXMLReader(sr);
+        } catch (TransformerException ex) {
+            throw new RuntimeException("Reader creation failure", ex);
+        }
+    }
+
+    /**
      * Initialize a FreeColObject from an Element.
      *
      * @param fco The <code>FreeColObject</code> to read into.
@@ -758,26 +774,15 @@ public class DOMMessage {
      */
     public static void readFromXMLElement(FreeColObject fco, Element element,
                                           boolean intern) {
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element),
-                                     new StreamResult(stringWriter));
-            String xml = stringWriter.toString();
-            try (
-                FreeColXMLReader xr
-                    = new FreeColXMLReader(new StringReader(xml));
-            ) {
-                xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
-                    : FreeColXMLReader.ReadScope.NOINTERN);
-                xr.nextTag();
-                fco.readFromXML(xr);
-            } catch (XMLStreamException xe) {
-                throw new IllegalStateException("XML failure", xe);
-            }
-        } catch (IOException|TransformerException ex) {
-            throw new RuntimeException("Read failure", ex);
+        try (
+            FreeColXMLReader xr = makeElementReader(element);
+        ) {
+            xr.setReadScope((intern) ? FreeColXMLReader.ReadScope.NORMAL
+                : FreeColXMLReader.ReadScope.NOINTERN);
+            xr.nextTag();
+            fco.readFromXML(xr);
+        } catch (IOException|XMLStreamException ex) {
+            throw new RuntimeException("XML failure", ex);
         }
     }
 
