@@ -703,6 +703,25 @@ public class DOMMessage {
     }
 
     /**
+     * Update an existing game object from an element.
+     *
+     * @param game The <code>Game</code> to update in.
+     * @param element The <code>Element</code> containing the object.
+     * @return The updated <code>FreeColGameObject</code>.
+     */
+    public static FreeColGameObject updateFromElement(Game game,
+                                                      Element element) {
+        String id = readId(element);
+        FreeColGameObject fcgo = game.getFreeColGameObject(id);
+        if (fcgo == null) {
+            logger.warning("Update object not present: " + id);
+            return null;
+        }
+        readFromXMLElement(fcgo, element, true);
+        return fcgo;
+    }
+        
+    /**
      * Read a new FreeCol object from an element.
      *
      * @param game The <code>Game</code> to check for existing objects.

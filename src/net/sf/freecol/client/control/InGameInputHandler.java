@@ -1126,18 +1126,11 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element update(Element element) {
         final Player player = getFreeColClient().getMyPlayer();
+        final Game game = getGame();
         boolean visibilityChange = false;
-
-        NodeList nodeList = element.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element e = (Element)nodeList.item(i);
-            String id = DOMMessage.readId(e);
-            FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
-            if (fcgo == null) {
-                logger.warning("Update object not present in client: " + id);
-            } else {
-                DOMMessage.readFromXMLElement(fcgo, e);
-            }
+        
+        for (FreeColGameObject fcgo : DOMMessage.mapChildren(game, element,
+                e -> DOMMessage.updateFromElement(game, e))) {
             if ((fcgo instanceof Player && (fcgo == player))
                 || ((fcgo instanceof Settlement || fcgo instanceof Unit)
                     && player.owns((Ownable)fcgo))) {
