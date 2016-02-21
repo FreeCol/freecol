@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -78,7 +79,7 @@ public final class PreGameInputHandler extends InputHandler {
         String type = (element == null) ? "(null)" : element.getTagName();
         return (Connection.DISCONNECT_TAG.equals(type))
             ? disconnect(element)
-            : ("addPlayer".equals(type))
+            : (AddPlayerMessage.TAG.equals(type))
             ? addPlayer(element)
             : ("chat".equals(type))
             ? chat(element)
@@ -119,19 +120,9 @@ public final class PreGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element addPlayer(Element element) {
-        Game game = getFreeColClient().getGame();
-
-        Element playerElement = (Element)element
-            .getElementsByTagName(Player.getTagName()).item(0);
-        String id = DOMMessage.readId(playerElement);
-        FreeColGameObject fcgo = game.getFreeColGameObject(id);
-        if (fcgo == null) {
-            game.addPlayer(new Player(game, playerElement));
-        } else {
-            DOMMessage.readFromXMLElement(fcgo, playerElement, true);
-        }
+        // The constructor interns the new players directly.
+        new AddPlayerMessage(getFreeColClient().getGame(), element);
         getGUI().refreshPlayersTable();
-
         return null;
     }
 

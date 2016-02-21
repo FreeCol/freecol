@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -171,7 +172,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             // may change one day.
             case Connection.DISCONNECT_TAG:                
             case "addObject":
-            case "addPlayer":
+            case AddPlayerMessage.TAG:
             case "animateMove":
             case "animateAttack":
             case "chat":

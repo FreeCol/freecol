@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -217,7 +218,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = disconnect(element); break; // Inherited
         case "addObject":
             reply = addObject(element); break;
-        case "addPlayer":
+        case AddPlayerMessage.TAG:
             reply = addPlayer(element); break;
         case "animateAttack":
             reply = animateAttack(element); break;
@@ -346,18 +347,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element addPlayer(Element element) {
-        final Game game = getGame();
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element playerElement = (Element)nodes.item(i);
-            String id = DOMMessage.readId(playerElement);
-            Player p = game.getFreeColGameObject(id, Player.class);
-            if (p == null) {
-                game.addPlayer(new Player(game, playerElement));
-            } else {
-                DOMMessage.readFromXMLElement(p, playerElement);
-            }
-        }
+        new AddPlayerMessage(getGame(), element);
         return null;
     }
 

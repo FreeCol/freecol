@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -211,9 +212,7 @@ public class LoginMessage extends DOMMessage {
 
             // Send message to all players except to the new player.
             // FIXME: check visibility.
-            DOMMessage adp = new DOMMessage("addPlayer");
-            adp.add(player);
-            server.sendToAll(adp, connection);
+            server.sendToAll(new AddPlayerMessage(player), connection);
 
             // Ready now to handle pre-game messages.
             mh = server.getPreGameInputHandler();
