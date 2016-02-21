@@ -887,7 +887,10 @@ public abstract class ServerAPI {
     public LoginMessage login(String userName, String version) {
         Element reply = askExpecting(null, new LoginMessage(userName, version),
                                      LoginMessage.getTagName());
-        return (reply == null) ? null : new LoginMessage(null, reply);
+        return (reply == null) ? null
+            // Note, using dummy game here, but will actually use the
+            // game returned attached to the login message.
+            : new LoginMessage(new Game(), reply);
     }
 
     /**
