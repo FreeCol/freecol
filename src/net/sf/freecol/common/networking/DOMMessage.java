@@ -671,10 +671,6 @@ public class DOMMessage {
     /**
      * Read a new FreeCol game object from an element.
      *
-     * Special handling for null game, so that
-     * <code>LoginMessage</code> can bootstrap itself despite no game
-     * existing yet.
-     *
      * @param game The <code>Game</code> to check for existing objects.
      * @param element The <code>Element</code> to read from.
      * @param intern Whether to intern the instantiated object.
@@ -687,15 +683,19 @@ public class DOMMessage {
         if (intern) {
             // Check if the object is already in the game, but only if
             // interning
-            FreeColGameObject fcgo = (game == null)
-                ? ((Game.class.isAssignableFrom(returnClass)) ? new Game()
-                    : null)
-                : game.getFreeColGameObject(readId(element));
-            try {
-                ret = returnClass.cast(fcgo);
-            } catch (ClassCastException cce) {}
+            String id = readId(element);
+            FreeColGameObject fcgo = game.getFreeColGameObject(id);
+            if (fcgo != null) {
+                try {
+                    ret = returnClass.cast(fcgo);
+                } catch (ClassCastException cce) {
+                    logger.log(Level.WARNING, "Casting existing " + id
+                        + " to " + returnClass.getName() + " failed", cce);
+                    return null;
+                }
+            }
         }
-        if (ret == null && game != null) {
+        if (ret == null) {
             ret = FreeColGameObject.newInstance(game, returnClass);
         }
         if (ret != null) readFromXMLElement(ret, element, intern);
