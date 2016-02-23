@@ -25,8 +25,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.networking.DOMMessage;
 
-import org.w3c.dom.Element;
-
 
 /**
  * Objects of this class hold the export data for a particular type of
