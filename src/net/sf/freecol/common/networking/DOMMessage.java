@@ -681,8 +681,6 @@ public class DOMMessage {
         Element element, boolean intern, Class<T> returnClass) {
         T ret = null;
         if (intern) {
-            // Check if the object is already in the game, but only if
-            // interning
             String id = readId(element);
             FreeColGameObject fcgo = game.getFreeColGameObject(id);
             if (fcgo != null) {
@@ -694,8 +692,11 @@ public class DOMMessage {
                     return null;
                 }
             }
-        }
-        if (ret == null) {
+            if (ret == null) {
+                ret = FreeColGameObject.newInstance(game, returnClass);
+                ret.internId(id);
+            }
+        } else {
             ret = FreeColGameObject.newInstance(game, returnClass);
         }
         if (ret != null) readFromXMLElement(ret, element, intern);
