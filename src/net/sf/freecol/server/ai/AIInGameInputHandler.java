@@ -56,6 +56,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
+import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -194,7 +195,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "setDead":
             case "setStance":
             case "startGame":
-            case "update":
+            case UpdateMessage.TAG:
                 break;
             default:
                 logger.warning("Unknown message type: " + tag);

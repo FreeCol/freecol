@@ -26,6 +26,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.ServerListMessage;
+import net.sf.freecol.common.networking.UpdateMessage;
 
 import org.w3c.dom.Element;
 
@@ -74,14 +75,14 @@ public final class NetworkHandler implements MessageHandler {
         case "register":
             reply = register(connection, element);
             break;
-        case "update":
-            reply = update(connection, element);
-            break;
         case ServerListMessage.TAG:
             reply = new ServerListMessage(metaRegister).toXMLElement();
             break;
         case "remove":
             reply = remove(connection, element);
+            break;
+        case UpdateMessage.TAG:
+            reply = update(connection, element);
             break;
         default:
             logger.warning("Unknown request: " + tag);

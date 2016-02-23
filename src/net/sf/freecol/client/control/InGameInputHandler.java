@@ -68,6 +68,7 @@ import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
+import net.sf.freecol.common.networking.UpdateMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -281,7 +282,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = setStance(element); break;
         case SpySettlementMessage.TAG:
             reply = spySettlement(element); break;
-        case "update":
+        case UpdateMessage.TAG:
             reply = update(element); break;
 
         // Never returned
@@ -1104,10 +1105,10 @@ public final class InGameInputHandler extends InputHandler {
     private Element update(Element element) {
         final Player player = getFreeColClient().getMyPlayer();
         final Game game = getGame();
+        final UpdateMessage message = new UpdateMessage(game, element);
         boolean visibilityChange = false;
         
-        for (FreeColGameObject fcgo : DOMMessage.mapChildren(game, element,
-                e -> DOMMessage.updateFromElement(game, e))) {
+        for (FreeColGameObject fcgo : message.getObjects()) {
             if ((fcgo instanceof Player && (fcgo == player))
                 || ((fcgo instanceof Settlement || fcgo instanceof Unit)
                     && player.owns((Ownable)fcgo))) {

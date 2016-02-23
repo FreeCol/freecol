@@ -40,6 +40,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -80,12 +81,12 @@ public final class PreGameInputHandler extends InputHandler {
                                        Element element) {
         final String tag = (element == null) ? "(null)" : element.getTagName();
         switch (tag) {
-        case Connection.DISCONNECT_TAG:
-            return disconnect(element);
         case AddPlayerMessage.TAG:
             return addPlayer(element);
-        case "chat":
+        case ChatMessage.TAG:
             return chat(element);
+        case Connection.DISCONNECT_TAG:
+            return disconnect(element);
         case ErrorMessage.TAG:
             return error(element);
         case "logout":
@@ -102,7 +103,7 @@ public final class PreGameInputHandler extends InputHandler {
             return startGame(element);
         case "updateColor":
             return updateColor(element);
-        case "update":
+        case UpdateMessage.TAG:
             return update(element);
         case UpdateGameOptionsMessage.TAG:
             return updateGameOptions(element);
@@ -296,6 +297,28 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
+     * Handles an "update"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element update(Element element) {
+        final FreeColClient fcc = getFreeColClient();
+        final Game game = fcc.getGame();
+        final UpdateMessage message = new UpdateMessage(game, element);
+        for (FreeColGameObject fcgo : message.getObjects()) {
+            if (fcgo instanceof Game) {
+                fcgo.insert();
+                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
+            } else {
+                logger.warning("Game node expected: " + fcgo.getId());
+            }
+        }
+        return null;
+    }
+
+    /**
      * Handles an "updateColor"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
@@ -326,30 +349,10 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "update"-message.
+     * Handles an "updateGameOptions"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *                holds all the information.
-     * @return Null.
-     */
-    private Element update(Element element) {
-        NodeList children = element.getChildNodes();
-        if (children.getLength() == 1) {
-            FreeColClient fcc = getFreeColClient();
-            Game game = fcc.getGame();
-            DOMMessage.readFromXMLElement(game, (Element)children.item(0), true);
-            fcc.addSpecificationActions(game.getSpecification());
-        } else {
-            logger.warning("Child node expected: " + element.getTagName());
-        }
-        return null;
-    }
-
-    /**
-     * Handles an "updateGameOptions"-message.
-     *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateGameOptions(Element element) {
