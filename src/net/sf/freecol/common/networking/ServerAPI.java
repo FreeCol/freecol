@@ -1345,9 +1345,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean updateGameOptions(OptionGroup gameOptions) {
-        DOMMessage up = new DOMMessage("updateGameOptions");
-        up.add(gameOptions);
-        return send(up);
+        return send(new UpdateGameOptionsMessage(gameOptions));
     }
 
     /**

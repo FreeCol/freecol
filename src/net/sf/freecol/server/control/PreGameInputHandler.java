@@ -33,8 +33,10 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -87,13 +89,18 @@ public final class PreGameInputHandler extends InputHandler {
             (Connection connection, Element element) ->
             setAvailable(connection, element));
         register("updateGameOptions",
-            (Connection connection, Element element) ->
-            updateGameOptions(connection, element));
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new UpdateGameOptionsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
         register("updateMapGeneratorOptions",
             (Connection connection, Element element) ->
             updateMapGeneratorOptions(connection, element));
     }
-
+            
     /**
      * Handles a "logout"-message.
      * 
@@ -331,32 +338,6 @@ public final class PreGameInputHandler extends InputHandler {
         } else {
             logger.warning("setNationType from unknown connection.");
         }
-        return null;
-    }
-
-    /**
-     * Handles a "updateGameOptions"-message from a client.
-     * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
-     * @return Null.
-     */
-    private Element updateGameOptions(Connection connection, Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
-        if (!player.isAdmin()) {
-            throw new IllegalStateException("Not an admin");
-        }
-        OptionGroup gameOptions = spec.getGameOptions();
-        Element child = (Element)element.getChildNodes().item(0);
-        DOMMessage.readFromXMLElement(gameOptions, child);
-        spec.clean("update game options (server)");
-
-        DOMMessage up = new DOMMessage("updateGameOptions");
-        up.add(gameOptions);
-        freeColServer.sendToAll(up, connection);
         return null;
     }
 

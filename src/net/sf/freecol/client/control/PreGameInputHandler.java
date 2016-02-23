@@ -40,6 +40,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -101,7 +102,7 @@ public final class PreGameInputHandler extends InputHandler {
             ? updateColor(element)
             : ("update".equals(type))
             ? update(element)
-            : ("updateGameOptions".equals(type))
+            : (UpdateGameOptionsMessage.TAG.equals(type))
             ? updateGameOptions(element)
             : ("updateMapGeneratorOptions".equals(type))
             ? updateMapGeneratorOptions(element)
@@ -342,22 +343,21 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateGameOptions"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateGameOptions(Element element) {
-        Game game = getFreeColClient().getGame();
-
-        Element mgoElement = (Element)element
-            .getElementsByTagName(GameOptions.getTagName()).item(0);
-        Specification spec = game.getSpecification();
-        OptionGroup gameOptions = spec.getGameOptions();
-        DOMMessage.readFromXMLElement(gameOptions, mgoElement, false);
-        spec.clean("update game options (server initiated)");
-
-        getGUI().updateGameOptions();
-
+        final Game game = getFreeColClient().getGame();
+        final Specification spec = game.getSpecification();
+        UpdateGameOptionsMessage message
+            = new UpdateGameOptionsMessage(game, element);
+        if (message.mergeOptions(game)) {
+            spec.clean("update game options (server initiated)");
+            getGUI().updateGameOptions();
+        } else {
+            logger.warning("Game option update failed");
+        }
         return null;
     }
     
