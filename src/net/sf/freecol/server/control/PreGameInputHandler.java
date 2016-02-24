@@ -37,6 +37,7 @@ import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
+import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -88,7 +89,7 @@ public final class PreGameInputHandler extends InputHandler {
         register("setAvailable",
             (Connection connection, Element element) ->
             setAvailable(connection, element));
-        register("updateGameOptions",
+        register(UpdateGameOptionsMessage.TAG,
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
@@ -96,9 +97,14 @@ public final class PreGameInputHandler extends InputHandler {
                 return new UpdateGameOptionsMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register("updateMapGeneratorOptions",
-            (Connection connection, Element element) ->
-            updateMapGeneratorOptions(connection, element));
+        register(UpdateMapGeneratorOptionsMessage.TAG,
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new UpdateMapGeneratorOptionsMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
     }
             
     /**
@@ -338,31 +344,6 @@ public final class PreGameInputHandler extends InputHandler {
         } else {
             logger.warning("setNationType from unknown connection.");
         }
-        return null;
-    }
-
-    /**
-     * Handles a "updateMapGeneratorOptions"-message from a client.
-     * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
-     * @return Null.
-     */
-    private Element updateMapGeneratorOptions(Connection connection,
-                                              Element element) {
-        final FreeColServer freeColServer = getFreeColServer();
-        final ServerPlayer player = freeColServer.getPlayer(connection);
-        final Specification spec = getGame().getSpecification();
-
-        if (!player.isAdmin()) {
-            throw new IllegalStateException("Not an admin");
-        }
-        OptionGroup mgo = spec.getMapGeneratorOptions();
-        Element child = (Element)element.getChildNodes().item(0);
-        DOMMessage.readFromXMLElement(mgo, child);
-        DOMMessage umge = new DOMMessage("updateMapGeneratorOptions");
-        umge.add(mgo);
-        freeColServer.sendToAll(umge, connection);
         return null;
     }
 }

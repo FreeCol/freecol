@@ -41,6 +41,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
+import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -104,7 +105,7 @@ public final class PreGameInputHandler extends InputHandler {
             ? update(element)
             : (UpdateGameOptionsMessage.TAG.equals(type))
             ? updateGameOptions(element)
-            : ("updateMapGeneratorOptions".equals(type))
+            : (UpdateMapGeneratorOptionsMessage.TAG.equals(type))
             ? updateMapGeneratorOptions(element)
             : ("updateNation".equals(type))
             ? updateNation(element)
@@ -369,14 +370,14 @@ public final class PreGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element updateMapGeneratorOptions(Element element) {
-        Element mgoElement = (Element)element
-            .getElementsByTagName(MapGeneratorOptions.getTagName())
-            .item(0);
-        DOMMessage.readFromXMLElement(getFreeColClient().getGame()
-            .getMapGeneratorOptions(), mgoElement, false);
-
-        getGUI().updateMapGeneratorOptions();
-
+        final Game game = getFreeColClient().getGame();
+        UpdateMapGeneratorOptionsMessage message
+            = new UpdateMapGeneratorOptionsMessage(game, element);
+        if (message.mergeOptions(game)) {
+            getGUI().updateMapGeneratorOptions();
+        } else {
+            logger.warning("Map generator option update failed");
+        }
         return null;
     }
     

@@ -1357,9 +1357,7 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean updateMapGeneratorOptions(OptionGroup mapOptions) {
-        DOMMessage up = new DOMMessage("updateMapGeneratorOptions");
-        up.add(mapOptions);
-        return send(up);
+        return send(new UpdateMapGeneratorOptionsMessage(mapOptions));
     }
 
     /**

@@ -22,7 +22,6 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -31,36 +30,36 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent to update the game options.
+ * The message sent to update the map generator options.
  */
-public class UpdateGameOptionsMessage extends DOMMessage {
+public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
 
-    public static final String TAG = "updateGameOptions";
+    public static final String TAG = "updateMapGeneratorOptions";
 
     /** The options. */
     private final OptionGroup options;
 
 
     /**
-     * Create a new <code>UpdateGameOptionsMessage</code> with the
+     * Create a new <code>UpdateMapGeneratorOptionsMessage</code> with the
      * supplied name.
      *
-     * @param options The game options <code>OptionGroup</code>.
+     * @param options The map generator options <code>OptionGroup</code>.
      */
-    public UpdateGameOptionsMessage(OptionGroup options) {
+    public UpdateMapGeneratorOptionsMessage(OptionGroup options) {
         super(getTagName());
 
         this.options = options;
     }
 
     /**
-     * Create a new <code>UpdateGameOptionsMessage</code> from a
+     * Create a new <code>UpdateMapGeneratorOptionsMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public UpdateGameOptionsMessage(Game game, Element element) {
+    public UpdateMapGeneratorOptionsMessage(Game game, Element element) {
         this(getChild(game, element, 0, OptionGroup.class));
     }
 
@@ -72,7 +71,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      *
      * @return The options.
      */
-    public OptionGroup getGameOptions() {
+    public OptionGroup getMapGeneratorOptions() {
         return this.options;
     }
 
@@ -85,15 +84,15 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     public boolean mergeOptions(Game game) {
         boolean result = false;        
         if (this.options != null) {
-            OptionGroup gameOptions = game.getGameOptions();
-            result = gameOptions.merge(this.options);
+            OptionGroup mapGeneratorOptions = game.getMapGeneratorOptions();
+            result = mapGeneratorOptions.merge(this.options);
         }
         return result;
     }
 
 
     /**
-     * Handle a "updateGameOptions"-message.
+     * Handle a "updateMapGeneratorOptions"-message.
      *
      * @param freeColServer The <code>FreeColServer</code> handling
      *     the message.
@@ -115,10 +114,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        final Specification spec = game.getSpecification();
-        spec.clean("update game options (server)");
-        UpdateGameOptionsMessage message
-            = new UpdateGameOptionsMessage(game.getGameOptions());
+        DOMMessage message = new UpdateMapGeneratorOptionsMessage(game.getMapGeneratorOptions());
         freeColServer.sendToAll(message, connection);
         return null;
     }
@@ -138,7 +134,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "updateGameOptions".
+     * @return "updateMapGeneratorOptions".
      */
     public static String getTagName() {
         return TAG;
