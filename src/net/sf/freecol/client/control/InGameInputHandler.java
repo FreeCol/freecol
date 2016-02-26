@@ -307,36 +307,34 @@ public final class InGameInputHandler extends InputHandler {
     private Element addObject(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element)nodes.item(i);
-            String owner = DOMMessage.getStringAttribute(e, "owner");
-            Player player = game.getFreeColGameObject(owner, Player.class);
-            if (player == null) {
-                logger.warning("addObject with broken owner: " + owner);
-                continue;
-            }
-
-            final String tag = e.getTagName();
-            if (FoundingFather.getTagName().equals(tag)) {
-                FoundingFather father
-                    = spec.getFoundingFather(DOMMessage.readId(e));
-                if (father != null) player.addFather(father);
-                player.invalidateCanSeeTiles();// Might be coronado?
-                
-            } else if (HistoryEvent.getTagName().equals(tag)) {
-                player.getHistory().add(DOMMessage.readElement(game, e, HistoryEvent.class));
-
-            } else if (LastSale.getTagName().equals(tag)) {
-                player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
-
-            } else if (ModelMessage.getTagName().equals(tag)) {
-                player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
-
-            } else {
-                logger.warning("addObject unrecognized: " + tag);
-            }
-        }
+        DOMMessage.mapChildren(game, element, (e) -> {
+                String owner = DOMMessage.getStringAttribute(e, "owner");
+                Player player = game.getFreeColGameObject(owner, Player.class);
+                if (player == null) {
+                    logger.warning("addObject with broken owner: " + owner);
+                } else {
+                    final String tag = e.getTagName();
+                    if (FoundingFather.getTagName().equals(tag)) {
+                        FoundingFather father
+                            = spec.getFoundingFather(DOMMessage.readId(e));
+                        if (father != null) player.addFather(father);
+                        player.invalidateCanSeeTiles();// Might be coronado?
+                        
+                    } else if (HistoryEvent.getTagName().equals(tag)) {
+                        player.getHistory().add(DOMMessage.readElement(game, e, HistoryEvent.class));
+                        
+                    } else if (LastSale.getTagName().equals(tag)) {
+                        player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));
+                        
+                    } else if (ModelMessage.getTagName().equals(tag)) {
+                        player.addModelMessage(DOMMessage.readElement(game, e, ModelMessage.class));
+                        
+                    } else {
+                        logger.warning("addObject unrecognized: " + tag);
+                    }
+                }
+                return player;
+            });
         return null;
     }
 
@@ -497,10 +495,9 @@ public final class InGameInputHandler extends InputHandler {
         final Game game = getGame();
         final ChatMessage chatMessage = new ChatMessage(game, element);
 
-        invokeLater(() -> {
-                igc().chat(chatMessage.getPlayer(game),
-                           chatMessage.getMessage(), chatMessage.isPrivate());
-            });
+        invokeLater(() ->
+            igc().chat(chatMessage.getPlayer(game), chatMessage.getMessage(),
+                       chatMessage.isPrivate()));
         return null;
     }
 
@@ -516,7 +513,7 @@ public final class InGameInputHandler extends InputHandler {
             = new ChooseFoundingFatherMessage(getGame(), element);
         final List<FoundingFather> ffs = message.getFathers();
 
-        invokeLater(() -> { igc().chooseFoundingFather(ffs); });
+        invokeLater(() -> igc().chooseFoundingFather(ffs));
         return null;
     }
 
@@ -579,23 +576,21 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     private Element disposeUnits(Element element) {
-        Game game = getGame();
-        NodeList nodes = element.getChildNodes();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            // Do not read the whole unit out of the element as we are
-            // only going to dispose of it, not forgetting that the
-            // server may have already done so and its view will only
-            // mislead us here in the client.
-            Element e = (Element) nodes.item(i);
-            String id = DOMMessage.readId(e);
-            Unit u = game.getFreeColGameObject(id, Unit.class);
-            if (u == null) {
-                logger.warning("Object is not a unit");
-            } else {
-                u.dispose();
-            }
-        }
+        final Game game = getGame();
+        DOMMessage.mapChildren(game, element, (e) -> {
+                // Do not read the whole unit out of the element as we
+                // are only going to dispose of it, not forgetting
+                // that the server may have already done so and its
+                // view will only mislead us here in the client.
+                final String id = DOMMessage.readId(e);
+                Unit u = game.getFreeColGameObject(id, Unit.class);
+                if (u == null) {
+                    logger.warning("Object is not a unit");
+                } else {
+                    u.dispose();
+                }
+                return u;
+            });
         return null;
     }
 
@@ -608,10 +603,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element error(Element element) {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
-        invokeLater(() -> {
-                igc().error(errorMessage.getMessageId(),
-                            errorMessage.getMessage());
-            });
+        invokeLater(() -> igc().error(errorMessage.getMessageId(),
+                                      errorMessage.getMessage()));
         return null;
     }
 
@@ -625,37 +618,35 @@ public final class InGameInputHandler extends InputHandler {
     private Element featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
-        String id = DOMMessage.readId(element);
-        FreeColGameObject object = game.getFreeColGameObject(id);
+        final boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
+        final String id = DOMMessage.readId(element);
+        final FreeColGameObject object = game.getFreeColGameObject(id);
         if (object == null) {
             logger.warning("featureChange with null object");
             return null;
         }
 
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element) nodes.item(i);
-
-            final String tag = e.getTagName();
-            if (Ability.getTagName().equals(tag)) {
-                if (add) {
-                    object.addAbility(new Ability(e, spec));
+        DOMMessage.mapChildren(game, element, (e) -> {
+                final String tag = DOMMessage.readId(e);
+                if (Ability.getTagName().equals(tag)) {
+                    if (add) {
+                        object.addAbility(new Ability(e, spec));
+                    } else {
+                        object.removeAbility(new Ability(e, spec));
+                    }
+                    
+                } else if (Modifier.getTagName().equals(tag)) {
+                    if (add) {
+                        object.addModifier(new Modifier(e, spec));
+                    } else {
+                        object.removeModifier(new Modifier(e, spec));
+                    }
+                    
                 } else {
-                    object.removeAbility(new Ability(e, spec));
+                    logger.warning("featureChange unrecognized: " + tag);
                 }
-
-            } else if (Modifier.getTagName().equals(tag)) {
-                if (add) {
-                    object.addModifier(new Modifier(e, spec));
-                } else {
-                    object.removeModifier(new Modifier(e, spec));
-                }
-
-            } else {
-                logger.warning("featureChange unrecognized: " + tag);
-            }
-        }
+                return object;
+            });
         return null;
     }
 
@@ -785,10 +776,8 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Demand to anothers colony");
         }
 
-        invokeAndWait(() -> {
-                message.setResult(igc().indianDemand(unit, colony,
-                        message.getType(game), message.getAmount()));
-            });
+        invokeAndWait(() -> message.setResult(igc().indianDemand(unit, colony,
+                    message.getType(game), message.getAmount())));
         return message.toXMLElement();
     }
 
@@ -807,7 +796,7 @@ public final class InGameInputHandler extends InputHandler {
         final List<Goods> goods = message.getGoods();
         if (unit == null || goods == null) return null;
 
-        invokeLater(() -> { igc().loot(unit, goods, defenderId); });
+        invokeLater(() -> igc().loot(unit, goods, defenderId));
         return null;
     }
 
@@ -823,10 +812,8 @@ public final class InGameInputHandler extends InputHandler {
         final MonarchActionMessage message
             = new MonarchActionMessage(game, element);
 
-        invokeLater(() -> {
-                igc().monarch(message.getAction(), message.getTemplate(),
-                              message.getMonarchKey());
-            });
+        invokeLater(() -> igc().monarch(message.getAction(),
+                message.getTemplate(), message.getMonarchKey()));
         return null;
     }
 
@@ -868,7 +855,7 @@ public final class InGameInputHandler extends InputHandler {
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
 
-        invokeLater(() -> { igc().newLandName(defaultName, unit); });
+        invokeLater(() -> igc().newLandName(defaultName, unit));
         return null;
     }
 
@@ -888,9 +875,7 @@ public final class InGameInputHandler extends InputHandler {
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
 
-        invokeLater(() -> {
-                igc().newRegionName(region, defaultName, tile, unit);
-            });
+        invokeLater(() -> igc().newRegionName(region, defaultName, tile, unit));
         return null;
     }
 
@@ -926,7 +911,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeLater(() -> { igc().newTurn(n); });
+        invokeLater(() -> igc().newTurn(n));
         return null;
     }
 
@@ -956,23 +941,21 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColGameObject divert
             = game.getFreeColGameObject(element.getAttribute("divert"));
         final List<FreeColGameObject> objects = new ArrayList<>();
-        NodeList nodeList = element.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element e = (Element)nodeList.item(i);
-            String idString = DOMMessage.readId(e);
-            FreeColGameObject fcgo = game.getFreeColGameObject(idString);
-            if (fcgo == null) {
-                // This can happen legitimately when an update that
-                // removes pointers to a disappearing unit happens,
-                // then a gc which drops the weak reference in
-                // freeColGameObjects, before this remove is processed.
-                continue;
-            }
-            objects.add(fcgo);
-        }
-
+        DOMMessage.mapChildren(game, element, (e) -> {
+                final String id = DOMMessage.readId(e);
+                FreeColGameObject fcgo = game.getFreeColGameObject(id);
+                if (fcgo != null) {
+                    // Null fcgo can happen legitimately when an
+                    // update that removes pointers to a disappearing
+                    // unit happens, then a gc which drops the weak
+                    // reference in freeColGameObjects, before this
+                    // remove is processed.
+                    objects.add(fcgo);
+                }
+                return fcgo;
+            });
         if (!objects.isEmpty()) {
-            invokeLater(() -> { igc().remove(objects, divert); });
+            invokeLater(() -> igc().remove(objects, divert));
         }
         return null;
     }
@@ -1028,7 +1011,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeLater(() -> { igc().setDead(player); });
+        invokeLater(() -> igc().setDead(player));
         return null;
     }
 
@@ -1060,7 +1043,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        invokeLater(() -> { igc().setStance(stance, p1, p2); });
+        invokeLater(() -> igc().setStance(stance, p1, p2));
         return null;
     }
 
@@ -1091,6 +1074,7 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = getFreeColClient().getMyPlayer();
         final Game game = getGame();
         boolean visibilityChange = false;
+        
         for (FreeColGameObject fcgo : DOMMessage.mapChildren(game, element,
                 e -> DOMMessage.updateFromElement(game, e))) {
             if ((fcgo instanceof Player && (fcgo == player))
@@ -1100,6 +1084,7 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
         if (visibilityChange) player.invalidateCanSeeTiles();//+vis(player)
+
         return null;
     }
 }
