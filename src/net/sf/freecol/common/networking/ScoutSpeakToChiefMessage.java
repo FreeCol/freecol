@@ -20,9 +20,9 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -39,28 +39,37 @@ import org.w3c.dom.Element;
 public class ScoutSpeakToChiefMessage extends DOMMessage {
 
     public static final String TAG = "scoutSpeakToChief";
-    private static final String DIRECTION_TAG = "direction";
+    private static final String RESULT_TAG = "result";
+    private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit that is speaking. */
     private final String unitId;
 
-    /** The direction of the settlement from the unit. */
-    private final String directionString;
+    /** The identifier of the settlement to talk to. */
+    private final String settlementId;
+
+    /** The result of speaking to the chief. */
+    private final String result;
 
 
     /**
      * Create a new <code>ScoutSpeakToChiefMessage</code> with the
-     * supplied unit and direction.
+     * supplied unit, settlement and result.
+     *
+     * Result is null in a request.
      *
      * @param unit The <code>Unit</code> that is learning.
-     * @param direction The <code>Direction</code> the unit is looking.
+     * @param settlement The <code>IndianSettlement</code> to talk to.
+     * @param result The result of speaking.
      */
-    public ScoutSpeakToChiefMessage(Unit unit, Direction direction) {
+    public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement settlement,
+                                    String result) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        this.settlementId = settlement.getId();
+        this.result = result;
     }
 
     /**
@@ -74,10 +83,27 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
         super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
+        this.result = getStringAttribute(element, RESULT_TAG);
     }
 
 
+    // Public interface
+
+    public Unit getUnit(Game game) {
+        return game.getFreeColGameObject(this.unitId, Unit.class);
+    }
+
+    public IndianSettlement getSettlement(Game game) {
+        return game.getFreeColGameObject(this.settlementId,
+                                         IndianSettlement.class);
+    }
+
+    public String getResult() {
+        return (this.result == null) ? "" : this.result;
+    }
+
+    
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
@@ -104,18 +130,12 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Tile tile;
+        IndianSettlement is;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            is = (IndianSettlement)unit
+                .getAdjacentIndianSettlementSafely(this.settlementId);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
-        }
-
-        IndianSettlement is = tile.getIndianSettlement();
-        if (is == null) {
-            return serverPlayer.clientError("There is no native settlement at: "
-                + tile.getId())
                 .build(serverPlayer);
         }
 
@@ -141,7 +161,8 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString).toXMLElement();
+            SETTLEMENT_TAG, this.settlementId,
+            RESULT_TAG, this.result).toXMLElement();
     }
 
     /**

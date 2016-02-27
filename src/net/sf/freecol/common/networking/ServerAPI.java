@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
@@ -1119,16 +1120,13 @@ public abstract class ServerAPI {
      * Server query-response for speaking with a native chief.
      *
      * @param unit The <code>Unit</code> that is speaking.
-     * @param direction The direction to a settlement to ask.
-     * @return A string describing the result,
-     *     or null if the server interaction failed.
+     * @param settlement The <code>IndianSettlement</code> to ask.
+     * @return True if the server interaction succeeded.
      */
-    public String scoutSpeakToChief(Unit unit, Direction direction) {
-        Element reply = askExpecting(unit.getGame(),
-            new ScoutSpeakToChiefMessage(unit, direction),
+    public boolean scoutSpeakToChief(Unit unit, IndianSettlement settlement) {
+        return askHandling(unit.getGame(),
+            new ScoutSpeakToChiefMessage(unit, settlement, null),
             null);
-        resolve(handle(reply));
-        return DOMMessage.getStringAttribute(reply, "result");
     }
 
     /**

@@ -53,6 +53,7 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
+import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -184,6 +185,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "newTradeRoute":
             case "remove":
             case "removeGoods":
+            case ScoutSpeakToChiefMessage.TAG:
             case "setAI":
             case "setDead":
             case "setStance":

@@ -439,8 +439,9 @@ public class ScoutingMission extends Mission {
 
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
             d = unit.getTile().getDirection(getTarget().getTile());
-            assert d != null;
-            if (AIMessage.askScoutSpeakToChief(aiUnit, d)) {
+            assert d != null && getTarget() instanceof IndianSettlement;
+            if (AIMessage.askScoutSpeakToChief(aiUnit,
+                                               (IndianSettlement)getTarget())) {
                 lbDone(lb, true, "speak-with-chief at ", getTarget());
             } else {
                 lbFail(lb, true, "unexpected failure to speak at ", getTarget());

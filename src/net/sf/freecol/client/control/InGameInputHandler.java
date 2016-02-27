@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
@@ -63,6 +64,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
+import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 
 import org.w3c.dom.Element;
@@ -265,6 +267,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = reconnect(element); break;
         case "remove":
             reply = remove(element); break;
+        case ScoutSpeakToChiefMessage.TAG:
+            reply = scoutSpeakToChief(element); break;
         case "setAI":
             reply = setAI(element); break;
         case "setCurrentPlayer":
@@ -956,6 +960,27 @@ public final class InGameInputHandler extends InputHandler {
             });
         if (!objects.isEmpty()) {
             invokeLater(() -> igc().remove(objects, divert));
+        }
+        return null;
+    }
+
+    /**
+     * Handle a "scoutSpeakToChief"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element scoutSpeakToChief(Element element) {
+        final Game game = getGame();
+        final ScoutSpeakToChiefMessage message
+            = new ScoutSpeakToChiefMessage(game, element);
+        if (message != null) {
+            final Unit unit = message.getUnit(game);
+            final IndianSettlement settlement = message.getSettlement(game);
+            final String result = message.getResult();
+            invokeLater(() ->
+                igc().scoutSpeakToChief(unit, settlement, result));
         }
         return null;
     }

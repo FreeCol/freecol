@@ -822,6 +822,7 @@ public final class InGameController implements NetworkConstants {
         if (active != null) player.setNextGoingToUnit(active);
 
         // Process all units.
+        boolean fail = false;
         while (player.hasNextGoingToUnit()) {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
@@ -835,11 +836,12 @@ public final class InGameController implements NetworkConstants {
             // shown in a popup before pressing on with more moves.
             if (gui.isShowingSubPanel()) {
                 gui.requestFocusForSubPanel();
+                fail = true;
                 break;
             }
         }
         gui.setActiveUnit((stillActive != null) ? stillActive : active);
-        return stillActive == null;
+        return stillActive == null && !fail;
     }
 
     /**
@@ -1731,32 +1733,9 @@ public final class InGameController implements NetworkConstants {
             askServer().attack(unit, direction);
             return false;
         case INDIAN_SETTLEMENT_SPEAK:
-            final int oldGold = player.getGold();
-            String result = askServer().scoutSpeakToChief(unit, direction);
-            if (result == null) {
-                return false; // Fail
-            } else if ("die".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    "scoutSettlement.speakDie");
-                return false;
-            } else if ("expert".equals(result)) {
-                gui.showInformationMessage(settlement, StringTemplate
-                    .template("scoutSettlement.expertScout")
-                    .addNamed("%unit%", unit.getType()));
-            } else if ("tales".equals(result)) {
-                gui.showInformationMessage(settlement,
-                    "scoutSettlement.speakTales");
-            } else if ("beads".equals(result)) {
-                gui.showInformationMessage(settlement, StringTemplate
-                    .template("scoutSettlement.speakBeads")
-                    .addAmount("%amount%", player.getGold() - oldGold));
-            } else if ("nothing".equals(result)) {
-                gui.showInformationMessage(settlement, StringTemplate
-                    .template("scoutSettlement.speakNothing")
-                    .addStringTemplate("%nation%", player.getNationLabel()));
-            } else {
-                logger.warning("Invalid result from askScoutSpeak: " + result);
-            }
+            // Prevent turn ending to allow speaking results to complete
+            moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
+            askServer().scoutSpeakToChief(unit, settlement);
             return false;
         case INDIAN_SETTLEMENT_TRIBUTE:
             return moveTribute(unit, 1, direction);
@@ -4587,6 +4566,46 @@ public final class InGameController implements NetworkConstants {
         return false;
     }
 
+    /**
+     * Display the results of speaking to a chief.
+     *
+     * Called from IGIH.scoutSpeakToChief.
+     *
+     * @param unit The <code>Unit</code> that was speaking.
+     * @param settlement The <code>IndianSettlement</code> spoken to.
+     * @param result The result.
+     */
+    public void scoutSpeakToChief(Unit unit, IndianSettlement settlement,
+                                  String result) {
+        switch (result) {
+        case "":
+            break;
+        case "die":
+            gui.showInformationMessage(settlement,
+                "scoutSettlement.speakDie");
+            break;
+        case "expert":
+            gui.showInformationMessage(settlement, StringTemplate
+                .template("scoutSettlement.expertScout")
+                .addNamed("%unit%", unit.getType()));
+            break;
+        case "tales":
+            gui.showInformationMessage(settlement,
+                "scoutSettlement.speakTales");
+            break;
+        case "nothing":
+            gui.showInformationMessage(settlement, StringTemplate
+                .template("scoutSettlement.speakNothing")
+                .addStringTemplate("%nation%", unit.getOwner().getNationLabel()));
+            break;
+        default: // result == amount of gold
+            gui.showInformationMessage(settlement, StringTemplate
+                .template("scoutSettlement.speakBeads")
+                .add("%amount%", result));
+            break;
+        }
+    }
+    
     /**
      * Selects a destination for this unit. Europe and the player's
      * colonies are valid destinations.

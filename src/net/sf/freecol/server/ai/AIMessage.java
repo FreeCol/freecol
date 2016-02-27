@@ -25,12 +25,13 @@ import java.util.List;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
@@ -394,16 +395,16 @@ public class AIMessage {
     }
 
     /**
-     * An AI unit scouts a native settlement.
+     * An AI unit speaks to the chief of a native settlement.
      *
      * @param aiUnit The <code>AIUnit</code> that is scouting.
-     * @param direction The <code>Direction</code> to move.
+     * @param settlement The <code>IndianSettlement</code> to scout.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askScoutSpeakToChief(AIUnit aiUnit,
-                                               Direction direction) {
+                                               IndianSettlement settlement) {
         return aiUnit.getAIOwner().askServer()
-            .scoutSpeakToChief(aiUnit.getUnit(), direction) != null;
+            .scoutSpeakToChief(aiUnit.getUnit(), settlement);
     }
 
     /**

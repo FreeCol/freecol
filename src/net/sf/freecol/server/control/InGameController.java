@@ -110,6 +110,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
+import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -3705,7 +3706,9 @@ public final class InGameController extends Controller {
                     }
                     serverPlayer.modifyGold(gold);
                     settlement.getOwner().modifyGold(-gold);
-                    result = "beads";
+                    result = Integer.toString(gold);
+                    cs.addPartial(See.only(serverPlayer), serverPlayer,
+                                  "gold", "score");
                 }
             }
 
@@ -3727,10 +3730,6 @@ public final class InGameController extends Controller {
                 cs.add(See.perhaps(), unit);
             } else {
                 cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-                if ("beads".equals(result)) {
-                    cs.addPartial(See.only(serverPlayer), serverPlayer,
-                                  "gold", "score");
-                }
             }
         }
         if (tileDirty) {
@@ -3739,7 +3738,8 @@ public final class InGameController extends Controller {
         }
 
         // Always add result.
-        cs.addAttribute(See.only(serverPlayer), "result", result);
+        cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
+            new ScoutSpeakToChiefMessage(unit, settlement, result));
 
         // Other players may be able to see unit disappearing, or
         // learning.
