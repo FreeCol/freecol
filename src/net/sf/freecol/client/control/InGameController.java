@@ -184,6 +184,10 @@ public final class InGameController implements NetworkConstants {
         EXECUTE_GOTO_ORDERS,
         END_TURN;
 
+        public MoveMode minimize(MoveMode m) {
+            return (this.ordinal() > m.ordinal()) ? m : this;
+        }
+
         public MoveMode maximize(MoveMode m) {
             return (this.ordinal() < m.ordinal()) ? m : this;
         }
@@ -864,8 +868,10 @@ public final class InGameController implements NetworkConstants {
         // Ensure end-turn mode sticks.
         moveMode = moveMode.maximize(MoveMode.END_TURN);
 
-        // Make sure all goto orders are complete before ending turn.
-        if (!doExecuteGotoOrders()) return false;
+        // Make sure all goto orders are complete before ending turn, and
+        // that nothing (like a LCR exploration) has cancelled the end turn.
+        if (!doExecuteGotoOrders()
+            || moveMode.ordinal() < MoveMode.END_TURN.ordinal()) return false;
 
         // Check for desync as last thing!
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.DESYNC)
@@ -1493,6 +1499,8 @@ public final class InGameController implements NetworkConstants {
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
             askServer().declineMounds(unit, direction); // LCR goes away
         }
+        // Prevent turn ending at once to allow FoY prompts to complete
+        moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
         return moveMove(unit, direction);
     }
 

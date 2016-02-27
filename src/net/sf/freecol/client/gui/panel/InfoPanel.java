@@ -509,13 +509,12 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void update() {
         InfoPanelMode newMode = getMode();
-        if(newMode == InfoPanelMode.END &&
-           getFreeColClient().getMyPlayer().hasNextActiveUnit()) {
-            logger.warning("Inconsistent InfoPanel status");
-        }
+        Player player = getFreeColClient().getMyPlayer();
+        boolean fail = newMode == InfoPanelMode.END && player != null
+            && player.hasNextActiveUnit();
+        logger.info("InfoPanel " + mode + " -> " + newMode
+            + ((fail) ? "inconsistent" : ""));
         if (this.mode != newMode) {
-            logger.info("Switching InfoPanel mode from " + mode +
-                        " to " + newMode);
             switch (this.mode = newMode) {
             case END:
                 this.mapEditorPanel.setVisible(false);
