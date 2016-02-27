@@ -321,7 +321,7 @@ public final class InGameInputHandler extends InputHandler {
                         player.invalidateCanSeeTiles();// Might be coronado?
                         
                     } else if (HistoryEvent.getTagName().equals(tag)) {
-                        player.getHistory().add(DOMMessage.readElement(game, e, HistoryEvent.class));
+                        player.addHistory(DOMMessage.readElement(game, e, HistoryEvent.class));
                         
                     } else if (LastSale.getTagName().equals(tag)) {
                         player.addLastSale(DOMMessage.readElement(game, e, LastSale.class));

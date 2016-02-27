@@ -2451,10 +2451,12 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the history events for this player.
      *
-     * @return The list of <code>HistoryEvent</code>s for this player.
+     * @return A copy of the <code>HistoryEvent</code>s for this player.
      */
     public final List<HistoryEvent> getHistory() {
-        return history;
+        synchronized (this.history) {
+            return new ArrayList<>(this.history);
+        }
     }
 
     /**
@@ -2463,7 +2465,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param event The <code>HistoryEvent</code> to add.
      */
     public void addHistory(HistoryEvent event) {
-        history.add(event);
+        synchronized (this.history) {
+            this.history.add(event);
+        }
     }
 
 
@@ -4102,7 +4106,7 @@ public class Player extends FreeColGameObject implements Nameable {
             highSeas = xr.readFreeColGameObject(game, HighSeas.class);
 
         } else if (HistoryEvent.getTagName().equals(tag)) {
-            getHistory().add(new HistoryEvent(xr));
+            addHistory(new HistoryEvent(xr));
 
         } else if (LastSale.getTagName().equals(tag)) {
             addLastSale(new LastSale(xr));
