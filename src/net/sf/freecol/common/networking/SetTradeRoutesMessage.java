@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -83,26 +81,9 @@ public class SetTradeRoutesMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
-        final Game game = server.getGame();
 
-        StringTemplate fail = StringTemplate.label(", ");
-        List<TradeRoute> newRoutes = new ArrayList<>();
-        for (TradeRoute tr : tradeRoutes) {
-            StringTemplate st = tr.verify();
-            if (st != null) {
-                fail.addStringTemplate(st);
-            } else {
-                newRoutes.add(tr);
-            }
-        }
-        if (!fail.isEmpty()) {
-            return serverPlayer.clientError(Messages.message(fail))
-                .build(serverPlayer);
-        }
-
-        // Proceed to set trade routes
         return server.getInGameController()
-            .setTradeRoutes(serverPlayer, newRoutes)
+            .setTradeRoutes(serverPlayer, this.tradeRoutes)
             .build(serverPlayer);
     }
 

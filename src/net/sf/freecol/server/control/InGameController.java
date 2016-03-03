@@ -4077,9 +4077,31 @@ public final class InGameController extends Controller {
      */
     public ChangeSet setTradeRoutes(ServerPlayer serverPlayer,
                                     List<TradeRoute> routes) {
+        StringTemplate st, fail = StringTemplate.label(", ");
+        List<TradeRoute> newRoutes = new ArrayList<>();
+        String name;
         for (TradeRoute tr : routes) {
-            serverPlayer.updateTradeRoute(tr);
+            if (tr == null || tr.getId() == null
+                || (name = tr.getName()) == null) {
+                fail.addName("Bogus route");
+            } else if ((st = tr.verify()) != null) {
+                fail.addStringTemplate(st);
+            } else {
+                newRoutes.add(tr);
+            }
         }
+        if (!fail.isEmpty()) {
+            return serverPlayer.clientError(Messages.message(fail));
+        }
+        for (TradeRoute tr : newRoutes) {
+            TradeRoute t = serverPlayer.getTradeRouteByName(tr.getName(), tr);
+            if (t != null) {
+                t.updateFrom(tr);
+            } else {
+                serverPlayer.addTradeRoute(tr);
+            }
+        }
+
         // Have to update the whole player alas.
         return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
     }
@@ -4174,13 +4196,27 @@ public final class InGameController extends Controller {
      * Update a trade route for a player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to set trade
-     *    routes for.
+     *     routes for.
      * @param tradeRoute An uninterned <code>TradeRoute</code> to update.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet updateTradeRoute(ServerPlayer serverPlayer,
                                       TradeRoute tradeRoute) {
-        serverPlayer.updateTradeRoute(tradeRoute);
+        final Game game = getGame();
+        String name;
+        StringTemplate fail;
+        TradeRoute tr;
+        if (tradeRoute == null || tradeRoute.getId() == null
+            || (name = tradeRoute.getName()) == null) {
+            return serverPlayer.clientError("Bogus route");
+        } else if ((fail = tradeRoute.verify()) != null) {
+            return serverPlayer.clientError(Messages.message(fail));
+        } else if ((tr = game.getFreeColGameObject(tradeRoute.getId(),
+                    TradeRoute.class)) == null) {
+            return serverPlayer.clientError("Not an existing trade route: "
+                + tradeRoute.getId());
+        }
+        tr.updateFrom(tradeRoute);
 
         // Have to update the whole player alas.
         return new ChangeSet().add(See.only(serverPlayer), serverPlayer);

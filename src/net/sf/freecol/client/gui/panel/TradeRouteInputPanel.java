@@ -287,9 +287,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         public void setEnabled(boolean enable) {
             super.setEnabled(enable);
             for (Component child : getComponents()) {
-                if (child instanceof CargoLabel) {
-                    child.setEnabled(enable);
-                }
+                if (child instanceof CargoLabel) child.setEnabled(enable);
             }
         }
     }

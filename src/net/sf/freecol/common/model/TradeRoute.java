@@ -94,7 +94,7 @@ public class TradeRoute extends FreeColGameObject
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
         setOwner(other.getOwner());
-        stops.clear();
+        clearStops();
         for (TradeRouteStop otherStop : other.getStops()) {
             addStop(new TradeRouteStop(otherStop));
         }
@@ -194,7 +194,7 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned <code>Unit</code>s.
      */
     public List<Unit> getAssignedUnits() {
-        return transform(owner.getUnits(),
+        return transform(getOwner().getUnits(),
             u -> u.getTradeRoute() == this, Collectors.toList());
     }
 
@@ -221,6 +221,19 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
+     * Check the uniqueness of the trade route name.
+     *
+     * @return Null if the name is unique, or a <code>StringTemplate</code>
+     *     containing an error message if not.
+     */
+    public StringTemplate verifyUniqueName() {
+        return (getOwner().getTradeRouteByName(this.name, this) != null)
+            ? StringTemplate.template("model.tradeRoute.duplicateName")
+                .addName("%name%", this.name)
+            : null;
+    }
+
+    /**
      * Check that the trade route is valid.
      *
      * @param other Ignore this name from the name collision check.
@@ -233,12 +246,6 @@ public class TradeRoute extends FreeColGameObject
         }
         if (this.owner == null) {
             return StringTemplate.template("model.tradeRoute.nullOwner");
-        }
-
-        // Check that the name is unique
-        if (owner.getTradeRouteByName(this.name, this) != null) {
-            return StringTemplate.template("model.tradeRoute.duplicateName")
-                .addName("%name%", this.name);
         }
 
         // Verify that it has at least two stops

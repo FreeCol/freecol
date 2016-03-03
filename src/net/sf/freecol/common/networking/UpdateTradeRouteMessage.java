@@ -19,9 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -76,21 +74,9 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
-        if (this.tradeRoute == null || this.tradeRoute.getId() == null) {
-            return serverPlayer.clientError("Bogus route")
-                .build(serverPlayer);
-        } else {
-            StringTemplate fail = this.tradeRoute.verify();
-            if (fail != null) {
-                return serverPlayer.clientError(Messages.message(fail))
-                    .build(serverPlayer);
-            }
-        }
-
-        // Add this route to the game
-        this.tradeRoute.insert();
-        
-        return null;
+        return server.getInGameController()
+            .updateTradeRoute(serverPlayer, this.tradeRoute)
+            .build(serverPlayer);
     }
 
     /**

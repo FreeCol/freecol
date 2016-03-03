@@ -121,7 +121,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                 }
             });
 
-        JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
+        JScrollPane tradeRouteView = new JScrollPane(this.tradeRoutes);
 
         // Buttons.  New route, edit and delete route actions do not
         // close the dialog by default, so they have dedicated action
@@ -130,9 +130,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         // listener below.
         this.newRouteButton = Utility.localizedButton("tradeRoutePanel.newRoute");
         Utility.localizeToolTip(this.newRouteButton, "tradeRoutePanel.new.tooltip");
-        this.newRouteButton.addActionListener((ActionEvent ae) -> {
-                newRoute();
-            });
+        this.newRouteButton.addActionListener((ActionEvent ae) -> newRoute());
 
         this.editRouteButton = Utility.localizedButton("tradeRoutePanel.editRoute");
         Utility.localizeToolTip(this.editRouteButton, "tradeRoutePanel.edit.tooltip");
@@ -143,7 +141,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                         StringTemplate template = null;
                         if (selected.getName() == null) { // Cancelled
                             selected.setName(name);
-                        } else if ((template = selected.verify()) == null) {
+                        } else if ((template = selected.verify()) == null
+                            && (template = selected.verifyUniqueName()) == null) {
                             igc().updateTradeRoute(selected);
                             updateList(selected);
                         } else {
@@ -176,14 +175,14 @@ public final class TradeRoutePanel extends FreeColPanel {
         setCancelComponent(cancelButton);
 
         updateButtons();
-        updateList((unit == null || unit.getTradeRoute() == null) ? null
+        updateList((this.unit == null
+                || this.unit.getTradeRoute() == null) ? null
             : unit.getTradeRoute());
 
         add(Utility.localizedHeader(Messages.nameKey("tradeRoutePanel"), false),
             "span, align center");
         if (this.unit != null && this.unit.getLocation() != null) {
-            JLabel unitLabel
-                = new JLabel(unit.getDescription(Unit.UnitLabelType.NATIONAL));
+            JLabel unitLabel = new JLabel(this.unit.getDescription(Unit.UnitLabelType.NATIONAL));
             unitLabel.setIcon(new ImageIcon(
                 getImageLibrary().getSmallerUnitImage(this.unit)));
             add(unitLabel);
@@ -223,7 +222,8 @@ public final class TradeRoutePanel extends FreeColPanel {
                 if (name == null) { // Cancelled
                     igc().deleteTradeRoute(newRoute);
                     updateList(null);
-                } else if ((template = newRoute.verify()) != null) {
+                } else if ((template = newRoute.verify()) != null
+                    && (template = newRoute.verifyUniqueName()) != null) {
                     updateList(null);
                     getGUI().showInformationMessage(template);
                 } else {
@@ -246,8 +246,8 @@ public final class TradeRoutePanel extends FreeColPanel {
         } else {
             editRouteButton.setEnabled(true);
             deleteRouteButton.setEnabled(true);
-            deassignRouteButton.setEnabled(unit != null
-                && unit.getTradeRoute() != null);
+            deassignRouteButton.setEnabled(this.unit != null
+                && this.unit.getTradeRoute() != null);
         }
     }
 
@@ -309,19 +309,14 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute route = getRoute();
         switch (command) {
         case DEASSIGN:
-            if (unit != null && route == unit.getTradeRoute()) {
-                igc().clearOrders(unit);
+            if (this.unit != null && route == this.unit.getTradeRoute()) {
+                igc().clearOrders(this.unit);
             }
             getGUI().removeFromCanvas(this);
             break;
         case OK:
-            List<TradeRoute> routes = new ArrayList<>();
-            for (int index = 0; index < listModel.getSize(); index++) {
-                routes.add(listModel.getElementAt(index));
-            }
-            igc().setTradeRoutes(routes);
-            if (unit != null && route != null) {
-                igc().assignTradeRoute(unit, route);
+            if (this.unit != null && route != null) {
+                igc().assignTradeRoute(this.unit, route);
             }
             super.actionPerformed(ae);
             break;
