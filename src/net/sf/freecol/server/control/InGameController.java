@@ -3417,10 +3417,9 @@ public final class InGameController extends Controller {
      * @return The new <code>TradeRoute</code>.
      */
     public TradeRoute newTradeRoute(ServerPlayer serverPlayer) {
-        List<TradeRoute> routes = serverPlayer.getTradeRoutes();
         TradeRoute route = new TradeRoute(getGame(), 
             serverPlayer.getNameForTradeRoute(), serverPlayer);
-        routes.add(route);
+        serverPlayer.addTradeRoute(route);
         return route;
     }
 

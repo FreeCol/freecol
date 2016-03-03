@@ -2081,19 +2081,55 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the trade routes defined for this player.
      *
-     * @return The list of <code>TradeRoute</code>s for this player.
+     * @return A copy of the list of <code>TradeRoute</code>s for this player.
      */
-    public final List<TradeRoute> getTradeRoutes() {
-        return tradeRoutes;
+    public synchronized final List<TradeRoute> getTradeRoutes() {
+        return new ArrayList<>(this.tradeRoutes);
     }
 
+    /**
+     * Get number of trade routes defined for this player.
+     *
+     * @return The trade route count.
+     */
+    public synchronized final int getTradeRouteCount() {
+        return this.tradeRoutes.size();
+    }
+
+    /**
+     * Get the most recently defined trade route.
+     *
+     * Relies on trade routes *always* being added at the end of the list.
+     *
+     * @return The most recently defined <code>TradeRoute</code>.
+     */
+    public synchronized final TradeRoute getNewestTradeRoute() {
+        return (this.tradeRoutes.isEmpty()) ? null
+            : this.tradeRoutes.get(this.tradeRoutes.size());
+    }
+
+    /**
+     * Add a new trade route.
+     *
+     * @param tradeRoute The <code>TradeRoute</code> to add.
+     */
+    public final void addTradeRoute(TradeRoute tradeRoute) {
+        String name;
+        if (tradeRoute != null && (name = tradeRoute.getName()) != null
+            && getTradeRouteByName(name) == null) {
+            synchronized (this.tradeRoutes) {
+                this.tradeRoutes.add(tradeRoute);
+            }
+        }
+    }
+    
     /**
      * Get a trade route by name.
      *
      * @param name The trade route name.
      */
-    public TradeRoute getTradeRouteByName(String name) {
-        return find(tradeRoutes, t -> t.getName().equals(name));
+    public synchronized final TradeRoute getTradeRouteByName(String name) {
+        return find(this.tradeRoutes, t -> t.getName().equals(name));
     }
 
     /**
@@ -2116,9 +2152,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newTradeRoutes The new list of <code>TradeRoute</code>s,
      *     currently uninterned.
      */
-    public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
-        tradeRoutes.clear();
-        tradeRoutes.addAll(newTradeRoutes);
+    public synchronized final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
+        this.tradeRoutes.clear();
+        this.tradeRoutes.addAll(newTradeRoutes);
     }
 
     /**
@@ -2130,7 +2166,7 @@ public class Player extends FreeColGameObject implements Nameable {
         TradeRoute tr = getTradeRouteByName(tradeRoute.getName());
         if (tr != null) tradeRoutes.remove(tr);
         tradeRoute.insert();
-        tradeRoutes.add(tradeRoute);
+        addTradeRoute(tradeRoute);
     }
 
     /**
@@ -4139,7 +4175,7 @@ public class Player extends FreeColGameObject implements Nameable {
             monarch = xr.readFreeColGameObject(game, Monarch.class);
 
         } else if (TradeRoute.getTagName().equals(tag)) {
-            tradeRoutes.add(xr.readFreeColGameObject(game, TradeRoute.class));
+            addTradeRoute(xr.readFreeColGameObject(game, TradeRoute.class));
 
         } else {
             super.readChild(xr);

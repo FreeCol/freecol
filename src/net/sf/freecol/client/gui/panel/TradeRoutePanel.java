@@ -269,8 +269,9 @@ public final class TradeRoutePanel extends FreeColPanel {
             }
         }
 
-        // Now create a sorted list of routes
-        List<TradeRoute> routes = new ArrayList<>(player.getTradeRoutes());
+        // Now create a sorted list of routes.
+        // We are deliberately *not* sorting the player's list.
+        List<TradeRoute> routes = player.getTradeRoutes();
         Collections.sort(routes, tradeRouteComparator);
 
         // Then add the routes to the list model.

@@ -903,7 +903,7 @@ public final class InGameInputHandler extends InputHandler {
         if (message != null) {
             final Player player = getFreeColClient().getMyPlayer();
             TradeRoute tr = message.getTradeRoute();
-            if (tr != null) player.getTradeRoutes().add(tr);
+            if (tr != null) player.addTradeRoute(tr);
         }
         return null;
     }

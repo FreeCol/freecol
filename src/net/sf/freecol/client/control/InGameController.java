@@ -4232,7 +4232,8 @@ public final class InGameController implements NetworkConstants {
     /**
      * Gets a new trade route for a player.
      *
-     * Called from TradeRoutePanel.newRoute
+     * Called from TradeRoutePanel.newRoute.  Relies on new trade routes
+     * being added at the end of the trade route list.
      *
      * @param player The <code>Player</code> to get a new trade route for.
      * @return A new <code>TradeRoute</code>.
@@ -4240,10 +4241,10 @@ public final class InGameController implements NetworkConstants {
     public TradeRoute newTradeRoute(Player player) {
         if (player == null) return null;
 
-        final int n = player.getTradeRoutes().size();
+        final int n = player.getTradeRouteCount();
         return (askServer().newTradeRoute(freeColClient.getGame())
-            && player.getTradeRoutes().size() == n + 1)
-            ? player.getTradeRoutes().get(n)
+            && player.getTradeRouteCount() == n + 1)
+            ? player.getNewestTradeRoute()
             : null;
     }
 
