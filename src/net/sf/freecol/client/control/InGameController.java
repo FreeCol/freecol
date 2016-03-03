@@ -3299,6 +3299,21 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Delete a trade route.
+     *
+     * Called from TradeRoutePanel button.
+     *
+     * @param tradeRoute The <code>TradeRoute</code> to delete.
+     * @return True if the route was successfully deleted.
+     */
+    public boolean deleteTradeRoute(TradeRoute tradeRoute) {
+        final Player player = freeColClient.getMyPlayer();
+        final String name = tradeRoute.getName();
+        boolean ret = askServer().deleteTradeRoute(tradeRoute);
+        return ret && player.getTradeRouteByName(name) == null;
+    }
+
+    /**
      * Handle a diplomatic offer.
      *
      * Called from IGIH.diplomacy

@@ -53,6 +53,7 @@ import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -215,8 +216,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         Element reply;
-        final String type = element.getTagName();
-        switch (type) {
+        final String tag = element.getTagName();
+        switch (tag) {
         case Connection.DISCONNECT_TAG:
             reply = disconnect(element); break; // Inherited
         case "addObject":
@@ -281,11 +282,14 @@ public final class InGameInputHandler extends InputHandler {
             reply = spySettlement(element); break;
         case "update":
             reply = update(element); break;
+
+        // Never returned
+        case DeleteTradeRouteMessage.TAG:
         default:
-            logger.warning("Received unsupported message type: " + type);
+            logger.warning("Unsupported message type: " + tag);
             return null;
         }
-        logger.log(Level.FINEST, "Client handled: " + type
+        logger.log(Level.FINEST, "Client handled: " + tag
             + " with: " + ((reply == null) ? "null" : reply.getTagName()));
 
         // If there is a "flush" attribute present, encourage the client

@@ -2097,6 +2097,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Remove a trade route.
+     *
+     * @param tradeRoute The <code>TradeRoute</code> to remove.
+     * @return A list of units that were formally assigned to the trade route.
+     */
+    public final List<Unit> removeTradeRoute(TradeRoute tradeRoute) {
+        List<Unit> ret = (!this.tradeRoutes.remove(tradeRoute))
+            ? Collections.<Unit>emptyList()
+            : tradeRoute.getAssignedUnits();
+        for (Unit u : ret) u.setTradeRoute(null);
+        return ret;
+    }
+
+    /**
      * Set the players trade routes.
      *
      * @param newTradeRoutes The new list of <code>TradeRoute</code>s,

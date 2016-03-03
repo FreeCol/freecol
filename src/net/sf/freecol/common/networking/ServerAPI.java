@@ -535,6 +535,17 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response for deleting a trade route.
+     *
+     * @param tradeRoute The <code>TradeRoute</code> to delete.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean deleteTradeRoute(TradeRoute tradeRoute) {
+        return askHandling(tradeRoute.getGame(),
+            new DeleteTradeRouteMessage(tradeRoute), null);
+    }
+
+    /**
      * Server query-response to give the given goods to the natives.
      *
      * @param unit The <code>Unit</code> that is trading.

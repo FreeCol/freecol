@@ -160,7 +160,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                     for (Unit u : route.getAssignedUnits()) {
                         igc().assignTradeRoute(u, null);
                     }
-                    deleteTradeRoute(route);
+                    igc().deleteTradeRoute(route);
                     updateList(null);
                 }
             });
@@ -220,7 +220,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         getGUI().showTradeRouteInputPanel(newRoute, () -> {
                 StringTemplate template = null;
                 if (newRoute.getName() == null) { // Cancelled
-                    deleteTradeRoute(newRoute);
+                    igc().deleteTradeRoute(newRoute);
                     updateList(null);
                 } else if ((template = newRoute.verify(true)) == null) {
                     igc().updateTradeRoute(newRoute);
@@ -283,17 +283,6 @@ public final class TradeRoutePanel extends FreeColPanel {
         if (selectRoute != null && this.tradeRoutes != null) {
             this.tradeRoutes.setSelectedValue(selectRoute, true);
         }
-    }
-
-    /**
-     * Delete a player trade route.
-     *
-     * @param route The <code>TradeRoute</code> to delete.
-     */
-    private void deleteTradeRoute(TradeRoute route) {
-        List<TradeRoute> routes = getMyPlayer().getTradeRoutes();
-        routes.remove(route);
-        igc().setTradeRoutes(routes);
     }
 
 

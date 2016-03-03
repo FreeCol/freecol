@@ -1919,6 +1919,26 @@ public final class InGameController extends Controller {
 
 
     /**
+     * Delete a trade route.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to delete a trade
+     *     route for.
+     * @param tradeRoute The <code>TradeRoute</code> to delete.
+     * @return A <code>ChangeSet</code> encapsulating this action.
+     */
+    public ChangeSet deleteTradeRoute(ServerPlayer serverPlayer,
+                                      TradeRoute tradeRoute) {
+        List<Unit> dropped = serverPlayer.removeTradeRoute(tradeRoute);
+
+        // Trade route change is entirely internal
+        ChangeSet cs = new ChangeSet();
+        cs.add(See.only(serverPlayer), serverPlayer); // FIXME: big update
+        if (!dropped.isEmpty()) cs.add(See.only(serverPlayer), dropped);
+        return cs;
+    }
+
+
+    /**
      * Deliver gift to settlement.
      * Note that this includes both European and native gifts.
      *
