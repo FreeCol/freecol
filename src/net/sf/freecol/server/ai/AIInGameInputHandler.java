@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
@@ -177,6 +178,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case AddPlayerMessage.TAG:
             case "animateMove":
             case "animateAttack":
+            case AssignTradeRouteMessage.TAG:
             case "chat":
             case DeleteTradeRouteMessage.TAG:
             case ErrorMessage.TAG:

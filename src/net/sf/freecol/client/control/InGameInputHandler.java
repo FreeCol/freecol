@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -284,6 +285,7 @@ public final class InGameInputHandler extends InputHandler {
             reply = update(element); break;
 
         // Never returned
+        case AssignTradeRouteMessage.TAG:
         case DeleteTradeRouteMessage.TAG:
         default:
             logger.warning("Unsupported message type: " + tag);

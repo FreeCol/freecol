@@ -148,6 +148,14 @@ public final class InGameInputHandler extends InputHandler
                 return new AssignTeacherMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
+        register(AssignTradeRouteMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new AssignTradeRouteMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
         register(AttackMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -602,10 +610,6 @@ public final class InGameInputHandler extends InputHandler
 
         // FIXME: everything that has to getPlayer() should be moved above
         // NetworkRequestHandlers
-        register(AssignTradeRouteMessage.getTagName(),
-            (Connection connection, Element element) ->
-            new AssignTradeRouteMessage(getGame(), element)
-                .handle(freeColServer, connection));
         register("continuePlaying",
             (Connection connection, Element element) -> {
                 freeColServer.getInGameController()

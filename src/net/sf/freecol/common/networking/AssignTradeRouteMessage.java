@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
@@ -77,11 +78,13 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * Handle a "assignTradeRoute"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
+     * @param player The <code>Player</code> that sent the message.
      * @param connection The <code>Connection</code> message was received on.
-     * @return An update containing the assignTradeRouted unit, or an
-     *     error <code>Element</code> on failure.
+     * @return An <code>Element</code> to update the originating
+     *     player with the result of the demand.
      */
-    public Element handle(FreeColServer server, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
