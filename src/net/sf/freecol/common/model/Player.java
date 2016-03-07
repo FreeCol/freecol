@@ -2105,7 +2105,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public synchronized final TradeRoute getNewestTradeRoute() {
         return (this.tradeRoutes.isEmpty()) ? null
-            : this.tradeRoutes.get(this.tradeRoutes.size());
+            : this.tradeRoutes.get(this.tradeRoutes.size()-1);
     }
 
     /**
