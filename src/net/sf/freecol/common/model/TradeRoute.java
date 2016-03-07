@@ -228,7 +228,10 @@ public class TradeRoute extends FreeColGameObject
      *     explaining the problem if invalid.
      */
     public StringTemplate verify(boolean nameCollisions) {
-        if (owner == null) {
+        if (this.name == null) {
+            return StringTemplate.template("model.tradeRoute.nullName");
+        }
+        if (this.owner == null) {
             return StringTemplate.template("model.tradeRoute.nullOwner");
         }
 
