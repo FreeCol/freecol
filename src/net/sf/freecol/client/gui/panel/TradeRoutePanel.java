@@ -258,21 +258,30 @@ public final class TradeRoutePanel extends FreeColPanel {
     private void updateList(TradeRoute selectRoute) {
         final Player player = getMyPlayer();
 
-        // First update the counts
+        // Create a sorted list of routes.
+        // We are deliberately *not* sorting the player's list.
+        List<TradeRoute> routes = new ArrayList<>();
+        for (TradeRoute tr : player.getTradeRoutes()) {
+            StringTemplate st = tr.verify(false);
+            if (st == null) {
+                routes.add(tr);
+            } else {
+                igc().deleteTradeRoute(tr);
+                logger.warning("Dropped trade route: " + Messages.message(st));
+            }
+        }
+        Collections.sort(routes, tradeRouteComparator);
+
+        // Update the counts
         this.counts.clear();
         for (Unit u : player.getUnits()) {
             TradeRoute tradeRoute = u.getTradeRoute();
-            if (tradeRoute != null) {
+            if (tradeRoute != null && routes.contains(tradeRoute)) {
                 Integer i = counts.get(tradeRoute);
                 int value = (i == null) ? 0 : i;
                 counts.put(tradeRoute, value + 1);
             }
         }
-
-        // Now create a sorted list of routes.
-        // We are deliberately *not* sorting the player's list.
-        List<TradeRoute> routes = player.getTradeRoutes();
-        Collections.sort(routes, tradeRouteComparator);
 
         // Then add the routes to the list model.
         this.listModel.clear();
