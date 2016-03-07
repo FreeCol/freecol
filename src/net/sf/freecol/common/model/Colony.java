@@ -2457,8 +2457,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
-        // Everyone can always work out a colony name.
-        return StringTemplate.name(getName());
+        // Everyone can always work out a colony name, but it can be invalid
+        final String name = getName();
+        return StringTemplate.name((name == null) ? "?" : name);
     }
 
     /**
