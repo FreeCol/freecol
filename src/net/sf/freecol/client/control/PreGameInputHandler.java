@@ -309,7 +309,6 @@ public final class PreGameInputHandler extends InputHandler {
         final UpdateMessage message = new UpdateMessage(game, element);
         for (FreeColGameObject fcgo : message.getObjects()) {
             if (fcgo instanceof Game) {
-                fcgo.insert();
                 fcc.addSpecificationActions(((Game)fcgo).getSpecification());
             } else {
                 logger.warning("Game node expected: " + fcgo.getId());

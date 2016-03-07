@@ -96,18 +96,18 @@ public abstract class FreeColGameObject extends FreeColObject {
     /**
      * Instantiate an uninitialized FreeColGameObject within a game.
      *
-     * @param game The <code>Game</code> to add to.
+     * @param game The <code>Game</code> to instantiate within.
      * @param returnClass The required <code>FreeColObject</code> class.
      * @return The new uninitialized object, or null on error.
      */
     public static <T extends FreeColObject> T newInstance(Game game,
-                                                          Class<T> returnClass) {
+        Class<T> returnClass) {
         try {
             return Introspector.instantiate(returnClass,
                 new Class[] { Game.class, String.class },
                 new Object[] { game, (String)null }); // No intern!
         } catch (Introspector.IntrospectorException ex) {}
-        // OK, did not work, try some simpler constructors
+        // OK, did not work, try the simpler constructors
         return (FreeColSpecObject.class.isAssignableFrom(returnClass))
             ? FreeColSpecObject.newInstance(game.getSpecification(),
                                             returnClass)
@@ -125,27 +125,17 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (game != null && newId != null && isInternable()) {
             final String oldId = getId();
             if (!newId.equals(oldId)) {
-                if (oldId != null) game.removeFreeColGameObject(oldId, "override");
+                if (oldId != null) {
+                    game.removeFreeColGameObject(oldId, "override");
+                }
                 setId(newId);
-                if (newId != null) game.setFreeColGameObject(newId, this);
+                if (newId != null) {
+                    game.setFreeColGameObject(newId, this);
+                }
             }
         } else {
             setId(newId);
         }
-    }
-
-    /**
-     * Insert this object into the game using its existing identifier.
-     */
-    public final void insert() {
-        final Game game = getGame();
-        if (game == null) throw new RuntimeException("Null game");
-        String id = getId();
-        FreeColGameObject fcgo = game.getFreeColGameObject(id);
-        if (fcgo != null && fcgo != this) {
-            game.removeFreeColGameObject(id, "update");
-        }
-        game.setFreeColGameObject(id, this);
     }
 
     /**
