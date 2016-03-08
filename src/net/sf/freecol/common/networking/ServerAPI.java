@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
@@ -204,52 +205,40 @@ public abstract class ServerAPI {
      *
      * @param game The current <code>Game</code>.
      * @param message A <code>DOMMessage</code> to send.
-     * @param tag The expected tag
+     * @param tag The expected tag.
      * @return The answer from the server if it has the specified tag,
-     *         otherwise <code>null</code>.
+     *     otherwise <code>null</code>.
      */
     private Element askExpecting(Game game, DOMMessage message, String tag) {
         Element reply = ask(message);
         if (reply == null) return null;
-        final Connection c = getConnection();
 
-        // Shortcut error processing
+        if (MultipleMessage.TAG.equals(reply.getTagName())) {
+            // Process multiple returns, pick out expected element if
+            // present and continue processing the reply.
+            MultipleMessage mm = new MultipleMessage(game, reply);
+            Element e = mm.extract(tag);
+            resolve(handle(e));
+            if (mm == null) return null;
+            reply = mm.toXMLElement();
+        }
+
         if (ErrorMessage.TAG.equals(reply.getTagName())) {
+            // Shortcut error processing
             handle(reply);
             return null;
         }
 
-        // Success!
         if (tag == null || tag.equals(reply.getTagName())) {
-            // Do the standard processing.
+            // Success.  Do the standard processing.
             doClientProcessingFor(reply);
             return reply;
         }
 
-        // Process multiple returns, pick out expected element if present
-        if ("multiple".equals(reply.getTagName())) {
-            List<Element> replies = new ArrayList<>();
-            NodeList nodes = reply.getChildNodes();
-            Element result = null;
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                if (nodes.item(i) instanceof Element
-                    && ((Element)nodes.item(i)).getTagName().equals(tag)) {
-                    result = (Element)nodes.item(i);
-                } else {
-                    Element e = handle((Element)nodes.item(i));
-                    if (e != null) replies.add(e);
-                }
-            }
-            resolve(DOMMessage.collapseElements(replies));
-            if (result != null) return result;
-        }
-
         // Unexpected reply.  Whine and fail.
-        String complaint = "Received reply with tag " + reply.getTagName()
+        logger.warning("Received reply with tag " + reply.getTagName()
             + " which should have been " + tag
-            + " to message " + message;
-        logger.warning(complaint);
+            + " to message " + message);
         return null;
     }
 

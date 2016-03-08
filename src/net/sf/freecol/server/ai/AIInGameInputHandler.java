@@ -53,6 +53,7 @@ import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
@@ -162,7 +163,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = lootCargo(connection, element); break;
             case "monarchAction":
                 reply = monarchAction(connection, element); break;
-            case "multiple":
+            case MultipleMessage.TAG:
                 reply = multiple(connection, element); break;
             case "newLandName":
                 reply = newLandName(connection, element); break;
@@ -424,19 +425,7 @@ public final class AIInGameInputHandler implements MessageHandler {
      * @return An <code>Element</code> containing the response/s.
      */
     public Element multiple(Connection connection, Element element) {
-        NodeList nodes = element.getChildNodes();
-        List<Element> results = new ArrayList<>();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            try {
-                Element reply = handle(connection, (Element) nodes.item(i));
-                if (reply != null) results.add(reply);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Caught crash in multiple item " + i
-                    + ", continuing.", e);
-            }
-        }
-        return DOMMessage.collapseElements(results);
+        return new MultipleMessage(element).applyHandler(this, connection);
     }
 
     /**

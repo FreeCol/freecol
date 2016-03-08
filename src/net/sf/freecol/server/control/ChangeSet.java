@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -1915,11 +1916,10 @@ public class ChangeSet {
             result = elements.get(0);
             break;
         default:
-            result = doc.createElement("multiple");
-            for (Element e : elements) result.appendChild(e);
+            result = new MultipleMessage(elements).toXMLElement();
             break;
         }
-        doc.appendChild(result);
+        result = (Element)doc.importNode(result, true);
         for (Change change : diverted) change.attachToElement(result);
         return result;
     }

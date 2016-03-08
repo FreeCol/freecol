@@ -37,9 +37,11 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
@@ -91,7 +93,7 @@ public final class PreGameInputHandler extends InputHandler {
             return error(element);
         case "logout":
             return logout(element);
-        case "multiple":
+        case MultipleMessage.TAG:
             return multiple(connection, element);
         case "playerReady":
             return playerReady(element);
@@ -122,8 +124,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "addPlayer"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element addPlayer(Element element) {
@@ -136,8 +138,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "chat"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element chat(Element element)  {
@@ -166,8 +168,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "logout"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element logout(Element element) {
@@ -190,25 +192,19 @@ public final class PreGameInputHandler extends InputHandler {
      * Handle all the children of this element.
      *
      * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return The result of handling the last <code>Element</code>.
      */
     public Element multiple(Connection connection, Element element) {
-        NodeList nodes = element.getChildNodes();
-        Element reply = null;
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            reply = handle(connection, (Element)nodes.item(i));
-        }
-        return reply;
+        return new MultipleMessage(element).applyHandler(this, connection);
     }
 
     /**
      * Handles a "playerReady"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element playerReady(Element element) {
@@ -226,8 +222,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "removePlayer"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element removePlayer(Element element) {
@@ -246,8 +242,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles a "setAvailable"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element setAvailable(Element element) {
@@ -320,8 +316,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateColor"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateColor(Element element) {
@@ -350,8 +346,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateGameOptions"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateGameOptions(Element element) {
@@ -371,8 +367,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateMapGeneratorOptions"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateMapGeneratorOptions(Element element) {
@@ -390,8 +386,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateNation"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateNation(Element element) {
@@ -411,8 +407,8 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * Handles an "updateNationType"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element updateNationType(Element element) {

@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.InputHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -357,16 +358,49 @@ public class DOMMessage {
         default:
             break;
         }
-        Element first = elements.remove(0);
-        Document doc = first.getOwnerDocument();
-        Element result = doc.createElement("multiple");
-        result.appendChild(first);
-        for (Element e : elements) {
-            result.appendChild(doc.importNode(e, true));
-        }
-        return result;
+        return new MultipleMessage(elements).toXMLElement();
     }
 
+
+    /**
+     * Handle the child nodes of an element.
+     *
+     * @param mh The <code>MessageHandler</code> to handle the nodes.
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return An <code>Element</code> containing the response/s.
+     */
+    public static final Element handleChildren(MessageHandler mh,
+        Connection connection, Element element) {
+        return handleList(mh, connection, mapChildren(element, e -> e));
+    }
+
+    /**
+     * Handle a list of messages.
+     *
+     * @param mh The <code>MessageHandler</code> to handle the messages.
+     * @param connection The <code>Connection</code> the messages arrived on.
+     * @param elements The list of <code>Element</code>s to process.
+     * @return An <code>Element</code> containing the response/s.
+     */
+    public static final Element handleList(MessageHandler mh,
+        Connection connection, List<Element> elements) {
+        List<Element> results = new ArrayList<>();
+        int i = 0;
+        for (Element e : elements) {
+            final String tag = e.getTagName();
+            try {
+                Element reply = mh.handle(connection, e);
+                if (reply != null) results.add(reply);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Crash in multiple " + i
+                    + ", tag " + tag + ", continuing.", ex);
+            }
+            i++;
+        }
+        return collapseElements(results);
+    }    
+    
     /**
      * Convenience method to find the first child element with the
      * specified tagname.

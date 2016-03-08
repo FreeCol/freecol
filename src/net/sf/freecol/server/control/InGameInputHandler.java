@@ -70,6 +70,7 @@ import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
+import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -436,6 +437,14 @@ public final class InGameInputHandler extends InputHandler
                 return new MoveToMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
+        register(MultipleMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new MultipleMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
         register(NewLandNameMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -581,33 +590,6 @@ public final class InGameInputHandler extends InputHandler
                     .handle(freeColServer, player, connection);
             }});
 
-        register("multiple",
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                final NodeList nodes = element.getChildNodes();
-                List<Element> results = new ArrayList<>();
-
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    final Element node = (Element)nodes.item(i);
-                    final String tag = node.getTagName();
-                    try {
-                        Element reply = InGameInputHandler.this
-                            .handle(connection, node);
-                        if (reply != null) results.add(reply);
-                        logger.log(Level.FINEST, "multiple(" + i + "): " + tag
-                                + " -> " + ((reply == null) ? "null"
-                                    : reply.getTagName()));
-                    } catch (Exception e) {
-                        logger.log(Level.WARNING, "Crash in multiple " + i
-                            + ", tag " + tag + ", continuing.", e);
-                    }
-                }
-                return DOMMessage.collapseElements(results);
-            }});
-
-        // FIXME: everything that has to getPlayer() should be moved above
         // NetworkRequestHandlers
         register("continuePlaying",
             (Connection connection, Element element) -> {
