@@ -695,7 +695,9 @@ public final class EuropePanel extends PortPanel {
         add(sailButton);
         add(exitButton, "tag ok");
 
-        setSelectedUnitLabel(null);
+        // Select a unit, preferring most recently added
+        Unit u = europe.getLastUnit();
+        if (u == null) setSelectedUnitLabel(null); else setSelectedUnit(u);
 
         float scale = getImageLibrary().getScaleFactor();
         getGUI().restoreSavedSize(this, 200 + (int)(scale*850), 200 + (int)(scale*525));
