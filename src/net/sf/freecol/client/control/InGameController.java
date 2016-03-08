@@ -4891,20 +4891,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Sets the trade routes for this player
-     *
-     * Called from TradeRoutePanel.deleteTradeRoute
-     *
-     * @param routes The trade routes to set.
-     * @return True if the trade routes were set.
-     */
-    public boolean setTradeRoutes(List<TradeRoute> routes) {
-        if (routes == null) return false;
-
-        return askServer().setTradeRoutes(freeColClient.getGame(), routes);
-    }
-
-    /**
      * Spy on a colony.
      *
      * Called from IGIH.spyResult.

@@ -2150,17 +2150,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Set the players trade routes.
-     *
-     * @param newTradeRoutes The new list of <code>TradeRoute</code>s,
-     *     currently uninterned.
-     */
-    public synchronized final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
-        this.tradeRoutes.clear();
-        this.tradeRoutes.addAll(newTradeRoutes);
-    }
-
-    /**
      * Get a unique name for a new trade route.
      */
     public String getNameForTradeRoute() {

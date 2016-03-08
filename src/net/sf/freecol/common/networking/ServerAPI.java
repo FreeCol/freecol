@@ -1288,18 +1288,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for setting the trade routes.
-     *
-     * @param game The <code>Game</code> to construct a reply message in.
-     * @param routes A list of trade routes to update.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean setTradeRoutes(Game game, List<TradeRoute> routes) {
-        return askHandling(game,
-            new SetTradeRoutesMessage(routes), null);
-    }
-
-    /**
      * Server query-response for spying on a colony.
      *
      * @param unit The <code>Unit</code> that is spying.

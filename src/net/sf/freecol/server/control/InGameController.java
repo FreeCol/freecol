@@ -4068,46 +4068,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Set trade routes for a player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to set trade
-     *    routes for.
-     * @param routes The list of <code>TradeRoute</code>s.
-     * @return A <code>ChangeSet</code> encapsulating this action.
-     */
-    public ChangeSet setTradeRoutes(ServerPlayer serverPlayer,
-                                    List<TradeRoute> routes) {
-        StringTemplate st, fail = StringTemplate.label(", ");
-        List<TradeRoute> newRoutes = new ArrayList<>();
-        String name;
-        for (TradeRoute tr : routes) {
-            if (tr == null || tr.getId() == null
-                || (name = tr.getName()) == null) {
-                fail.addName("Bogus route");
-            } else if ((st = tr.verify()) != null) {
-                fail.addStringTemplate(st);
-            } else {
-                newRoutes.add(tr);
-            }
-        }
-        if (!fail.isEmpty()) {
-            return serverPlayer.clientError(Messages.message(fail));
-        }
-        for (TradeRoute tr : newRoutes) {
-            TradeRoute t = serverPlayer.getTradeRouteByName(tr.getName(), tr);
-            if (t != null) {
-                t.updateFrom(tr);
-            } else {
-                serverPlayer.addTradeRoute(tr);
-            }
-        }
-
-        // Have to update the whole player alas.
-        return new ChangeSet().add(See.only(serverPlayer), serverPlayer);
-    }
-
-
-    /**
      * Train a unit in Europe.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
