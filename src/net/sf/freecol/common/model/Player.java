@@ -2116,7 +2116,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public final void addTradeRoute(TradeRoute tradeRoute) {
         String name;
         if (tradeRoute != null && (name = tradeRoute.getName()) != null
-            && getTradeRouteByName(name) == null) {
+            && getTradeRouteByName(name, tradeRoute) == null) {
             synchronized (this.tradeRoutes) {
                 this.tradeRoutes.add(tradeRoute);
             }
@@ -2127,9 +2127,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * Get a trade route by name.
      *
      * @param name The trade route name.
+     * @param exclude An optional <code>TradeRoute</code> to exclude.
      */
-    public synchronized final TradeRoute getTradeRouteByName(String name) {
-        return find(this.tradeRoutes, t -> t.getName().equals(name));
+    public synchronized final TradeRoute getTradeRouteByName(final String name,
+        final TradeRoute exclude) {
+        return find(this.tradeRoutes,
+                    t -> t.getName().equals(name) && t != exclude);
     }
 
     /**
@@ -2163,7 +2166,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param tradeRoute The uninterned <code>TradeRoute</code> to update.
      */
     public final void updateTradeRoute(final TradeRoute tradeRoute) {
-        TradeRoute tr = getTradeRouteByName(tradeRoute.getName());
+        TradeRoute tr = getTradeRouteByName(tradeRoute.getName(), null);
         if (tr != null) tradeRoutes.remove(tr);
         tradeRoute.insert();
         addTradeRoute(tradeRoute);

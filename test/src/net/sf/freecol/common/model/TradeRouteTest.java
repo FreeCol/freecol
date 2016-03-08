@@ -73,24 +73,24 @@ public class TradeRouteTest extends FreeColTestCase {
         assertNotNull(tr);
        
         // Build towards validity
-        assertNotNull(tr.verify(true)); // Invalid, no stops
+        assertNotNull(tr.verify()); // Invalid, no stops
         assertTrue(tr.getStops().isEmpty());
         TradeRouteStop trs1 = new TradeRouteStop(game, colony1);
         assertTrue(trs1.isValid(player));
         tr.addStop(trs1);
-        assertNotNull(tr.verify(true)); // Invalid, one stop is not enough
+        assertNotNull(tr.verify()); // Invalid, one stop is not enough
         TradeRouteStop trs2 = new TradeRouteStop(game, colony2);
         assertTrue(trs2.isValid(player));
         tr.addStop(trs2);
-        assertNotNull(tr.verify(true)); // Invalid, all stops are empty
+        assertNotNull(tr.verify()); // Invalid, all stops are empty
         trs1.addCargo(fursGoodsType);
-        assertNull(tr.verify(true)); // Now finally valid
+        assertNull(tr.verify()); // Now finally valid
         trs2.addCargo(fursGoodsType);
-        assertNotNull(tr.verify(true)); // Invalid again, furs always present
+        assertNotNull(tr.verify()); // Invalid again, furs always present
         TradeRouteStop trs3 = new TradeRouteStop(game, colony3);
         assertTrue(trs3.isValid(player));
         tr.addStop(trs3);
-        assertNull(tr.verify(true)); // Valid again, furs dumped at colony3
+        assertNull(tr.verify()); // Valid again, furs dumped at colony3
 
         // Assign the trade route
         wagon.setTradeRoute(tr);

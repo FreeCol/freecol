@@ -88,7 +88,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
         StringTemplate fail = StringTemplate.label(", ");
         List<TradeRoute> newRoutes = new ArrayList<>();
         for (TradeRoute tr : tradeRoutes) {
-            StringTemplate st = tr.verify(false);
+            StringTemplate st = tr.verify();
             if (st != null) {
                 fail.addStringTemplate(st);
             } else {

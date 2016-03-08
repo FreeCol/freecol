@@ -223,11 +223,11 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Check that the trade route is valid.
      *
-     * @param nameCollisions Complain about name collisions.
+     * @param other Ignore this name from the name collision check.
      * @return Null if the route is valid, or a <code>StringTemplate</code>
      *     explaining the problem if invalid.
      */
-    public StringTemplate verify(boolean nameCollisions) {
+    public StringTemplate verify() {
         if (this.name == null) {
             return StringTemplate.template("model.tradeRoute.nullName");
         }
@@ -236,7 +236,7 @@ public class TradeRoute extends FreeColGameObject
         }
 
         // Check that the name is unique
-        if (nameCollisions && owner.getTradeRouteByName(this.name) != null) {
+        if (owner.getTradeRouteByName(this.name, this) != null) {
             return StringTemplate.template("model.tradeRoute.duplicateName")
                 .addName("%name%", this.name);
         }
@@ -288,7 +288,7 @@ public class TradeRoute extends FreeColGameObject
         this.name = newName;
     }
 
-    
+
     // Interface Ownable
 
     /**
@@ -351,7 +351,7 @@ public class TradeRoute extends FreeColGameObject
         this.owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
                                               Player.class, (Player)null, true);
 
-        silent = xr.getAttribute(SILENT_TAG, false);
+        this.silent = xr.getAttribute(SILENT_TAG, false);
     }
 
     /**

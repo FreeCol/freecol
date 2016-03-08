@@ -3310,7 +3310,7 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         final String name = tradeRoute.getName();
         boolean ret = askServer().deleteTradeRoute(tradeRoute);
-        return ret && player.getTradeRouteByName(name) == null;
+        return ret && player.getTradeRouteByName(name, null) == null;
     }
 
     /**

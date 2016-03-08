@@ -80,7 +80,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
             return serverPlayer.clientError("Bogus route")
                 .build(serverPlayer);
         } else {
-            StringTemplate fail = this.tradeRoute.verify(false);
+            StringTemplate fail = this.tradeRoute.verify();
             if (fail != null) {
                 return serverPlayer.clientError(Messages.message(fail))
                     .build(serverPlayer);

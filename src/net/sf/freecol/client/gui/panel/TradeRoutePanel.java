@@ -143,7 +143,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                         StringTemplate template = null;
                         if (selected.getName() == null) { // Cancelled
                             selected.setName(name);
-                        } else if ((template = selected.verify(true)) == null) {
+                        } else if ((template = selected.verify()) == null) {
                             igc().updateTradeRoute(selected);
                             updateList(selected);
                         } else {
@@ -219,16 +219,17 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute newRoute = igc().newTradeRoute(player);
         getGUI().showTradeRouteInputPanel(newRoute, () -> {
                 StringTemplate template = null;
-                if (newRoute.getName() == null) { // Cancelled
+                String name = newRoute.getName();
+                if (name == null) { // Cancelled
                     igc().deleteTradeRoute(newRoute);
                     updateList(null);
-                } else if ((template = newRoute.verify(true)) == null) {
+                } else if ((template = newRoute.verify()) != null) {
+                    updateList(null);
+                    getGUI().showInformationMessage(template);
+                } else {
                     igc().updateTradeRoute(newRoute);
                     if (u != null) igc().assignTradeRoute(u, newRoute);
                     updateList(newRoute);
-                } else {
-                    updateList(null);
-                    getGUI().showInformationMessage(template);
                 }
             });
     }
@@ -238,7 +239,7 @@ public final class TradeRoutePanel extends FreeColPanel {
      */
     private void updateButtons() {
         newRouteButton.setEnabled(true);
-        if (tradeRoutes.getSelectedIndex() < 0) {
+        if (this.tradeRoutes.getSelectedIndex() < 0) {
             editRouteButton.setEnabled(false);
             deleteRouteButton.setEnabled(false);
             deassignRouteButton.setEnabled(false);
@@ -262,7 +263,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         // We are deliberately *not* sorting the player's list.
         List<TradeRoute> routes = new ArrayList<>();
         for (TradeRoute tr : player.getTradeRoutes()) {
-            StringTemplate st = tr.verify(false);
+            StringTemplate st = tr.verify();
             if (st == null) {
                 routes.add(tr);
             } else {
