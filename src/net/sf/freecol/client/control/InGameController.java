@@ -3407,15 +3407,26 @@ public final class InGameController implements NetworkConstants {
      *
      * @param high A <code>Boolean</code> whose values indicates whether
      *     a new high score has been achieved, or no information if null.
-     * @return True, the high scores were displayed.
+     * @return True if the server interaction succeeded.
      */
     public boolean displayHighScores(Boolean high) {
         final Game game = freeColClient.getGame();
-        List<HighScore> scores = askServer().getHighScores(game);
-        gui.showHighScoresPanel((high == null) ? null
-            : (high) ? "highscores.yes" : "highscores.no",
-            scores);
-        return true;
+        return askServer().getHighScores(game,
+            (high == null) ? null
+            : (high) ? "highscores.yes"
+            : "highscores.no");
+    }
+
+    /**
+     * Display the high scores.
+     *
+     * Called from IGIH.highScore.
+     *
+     * @param key An optional message key.
+     * @param scores The list of <code>HighScore</code> records to display.
+     */
+    public void displayHighScores(String key, List<HighScore> scores) {
+        gui.showHighScoresPanel(key, scores);
     }
 
     /**

@@ -60,6 +60,7 @@ import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GetNationSummaryMessage;
+import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -250,6 +251,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = gameEnded(element); break;
         case "getNationSummary":
             reply = getNationSummary(element); break;
+        case HighScoreMessage.TAG:
+            reply = highScore(element); break;
         case "indianDemand":
             reply = indianDemand(element); break;
         case "lootCargo":
@@ -756,6 +759,22 @@ public final class InGameInputHandler extends InputHandler {
         player.putNationSummary(other, ns);
         logger.info("Updated nation summary of " + other.getSuffix()
             + " for " + player.getSuffix() + " with " + ns);
+        return null;
+    }
+        
+    /**
+     * Handle a "highScore" message.
+     *
+     * @param element The <code>Element</code> to process.
+     * @return Null.
+     */
+    private Element highScore(Element element) {
+        final Game game = getGame();
+
+        HighScoreMessage message
+            = new HighScoreMessage(game, element);
+        invokeLater(() -> { igc().displayHighScores(message.getKey(),
+                                                    message.getScores()); });
         return null;
     }
         

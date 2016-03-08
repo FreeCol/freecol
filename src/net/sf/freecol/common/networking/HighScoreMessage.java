@@ -37,6 +37,10 @@ import org.w3c.dom.Element;
 public class HighScoreMessage extends DOMMessage {
 
     public static final String TAG = "highScore";
+    private static final String KEY_TAG = "key";
+
+    /** An optional key for the final display. */
+    private final String key;
 
     /** The high scores. */
     private final List<HighScore> scores = new ArrayList<>();
@@ -46,8 +50,10 @@ public class HighScoreMessage extends DOMMessage {
      * Create a new <code>HighScoreMessage</code> in request form (no
      * scores attached).
      */
-    public HighScoreMessage() {
+    public HighScoreMessage(String key) {
         super(getTagName());
+
+        this.key = key;
     }
 
     /**
@@ -59,12 +65,22 @@ public class HighScoreMessage extends DOMMessage {
     public HighScoreMessage(Game game, Element element) {
         super(getTagName());
 
+        this.key = getStringAttribute(element, KEY_TAG);
         this.scores.clear();
         this.scores.addAll(getChildren(game, element, HighScore.class));
     }
 
 
     // Public interface
+
+    /**
+     * Accessor for the key.
+     *
+     * @return The key.
+     */
+    public String getKey() {
+        return this.key;
+    }
 
     /**
      * Accessor for the scores list.
@@ -95,8 +111,8 @@ public class HighScoreMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
-            .add(this.scores).toXMLElement();
+        return new DOMMessage(getTagName(),
+            KEY_TAG, this.key).add(this.scores).toXMLElement();
     }
 
     /**

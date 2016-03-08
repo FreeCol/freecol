@@ -797,10 +797,11 @@ public final class FreeColClient {
      */
     public void retire() {
         if (gui.confirm("retireDialog.areYouSure.text", "ok", "cancel")) {
-            Player player = getMyPlayer();
+            final Game game = getGame();
+            final Player player = getMyPlayer();
             player.changePlayerType(Player.PlayerType.RETIRED);
-            askServer().retire(getGame());
-            gui.showHighScoresPanel(null, askServer().getHighScores(getGame()));
+            getInGameController().displayHighScores(null);
+            askServer().retire(game);
         }
     }
 

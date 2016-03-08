@@ -764,13 +764,12 @@ public abstract class ServerAPI {
      * Server query-response for asking for the high scores list.
      *
      * @param game The <code>Game</code> to extract scores from.
-     * @return The list of high scores.
+     * @return True if the server interaction succeeded.
      */
-    public List<HighScore> getHighScores(Game game) {
-        Element reply = askExpecting(game, new HighScoreMessage(),
-                                     HighScoreMessage.getTagName());
-        return (reply == null) ? Collections.<HighScore>emptyList()
-            : new HighScoreMessage(game, reply).getScores();
+    public boolean getHighScores(Game game, String key) {
+        return askHandling(game,
+            new HighScoreMessage(key),
+            null);
     }
 
     /**
