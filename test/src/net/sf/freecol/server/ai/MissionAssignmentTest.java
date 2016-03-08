@@ -197,7 +197,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca)
             .settlementTile(settlementTile).initialBravesInCamp(8).build();
-        assertEquals("One camp", 1, inca.getNumberOfSettlements());
+        assertEquals("One camp", 1, inca.getSettlements().size());
 
         // Put one brave outside the camp, but in the settlement tile,
         // so that he may defend the settlement

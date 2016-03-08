@@ -355,8 +355,7 @@ public class SimpleMapGenerator implements MapGenerator {
         HashMap<String, Territory> territoryMap = new HashMap<>();
 
         for (Player player : game.getLiveNativePlayers(null)) {
-            switch (player.getNationType()
-                    .getNumberOfSettlements()) {
+            switch (player.getNationType().getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;
                 break;
@@ -451,8 +450,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = new ArrayList<>(territoryMap.values());
         int settlementsPlaced = 0;
         for (Territory territory : territories) {
-            switch (territory.player.getNationType()
-                    .getNumberOfSettlements()) {
+            switch (territory.player.getNationType().getNumberOfSettlements()) {
             case HIGH:
                 territory.numberOfSettlements = Math.round(4 * share);
                 break;

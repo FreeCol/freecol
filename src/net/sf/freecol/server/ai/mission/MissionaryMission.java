@@ -240,7 +240,7 @@ public class MissionaryMission extends Mission {
                 && !unit.hasAbility(Ability.EXPERT_MISSIONARY))
             ? "unit-is-not-subskilled-or-expertMissionary"
             : (unit.isInEurope() || unit.isAtSea()) 
-            ? ((unit.getOwner().getNumberOfSettlements() <= 0)
+            ? ((!unit.getOwner().hasSettlements())
                 ? "unit-off-map-but-missing-initial-settlement"
                 : null)
             : (unit.isInMission()) ? "unit-is-already-at-mission"

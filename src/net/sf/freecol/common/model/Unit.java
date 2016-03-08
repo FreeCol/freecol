@@ -2841,7 +2841,7 @@ public class Unit extends GoodsLocation
     public PathNode findOurNearestSettlement(final boolean excludeStart,
                                              int range, final boolean coastal) {
         final Player player = getOwner();
-        if (player.getNumberOfSettlements() <= 0 || !hasTile()) return null;
+        if (!player.hasSettlements() || !hasTile()) return null;
         return findOurNearestSettlement(getTile(), excludeStart,
                                         range, coastal);
     }
@@ -2861,8 +2861,7 @@ public class Unit extends GoodsLocation
                                              final boolean excludeStart,
                                              int range, final boolean coastal) {
         final Player player = getOwner();
-        if (startTile == null
-            || player.getNumberOfSettlements() <= 0) return null;
+        if (startTile == null || !player.hasSettlements()) return null;
         final GoalDecider gd = new GoalDecider() {
 
                 private int bestValue = Integer.MAX_VALUE;

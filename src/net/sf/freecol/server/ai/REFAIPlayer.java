@@ -894,13 +894,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     if (((Settlement)target).isConnectedPort()) {
                         value += 500;
                     } else {
-                        if (getPlayer().getNumberOfSettlements() <= 0) {
+                        if (!getPlayer().hasSettlements()) {
                             return Integer.MIN_VALUE;
                         }
                     }
                 } else if (target instanceof Unit) {
                     // Do not chase units until at least one colony is captured.
-                    if (getPlayer().getNumberOfSettlements() <= 0) {
+                    if (!getPlayer().hasSettlements()) {
                         return Integer.MIN_VALUE;
                     }
                     // Do not chase the same unit!

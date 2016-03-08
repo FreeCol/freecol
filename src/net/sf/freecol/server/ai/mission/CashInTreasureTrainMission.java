@@ -232,7 +232,7 @@ public class CashInTreasureTrainMission extends Mission {
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
-        if (player.getNumberOfSettlements() <= 0 || start == null) {
+        if (!player.hasSettlements() || start == null) {
             // No settlements or not on the map, so go straight to
             // Europe.  If Europe does not exist then this mission is
             // doomed.

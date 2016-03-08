@@ -88,10 +88,21 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @return The summary.
      */
     public NationSummary getNationSummary() {
-        return summary;
+        return this.summary;
     }
 
-
+    /**
+     * Set the nation summary.
+     *
+     * @param ns The new <code>NationSummary</code>.
+     * @return This message.
+     */
+    public GetNationSummaryMessage setNationSummary(NationSummary ns) {
+        this.summary = ns;
+        return this;
+    }
+    
+    
     /**
      * Handle a "getNationSummary"-message.
      *
@@ -114,7 +125,7 @@ public class GetNationSummaryMessage extends DOMMessage {
         }
 
         // Proceed to get the summary.
-        this.summary = new NationSummary(player, serverPlayer);
+        setNationSummary(new NationSummary(player, serverPlayer));
         return toXMLElement();
     }
 

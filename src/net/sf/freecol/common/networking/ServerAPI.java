@@ -1116,15 +1116,12 @@ public abstract class ServerAPI {
      *
      * @param unit The <code>Unit</code> that is speaking.
      * @param direction The direction to a settlement to ask.
-     * @return The number of settlements of this tribe (which is
-     *     needed in the dialog following), or negative on error.
+     * @return True if the server interaction succeeded.
      */
-    public int scoutSettlement(Unit unit, Direction direction) {
-        Element reply = askExpecting(unit.getGame(),
+    public boolean scoutSettlement(Unit unit, Direction direction) {
+        return askHandling(unit.getGame(),
             new ScoutIndianSettlementMessage(unit, direction),
             null);
-        resolve(handle(reply));
-        return DOMMessage.getIntegerAttribute(reply, "settlements", -1);
     }
    
     /**

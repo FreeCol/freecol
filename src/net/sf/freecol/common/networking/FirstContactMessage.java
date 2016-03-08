@@ -73,7 +73,7 @@ public class FirstContactMessage extends DOMMessage {
         this.otherId = other.getId();
         this.tileId = (tile == null) ? null : tile.getId();
         this.settlementCount = (other.isEuropean()) ? null
-            : Integer.toString(other.getNumberOfSettlements());
+            : Integer.toString(other.getSettlements().size());
         this.result = null;
     }
 

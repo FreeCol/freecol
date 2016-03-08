@@ -1696,7 +1696,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public int evaluateFor(Player player) {
         if (player.isAI()
-            && player.getNumberOfSettlements() < 5) {// FIXME: magic#
+            && player.getSettlements().size() < 5) {// FIXME: magic#
             return Integer.MIN_VALUE;
         }
         int result, v;

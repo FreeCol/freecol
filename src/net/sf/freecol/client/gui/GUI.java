@@ -624,7 +624,7 @@ public class GUI {
         Player player = attacker.getOwner();
         Player other = is.getOwner();
         int strength = player.calculateStrength(false);
-        String messageId = (other.getNumberOfSettlements() >= strength)
+        String messageId = (other.getSettlements().size() >= strength)
             ? "confirmTribute.unwise"
             : (other.getStance(player) == Stance.CEASE_FIRE)
             ? "confirmTribute.warLikely"

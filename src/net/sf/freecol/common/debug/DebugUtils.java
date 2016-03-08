@@ -149,7 +149,7 @@ public class DebugUtils {
             }
         }
         gui.showInformationMessage(join(", ", results));
-        if (fails < sPlayer.getNumberOfSettlements()) {
+        if (fails < sPlayer.getSettlements().size()) {
             // Brutally resynchronize
             freeColClient.getConnectController().reconnect();
         }

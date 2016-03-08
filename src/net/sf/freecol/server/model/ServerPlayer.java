@@ -615,7 +615,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (getRebels().isEmpty()) return false;
 
         // Not defeated if there are settlements.
-        if (!getSettlements().isEmpty()) return false;
+        if (hasSettlements()) return false;
 
         // Not defeated if there is a non-zero navy and enough land units.
         final int landREFUnitsRequired = 7; // FIXME: magic number
@@ -790,7 +790,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return false;
         }
         return canHaveFoundingFathers() && currentFather == null
-            && !getSettlements().isEmpty()
+            && hasSettlements()
             && getFatherCount() < spec.getFoundingFathers().size();
     }
 
@@ -1603,7 +1603,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csNaturalDisasters(Random random, ChangeSet cs,
                                    int probability) {
         if (randomInt(logger, "Natural disaster", random, 100) < probability) {
-            int size = getNumberOfSettlements();
+            int size = getSettlements().size();
             if (size < 1) return;
             // randomly select a colony to start with, then generate
             // an appropriate disaster if possible, else continue with

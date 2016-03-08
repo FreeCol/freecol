@@ -227,7 +227,7 @@ public class DefendSettlementMission extends Mission {
         String reason = invalidMissionReason(aiUnit);
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getOwner().getNumberOfSettlements() <= 0)
+            : (!aiUnit.getUnit().getOwner().hasSettlements())
             ? Mission.TARGETNOTFOUND
             : null;
     }

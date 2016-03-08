@@ -615,10 +615,10 @@ public final class Monarch extends FreeColGameObject implements Named {
                 && !getDispleasure();
         case SUPPORT_LAND: case MONARCH_MERCENARIES:
             return player.isAtWar() && !getDispleasure()
-                && player.getNumberOfSettlements() > 0;
+                && player.hasSettlements();
         case HESSIAN_MERCENARIES:
             return player.checkGold(HESSIAN_MINIMUM_PRICE)
-                && player.getNumberOfSettlements() > 0;
+                && player.hasSettlements();
         case DISPLEASURE:
             return false;
         default:
@@ -642,7 +642,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Nothing happens during the first few turns, if there are no
         // colonies, or after the revolution begins.
         if (turn < grace
-            || player.getSettlements().isEmpty()
+            || !player.hasSettlements()
             || player.getPlayerType() != PlayerType.COLONIAL) {
             return choices;
         }

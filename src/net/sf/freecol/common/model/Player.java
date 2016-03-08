@@ -2197,12 +2197,12 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the number of settlements.
+     * Does this player have any settlements at present.
      *
-     * @return The number of settlements this player has.
+     * @return True if this player has settlements.
      */
-    public int getNumberOfSettlements() {
-        return settlements.size();
+    public boolean hasSettlements() {
+        return !settlements.isEmpty();
     }
 
     /**
@@ -3780,7 +3780,6 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String NATION_ID_TAG = "nationId";
     private static final String NATION_TYPE_TAG = "nationType";
     private static final String NEW_LAND_NAME_TAG = "newLandName";
-    private static final String NUMBER_OF_SETTLEMENTS_TAG = "numberOfSettlements";
     private static final String OFFERED_FATHERS_TAG = "offeredFathers";
     private static final String OLD_SOL_TAG = "oldSoL";
     private static final String PLAYER_TAG = "player";

@@ -104,6 +104,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -3653,14 +3654,16 @@ public final class InGameController extends Controller {
     public ChangeSet scoutIndianSettlement(ServerPlayer serverPlayer,
                                            Unit unit,
                                            IndianSettlement settlement) {
+        final Player owner = settlement.getOwner();
         ChangeSet cs = new ChangeSet();
         Tile tile = settlement.getTile();
 
         csVisit(serverPlayer, settlement, -1, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
-        cs.addAttribute(See.only(serverPlayer), "settlements",
-            Integer.toString(settlement.getOwner().getSettlements().size()));
+        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            new GetNationSummaryMessage(owner)
+                .setNationSummary(new NationSummary(owner, serverPlayer)));
 
         // This is private.
         return cs;

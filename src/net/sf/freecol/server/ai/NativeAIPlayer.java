@@ -471,7 +471,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
             for (AIUnit aiu : aiUnits) lb.add(" ", aiu.getUnit());
         }
         lb.add("\n  Missions(settlements=",
-            player.getNumberOfSettlements(), ")");
+            player.getSettlements().size(), ")");
         logMissions(reasons, lb);
     }
 
@@ -745,7 +745,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
     public void startWorking() {
         final Player player = getPlayer();
         final Turn turn = getGame().getTurn();
-        final int nSettlements = player.getNumberOfSettlements();
+        final int nSettlements = player.getSettlements().size();
         final Random air = getAIRandom();
 
         LogBuilder lb = new LogBuilder(1024);

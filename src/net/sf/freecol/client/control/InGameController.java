@@ -1721,7 +1721,9 @@ public final class InGameController implements NetworkConstants {
         askClearGotoOrders(unit);
 
         // Offer the choices.
-        int count = askServer().scoutSettlement(unit, direction);
+        if (!askServer().scoutSettlement(unit, direction)) return false;
+        int count = player.getNationSummary(settlement.getOwner())
+            .getNumberOfSettlements();
         String number = (count <= 0) ? Messages.message("many")
             : Integer.toString(count);
         ScoutIndianSettlementAction act

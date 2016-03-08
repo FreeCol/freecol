@@ -1736,9 +1736,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
         // First try to satisfy the demand for missions with a defined
         // quota.  Builders first to keep weak players in the game,
-        // scouts next as they are profitable.  Pile onto any
-        // exisiting building mission if there are no colonies.
-        if (player.getNumberOfSettlements() <= 0 && bcm != null) {
+        // scouts next as they are profitable.  Pile onto any existing
+        // building mission if there are no colonies.
+        if (!player.hasSettlements() && bcm != null) {
             final Location bcmTarget = bcm.getTarget();
             Collections.sort(aiUnits, builderComparator);
             for (AIUnit aiUnit : aiUnits) {
@@ -1909,7 +1909,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 lb.add(" ", aiu.getUnit());
             }
         }
-        lb.add("\n  Missions(colonies=", player.getNumberOfSettlements(),
+        lb.add("\n  Missions(colonies=", player.getSettlements().size(),
             " builders=", nBuilders,
             " pioneers=", nPioneers,
             " scouts=", nScouts,
