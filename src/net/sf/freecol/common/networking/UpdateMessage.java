@@ -64,7 +64,7 @@ public class UpdateMessage extends DOMMessage {
     public UpdateMessage(Game game, Element element) {
         this(null);
 
-        for (FreeColGameObject f : mapChildren(game, element, (e) ->
+        for (FreeColGameObject f : mapChildren(element, (e) ->
                 DOMMessage.updateFromElement(game, e))) {
             if (f != null) this.fcgos.add(f);
         }

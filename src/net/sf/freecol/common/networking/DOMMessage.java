@@ -449,12 +449,11 @@ public class DOMMessage {
     /**
      * Convenience method to map a function over the children of an Element.
      *
-     * @param game The <code>Game</code> to instantiate within.
      * @param element The <code>Element</code> to extract children from.
      * @param mapper A mapper function.
      * @return A list of results of the mapping.
      */
-    public static <T> List<T> mapChildren(Game game, Element element,
+    public static <T> List<T> mapChildren(Element element,
         Function<? super Element, ? extends T> mapper) {
         List<T> ret = new ArrayList<>();
         NodeList nl = element.getChildNodes();

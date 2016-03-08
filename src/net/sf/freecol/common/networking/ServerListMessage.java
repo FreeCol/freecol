@@ -84,7 +84,7 @@ public class ServerListMessage extends DOMMessage {
         super(getTagName());
 
         this.servers.clear();
-        this.servers.addAll(mapChildren(game, element,
+        this.servers.addAll(mapChildren(element,
                                         ServerListMessage::elementToServer));
     }
 

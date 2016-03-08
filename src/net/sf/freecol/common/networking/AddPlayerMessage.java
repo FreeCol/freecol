@@ -66,8 +66,8 @@ public class AddPlayerMessage extends DOMMessage {
         // Making this message implicitly updates the game.
         // TODO: should this do a non-interning read and have the client
         // handlers do more checking?
-        this.players.addAll(DOMMessage.mapChildren(game, element,
-                e -> DOMMessage.readGameElement(game, e, true, Player.class)));
+        this.players.addAll(DOMMessage.mapChildren(element, (e) ->
+                DOMMessage.readGameElement(game, e, true, Player.class)));
     }
 
 

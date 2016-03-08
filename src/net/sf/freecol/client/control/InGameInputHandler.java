@@ -318,7 +318,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element addObject(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        DOMMessage.mapChildren(game, element, (e) -> {
+        DOMMessage.mapChildren(element, (e) -> {
                 String owner = DOMMessage.getStringAttribute(e, "owner");
                 Player player = game.getFreeColGameObject(owner, Player.class);
                 if (player == null) {
@@ -588,7 +588,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element disposeUnits(Element element) {
         final Game game = getGame();
-        DOMMessage.mapChildren(game, element, (e) -> {
+        DOMMessage.mapChildren(element, (e) -> {
                 // Do not read the whole unit out of the element as we
                 // are only going to dispose of it, not forgetting
                 // that the server may have already done so and its
@@ -637,7 +637,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        DOMMessage.mapChildren(game, element, (e) -> {
+        DOMMessage.mapChildren(element, (e) -> {
                 final String tag = DOMMessage.readId(e);
                 if (Ability.getTagName().equals(tag)) {
                     if (add) {
@@ -952,7 +952,7 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColGameObject divert
             = game.getFreeColGameObject(element.getAttribute("divert"));
         final List<FreeColGameObject> objects = new ArrayList<>();
-        DOMMessage.mapChildren(game, element, (e) -> {
+        DOMMessage.mapChildren(element, (e) -> {
                 final String id = DOMMessage.readId(e);
                 FreeColGameObject fcgo = game.getFreeColGameObject(id);
                 if (fcgo != null) {
