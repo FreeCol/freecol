@@ -1593,6 +1593,69 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
 
+    /**
+     * Get a list of abstract REF units for this player.
+     *
+     * @return A list of <code>AbstractUnit</code>s defining the REF.
+     */
+    public List<AbstractUnit> getREFUnits() {
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+        List<AbstractUnit> units;
+
+        switch (getPlayerType()) {
+        case COLONIAL:
+            units = getMonarch().getExpeditionaryForce().getUnits();
+            break;
+        case REBEL:
+            units = getREFPlayer().getMilitaryUnits();
+            break;
+        case ROYAL:
+            units = getMilitaryUnits();
+            break;
+        default:
+            units = Collections.<AbstractUnit>emptyList();
+            break;
+        }
+        return units;
+    }
+
+    /**
+     * Get a list of the military units for this player.
+     *
+     * @return A list of military <code>AbstractUnit</code>s.
+     */
+    public List<AbstractUnit> getMilitaryUnits() {
+        final UnitType defaultType = getSpecification().getDefaultUnitType(this);
+        java.util.Map<UnitType, HashMap<String, Integer>> unitHash
+            = new HashMap<>();
+        List<AbstractUnit> units = new ArrayList<>();
+        for (Unit unit : getUnits()) {
+            if (!unit.isOffensiveUnit()) continue;
+            UnitType unitType = defaultType;
+            if (unit.getType().getOffence() > 0
+                || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
+                unitType = unit.getType();
+            }
+            HashMap<String, Integer> roleMap = unitHash.get(unitType);
+            if (roleMap == null) roleMap = new HashMap<>();
+            String roleId = unit.getRole().getId();
+            Integer count = roleMap.get(roleId);
+            roleMap.put(roleId, (count == null) ? 1 : count + 1);
+            unitHash.put(unitType, roleMap);
+        }
+        for (java.util.Map.Entry<UnitType, HashMap<String, Integer>> typeEntry
+                 : unitHash.entrySet()) {
+            for (java.util.Map.Entry<String, Integer> roleEntry
+                     : typeEntry.getValue().entrySet()) {
+                units.add(new AbstractUnit(typeEntry.getKey(),
+                        roleEntry.getKey(), roleEntry.getValue()));
+            }
+        }
+        return units;
+    }
+    
+
     //
     // Taxation and trade
     //

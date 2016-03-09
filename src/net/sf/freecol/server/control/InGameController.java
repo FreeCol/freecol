@@ -2795,50 +2795,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get a list of abstract REF units for a player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to query the REF of.
-     * @return A list of <code>AbstractUnit</code>s defining the REF.
-     */
-    public List<AbstractUnit> getREFUnits(ServerPlayer serverPlayer) {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        List<AbstractUnit> units = new ArrayList<>();
-        final UnitType defaultType = spec.getDefaultUnitType(serverPlayer);
-
-        if (serverPlayer.getPlayerType() == PlayerType.COLONIAL) {
-            units = serverPlayer.getMonarch().getExpeditionaryForce().getUnits();
-        } else {
-            ServerPlayer REFPlayer = (ServerPlayer) serverPlayer.getREFPlayer();
-            java.util.Map<UnitType, HashMap<String, Integer>> unitHash
-                = new HashMap<>();
-            for (Unit unit : REFPlayer.getUnits()) {
-                if (unit.isOffensiveUnit()) {
-                    UnitType unitType = defaultType;
-                    if (unit.getType().getOffence() > 0
-                        || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
-                        unitType = unit.getType();
-                    }
-                    HashMap<String, Integer> roleMap = unitHash.get(unitType);
-                    if (roleMap == null) roleMap = new HashMap<>();
-                    String roleId = unit.getRole().getId();
-                    Integer count = roleMap.get(roleId);
-                    roleMap.put(roleId, (count == null) ? 1
-                            : count + 1);
-                    unitHash.put(unitType, roleMap);
-                }
-            }
-            for (java.util.Map.Entry<UnitType, HashMap<String, Integer>> typeEntry : unitHash.entrySet()) {
-                for (java.util.Map.Entry<String, Integer> roleEntry : typeEntry.getValue().entrySet()) {
-                    units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
-                }
-            }
-        }
-        return units;
-    }
-
-
-    /**
      * Get the current game statistics.
      *
      * @return A map of statistics key,value pairs.

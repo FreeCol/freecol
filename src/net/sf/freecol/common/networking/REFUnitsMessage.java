@@ -93,8 +93,7 @@ public class REFUnitsMessage extends DOMMessage {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         this.refUnits.clear();
-        this.refUnits.addAll(server.getInGameController()
-            .getREFUnits(server.getPlayer(connection)));
+        this.refUnits.addAll(server.getPlayer(connection).getREFUnits());
         return this.toXMLElement();
     }
 
