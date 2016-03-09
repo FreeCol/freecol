@@ -217,9 +217,11 @@ public class ScoutingMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, int range,
                                       boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, range, deferOK);
-        return (path != null) ? extractTarget(aiUnit, path)
-            : Location.upLoc(findCircleTarget(aiUnit,
-                    getGoalDecider(aiUnit, deferOK), range*3, deferOK));
+        Location ret = Location.upLoc((path != null)
+            ? extractTarget(aiUnit, path)
+            : findCircleTarget(aiUnit,
+                getGoalDecider(aiUnit, deferOK), range*3, deferOK));
+        return ret;
     }
 
     /**
