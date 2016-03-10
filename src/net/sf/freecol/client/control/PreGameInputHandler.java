@@ -35,12 +35,13 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
@@ -91,6 +92,8 @@ public final class PreGameInputHandler extends InputHandler {
             return disconnect(element);
         case ErrorMessage.TAG:
             return error(element);
+        case LoginMessage.TAG:
+            return login(element);
         case "logout":
             return logout(element);
         case MultipleMessage.TAG:
@@ -162,6 +165,44 @@ public final class PreGameInputHandler extends InputHandler {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
         getGUI().showErrorMessage(errorMessage.getMessageId(),
                                   errorMessage.getMessage());
+        return null;
+    }
+
+    /**
+     * Handle a "login"-request.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element login(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        final LoginMessage message = new LoginMessage(new Game(), element);
+        Game game = message.getGame();
+        freeColClient.setGame(game);
+
+        freeColClient.setSinglePlayer(message.isSinglePlayer());
+
+        final String user = message.getUserName();
+        Player player = game.getPlayerByName(user);
+        if (player == null) {
+            logger.warning("New game does not contain player: " + user);
+            StringTemplate st = StringTemplate.template("server.noSuchPlayer")
+                .addName("%player%", user);
+            getGUI().showErrorMessage(st);
+            return null;
+        }
+        freeColClient.setMyPlayer(player);
+        freeColClient.addSpecificationActions(game.getSpecification());
+        logger.info("FreeColClient logged in as " + user
+            + "/" + player.getId());
+
+        final boolean currentPlayer = message.isCurrentPlayer();
+        if (currentPlayer) game.setCurrentPlayer(player);
+
+        if (message.getStartGame()) {
+            freeColClient.getPreGameController().startGame();
+        }
         return null;
     }
 

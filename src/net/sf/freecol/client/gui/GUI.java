@@ -145,11 +145,10 @@ public class GUI {
 
     /**
      * In game initializations.
-     * Called from PreGameController.startGame().
      *
-     * @param tile An initial <code>Tile</code> to select.
+     * Called from PreGameController.startGame().
      */
-    public void initializeInGame(Tile tile) {
+    public void initializeInGame() {
     }
 
     /**

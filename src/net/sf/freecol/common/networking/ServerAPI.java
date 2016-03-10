@@ -852,7 +852,7 @@ public abstract class ServerAPI {
      * @param type The <code>GoodsType</code> to load.
      * @param amount The amount of goods to load.
      * @param carrier The <code>Unit</code> to load onto.
-     * @return True if the query-response succeeds.
+     * @return True if the server interaction succeeded.
      */
     public boolean loadGoods(Location loc, GoodsType type, int amount,
                              Unit carrier) {
@@ -865,15 +865,11 @@ public abstract class ServerAPI {
      *
      * @param userName The user name.
      * @param version The client version.
-     * @return A <code>LoginMessage</code> on success, or null on error.
+     * @return True if the server interaction succeeded.
      */
-    public LoginMessage login(String userName, String version) {
-        Element reply = askExpecting(null, new LoginMessage(userName, version),
-                                     LoginMessage.getTagName());
-        return (reply == null) ? null
-            // Note, using dummy game here, but will actually use the
-            // game returned attached to the login message.
-            : new LoginMessage(new Game(), reply);
+    public boolean login(String userName, String version) {
+        return askHandling(null,
+            new LoginMessage(userName, version), null);
     }
 
     /**

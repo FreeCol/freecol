@@ -149,7 +149,10 @@ public final class ConnectController {
 
     /**
      * Ask the server a question, but do not make a persistent
-     * connection yet.  Handle showing error messages on the GUI.
+     * connection yet.
+     *
+     * Handle showing error messages on the GUI.  Only simple messages
+     * will work here.
      *
      * @param host The name of the machine running the
      *     <code>FreeColServer</code>.
@@ -207,6 +210,7 @@ public final class ConnectController {
             freeColClient.askServer().disconnect();
         } catch (IOException ioe) {} // Ignore            
 
+        // Establish the full connection here
         String message = null;
         try {
             if (!freeColClient.askServer()
@@ -214,8 +218,9 @@ public final class ConnectController {
                          freeColClient.getPreGameInputHandler())) {
                 message = "repeated failure";
             }
-        } catch (Exception e) {
-            message = e.getMessage();
+        } catch (Exception ex) {
+            message = ex.getMessage();
+            if (message == null) message = "connection exception";
         }
         if (message != null) {
             gui.showErrorMessage("server.couldNotConnect", message);
@@ -223,59 +228,17 @@ public final class ConnectController {
         }
         logger.info("Connected to " + host + ":" + port);
 
-        LoginMessage msg = freeColClient.askServer()
-            .login(user, FreeCol.getVersion());
+        // Ask the server to log in a player with the given user name
+        // and return the game with the player inside.
+        // The work is done in PGIH.login().
         Game game;
-        if (msg == null || (game = msg.getGame()) == null) {
+        if (!freeColClient.askServer().login(user, FreeCol.getVersion())
+            || (game = freeColClient.getGame()) == null) {
             gui.showErrorMessage("server.couldNotLogin");
             return false;
+        } else if (freeColClient.getMyPlayer() == null) {
+            return false; // Error handled in PGIH.login
         }
-
-        // This completes the client's view of the spec with options
-        // obtained from the server difficulty.  It should not be
-        // required in the client, to be removed later, when newTurn()
-        // only runs in the server
-        freeColClient.setGame(game);
-        Player player = game.getPlayerByName(user);
-        if (player == null) {
-            logger.warning("New game does not contain player: " + user);
-            gui.showErrorMessage(StringTemplate.template("server.noSuchPlayer")
-                .addName("%player%", user));
-            return false;
-        }
-        freeColClient.setMyPlayer(player);
-        freeColClient.addSpecificationActions(game.getSpecification());
-        logger.info("FreeColClient logged in as " + user
-            + "/" + player.getId());
-
-        // Reconnect
-        if (msg.getStartGame()) {
-            Tile entryTile = (player.getEntryLocation() == null) ? null
-                : player.getEntryLocation().getTile();
-            freeColClient.setSinglePlayer(msg.isSinglePlayer());
-            boolean play = freeColClient.getPreGameController().startGame();
-            if (play) {
-                gui.setActiveUnit(null);
-                if (msg.isCurrentPlayer()) {
-                    freeColClient.getInGameController()
-                        .setCurrentPlayer(player);
-                    Unit activeUnit = game.getInitialActiveUnit();
-                    if (activeUnit != null) {
-                        activeUnit.getOwner().resetIterators();
-                        activeUnit.getOwner().setNextActiveUnit(activeUnit);
-                        gui.setActiveUnit(activeUnit);
-                        game.setInitialActiveUnitId(null);
-                    } else {
-                        gui.setSelectedTile(entryTile);
-                    }
-                } else {
-                    gui.setSelectedTile(entryTile);
-                }
-            }
-        }
-
-        // All done.
-        freeColClient.setLoggedIn(true);
         return true;
     }
 
@@ -353,9 +316,9 @@ public final class ConnectController {
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
+            freeColClient.setLoggedIn(true);
             gui.showStartGamePanel(freeColClient.getGame(),
                                    freeColClient.getMyPlayer(), false);
-            freeColClient.setSinglePlayer(false);
             break;
 
         case IN_GAME:
@@ -380,11 +343,8 @@ public final class ConnectController {
                     .collect(Collectors.toList()));
             if (choice == null) return false; // User cancelled
 
-            if (!login(Messages.getRulerName(choice), host, port)) {
-                // login() shows error messages
-                return false;
-            }
-            freeColClient.setSinglePlayer(false);
+            if (!login(Messages.getRulerName(choice), host, port)) return false;
+            freeColClient.setLoggedIn(true);
             break;
 
         case ENDING_GAME: default:

@@ -61,6 +61,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
+import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
@@ -292,6 +293,7 @@ public final class InGameInputHandler extends InputHandler {
         // Never returned
         case AssignTradeRouteMessage.TAG:
         case DeleteTradeRouteMessage.TAG:
+        case LoginMessage.TAG:
         default:
             logger.warning("Unsupported message type: " + tag);
             return null;

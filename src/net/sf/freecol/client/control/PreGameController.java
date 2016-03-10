@@ -27,12 +27,14 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -152,23 +154,33 @@ public final class PreGameController {
      */
     public boolean startGame() {
         final Player player = freeColClient.getMyPlayer();
-        if (!freeColClient.isHeadless()) {
-            gui.closeMainPanel();
-            gui.closeMenus();
-            gui.closeStatusPanel();
-            // Stop the long introduction sound
-            freeColClient.getSoundController().playSound(null);
-            freeColClient.getSoundController().playSound(
-                "sound.intro." + player.getNationId());
-        }
+        gui.closeMainPanel();
+        gui.closeMenus();
+        gui.closeStatusPanel();
+        // Stop the long introduction sound
+        freeColClient.getSoundController().playSound(null);
+        freeColClient.getSoundController()
+            .playSound("sound.intro." + player.getNationId());
         freeColClient.setMessageHandler(freeColClient.getInGameInputHandler());
-
         freeColClient.setInGame(true);
-        gui.initializeInGame((Tile)player.getEntryLocation());
+        gui.initializeInGame();
 
-        InGameController igc = freeColClient.getInGameController();
-        if (freeColClient.currentPlayerIsMyPlayer()) igc.nextActiveUnit();
-
+        Game game = freeColClient.getGame();
+        Tile entryTile = (player.getEntryLocation() == null) ? null
+            : player.getEntryLocation().getTile();
+        if (freeColClient.currentPlayerIsMyPlayer()) {
+            Unit activeUnit = game.getInitialActiveUnit();
+            if (activeUnit != null) {
+                player.resetIterators();
+                player.setNextActiveUnit(activeUnit);
+                gui.setActiveUnit(activeUnit);
+            } else {
+                gui.setSelectedTile(entryTile);
+            }
+            game.setInitialActiveUnitId(null);
+        } else {
+            gui.setSelectedTile(entryTile);
+        }
         gui.setupMouseListeners();
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
@@ -180,7 +192,7 @@ public final class PreGameController {
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             // force view of tutorial message
             player.addStartGameMessage();
-            igc.nextModelMessage();
+            freeColClient.getInGameController().nextModelMessage();
         }
         return true;
     }
