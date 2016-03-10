@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -361,7 +362,7 @@ public final class InGameController extends Controller {
         Player.makeContact(serverPlayer, refPlayer);
 
         // Instantiate the REF in Europe
-        Monarch.Force exf = monarch.getExpeditionaryForce();
+        Force exf = monarch.getExpeditionaryForce();
         // @compat 0.10.5
         // There was a bug that seriously under provisioned the navy back
         // around 0.10.5, the game in BR#2435 has it.  For now, just add

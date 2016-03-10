@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Effect;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.Event;
+import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -1505,7 +1506,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // We used to nullify the monarch when declaring independence.
                 // There are saved games out there where this happened
                 // (see BR#2435).  Defend against NPE.
-                Monarch.Force ivf = null;
+                Force ivf = null;
                 if (getMonarch() != null
                 // end @compat 0.10.5
                     && (ivf = getMonarch().getInterventionForce()) != null) {
