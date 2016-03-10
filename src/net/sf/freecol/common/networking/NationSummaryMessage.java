@@ -31,9 +31,9 @@ import org.w3c.dom.Element;
 /**
  * The message sent when summarizing a nation.
  */
-public class GetNationSummaryMessage extends DOMMessage {
+public class NationSummaryMessage extends DOMMessage {
 
-    public static final String TAG = "getNationSummary";
+    public static final String TAG = "nationSummary";
     private static final String PLAYER_TAG = "player";
 
     /** The identifier of the player to summarize. */
@@ -44,12 +44,12 @@ public class GetNationSummaryMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>GetNationSummaryMessage</code> for the
+     * Create a new <code>NationSummaryMessage</code> for the
      * specified player.
      *
      * @param player The <code>Player</code> to summarize.
      */
-    public GetNationSummaryMessage(Player player) {
+    public NationSummaryMessage(Player player) {
         super(getTagName());
 
         this.playerId = player.getId();
@@ -57,13 +57,13 @@ public class GetNationSummaryMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>GetNationSummaryMessage</code> from a
-     * supplied element.
+     * Create a new <code>NationSummaryMessage</code> from a supplied
+     * element.
      *
      * @param game The <code>Game</code> containing the nation to summarize.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public GetNationSummaryMessage(Game game, Element element) {
+    public NationSummaryMessage(Game game, Element element) {
         super(getTagName());
 
         this.playerId = getStringAttribute(element, PLAYER_TAG);
@@ -97,14 +97,14 @@ public class GetNationSummaryMessage extends DOMMessage {
      * @param ns The new <code>NationSummary</code>.
      * @return This message.
      */
-    public GetNationSummaryMessage setNationSummary(NationSummary ns) {
+    public NationSummaryMessage setNationSummary(NationSummary ns) {
         this.summary = ns;
         return this;
     }
     
     
     /**
-     * Handle a "getNationSummary"-message.
+     * Handle a "nationSummary"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> message was received on.
@@ -130,7 +130,7 @@ public class GetNationSummaryMessage extends DOMMessage {
     }
 
     /**
-     * Convert this GetNationSummaryMessage to XML.
+     * Convert this NationSummaryMessage to XML.
      *
      * @return The XML representation of this message.
      */
@@ -144,7 +144,7 @@ public class GetNationSummaryMessage extends DOMMessage {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "getNationSummary".
+     * @return "nationSummary".
      */
     public static String getTagName() {
         return TAG;

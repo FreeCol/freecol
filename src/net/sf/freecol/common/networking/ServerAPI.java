@@ -766,14 +766,12 @@ public abstract class ServerAPI {
      *
      * @param self The <code>Player</code> requesting the summary.
      * @param player The <code>Player</code> to summarize.
-     * @return A summary of that nation, or null on error.
+     * @return True if the server interaction succeeded.
      */
-    public NationSummary getNationSummary(Player self, Player player) {
-        return (askHandling(self.getGame(),
-                new GetNationSummaryMessage(player),
-                null))
-            ? self.getNationSummary(player)
-            : null;
+    public boolean nationSummary(Player self, Player player) {
+        return askHandling(self.getGame(),
+            new NationSummaryMessage(player),
+            null);
     }
 
     /**

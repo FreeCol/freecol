@@ -3642,8 +3642,10 @@ public final class InGameController implements NetworkConstants {
         NationSummary ns = myPlayer.getNationSummary(player);
         if (ns != null) return ns;
         // Refresh from server
-        askServer().getNationSummary(myPlayer, player);
-        return myPlayer.getNationSummary(player);
+        if (askServer().nationSummary(myPlayer, player)) {
+            return myPlayer.getNationSummary(player);
+        }
+        return null;
     }
 
     /**

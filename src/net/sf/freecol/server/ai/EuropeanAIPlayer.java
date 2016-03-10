@@ -1562,7 +1562,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final Player player = getPlayer();
         NationSummary ns = player.getNationSummary(other);
         if (ns != null) return ns;
-        AIMessage.askGetNationSummary(this, other);
+        AIMessage.askNationSummary(this, other);
         return player.getNationSummary(other);
     }
 

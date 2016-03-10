@@ -59,12 +59,12 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -250,8 +250,6 @@ public final class InGameInputHandler extends InputHandler {
             reply = fountainOfYouth(element); break;
         case "gameEnded":
             reply = gameEnded(element); break;
-        case "getNationSummary":
-            reply = getNationSummary(element); break;
         case HighScoreMessage.TAG:
             reply = highScore(element); break;
         case "indianDemand":
@@ -262,6 +260,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = monarchAction(element); break;
         case MultipleMessage.TAG:
             reply = multiple(connection, element); break;
+        case NationSummaryMessage.TAG:
+            reply = nationSummary(element); break;
         case "newLandName":
             reply = newLandName(element); break;
         case "newRegionName":
@@ -749,12 +749,11 @@ public final class InGameInputHandler extends InputHandler {
      * @param element The <code>Element</code> to process.
      * @return Null.
      */
-    private Element getNationSummary(Element element) {
+    private Element nationSummary(Element element) {
         final Game game = getGame();
         final Player player = getFreeColClient().getMyPlayer();
 
-        GetNationSummaryMessage message
-            = new GetNationSummaryMessage(game, element);
+        NationSummaryMessage message = new NationSummaryMessage(game, element);
         Player other = message.getPlayer(game);
         NationSummary ns = message.getNationSummary();
         player.putNationSummary(other, ns);

@@ -56,7 +56,6 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
@@ -71,6 +70,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
+import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -610,9 +610,9 @@ public final class InGameInputHandler extends InputHandler
             (Connection connection, Element element) ->
             new FirstContactMessage(getGame(), element)
                 .handle(freeColServer, connection));
-        register(GetNationSummaryMessage.getTagName(),
+        register(NationSummaryMessage.getTagName(),
             (Connection connection, Element element) ->
-            new GetNationSummaryMessage(getGame(), element)
+            new NationSummaryMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register(HighScoreMessage.getTagName(),
             (Connection connection, Element element) ->

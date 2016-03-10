@@ -104,11 +104,11 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
@@ -3618,7 +3618,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-            new GetNationSummaryMessage(owner)
+            new NationSummaryMessage(owner)
                 .setNationSummary(new NationSummary(owner, serverPlayer)));
 
         // This is private.

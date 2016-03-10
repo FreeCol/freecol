@@ -278,11 +278,11 @@ public class AIMessage {
      *
      * @param owner The <code>AIPlayer</code> making the inquiry.
      * @param player The <code>Player</code> to summarize.
-     * @return A summary of that nation, or null on error.
+     * @return True if the message was sent, and a non-error reply returned.
      */
-    public static NationSummary askGetNationSummary(AIPlayer owner, Player player) {
+    public static boolean askNationSummary(AIPlayer owner, Player player) {
         return owner.askServer()
-            .getNationSummary(owner.getPlayer(), player);
+            .nationSummary(owner.getPlayer(), player);
     }
 
     /**
