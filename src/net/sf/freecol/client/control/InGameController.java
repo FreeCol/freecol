@@ -3661,17 +3661,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Retrieves the server statistics.
-     *
-     * Called from StatisticsPanel
-     *
-     * @return A <code>Map</code> containing the server statistics.
-     */
-    public java.util.Map<String, String> getServerStatistics() {
-        return askServer().getStatistics(freeColClient.getGame());
-    }
-
-    /**
      * Go to a tile.
      *
      * Called from CanvasMouseListener, TilePopup

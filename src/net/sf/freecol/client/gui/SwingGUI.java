@@ -1470,8 +1470,9 @@ public class SwingGUI extends GUI {
     }
 
     @Override
-    public void showStatisticsPanel() {
-        canvas.showStatisticsPanel();
+    public void showStatisticsPanel(Map<String, String> serverStats,
+                                    Map<String, String> clientStats) {
+        canvas.showStatisticsPanel(serverStats, clientStats);
     }
 
     @Override

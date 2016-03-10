@@ -2481,8 +2481,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the statistics panel.
      */
-    void showStatisticsPanel() {
-        showSubPanel(new StatisticsPanel(freeColClient), true);
+    public void showStatisticsPanel(Map<String, String> serverStats,
+                                    Map<String, String> clientStats) {
+        showSubPanel(new StatisticsPanel(freeColClient, serverStats,
+                                         clientStats), true);
     }
 
     /**

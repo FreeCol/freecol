@@ -2796,18 +2796,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get the current game statistics.
-     *
-     * @return A map of statistics key,value pairs.
-     */
-    public java.util.Map<String, String> getStatistics() {
-        java.util.Map<String, String> stats = getGame().getStatistics();
-        stats.putAll(getFreeColServer().getAIMain().getAIStatistics());
-        return stats;
-    }
-
-
-    /**
      * Gets a settlement transaction session, either existing or
      * newly opened.
      *

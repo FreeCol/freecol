@@ -151,14 +151,13 @@ public final class StatisticsPanel extends FreeColPanel {
      * Creates the statistics panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param serverStatistics A map of key,value pairs of server statistics.
+     * @param clientStatistics A map of key,value pairs of client statistics.
      */
-    public StatisticsPanel(FreeColClient freeColClient) {
+    public StatisticsPanel(FreeColClient freeColClient,
+                           Map<String, String> serverStatistics,
+                           Map<String, String> clientStatistics) {
         super(freeColClient, new BorderLayout());
-
-        // Retrieve the client and server data
-        Map<String, String> serverStatistics = igc().getServerStatistics();
-        Map<String, String> clientStatistics = freeColClient.getGame()
-            .getStatistics();
 
         // Title
         JPanel header = new JPanel();

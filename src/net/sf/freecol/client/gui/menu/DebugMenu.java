@@ -367,9 +367,9 @@ public class DebugMenu extends JMenu {
         //statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
         statistics.addActionListener((ActionEvent ae) -> {
-                gui.showStatisticsPanel();
+                DebugUtils.statistics(freeColClient);
             });
-        statistics.setEnabled(true);
+        statistics.setEnabled(hasServer);
 
         // garbage collector
         final JMenuItem gc = Utility.localizedMenuItem("menuBar.debug.memoryManager.gc");

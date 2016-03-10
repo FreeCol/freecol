@@ -788,21 +788,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for asking for the server statistics.
-     *
-     * @param game The <code>Game</code> to extract statistics from.
-     * @return The server statistics.
-     */
-    public java.util.Map<String, String> getStatistics(Game game) {
-        Element reply = askExpecting(game, new StatisticsMessage(null),
-                                     StatisticsMessage.getTagName());
-        return (reply == null
-            || !StatisticsMessage.getTagName().equals(reply.getTagName()))
-            ? Collections.<String, String>emptyMap()
-            : new StatisticsMessage(game, reply).getStatistics();
-    }
-
-    /**
      * Server query-response for inciting the natives.
      *
      * @param unit The missionary <code>Unit</code>.

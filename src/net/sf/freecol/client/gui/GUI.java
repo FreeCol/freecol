@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -1391,7 +1392,8 @@ public class GUI {
                                    boolean singlePlayerMode) {
     }
 
-    public void showStatisticsPanel() {
+    public void showStatisticsPanel(Map<String, String> serverStats,
+                                    Map<String, String> clientStats) {
     }
 
     public void showStatusPanel(String message) {
