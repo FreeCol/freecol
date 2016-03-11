@@ -779,6 +779,8 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Null end.");
         } else if (end instanceof Europe) {
             return end;
+        } else if (end instanceof Map) {
+            return findRealEnd(unit, unit.getEntryLocation());
         } else if (end.getTile() != null) {
             return end.getTile();
         } else if (unit != null) {
