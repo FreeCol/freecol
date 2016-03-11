@@ -182,7 +182,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @see Building
      */
     public List<Building> getBuildings() {
-        return new ArrayList<>(buildingMap.values());
+        synchronized (buildingMap) {
+            return new ArrayList<>(buildingMap.values());
+        }
     }
 
     /**
@@ -195,7 +197,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The <code>Building</code> found.
      */
     public Building getBuilding(BuildingType type) {
-        return buildingMap.get(type.getFirstLevel().getId());
+        synchronized (buildingMap) {
+            return buildingMap.get(type.getFirstLevel().getId());
+        }
     }
 
     /**
@@ -206,7 +210,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @see ColonyTile
      */
     public List<ColonyTile> getColonyTiles() {
-        return colonyTiles;
+        synchronized (colonyTiles) {
+            return colonyTiles;
+        }
     }
 
     /**
@@ -217,7 +223,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The corresponding <code>ColonyTile</code>, or null if not found.
      */
     public ColonyTile getColonyTile(Tile t) {
-        return find(colonyTiles, ct -> ct.getWorkTile() == t);
+        return find(getColonyTiles(), ct -> ct.getWorkTile() == t);
     }
 
     /**
@@ -503,23 +509,19 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // WorkLocations, Buildings, ColonyTiles
 
     /**
-     * Get a stream of all the possible work locations for this colony.
-     *
-     * @return A suitable <code>Stream</code>.
-     */
-    private Stream<WorkLocation> getAllWorkLocationsStream() {
-        return Stream.concat(colonyTiles.stream(),
-                             buildingMap.values().stream());
-    }
-    
-    /**
      * Gets a list of every work location in this colony.
      *
      * @return The list of work locations.
      */
     public List<WorkLocation> getAllWorkLocations() {
-        return getAllWorkLocationsStream()
-            .collect(Collectors.toList());
+        List<WorkLocation> ret = new ArrayList<>();
+        synchronized (colonyTiles) {
+            ret.addAll(colonyTiles);
+        }
+        synchronized (buildingMap) {
+            ret.addAll(buildingMap.values());
+        }
+        return ret;
     }
 
     /**
@@ -529,7 +531,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of available <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getAvailableWorkLocations() {
-        return transform(getAllWorkLocationsStream(),
+        return transform(getAllWorkLocations(),
             WorkLocation::isAvailable, Collectors.toList());
     }
 
@@ -539,7 +541,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of current <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getCurrentWorkLocations() {
-        return transform(getAllWorkLocationsStream(),
+        return transform(getAllWorkLocations(),
             WorkLocation::isCurrent, Collectors.toList());
     }
 
@@ -559,7 +561,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (building == null || building.getType() == null) return false;
         final BuildingType buildingType = building.getType().getFirstLevel();
         if (buildingType == null || buildingType.getId() == null) return false;
-        buildingMap.put(buildingType.getId(), building);
+        synchronized (buildingMap) {
+            buildingMap.put(buildingType.getId(), building);
+        }
         addFeatures(building.getType());
         return true;
     }
@@ -575,7 +579,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     protected boolean removeBuilding(final Building building) {
         final BuildingType buildingType = building.getType().getFirstLevel();
-        if (buildingMap.remove(buildingType.getId()) == null) return false;
+        synchronized (buildingMap) {
+            if (buildingMap.remove(buildingType.getId()) == null) return false;
+        }
         removeFeatures(building.getType());
         return true;
     }
@@ -588,11 +594,23 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *      the given type of goods, or null if not found.
      */
     public Building getBuildingForProducing(final GoodsType goodsType) {
-        for (Building b : buildingMap.values()) {
+        for (Building b : getBuildings()) {
             if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
                 return b;
         }
         return null;
+    }
+
+    /**
+     * Add a colony tile.
+     *
+     * @param ct The <code>ColonyTile</code> to add.
+     */
+    private void addColonyTile(ColonyTile ct) {
+        if (ct == null) return;
+        synchronized (colonyTiles) {
+            colonyTiles.add(ct);
+        }
     }
 
     /**
@@ -778,7 +796,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<RandomChoice<Disaster>> getDisasters() {
         List<RandomChoice<Disaster>> disasters = new ArrayList<>();
-        for (ColonyTile tile : colonyTiles) {
+        for (ColonyTile tile : getColonyTiles()) {
             disasters.addAll(tile.getWorkTile().getDisasters());
         }
         return disasters;
@@ -1667,7 +1685,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public boolean isUnderSiege() {
         int friendlyUnits = 0;
         int enemyUnits = 0;
-        for (ColonyTile colonyTile : colonyTiles) {
+        for (ColonyTile colonyTile : getColonyTiles()) {
             for (Unit unit : colonyTile.getWorkTile().getUnitList()) {
                 if (unit.getOwner() == getOwner()) {
                     if (unit.isDefensiveUnit()) {
@@ -1750,7 +1768,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public boolean canTrain(UnitType unitType) {
         return hasAbility(Ability.TEACH)
-            && any(buildingMap.values(),
+            && any(getBuildings(),
                 b -> b.canTeach() && b.canAddType(unitType));
     }
 
@@ -1762,7 +1780,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<Unit> getTeachers() {
         List<Unit> teachers = new ArrayList<>();
-        for (Building building : buildingMap.values()) {
+        for (Building building : getBuildings()) {
             if (building.canTeach()) {
                 teachers.addAll(building.getUnitList());
             }
@@ -1859,7 +1877,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public List<Consumer> getConsumers() {
         List<Consumer> result = new ArrayList<>();
         result.addAll(getUnitList());
-        result.addAll(buildingMap.values());
+        result.addAll(getBuildings());
         result.add(buildQueue);
         result.add(populationQueue);
 
@@ -2657,7 +2675,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getUpkeep() {
-        return sum(buildingMap.values(), b -> b.getType().getUpkeep());
+        return sum(getBuildings(), b -> b.getType().getUpkeep());
     }
 
     /**
@@ -2957,8 +2975,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        colonyTiles.clear();
-        buildingMap.clear();
+        synchronized (colonyTiles) { colonyTiles.clear(); }
+        synchronized (buildingMap) { buildingMap.clear(); }
         exportData.clear();
         buildQueue.clear();
         populationQueue.clear();
@@ -2993,7 +3011,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             addBuilding(xr.readFreeColGameObject(game, Building.class));
 
         } else if (ColonyTile.getTagName().equals(tag)) {
-            colonyTiles.add(xr.readFreeColGameObject(game, ColonyTile.class));
+            addColonyTile(xr.readFreeColGameObject(game, ColonyTile.class));
 
         } else if (ExportData.getTagName().equals(tag)) {
             ExportData data = new ExportData(xr);
