@@ -4040,6 +4040,9 @@ public class Player extends FreeColGameObject implements Nameable {
         final Game game = getGame();
 
         name = xr.getAttribute(USERNAME_TAG, (String)null);
+        // @compat 0.11.5
+        if (name.startsWith("model.nation.")) name = Messages.message(name);
+        // end @compat 0.11.5
 
         nationId = xr.getAttribute(NATION_ID_TAG,
             // @compat 0.10.7
