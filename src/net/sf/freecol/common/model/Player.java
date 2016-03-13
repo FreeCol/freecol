@@ -1734,6 +1734,23 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get a template for the last sale price for a location and goods type.
+     *
+     * @param where The <code>Location</code> of the sale.
+     * @param what The <code>GoodsType</code> sold.
+     * @return A <code>StringTemplate</code> for the sale, or null if
+     *     none found.
+     */
+    public StringTemplate getLastSaleTip(Location where, GoodsType what) {
+        LastSale data = getLastSale(where, what);
+        return (data == null) ? null
+            : StringTemplate.template("model.indianSettlement.lastSale")
+                .addNamed("%goodsType%", what)
+                .addAmount("%price%", data.getPrice())
+                .addStringTemplate("%turn%", data.getWhen().getLabel());
+    }
+
+    /**
      * Gets the arrears due for a type of goods.
      *
      * @param type The <code>GoodsType</code> to check.

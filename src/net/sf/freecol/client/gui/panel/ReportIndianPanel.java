@@ -216,15 +216,16 @@ public final class ReportIndianPanel extends ReportPanel {
                 String x = (n > 1) ? "split " + Integer.toString(n) : null;
                 for (int i = 0; i < n; i++) {
                     JLabel goodsLabel;
+                    List<StringTemplate> gl
+                        = settlement.getWantedGoodsLabel(i, player);
                     if (visited && wantedGoods[i] != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(
                             lib.getSmallIconImage(wantedGoods[i])));
-                        Utility.localizeToolTip(goodsLabel, Messages
-                            .message(settlement.getWantedGoodsLabel(i, player)));
+                        Utility.localizeToolTip(goodsLabel,
+                            Messages.message(gl.get(0)));
                     } else {
-                        goodsLabel = Utility.localizedLabel(settlement
-                            .getWantedGoodsLabel(i, player));
+                        goodsLabel = Utility.localizedLabel(gl.get(0));
                     }
                     reportPanel.add(goodsLabel, x);
                     x = null;

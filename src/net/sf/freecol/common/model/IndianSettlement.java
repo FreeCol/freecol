@@ -390,22 +390,27 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * @param index The index into the wanted goods.
      * @param player The requesting <code>Player</code>.
-     * @return A suitable <code>StringTemplate</code>.
+     * @return A list of a <code>StringTemplate</code> for the label, and
+     *     optionally one for a tool tip.
      */
-    public StringTemplate getWantedGoodsLabel(int index, Player player) {
-        StringTemplate ret;
-        if (hasVisited(player) && 0 <= index && index < wantedGoods.length) {
-            if (wantedGoods[index] == null) {
-                ret = StringTemplate.key("model.indianSettlement.wantedGoodsNone");
-            } else {
-                ret = StringTemplate.label("")
-                    .add(Messages.nameKey(wantedGoods[index]));
-                String sale = player.getLastSaleString(this, wantedGoods[index]);
-                if (sale != null) ret.addName(" " + sale);
+    public List<StringTemplate> getWantedGoodsLabel(int index, Player player) {
+        StringTemplate lab = null, tip = null;
+        if (hasVisited(player) && 0 <= index && index < wantedGoods.length
+            && wantedGoods[index] != null) {
+            lab = StringTemplate.label("")
+                .add(Messages.nameKey(wantedGoods[index]));
+            String sale = player.getLastSaleString(this, wantedGoods[index]);
+            if (sale != null) {
+                lab.addName(" " + sale);
+                tip = player.getLastSaleTip(this, wantedGoods[index]);
             }
-        } else {
-            ret = StringTemplate.key("model.indianSettlement.wantedGoodsUnknown");
         }
+        if (lab == null) {
+            lab = StringTemplate.key("model.indianSettlement.wantedGoodsNone");
+        }
+        List<StringTemplate> ret = new ArrayList<>();
+        ret.add(lab);
+        if (tip != null) ret.add(tip);
         return ret;
     }                
             
