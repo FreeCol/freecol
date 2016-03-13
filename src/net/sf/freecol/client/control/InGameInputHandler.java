@@ -59,6 +59,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
+import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoginMessage;
@@ -251,6 +252,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = fountainOfYouth(element); break;
         case "gameEnded":
             reply = gameEnded(element); break;
+        case GoodsForSaleMessage.TAG:
+            reply = goodsForSale(element); break;
         case HighScoreMessage.TAG:
             reply = highScore(element); break;
         case "indianDemand":
@@ -741,6 +744,26 @@ public final class InGameInputHandler extends InputHandler {
         if (winner == freeColClient.getMyPlayer()) {
             invokeLater(() -> { igc().victory(highScore); });
         }
+        return null;
+    }
+
+    /**
+     * Handle a "goodsForSale"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
+     * @return Null.
+     */
+    private Element goodsForSale(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        final Game game = getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final GoodsForSaleMessage message
+            = new GoodsForSaleMessage(game, element);
+        final Unit unit = message.getUnit(player);
+        final IndianSettlement is = message.getSettlement(unit); 
+
+        is.setGoodsForSale(message.getGoods());
         return null;
     }
 

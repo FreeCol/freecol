@@ -737,16 +737,13 @@ public abstract class ServerAPI {
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
-     * @return The goods for sale in the settlement,
-     *     or null if the server interaction failed.
+     * @return True if the server interaction succeeded.
      */
-    public List<Goods> getGoodsForSaleInSettlement(Unit unit,
-                                                   Settlement settlement) {
-        Element reply = askExpecting(unit.getGame(),
+    public boolean getGoodsForSaleInSettlement(Unit unit,
+                                               Settlement settlement) {
+        return askHandling(unit.getGame(),
             new GoodsForSaleMessage(unit, settlement, null),
-            GoodsForSaleMessage.getTagName());
-        return (reply == null) ? Collections.<Goods>emptyList()
-            : new GoodsForSaleMessage(unit.getGame(), reply).getGoods();
+            null);
     }
 
     /**

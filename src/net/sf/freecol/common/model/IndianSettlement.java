@@ -142,6 +142,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     protected final java.util.Map<Player, Tension> alarm = new HashMap<>();
 
+    /** Cache of goods offered for sale.  Do not serialize. */
+    private final List<Goods> forSale = new ArrayList<>();
+
 
     /**
      * Constructor for ServerIndianSettlement.
@@ -606,6 +609,25 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             : (!hasContacted(player))
             ? "model.indianSettlement.tension.unknown"
             : getAlarm(player).getNameKey();
+    }
+
+    /**
+     * Get the current goods offered for sale.
+     *
+     * @return A list of <code>Goods</code> for sale.
+     */
+    public List<Goods> getGoodsForSale() {
+        return this.forSale;
+    }
+
+    /**
+     * Set the current goods offered for sale.
+     *
+     * @param forSale A new list of <code>Goods</code> for sale.
+     */
+    public void setGoodsForSale(List<Goods> forSale) {
+        this.forSale.clear();
+        this.forSale.addAll(forSale);
     }
 
     /**

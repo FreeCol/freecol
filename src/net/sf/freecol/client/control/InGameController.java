@@ -1807,16 +1807,17 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unit can move further.
      */
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
-        Settlement settlement = getSettlementAt(unit.getTile(), direction);
+        IndianSettlement is
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
 
         StringTemplate baseTemplate = StringTemplate
             .template("tradeProposition.welcome")
             .addStringTemplate("%nation%",
-                settlement.getOwner().getNationLabel())
-            .addName("%settlement%", settlement.getName());
+                is.getOwner().getNationLabel())
+            .addName("%settlement%", is.getName());
         StringTemplate template = baseTemplate;
         boolean[] results = askServer()
-            .openTransactionSession(unit, settlement);
+            .openTransactionSession(unit, is);
         while (results != null) {
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
@@ -1826,13 +1827,13 @@ public final class InGameController implements NetworkConstants {
             boolean gif = results[2] && unit.hasGoodsCargo();
             if (!buy && !sel && !gif) break;
 
-            TradeAction act = gui.getIndianSettlementTradeChoice(settlement,
+            TradeAction act = gui.getIndianSettlementTradeChoice(is,
                 template, buy, sel, gif);
             if (act == null) break;
             StringTemplate t = null;
             switch (act) {
             case BUY:
-                t = attemptBuyFromSettlement(unit, settlement);
+                t = attemptBuyFromSettlement(unit, is);
                 if (t == null) {
                     results[0] = false;
                     template = baseTemplate;
@@ -1841,7 +1842,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 break;
             case SELL:
-                t = attemptSellToSettlement(unit, settlement);
+                t = attemptSellToSettlement(unit, is);
                 if (t == null) {
                     results[1] = false;
                     template = baseTemplate;
@@ -1850,7 +1851,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 break;
             case GIFT:
-                t = attemptGiftToSettlement(unit, settlement);
+                t = attemptGiftToSettlement(unit, is);
                 if (t == null) {
                     results[2] = false;
                     template = baseTemplate;
@@ -1867,7 +1868,7 @@ public final class InGameController implements NetworkConstants {
             if (template == abortTrade) template = baseTemplate;
         }
 
-        askServer().closeTransactionSession(unit, settlement);
+        askServer().closeTransactionSession(unit, is);
         if (unit.getMovesLeft() > 0) gui.setActiveUnit(unit); // No trade?
         return false;
     }
@@ -1903,19 +1904,21 @@ public final class InGameController implements NetworkConstants {
      * User interaction for buying from the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>Settlement</code> that is trading.
      * @return A <code>StringTemplate</code> containing a message if
      *     there is problem, or null on success.
      */
     private StringTemplate attemptBuyFromSettlement(Unit unit,
-                                                    Settlement settlement) {
+                                                    IndianSettlement is) {
         final Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
 
         // Get list of goods for sale
-        List<Goods> forSale = askServer()
-            .getGoodsForSaleInSettlement(unit, settlement);
+        if (!askServer().getGoodsForSaleInSettlement(unit, is)) {
+            return StringTemplate.template("trade.nothingToSell");
+        }
+        List<Goods> forSale = is.getGoodsForSale();
         for (;;) {
             if (forSale.isEmpty()) { // Nothing to sell to the player
                 return StringTemplate.template("trade.nothingToSell");
@@ -1923,7 +1926,7 @@ public final class InGameController implements NetworkConstants {
 
             // Choose goods to buy
             goods = gui.getChoice(unit.getTile(),
-                Messages.message("buyProposition.text"), settlement, "nothing",
+                Messages.message("buyProposition.text"), is, "nothing",
                 forSale.stream()
                     .map(g -> new ChoiceItem<>(Messages.message(g.getLabel()), g))
                     .collect(Collectors.toList()));
@@ -1931,21 +1934,20 @@ public final class InGameController implements NetworkConstants {
 
             int gold = -1; // Initially ask for a price
             for (;;) {
-                gold = askServer().buyProposition(unit, settlement,
-                    goods, gold);
+                gold = askServer().buyProposition(unit, is, goods, gold);
                 if (gold <= 0) {
-                    return tradeFailMessage(gold, settlement, goods);
+                    return tradeFailMessage(gold, is, goods);
                 }
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
                 BuyAction act
-                    = gui.getBuyChoice(unit, settlement, goods, gold, canBuy);
+                    = gui.getBuyChoice(unit, is, goods, gold, canBuy);
                 if (act == null) break; // User cancelled
                 switch (act) {
                 case BUY: // Accept price, make purchase
                     return (askServer().buyFromSettlement(unit,
-                            settlement, goods, gold)) ? null
+                            is, goods, gold)) ? null
                         : abortTrade;
                 case HAGGLE: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
@@ -1963,17 +1965,17 @@ public final class InGameController implements NetworkConstants {
      * User interaction for selling to the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @return A <code>StringTemplate</code> containing a message if
      *     there is problem, or null on success.
      */
     private StringTemplate attemptSellToSettlement(Unit unit,
-                                                   Settlement settlement) {
+                                                   IndianSettlement is) {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
             goods = gui.getChoice(unit.getTile(),
-                Messages.message("sellProposition.text"), settlement, "nothing",
+                Messages.message("sellProposition.text"), is, "nothing",
                 unit.getGoodsList().stream()
                     .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
                     .collect(Collectors.toList()));
@@ -1981,27 +1983,26 @@ public final class InGameController implements NetworkConstants {
 
             int gold = -1; // Initially ask for a price
             for (;;) {
-                gold = askServer().sellProposition(unit, settlement,
+                gold = askServer().sellProposition(unit, is,
                                                    goods, gold);
                 if (gold <= 0) {
-                    return tradeFailMessage(gold, settlement, goods);
+                    return tradeFailMessage(gold, is, goods);
                 }
 
                 // Show dialog for sale proposal
-                SellAction act = gui.getSellChoice(unit, settlement,
-                                                   goods, gold);
+                SellAction act = gui.getSellChoice(unit, is, goods, gold);
                 if (act == null) break; // Cancelled
                 switch (act) {
                 case SELL: // Accepted price, make the sale
-                    return (askServer().sellToSettlement(unit, settlement,
-                            goods, gold)) ? null
+                    return (askServer().sellToSettlement(unit, is, goods, gold))
+                        ? null
                         : abortTrade;
                 case HAGGLE: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
                 case GIFT: // Decide to make a gift of the goods
                     askServer().deliverGiftToSettlement(unit,
-                        settlement, goods);
+                        is, goods);
                     return abortTrade;
                 default:
                     logger.warning("showSellDialog fail: " + act);
@@ -2016,19 +2017,19 @@ public final class InGameController implements NetworkConstants {
      * User interaction for delivering a gift to the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @return A <code>StringTemplate</code> containing a message if
      *     there is problem, or null on success.
      */
     private StringTemplate attemptGiftToSettlement(Unit unit,
-                                                   Settlement settlement) {
+                                                   IndianSettlement is) {
         Goods goods = gui.getChoice(unit.getTile(),
-            Messages.message("gift.text"), settlement, "cancel",
+            Messages.message("gift.text"), is, "cancel",
             unit.getGoodsList().stream()
                 .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
                 .collect(Collectors.toList()));
         return (goods != null
-            && askServer().deliverGiftToSettlement(unit, settlement, goods))
+            && askServer().deliverGiftToSettlement(unit, is, goods))
             ? null
             : abortTrade;
     }

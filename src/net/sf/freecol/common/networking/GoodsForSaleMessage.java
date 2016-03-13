@@ -90,6 +90,14 @@ public class GoodsForSaleMessage extends DOMMessage {
 
     // Public interface
 
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(this.unitId, Unit.class);
+    }
+
+    public IndianSettlement getSettlement(Unit unit) {
+        return unit.getAdjacentIndianSettlementSafely(this.settlementId);
+    }
+
     public List<Goods> getGoods() {
         return this.sellGoods;
     }
@@ -111,7 +119,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = getUnit(player);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -119,7 +127,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         IndianSettlement settlement;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(this.settlementId);
+            settlement = getSettlement(unit);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
