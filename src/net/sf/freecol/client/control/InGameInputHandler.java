@@ -61,6 +61,7 @@ import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
+import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -256,6 +257,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = goodsForSale(element); break;
         case HighScoreMessage.TAG:
             reply = highScore(element); break;
+        case InciteMessage.TAG:
+            reply = incite(element); break;
         case "indianDemand":
             reply = indianDemand(element); break;
         case "lootCargo":
@@ -767,6 +770,27 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Handle an "incite" message.
+     *
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
+     */
+    private Element incite(Element element) {
+        final FreeColClient freeColClient = getFreeColClient();
+        final Game game = getGame();
+        final Player player = freeColClient.getMyPlayer();
+        final InciteMessage message = new InciteMessage(game, element);
+        final Unit unit = message.getUnit(player);
+        final IndianSettlement is = message.getSettlement(unit);
+        final Player enemy = message.getEnemy(game);
+        final int gold = message.getGold();
+        
+        invokeLater(() -> { igc().incite(unit, is, enemy, gold); });
+        return null;
+    }
+    
     /**
      * Handle an incoming nation summary.
      *

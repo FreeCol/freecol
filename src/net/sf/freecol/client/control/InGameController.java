@@ -2104,21 +2104,7 @@ public final class InGameController implements NetworkConstants {
                     .map(p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))
                     .collect(Collectors.toList()));
             if (enemy == null) return true;
-            int gold = askServer().incite(unit, direction, enemy, -1);
-            if (gold < 0) {
-                // protocol fail
-            } else if (!player.checkGold(gold)) {
-                gui.showInformationMessage(settlement, StringTemplate
-                    .template("missionarySettlement.inciteGoldFail")
-                    .add("%player%", enemy.getName())
-                    .addAmount("%amount%", gold));
-            } else if (gui.confirm(unit.getTile(), StringTemplate
-                    .template("missionarySettlement.inciteConfirm")
-                    .add("%player%", enemy.getName())
-                    .addAmount("%amount%", gold),
-                    unit, "yes", "no")) {
-                askServer().incite(unit, direction, enemy, gold);
-            }
+            askServer().incite(unit, settlement, enemy, -1);
             break;
         default:
             logger.warning("showUseMissionaryDialog fail");
@@ -3710,6 +3696,35 @@ public final class InGameController implements NetworkConstants {
             stopIgnoringMessage(key);
         }
         return true;
+    }
+
+    /**
+     * Handle an incite response.
+     *
+     * Called from IGIH.incite.
+     *
+     * @param unit The <code>Unit</code> that is inciting.
+     * @param is The <code>IndianSettlement</code> being incited.
+     * @param enemy The <code>Player</code> incited against.
+     * @param gold The gold required by the natives to become hostile.
+     */
+    public void incite(Unit unit, IndianSettlement is, Player enemy, int gold) {
+        final Player player = freeColClient.getMyPlayer();
+        
+        if (gold < 0) {
+            ; // protocol fail
+        } else if (!player.checkGold(gold)) {
+            gui.showInformationMessage(is, StringTemplate
+                .template("missionarySettlement.inciteGoldFail")
+                .add("%player%", enemy.getName())
+                .addAmount("%amount%", gold));
+        } else if (gui.confirm(unit.getTile(), StringTemplate
+                .template("missionarySettlement.inciteConfirm")
+                .addStringTemplate("%enemy%", enemy.getNationLabel())
+                .addAmount("%amount%", gold),
+                unit, "yes", "no")) {
+            askServer().incite(unit, is, enemy, gold);
+        }
     }
 
     /**

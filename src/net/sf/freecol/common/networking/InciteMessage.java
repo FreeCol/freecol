@@ -20,7 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -38,16 +38,16 @@ import org.w3c.dom.Element;
 public class InciteMessage extends DOMMessage {
 
     public static final String TAG = "incite";
-    private static final String DIRECTION_TAG = "direction";
     private static final String ENEMY_TAG = "enemy";
     private static final String GOLD_TAG = "gold";
+    private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
     /** The identifier of the unit inciting. */
     private final String unitId;
 
-    /** The direction to the settlement. */
-    private final String directionString;
+    /** The identifier for the settlement. */
+    private final String settlementId;
 
     /** The identifier of the enemy to incite against. */
     private final String enemyId;
@@ -61,17 +61,17 @@ public class InciteMessage extends DOMMessage {
      * supplied name.
      *
      * @param unit The inciting <code>Unit</code>.
-     * @param direction The <code>Direction</code> to the settlement.
+     * @param settlement The <code>IndianSettlement</code> to incite.
      * @param enemy The enemy <code>Player</code>.
      * @param gold The amount of gold in the bribe (negative for the
      *             initial inquiry).
      */
-    public InciteMessage(Unit unit, Direction direction, Player enemy,
+    public InciteMessage(Unit unit, IndianSettlement settlement, Player enemy,
                          int gold) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.directionString = String.valueOf(direction);
+        this.settlementId = settlement.getId();
         this.enemyId = enemy.getId();
         this.goldString = Integer.toString(gold);
     }
@@ -87,9 +87,28 @@ public class InciteMessage extends DOMMessage {
         super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
-        this.directionString = getStringAttribute(element, DIRECTION_TAG);
+        this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
         this.enemyId = getStringAttribute(element, ENEMY_TAG);
         this.goldString = getStringAttribute(element, GOLD_TAG);
+    }
+
+
+    // Public interface
+
+    public Unit getUnit(Player player) {
+        return player.getOurFreeColGameObject(this.unitId, Unit.class);
+    }
+
+    public IndianSettlement getSettlement(Unit unit) {
+        return unit.getAdjacentIndianSettlementSafely(this.settlementId);
+    }
+
+    public Player getEnemy(Game game) {
+        return game.getFreeColGameObject(this.enemyId, Player.class);
+    }
+
+    public int getGold() {
+        return Integer.parseInt(this.goldString);
     }
 
 
@@ -109,31 +128,22 @@ public class InciteMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
+            unit = getUnit(serverPlayer);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
-        Tile tile;
+        IndianSettlement is;
         try {
-            tile = unit.getNeighbourTile(this.directionString);
+            is = (ServerIndianSettlement)getSettlement(unit);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
-                .build(serverPlayer);
-        }
-
-        ServerIndianSettlement is
-            = (ServerIndianSettlement)tile.getIndianSettlement();
-        if (is == null) {
-            return serverPlayer.clientError("There is no native settlement at: "
-                + tile.getId())
                 .build(serverPlayer);
         }
 
         MoveType type;
-        ServerPlayer enemy = game.getFreeColGameObject(this.enemyId,
-            ServerPlayer.class);
+        ServerPlayer enemy = (ServerPlayer)getEnemy(game);
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: " + this.enemyId)
                 .build(serverPlayer);
@@ -152,7 +162,7 @@ public class InciteMessage extends DOMMessage {
 
         int gold;
         try {
-            gold = Integer.parseInt(this.goldString);
+            gold = getGold();
         } catch (NumberFormatException e) {
             return serverPlayer.clientError("Bad gold: " + this.goldString)
                 .build(serverPlayer);
@@ -173,7 +183,7 @@ public class InciteMessage extends DOMMessage {
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
-            DIRECTION_TAG, this.directionString,
+            SETTLEMENT_TAG, this.settlementId,
             ENEMY_TAG, this.enemyId,
             GOLD_TAG, this.goldString).toXMLElement();
     }

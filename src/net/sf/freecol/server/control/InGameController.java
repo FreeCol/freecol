@@ -106,6 +106,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
@@ -2865,13 +2866,13 @@ public final class InGameController extends Controller {
         goldToPay = Math.max(goldToPay, 650);
 
         // Try to incite?
-        if (gold < 0) { // Initial enquiry.
-            cs.addAttribute(See.only(serverPlayer),
-                            "gold", Integer.toString(goldToPay));
+        if (gold < 0) { // Initial inquiry
+            cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
+                new InciteMessage(unit, settlement, enemy, goldToPay));
         } else if (gold < goldToPay || !serverPlayer.checkGold(gold)) {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                 "indianSettlement.inciteGoldFail",
+                                 "missionarySettlement.inciteGoldFail",
                                  serverPlayer, settlement)
                     .addStringTemplate("%player%",
                         enemyPlayer.getNationLabel())
@@ -2891,6 +2892,12 @@ public final class InGameController extends Controller {
                             "gold", Integer.toString(gold));
             serverPlayer.modifyGold(-gold);
             nativePlayer.modifyGold(gold);
+            cs.addMessage(See.only(serverPlayer),
+                new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                 "missionarySettlement.inciteSuccess",
+                                 nativePlayer)
+                .addStringTemplate("%native%", nativePlayer.getNationLabel())
+                    .addStringTemplate("%enemy%", enemy.getNationLabel()));
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
             unit.setMovesLeft(0);
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");

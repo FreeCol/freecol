@@ -788,19 +788,16 @@ public abstract class ServerAPI {
      * Server query-response for inciting the natives.
      *
      * @param unit The missionary <code>Unit</code>.
-     * @param direction The direction to a settlement to speak to.
+     * @param settlement The <code>IndianSettlement</code> to incite.
      * @param enemy An enemy <code>Player</code>.
      * @param gold The amount of bribe, negative to enquire.
-     * @return The amount of gold to bribe with if this was an inquiry,
-     *     zero for failure to incite and >0 for successful incitement,
-     *     negative if the server interaction failed.
+     * @return True if the server interaction succeeded.
      */
-    public int incite(Unit unit, Direction direction, Player enemy, int gold) {
-        Element reply = askExpecting(unit.getGame(),
-            new InciteMessage(unit, direction, enemy, gold),
+    public boolean incite(Unit unit, IndianSettlement is, Player enemy,
+                          int gold) {
+        return askHandling(unit.getGame(),
+            new InciteMessage(unit, is, enemy, gold),
             null);
-        resolve(handle(reply));
-        return DOMMessage.getIntegerAttribute(reply, "gold", -1);
     }
 
     /**
