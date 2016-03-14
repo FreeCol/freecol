@@ -772,19 +772,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for asking about a players REF.
-     *
-     * @param game The <code>Game</code> to extract scores from.
-     * @return A list of REF units for the player.
-     */
-    public List<AbstractUnit> getREFUnits(Game game) {
-        Element reply = askExpecting(game, new REFUnitsMessage(null),
-                                     REFUnitsMessage.getTagName());
-        return (reply == null) ? Collections.<AbstractUnit>emptyList()
-            : new REFUnitsMessage(game, reply).getREFUnits();
-    }
-
-    /**
      * Server query-response for inciting the natives.
      *
      * @param unit The missionary <code>Unit</code>.

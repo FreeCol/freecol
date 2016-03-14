@@ -1596,28 +1596,13 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a list of abstract REF units for this player.
      *
-     * @return A list of <code>AbstractUnit</code>s defining the REF.
+     * @return A list of <code>AbstractUnit</code>s defining the REF,
+     *     or null if not available.
      */
     public List<AbstractUnit> getREFUnits() {
-        final Game game = getGame();
-        final Specification spec = game.getSpecification();
-        List<AbstractUnit> units;
-
-        switch (getPlayerType()) {
-        case COLONIAL:
-            units = getMonarch().getExpeditionaryForce().getUnits();
-            break;
-        case REBEL:
-            units = getREFPlayer().getMilitaryUnits();
-            break;
-        case ROYAL:
-            units = getMilitaryUnits();
-            break;
-        default:
-            units = Collections.<AbstractUnit>emptyList();
-            break;
-        }
-        return units;
+        return (getPlayerType() == PlayerType.COLONIAL)
+            ? getMonarch().getExpeditionaryForce().getUnits()
+            : null;
     }
 
     /**

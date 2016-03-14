@@ -79,13 +79,14 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     @Override
     protected void addREFUnits() {
         final Specification spec = getSpecification();
-        final Nation refNation = getMyPlayer().getNation().getREFNation();
+        final Player player = getMyPlayer();
+        final Nation refNation = player.getNation().getREFNation();
 
         reportPanel.add(new JLabel(Messages.getName(refNation)),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> refUnits = igc().getREFUnits();
+        List<AbstractUnit> refUnits = player.getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit au : refUnits) {
                 if (au.getType(spec).isNaval()) {

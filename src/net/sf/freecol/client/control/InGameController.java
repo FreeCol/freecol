@@ -3636,18 +3636,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Gathers information about the REF.
-     *
-     * Called from ReportNavalPanel, ReportMilitaryPanel
-     *
-     * @return a <code>List</code> value
-     */
-    public List<AbstractUnit> getREFUnits() {
-        return (!requireOurTurn()) ? Collections.<AbstractUnit>emptyList()
-            : askServer().getREFUnits(freeColClient.getGame());
-    }
-
-    /**
      * Go to a tile.
      *
      * Called from CanvasMouseListener, TilePopup
