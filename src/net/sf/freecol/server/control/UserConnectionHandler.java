@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * set as the message handler when the client has successfully logged
  * on.
  */
-public final class UserConnectionHandler extends InputHandler {
+public final class UserConnectionHandler extends ServerInputHandler {
 
     private static final Logger logger = Logger.getLogger(UserConnectionHandler.class.getName());
 

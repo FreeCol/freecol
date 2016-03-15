@@ -39,13 +39,13 @@ import org.w3c.dom.Element;
 
 
 /**
- * Handles the network messages.
+ * Handles the network messages on the server side.
  * 
  * @see Controller
  */
-public abstract class InputHandler extends FreeColServerHolder implements MessageHandler {
+public abstract class ServerInputHandler extends FreeColServerHolder implements MessageHandler {
 
-    private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
     private static final String LOGOUT_TAG = "logout";
 
@@ -62,7 +62,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * 
      * @param freeColServer The main server object.
      */
-    public InputHandler(final FreeColServer freeColServer) {
+    public ServerInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
 
         register(ChatMessage.TAG, (Connection conn, Element e) ->

@@ -104,7 +104,7 @@ import org.w3c.dom.NodeList;
  * Handles the network messages that arrives while
  * {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME in game}.
  */
-public final class InGameInputHandler extends InputHandler
+public final class InGameInputHandler extends ServerInputHandler
     implements NetworkConstants {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());

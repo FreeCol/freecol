@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  * 
  * @see PreGameController
  */
-public final class PreGameInputHandler extends InputHandler {
+public final class PreGameInputHandler extends ServerInputHandler {
 
     private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 

@@ -56,7 +56,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.InputHandler;
+import net.sf.freecol.server.control.ServerInputHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
