@@ -31,11 +31,11 @@ import org.w3c.dom.Element;
 
 
 /**
- * Provides common methods for input handlers.
+ * Provides common methods for input handlers on the client side.
  */
-public abstract class InputHandler implements MessageHandler {
+public abstract class ClientInputHandler implements MessageHandler {
 
-    private static final Logger logger = Logger.getLogger(InputHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
     /** The main FreeCol client object. */
     private final FreeColClient freeColClient;
@@ -46,7 +46,7 @@ public abstract class InputHandler implements MessageHandler {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public InputHandler(FreeColClient freeColClient) {
+    public ClientInputHandler(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
     }
 

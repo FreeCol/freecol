@@ -56,7 +56,7 @@ import org.w3c.dom.NodeList;
 /**
  * Handles the network messages that arrives before the game starts.
  */
-public final class PreGameInputHandler extends InputHandler {
+public final class PreGameInputHandler extends ClientInputHandler {
 
     private static final Logger logger = Logger.getLogger(PreGameInputHandler.class.getName());
 

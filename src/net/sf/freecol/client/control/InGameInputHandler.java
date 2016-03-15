@@ -97,7 +97,7 @@ import org.w3c.dom.NodeList;
  * sometimes not (other nation unit moves).  Hence the hack
  * GUI.invokeNowOrWait.
  */
-public final class InGameInputHandler extends InputHandler {
+public final class InGameInputHandler extends ClientInputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
