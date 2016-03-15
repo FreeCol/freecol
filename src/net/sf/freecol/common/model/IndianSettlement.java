@@ -183,8 +183,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
         }
 
-        if (!ownedUnits.contains(unit)) {
-            ownedUnits.add(unit);
+        synchronized (this.ownedUnits) {
+            if (!this.ownedUnits.contains(unit)) {
+                this.ownedUnits.add(unit);
+            }
         }
     }
 
@@ -194,7 +196,18 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The list of units native to this settlement.
      */
     public List<Unit> getOwnedUnits() {
-        return new ArrayList<>(ownedUnits);
+        synchronized (this.ownedUnits) {
+            return new ArrayList<>(this.ownedUnits);
+        }
+    }
+
+    /**
+     * Clear the owned units.
+     */
+    private void clearOwnedUnits() {
+        synchronized (this.ownedUnits) {
+            this.ownedUnits.clear();
+        }
     }
 
     /**
@@ -204,7 +217,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getOwnedUnitsIterator() {
-        return ownedUnits.iterator();
+        synchronized (this.ownedUnits) {
+            return this.ownedUnits.iterator();
+        }
     }
 
     /**
@@ -221,7 +236,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         if (unit == null) {
             throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
         }
-        return ownedUnits.remove(unit);
+        synchronized (this.ownedUnits) {
+            return this.ownedUnits.remove(unit);
+        }
     }
 
     /**
@@ -575,7 +592,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *     encoutered the player.
      */
     public Tension getAlarm(Player player) {
-        return alarm.get(player);
+        synchronized (this.alarm) {
+            return this.alarm.get(player);
+        }
     }
 
     /**
@@ -587,7 +606,18 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
-        alarm.put(player, newAlarm);
+        synchronized (this.alarm) {
+            this.alarm.put(player, newAlarm);
+        }
+    }
+
+    /**
+     * Clear the alarm levels.
+     */
+    private void clearAlarm() {
+        synchronized (this.alarm) {
+            this.alarm.clear();
+        }
     }
 
     /**
@@ -775,7 +805,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             unitType, spec.getMilitaryRoles());
 
         if (type.isMilitaryGoods()) { // Retain enough goods to fully arm
-            return sum(ownedUnits, u -> !militaryRoles.contains(u.getRole()),
+            return sum(getOwnedUnits(),
+                       u -> !militaryRoles.contains(u.getRole()),
                        u -> AbstractGoods.getCount(type, 
                            u.getGoodsDifference(militaryRoles.get(0), 1)));
         }
@@ -1434,12 +1465,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
                 xw.writeAttribute(PLAYER_TAG, p);
 
-                xw.writeAttribute(VALUE_TAG, alarm.get(p).getValue());
+                xw.writeAttribute(VALUE_TAG, getAlarm(p).getValue());
 
                 xw.writeEndElement();
             }
 
-            for (Unit unit : sortedCopy(ownedUnits)) {
+            for (Unit unit : sortedCopy(this.ownedUnits)) {
                 xw.writeStartElement(OWNED_UNITS_TAG);
 
                 xw.writeAttribute(ID_ATTRIBUTE_TAG, unit);
@@ -1506,9 +1537,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         contactLevels.clear();
-        alarm.clear();
+        clearAlarm();
         missionary = null;
-        ownedUnits.clear();
+        clearOwnedUnits();
 
         super.readChildren(xr);
 
@@ -1542,7 +1573,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 setContacted(player);
             }
             // end @compat
-            alarm.put(player, new Tension(xr.getAttribute(VALUE_TAG, 0)));
+            setAlarm(player, new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(ALARM_TAG);
 
         } else if (CONTACT_LEVEL_TAG.equals(tag)) {

@@ -132,9 +132,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return The amount of this type of goods in this container.
      */
     public int getGoodsCount(GoodsType type) {
-        synchronized (storedGoods) {
-            return (storedGoods.containsKey(type)) 
-                ? storedGoods.get(type)
+        synchronized (this.storedGoods) {
+            return (this.storedGoods.containsKey(type)) 
+                ? this.storedGoods.get(type)
                 : 0;
         }
     }
@@ -147,12 +147,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *     the beginning of the turn
      */
     public int getOldGoodsCount(GoodsType type) {
-        synchronized (storedGoods) {
-            synchronized (oldStoredGoods) {
-                return (oldStoredGoods.containsKey(type))
-                    ? oldStoredGoods.get(type)
-                    : 0;
-            }
+        synchronized (this.oldStoredGoods) {
+            return (this.oldStoredGoods.containsKey(type))
+                ? this.oldStoredGoods.get(type)
+                : 0;
         }
     }
 
@@ -184,12 +182,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 + newAmount + " goods of type " + type
                 + " in Location " + parent);
         } else if (newAmount == 0) {
-            synchronized (storedGoods) {
-                storedGoods.remove(type);
+            synchronized (this.storedGoods) {
+                this.storedGoods.remove(type);
             }
         } else {
-            synchronized (storedGoods) {
-                storedGoods.put(type, newAmount);
+            synchronized (this.storedGoods) {
+                this.storedGoods.put(type, newAmount);
             }
         }
         return true;
@@ -231,13 +229,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         Goods removedGoods;
         if (newAmount > 0) {
             removedGoods = new Goods(getGame(), null, type, amount);
-            synchronized (storedGoods) {
-                storedGoods.put(type, newAmount);
+            synchronized (this.storedGoods) {
+                this.storedGoods.put(type, newAmount);
             }
         } else {
             removedGoods = new Goods(getGame(), null, type, oldAmount);
-            synchronized (storedGoods) {
-                storedGoods.remove(type);
+            synchronized (this.storedGoods) {
+                this.storedGoods.remove(type);
             }
         }
         return removedGoods;
@@ -251,12 +249,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public void setAmount(GoodsType goodsType, int newAmount) {
         if (newAmount == 0) {
-            synchronized (storedGoods) {
-                storedGoods.remove(goodsType);
+            synchronized (this.storedGoods) {
+                this.storedGoods.remove(goodsType);
             }
         } else {
-            synchronized (storedGoods) {
-                storedGoods.put(goodsType, newAmount);
+            synchronized (this.storedGoods) {
+                this.storedGoods.put(goodsType, newAmount);
             }
         }
     }
@@ -265,8 +263,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Remove all goods.
      */
     public void removeAll() {
-        synchronized (storedGoods) {
-            storedGoods.clear();
+        synchronized (this.storedGoods) {
+            this.storedGoods.clear();
         }
     }
 
@@ -274,10 +272,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Clear both containers.
      */
     private void clearContainers() {
-        synchronized (storedGoods) {
-            storedGoods.clear();
-            synchronized (oldStoredGoods) {
-                oldStoredGoods.clear();
+        synchronized (this.storedGoods) {
+            this.storedGoods.clear();
+            synchronized (this.oldStoredGoods) {
+                this.oldStoredGoods.clear();
             }
         }
     }
@@ -289,15 +287,15 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param newAmount The threshold.
      */
     public void removeAbove(int newAmount) {
-        synchronized (storedGoods) {
+        synchronized (this.storedGoods) {
             if (newAmount <= 0) {
-                storedGoods.clear();
+                this.storedGoods.clear();
                 return;
             }
-            for (GoodsType goodsType : storedGoods.keySet()) {
+            for (GoodsType goodsType : this.storedGoods.keySet()) {
                 if (goodsType.isStorable() && !goodsType.limitIgnored()
-                    && storedGoods.get(goodsType) > newAmount) {
-                    setAmount(goodsType, newAmount);
+                    && this.storedGoods.get(goodsType) > newAmount) {
+                    this.storedGoods.put(goodsType, newAmount);
                 }
             }
         }
@@ -311,9 +309,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *     given amount.
      */
     public boolean hasReachedCapacity(int amount) {
-        synchronized (storedGoods) {
-            return any(storedGoods.keySet(), gt -> gt.isStorable()
-                && !gt.limitIgnored() && storedGoods.get(gt) > amount);
+        synchronized (this.storedGoods) {
+            return any(this.storedGoods.keySet(), gt -> gt.isStorable()
+                && !gt.limitIgnored() && this.storedGoods.get(gt) > amount);
         }
     }
 
@@ -324,8 +322,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return The amount of space taken by this containers goods.
      */
     public int getSpaceTaken() {
-        synchronized (storedGoods) {
-            return sum(storedGoods.values(),
+        synchronized (this.storedGoods) {
+            return sum(this.storedGoods.values(),
                 amount -> (amount % CARGO_SIZE == 0)
                     ? amount/CARGO_SIZE
                     : amount/CARGO_SIZE + 1);
@@ -352,9 +350,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public List<Goods> getGoods() {
         List<Goods> totalGoods = new ArrayList<>();
-        synchronized (storedGoods) {
-            for (GoodsType goodsType : storedGoods.keySet()) {
-                int amount = storedGoods.get(goodsType);
+        synchronized (this.storedGoods) {
+            for (GoodsType goodsType : this.storedGoods.keySet()) {
+                int amount = this.storedGoods.get(goodsType);
                 while (amount > 0) {
                     totalGoods.add(new Goods(getGame(), parent, goodsType,
                             ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
@@ -374,8 +372,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public List<Goods> getCompactGoods() {
         final Game game = getGame();
-        synchronized (storedGoods) {
-            return transform(storedGoods.entrySet(), e -> e.getValue() > 0,
+        synchronized (this.storedGoods) {
+            return transform(this.storedGoods.entrySet(), e -> e.getValue() > 0,
                 e -> new Goods(game, parent, e.getKey(), e.getValue()),
                 Collectors.toList());
         }
@@ -386,10 +384,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * stored goods.
      */
     public void saveState() {
-        synchronized (storedGoods) {
-            synchronized (oldStoredGoods) {
-                oldStoredGoods.clear();
-                oldStoredGoods.putAll(storedGoods);
+        synchronized (this.storedGoods) {
+            synchronized (this.oldStoredGoods) {
+                this.oldStoredGoods.clear();
+                this.oldStoredGoods.putAll(this.storedGoods);
             }
         }
     }
@@ -399,10 +397,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * old state.
      */
     public void restoreState() {
-        synchronized (storedGoods) {
-            synchronized (oldStoredGoods) {
-                storedGoods.clear();
-                storedGoods.putAll(oldStoredGoods);
+        synchronized (this.storedGoods) {
+            synchronized (this.oldStoredGoods) {
+                this.storedGoods.clear();
+                this.storedGoods.putAll(this.oldStoredGoods);
             }
         }
     }
@@ -485,9 +483,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         if (xw.validFor(getOwner())) {
 
-            writeStorage(xw, STORED_GOODS_TAG, storedGoods);
-
-            writeStorage(xw, OLD_STORED_GOODS_TAG, oldStoredGoods);
+            synchronized (this.storedGoods) {
+                writeStorage(xw, STORED_GOODS_TAG, this.storedGoods);
+                synchronized (this.oldStoredGoods) {
+                    writeStorage(xw, OLD_STORED_GOODS_TAG, this.oldStoredGoods);
+                }
+            }
         }
     }
 
@@ -539,10 +540,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         final String tag = xr.getLocalName();
 
         if (OLD_STORED_GOODS_TAG.equals(tag)) {
-            readStorage(xr, oldStoredGoods);
+            synchronized (this.oldStoredGoods) {
+                readStorage(xr, this.oldStoredGoods);
+            }
 
         } else if (STORED_GOODS_TAG.equals(tag)) {
-            readStorage(xr, storedGoods);
+            synchronized (this.storedGoods) {
+                readStorage(xr, this.storedGoods);
+            }
 
         } else {
             super.readChild(xr);

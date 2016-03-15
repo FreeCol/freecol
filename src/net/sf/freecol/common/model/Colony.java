@@ -2449,9 +2449,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
 
-    // Interface Location (from Settlement via GoodsLocation
-    //   via UnitLocation)
-    //   The unit list in UnitLocation is replaced in Colonies.
+    // Interface Location (from Settlement via GoodsLocation via UnitLocation)
+    //   UnitLocation.units is not used in Colony, but getUnitList is
+    //   faked to return the union of the units in the work locations.
+    //   This is a wart, and was probably a bad idea.
     // Inherits
     //   FreeColObject.getId
     //   Settlement.getTile
@@ -2524,7 +2525,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public List<Unit> getUnitList() {
-        ArrayList<Unit> units = new ArrayList<>();
+        List<Unit> units = new ArrayList<>();
         for (WorkLocation wl : getCurrentWorkLocations()) {
             units.addAll(wl.getUnitList());
         }

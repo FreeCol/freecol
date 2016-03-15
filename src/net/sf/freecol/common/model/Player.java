@@ -1961,8 +1961,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the player has the unit.
      */
     public boolean hasUnit(Unit unit) {
-        synchronized (units) {
-            return units.contains(unit);
+        synchronized (this.units) {
+            return this.units.contains(unit);
         }
     }
 
@@ -1972,8 +1972,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of the player <code>Unit</code>s.
      */
     public List<Unit> getUnits() {
-        synchronized (units) {
-            return new ArrayList<>(units);
+        synchronized (this.units) {
+            return new ArrayList<>(this.units);
         }
     }
 
@@ -1984,7 +1984,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The unit with the given name, or null if none found.
      */
     public Unit getUnitByName(String name) {
-        return find(units, u -> name.equals(u.getName()));
+        synchronized (this.units) {
+            return find(this.units, u -> name.equals(u.getName()));
+        }
     }
 
     /**
@@ -1994,8 +1996,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see Unit
      */
     public Iterator<Unit> getUnitIterator() {
-        synchronized (units) {
-            return units.iterator();
+        synchronized (this.units) {
+            return this.units.iterator();
         }
     }
 
@@ -2016,8 +2018,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (hasUnit(newUnit)) return false;
 
-        synchronized (units) {
-            return units.add(newUnit);
+        synchronized (this.units) {
+            return this.units.add(newUnit);
         }
     }
 
@@ -2033,8 +2035,8 @@ public class Player extends FreeColGameObject implements Nameable {
         nextActiveUnitIterator.remove(oldUnit);
         nextGoingToUnitIterator.remove(oldUnit);
 
-        synchronized (units) {
-            return units.remove(oldUnit);
+        synchronized (this.units) {
+            return this.units.remove(oldUnit);
         }
     }
 
@@ -2148,8 +2150,10 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return A copy of the list of <code>TradeRoute</code>s for this player.
      */
-    public synchronized final List<TradeRoute> getTradeRoutes() {
-        return new ArrayList<>(this.tradeRoutes);
+    public final List<TradeRoute> getTradeRoutes() {
+        synchronized (this.tradeRoutes) {
+            return new ArrayList<>(this.tradeRoutes);
+        }
     }
 
     /**
@@ -2157,8 +2161,10 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The trade route count.
      */
-    public synchronized final int getTradeRouteCount() {
-        return this.tradeRoutes.size();
+    public final int getTradeRouteCount() {
+        synchronized (this.tradeRoutes) {
+            return this.tradeRoutes.size();
+        }
     }
 
     /**
@@ -2168,9 +2174,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The most recently defined <code>TradeRoute</code>.
      */
-    public synchronized final TradeRoute getNewestTradeRoute() {
-        return (this.tradeRoutes.isEmpty()) ? null
-            : this.tradeRoutes.get(this.tradeRoutes.size()-1);
+    public final TradeRoute getNewestTradeRoute() {
+        synchronized (this.tradeRoutes) {
+            return (this.tradeRoutes.isEmpty()) ? null
+                : this.tradeRoutes.get(this.tradeRoutes.size()-1);
+        }
     }
 
     /**
@@ -2194,10 +2202,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param name The trade route name.
      * @param exclude An optional <code>TradeRoute</code> to exclude.
      */
-    public synchronized final TradeRoute getTradeRouteByName(final String name,
+    public final TradeRoute getTradeRouteByName(final String name,
         final TradeRoute exclude) {
-        return find(this.tradeRoutes,
-                    t -> t.getName().equals(name) && t != exclude);
+        synchronized (this.tradeRoutes) {
+            return find(this.tradeRoutes,
+                t -> t.getName().equals(name) && t != exclude);
+        }
     }
 
     /**
@@ -2207,11 +2217,23 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of units that were formally assigned to the trade route.
      */
     public final List<Unit> removeTradeRoute(TradeRoute tradeRoute) {
-        List<Unit> ret = (!this.tradeRoutes.remove(tradeRoute))
-            ? Collections.<Unit>emptyList()
-            : tradeRoute.getAssignedUnits();
+        List<Unit> ret;
+        synchronized (this.tradeRoutes) {
+            ret = (!this.tradeRoutes.remove(tradeRoute))
+                ? Collections.<Unit>emptyList()
+                : tradeRoute.getAssignedUnits();
+        }
         for (Unit u : ret) u.setTradeRoute(null);
         return ret;
+    }
+
+    /**
+     * Clear the trade routes.
+     */
+    private void clearTradeRoutes() {
+        synchronized (this.tradeRoutes) {
+            this.tradeRoutes.clear();
+        }
     }
 
     /**
@@ -2258,7 +2280,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The list of <code>Settlements</code> this player owns.
      */
     public List<Settlement> getSettlements() {
-        return settlements;
+        synchronized (this.settlements) {
+            return this.settlements;
+        }
     }
 
     /**
@@ -2267,7 +2291,20 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player has settlements.
      */
     public boolean hasSettlements() {
-        return !settlements.isEmpty();
+        synchronized (this.settlements) {
+            return !settlements.isEmpty();
+        }
+    }
+
+    /**
+     * Get the count of settlements.
+     *
+     * @return The number of settlements this player has.
+     */
+    private int getSettlementCount() {
+        synchronized (this.settlements) {
+            return this.settlements.size();
+        }
     }
 
     /**
@@ -2300,7 +2337,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Settlement</code>.
      */
     public boolean hasSettlement(Settlement settlement) {
-        return settlements.contains(settlement);
+        synchronized (this.settlements) {
+            return this.settlements.contains(settlement);
+        }
     }
 
     /**
@@ -2315,7 +2354,9 @@ public class Player extends FreeColGameObject implements Nameable {
             throw new IllegalStateException("Does not own: " + settlement);
         }
         if (hasSettlement(settlement)) return false;
-        settlements.add(settlement);
+        synchronized (this.settlements) {
+            this.settlements.add(settlement);
+        }
         return true;
     }
 
@@ -2326,7 +2367,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the settlements container changed.
      */
     public boolean removeSettlement(Settlement settlement) {
-        return settlements.remove(settlement);
+        synchronized (this.settlements) {
+            return this.settlements.remove(settlement);
+        }
     }
 
     /**
@@ -2428,8 +2471,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getModelMessages() {
-        synchronized (modelMessages) {
-            return new ArrayList<>(modelMessages);
+        synchronized (this.modelMessages) {
+            return new ArrayList<>(this.modelMessages);
         }
     }
 
@@ -2440,8 +2483,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Player</code>.
      */
     public List<ModelMessage> getNewModelMessages() {
-        synchronized (modelMessages) {
-            return transform(modelMessages, m -> !m.hasBeenDisplayed(),
+        synchronized (this.modelMessages) {
+            return transform(this.modelMessages, m -> !m.hasBeenDisplayed(),
                 Collectors.toList());
         }
     }
@@ -2452,8 +2495,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param modelMessage The <code>ModelMessage</code> to add.
      */
     public void addModelMessage(ModelMessage modelMessage) {
-        synchronized (modelMessages) {
-            modelMessages.add(modelMessage);
+        synchronized (this.modelMessages) {
+            this.modelMessages.add(modelMessage);
         }
     }
 
@@ -2465,12 +2508,12 @@ public class Player extends FreeColGameObject implements Nameable {
      *     to enforce.
      */
     public void refilterModelMessages(OptionGroup options) {
-        synchronized (modelMessages) {
-            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-            while (messageIterator.hasNext()) {
-                ModelMessage message = messageIterator.next();
+        synchronized (this.modelMessages) {
+            Iterator<ModelMessage> mi = this.modelMessages.iterator();
+            while (mi.hasNext()) {
+                ModelMessage message = mi.next();
                 String id = message.getMessageType().getOptionName();
-                if (!options.getBoolean(id)) messageIterator.remove();
+                if (!options.getBoolean(id)) mi.remove();
             }
         }
     }
@@ -2479,11 +2522,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes all undisplayed model messages for this player.
      */
     public void removeDisplayedModelMessages() {
-        synchronized (modelMessages) {
-            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-            while (messageIterator.hasNext()) {
-                ModelMessage message = messageIterator.next();
-                if (message.hasBeenDisplayed()) messageIterator.remove();
+        synchronized (this.modelMessages) {
+            Iterator<ModelMessage> mi = this.modelMessages.iterator();
+            while (mi.hasNext()) {
+                ModelMessage message = mi.next();
+                if (message.hasBeenDisplayed()) mi.remove();
             }
         }
     }
@@ -2492,8 +2535,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes all the model messages for this player.
      */
     public void clearModelMessages() {
-        synchronized (modelMessages) {
-            modelMessages.clear();
+        synchronized (this.modelMessages) {
+            this.modelMessages.clear();
         }
     }
 
@@ -2508,13 +2551,13 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void divertModelMessages(FreeColGameObject source,
                                     FreeColGameObject newSource) {
-        synchronized (modelMessages) {
-            Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-            while (messageIterator.hasNext()) {
-                ModelMessage message = messageIterator.next();
+        synchronized (this.modelMessages) {
+            Iterator<ModelMessage> mi = this.modelMessages.iterator();
+            while (mi.hasNext()) {
+                ModelMessage message = mi.next();
                 if (Utils.equals(message.getSourceId(), source.getId())) {
                     if (newSource == null) {
-                        messageIterator.remove();
+                        mi.remove();
                     } else {
                         message.divert(newSource);
                     }
@@ -2555,6 +2598,15 @@ public class Player extends FreeColGameObject implements Nameable {
     public void addHistory(HistoryEvent event) {
         synchronized (this.history) {
             this.history.add(event);
+        }
+    }
+
+    /**
+     * Clear the history events.
+     */
+    private void clearHistory() {
+        synchronized (this.history) {
+            this.history.clear();
         }
     }
 
@@ -3452,11 +3504,12 @@ public class Player extends FreeColGameObject implements Nameable {
             values.add(1.0);
         }
         // Penalize certain problems more in the initial colonies.
-        double development = Math.min(LOW_SETTLEMENT_NUMBER, settlements.size())
+        double development = Math.min(LOW_SETTLEMENT_NUMBER,
+                                      getSettlementCount())
                 / (double)LOW_SETTLEMENT_NUMBER;
         int portCount = getNumberOfPorts();
 
-        if (tile.isPolar() && settlements.size() < LOW_SETTLEMENT_NUMBER) {
+        if (tile.isPolar() && getSettlementCount() < LOW_SETTLEMENT_NUMBER) {
             values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                        NoValueType.POLAR.getDouble());
             return values;
@@ -3470,7 +3523,7 @@ public class Player extends FreeColGameObject implements Nameable {
                        NoValueType.TERRAIN.getDouble());
             return values;
         case RUMOUR:
-            if (settlements.isEmpty()) {
+            if (!hasSettlements()) {
                 values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                            NoValueType.RUMOUR.getDouble());
                 return values;
@@ -3971,11 +4024,11 @@ public class Player extends FreeColGameObject implements Nameable {
                 xw.writeEndElement();
             }
 
-            for (HistoryEvent event : history) { // Already in order
+            for (HistoryEvent event : getHistory()) { // Already in order
                 event.toXML(xw);
             }
 
-            for (TradeRoute route : sortedCopy(tradeRoutes)) {
+            for (TradeRoute route : sortedCopy(getTradeRoutes())) {
                 route.toXML(xw);
             }
 
@@ -4116,8 +4169,8 @@ public class Player extends FreeColGameObject implements Nameable {
         offeredFathers.clear();
         europe = null;
         monarch = null;
-        history.clear();
-        tradeRoutes.clear();
+        clearHistory();
+        clearTradeRoutes();
         clearModelMessages();
         lastSales = null;
         highSeas = null;

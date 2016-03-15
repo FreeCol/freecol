@@ -150,6 +150,24 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
 
+    /**
+     * Internal addition of a unit to this location.
+     *
+     * @param u The <code>Unit</code> to add.
+     */
+    private void addUnit(Unit u) {
+        if (u == null) return;
+        if (u.getLocation() != this) {
+            logger.warning("Fixing bogus unit location for " + u.getId()
+                + ", expected " + this
+                + " but found " + u.getLocation());
+            u.setLocationNoUpdate(this);
+        }
+        synchronized (this.units) {
+            this.units.add(u);
+        }
+    }
+
     // Some useful utilities, marked final as they will work as long
     // as working implementations of getUnitList(), getUnitCount(),
     // getUnitCapacity() and getSettlement() are provided.
@@ -249,8 +267,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     public List<FreeColGameObject> getDisposeList() {
         List<FreeColGameObject> objects = new ArrayList<>();
-        synchronized (units) {
-            for (Unit u : units) objects.addAll(u.getDisposeList());
+        synchronized (this.units) {
+            for (Unit u : this.units) objects.addAll(u.getDisposeList());
         }
         objects.addAll(super.getDisposeList());
         return objects;
@@ -261,8 +279,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public void disposeResources() {
-        synchronized (units) {
-            units.clear();
+        synchronized (this.units) {
+            this.units.clear();
         }
         super.disposeResources();
     }
@@ -307,11 +325,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             if (contains(unit)) {
                 return true;
             } else if (canAdd(unit)) {
-                synchronized (units) {
-                    if (!units.add(unit)) return false;
-                    unit.setLocationNoUpdate(this);
-                    return true;
+                synchronized (this.units) {
+                    if (!this.units.add(unit)) return false;
                 }
+                unit.setLocationNoUpdate(this);
+                return true;
             }
         } else if (locatable instanceof Goods) {
             // dumping goods is a valid action
@@ -333,11 +351,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
-            synchronized (units) {
-                if (!units.remove(unit)) return false;
-                unit.setLocationNoUpdate(null);
-                return true;
+            synchronized (this.units) {
+                if (!this.units.remove(unit)) return false;
             }
+            unit.setLocationNoUpdate(null);
+            return true;
         } else {
             logger.warning("Tried to remove non-Unit " + locatable
                            + " from UnitLocation: " + getId());
@@ -351,8 +369,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     public boolean contains(Locatable locatable) {
         if (!(locatable instanceof Unit)) return false;
-        synchronized (units) {
-            return units.contains(locatable);
+        synchronized (this.units) {
+            return this.units.contains(locatable);
         }
     }
 
@@ -369,8 +387,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public int getUnitCount() {
-        synchronized (units) {
-            return units.size();
+        synchronized (this.units) {
+            return this.units.size();
         }
     }
 
@@ -379,8 +397,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public List<Unit> getUnitList() {
-        synchronized (units) {
-            return new ArrayList<>(units);
+        synchronized (this.units) {
+            return new ArrayList<>(this.units);
         }
     }
 
@@ -451,8 +469,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param u The <code>Unit</code> to move to the front.
      */
     public void moveToFront(Unit u) {
-        synchronized (units) {
-            if (units.remove(u)) units.add(0, u);
+        synchronized (this.units) {
+            if (this.units.remove(u)) this.units.add(0, u);
         }
     }
 
@@ -460,8 +478,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * Clear the units from this container.
      */
     protected void clearUnitList() {
-        synchronized (units) {
-            units.clear();
+        synchronized (this.units) {
+            this.units.clear();
         }
     }
 
@@ -536,8 +554,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        synchronized (units) {
-            for (Unit unit : units) {
+        synchronized (this.units) {
+            // Do *not* use getUnitList here, because Colony.getUnitList lies!
+            for (Unit unit : this.units) {
                 if (unit.getLocation() != this) {
                     logger.warning("UnitLocation contains unit " + unit
                         + " with bogus location " + unit.getLocation()
@@ -568,16 +587,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         final String tag = xr.getLocalName();
 
         if (Unit.getTagName().equals(tag)) {
-            Unit u = xr.readFreeColGameObject(getGame(), Unit.class);
-            if (u.getLocation() != this) {
-                logger.warning("Fixing bogus unit location for " + u.getId()
-                    + ", expected " + this
-                    + " but found " + u.getLocation());
-                u.setLocationNoUpdate(this);
-            }
-            if (u != null) synchronized (units) {
-                units.add(u);
-            }
+            addUnit(xr.readFreeColGameObject(getGame(), Unit.class));
 
         } else {
             super.readChild(xr);
