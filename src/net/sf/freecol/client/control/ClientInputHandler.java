@@ -19,6 +19,10 @@
 
 package net.sf.freecol.client.control;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -27,6 +31,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.NetworkRequestHandler;
 
 import org.w3c.dom.Element;
 
@@ -39,6 +44,13 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
 
+    /**
+     * The handler map provides named handlers for network
+     * requests.  Each handler deals with a given request type.
+     */
+    private final Map<String, NetworkRequestHandler> handlerMap
+        = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
+
 
     /**
      * The constructor to use.
@@ -47,28 +59,41 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      */
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
+
+        register(Connection.DISCONNECT_TAG,
+            (Connection c, Element e) -> disconnect(e));
     }
 
 
-    /**
-     * Deals with incoming messages that have just been received.
-     *
-     * @param connection The <code>Connection</code> the message was
-     *     received on.
-     * @param element The root <code>Element</code> of the message.
-     * @return The reply.
+   /**
+     * Register a network request handler.
+     * 
+     * @param name The handler name.
+     * @param handler The <code>NetworkRequestHandler</code> to register.
      */
-    @Override
-    public abstract Element handle(Connection connection, Element element);
+    protected final void register(String name, NetworkRequestHandler handler) {
+        this.handlerMap.put(name, handler);
+    }
+
+    /**
+     * Unregister a network request handler.
+     * 
+     * @param name The handler name.
+     * @param handler The <code>NetworkRequestHandler</code> to unregister.
+     * @return True if the supplied handler was actually removed.
+     */
+    protected final boolean unregister(String name, NetworkRequestHandler handler) {
+        return this.handlerMap.remove(name, handler);
+    }
 
 
     // Useful handlers
 
     /**
-     * Handles a "disconnect"-message.
+     * Handle a "disconnect"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     protected Element disconnect(Element element) {
@@ -86,15 +111,29 @@ public abstract class ClientInputHandler extends FreeColClientHolder
         return null;
     }
 
+
+    // Implement MessageHandler
+
     /**
-     * Handles a message of unknown type.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *                holds all the information.
-     * @return Null.
+     * {@inheritDoc}
      */
-    protected Element unknown(Element element) {
-        logger.warning("Unknown message type: " + element.getTagName());
-        return null;
+    public Element handle(Connection connection, Element element) {
+        if (element == null) return null;
+        final String tag = element.getTagName();
+        NetworkRequestHandler handler = handlerMap.get(tag);
+        Element reply = null;
+        if (handler == null) {
+            logger.warning("Client ignore: " + tag);
+        } else {
+            try {
+                reply = handler.handle(connection, element);
+                logger.log(Level.FINEST, "Client ok: " + tag
+                    + " to " + ((reply == null) ? "null" : reply.getTagName()));
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Client fail: " + tag, ex);
+                connection.reconnect();
+            }
+        }
+        return reply;
     }
 }

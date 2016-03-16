@@ -120,6 +120,77 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     public InGameInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
+
+        register(Connection.DISCONNECT_TAG,
+            (Connection c, Element e) -> disconnect(e));
+        register("addObject",
+            (Connection c, Element e) -> addObject(e));
+        register(AddPlayerMessage.TAG,
+            (Connection c, Element e) -> addPlayer(e));
+        register("animateAttack",
+            (Connection c, Element e) -> animateAttack(e));
+        register("animateMove",
+            (Connection c, Element e) -> animateMove(e));
+        register("chat",
+            (Connection c, Element e) -> chat(e));
+        register("chooseFoundingFather",
+            (Connection c, Element e) -> chooseFoundingFather(e));
+        register("closeMenus",
+            (Connection c, Element e) -> closeMenus());
+        register("diplomacy",
+            (Connection c, Element e) -> diplomacy(e));
+        register(ErrorMessage.TAG,
+            (Connection c, Element e) -> error(e));
+        register("featureChange",
+            (Connection c, Element e) -> featureChange(e));
+        register("firstContact",
+            (Connection c, Element e) -> firstContact(e));
+        register("fountainOfYouth",
+            (Connection c, Element e) -> fountainOfYouth(e));
+        register("gameEnded",
+            (Connection c, Element e) -> gameEnded(e));
+        register(GoodsForSaleMessage.TAG,
+            (Connection c, Element e) -> goodsForSale(e));
+        register(HighScoreMessage.TAG,
+            (Connection c, Element e) -> highScore(e));
+        register(InciteMessage.TAG,
+            (Connection c, Element e) -> incite(e));
+        register("indianDemand",
+            (Connection c, Element e) -> indianDemand(e));
+        register("lootCargo",
+            (Connection c, Element e) -> lootCargo(e));
+        register("monarchAction",
+            (Connection c, Element e) -> monarchAction(e));
+        register(MultipleMessage.TAG,
+            (Connection c, Element e) -> multiple(c, e));
+        register(NationSummaryMessage.TAG,
+            (Connection c, Element e) -> nationSummary(e));
+        register("newLandName",
+            (Connection c, Element e) -> newLandName(e));
+        register("newRegionName",
+            (Connection c, Element e) -> newRegionName(e));
+        register("newTurn",
+            (Connection c, Element e) -> newTurn(e));
+        register("newTradeRoute",
+            (Connection c, Element e) -> newTradeRoute(e));
+        register(Connection.RECONNECT_TAG,
+            (Connection c, Element e) -> reconnect());
+        register("remove",
+            (Connection c, Element e) -> remove(e));
+        register(ScoutSpeakToChiefMessage.TAG,
+            (Connection c, Element e) -> scoutSpeakToChief(e));
+        register("setAI",
+            (Connection c, Element e) -> setAI(e));
+        register("setCurrentPlayer",
+            (Connection c, Element e) -> setCurrentPlayer(e));
+        register("setDead",
+            (Connection c, Element e) -> setDead(e));
+        register("setStance",
+            (Connection c, Element e) -> setStance(e));
+        register(SpySettlementMessage.TAG,
+            (Connection c, Element e) -> spySettlement(e));
+        register(UpdateMessage.TAG,
+            (Connection c, Element e) -> update(e));
     }
 
 
@@ -202,101 +273,15 @@ public final class InGameInputHandler extends ClientInputHandler {
     }
 
 
-    // Override InputHandler
+    // Override ClientInputHandler
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Element handle(Connection connection, Element element) {
-        if (element == null) {
-            throw new RuntimeException("Received empty (null) message!");
-        }
-
-        Element reply;
-        final String tag = element.getTagName();
-        switch (tag) {
-        case Connection.DISCONNECT_TAG:
-            reply = disconnect(element); break; // Inherited
-        case "addObject":
-            reply = addObject(element); break;
-        case AddPlayerMessage.TAG:
-            reply = addPlayer(element); break;
-        case "animateAttack":
-            reply = animateAttack(element); break;
-        case "animateMove":
-            reply = animateMove(element); break;
-        case "chat":
-            reply = chat(element); break;
-        case "chooseFoundingFather":
-            reply = chooseFoundingFather(element); break;
-        case "closeMenus":
-            reply = closeMenus(); break;
-        case "diplomacy":
-            reply = diplomacy(element); break;
-        case ErrorMessage.TAG:
-            reply = error(element); break;
-        case "featureChange":
-            reply = featureChange(element); break;
-        case "firstContact":
-            reply = firstContact(element); break;
-        case "fountainOfYouth":
-            reply = fountainOfYouth(element); break;
-        case "gameEnded":
-            reply = gameEnded(element); break;
-        case GoodsForSaleMessage.TAG:
-            reply = goodsForSale(element); break;
-        case HighScoreMessage.TAG:
-            reply = highScore(element); break;
-        case InciteMessage.TAG:
-            reply = incite(element); break;
-        case "indianDemand":
-            reply = indianDemand(element); break;
-        case "lootCargo":
-            reply = lootCargo(element); break;
-        case "monarchAction":
-            reply = monarchAction(element); break;
-        case MultipleMessage.TAG:
-            reply = multiple(connection, element); break;
-        case NationSummaryMessage.TAG:
-            reply = nationSummary(element); break;
-        case "newLandName":
-            reply = newLandName(element); break;
-        case "newRegionName":
-            reply = newRegionName(element); break;
-        case "newTurn":
-            reply = newTurn(element); break;
-        case "newTradeRoute":
-            reply = newTradeRoute(element); break;
-        case Connection.RECONNECT_TAG:
-            reply = reconnect(element); break;
-        case "remove":
-            reply = remove(element); break;
-        case ScoutSpeakToChiefMessage.TAG:
-            reply = scoutSpeakToChief(element); break;
-        case "setAI":
-            reply = setAI(element); break;
-        case "setCurrentPlayer":
-            reply = setCurrentPlayer(element); break;
-        case "setDead":
-            reply = setDead(element); break;
-        case "setStance":
-            reply = setStance(element); break;
-        case SpySettlementMessage.TAG:
-            reply = spySettlement(element); break;
-        case UpdateMessage.TAG:
-            reply = update(element); break;
-
-        // Never returned
-        case AssignTradeRouteMessage.TAG:
-        case DeleteTradeRouteMessage.TAG:
-        case LoginMessage.TAG:
-        default:
-            logger.warning("Unsupported message type: " + tag);
-            return null;
-        }
-        logger.log(Level.FINEST, "Client handled: " + tag
-            + " with: " + ((reply == null) ? "null" : reply.getTagName()));
+        if (element == null) return null;
+        Element reply = super.handle(connection, element);
 
         // If there is a "flush" attribute present, encourage the client
         // to display any new messages.
@@ -804,8 +789,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element highScore(Element element) {
         final Game game = getGame();
-
-        HighScoreMessage message
+        final HighScoreMessage message
             = new HighScoreMessage(game, element);
         invokeLater(() -> { igc().displayHighScores(message.getKey(),
                                                     message.getScores()); });
@@ -952,8 +936,8 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "newTurn"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
+     * @param element The element (root element in a DOM-parsed XML
+     *     tree) that holds all the information.
      * @return Null.
      */
     private Element newTurn(Element element) {
@@ -970,13 +954,9 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "reconnect"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
      * @return Null.
      */
-    private Element reconnect(@SuppressWarnings("unused") Element element) {
-        logger.finest("Entered reconnect.");
-
+    private Element reconnect() {
         invokeLater(reconnectRunnable);
         return null;
     }

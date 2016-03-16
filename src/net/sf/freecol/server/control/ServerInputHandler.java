@@ -43,15 +43,16 @@ import org.w3c.dom.Element;
  * 
  * @see Controller
  */
-public abstract class ServerInputHandler extends FreeColServerHolder implements MessageHandler {
+public abstract class ServerInputHandler extends FreeColServerHolder
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ServerInputHandler.class.getName());
 
     private static final String LOGOUT_TAG = "logout";
 
     /**
-     * The handler map provides named handlers for network requests. Each
-     * handler deals with a given request type.
+     * The handler map provides named handlers for network
+     * requests.  Each handler deals with a given request type.
      */
     private final Map<String, NetworkRequestHandler> handlerMap
         = Collections.synchronizedMap(new HashMap<String, NetworkRequestHandler>());
@@ -135,28 +136,22 @@ public abstract class ServerInputHandler extends FreeColServerHolder implements 
     // Implement MessageHandler
 
     /**
-     * Deals with incoming messages that have just been received.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *     on.
-     * @param element The root element of the message.
-     * @return The reply.
+     * {@inheritDoc}
      */
-    @Override
     public final Element handle(Connection connection, Element element) {
         if (element == null) return null;
-        final String tagName = element.getTagName();
-        NetworkRequestHandler handler = handlerMap.get(tagName);
+        final String tag = element.getTagName();
+        NetworkRequestHandler handler = handlerMap.get(tag);
         if (handler == null) {
             // Should we return an error here? The old handler returned null.
-            logger.warning("No handler installed for " + tagName);
+            logger.warning("No handler installed for " + tag);
         } else {
             try {
-                logger.log(Level.FINEST, "Handling " + tagName);
+                logger.log(Level.FINEST, "Handling " + tag);
                 return handler.handle(connection, element);
             } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
-                logger.log(Level.WARNING, "Handler failed", e);
+                logger.log(Level.WARNING, "Handler failure for " + tag, e);
                 connection.reconnect();
             }
         }

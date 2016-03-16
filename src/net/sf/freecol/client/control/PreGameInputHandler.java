@@ -68,61 +68,43 @@ public final class PreGameInputHandler extends ClientInputHandler {
      */
     public PreGameInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
+
+        register(AddPlayerMessage.TAG,
+            (Connection c, Element e) -> addPlayer(e));
+        register(ChatMessage.TAG,
+            (Connection c, Element e) -> chat(e));
+        register(ErrorMessage.TAG,
+            (Connection c, Element e) -> error(e));
+        register(LoginMessage.TAG,
+            (Connection c, Element e) -> login(e));
+        register("logout",
+            (Connection c, Element e) -> logout(e));
+        register(MultipleMessage.TAG,
+            (Connection c, Element e) -> multiple(c, e));
+        register("playerReady",
+            (Connection c, Element e) -> playerReady(e));
+        register("removePlayer",
+            (Connection c, Element e) -> removePlayer(e));
+        register("setAvailable",
+            (Connection c, Element e) -> setAvailable(e));
+        register("startGame",
+            (Connection c, Element e) -> startGame(e));
+        register("updateColor",
+            (Connection c, Element e) -> updateColor(e));
+        register(UpdateMessage.TAG,
+            (Connection c, Element e) -> update(e));
+        register(UpdateGameOptionsMessage.TAG,
+            (Connection c, Element e) -> updateGameOptions(e));
+        register(UpdateMapGeneratorOptionsMessage.TAG,
+            (Connection c, Element e) -> updateMapGeneratorOptions(e));
+        register("updateNation",
+            (Connection c, Element e) -> updateNation(e));
+        register("updateNationType",
+            (Connection c, Element e) -> updateNationType(e));
     }
 
 
-    /**
-     * Deals with incoming messages that have just been received.
-     *
-     * @param connection The <code>Connection</code> the message was
-     *     received on.
-     * @param element The root <code>Element</code> of the message.
-     * @return The reply.
-     */
-    @Override
-    public synchronized Element handle(Connection connection,
-                                       Element element) {
-        final String tag = (element == null) ? "(null)" : element.getTagName();
-        switch (tag) {
-        case AddPlayerMessage.TAG:
-            return addPlayer(element);
-        case ChatMessage.TAG:
-            return chat(element);
-        case Connection.DISCONNECT_TAG:
-            return disconnect(element);
-        case ErrorMessage.TAG:
-            return error(element);
-        case LoginMessage.TAG:
-            return login(element);
-        case "logout":
-            return logout(element);
-        case MultipleMessage.TAG:
-            return multiple(connection, element);
-        case "playerReady":
-            return playerReady(element);
-        case "removePlayer":
-            return removePlayer(element);
-        case "setAvailable":
-            return setAvailable(element);
-        case "startGame":
-            return startGame(element);
-        case "updateColor":
-            return updateColor(element);
-        case UpdateMessage.TAG:
-            return update(element);
-        case UpdateGameOptionsMessage.TAG:
-            return updateGameOptions(element);
-        case UpdateMapGeneratorOptionsMessage.TAG:
-            return updateMapGeneratorOptions(element);
-        case "updateNation":
-            return updateNation(element);
-        case "updateNationType":
-            return updateNationType(element);
-        default:
-            break;
-        }
-        return unknown(element);
-    }
+    // Individual handlers
 
     /**
      * Handles an "addPlayer"-message.
@@ -132,8 +114,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element addPlayer(Element element) {
-        // The constructor interns the new players directly.
-        new AddPlayerMessage(getGame(), element);
+        // The message constructor interns the new players directly.
+        new AddPlayerMessage(getFreeColClient().getGame(), element);
+
         getGUI().refreshPlayersTable();
         return null;
     }
@@ -146,8 +129,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element chat(Element element)  {
-        Game game = getGame();
-        ChatMessage chatMessage = new ChatMessage(game, element);
+        final Game game = getGame();
+        final ChatMessage chatMessage = new ChatMessage(game, element);
+
         getGUI().displayChatMessage(chatMessage.getPlayer(game),
                                     chatMessage.getMessage(),
                                     chatMessage.isPrivate());
@@ -163,6 +147,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      */
     private Element error(Element element)  {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
+
         getGUI().showErrorMessage(errorMessage.getMessageId(),
                                   errorMessage.getMessage());
         return null;
