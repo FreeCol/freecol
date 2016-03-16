@@ -143,6 +143,7 @@ public class SwingGUI extends GUI {
      */
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
         super(freeColClient, scaleFactor);
+        
         graphicsDevice = getGoodGraphicsDevice();
         logger.info("GUI constructed using scale factor " + scaleFactor);
     }
@@ -198,7 +199,7 @@ public class SwingGUI extends GUI {
     @Override
     public void initializeInGame() {
         canvas.initializeInGame();
-        enableMapControls(freeColClient.getClientOptions()
+        enableMapControls(getClientOptions()
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
     }
 
@@ -256,7 +257,7 @@ public class SwingGUI extends GUI {
     public void showOpeningVideo(final String userMsg) {
         canvas.closeMenus();
         final Video video = ResourceManager.getVideo("video.opening");
-        boolean muteAudio = !freeColClient.getSoundController().canPlaySound();
+        boolean muteAudio = !getSoundController().canPlaySound();
         final VideoComponent vp = new VideoComponent(video, muteAudio);
 
         final class AbortListener implements ActionListener, KeyListener, MouseListener, VideoListener {
@@ -367,7 +368,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void startGUI(final Dimension desiredWindowSize) {
-        final ClientOptions opts = freeColClient.getClientOptions();
+        final ClientOptions opts = getClientOptions();
 
         // Work around a Java 2D bug that seems to be X11 specific.
         // According to:
@@ -401,13 +402,13 @@ public class SwingGUI extends GUI {
                 logger.info("Set " + pmoffscreen + " to: " + newValue);
             });
 
-        this.mapViewer = new MapViewer(freeColClient);
-        this.canvas = new Canvas(freeColClient, graphicsDevice, this,
+        this.mapViewer = new MapViewer(getFreeColClient());
+        this.canvas = new Canvas(getFreeColClient(), graphicsDevice, this,
                                  desiredWindowSize, mapViewer);
-        this.tileViewer = new TileViewer(freeColClient);
+        this.tileViewer = new TileViewer(getFreeColClient());
 
         // Now that there is a canvas, prepare for language changes.
-        LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
+        LanguageOption o = (LanguageOption)getClientOptions()
             .getOption(ClientOptions.LANGUAGE);
         o.addPropertyChangeListener((PropertyChangeEvent e) -> {
                 Language language = (Language)e.getNewValue();
@@ -529,7 +530,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void resetMenuBar() {
-        freeColClient.updateActions();
+        getFreeColClient().updateActions();
         canvas.resetMenuBar();
     }
 
@@ -575,7 +576,7 @@ public class SwingGUI extends GUI {
         boolean result = mapViewer.setActiveUnit(unit);
         updateMapControls();
         updateMenuBar();
-        if (unit != null && !freeColClient.getMyPlayer().owns(unit)) {
+        if (unit != null && !getMyPlayer().owns(unit)) {
             canvas.refresh();
         }
         return result;
@@ -589,7 +590,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public void updateMenuBar() {
-        freeColClient.updateActions();
+        getFreeColClient().updateActions();
         canvas.updateMenuBar();
     }
 
@@ -604,8 +605,7 @@ public class SwingGUI extends GUI {
      */
     public boolean requireFocus(Tile tile) {
         // Account for the ALWAYS_CENTER client option.
-        boolean required = freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.ALWAYS_CENTER);
+        boolean required = getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
         if ((required && tile != getFocus()) || !mapViewer.onScreen(tile)) {
             setFocusImmediately(tile);
             return true;
@@ -627,7 +627,7 @@ public class SwingGUI extends GUI {
                                   Tile attackerTile, Tile defenderTile,
                                   boolean success) {
         requireFocus(attackerTile);
-        Animations.unitAttack(freeColClient, attacker, defender,
+        Animations.unitAttack(getFreeColClient(), attacker, defender,
                               attackerTile, defenderTile, success);
     }
 
@@ -641,7 +641,7 @@ public class SwingGUI extends GUI {
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         requireFocus(srcTile);
-        Animations.unitMove(freeColClient, unit, srcTile, dstTile);
+        Animations.unitMove(getFreeColClient(), unit, srcTile, dstTile);
     }
 
 
@@ -658,20 +658,19 @@ public class SwingGUI extends GUI {
     public void enableMapControls(boolean enable) {
         // Always instantiate in game.
         if (enable && mapControls == null) {
-            String className = freeColClient.getClientOptions()
-                .getString(ClientOptions.MAP_CONTROLS);
+            String className = getClientOptions().getString(ClientOptions.MAP_CONTROLS);
             try {
                 final String panelName = "net.sf.freecol.client.gui.panel."
                     + lastPart(className, ".");
                 Class<?> controls = Class.forName(panelName);
                 mapControls = (MapControls)controls
                     .getConstructor(FreeColClient.class)
-                    .newInstance(freeColClient);
+                    .newInstance(getFreeColClient());
                 logger.info("Instantiated " + panelName);
             } catch (Exception e) {
                 logger.log(Level.INFO, "Fallback to CornerMapControls from "
                     + className, e);
-                mapControls = new CornerMapControls(freeColClient);
+                mapControls = new CornerMapControls(getFreeColClient());
             }
             if (mapControls != null) {
                 mapControls.addToComponent(canvas);
@@ -1046,7 +1045,7 @@ public class SwingGUI extends GUI {
                 updateMapControls();
             }
         }
-        if (!freeColClient.isInGame()) showMainPanel(null);
+        if (!getFreeColClient().isInGame()) showMainPanel(null);
     }
 
     @Override
@@ -1093,8 +1092,7 @@ public class SwingGUI extends GUI {
      */
     @Override
     public OptionGroup showDifficultyDialog() {
-        Game game = freeColClient.getGame();
-        Specification spec = game.getSpecification();
+        final Specification spec = getSpecification();
         return canvas.showDifficultyDialog(spec,
             spec.getDifficultyOptionGroup(), false);
     }

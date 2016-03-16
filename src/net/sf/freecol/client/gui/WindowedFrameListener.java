@@ -23,14 +23,15 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 
 
 /**
  * The WindowListener for the WindowedFrame class.
  */
-public final class WindowedFrameListener implements WindowListener {
+public final class WindowedFrameListener extends FreeColClientHolder
+    implements WindowListener {
 
-    private final FreeColClient freeColClient;
 
     /**
      * Constructs this WindowListener.
@@ -38,7 +39,7 @@ public final class WindowedFrameListener implements WindowListener {
      * @param freeColClient The <code>FreeColClient</code> to notify.
      */
     public WindowedFrameListener(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
     }
     
     /**
@@ -66,10 +67,10 @@ public final class WindowedFrameListener implements WindowListener {
      */
     @Override
     public void windowClosing(WindowEvent event) {
-        if (freeColClient.isInGame()) {
-            freeColClient.askToQuit();
+        if (getFreeColClient().isInGame()) {
+            getFreeColClient().askToQuit();
         } else {
-            freeColClient.quit();
+            getFreeColClient().quit();
         }
     }
     

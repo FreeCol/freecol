@@ -63,21 +63,11 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
 
     /**
-     * Get the GUI.
-     *
-     * @return The GUI.
-     */
-    private GUI getGUI() {
-        return freeColClient.getGUI();
-    }
-
-    /**
      * This method can be called to make sure the map is loaded
      * There is no point executing mouse events if the map is not loaded
      */
     private Map getMap() {
-        return (freeColClient.getGame() == null) ? null
-            : freeColClient.getGame().getMap();
+        return (getGame() == null) ? null : getGame().getMap();
     }
 
     /**
@@ -91,7 +81,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                          Point startPoint, Point endPoint) {
         if (startPoint == null || endPoint == null
             || startPoint.distance(endPoint) == 0
-            || freeColClient.getMapEditorController() == null)
+            || getFreeColClient().getMapEditorController() == null)
             return;
 
         Graphics2D graphics = (Graphics2D)component.getGraphics();
@@ -180,7 +170,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             || getGUI().getFocus() == null) return;
         final JComponent component = (JComponent)e.getSource();
         final MapEditorController controller
-            = freeColClient.getMapEditorController();
+            = getFreeColClient().getMapEditorController();
         final boolean isTransformActive = controller.getMapTransform() != null;
 
         endPoint = e.getPoint();

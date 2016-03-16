@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -42,15 +43,9 @@ import net.sf.freecol.common.option.OptionGroup;
 /**
  * The controller that will be used before the game starts.
  */
-public final class PreGameController {
+public final class PreGameController extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
-
-    /** The main client. */
-    private final FreeColClient freeColClient;
-
-    /** The GUI to display on. */
-    private final GUI gui;
 
 
     /**
@@ -59,8 +54,7 @@ public final class PreGameController {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public PreGameController(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        super(freeColClient);
     }
 
 
@@ -70,7 +64,7 @@ public final class PreGameController {
      * @param message The text of the message.
      */
     public void chat(String message) {
-        freeColClient.askServer().chat(freeColClient.getMyPlayer(), message);
+        askServer().chat(getMyPlayer(), message);
     }
 
     /**
@@ -80,9 +74,9 @@ public final class PreGameController {
      *     start the game.
      */
     public void setReady(boolean ready) {
-        freeColClient.getMyPlayer().setReady(ready);
+        getMyPlayer().setReady(ready);
         
-        freeColClient.askServer().setReady(ready);
+        askServer().setReady(ready);
     }
 
     /**
@@ -90,12 +84,12 @@ public final class PreGameController {
      * if all players are ready to start the game.
      */
     public void requestLaunch() {
-        if (freeColClient.getGame().allPlayersReadyToLaunch()) {
-            gui.showStatusPanel(Messages.message("status.startingGame"));
-            freeColClient.askServer().requestLaunch();
+        if (getGame().allPlayersReadyToLaunch()) {
+            getGUI().showStatusPanel(Messages.message("status.startingGame"));
+            askServer().requestLaunch();
 
         } else {
-            gui.showErrorMessage("server.notAllReady");
+            getGUI().showErrorMessage("server.notAllReady");
         }
     }
 
@@ -106,10 +100,9 @@ public final class PreGameController {
      * @param state The <code>NationState</code> value to set.
      */
     public void setAvailable(Nation nation, NationState state) {
-        freeColClient.getGame().getNationOptions()
-            .getNations().put(nation, state);
+        getGame().getNationOptions().getNations().put(nation, state);
 
-        freeColClient.askServer().setAvailable(nation, state);
+        askServer().setAvailable(nation, state);
     }
 
     /**
@@ -121,7 +114,7 @@ public final class PreGameController {
     public void setColor(Nation nation, Color color) {
         nation.setColor(color);
 
-        freeColClient.askServer().setColor(nation, color);
+        askServer().setColor(nation, color);
     }
 
     /**
@@ -130,9 +123,9 @@ public final class PreGameController {
      * @param nation Which <code>Nation</code> this player wishes to set.
      */
     public void setNation(Nation nation) {
-        freeColClient.getMyPlayer().setNation(nation);
+        getMyPlayer().setNation(nation);
         
-        freeColClient.askServer().setNation(nation);
+        askServer().setNation(nation);
     }
 
     /**
@@ -141,9 +134,9 @@ public final class PreGameController {
      * @param nationType Which nation type this player wishes to set.
      */
     public void setNationType(NationType nationType) {
-        freeColClient.getMyPlayer().changeNationType(nationType);
+        getMyPlayer().changeNationType(nationType);
 
-        freeColClient.askServer().setNationType(nationType);
+        askServer().setNationType(nationType);
     }
 
     /**
@@ -153,22 +146,22 @@ public final class PreGameController {
      *     a debug run and should be skipping turns.
      */
     public boolean startGame() {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
+        final GUI gui = getGUI();
         gui.closeMainPanel();
         gui.closeMenus();
         gui.closeStatusPanel();
         // Stop the long introduction sound
-        freeColClient.getSoundController().playSound(null);
-        freeColClient.getSoundController()
-            .playSound("sound.intro." + player.getNationId());
-        freeColClient.setMessageHandler(freeColClient.getInGameInputHandler());
-        freeColClient.setInGame(true);
+        getSoundController().playSound(null);
+        getSoundController().playSound("sound.intro." + player.getNationId());
+        getFreeColClient().setMessageHandler(getFreeColClient().getInGameInputHandler());
+        getFreeColClient().setInGame(true);
         gui.initializeInGame();
 
-        Game game = freeColClient.getGame();
+        Game game = getGame();
         Tile entryTile = (player.getEntryLocation() == null) ? null
             : player.getEntryLocation().getTile();
-        if (freeColClient.currentPlayerIsMyPlayer()) {
+        if (currentPlayerIsMyPlayer()) {
             Unit activeUnit = game.getInitialActiveUnit();
             if (activeUnit != null) {
                 player.resetIterators();
@@ -185,14 +178,14 @@ public final class PreGameController {
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && FreeColDebugger.getDebugRunTurns() > 0) {
-            freeColClient.skipTurns(FreeColDebugger.getDebugRunTurns());
+            getFreeColClient().skipTurns(FreeColDebugger.getDebugRunTurns());
             return false;
         }
 
-        if (freeColClient.getGame().getTurn().getNumber() == 1) {
+        if (getGame().getTurn().getNumber() == 1) {
             // force view of tutorial message
             player.addStartGameMessage();
-            freeColClient.getInGameController().nextModelMessage();
+            igc().nextModelMessage();
         }
         return true;
     }
@@ -202,11 +195,10 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
     public void updateGameOptions() {
-        OptionGroup gameOptions = freeColClient.getGame().getGameOptions();
-        freeColClient.getGame().getSpecification()
-            .clean("update game options (client initiated)");
+        OptionGroup gameOptions = getGame().getGameOptions();
+        getSpecification().clean("update game options (client initiated)");
 
-        freeColClient.askServer().updateGameOptions(gameOptions);
+        askServer().updateGameOptions(gameOptions);
     }
 
     /**
@@ -214,8 +206,8 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
     public void updateMapGeneratorOptions() {
-        OptionGroup mgo = freeColClient.getGame().getMapGeneratorOptions();
+        OptionGroup mgo = getGame().getMapGeneratorOptions();
 
-        freeColClient.askServer().updateMapGeneratorOptions(mgo);
+        askServer().updateMapGeneratorOptions(mgo);
     }
 }

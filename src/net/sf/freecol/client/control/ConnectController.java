@@ -33,7 +33,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol; 
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient; 
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.LoadingSavegameInfo;
@@ -67,13 +68,9 @@ import net.sf.freecol.server.FreeColServer.GameState;
  * {@link PreGameInputHandler} will be set as the input handler when a
  * successful login has been completed,
  */
-public final class ConnectController {
+public final class ConnectController extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(ConnectController.class.getName());
-
-    private final FreeColClient freeColClient;
-
-    private final GUI gui;
 
 
     /**
@@ -82,8 +79,7 @@ public final class ConnectController {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ConnectController(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        super(freeColClient);
     }
 
 
@@ -93,11 +89,12 @@ public final class ConnectController {
     private void finish() {
         ResourceManager.setScenarioMapping(null);
 
-        if (!freeColClient.isHeadless()) freeColClient.setInGame(false);
-        freeColClient.setGame(null);
-        freeColClient.setMyPlayer(null);
-        freeColClient.askServer().reset();
-        freeColClient.setLoggedIn(false);
+        final FreeColClient fcc = getFreeColClient();
+        if (!fcc.isHeadless()) fcc.setInGame(false);
+        fcc.setGame(null);
+        fcc.setMyPlayer(null);
+        askServer().reset();
+        fcc.setLoggedIn(false);
     }
 
     /**
@@ -107,11 +104,11 @@ public final class ConnectController {
      * @return True if there should be no blocking server remaining.
      */
     private boolean unblockServer(int port) {
-        FreeColServer freeColServer = freeColClient.getFreeColServer();
+        FreeColServer freeColServer = getFreeColServer();
         if (freeColServer != null
             && freeColServer.getServer().getPort() == port) {
-            if (gui.confirm("stopServer.text", "stopServer.yes",
-                            "stopServer.no")) {
+            if (getGUI().confirm("stopServer.text", "stopServer.yes",
+                                 "stopServer.no")) {
                 freeColServer.getController().shutdown();
             } else {
                 return false;
@@ -137,12 +134,12 @@ public final class ConnectController {
                                               spec, port, null);
         } catch (IOException e) {
             freeColServer = null;
-            gui.showErrorMessage("server.initialize");
+            getGUI().showErrorMessage("server.initialize");
             logger.log(Level.WARNING, "Could not start server.", e);
         }
         if (publicServer && freeColServer != null
             && !freeColServer.getPublicServer()) {
-            gui.showErrorMessage("server.noRouteToServer");
+            getGUI().showErrorMessage("server.noRouteToServer");
         }
         return freeColServer;
     }
@@ -169,9 +166,10 @@ public final class ConnectController {
             Connection c = new Connection(host, port, null,
                                           FreeCol.CLIENT_THREAD)
         ) {
-            reply = c.ask(freeColClient.getGame(), query, replyTag);
+            reply = c.ask(getGame(), query, replyTag);
         } catch (IOException ioe) {
-            gui.showErrorMessage("server.couldNotConnect", ioe.getMessage());
+            getGUI().showErrorMessage("server.couldNotConnect",
+                                      ioe.getMessage());
             logger.log(Level.WARNING, "Could not connect to " + host
                 + ":" + port, ioe);
             return null;
@@ -185,7 +183,7 @@ public final class ConnectController {
             if (errorId == null && em.getMessageId() != null) {
                 errorId = em.getMessageId();
             }
-            gui.showErrorMessage(errorId, em.getMessage());
+            getGUI().showErrorMessage(errorId, em.getMessage());
         } else {
             throw new IllegalStateException("Bogus tag: " + reply.getType());
         }
@@ -204,18 +202,19 @@ public final class ConnectController {
      * @return True if the login succeeds.
      */
     public boolean login(String user, String host, int port) {
-        freeColClient.setMapEditor(false);
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
  
         try {
-            freeColClient.askServer().disconnect();
+            askServer().disconnect();
         } catch (IOException ioe) {} // Ignore            
 
         // Establish the full connection here
         String message = null;
         try {
-            if (!freeColClient.askServer()
-                .connect(FreeCol.CLIENT_THREAD + user, host, port,
-                         freeColClient.getPreGameInputHandler())) {
+            if (!askServer().connect(FreeCol.CLIENT_THREAD + user,
+                                     host, port,
+                                     fcc.getPreGameInputHandler())) {
                 message = "repeated failure";
             }
         } catch (Exception ex) {
@@ -223,7 +222,7 @@ public final class ConnectController {
             if (message == null) message = "connection exception";
         }
         if (message != null) {
-            gui.showErrorMessage("server.couldNotConnect", message);
+            getGUI().showErrorMessage("server.couldNotConnect", message);
             return false;
         }
         logger.info("Connected to " + host + ":" + port);
@@ -232,11 +231,11 @@ public final class ConnectController {
         // and return the game with the player inside.
         // The work is done in PGIH.login().
         Game game;
-        if (!freeColClient.askServer().login(user, FreeCol.getVersion())
-            || (game = freeColClient.getGame()) == null) {
-            gui.showErrorMessage("server.couldNotLogin");
+        if (!askServer().login(user, FreeCol.getVersion())
+            || (game = getGame()) == null) {
+            getGUI().showErrorMessage("server.couldNotLogin");
             return false;
-        } else if (freeColClient.getMyPlayer() == null) {
+        } else if (getMyPlayer() == null) {
             return false; // Error handled in PGIH.login
         }
         return true;
@@ -279,9 +278,10 @@ public final class ConnectController {
      */
     public boolean startMultiplayerGame(Specification specification,
                                         boolean publicServer, int port) {
-        freeColClient.setMapEditor(false);
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
 
-        if (freeColClient.isLoggedIn()) logout(true);
+        if (fcc.isLoggedIn()) logout(true);
 
         if (!unblockServer(port)) return false;
 
@@ -289,7 +289,7 @@ public final class ConnectController {
                                                   specification, port);
         if (freeColServer == null) return false;
 
-        freeColClient.setFreeColServer(freeColServer);
+        fcc.setFreeColServer(freeColServer);
         return joinMultiplayerGame(freeColServer.getHost(),
                                    freeColServer.getPort());
     }
@@ -302,9 +302,10 @@ public final class ConnectController {
      * @return True if the game starts successfully.
      */
     public boolean joinMultiplayerGame(String host, int port) {
-        freeColClient.setMapEditor(false);
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
 
-        if (freeColClient.isLoggedIn()) logout(true);
+        if (fcc.isLoggedIn()) logout(true);
 
         DOMMessage msg = ask(host, port, new GameStateMessage(),
                              GameStateMessage.TAG, "client.noState");
@@ -316,15 +317,14 @@ public final class ConnectController {
         switch (state) {
         case STARTING_GAME:
             if (!login(FreeCol.getName(), host, port)) return false;
-            freeColClient.setLoggedIn(true);
-            gui.showStartGamePanel(freeColClient.getGame(),
-                                   freeColClient.getMyPlayer(), false);
+            fcc.setLoggedIn(true);
+            getGUI().showStartGamePanel(getGame(), getMyPlayer(), false);
             break;
 
         case IN_GAME:
             // Disable this check if you need to debug a multiplayer client.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                gui.showErrorMessage("client.debugConnect");
+                getGUI().showErrorMessage("client.debugConnect");
                 return false;
             }
             msg = ask(host, port, new VacantPlayersMessage(),
@@ -334,7 +334,7 @@ public final class ConnectController {
                 : null;
             if (names == null || names.isEmpty()) return false;
 
-            String choice = gui.getChoice(null,
+            String choice = getGUI().getChoice(null,
                 Messages.message("client.choicePlayer"),
                 "cancel", names.stream()
                     .map(n -> new ChoiceItem<>(Messages.message(StringTemplate
@@ -344,11 +344,11 @@ public final class ConnectController {
             if (choice == null) return false; // User cancelled
 
             if (!login(Messages.getRulerName(choice), host, port)) return false;
-            freeColClient.setLoggedIn(true);
+            fcc.setLoggedIn(true);
             break;
 
         case ENDING_GAME: default:
-            gui.showErrorMessage("client.ending");
+            getGUI().showErrorMessage("client.ending");
             return false;
         }
         return true;
@@ -364,9 +364,10 @@ public final class ConnectController {
      * @return True if the game starts successfully.
      */
     public boolean startSinglePlayerGame(Specification spec, boolean skip) {
-        freeColClient.setMapEditor(false);
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
 
-        if (freeColClient.isLoggedIn()) logout(true);
+        if (fcc.isLoggedIn()) logout(true);
 
         if (!unblockServer(FreeCol.getServerPort())) return false;
 
@@ -375,28 +376,26 @@ public final class ConnectController {
         //
         // ATM we only allow mods in single player games.
         // FIXME: allow in stand alone server starts?
-        List<FreeColModFile> mods = freeColClient.getClientOptions()
-            .getActiveMods();
-        spec.loadMods(mods);    
+        List<FreeColModFile> mods = getClientOptions().getActiveMods();
+        spec.loadMods(mods);
         Messages.loadActiveModMessageBundle(mods, FreeCol.getLocale());
         FreeColServer freeColServer = startServer(false, true, spec, -1);
         if (freeColServer == null) return false;
 
-        freeColClient.setFreeColServer(freeColServer);
-        freeColClient.setSinglePlayer(true);
+        fcc.setFreeColServer(freeColServer);
+        fcc.setSinglePlayer(true);
         if (!login(FreeCol.getName(), freeColServer.getHost(),
                    freeColServer.getPort())) return false;
 
-        final ClientOptions co = freeColClient.getClientOptions();
+        final ClientOptions co = getClientOptions();
         if (co.getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
             FreeColServer.removeAutosaves(co.getText(ClientOptions.AUTO_SAVE_PREFIX));
         }
-        freeColClient.getPreGameController().setReady(true);
+        fcc.getPreGameController().setReady(true);
         if (skip) {
-            freeColClient.getPreGameController().requestLaunch();
+            fcc.getPreGameController().requestLaunch();
         } else {
-            gui.showStartGamePanel(freeColClient.getGame(),
-                                   freeColClient.getMyPlayer(), true);
+            getGUI().showStartGamePanel(getGame(), getMyPlayer(), true);
         }
         return true;
     }
@@ -409,7 +408,8 @@ public final class ConnectController {
      * @return True if the game starts successully.
      */
     public boolean startSavedGame(File file, final String userMsg) {
-        freeColClient.setMapEditor(false);
+        final FreeColClient fcc = getFreeColClient();
+        fcc.setMapEditor(false);
 
         class ErrorJob implements Runnable {
             private final String message;
@@ -427,16 +427,16 @@ public final class ConnectController {
             
             @Override
             public void run() {
-                gui.closeMenus();
+                getGUI().closeMenus();
                 if (this.template != null) {
-                    gui.showErrorMessage(template);
+                    getGUI().showErrorMessage(template);
                 } else {
-                    gui.showErrorMessage(message);
+                    getGUI().showErrorMessage(message);
                 }
             }
         }
 
-        final ClientOptions options = freeColClient.getClientOptions();
+        final ClientOptions options = getClientOptions();
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         FreeColSavegameFile fis = null;
@@ -494,10 +494,10 @@ public final class ConnectController {
             || (!defaultSinglePlayer
                 && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
         if (show) {
-            if (!gui.showLoadingSavegameDialog(defaultPublicServer,
-                                               defaultSinglePlayer))
+            if (!getGUI().showLoadingSavegameDialog(defaultPublicServer,
+                                                    defaultSinglePlayer))
                 return false;
-            LoadingSavegameInfo lsd = gui.getLoadingSavegameInfo();
+            LoadingSavegameInfo lsd = getGUI().getLoadingSavegameInfo();
             singlePlayer = lsd.isSinglePlayer();
             name = lsd.getServerName();
             port = lsd.getPort();
@@ -509,7 +509,7 @@ public final class ConnectController {
         Messages.loadActiveModMessageBundle(options.getActiveMods(),
                                             FreeCol.getLocale());
         if (!unblockServer(port)) return false;
-        gui.showStatusPanel(Messages.message("status.loadingGame"));
+        getGUI().showStatusPanel(Messages.message("status.loadingGame"));
 
         final File theFile = file;
         Runnable loadGameJob = () -> {
@@ -520,18 +520,18 @@ public final class ConnectController {
                     = new FreeColSavegameFile(theFile);
                 freeColServer = new FreeColServer(saveGame,
                     (Specification)null, port, name);
-                freeColClient.setFreeColServer(freeColServer);
+                fcc.setFreeColServer(freeColServer);
                 // Server might have bounced to another port.
-                freeColClient.setSinglePlayer(singlePlayer);
-                freeColClient.getInGameController().setGameConnected();
+                fcc.setSinglePlayer(singlePlayer);
+                igc().setGameConnected();
                 if (login(FreeCol.getName(), freeColServer.getHost(), 
-                        freeColServer.getPort())) {
+                          freeColServer.getPort())) {
                     SwingUtilities.invokeLater(() -> {
                             ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
                             if (userMsg != null) {
-                                gui.showInformationMessage(userMsg);
+                                getGUI().showInformationMessage(userMsg);
                             }
-                            gui.closeStatusPanel();
+                            getGUI().closeStatusPanel();
                         });
                     return; // Success!
                 }
@@ -553,18 +553,17 @@ public final class ConnectController {
             }                
             if (err != null) {
                 // If this is a debug run, fail hard.
-                if (freeColClient.isHeadless()
-                    || FreeColDebugger.getDebugRunTurns() >= 0) {
+                if (fcc.isHeadless() || FreeColDebugger.getDebugRunTurns() >= 0) {
                     FreeCol.fatal(Messages.message(err));
                 }
                 SwingUtilities.invokeLater(() -> {
-                        gui.closeMainPanel();
-                        gui.showMainPanel(null);
+                        getGUI().closeMainPanel();
+                        getGUI().showMainPanel(null);
                     });
                 SwingUtilities.invokeLater(new ErrorJob(err));
             }
         };
-        freeColClient.setWork(loadGameJob);
+        fcc.setWork(loadGameJob);
         return true;
     }
 
@@ -574,13 +573,13 @@ public final class ConnectController {
      * @return True if the reconnection succeeds.
      */
     public boolean reconnect() {
-        final String host = freeColClient.askServer().getHost();
-        final int port = freeColClient.askServer().getPort();
+        final String host = askServer().getHost();
+        final int port = askServer().getPort();
 
-        gui.removeInGameComponents();
+        getGUI().removeInGameComponents();
         logout(true);
         if (!login(FreeCol.getName(), host, port)) return false;
-        freeColClient.getInGameController().nextModelMessage();
+        igc().nextModelMessage();
         return true;
     }
 
@@ -592,11 +591,9 @@ public final class ConnectController {
      *     out then we don't need to confirm with a logout message.
      */
     public void logout(boolean notifyServer) {
-        if (notifyServer) {
-            freeColClient.askServer().logout();
-        }
+        if (notifyServer) askServer().logout();
         try {
-            freeColClient.askServer().disconnect();
+            askServer().disconnect();
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Disconnection error", ioe);
         }
@@ -612,13 +609,13 @@ public final class ConnectController {
      *     out then we don't need to confirm with a logout message.
      */
     public void quitGame(boolean stopServer, boolean notifyServer) {
-        final FreeColServer server = freeColClient.getFreeColServer();
+        final FreeColServer server = getFreeColServer();
         if (stopServer && server != null) {
             server.getController().shutdown();
-            freeColClient.setFreeColServer(null);
+            getFreeColClient().setFreeColServer(null);
             finish();
         } else {
-            if (freeColClient.isLoggedIn()) logout(notifyServer);
+            if (getFreeColClient().isLoggedIn()) logout(notifyServer);
         }
     }
 

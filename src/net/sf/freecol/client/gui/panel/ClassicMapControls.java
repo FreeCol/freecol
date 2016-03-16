@@ -95,10 +95,7 @@ public final class ClassicMapControls extends MapControls {
      */
     @Override
     public void addToComponent(Canvas component) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
-            return;
-        }
+        if (getGame() == null || getGame().getMap() == null) return;
         int width = (int) panel.getPreferredSize().getWidth();
         panel.setSize(width, component.getHeight());
         panel.setLocation(component.getWidth() - width, 0);

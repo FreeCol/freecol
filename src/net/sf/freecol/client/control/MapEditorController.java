@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
@@ -53,15 +54,11 @@ import net.sf.freecol.server.model.ServerPlayer;
 /**
  * The map editor controller.
  */
-public final class MapEditorController {
+public final class MapEditorController extends FreeColClientHolder {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
-
-    private final FreeColClient freeColClient;
-
-    private final GUI gui;
 
     public interface IMapTransform {
 
@@ -86,8 +83,7 @@ public final class MapEditorController {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public MapEditorController(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
-        this.gui = freeColClient.getGUI();
+        super(freeColClient);
     }
 
 
@@ -98,25 +94,26 @@ public final class MapEditorController {
      * command line, but we should do better.
      */
     public void startMapEditor() {
+        final FreeColClient fcc = getFreeColClient();
         try {
             Specification specification = getDefaultSpecification();
-            freeColClient.setMapEditor(true);
+            fcc.setMapEditor(true);
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
-            freeColClient.setFreeColServer(freeColServer);
+            fcc.setFreeColServer(freeColServer);
             Game game = freeColServer.getGame();
             requireNativeNations(game);
-            freeColClient.setGame(game);
-            freeColClient.setMyPlayer(null);
-            freeColClient.getSoundController().playSound(null);
+            fcc.setGame(game);
+            fcc.setMyPlayer(null);
+            getSoundController().playSound(null);
 
-            gui.closeMainPanel();
-            gui.closeMenus();
-            freeColClient.setInGame(true);
-            gui.changeViewMode(GUI.VIEW_TERRAIN_MODE);
-            gui.startMapEditorGUI();
+            getGUI().closeMainPanel();
+            getGUI().closeMenus();
+            fcc.setInGame(true);
+            getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
+            getGUI().startMapEditorGUI();
         } catch (IOException e) {
-            gui.showErrorMessage("server.initialize");
+            getGUI().showErrorMessage("server.initialize");
             return;
         }
     }
@@ -139,7 +136,7 @@ public final class MapEditorController {
      */
     public void setMapTransform(IMapTransform mt) {
         currentMapTransform = mt;
-        gui.updateMapControls();
+        getGUI().updateMapControls();
     }
 
     /**
@@ -171,19 +168,19 @@ public final class MapEditorController {
      * @see MapGeneratorOptions
      */
     public void newMap() {
-        final Game game = freeColClient.getGame();
-        final Specification spec = game.getSpecification();
+        final Game game = getGame();
+        final Specification spec = getSpecification();
 
-        gui.removeInGameComponents();
-        OptionGroup mgo = gui.showMapGeneratorOptionsDialog(true);
+        getGUI().removeInGameComponents();
+        OptionGroup mgo = getGUI().showMapGeneratorOptionsDialog(true);
         if (mgo == null) return;
         game.setMapGeneratorOptions(mgo);
-        Map map = freeColClient.getFreeColServer().getMapGenerator()
+        Map map = getFreeColServer().getMapGenerator()
             .createMap(new LogBuilder(-1));
         requireNativeNations(game);
-        gui.setFocus(game.getMap().getTile(1,1));
-        gui.updateMenuBar();
-        gui.refresh();
+        getGUI().setFocus(game.getMap().getTile(1,1));
+        getGUI().updateMenuBar();
+        getGUI().refresh();
     }
 
     /**
@@ -191,8 +188,8 @@ public final class MapEditorController {
      * and saves the game.
      */
     public void saveGame() {
-        File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
-                                       FreeColDirectories.MAP_FILE_NAME);
+        File file = getGUI().showSaveDialog(FreeColDirectories.getSaveDirectory(),
+                                            FreeColDirectories.MAP_FILE_NAME);
         if (file != null) saveGame(file);
     }
 
@@ -202,27 +199,26 @@ public final class MapEditorController {
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
-        final Game game = freeColClient.getGame();
+        final Game game = getGame();
         Map map = game.getMap();
         map.resetContiguity();
         map.resetHighSeasCount();
         map.resetLayers();
 
-        gui.showStatusPanel(Messages.message("status.savingGame"));
+        getGUI().showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
                 @Override
                 public void run() {
                     try {
-                        BufferedImage thumb = gui.createMiniMapThumbNail();
-                        freeColClient.getFreeColServer()
-                            .saveMapEditorGame(file, thumb);
+                        BufferedImage thumb = getGUI().createMiniMapThumbNail();
+                        getFreeColServer().saveMapEditorGame(file, thumb);
                         SwingUtilities.invokeLater(() -> {
-                                gui.closeStatusPanel();
-                                gui.requestFocusInWindow();
+                                getGUI().closeStatusPanel();
+                                getGUI().requestFocusInWindow();
                             });
                     } catch (IOException e) {
                         SwingUtilities.invokeLater(() -> {
-                                gui.showErrorMessage(FreeCol.badSave(file));
+                                getGUI().showErrorMessage(FreeCol.badSave(file));
                             });
                     }
                 }
@@ -235,7 +231,7 @@ public final class MapEditorController {
      * game.
      */
     public void loadGame() {
-        File file = gui.showLoadSaveFileDialog();
+        File file = getGUI().showLoadSaveFileDialog();
         if (file != null) loadGame(file);
     }
 
@@ -263,7 +259,7 @@ public final class MapEditorController {
     public void loadGame(File file) {
         final File theFile = file;
 
-        freeColClient.setMapEditor(true);
+        getFreeColClient().setMapEditor(true);
 
         class ErrorJob implements Runnable {
             private final StringTemplate template;
@@ -274,26 +270,26 @@ public final class MapEditorController {
 
             @Override
             public void run() {
-                gui.closeMenus();
-                gui.showErrorMessage(template);
+                getGUI().closeMenus();
+                getGUI().showErrorMessage(template);
             }
         }
 
-        gui.showStatusPanel(Messages.message("status.loadingGame"));
+        getGUI().showStatusPanel(Messages.message("status.loadingGame"));
 
         Runnable loadGameJob = () -> {
-            FreeColServer freeColServer = freeColClient.getFreeColServer();
+            FreeColServer freeColServer = getFreeColServer();
             try {
                 Specification spec = getDefaultSpecification();
                 Game game = FreeColServer.readGame(new FreeColSavegameFile(theFile),
                                                    spec, freeColServer);
-                freeColClient.setGame(game);
+                getFreeColClient().setGame(game);
                 requireNativeNations(game);
                 SwingUtilities.invokeLater(() -> {
-                        gui.closeStatusPanel();
-                        gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
-                        gui.updateMenuBar();
-                        gui.refresh();
+                        getGUI().closeStatusPanel();
+                        getGUI().setFocus(getGame().getMap().getTile(1,1));
+                        getGUI().updateMenuBar();
+                        getGUI().refresh();
                     });
             } catch (FreeColException e) {
                 reloadMainPanel();
@@ -309,15 +305,14 @@ public final class MapEditorController {
                 SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(theFile)));
             }
         };
-        freeColClient.setWork(loadGameJob);
+        getFreeColClient().setWork(loadGameJob);
     }
 
     private void reloadMainPanel () {
         SwingUtilities.invokeLater(() -> {
-                gui.closeMainPanel();
-                gui.showMainPanel(null);
-                freeColClient.getSoundController()
-                    .playSound("sound.intro.general");
+                getGUI().closeMainPanel();
+                getGUI().showMainPanel(null);
+                getSoundController().playSound("sound.intro.general");
             });
     }
 }

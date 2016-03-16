@@ -22,6 +22,7 @@ package net.sf.freecol.client.control;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
@@ -33,12 +34,10 @@ import org.w3c.dom.Element;
 /**
  * Provides common methods for input handlers on the client side.
  */
-public abstract class ClientInputHandler implements MessageHandler {
+public abstract class ClientInputHandler extends FreeColClientHolder
+    implements MessageHandler {
 
     private static final Logger logger = Logger.getLogger(ClientInputHandler.class.getName());
-
-    /** The main FreeCol client object. */
-    private final FreeColClient freeColClient;
 
 
     /**
@@ -47,36 +46,9 @@ public abstract class ClientInputHandler implements MessageHandler {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ClientInputHandler(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
     }
 
-
-    /**
-     * Gets the main freecol client object.
-     *
-     * @return The main freecol client object.
-     */
-    protected FreeColClient getFreeColClient() {
-        return freeColClient;
-    }
-
-    /**
-     * Gets the GUI.
-     *
-     * @return The GUI.
-     */
-    protected GUI getGUI() {
-        return freeColClient.getGUI();
-    }
-
-    /**
-     * Gets the Game.
-     *
-     * @return The <code>Game</code>.
-     */
-    protected Game getGame() {
-        return freeColClient.getGame();
-    }
 
     /**
      * Deals with incoming messages that have just been received.
@@ -103,7 +75,7 @@ public abstract class ClientInputHandler implements MessageHandler {
         // Updating the GUI should always be done in the EDT:
         javax.swing.SwingUtilities.invokeLater(() -> {
                 if (getGUI().containsInGameComponents()) {
-                    if (freeColClient.getFreeColServer() == null) {
+                    if (getFreeColServer() == null) {
                         getGUI().returnToTitle();
                     } else {
                         getGUI().removeInGameComponents();

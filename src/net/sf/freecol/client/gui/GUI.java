@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.panel.MiniMap;
@@ -81,7 +82,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * The API and common reusable functionality for the overall GUI.
  */
-public class GUI {
+public class GUI extends FreeColClientHolder {
 
     protected static final Logger logger = Logger.getLogger(GUI.class.getName());
 
@@ -94,9 +95,6 @@ public class GUI {
     public static final int MOVE_UNITS_MODE = 0;
     public static final int VIEW_TERRAIN_MODE = 1;
 
-    /** The client for the game. */
-    protected final FreeColClient freeColClient;
-
     /** An image library to use. */
     protected final ImageLibrary imageLibrary;
 
@@ -108,19 +106,16 @@ public class GUI {
      * @param scaleFactor The scale factor for the GUI.
      */
     public GUI(FreeColClient freeColClient, float scaleFactor) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
+
         this.imageLibrary = new ImageLibrary(scaleFactor);
     }
 
 
     // Simple accessors
 
-    protected InGameController igc() {
-        return freeColClient.getInGameController();
-    }
-
     public ImageLibrary getImageLibrary() {
-        return imageLibrary;
+        return this.imageLibrary;
     }
 
     public boolean isWindowed() {
@@ -225,9 +220,9 @@ public class GUI {
      * @return The created image.
      */
     public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(freeColClient);
+        MiniMap miniMap = new MiniMap(getFreeColClient());
         miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
-        Game game = freeColClient.getGame();
+        Game game = getGame();
         int width = game.getMap().getWidth() * MiniMap.MAX_TILE_SIZE
             + MiniMap.MAX_TILE_SIZE / 2;
         int height = game.getMap().getHeight() * MiniMap.MAX_TILE_SIZE / 4;
@@ -647,8 +642,7 @@ public class GUI {
      * @return True to attack, false to abort.
      */
     public boolean confirmPreCombat(Unit attacker, Tile tile) {
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
+        if (getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
             Settlement settlement = tile.getSettlement();
             // Don't tell the player how a settlement is defended!
             FreeColGameObject defender = (settlement != null) ? settlement
@@ -676,7 +670,7 @@ public class GUI {
      * @return The chosen action, tribute, attack or cancel.
      */
     public ArmedUnitSettlementAction getArmedUnitSettlementChoice(Settlement settlement) {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
 
         List<ChoiceItem<ArmedUnitSettlementAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("armedUnitSettlement.tribute"),
@@ -916,7 +910,7 @@ public class GUI {
      */
     public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement settlement,
         String numberString) {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
         final Player owner = settlement.getOwner();
 
         StringTemplate template = StringTemplate.label("")
@@ -1123,7 +1117,7 @@ public class GUI {
      */
     void showSettlement(Settlement settlement) {
         if (settlement instanceof Colony) {
-            if (settlement.getOwner().equals(freeColClient.getMyPlayer())) {
+            if (settlement.getOwner().equals(getMyPlayer())) {
                 showColonyPanel((Colony)settlement, null);
             } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 showForeignColony(settlement);
@@ -1454,7 +1448,7 @@ public class GUI {
      * @param sound The sound resource to play, or if null stop playing.
      */
     public void playSound(String sound) {
-        freeColClient.getSoundController().playSound(sound);
+        getSoundController().playSound(sound);
     }
 
     /**
@@ -1462,10 +1456,8 @@ public class GUI {
      * option for it is turned on.
      */
     private void alertSound() {
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            freeColClient.getSoundController()
-                .playSound("sound.event.alertSound");
+        if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
+            playSound("sound.event.alertSound");
         }
     }
 
@@ -1477,7 +1469,7 @@ public class GUI {
      * @return The text.
      */
     public String getSoundMixerLabelText() {
-        return freeColClient.getSoundController().getSoundMixerLabelText();
+        return getSoundController().getSoundMixerLabelText();
     }
 
     // invoke method forwarding

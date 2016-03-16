@@ -133,7 +133,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      */
     private Element addPlayer(Element element) {
         // The constructor interns the new players directly.
-        new AddPlayerMessage(getFreeColClient().getGame(), element);
+        new AddPlayerMessage(getGame(), element);
         getGUI().refreshPlayersTable();
         return null;
     }
@@ -176,12 +176,12 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element login(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
+        final FreeColClient fcc = getFreeColClient();
         final LoginMessage message = new LoginMessage(new Game(), element);
         Game game = message.getGame();
-        freeColClient.setGame(game);
+        fcc.setGame(game);
 
-        freeColClient.setSinglePlayer(message.isSinglePlayer());
+        fcc.setSinglePlayer(message.isSinglePlayer());
 
         final String user = message.getUserName();
         Player player = game.getPlayerByName(user);
@@ -192,17 +192,15 @@ public final class PreGameInputHandler extends ClientInputHandler {
             getGUI().showErrorMessage(st);
             return null;
         }
-        freeColClient.setMyPlayer(player);
-        freeColClient.addSpecificationActions(game.getSpecification());
+        fcc.setMyPlayer(player);
+        fcc.addSpecificationActions(game.getSpecification());
         logger.info("FreeColClient logged in as " + user
             + "/" + player.getId());
 
         final boolean currentPlayer = message.isCurrentPlayer();
         if (currentPlayer) game.setCurrentPlayer(player);
 
-        if (message.getStartGame()) {
-            freeColClient.getPreGameController().startGame();
-        }
+        if (message.getStartGame()) fcc.getPreGameController().startGame();
         return null;
     }
 
@@ -214,7 +212,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element logout(Element element) {
-        Game game = getFreeColClient().getGame();
+        final Game game = getGame();
 
         String playerId = element.getAttribute("player");
         String reason = element.getAttribute("reason");
@@ -249,7 +247,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element playerReady(Element element) {
-        Game game = getFreeColClient().getGame();
+        final Game game = getGame();
 
         Player player = game
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
@@ -268,13 +266,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element removePlayer(Element element) {
-        Game game = getFreeColClient().getGame();
+        final Game game = getGame();
 
         Element playerElement = (Element)element
             .getElementsByTagName(Player.getTagName()).item(0);
         Player player = new Player(game, playerElement);
 
-        getFreeColClient().getGame().removePlayer(player);
+        game.removePlayer(player);
         getGUI().refreshPlayersTable();
 
         return null;
@@ -288,12 +286,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element setAvailable(Element element) {
-        Nation nation = getGame().getSpecification()
-            .getNation(element.getAttribute("nation"));
+        Nation nation = getSpecification().getNation(element.getAttribute("nation"));
         NationState state = Enum.valueOf(NationState.class,
                                          element.getAttribute("state"));
-        getFreeColClient().getGame().getNationOptions()
-            .setNationState(nation, state);
+        getGame().getNationOptions().setNationState(nation, state);
         getGUI().refreshPlayersTable();
         return null;
     }
@@ -314,11 +310,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
                 @Override
                 public void run() {
                     for (;;) {
-                        FreeColClient fcc = getFreeColClient();
-                        if (fcc != null) {
-                            Game game = fcc.getGame();
-                            if (game != null && game.getMap() != null) break;
-                        }
+                        Game game = getGame();
+                        if (game != null && game.getMap() != null) break;
                         try {
                             Thread.sleep(200);
                         } catch (Exception ex) {}
@@ -341,12 +334,13 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element update(Element element) {
-        final FreeColClient fcc = getFreeColClient();
-        final Game game = fcc.getGame();
+        final Game game = getGame();
         final UpdateMessage message = new UpdateMessage(game, element);
+
         for (FreeColGameObject fcgo : message.getObjects()) {
             if (fcgo instanceof Game) {
-                fcc.addSpecificationActions(((Game)fcgo).getSpecification());
+                getFreeColClient()
+                    .addSpecificationActions(((Game)fcgo).getSpecification());
             } else {
                 logger.warning("Game node expected: " + fcgo.getId());
             }
@@ -362,8 +356,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element updateColor(Element element) {
-        Game game = getFreeColClient().getGame();
-        Specification spec = game.getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
+
         String str = element.getAttribute("nation");
         Nation nation = spec.getNation(str);
         if (nation == null) {
@@ -380,7 +375,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
             return null;
         }
         nation.setColor(color);
-        getFreeColClient().getGUI().refreshPlayersTable();
+        getGUI().refreshPlayersTable();
         return null;
     }
 
@@ -392,10 +387,11 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element updateGameOptions(Element element) {
-        final Game game = getFreeColClient().getGame();
-        final Specification spec = game.getSpecification();
-        UpdateGameOptionsMessage message
+        final Game game = getGame();
+        final Specification spec = getSpecification();
+        final UpdateGameOptionsMessage message
             = new UpdateGameOptionsMessage(game, element);
+
         if (message.mergeOptions(game)) {
             spec.clean("update game options (server initiated)");
             getGUI().updateGameOptions();
@@ -413,9 +409,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element updateMapGeneratorOptions(Element element) {
-        final Game game = getFreeColClient().getGame();
-        UpdateMapGeneratorOptionsMessage message
+        final Game game = getGame();
+        final UpdateMapGeneratorOptionsMessage message
             = new UpdateMapGeneratorOptionsMessage(game, element);
+
         if (message.mergeOptions(game)) {
             getGUI().updateMapGeneratorOptions();
         } else {
@@ -432,7 +429,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element updateNation(Element element) {
-        Game game = getFreeColClient().getGame();
+        final Game game = getGame();
 
         Player player = game
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
@@ -453,11 +450,11 @@ public final class PreGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element updateNationType(Element element) {
-        Game game = getFreeColClient().getGame();
+        final Game game = getGame();
 
         Player player = game
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        NationType nationType = getGame().getSpecification()
+        NationType nationType = getSpecification()
             .getNationType(element.getAttribute("value"));
 
         player.changeNationType(nationType);

@@ -25,6 +25,7 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.common.model.Tile;
@@ -34,7 +35,7 @@ import net.sf.freecol.common.model.Unit;
 /**
  * Class for the animation of units movement.
  */
-final class UnitMoveAnimation {
+final class UnitMoveAnimation extends FreeColClientHolder {
 
     /*
      * Display delay between one frame and another, in milliseconds.
@@ -42,10 +43,10 @@ final class UnitMoveAnimation {
      */
     private static final int ANIMATION_DELAY = 33;
 
-    private final FreeColClient freeColClient;
     private final Unit unit;
     private final Tile sourceTile;
     private final Tile destinationTile;
+
 
     /**
      * Constructor
@@ -57,7 +58,8 @@ final class UnitMoveAnimation {
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
+
         this.unit = unit;
         this.sourceTile = sourceTile;
         this.destinationTile = destinationTile;
@@ -69,8 +71,8 @@ final class UnitMoveAnimation {
      */
     public void animate() {
         final int movementSpeed
-            = freeColClient.getAnimationSpeed(unit.getOwner());
-        final SwingGUI gui = (SwingGUI)freeColClient.getGUI();
+            = getFreeColClient().getAnimationSpeed(unit.getOwner());
+        final SwingGUI gui = (SwingGUI)getGUI();
         final Point srcP = gui.getTilePosition(sourceTile);
         final Point dstP = gui.getTilePosition(destinationTile);
         

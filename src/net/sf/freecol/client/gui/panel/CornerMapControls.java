@@ -92,7 +92,7 @@ public final class CornerMapControls extends MapControls {
                  */
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Unit unit = freeColClient.getGUI().getActiveUnit();
+                    Unit unit = getGUI().getActiveUnit();
                     if (unit == null) return;
                     int x = e.getX() - compassRose.getWidth()/2;
                     int y = e.getY() - compassRose.getHeight()/2;
@@ -100,8 +100,7 @@ public final class CornerMapControls extends MapControls {
                     if (theta < 0) {
                         theta += 2*Math.PI;
                     }
-                    freeColClient.getInGameController().moveUnit(unit,
-                        Direction.angleToDirection(theta));
+                    igc().moveUnit(unit, Direction.angleToDirection(theta));
                 }
             });
 
@@ -178,13 +177,9 @@ public final class CornerMapControls extends MapControls {
      */
     @Override
     public void addToComponent(Canvas canvas) {
-        if (freeColClient.getGame() == null
-            || freeColClient.getGame().getMap() == null) {
-            return;
-        }
+        if (getGame() == null || getGame().getMap() == null) return;
 
-        final boolean rose = freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
+        final boolean rose = getClientOptions().getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE);
 
         //
         // Relocate GUI Objects
@@ -219,7 +214,7 @@ public final class CornerMapControls extends MapControls {
         addToCanvas(canvas, infoPanel);
         addToCanvas(canvas, miniMapPanel);
         if (rose) addToCanvas(canvas, compassRose);
-        if (!freeColClient.isMapEditor()) {
+        if (!getFreeColClient().isMapEditor()) {
             for (UnitButton button : unitButtons) {
                 addToCanvas(canvas, button);
                 button.refreshAction();

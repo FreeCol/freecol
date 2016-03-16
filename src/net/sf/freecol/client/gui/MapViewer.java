@@ -49,6 +49,7 @@ import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -78,7 +79,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * In addition, the graphical state of the map (focus, active unit..)
  * is currently handled by this class.
  */
-public final class MapViewer {
+public final class MapViewer extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
 
@@ -95,8 +96,6 @@ public final class MapViewer {
         }
     }
 
-
-    private final FreeColClient freeColClient;
 
     private final SwingGUI gui;
 
@@ -188,8 +187,9 @@ public final class MapViewer {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     MapViewer(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
-        this.gui = (SwingGUI)freeColClient.getGUI();
+        super(freeColClient);
+        
+        this.gui = (SwingGUI)getGUI();
         this.size = null;
 
         tv = new TileViewer(freeColClient);
@@ -271,7 +271,7 @@ public final class MapViewer {
      * @return The Tile that is located at the given position on the screen.
      */
     Tile convertToMapTile(int x, int y) {
-        final Game game = freeColClient.getGame();
+        final Game game = getGame();
         if (game == null || game.getMap() == null) return null;
 
         int leftOffset;
@@ -367,7 +367,7 @@ public final class MapViewer {
         }
         logger.finest("Direction is " + direction
                       + ", new focus is " + col + ", " + row);
-        return freeColClient.getGame().getMap().getTile(col, row);
+        return getGame().getMap().getTile(col, row);
 
     }
 
@@ -453,7 +453,7 @@ public final class MapViewer {
         final int unitX = (width - unitImg.getWidth()) / 2;
         g.drawImage(unitImg, unitX, 0, null);
 
-        Player player = freeColClient.getMyPlayer();
+        Player player = getMyPlayer();
         String text = Messages.message(unit.getOccupationLabel(player, false));
         g.drawImage(lib.getOccupationIndicatorChip(g, unit, text), 0, 0, null);
 
@@ -612,7 +612,7 @@ public final class MapViewer {
     int setOffsetFocus(Tile tile) {
         if (tile == null) return 0;
         int where;
-        final Map map = freeColClient.getGame().getMap();
+        final Map map = getGame().getMap();
         final int tx = tile.getX(), ty = tile.getY(),
             width = rightColumn - leftColumn;
         int moveX = -1;
@@ -665,7 +665,7 @@ public final class MapViewer {
      * @param pos The <code>Tile</code> to center at.
      */
     private void positionMap(Tile pos) {
-        final Game game = freeColClient.getGame();
+        final Game game = getGame();
         int x = pos.getX(), y = pos.getY();
         int leftColumns = getLeftColumns(), rightColumns = getRightColumns();
 
@@ -776,7 +776,7 @@ public final class MapViewer {
         if (isMapNearTop(ty) && isMapNearTop(fy)) {
             y = (ty <= fy) ? fy : topRows;
         } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
-            y = (ty >= fy) ? fy : freeColClient.getGame().getMap().getWidth()
+            y = (ty >= fy) ? fy : getGame().getMap().getWidth()
                 - bottomRows;
         } else {
             y = ty;
@@ -784,14 +784,14 @@ public final class MapViewer {
         if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
             x = (tx <= fx) ? fx : getLeftColumns(ty);
         } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
-            x = (tx >= fx) ? fx : freeColClient.getGame().getMap().getWidth()
+            x = (tx >= fx) ? fx : getGame().getMap().getWidth()
                 - getRightColumns(ty);
         } else {
             x = tx;
         }
 
         if (x == fx && y == fy) return false;
-        gui.setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        gui.setFocus(getGame().getMap().getTile(x,y));
         return true;
     }
 
@@ -802,7 +802,7 @@ public final class MapViewer {
      * @return True if near the bottom.
      */
     private boolean isMapNearBottom(int y) {
-        return y >= freeColClient.getGame().getMap().getHeight() - bottomRows;
+        return y >= getGame().getMap().getHeight() - bottomRows;
     }
 
     /**
@@ -824,8 +824,7 @@ public final class MapViewer {
      * @return True if near the right.
      */
     private boolean isMapNearRight(int x, int y) {
-        return x >= freeColClient.getGame().getMap().getWidth()
-            - getRightColumns(y);
+        return x >= getGame().getMap().getWidth() - getRightColumns(y);
     }
 
     /**
@@ -963,7 +962,7 @@ public final class MapViewer {
 
         // Check for refocus
         if (!onScreen(newTile)
-            || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
+            || getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
             gui.setFocus(newTile);
             ret = true;
         } else {
@@ -1082,8 +1081,7 @@ public final class MapViewer {
         } else {
             updateCurrentPathForActiveUnit();
             if (!gui.setSelectedTile(tile)
-                || freeColClient.getClientOptions()
-                .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
+                || getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
                 gui.setFocus(tile);
                 return true;
             }
@@ -1278,8 +1276,8 @@ public final class MapViewer {
      * @param g The Graphics2D object on which to draw the Map.
      */
     void displayMap(Graphics2D g) {
-        final ClientOptions options = freeColClient.getClientOptions();
-        Game game = freeColClient.getGame();
+        final ClientOptions options = getClientOptions();
+        final Game game = getGame();
         Map map = game.getMap();
 
         // Remember transform
@@ -1524,7 +1522,7 @@ public final class MapViewer {
 
         // Display the colony names, if needed
         if (colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            final Player player = freeColClient.getMyPlayer();
+            final Player player = getMyPlayer();
             FontLibrary fontLibrary = new FontLibrary(lib.getScaleFactor());
             Font font = fontLibrary.createScaledFont(
                 FontLibrary.FontType.NORMAL, FontLibrary.FontSize.SMALLER,
@@ -1906,7 +1904,7 @@ public final class MapViewer {
      * @param unit The Unit to draw.
      */
     private void displayUnit(Graphics2D g, Unit unit) {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
 
         // Draw the unit.
         // If unit is sentry, draw in grayscale
@@ -1951,9 +1949,8 @@ public final class MapViewer {
             && player != null
             && !player.owns(unit)
             && unit.getOwner().isAI()
-            && freeColClient.getFreeColServer() != null
-            && (au = freeColClient.getFreeColServer().getAIMain()
-                .getAIUnit(unit)) != null) {
+            && getFreeColServer() != null
+            && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
             if (FreeColDebugger.debugShowMission()) {
                 g.setColor(Color.WHITE);
                 g.drawString((!au.hasMission()) ? "No mission"

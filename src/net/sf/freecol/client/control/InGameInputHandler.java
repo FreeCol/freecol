@@ -124,21 +124,12 @@ public final class InGameInputHandler extends ClientInputHandler {
 
 
     /**
-     * Shorthand to get the controller.
-     *
-     * @return The in-game controller.
-     */
-    private InGameController igc() {
-        return getFreeColClient().getInGameController();
-    }
-
-    /**
      * Shorthand to run in the EDT and wait.
      *
      * @param runnable The <code>Runnable</code> to run.
      */
     private void invokeAndWait(Runnable runnable) {
-        getFreeColClient().getGUI().invokeNowOrWait(runnable);
+        getGUI().invokeNowOrWait(runnable);
     }
     
     /**
@@ -147,7 +138,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @param runnable The <code>Runnable</code> to run.
      */
     private void invokeLater(Runnable runnable) {
-        getFreeColClient().getGUI().invokeNowOrLater(runnable);
+        getGUI().invokeNowOrLater(runnable);
     }
     
     /**
@@ -309,9 +300,8 @@ public final class InGameInputHandler extends ClientInputHandler {
 
         // If there is a "flush" attribute present, encourage the client
         // to display any new messages.
-        final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
-            && fcc.currentPlayerIsMyPlayer()) {
+            && currentPlayerIsMyPlayer()) {
             invokeLater(displayModelMessagesRunnable);
         }
         return reply;
@@ -384,9 +374,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element animateAttack(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
         String str;
         Unit u;
 
@@ -455,9 +444,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element animateMove(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
 
         String unitId = element.getAttribute("unit");
         if (unitId.isEmpty()) {
@@ -686,7 +674,7 @@ public final class InGameInputHandler extends ClientInputHandler {
             = new FirstContactMessage(game, element);
 
         final Player player = message.getPlayer(game);
-        if (player == null || player != getFreeColClient().getMyPlayer()) {
+        if (player == null || player != getMyPlayer()) {
             logger.warning("firstContact with bad player: " + player);
             return null;
         }
@@ -733,8 +721,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element gameEnded(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        FreeColDebugger.finishDebugRun(freeColClient, true);
+        FreeColDebugger.finishDebugRun(getFreeColClient(), true);
         final Player winner
             = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                              Player.class);
@@ -744,7 +731,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         }
         final String highScore = element.getAttribute("highScore");
 
-        if (winner == freeColClient.getMyPlayer()) {
+        if (winner == getMyPlayer()) {
             invokeLater(() -> { igc().victory(highScore); });
         }
         return null;
@@ -758,9 +745,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element goodsForSale(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
         final GoodsForSaleMessage message
             = new GoodsForSaleMessage(game, element);
         final Unit unit = message.getUnit(player);
@@ -778,9 +764,8 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element incite(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
         final Game game = getGame();
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
         final InciteMessage message = new InciteMessage(game, element);
         final Unit unit = message.getUnit(player);
         final IndianSettlement is = message.getSettlement(unit);
@@ -800,7 +785,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element nationSummary(Element element) {
         final Game game = getGame();
-        final Player player = getFreeColClient().getMyPlayer();
+        final Player player = getMyPlayer();
 
         NationSummaryMessage message = new NationSummaryMessage(game, element);
         Player other = message.getPlayer(game);
@@ -837,7 +822,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element indianDemand(Element element) {
         final Game game = getGame();
-        final Player player = getFreeColClient().getMyPlayer();
+        final Player player = getMyPlayer();
         final IndianDemandMessage message
             = new IndianDemandMessage(game, element);
         final Unit unit = message.getUnit(game);
@@ -917,7 +902,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     private Element newLandName(Element element) {
         final Game game = getGame();
         NewLandNameMessage message = new NewLandNameMessage(game, element);
-        final Unit unit = message.getUnit(getFreeColClient().getMyPlayer());
+        final Unit unit = message.getUnit(getMyPlayer());
         final String defaultName = message.getNewLandName();
         if (unit == null || defaultName == null 
             || !unit.hasTile()) return null;
@@ -937,7 +922,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         NewRegionNameMessage message = new NewRegionNameMessage(game, element);
         final Tile tile = message.getTile(game);
-        final Unit unit = message.getUnit(getFreeColClient().getMyPlayer());
+        final Unit unit = message.getUnit(getMyPlayer());
         final Region region = message.getRegion(game);
         final String defaultName = message.getNewRegionName();
         if (defaultName == null || region == null) return null;
@@ -957,7 +942,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         NewTradeRouteMessage message = new NewTradeRouteMessage(game, element);
         if (message != null) {
-            final Player player = getFreeColClient().getMyPlayer();
+            final Player player = getMyPlayer();
             TradeRoute tr = message.getTradeRoute();
             if (tr != null) player.addTradeRoute(tr);
         }
@@ -1159,7 +1144,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @return Null.
      */
     private Element update(Element element) {
-        final Player player = getFreeColClient().getMyPlayer();
+        final Player player = getMyPlayer();
         final Game game = getGame();
         final UpdateMessage message = new UpdateMessage(game, element);
         boolean visibilityChange = false;

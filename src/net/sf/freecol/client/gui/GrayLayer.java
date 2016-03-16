@@ -58,6 +58,7 @@ public class GrayLayer extends Component {
 
     /** The client for this FreeCol game */
     private final FreeColClient freeColClient;
+    
     /** Player object or <code>null</code> */
     private Player player;
 

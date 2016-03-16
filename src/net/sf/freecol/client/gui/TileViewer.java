@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -65,7 +66,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * This class is responsible for drawing map tiles
  * for MapViewer and some GUI-panels.
  */
-public final class TileViewer {
+public final class TileViewer extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(TileViewer.class.getName());
 
@@ -111,8 +112,6 @@ public final class TileViewer {
         }
     }
 
-    private final FreeColClient freeColClient;
-
     private ImageLibrary lib;
 
     private RoadPainter rp;
@@ -132,8 +131,8 @@ public final class TileViewer {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    TileViewer(FreeColClient freeColClient) {
-        this.freeColClient = freeColClient;
+    public TileViewer(FreeColClient freeColClient) {
+        super(freeColClient);
 
         setImageLibraryAndUpdateData(new ImageLibrary());
     }
@@ -344,7 +343,7 @@ public final class TileViewer {
                         tileWidth/4 - image.getWidth() / 2,
                         halfHeight - image.getHeight() / 2, null);
             // Draw an occupation and nation indicator.
-            Player owner = freeColClient.getMyPlayer();
+            Player owner = getMyPlayer();
             String text = Messages.message(unit.getOccupationLabel(owner, false));
             g.drawImage(lib.getOccupationIndicatorChip(g, unit, text),
                         (int)(STATE_OFFSET_X * lib.getScaleFactor()),
@@ -514,11 +513,10 @@ public final class TileViewer {
      * @param tile The <code>Tile</code> to draw.
      */
     void displayFogOfWar(Graphics2D g, Tile tile) {
-        if (freeColClient.getGame() != null
-            && freeColClient.getGame().getSpecification()
-                .getBoolean(GameOptions.FOG_OF_WAR)
-            && freeColClient.getMyPlayer() != null
-            && !freeColClient.getMyPlayer().canSee(tile)) {
+        if (getGame() != null
+            && getSpecification().getBoolean(GameOptions.FOG_OF_WAR)
+            && getMyPlayer() != null
+            && !getMyPlayer().canSee(tile)) {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
@@ -537,8 +535,7 @@ public final class TileViewer {
      */
     void displayOptionalTileText(Graphics2D g, Tile tile) {
         String text = null;
-        int op = freeColClient.getClientOptions()
-            .getInteger(ClientOptions.DISPLAY_TILE_TEXT);
+        int op = getClientOptions().getInteger(ClientOptions.DISPLAY_TILE_TEXT);
         switch (op) {
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
             text = Messages.getName(tile);
@@ -612,7 +609,7 @@ public final class TileViewer {
      */
     void displaySettlementWithChipsOrPopulationNumber(
             Graphics2D g, Tile tile, boolean withNumber) {
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getMyPlayer();
         final Settlement settlement = tile.getSettlement();
 
         if (settlement != null) {
@@ -653,7 +650,7 @@ public final class TileViewer {
                 BufferedImage chip;
                 float xOffset = STATE_OFFSET_X * lib.getScaleFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScaleFactor();
-                final int colonyLabels = freeColClient.getClientOptions()
+                final int colonyLabels = getClientOptions()
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip

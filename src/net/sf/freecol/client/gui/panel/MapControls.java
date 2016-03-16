@@ -26,6 +26,7 @@ import javax.swing.JLayeredPane;
 import net.sf.freecol.client.ClientOptions;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -57,14 +58,13 @@ import net.sf.freecol.common.model.Unit;
  * The MapControls are useless by themselves, this object needs to be
  * placed on a JComponent in order to be usable.
  */
-public abstract class MapControls {
+public abstract class MapControls extends FreeColClientHolder {
 
     public static final int MAP_WIDTH = 220;
     public static final int MAP_HEIGHT = 128;
     public static final int GAP = 4;
     public static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
-    protected final FreeColClient freeColClient;
     protected final InfoPanel infoPanel;
     protected final MiniMap miniMap;
     protected final UnitButton miniMapToggleBorders;
@@ -80,14 +80,14 @@ public abstract class MapControls {
      * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public MapControls(final FreeColClient freeColClient, boolean useSkin) {
-        this.freeColClient = freeColClient;
+        super(freeColClient);
 
-        infoPanel = new InfoPanel(freeColClient, useSkin);
-        miniMap = new MiniMap(freeColClient);
-        final ActionManager am = freeColClient.getActionManager();
+        infoPanel = new InfoPanel(getFreeColClient(), useSkin);
+        miniMap = new MiniMap(getFreeColClient());
+        final ActionManager am = getFreeColClient().getActionManager();
         unitButtons = new ArrayList<>();
 
-        final Game game = freeColClient.getGame();
+        final Game game = getGame();
         if (game != null) {
             unitButtons.add(new UnitButton(am, WaitAction.id));
             unitButtons.add(new UnitButton(am, SkipUnitAction.id));
@@ -156,13 +156,13 @@ public abstract class MapControls {
     public abstract void repaint();
     
     public void toggleView() {
-        miniMap.setToggleBordersOption(!freeColClient.getClientOptions()
+        miniMap.setToggleBordersOption(!getClientOptions()
             .getBoolean(ClientOptions.MINIMAP_TOGGLE_BORDERS));
         repaint();
     }
     
     public void toggleFogOfWar() {
-        miniMap.setToggleFogOfWarOption(!freeColClient.getClientOptions()
+        miniMap.setToggleFogOfWarOption(!getClientOptions()
             .getBoolean(ClientOptions.MINIMAP_TOGGLE_FOG_OF_WAR));
         repaint();
     }
@@ -171,7 +171,7 @@ public abstract class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
-        final GUI gui = freeColClient.getGUI();
+        final GUI gui = getGUI();
         Unit unit = gui.getActiveUnit();
 
         switch (gui.getViewMode()) {
