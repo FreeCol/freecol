@@ -194,9 +194,8 @@ public class AbstractUnit extends FreeColObject {
      * @return A list of <code>AbstractUnit</code>s.
      */
     public static List<AbstractUnit> deepCopy(List<AbstractUnit> units) {
-        return transform(units, au -> true,
-            au -> new AbstractUnit(au.getId(), au.getRoleId(), au.getNumber()),
-            Collectors.toList());
+        return toList(map(units, au ->
+                new AbstractUnit(au.getId(), au.getRoleId(), au.getNumber())));
     }
 
     /**

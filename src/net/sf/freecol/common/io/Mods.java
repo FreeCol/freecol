@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.io.FreeColModFile;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -108,10 +109,9 @@ public class Mods {
      * @return A list of <code>FreeColModFile</code>s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
-        return Arrays.stream(FreeColDirectories.getRulesDirectory()
-                .listFiles(FreeColTcFile.getFileFilter()))
-            .map(FreeColTcFile::make)
-            .filter(tc -> tc != null)
-            .collect(Collectors.toList());
+        return toList(map(FreeColDirectories.getRulesDirectory()
+                .listFiles(FreeColTcFile.getFileFilter()),
+                FreeColTcFile::make)
+            .filter(tc -> tc != null));
     }
 }

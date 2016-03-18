@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 
 
@@ -312,9 +313,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 default:
                     ResourceType choice = getGUI().getChoice(null, 
                         Messages.message("mapEditorTransformPanel.chooseResource"),
-                        "cancel", resList.stream()
-                            .map(rt -> new ChoiceItem<>(Messages.getName(rt), rt))
-                            .collect(Collectors.toList()));
+                        "cancel",
+                        toList(map(resList, rt ->
+                                new ChoiceItem<>(Messages.getName(rt), rt))));
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));

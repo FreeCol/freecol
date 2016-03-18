@@ -48,6 +48,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -110,14 +111,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * For now we are relying on the directory only containing save
      * games that happen to be valid maps.
      *
-     * @param directory The directory to load from.
+     * @param dir The directory to load from.
      * @return A list of potential map files.
      */
-    private List<File> loadMapFiles(File directory) {
-        return Arrays.stream(directory
-            .listFiles(FreeColSavegameFile.getFileFilter()))
-            .sorted(Comparator.comparing(File::getName))
-            .collect(Collectors.toList());
+    private List<File> loadMapFiles(File dir) {
+        final Comparator<File> comp = Comparator.comparing(File::getName);
+        return toSortedList(dir.listFiles(FreeColSavegameFile.getFileFilter()),
+                            comp);
     }
 
     /**

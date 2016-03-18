@@ -773,10 +773,10 @@ public final class InGameController extends FreeColClientHolder
 
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<>();
-        for (Unit unit : iterable(player.getUnits().stream()
+        for (Unit unit : toSortedList(player.getUnits().stream()
                 .filter(u -> u.isReadyToMove() && u.getOwner() == player
-                    && u.getTradeRoute() != null)
-                .sorted(tradeRouteUnitComparator))) {
+                    && u.getTradeRoute() != null),
+                tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
             if (moveToDestination(unit, messages)) stillActive = unit;
         }
@@ -1374,9 +1374,8 @@ public final class InGameController extends FreeColClientHolder
                 moveDirection(disembarkable.get(0), direction, false);
             }
         } else {
-            List<ChoiceItem<Unit>> choices = disembarkable.stream()
-                .map(u -> new ChoiceItem<Unit>(u.getDescription(Unit.UnitLabelType.NATIONAL), u))
-                .collect(Collectors.toList());
+            List<ChoiceItem<Unit>> choices = toList(map(disembarkable, u ->
+                    new ChoiceItem<Unit>(u.getDescription(Unit.UnitLabelType.NATIONAL), u)));
             choices.add(new ChoiceItem<>(Messages.message("all"), unit));
 
             // Use moveDirection() to disembark units as while the
@@ -1901,9 +1900,8 @@ public final class InGameController extends FreeColClientHolder
             // Choose goods to buy
             goods = getGUI().getChoice(unit.getTile(),
                 Messages.message("buyProposition.text"), is, "nothing",
-                forSale.stream()
-                    .map(g -> new ChoiceItem<>(Messages.message(g.getLabel()), g))
-                    .collect(Collectors.toList()));
+                toList(map(forSale,
+                        g -> new ChoiceItem<>(Messages.message(g.getLabel()), g))));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1950,9 +1948,8 @@ public final class InGameController extends FreeColClientHolder
             // Choose goods to sell
             goods = getGUI().getChoice(unit.getTile(),
                 Messages.message("sellProposition.text"), is, "nothing",
-                unit.getGoodsList().stream()
-                    .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
-                    .collect(Collectors.toList()));
+                toList(map(unit.getGoodsList(), g ->
+                        new ChoiceItem<>(Messages.message(g.getLabel(true)), g))));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1999,9 +1996,8 @@ public final class InGameController extends FreeColClientHolder
                                                    IndianSettlement is) {
         Goods goods = getGUI().getChoice(unit.getTile(),
             Messages.message("gift.text"), is, "cancel",
-            unit.getGoodsList().stream()
-                .map(g -> new ChoiceItem<>(Messages.message(g.getLabel(true)), g))
-                .collect(Collectors.toList()));
+            toList(map(unit.getGoodsList(), g ->
+                    new ChoiceItem<>(Messages.message(g.getLabel(true)), g))));
         return (goods != null
             && askServer().deliverGiftToSettlement(unit, is, goods))
             ? null
@@ -2074,9 +2070,8 @@ public final class InGameController extends FreeColClientHolder
             Player enemy = getGUI().getChoice(unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
                 unit, "missionarySettlement.cancel",
-                getGame().getLiveEuropeanPlayers(player).stream()
-                    .map(p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))
-                    .collect(Collectors.toList()));
+                toList(map(getGame().getLiveEuropeanPlayers(player), p ->
+                        new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))));
             if (enemy == null) return true;
             askServer().incite(unit, settlement, enemy, -1);
             break;

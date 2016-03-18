@@ -810,8 +810,8 @@ public class Game extends FreeColGameObject {
      */
     public final List<Nation> getVacantNations() {
         return transform(nationOptions.getNations().entrySet(),
-            e -> e.getValue() == NationState.AVAILABLE,
-            Entry::getKey, Collectors.toList());
+                         e -> e.getValue() == NationState.AVAILABLE,
+                         Entry::getKey, Collectors.toList());
     }
 
     /**
@@ -1274,7 +1274,7 @@ public class Game extends FreeColGameObject {
 
         nationOptions.toXML(xw);
 
-        List<Player> players = sortedCopy(getPlayers());
+        List<Player> players = toSortedList(getPlayers());
         Player unknown = getUnknownEnemy();
         if (unknown != null) players.add(unknown);
         for (Player p : players) p.toXML(xw);

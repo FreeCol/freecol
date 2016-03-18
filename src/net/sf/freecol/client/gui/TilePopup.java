@@ -203,9 +203,7 @@ public final class TilePopup extends JPopupMenu {
         Container currentMenu = this;
         boolean moreUnits = false;
         Unit firstUnit = tile.getFirstUnit();
-        for (Unit u : tile.getUnitList().stream()
-                 .sorted(Unit.typeRoleComparator)
-                 .collect(Collectors.toList())) {
+        for (Unit u : toSortedList(tile.getUnitList(), Unit.typeRoleComparator)) {
             if (lineCount > maxUnits) {
                 JMenu more = Utility.localizedMenu("more");
                 more.setFont(more.getFont().deriveFont(Font.ITALIC));

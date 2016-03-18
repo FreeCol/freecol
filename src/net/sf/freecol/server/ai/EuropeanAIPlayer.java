@@ -486,7 +486,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 .map(ut -> workerWishes.get(ut))
                 .filter(wl -> wl != null && !wl.isEmpty())
                 .map(wl -> wl.get(0));
-            WorkerWish bestWish = maximize(values, ww -> true, comp);
+            WorkerWish bestWish = maximize(values, comp);
 
             int cost = (bestWish != null)
                 ? europe.getUnitPrice(bestWish.getUnitType())
@@ -1131,9 +1131,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         return (demand == null) ? Collections.<WorkerWish>emptyList()
             : transform(demand,
-                w -> w instanceof WorkerWish
-                    && ((WorkerWish)w).getUnitType() == type,
-                w -> (WorkerWish)w, Collectors.toList());
+                        w -> w instanceof WorkerWish
+                            && ((WorkerWish)w).getUnitType() == type,
+                        w -> (WorkerWish)w, Collectors.toList());
     }
 
     /**
@@ -1147,9 +1147,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
         return (demand == null) ? Collections.<GoodsWish>emptyList()
             : transform(demand,
-                w -> w instanceof GoodsWish
-                    && ((GoodsWish)w).getGoodsType() == type,
-                w -> (GoodsWish)w, Collectors.toList());
+                        w -> w instanceof GoodsWish
+                            && ((GoodsWish)w).getGoodsType() == type,
+                        w -> (GoodsWish)w, Collectors.toList());
     }
 
     /**

@@ -1807,11 +1807,12 @@ public final class InGameController extends Controller {
         // natives declare peace on you and war on the REF.  If they
         // are the same nation, go to the next most hostile nation
         // that may already be at war.
-        List<Player> natives = game.getLiveNativePlayers(null).stream()
-            .filter(p -> p.hasContacted(serverPlayer))
-            .sorted(Comparator.comparingInt(p ->
-                    p.getTension(serverPlayer).getValue()))
-            .collect(Collectors.toList());
+        final Comparator<Player> comp = Comparator.comparingInt(p ->
+            p.getTension(serverPlayer).getValue());
+        List<Player> natives
+            = toSortedList(game.getLiveNativePlayers(null).stream()
+                .filter(p -> p.hasContacted(serverPlayer)),
+                comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)natives.get(0);
             logger.info("Native ally following independence: " + good);
@@ -3535,10 +3536,9 @@ public final class InGameController extends Controller {
         }
 
         // Collect roles that cause a change, ordered by simplest change
-        for (UnitChange uc : iterable(unitChanges.stream()
-                .filter(uc -> uc.role != uc.unit.getRole()
-                    && uc.role != defaultRole)
-                .sorted(Comparator.<UnitChange>reverseOrder()))) {
+        for (UnitChange uc : transformAndSort(unitChanges,
+                uc -> uc.role != uc.unit.getRole() && uc.role != defaultRole,
+                Comparator.<UnitChange>reverseOrder(), Collectors.toList())) {
             if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + uc.unit.getId() + " for role " + uc.role

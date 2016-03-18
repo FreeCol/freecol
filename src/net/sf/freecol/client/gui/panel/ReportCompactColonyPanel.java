@@ -255,14 +255,14 @@ public final class ReportCompactColonyPanel extends ReportPanel
             
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
-            this.couldWork.addAll(this.notWorking.stream()
-                .filter(u -> {
+            this.couldWork.addAll(transform(this.notWorking,
+                    u -> {
                         WorkLocation wl = u.getWorkLocation();
                         return wl != null
                             && (wl.getWorkFor(u) == null
                                 || wl.getWorkFor(u) != u.getWorkType());
-                    })
-                .map(Unit::getType).collect(Collectors.toList()));
+                    },
+                    Unit::getType, Collectors.toList()));
 
             this.build = colony.getCurrentlyBuilding();
             if (this.build == null) {
@@ -1030,13 +1030,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // Field: The required goods rates.
         // Colour: cPlain
-        List<JLabel> labels = mapEntriesByValue(rNeeded, descendingDoubleComparator).stream()
-            .map(e -> newLabel(String.format("%4.1f %s", e.getValue(),
-                                             Messages.getName(e.getKey())),
+        List<JLabel> labels = toList(map(mapEntriesByValue(rNeeded, descendingDoubleComparator),
+                e -> newLabel(String.format("%4.1f %s", e.getValue(),
+                                            Messages.getName(e.getKey())),
                     null, cPlain,
                     stpld("report.colony.making.summary")
-                        .addNamed("%goods%", e.getKey())))
-            .collect(Collectors.toList());
+                        .addNamed("%goods%", e.getKey()))));
 
         // Field: What is being trained (attached to previous)
         // Colour: cPlain.

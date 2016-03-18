@@ -114,16 +114,14 @@ public class DebugUtils {
                                     String buildingTitle) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
         final GUI gui = freeColClient.getGUI();
         final Player player = freeColClient.getMyPlayer();
 
         BuildingType buildingType = gui.getChoice(null, buildingTitle,
             "cancel",
-            transformAndSort(game.getSpecification().getBuildingTypeList(),
-                bt -> true,
-                (BuildingType bt) ->
-                    new ChoiceItem<BuildingType>(Messages.getName(bt), bt), 
-                Collectors.toList()));
+            toSortedList(map(spec.getBuildingTypeList(), (BuildingType bt) ->
+                    new ChoiceItem<BuildingType>(Messages.getName(bt), bt))));
         if (buildingType == null) return;
 
         final Game sGame = server.getGame();
@@ -317,11 +315,8 @@ public class DebugUtils {
 
         UnitType unitChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectUnitType"), "cancel",
-            transformAndSort(sSpec.getUnitTypeList(),
-                ut -> true,
-                (UnitType ut) ->
-                    new ChoiceItem<UnitType>(Messages.getName(ut), ut),
-                Collectors.toList()));
+            toSortedList(map(sSpec.getUnitTypeList(), (UnitType ut) ->
+                    new ChoiceItem<UnitType>(Messages.getName(ut), ut))));
         if (unitChoice == null) return;
 
         Unit carrier = null, sCarrier = null;
@@ -411,12 +406,10 @@ public class DebugUtils {
         }
         Disaster disaster = gui.getChoice(null,
             StringTemplate.template("prompt.selectDisaster"), "cancel",
-            transformAndSort(disasters, rc -> true,
-                (RandomChoice<Disaster> rc) ->
+            toSortedList(map(disasters, (RandomChoice<Disaster> rc) ->
                     new ChoiceItem<Disaster>(Messages.getName(rc.getObject())
                         + " " + Integer.toString(rc.getProbability()),
-                        rc.getObject()),
-                Collectors.toList()));
+                        rc.getObject()))));
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -454,11 +447,8 @@ public class DebugUtils {
 
         Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
-            transformAndSort(game.getLiveEuropeanPlayers(colony.getOwner()),
-                p -> true,
-                (Player p) ->
-                    new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p),
-                Collectors.toList()));
+            toSortedList(map(game.getLiveEuropeanPlayers(colony.getOwner()),
+                    (Player p) -> new ChoiceItem<Player>(Messages.message(p.getCountryLabel()), p))));
         if (player == null) return;
 
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
@@ -531,9 +521,8 @@ public class DebugUtils {
 
         Role roleChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectRole"), "cancel",
-            transformAndSort(sGame.getSpecification().getRoles(), r -> true,
-                (Role r) -> new ChoiceItem<Role>(r.getId(), r),
-                Collectors.toList()));
+            toSortedList(map(sGame.getSpecification().getRoles(),
+                    (Role r) -> new ChoiceItem<Role>(r.getId(), r))));
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());
@@ -970,9 +959,8 @@ public class DebugUtils {
 
         MonarchAction action = gui.getChoice(null, monarchTitle,
             "cancel",
-            transformAndSort(MonarchAction.values(), a -> true,
-                (MonarchAction a) -> new ChoiceItem<MonarchAction>(a),
-                Collectors.toList()));
+            toSortedList(map(MonarchAction.values(), (MonarchAction a) ->
+                    new ChoiceItem<MonarchAction>(a))));
         if (action == null) return;
         
         server.getInGameController().setMonarchAction(sPlayer, action);

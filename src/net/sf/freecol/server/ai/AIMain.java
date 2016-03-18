@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -300,24 +301,20 @@ public class AIMain extends FreeColObject
      * track memory leaks over time
      */
     public Map<String, String> getAIStatistics() {
-        Map<String, String> stats = new HashMap<>();
-        Map<String, Long> objStats = new HashMap<>();
+        Map<String, Long> stats = new HashMap<>();
         for (AIObject aio : getAIObjects()) {
             String className = aio.getClass().getSimpleName();
-            if (objStats.containsKey(className)) {
-                Long count = objStats.get(className);
+            if (stats.containsKey(className)) {
+                Long count = stats.get(className);
                 count++;
-                objStats.put(className, count);
+                stats.put(className, count);
             } else {
                 Long count = (long) 1;
-                objStats.put(className, count);
+                stats.put(className, count);
             }
         }
-        for (Entry<String, Long> entry : objStats.entrySet()) {
-            stats.put(entry.getKey(), Long.toString(entry.getValue()));
-        }
-
-        return stats;
+        return toMap(stats.entrySet(),
+                     Entry::getKey, e -> Long.toString(e.getValue()));
     }
 
     /**
@@ -488,7 +485,7 @@ public class AIMain extends FreeColObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (AIObject aio : sortedCopy(aiObjects.values())) {
+        for (AIObject aio : toSortedList(aiObjects.values())) {
             if (aio.checkIntegrity(false) < 0) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its

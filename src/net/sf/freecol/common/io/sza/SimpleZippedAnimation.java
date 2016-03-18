@@ -266,8 +266,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             (ae instanceof ImageAnimationEventImpl)
                 ? ((ImageAnimationEventImpl)ae).createScaledVersion(scale)
                 : ae;
-        return new SimpleZippedAnimation(transform(this.events, ae -> true,
-                scaleEvent, Collectors.toList()),
+        return new SimpleZippedAnimation(toList(map(this.events, scaleEvent)),
             (int)(this.width * scale), (int)(this.height * scale));
     }
 

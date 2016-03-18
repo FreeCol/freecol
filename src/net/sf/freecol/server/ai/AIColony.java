@@ -952,7 +952,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public List<GoodsWish> getGoodsWishes() {
         return transform(wishes, w -> w instanceof GoodsWish,
-            w -> (GoodsWish)w, Collectors.toList());
+                         w -> (GoodsWish)w, Collectors.toList());
     }
 
     /**
@@ -962,7 +962,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public List<WorkerWish> getWorkerWishes() {
         return transform(wishes, w -> w instanceof WorkerWish,
-            w -> (WorkerWish)w, Collectors.toList());
+                         w -> (WorkerWish)w, Collectors.toList());
     }
 
     /**

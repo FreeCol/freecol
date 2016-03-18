@@ -115,7 +115,7 @@ public class CashInTreasureTrainMission extends Mission {
         final Location here = unit.getLocation();
         final Comparator<Unit> comp = cachingIntComparator(u ->
             u.getTurnsToReach(here));
-        Unit closest = minimize(carriers, u -> true, comp);
+        Unit closest = minimize(carriers, comp);
         final AIMain aiMain = getAIMain();
         TransportMission tm;
         AIUnit aiCarrier;

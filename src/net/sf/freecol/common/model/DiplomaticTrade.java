@@ -308,7 +308,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
         return transform(this.items, ti -> ti.getSource() == player,
-            Collectors.toList());
+                         Collectors.toList());
     }
 
     /**

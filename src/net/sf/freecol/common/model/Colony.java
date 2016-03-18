@@ -1656,7 +1656,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<Building> getBurnableBuildings() {
         return transform(getBuildings(), Building::canBeDamaged,
-                                Collectors.toList());
+                         Collectors.toList());
     }
 
     /**
@@ -2631,7 +2631,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final CombatModel cm = getGame().getCombatModel();
         final Comparator<Unit> comp
             = cachingDoubleComparator(u -> cm.getDefencePower(attacker, u));
-        return maximize(getUnitList(), e -> true, comp);
+        return maximize(getUnitList(), comp);
     }
 
     /**
@@ -2913,8 +2913,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 e.getValue().toXML(xw);
             }
 
-            for (WorkLocation workLocation : sortedCopy(getAllWorkLocations())) {
-                workLocation.toXML(xw);
+            for (WorkLocation wl : toSortedList(getAllWorkLocations())) {
+                wl.toXML(xw);
             }
 
             for (BuildableType item : buildQueue.getValues()) { // In order!

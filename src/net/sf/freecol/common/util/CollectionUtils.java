@@ -290,9 +290,8 @@ public class CollectionUtils {
      */
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map) {
-        return map.entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey))
-            .collect(Collectors.toList());
+        return toSortedList(map.entrySet().stream(),
+                            Comparator.comparing(Entry::getKey));
     }
 
     /**
@@ -304,9 +303,8 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
-        return map.entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey, comparator))
-            .collect(Collectors.toList());
+        return toSortedList(map.entrySet().stream(),
+                            Comparator.comparing(Entry::getKey, comparator));
     }
 
     /**
@@ -317,9 +315,8 @@ public class CollectionUtils {
      */
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map) {
-        return map.entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getValue))
-            .collect(Collectors.toList());
+        return toSortedList(map.entrySet().stream(),
+                            Comparator.comparing(Entry::getValue));
     }
 
     /**
@@ -331,9 +328,8 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
-        return map.entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getValue, comparator))
-            .collect(Collectors.toList());
+        return toSortedList(map.entrySet().stream(),
+                            Comparator.comparing(Entry::getValue, comparator));
     }
 
     public static <T> boolean all(T[] array, Predicate<T> predicate) {
@@ -570,6 +566,18 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param c The <code>Collection</code> to maximize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(Collection<T> c, Comparator<T> comparator) {
+        return maximize(c.stream(), p -> true, comparator);
+    }
+
+    /**
+     * Find the selected member of a collection that maximizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to maximize from.
      * @param predicate A <code>Predicate</code> to match with.
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
@@ -577,6 +585,18 @@ public class CollectionUtils {
     public static <T> T maximize(Collection<T> c, Predicate<T> predicate,
                                  Comparator<T> comparator) {
         return maximize(c.stream(), predicate, comparator);
+    }
+
+    /**
+     * Find the selected member of a stream that maximizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to maximize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(Stream<T> stream, Comparator<T> comparator) {
+        return maximize(stream, p -> true, comparator);
     }
 
     /**
@@ -599,6 +619,18 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param c The <code>Collection</code> to minimize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(Collection<T> c, Comparator<T> comparator) {
+        return minimize(c.stream(), t -> true, comparator);
+    }
+
+    /**
+     * Find the selected member of a collection that minimizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to minimize from.
      * @param predicate A <code>Predicate</code> to match with.
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
@@ -606,6 +638,18 @@ public class CollectionUtils {
     public static <T> T minimize(Collection<T> c, Predicate<T> predicate,
                                  Comparator<T> comparator) {
         return minimize(c.stream(), predicate, comparator);
+    }
+
+    /**
+     * Find the selected member of a stream that minimizes according
+     * to a given comparison.
+     *
+     * @param c The <code>Collection</code> to minimize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(Stream<T> stream, Comparator<T> comparator) {
+        return minimize(stream, t -> true, comparator);
     }
 
     /**
@@ -725,11 +769,19 @@ public class CollectionUtils {
     }
 
     /**
-     * Convenience function to convert a collection to a map.
+     * Convenience function to convert an array to a list.
+     *
+     * @param array The array to convert.
+     * @return A map of the stream contents.
+     */
+    public static <T> List<T> toList(T[] array) {
+        return toList(Arrays.stream(array));
+    }
+
+    /**
+     * Convenience function to convert a collection to a list.
      *
      * @param collection The <code>Collection</code> to convert.
-     * @param keyMapper A mapping function from datum to key.
-     * @param valueMapper A mapping function from datum to value.
      * @return A map of the stream contents.
      */
     public static <T> Collection<T> toList(Collection<T> collection) {
@@ -744,6 +796,76 @@ public class CollectionUtils {
      */
     public static <T> List<T> toList(Stream<T> stream) {
         return stream.collect(Collectors.toList());
+    }
+
+    /**
+     * Convenience function to convert an array to a sorted list.
+     *
+     * @param array The array to convert.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T>
+        toSortedList(T[] array) {
+        return toSortedList(Arrays.stream(array));
+    }
+
+    /**
+     * Convenience function to convert a collection to a sorted list.
+     *
+     * @param collection The <code>Collection</code> to convert.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T>
+        toSortedList(Collection<T> collection) {
+        return toSortedList(collection.stream());
+    }
+
+    /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param stream The <code>Stream</code> to collect.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T>
+        toSortedList(Stream<T> stream) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return toSortedList(stream, comparator);
+    }
+
+    /**
+     * Convenience function to convert an array to a sorted list.
+     *
+     * @param array The array to convert.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    public static <T> List<T> toSortedList(T[] array,
+                                           Comparator<T> comparator) {
+        return toSortedList(Arrays.stream(array), comparator);
+    }
+
+    /**
+     * Convenience function to convert a collection to a map.
+     *
+     * @param collection The <code>Collection</code> to convert.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A map of the stream contents.
+     */
+    public static <T> List<T> toSortedList(Collection<T> collection,
+                                           Comparator<T> comparator) {
+        return toSortedList(collection.stream(), comparator);
+    }
+
+    /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param stream The <code>Stream</code> to collect.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    public static <T> List<T> toSortedList(Stream<T> stream,
+                                           Comparator<T> comparator) {
+        return stream.sorted(comparator).collect(Collectors.toList());
     }
 
     /**
@@ -1023,15 +1145,5 @@ public class CollectionUtils {
         return new Iterable<T>() {
             public Iterator<T> iterator() { return stream.iterator(); }
         };
-    }
-
-    /**
-     * Sort a collection.
-     *
-     * @param c The <code>Collection</code> to sort.
-     * @return A sorted copy of the collection as a list.
-     */
-    public static <T> List<T> sortedCopy(Collection<T> c) {
-        return c.stream().sorted().collect(Collectors.toList());
     }
 }

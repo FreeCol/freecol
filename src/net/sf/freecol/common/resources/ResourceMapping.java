@@ -293,7 +293,8 @@ public final class ResourceMapping {
      */
     public List<String> getImageKeys(String prefix) {
         return transform(imageResources.keySet(),
-            k -> k.startsWith(prefix), Collectors.toList());
+                         k -> k.startsWith(prefix),
+                         Collectors.toList());
     }
 
     /**
@@ -304,7 +305,8 @@ public final class ResourceMapping {
      */
     public Set<String> getImageKeySet(String prefix) {
         return transform(imageResources.keySet(),
-            k -> k.startsWith(prefix), Collectors.toSet());
+                         k -> k.startsWith(prefix),
+                         Collectors.toSet());
     }
 
     /**
@@ -317,7 +319,7 @@ public final class ResourceMapping {
      */
     public List<String> getImageKeys(String prefix, String suffix) {
         return transform(imageResources.keySet(),
-            k -> k.startsWith(prefix) && k.endsWith(suffix),
-            Collectors.toList());
+                         k -> k.startsWith(prefix) && k.endsWith(suffix),
+                         Collectors.toList());
     }
 }

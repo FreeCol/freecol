@@ -194,7 +194,7 @@ public class IndianDemandMission extends Mission {
 
         // Finally just go for expense
         if (goods == null) {
-            goods = maximize(target.getCompactGoods(), g -> true, marketPrice);
+            goods = maximize(target.getCompactGoods(), marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }
 

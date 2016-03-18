@@ -407,7 +407,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public List<Role> getExpertRoles() {
         return transform(getSpecification().getRoles(),
-            r -> r.getExpertUnit() == this, Collectors.toList());
+                         r -> r.getExpertUnit() == this, Collectors.toList());
     }
 
     /**

@@ -313,7 +313,7 @@ public class PioneeringMission extends Mission {
         final Comparator<AIColony> comp = Comparator.comparingInt(c ->
             c.getTileImprovementPlans().size());
         final EuropeanAIPlayer owner = (EuropeanAIPlayer)aiUnit.getAIOwner();
-        AIColony bestColony = maximize(owner.getAIColonies(), c -> true, comp);
+        AIColony bestColony = maximize(owner.getAIColonies(), comp);
             
         PathNode path;
         Colony colony;

@@ -114,7 +114,8 @@ public class Building extends WorkLocation
             colony.addFeatures(buildingType);
 
             // Colonists which can't work here must be put outside
-            eject.addAll(transform(getUnitList(), u -> !canAddType(u.getType()),
+            eject.addAll(transform(getUnitList(),
+                                   u -> !canAddType(u.getType()),
                                    Collectors.toList()));
         }
 

@@ -59,6 +59,7 @@ import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.ServerListMessage;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.FreeColServer.GameState;
 
@@ -336,11 +337,11 @@ public final class ConnectController extends FreeColClientHolder {
 
             String choice = getGUI().getChoice(null,
                 Messages.message("client.choicePlayer"),
-                "cancel", names.stream()
-                    .map(n -> new ChoiceItem<>(Messages.message(StringTemplate
+                "cancel",
+                toList(map(names, n ->
+                        new ChoiceItem<>(Messages.message(StringTemplate
                                 .template("countryName")
-                                .add("%nation%", Messages.nameKey(n))), n))
-                    .collect(Collectors.toList()));
+                                .add("%nation%", Messages.nameKey(n))), n))));
             if (choice == null) return false; // User cancelled
 
             if (!login(Messages.getRulerName(choice), host, port)) return false;

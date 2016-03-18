@@ -286,9 +286,7 @@ public class ColonyPlan {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void refine(BuildableType build, LogBuilder lb) {
-        List<GoodsType> required
-            = transform(colony.getFullRequiredGoods(build), ag -> true,
-                AbstractGoods::getType, Collectors.toList());
+        List<GoodsType> required = toList(map(colony.getFullRequiredGoods(build), AbstractGoods::getType));
         Map<GoodsType, List<WorkLocationPlan>> suppressed = new HashMap<>();
 
         // Examine a copy of the work plans, but operate on the

@@ -2820,8 +2820,7 @@ public class Unit extends GoodsLocation
     public Colony getClosestColony(Stream<Colony> colonies) {
         final Comparator<Colony> comp = cachingIntComparator(col ->
             (col == null) ? MANY_TURNS-1 : this.getTurnsToReach(col));
-        return minimize(Stream.concat(Stream.of((Colony)null), colonies),
-                        c -> true, comp);
+        return minimize(Stream.concat(Stream.of((Colony)null), colonies), comp);
     }
     
     /**

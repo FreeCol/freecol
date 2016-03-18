@@ -517,7 +517,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isRiverCorner() {
         List<Tile> tiles = transform(getSurroundingTiles(0, 1),
-            Tile::isOnRiver, Collectors.toList());
+                                     Tile::isOnRiver, Collectors.toList());
         switch (tiles.size()) {
         case 0: case 1:
             return false;
@@ -1290,8 +1290,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of adjacent <code>Colony</code>s.
      */
     public List<Colony> getAdjacentColonies() {
-        return transform(getSurroundingTiles(0, 1),
-            t -> t.getColony() != null, Tile::getColony, Collectors.toList());
+        return transform(getSurroundingTiles(0, 1), t -> t.getColony() != null,
+                         Tile::getColony, Collectors.toList());
     }
 
     /**
@@ -1380,13 +1380,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        final ToDoubleFunction<Tile> safeness
-            = cacheDouble(Tile::getDefenceValue);
-        return getSurroundingTiles(0, 1).stream()
-            .filter(t -> t.isLand()
-                && (!t.hasSettlement() || player.owns(t.getSettlement())))
-            .sorted(Comparator.comparingDouble(safeness).reversed())
-            .collect(Collectors.toList());
+        final Comparator<Tile> comp = cachingDoubleComparator((Tile t) ->
+            t.getDefenceValue()).reversed();
+        return toSortedList(getSurroundingTiles(0, 1).stream()
+                .filter(t -> t.isLand()
+                    && (!t.hasSettlement() || player.owns(t.getSettlement()))),
+            comp);
     }
                     
     /**

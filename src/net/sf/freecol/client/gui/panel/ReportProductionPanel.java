@@ -70,9 +70,8 @@ public final class ReportProductionPanel extends ReportPanel {
 
         this.goodsTypes = transform(getSpecification().getGoodsTypeList(),
             gt -> !gt.isFarmed(), Collectors.toList());
-        List<String> goodsNames = this.goodsTypes.stream()
-            .map(gt -> Messages.getName(gt))
-            .collect(Collectors.toList());
+        List<String> goodsNames = toList(map(this.goodsTypes,
+                                             gt -> Messages.getName(gt)));
         goodsNames.add(0, Messages.message("nothing"));
         String[] model = goodsNames.toArray(new String[0]);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
@@ -111,13 +110,12 @@ public final class ReportProductionPanel extends ReportPanel {
             final Specification spec = getSpecification();
             final FreeColClient fcc = getFreeColClient();
             List<List<BuildingType>> basicBuildingTypes
-                = transform(selectedTypes, gt -> true,
-                    gt -> transformDistinct(spec.getBuildingTypeList(),
-                        bt -> gt == bt.getProducedGoodsType()
+                = toList(map(selectedTypes,
+                        gt -> transformDistinct(spec.getBuildingTypeList(),
+                            bt -> gt == bt.getProducedGoodsType()
                             || bt.hasModifier(gt.getId()),
-                        (BuildingType bt) -> bt.getFirstLevel(),
-                        Collectors.toList()),
-                    Collectors.toList());
+                            (BuildingType bt) -> bt.getFirstLevel(),
+                            Collectors.toList())));
 
             // labels
             JLabel newLabel;

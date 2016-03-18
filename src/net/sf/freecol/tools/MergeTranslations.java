@@ -74,8 +74,8 @@ public class MergeTranslations {
 
                 List<Entry<String,String>> missingProperties
                     = transform(sourceProperties.entrySet(),
-                        e -> !targetProperties.containsKey(e.getKey()),
-                        Collectors.toList());
+                                e -> !targetProperties.containsKey(e.getKey()),
+                                Collectors.toList());
                 if (!missingProperties.isEmpty()) {
                     try (FileWriter out = new FileWriter(targetFile, true)) {
                         out.write("### Merged from trunk on "

@@ -264,11 +264,11 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
-        return map.keySet().stream()
-            .sorted(Comparator.comparingInt((JMenuItem k)
-                    -> map.get(k)).reversed()
-                .thenComparing(JMenuItem::getText))
-            .collect(Collectors.toList());
+        final Comparator<JMenuItem> comp
+            = Comparator.comparingInt((JMenuItem k) -> map.get(k))
+                .reversed()
+                .thenComparing(JMenuItem::getText);
+        return toSortedList(map.keySet(), comp);
     }
 
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,

@@ -737,10 +737,10 @@ public class SimpleMapGenerator implements MapGenerator {
                                               NationType nationType) {
         List<RandomChoice<UnitType>> skills
             = ((IndianNationType)nationType).getSkills();
-        java.util.Map<GoodsType, Integer> scale = new HashMap<>();
-        for (RandomChoice<UnitType> skill : skills) {
-            scale.put(skill.getObject().getExpertProduction(), 1);
-        }
+        java.util.Map<GoodsType, Integer> scale
+            = toMap(skills,
+                    rc -> rc.getObject().getExpertProduction(),
+                    rc -> 1);
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
@@ -750,22 +750,17 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
 
-        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<>();
-        for (RandomChoice<UnitType> skill : skills) {
-            UnitType unitType = skill.getObject();
-            int scaleValue = scale.get(unitType.getExpertProduction());
-            scaledSkills.add(new RandomChoice<>(unitType,
-                    skill.getProbability() * scaleValue));
-        }
         UnitType skill = RandomChoice.getWeightedRandom(null, null,
-                                                        scaledSkills, random);
-        if (skill == null) {
-            // Seasoned Scout
-            List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
-            return getRandomMember(logger, "Scout", unitList, random);
-        } else {
-            return skill;
-        }
+            toList(map(skills, rc -> {
+                        UnitType unitType = rc.getObject();
+                        return new RandomChoice<>(unitType, rc.getProbability()
+                            * scale.get(unitType.getExpertProduction()));
+                    })),
+            random);
+        final Specification spec = map.getSpecification();
+        return (skill != null) ? skill
+            : getRandomMember(logger, "Scout",
+                spec.getUnitTypesWithAbility(Ability.EXPERT_SCOUT), random);
     }
 
     /**

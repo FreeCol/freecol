@@ -185,8 +185,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         if (unitList == null || unitList.isEmpty()) {
             reportPanel.add(Utility.localizedLabel("none"), "sg");
         } else {
-            for (Unit u : unitList.stream()
-                     .sorted(Unit.typeRoleComparator).collect(Collectors.toList())) {
+            for (Unit u : toSortedList(unitList, Unit.typeRoleComparator)) {
                 JButton unitButton = getUnitButton(u);
                 if (u.isCarrier()) {
                     reportPanel.add(unitButton, "newline, sg");

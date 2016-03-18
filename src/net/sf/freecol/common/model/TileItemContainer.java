@@ -239,10 +239,8 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of complete <code>TileItem</code>s.
      */
     public List<TileItem> getCompleteItems() {
-        synchronized (tileItems) {
-            return transform(tileItems, TileItem::isComplete,
-                Collectors.toList());
-        }
+        return transform(getTileItems(), TileItem::isComplete,
+                         Collectors.toList());
     }
 
     /**

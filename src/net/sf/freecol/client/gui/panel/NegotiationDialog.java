@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -67,6 +68,7 @@ import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
@@ -1023,9 +1025,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * @return A list of storable <code>Goods</code>.
      */
     private List<Goods> getAnyGoods(GoodsLocation gl) {
-        return getSpecification().getStorableGoodsTypeList().stream()
-            .map(gt -> new Goods(getGame(), gl, gt, GoodsContainer.CARGO_SIZE))
-            .collect(Collectors.toList());
+        final Game game = getGame();
+        final Specification spec = getSpecification();
+        return toList(map(spec.getStorableGoodsTypeList(), gt ->
+                new Goods(game, gl, gt, GoodsContainer.CARGO_SIZE)));
     }
 
     /**

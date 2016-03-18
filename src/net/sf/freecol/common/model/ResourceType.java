@@ -79,7 +79,7 @@ public final class ResourceType extends FreeColSpecObjectType {
         final Comparator<Modifier> comp = cachingDoubleComparator(m ->
             spec.getInitialPrice(spec.getGoodsType(m.getId()))
                 * (double)m.applyTo(100));
-        Modifier best = maximize(getModifiers(), m -> true, comp);
+        Modifier best = maximize(getModifiers(), comp);
         return (best == null) ? null : spec.getGoodsType(best.getId());
     }
 

@@ -22,11 +22,13 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -225,13 +227,8 @@ public final class TileType extends FreeColSpecObjectType {
      * @return A list of <code>ResourceType</code>s.
      */
     public List<ResourceType> getResourceTypes() {
-        List<ResourceType> result = new ArrayList<>();
-        if (resourceTypes != null) {
-            for (RandomChoice<ResourceType> resource : resourceTypes) {
-                result.add(resource.getObject());
-            }
-        }
-        return result;
+        return (resourceTypes == null) ? Collections.<ResourceType>emptyList()
+            : toList(map(resourceTypes, RandomChoice::getObject));
     }
 
     /**

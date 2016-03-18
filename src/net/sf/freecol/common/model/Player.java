@@ -2326,7 +2326,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return (!isEuropean())
             ? Collections.<Colony>emptyList()
             : transform(getColonies(), Colony::isConnectedPort,
-                Collectors.toList());
+                        Collectors.toList());
     }
 
     /**
@@ -2418,12 +2418,12 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a sorted list of all colonies this player owns.
      *
-     * @param c A comparator to operate on the colony list.
+     * @param comp A <code>Comparator</code> to operate on the colony list.
      * @return A fresh list of the <code>Colony</code>s this player owns.
      */
-    public List<Colony> getSortedColonies(Comparator<Colony> c) {
+    public List<Colony> getSortedColonies(Comparator<Colony> comp) {
         return transformAndSort(getSettlements(), s -> s instanceof Colony,
-                                s -> (Colony)s, c, Collectors.toList());
+                                s -> (Colony)s, comp, Collectors.toList());
     }
 
     /**
@@ -2456,7 +2456,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public Settlement getClosestPortForEurope() {
         final Comparator<Settlement> comp
             = Comparator.comparingInt(Settlement::getHighSeasCount);
-        return minimize(getSettlements(), s -> true, comp);
+        return minimize(getSettlements(), comp);
     }
 
 
@@ -2485,7 +2485,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<ModelMessage> getNewModelMessages() {
         synchronized (this.modelMessages) {
             return transform(this.modelMessages, m -> !m.hasBeenDisplayed(),
-                Collectors.toList());
+                             Collectors.toList());
         }
     }
 
@@ -3499,10 +3499,9 @@ public class Player extends FreeColGameObject implements Nameable {
         final int FOOD_VERY_LOW = 1;
 
         // Multiplicative modifiers, to be applied to value later
-        List<Double> values = new ArrayList<>();
-        for (ColonyValueCategory c : ColonyValueCategory.values()) {
-            values.add(1.0);
-        }
+        List<Double> values = toList(map(ColonyValueCategory.values(),
+                                         v -> 1.0));
+
         // Penalize certain problems more in the initial colonies.
         double development = Math.min(LOW_SETTLEMENT_NUMBER,
                                       getSettlementCount())
@@ -3991,7 +3990,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            for (Player p : sortedCopy(tension.keySet())) {
+            for (Player p : toSortedList(tension.keySet())) {
                 xw.writeStartElement(TENSION_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, p);
@@ -4002,7 +4001,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             
             if (bannedMissions != null) {
-                for (Player p : sortedCopy(bannedMissions)) {
+                for (Player p : toSortedList(bannedMissions)) {
                     xw.writeStartElement(BAN_MISSIONS_TAG);
 
                     xw.writeAttribute(PLAYER_TAG, p.getId());
@@ -4028,7 +4027,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 event.toXML(xw);
             }
 
-            for (TradeRoute route : sortedCopy(getTradeRoutes())) {
+            for (TradeRoute route : toSortedList(getTradeRoutes())) {
                 route.toXML(xw);
             }
 
@@ -4045,7 +4044,7 @@ public class Player extends FreeColGameObject implements Nameable {
             for (ModelMessage m : getModelMessages()) m.toXML(xw);
 
             if (lastSales != null) {
-                for (LastSale ls : sortedCopy(lastSales.values())) {
+                for (LastSale ls : toSortedList(lastSales.values())) {
                     ls.toXML(xw);
                 }
             }

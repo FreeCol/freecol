@@ -2492,7 +2492,7 @@ public class Map extends FreeColGameObject implements Location {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Region region : sortedCopy(regions)) {
+        for (Region region : toSortedList(regions)) {
             region.toXML(xw);
         }
 

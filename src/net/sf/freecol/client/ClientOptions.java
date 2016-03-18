@@ -51,6 +51,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.TextOption;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -574,11 +575,10 @@ public class ClientOptions extends OptionGroup {
     public List<FreeColModFile> getActiveMods() {
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
         return (option == null) ? Collections.<FreeColModFile>emptyList()
-            : option.getOptionValues().stream()
-                .map(m -> (m == null || m.getId() == null) ? null
-                    : Mods.getFreeColModFile(m.getId()))
-                .filter(f -> f != null)
-                .collect(Collectors.toList());
+            : toList(map(option.getOptionValues(),
+                    m -> (m == null || m.getId() == null) ? null
+                        : Mods.getFreeColModFile(m.getId()))
+                .filter(f -> f != null));
     }
 
     /**

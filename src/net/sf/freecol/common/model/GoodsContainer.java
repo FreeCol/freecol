@@ -373,7 +373,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public List<Goods> getCompactGoods() {
         final Game game = getGame();
         synchronized (this.storedGoods) {
-            return transform(this.storedGoods.entrySet(), e -> e.getValue() > 0,
+            return transform(this.storedGoods.entrySet(),
+                e -> e.getValue() > 0,
                 e -> new Goods(game, parent, e.getKey(), e.getValue()),
                 Collectors.toList());
         }
@@ -507,7 +508,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         xw.writeStartElement(tag);
 
-        for (GoodsType goodsType : sortedCopy(storage.keySet())) {
+        for (GoodsType goodsType : toSortedList(storage.keySet())) {
 
             xw.writeStartElement(Goods.getTagName());
 

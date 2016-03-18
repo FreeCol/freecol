@@ -617,7 +617,7 @@ public abstract class Mission extends AIObject {
                 }
                 return value;
             });
-        return maximize(player.getSettlements(), s -> true, comp);
+        return maximize(player.getSettlements(), comp);
     }
 
     /**

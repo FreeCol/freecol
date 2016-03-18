@@ -127,8 +127,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param modSet A set of <code>Modifiers</code> to log.
      */   
     private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
-        lb.addCollection(" ", modSet.stream()
-            .sorted().collect(Collectors.toList()));
+        lb.addCollection(" ", toSortedList(modSet));
     }
 
     /**
