@@ -271,7 +271,7 @@ public final class CostDeciders {
     public static CostDecider defaultCostDeciderFor(final Unit unit) {
         return (unit == null)
             ? avoidIllegal()
-            : (unit.isNaval())
+            : (unit.isNaval() && !unit.isOffensiveUnit())
             ? avoidNavalDanger()
             : (unit.isOffensiveUnit())
             ? avoidSettlements()
