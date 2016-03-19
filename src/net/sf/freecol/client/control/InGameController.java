@@ -774,8 +774,7 @@ public final class InGameController extends FreeColClientHolder
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<>();
         for (Unit unit : toSortedList(player.getUnits().stream()
-                .filter(u -> u.isReadyToMove() && u.getOwner() == player
-                    && u.getTradeRoute() != null),
+                .filter(u -> u.isReadyToTrade() && player.owns(u)),
                 tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
             if (moveToDestination(unit, messages)) stillActive = unit;

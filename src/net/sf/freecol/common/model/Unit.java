@@ -580,22 +580,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Is this unit ready to move?
-     *
-     * @return True if the unit is ready to move.
-     */
-    public boolean isReadyToMove() {
-        return !isDisposed()
-            && getState() != Unit.UnitState.FORTIFYING
-            && getState() != Unit.UnitState.SKIPPED
-            && getMovesLeft() > 0
-            && !isDamaged()
-            && !isAtSea()
-            && !isOnCarrier()
-            && !isInColony();
-    }
-
-    /**
      * Gets the state of this <code>Unit</code>.
      *
      * @return The state of this <code>Unit</code>.
@@ -2494,6 +2478,23 @@ public class Unit extends GoodsLocation
         if (getColony() != null && getMovesLeft() < getInitialMovesLeft()) {
             setMovesLeft(0);
         }
+    }
+
+    /**
+     * Is this unit ready to operate a trade route?
+     *
+     * @return True if the unit is ready to trade.
+     */
+    public boolean isReadyToTrade() {
+        return !isDisposed()
+            && !isDamaged()
+            && !isAtSea()
+            && !isOnCarrier()
+            && !isInColony()
+            && getTradeRoute() != null
+            && getState() != Unit.UnitState.FORTIFYING
+            && getState() != Unit.UnitState.SKIPPED
+            && getMovesLeft() > 0;
     }
 
     /**
