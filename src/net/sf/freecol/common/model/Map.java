@@ -1046,9 +1046,23 @@ public class Map extends FreeColGameObject implements Location {
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
-            path = findMapPath(unit, (Tile)realStart, (Tile)realEnd, carrier,
-                               costDecider, lb);
-
+            // Short circuit if adjacent and blocked
+            Direction d;
+            Unit.MoveType mt;
+            if (unit != null
+                && (d = ((Tile)realStart).getDirection((Tile)realEnd)) != null
+                && (mt = unit.getMoveType(d)).isLegal()
+                && !mt.isProgress()) {
+                path = new PathNode(realStart, unit.getMovesLeft(), 0,
+                                    carrier != null, null, null);
+                int cost = unit.getMoveCost((Tile)realStart, (Tile)realEnd,
+                                            unit.getMovesLeft());
+                path.next = new PathNode(realEnd, unit.getMovesLeft() - cost,
+                                         0, false, path, null);
+            } else {
+                path = findMapPath(unit, (Tile)realStart, (Tile)realEnd,
+                                   carrier, costDecider, lb);
+            }
         } else {
             throw new IllegalStateException("Can not happen: " + realStart
                                             + ", " + realEnd);

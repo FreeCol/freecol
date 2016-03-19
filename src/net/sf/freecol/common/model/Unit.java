@@ -1988,10 +1988,10 @@ public class Unit extends GoodsLocation
      * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param from The <code>Tile</code> this <code>Unit</code> will move
-     *            from.
-     * @param target The <code>Tile</code> this <code>Unit</code> will move
-     *            onto.
+     * @param from The <code>Tile</code> this <code>Unit</code> will
+     *     move from.
+     * @param target The <code>Tile</code> this <code>Unit</code> will
+     *     move onto.
      * @param ml The amount of moves this Unit has left.
      * @return The cost of moving this unit onto the given <code>Tile</code>.
      */
