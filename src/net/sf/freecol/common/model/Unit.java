@@ -4121,6 +4121,20 @@ public class Unit extends GoodsLocation
                 }
             }
         }
+        if (this.state == UnitState.IMPROVING
+            && this.workImprovement == null) {
+            // This can happen as a result of trying to read an invalid
+            // improvement.
+            if (fix) {
+                this.state = UnitState.ACTIVE;
+                logger.warning("Made improving unit active: " + getId());
+                result = Math.min(result, 0);
+            } else {
+                logger.warning("Improving unit with no improvement: "
+                    + getId());
+                result = -1;
+            }
+        }
         return result;
     }
 

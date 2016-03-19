@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -32,6 +33,8 @@ import net.sf.freecol.common.model.Map.Layer;
  */
 public abstract class TileItem extends FreeColGameObject
     implements Locatable, Named {
+
+    private static final Logger logger = Logger.getLogger(TileItem.class.getName());
 
     /** The tile where the tile item is. */
     protected Tile tile;
@@ -202,4 +205,20 @@ public abstract class TileItem extends FreeColGameObject
      */
     @Override
     public abstract String getNameKey();
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (this.tile == null) {
+            logger.warning("Tile item with no tile: " + this.getId());
+            return -1;
+        }
+        return result;
+    }
 }
