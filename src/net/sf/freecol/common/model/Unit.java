@@ -658,9 +658,15 @@ public class Unit extends GoodsLocation
         switch (state) {
         case IMPROVING:
             if (workImprovement != null && getWorkLeft() > 0) {
+                // Remove the tile improvement if it is incomplete
+                // and no one else is working on it
+                Tile tile;
                 if (!workImprovement.isComplete()
-                    && workImprovement.getTile() != null
-                    && workImprovement.getTile().getTileItemContainer() != null) {
+                    && (tile = workImprovement.getTile()) != null
+                    && tile.getTileItemContainer() != null
+                    && none(tile.getUnitList(), u ->
+                        u != this && u.getState() == UnitState.IMPROVING
+                             && u.getWorkImprovement() == workImprovement)) {
                     workImprovement.getTile().getTileItemContainer()
                         .removeTileItem(workImprovement);
                 }
