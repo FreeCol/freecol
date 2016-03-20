@@ -985,6 +985,17 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get all the colonies in the game.
+     *
+     * @param player An optional <code>Player</code> to omit.
+     * @return A list of all the <code>Colony</code>s in the game.
+     */
+    public List<Colony> getAllColonies(Player player) {
+        return toList(flatten(getLivePlayers(player), p -> p.isEuropean(),
+                              p -> p.getColonies()));
+    }
+            
+    /**
      * Finds a settlement by name.
      *
      * @param name The name of the <code>Settlement</code>.
@@ -1334,9 +1345,7 @@ public class Game extends FreeColGameObject {
 
         // Make sure all work locations have rational default production
         // now that all tiles are defined.
-        for (Player player : getLiveEuropeanPlayers(null)) {
-            for (Colony c : player.getColonies()) c.updateProductionTypes();
-        }
+        for (Colony c : getAllColonies(null)) c.updateProductionTypes();
     }
 
     /**

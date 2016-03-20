@@ -1785,14 +1785,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Update player explored tiles after a change to this tile.
      */
     private void updateColonyTiles() {
-        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
-            for (Colony colony : player.getColonies()) {
-                for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                    if (colonyTile.getWorkTile() == this) {
-                        colonyTile.updateProductionType();
-                    }
-                }
-            }
+        for (ColonyTile ct : transform(flatten(getGame().getAllColonies(null),
+                                               c -> c.getColonyTiles()),
+                                       ct -> ct.getWorkTile() == this,
+                                       Collectors.toList())) {
+            ct.updateProductionType();
         }
     }
 
