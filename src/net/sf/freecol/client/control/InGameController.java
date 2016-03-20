@@ -949,7 +949,10 @@ public final class InGameController extends FreeColClientHolder
             return followTradeRoute(unit, messages);
         } else if ((destination = unit.getDestination()) == null) {
             return unit.getMovesLeft() > 0;
+        } else if (!changeState(unit, UnitState.ACTIVE)) {
+            return false;
         }
+        getGUI().setActiveUnit(unit);
 
         // Find a path to the destination and try to follow it.
         final Player player = getMyPlayer();
@@ -967,7 +970,6 @@ public final class InGameController extends FreeColClientHolder
             getGUI().showInformationMessage(unit, template);
             return false;
         }
-        getGUI().setActiveUnit(unit);
 
         // Clear ordinary destinations if arrived.
         if (movePath(unit, path) && unit.isAtLocation(destination)) {
