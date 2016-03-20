@@ -216,9 +216,14 @@ public class LandMap {
 
     /**
      * Create the standard FreeCol land map.
+     *
+     * @param preferredDistanceToEdge The nominal edge clearance.
+     * @param minimumNumberOfTiles Lower bound for the tiles to create.
+     * @param random A pseudo-random number source.
      */
     private void createClassicLandMap(int preferredDistanceToEdge,
-                                      int minimumNumberOfTiles, Random random) {
+                                      int minimumNumberOfTiles,
+                                      Random random) {
         int x, y;
         while (numberOfLandTiles < minimumNumberOfTiles) {
             int failCounter = 0;
@@ -285,6 +290,7 @@ public class LandMap {
      *
      * @param x The x coordinate to check.
      * @param y The y coordinate to check.
+     * @return Does this tile have no adjoining land.
      */
     private boolean isSingleTile(int x, int y) {
         final Position p = new Position(x, y);

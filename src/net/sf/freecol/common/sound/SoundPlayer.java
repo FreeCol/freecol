@@ -298,6 +298,7 @@ public class SoundPlayer {
          *
          * @param in The <code>AudioInputStream</code> to play.
          * @return True if the stream was played without incident.
+         * @exception IOException if unable to read or write the sound data.
          */
         private boolean playSound(AudioInputStream in) throws IOException {
             boolean ret = false;

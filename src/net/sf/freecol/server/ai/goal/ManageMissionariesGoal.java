@@ -38,7 +38,7 @@ import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * This {@link Goal} deals with all missionaries of one {@link AIPlayer}.
- * </p><p>
+ *
  * For each missionary unit that is being added, this goal will try to find
  * an {@link IndianSettlement} needing a visit.
  * Distance and reachability from the current position of the unit are
@@ -47,7 +47,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * even worth visiting.
  * Since missionary units are either created in a player-owned colony,
  * or brought there from Europe, this assumption will most often be valid.
- * </p><p>
+ *
  * If a settlement has been found, a {@link CreateMissionAtSettlementGoal}
  * will be created, and the unit be moved there.
  */

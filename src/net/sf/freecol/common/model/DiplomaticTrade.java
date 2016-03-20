@@ -105,6 +105,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
      * @param items A list of items to trade.
+     * @param version The trade version number.
      */
     public DiplomaticTrade(Game game, TradeContext context,
                            Player sender, Player recipient,
@@ -324,6 +325,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get a list of colonies offered in this trade.
      *
+     * @param player The <code>Player</code> offering the colonies.
      * @return A list of <code>Colony</code>s offered in this trade.
      */
     public List<Colony> getColoniesGivenBy(final Player player) {
@@ -347,6 +349,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the goods being offered.
      *
+     * @param player The <code>Player</code> offering the goods.
      * @return A list of <code>Goods</code> offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player) {
@@ -368,6 +371,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get a list of units offered in this trade.
      *
+     * @param player The <code>Player</code> offering the units.
      * @return A list of <code>Unit</code>s offered in this trade.
      */
     public List<Unit> getUnitsGivenBy(Player player) {

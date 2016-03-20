@@ -33,7 +33,7 @@ import net.sf.freecol.common.util.LogBuilder;
  */
 public class PathNode {
 
-    /** Weight turns >> moves. */
+    /** Weight turns much greater than moves. */
     private static final int TURN_FACTOR = 100;
 
     /** The location this node refers to.  Usually a Tile. */

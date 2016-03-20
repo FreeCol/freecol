@@ -202,6 +202,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes a <code>TileItem</code> from this container.
      *
+     * @param <T> The actual <code>TileItem</code> type.
      * @param item The <code>TileItem</code> to remove from this container.
      * @return The <code>TileItem</code> that has been removed from
      *     this container (if any).
@@ -222,6 +223,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes all tile items of a given class.
      *
+     * @param <T> The actual <code>TileItem</code> type.
      * @param c The <code>Class</code> to remove.
      */
     public final <T extends TileItem> void removeAll(Class<T> c) {

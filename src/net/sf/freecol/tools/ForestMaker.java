@@ -118,8 +118,11 @@ public class ForestMaker {
 
     /**
      * Pass the source directory as first argument.
+     *
+     * @param args The program arguments.
+     * @exception IOException if the resources can not be read or written.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
 
         if (args.length == 0) {
             System.out.println("Usage: ForestMaker <directory>...");

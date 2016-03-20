@@ -242,13 +242,15 @@ public final class CompactLabourReport extends ReportPanel {
     }
 
     /**
-     * add unit data for a given location
+     * Add unit data for a given location.
      *
-     * @param data
-     * @param row  starting row
-     * @return next row to use
+     * @param data The <code>LocationData</code> to add to.
+     * @param colony The enclosing <code>Colony</code>.
+     * @param row The starting row.
+     * @return The finishing row.
      */
-    private int addLocationData(LabourData.LocationData data, Colony colony, int row) {
+    private int addLocationData(LabourData.LocationData data, Colony colony,
+                                int row) {
         boolean allColonists = data.getUnitData().isSummary();
 
         LabourData.UnitData unit = data.getUnitData();

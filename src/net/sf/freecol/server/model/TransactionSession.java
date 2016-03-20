@@ -123,6 +123,7 @@ public abstract class TransactionSession {
     /**
      * Look up a session of specified type given the game objects involved.
      *
+     * @param <T> The actual session class found.
      * @param type The class of session.
      * @param o1 The first <code>FreeColGameObject</code> in the session.
      * @param o2 The second <code>FreeColGameObject</code> in the session.
@@ -138,6 +139,7 @@ public abstract class TransactionSession {
      * involved.  This version is needed for sessions where one of the objects
      * may have already been disposed of while the session is still valid.
      *
+     * @param <T> The actual session class found.
      * @param type The class of session.
      * @param s1 The identifier of the first object in the session.
      * @param s2 The identifier of the second object in the session.

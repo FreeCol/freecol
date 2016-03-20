@@ -48,6 +48,7 @@ public final class DefaultHandler extends Handler {
      * The constructor to use.
      * 
      * @param consoleLogging The flag to log to the console as well.
+     * @param fileName The name of a file to log to.
      * @exception FreeColException In case the log file could not be
      *     created/written to.
      */

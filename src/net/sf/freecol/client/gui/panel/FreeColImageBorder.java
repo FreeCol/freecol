@@ -67,9 +67,10 @@ public class FreeColImageBorder extends AbstractBorder {
 
 
     /**
-     * Creates a border with the given set of images.<br />
+     * Creates a border with the given set of images.
      * Needs <code>BufferedImage</code> objects, because the images will
      * be used as Textures for the border.
+     *
      * @param topLeftCornerImage NW-corner
      * @param topImage N-border
      * @param topRightCornerImage NE-corner

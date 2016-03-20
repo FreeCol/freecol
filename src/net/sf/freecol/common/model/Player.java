@@ -2201,6 +2201,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param name The trade route name.
      * @param exclude An optional <code>TradeRoute</code> to exclude.
+     * @return The <code>TradeRoute</code> found.
      */
     public final TradeRoute getTradeRouteByName(final String name,
         final TradeRoute exclude) {
@@ -2238,6 +2239,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get a unique name for a new trade route.
+     *
+     * @return A suitable name.
      */
     public String getNameForTradeRoute() {
         return NameCache.getTradeRouteName(this);
@@ -3209,8 +3212,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * The test for whether a tile can be freely claimed by a player
-     * settlement (freely => not by purchase or stealing).  The rule
-     * for the center tile is different, see below.
+     * settlement (freely implies not by purchase or stealing).  The
+     * rule for the center tile is different, see below.
      *
      * The tile must be ownable by this player, settlement-free, and
      * either not currently owned, owned by this player and not by
@@ -3796,6 +3799,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Used mainly in message decoding.
      *
+     * @param <T> The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.

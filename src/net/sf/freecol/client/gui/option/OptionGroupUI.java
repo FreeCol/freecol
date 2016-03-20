@@ -57,7 +57,6 @@ public final class OptionGroupUI extends MigPanel
 
     private final HashMap<String, OptionUI> optionUIs = new HashMap<>();
 
-
     private final JPanel detailPanel;
 
     private final JTree tree;
@@ -72,9 +71,9 @@ public final class OptionGroupUI extends MigPanel
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param gui
-     * @param group
-     * @param editable
+     * @param gui The enclosing <code>GUI</code>.
+     * @param group The <code>OptionGroup</code> encapsulate.
+     * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
         super("ReportPanelUI");
@@ -126,6 +125,9 @@ public final class OptionGroupUI extends MigPanel
     /**
      * Builds the JTree which represents the navigation menu and then
      * returns it
+     *
+     * @param group The <code>OptionGroup</code> to build from.
+     * @param parent The tree to build onto.
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
         for (Option option : group.getOptions()) {

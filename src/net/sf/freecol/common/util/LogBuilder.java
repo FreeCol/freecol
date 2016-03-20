@@ -55,6 +55,7 @@ public class LogBuilder {
      * Convert a simple object to a string suitable for a log buffer.
      *
      * @param o The <code>Object</code> to convert.
+     * @return The simple string result.
      */
     private static String o2s(Object o) {
         return (o == null) ? "null"
@@ -94,6 +95,7 @@ public class LogBuilder {
     /**
      * Add a delimited collection to the buffer.
      *
+     * @param <T> The collection member type.
      * @param delim An internal delimiter.
      * @param c The <code>Collection</code> of objects to add.
      */
@@ -187,6 +189,7 @@ public class LogBuilder {
      *
      * @param size The width to set.
      * @param objects The <code>Object</code>s to add.
+     * @return The widened string.
      */
     public static String wide(int size, Object... objects) {
         if (size == 0) return "";

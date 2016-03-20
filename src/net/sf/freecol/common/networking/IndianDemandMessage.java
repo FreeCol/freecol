@@ -103,6 +103,7 @@ public class IndianDemandMessage extends DOMMessage {
      * Client-side convenience function to get the unit in this message.
      *
      * @param game The <code>Game</code> to look for the unit in.
+     * @return The <code>Unit</code> found.
      */
     public Unit getUnit(Game game) {
         return game.getFreeColGameObject(unitId, Unit.class);
@@ -112,6 +113,7 @@ public class IndianDemandMessage extends DOMMessage {
      * Client-side convenience function to get the colony in this message.
      *
      * @param game The <code>Game</code> to look for the colony in.
+     * @return The <code>Colony</code> found.
      */
     public Colony getColony(Game game) {
         return game.getFreeColGameObject(colonyId, Colony.class);
@@ -119,6 +121,9 @@ public class IndianDemandMessage extends DOMMessage {
 
     /**
      * Client-side convenience function to get the goods type in this message.
+     *
+     * @param game The <code>Game</code> to look for the goods type in.
+     * @return The <code>GoodsType</code> found.
      */
     public GoodsType getType(Game game) {
         return (typeId == null) ? null
@@ -127,6 +132,9 @@ public class IndianDemandMessage extends DOMMessage {
 
     /**
      * Client-side convenience function to get the gold in this message.
+     *
+     * @return The amount of gold specified by this message, or -1 if
+     *     none or invalid.
      */
     public int getAmount() {
         try {

@@ -115,6 +115,7 @@ public final class MetaRegister {
      * @param isGameStarted <i>true</i> if the game has started.
      * @param version The version of the server.
      * @param gameState The current state of the game.
+     * @exception IOException if the connection fails.
      */
     public synchronized void addServer(String name, String address, int port,
                                        int slotsAvailable, int currentlyPlaying,
@@ -193,6 +194,7 @@ public final class MetaRegister {
      * @param isGameStarted <i>true</i> if the game has started.
      * @param version The version of the server.
      * @param gameState The current state of the game.
+     * @exception IOException if the server can not be contacted.
      */
     public synchronized void updateServer(String name, String address,
                                           int port, int slotsAvailable,

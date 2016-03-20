@@ -46,13 +46,15 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class GoodsLabel extends AbstractGoodsLabel
     implements Draggable {
+    
+    private GUI gui;
 
-    GUI gui;
  
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param goods The Goods that this JLabel will visually represent.
+     * @param gui The <code>GUI</code> to display on.
+     * @param goods The <code>Goods</code> that this label will represent.
      */
     public GoodsLabel(GUI gui, Goods goods) {
         super(gui.getImageLibrary(), goods);

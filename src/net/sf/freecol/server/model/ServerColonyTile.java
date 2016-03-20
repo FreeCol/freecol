@@ -46,6 +46,9 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
 
     /**
      * Trivial constructor required for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param id The object identifier.
      */
     public ServerColonyTile(Game game, String id) {
         super(game, id);

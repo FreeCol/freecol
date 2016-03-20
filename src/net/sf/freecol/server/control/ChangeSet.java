@@ -228,6 +228,8 @@ public class ChangeSet {
 
         /**
          * Make a new Change.
+         *
+         * @param see The visibility.
          */
         public Change(See see) {
             this.see = see;
@@ -247,6 +249,8 @@ public class ChangeSet {
         /**
          * Gets the sort priority of a change, to be used by the
          * changeComparator.
+         *
+         * @return The sort priority.
          */
         public abstract int getPriority();
 
@@ -1350,6 +1354,7 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param name The name of the element.
          * @param priority The sort priority of this change.
+         * @param attributes The attributes to add to the change.
          */
         public TrivialChange(See see, String name, int priority,
                              String[] attributes) {

@@ -125,13 +125,13 @@ public class AIMessage {
      * Claims a tile for a colony.
      *
      * @param tile The <code>Tile</code> to claim.
-     * @param aiColont The <code>AIColony</code> that is claiming.
+     * @param aic The <code>AIColony</code> that is claiming.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askClaimLand(Tile tile, AIColony aiColony, int price) {
-        return aiColony.getAIOwner().askServer()
-            .claimTile(tile, aiColony.getColony(), price);
+    public static boolean askClaimLand(Tile tile, AIColony aic, int price) {
+        return aic.getAIOwner().askServer()
+            .claimTile(tile, aic.getColony(), price);
     }
 
     /**

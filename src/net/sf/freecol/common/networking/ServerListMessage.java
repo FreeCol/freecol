@@ -141,6 +141,7 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Add information about a server.
      *
+     * @param <T> The <code>ServerInfo</code> type to add.
      * @param si The <code>ServerInfo</code> to add.
      */
     public <T extends ServerInfo> void addServer(T si) {

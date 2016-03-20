@@ -511,6 +511,12 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
      * Displays an input dialog box where the user should specify a
      * goods transfer amount.
+     *
+     * @param goodsType The <code>GoodsType</code> to transfer.
+     * @param available The amount of goods available.
+     * @param defaultAmount The default amount of goods to offer.
+     * @param needToPay If true limit by available funds.
+     * @return The selected amount of goods.
      */
     private int getAmount(GoodsType goodsType, int available,
                           int defaultAmount, boolean needToPay) {
@@ -518,6 +524,9 @@ public final class DefaultTransferHandler extends TransferHandler {
                                           needToPay);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         int srcActions = getSourceActions(comp);

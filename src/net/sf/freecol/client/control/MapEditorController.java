@@ -150,7 +150,7 @@ public final class MapEditorController extends FreeColClientHolder {
 
     /**
      * Transforms the given <code>Tile</code> using the
-     * {@link #getMapTransform() current <code>MapTransform</code>}.
+     * {@link #getMapTransform()} current <code>MapTransform</code>.
      *
      * @param t The <code>Tile</code> to be modified.
      */

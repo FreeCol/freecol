@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 /**
@@ -41,8 +43,13 @@ public class DesktopEntry {
 
     /**
      * Pass the desktop entry file to create as first argument.
+     *
+     * @param args The program arguments.
+     * @exception FileNotFoundException if the source file is absent.
+     * @exception IOException when various IO fails.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)
+        throws FileNotFoundException, IOException {
 
         try (FileWriter result = new FileWriter(new File(args[0]))) {
             result.append("[Desktop Entry]\n");

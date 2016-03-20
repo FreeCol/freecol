@@ -42,9 +42,12 @@ public class AIServerAPI extends ServerAPI {
 
     /**
      * Create the new AI wrapper for the server API.
+     *
+     * @param owner The <code>AIPlayer</code> attached to this API.
      */
     public AIServerAPI(AIPlayer owner) {
         super();
+
         this.owner = owner;
     }
 

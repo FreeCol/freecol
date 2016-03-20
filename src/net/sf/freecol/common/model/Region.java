@@ -440,6 +440,7 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Is a key one of the dodgy keys that were generated up to 0.11.3?
      *
+     * @param key The key to check.
      * @return A valid key or null if already null or invalid.
      */
     private String fixRegionKey(String key) {

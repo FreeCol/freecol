@@ -46,6 +46,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Initializes this JLabel with the given goods type.
      *
+     * @param lib The <code>ImageLibrary</code> to display with.
      * @param type The <code>GoodsType</code> to represent.
      * @param market The <code>Market</code> in which to trade the goods.
      */

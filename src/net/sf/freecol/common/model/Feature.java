@@ -213,7 +213,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     /**
      * Is this a temporary feature?
      *
-     * True if this is a temporary feature.
+     * @return True if this is a temporary feature.
      */
     public final boolean isTemporary() {
         return temporary;

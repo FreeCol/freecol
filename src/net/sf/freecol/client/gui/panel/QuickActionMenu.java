@@ -126,7 +126,6 @@ public final class QuickActionMenu extends JPopupMenu {
         return this;
     }
 
-
     /**
      * Prompt for an amount of goods to use.
      *
@@ -141,15 +140,17 @@ public final class QuickActionMenu extends JPopupMenu {
         if (ret > 0) ag.setAmount(ret);
     }
 
-
     /**
      * Creates a popup menu for a Unit.
+     *
+     * @param unitLabel The <code>UnitLabel</code> to create items for.
      */
     private void createUnitMenu(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
 
         this.setLabel("Unit");
-        ImageIcon unitIcon = new ImageIcon(gui.getImageLibrary().getSmallUnitImage(unit));
+        ImageIcon unitIcon = new ImageIcon(gui.getImageLibrary()
+            .getSmallUnitImage(unit));
         JMenuItem name = new JMenuItem(unit.getDescription(Unit.UnitLabelType.NATIONAL)
             + " (" + Messages.message("colopedia") + ")", unitIcon);
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -552,6 +553,14 @@ public final class QuickActionMenu extends JPopupMenu {
      * changes despite the point of the role cutover was to get rid of
      * equipment types.  However, its time to release, and we should avoid
      * string changes.  Get rid of this post 0.11.0-release.
+     *
+     * @param unitLabel The <code>UnitLabel</code> to create items for.
+     * @param from The starting <code>Role</code>.
+     * @param fromCount The starting role count.
+     * @param to The new <code>Role</code>.
+     * @param toCount The new role count.
+     * @param price An optional price to charge for the change.
+     * @return A suitable menu item.
      */
     private JMenuItem createRoleItem(final UnitLabel unitLabel,
                                      final Role from, final int fromCount, 
@@ -666,6 +675,8 @@ public final class QuickActionMenu extends JPopupMenu {
 
     /**
      * Creates a menu for some goods.
+     *
+     * @param goodsLabel The <code>GoodsLabel</code> to create items for.
      */
     private void createGoodsMenu(final GoodsLabel goodsLabel) {
         final InGameController igc = freeColClient.getInGameController();
@@ -818,6 +829,8 @@ public final class QuickActionMenu extends JPopupMenu {
 
     /**
      * Creates a menu for a tile.
+     * 
+     * @param singleTilePanel The <code>ASingleTilePanel</code> to create with.
      */
     private void createTileMenu(final ASingleTilePanel singleTilePanel) {
         if (singleTilePanel.getColonyTile() != null

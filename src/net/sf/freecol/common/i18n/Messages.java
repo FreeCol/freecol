@@ -217,7 +217,7 @@ public class Messages {
      * Public for the test suite.
      *
      * @param is The <code>InputStream</code> to read from.
-     * @throws IOException
+     * @throws IOException on failure to read from the stream.
      */
     public static void loadMessages(InputStream is) throws IOException {
         InputStreamReader inputReader;

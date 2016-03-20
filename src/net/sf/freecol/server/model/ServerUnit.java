@@ -89,6 +89,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
     /**
      * Trivial constructor required for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> in which this unit belongs.
+     * @param id The object identifier.
      */
     public ServerUnit(Game game, String id) {
         super(game, id);

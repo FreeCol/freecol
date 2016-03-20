@@ -52,6 +52,7 @@ public final class UnitImageAnimation {
      * @param unit The <code>Unit</code> to be animated. 
      * @param tile The <code>Tile</code> where the animation occurs.
      * @param animation The animation to show.
+     * @param mirror Mirror image the base animation.
      */
     public UnitImageAnimation(SwingGUI gui, Unit unit, Tile tile,
                               SimpleZippedAnimation animation, boolean mirror) {

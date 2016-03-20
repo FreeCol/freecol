@@ -537,7 +537,7 @@ public class FreeColDirectories {
      *   - config:  ~/Library/Preferences/freecol
      *   - else:    ~/Library/Application Support/freecol
      * - on Windows:
-     *   - everything in \<default directory\>/freecol
+     *   - everything in <em>default directory</em>/freecol
      * - otherwise use what was there
      *
      * Note: the freecol data directory is set independently and earlier

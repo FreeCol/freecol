@@ -36,7 +36,7 @@ public interface MessageHandler {
      * @param connection The <code>Connection</code> the message came from.
      * @param element The <code>Element</code> to handle.
      * @return The reply (if any) or <i>null</i>.
-     * @throws FreeColException
+     * @throws FreeColException on error.
      */
     public Element handle(Connection connection, Element element)
         throws FreeColException;

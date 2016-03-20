@@ -264,6 +264,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
          *
          * @param loc1 The first <code>Location</code>.
          * @param loc2 The second <code>Location</code>.
+         * @return The comparison result.
          */
         protected int compareNames(Location loc1, Location loc2) {
             if (!(loc1 instanceof Settlement)) return -1;
@@ -348,9 +349,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param frame The owner frame.
+     * @param unit The <code>Unit</code> to plan for.
      */
     public SelectDestinationDialog(FreeColClient freeColClient, JFrame frame,
-            Unit unit) {
+                                   Unit unit) {
         super(freeColClient, frame);
 
         // Collect the goods the unit is carrying and set this.destinations.

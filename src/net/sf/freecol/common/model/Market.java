@@ -70,6 +70,9 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Main constructor for creating a market for a new player.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param player The <code>Player</code> to own the market.
      */
     public Market(Game game, Player player) {
         super(game);
@@ -417,6 +420,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Get a sale price comparator for this market.
      *
+     * @param <T> The <code>AbstractGoods</code> type to compare.
      * @return A suitable <code>Comparator</code>.
      */
     public <T extends AbstractGoods> Comparator<T> getSalePriceComparator() {

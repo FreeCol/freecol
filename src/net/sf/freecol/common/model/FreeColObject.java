@@ -87,6 +87,7 @@ public abstract class FreeColObject
     /**
      * Instantiate a FreeColObject class with its trivial constructor.
      *
+     * @param <T> The actual instance type.
      * @param returnClass The required FreeColObject class.
      * @return The new object or null on error.
      */
@@ -150,6 +151,7 @@ public abstract class FreeColObject
     /**
      * Get the type part of the identifier.
      *
+     * @param id The identifier to examine.
      * @return The type part of the identifier, or null on error.
      */
     public static String getIdType(String id) {
@@ -733,6 +735,7 @@ public abstract class FreeColObject
     /**
      * Log a collection of <code>FreeColObject</code>s.
      *
+     * @param <T> The collection member type.
      * @param c The <code>Collection</code> to log.
      * @param lb A <code>LogBuilder</code> to log to.
      */
@@ -746,8 +749,9 @@ public abstract class FreeColObject
     /**
      * Invoke a method for this object.
      *
+     * @param <T> The actual return type.
      * @param methodName The name of the method.
-     * @param returnClass The class of the return value.
+     * @param returnClass The expected return class.
      * @param defaultValue The default value.
      * @return The result of invoking the method, or the default value
      *     on failure.
@@ -821,6 +825,9 @@ public abstract class FreeColObject
 
     /**
      * Debugging tool, dump collection XML to System.err.
+     *
+     * @param <T> The collection member type.
+     * @param items The collection to dump.
      */
     public static <T extends FreeColObject> void dumpCollection(Collection<T> items) {
         System.err.println("[Collection begin ");
@@ -833,9 +840,10 @@ public abstract class FreeColObject
      *
      * @param file The <code>File</code> to write to.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException
+     * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file) throws FileNotFoundException {
+    public boolean save(File file)
+        throws FileNotFoundException {
         return save(file, WriteScope.toSave());
     }
 
@@ -845,9 +853,10 @@ public abstract class FreeColObject
      * @param file The <code>File</code> to write to.
      * @param scope The <code>WriteScope</code> to use.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException
+     * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file, WriteScope scope) throws FileNotFoundException {
+    public boolean save(File file, WriteScope scope)
+        throws FileNotFoundException {
         return save(file, scope, false);
     }
 
@@ -858,9 +867,10 @@ public abstract class FreeColObject
      * @param scope The <code>WriteScope</code> to use.
      * @param pretty Attempt to indent the output nicely.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException
+     * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file, WriteScope scope, boolean pretty) throws FileNotFoundException {
+    public boolean save(File file, WriteScope scope, boolean pretty)
+        throws FileNotFoundException {
         try (
             FileOutputStream fos = new FileOutputStream(file);
         ) {
@@ -947,8 +957,9 @@ public abstract class FreeColObject
      * to the copied colony and the copied colony refer to the copied
      * tile, but both will refer to the original uncopied owning player. 
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to add the object to.
-     * @param returnClass The required object class.
+     * @param returnClass The expected return class.
      * @return The copied object, or null on error.
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {

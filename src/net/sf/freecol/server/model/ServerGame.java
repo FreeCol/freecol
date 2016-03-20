@@ -159,6 +159,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * Send a change set to a list of players.
      *
      * @param serverPlayers The list of <code>ServerPlayer</code>s to send to.
+     * @param cs The <code>ChangeSet</code> to send.
      */
     public void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
         for (ServerPlayer s : serverPlayers) sendTo(s, cs);
@@ -168,6 +169,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * Send a change set to one player.
      *
      * @param serverPlayer The <code>ServerPlayer</code> to send to.
+     * @param cs The <code>ChangeSet</code> to send.
      */
     public void sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
         serverPlayer.send(cs);
@@ -207,6 +209,12 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param type The server object tag.
      * @param id The object identifier.
      * @return A trivial server object.
+     * @exception ClassNotFoundException if there is no such type.
+     * @exception IllegalAccessException if the target exists but is hidden.
+     * @exception InstantiationException if the instantiation fails.
+     * @exception InvocationTargetException if the target in not available.
+     * @exception NoSuchMethodException if the tag does not refer to a
+     *      server type.
      */
     private Object makeServerObject(String type, String id)
         throws ClassNotFoundException, IllegalAccessException,
@@ -294,6 +302,8 @@ public class ServerGame extends Game implements ServerModelObject {
 
     /**
      * Is the next player in a new turn?
+     *
+     * @return True if the next turn is due.
      */
     public boolean isNextPlayerInNewTurn() {
         Player nextPlayer = getNextPlayer();

@@ -201,6 +201,7 @@ public abstract class Mission extends AIObject {
     /**
      * Is an invalidity reason due to a target failure?
      *
+     * @param reason The reason to check.
      * @return True if the reason starts with "target-".
      */
     public static boolean isTargetReason(String reason) {
@@ -238,6 +239,7 @@ public abstract class Mission extends AIObject {
      * Is an AI unable to perform a new mission because it already has
      * a valid, non-onetime mission?
      *
+     * @param aiUnit The <code>AIUnit</code> to test.
      * @return "mission-exists" if a valid mission is found, or null
      *     if none found.
      */

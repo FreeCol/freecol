@@ -54,6 +54,7 @@ public class InformationPanel extends FreeColPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param text The text to be displayed in the panel.
+     * @param fco A source <code>FreeColObject</code>.
      * @param image The image to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient,
@@ -68,7 +69,7 @@ public class InformationPanel extends FreeColPanel {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param texts The texts to be displayed in the panel.
-     * @param fcos The source <code>FreeColObject</code> for the text.
+     * @param fcos The source <code>FreeColObject</code>s for the text.
      * @param images The images to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,

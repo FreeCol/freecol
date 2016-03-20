@@ -56,6 +56,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
 
     /**
      * Trivial constructor required for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param id The object identifier.
      */
     public ServerEurope(Game game, String id) {
         super(game, id);

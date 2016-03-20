@@ -253,6 +253,7 @@ public class AIMain extends FreeColObject
      * Gets the <code>AIObject</code> with the specified object
      * identifier and class.
      *
+     * @param <T> The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The <code>AIObject</code> found, or null if not.
@@ -299,6 +300,8 @@ public class AIMain extends FreeColObject
     /**
      * Computes how many objects of each class have been created, to
      * track memory leaks over time
+     *
+     * @return A map of AI statistics.
      */
     public Map<String, String> getAIStatistics() {
         Map<String, Long> stats = new HashMap<>();

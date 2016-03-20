@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +57,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /** Comparator to sort tiles by increasing distance from the edge. */
     public static final Comparator<Tile> edgeDistanceComparator
         = Comparator.comparingInt(Tile::getEdgeDistance);
+
+    /** Comparator to find the smallest high seas count. */
+    public static final Comparator<Tile> highSeasComparator
+        = Comparator.comparingInt(Tile::getHighSeasCount);
+
+    /** Predicate to identify ordinary sea tiles. */
+    public static final Predicate<Tile> isSeaTile = t ->
+        !t.isLand() && t.getHighSeasCount() >= 0;
 
     /**
      * Information that is internal to the native settlements, and only
@@ -816,6 +825,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
+     * @param <T> The actual <code>TileItem</code> type.
      * @param item The <code>TileItem</code> to remove.
      * @return The item removed, or null on failure.
      */

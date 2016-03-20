@@ -2089,7 +2089,7 @@ public final class ColonyPanel extends PortPanel
                     }
                     super.add(label);
                 }
-                updateDescriptionLabel(label, true);
+                updateDescriptionLabel(label);
                 if (colonyTile.isColonyCenterTile()) {
                     setLayout(new GridLayout(2, 1));
                     ProductionInfo info = colony.getProductionInfo(colonyTile);
@@ -2121,16 +2121,18 @@ public final class ColonyPanel extends PortPanel
              * the terrain type, road and plow indicator, if any.
              *
              * If a unit is on it update the tooltip of it instead.
+             *
+             * @param unitLabel The <code>UnitLabel</code> to update.
              */
-            private void updateDescriptionLabel(UnitLabel unitLabel, boolean toAdd) {
+            private void updateDescriptionLabel(UnitLabel unitLabel) {
                 String tileMsg = Messages.message(colonyTile.getLabel());
                 if (unitLabel == null) {
                     setToolTipText(tileMsg);
                 } else {
-                    String unitMsg = unitLabel.getUnit()
-                        .getDescription(Unit.UnitLabelType.NATIONAL);
-                    if (toAdd) unitMsg = tileMsg + " [" + unitMsg + "]";
-                    unitLabel.setDescriptionLabel(unitMsg);
+                    final Unit unit = unitLabel.getUnit();
+                    unitLabel.setDescriptionLabel(tileMsg + " ["
+                        + unit.getDescription(Unit.UnitLabelType.NATIONAL)
+                        + "]");
                 }
             }
 

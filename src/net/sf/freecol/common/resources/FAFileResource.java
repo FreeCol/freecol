@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.resources;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
@@ -43,9 +44,10 @@ public class FAFileResource extends Resource {
      * Do not use directly.
      *
      * @param resourceLocator The <code>URI</code> used when loading this
-     *      resource.
+     *     resource.
+     * @exception IOException if FAFile can not be opened.
      */
-    public FAFileResource(URI resourceLocator) throws Exception {
+    public FAFileResource(URI resourceLocator) throws IOException {
         super(resourceLocator);
         URL url = resourceLocator.toURL();
         FAFile = new FAFile(url.openStream());

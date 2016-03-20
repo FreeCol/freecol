@@ -256,7 +256,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Gets the natural disasters than can strike this tile type.
      *
-     * @return a <code>List<RandomChoice<Disaster>></code> value
+     * @return A list of <code>RandomChoice</code>s for the disasters.
      */
     public List<RandomChoice<Disaster>> getDisasters() {
         return (disasters == null)

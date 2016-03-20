@@ -1247,6 +1247,8 @@ public class Map extends FreeColGameObject implements Location {
 
         /**
          * Handles the change of unit as a result of an embark.
+         *
+         * @param unit The <code>Unit</code> to embark.
          */
         public void embarkUnit(Unit unit) {
             this.unit = unit;
@@ -1302,6 +1304,7 @@ public class Map extends FreeColGameObject implements Location {
          * Does this move candidate improve on a specified move.
          *
          * @param best The <code>PathNode</code> to compare against.
+         * @return True if this candidate is an improvement.
          */
         public boolean canImprove(PathNode best) {
             return cost != CostDecider.ILLEGAL_MOVE

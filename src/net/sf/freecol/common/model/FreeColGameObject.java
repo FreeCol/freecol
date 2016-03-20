@@ -96,6 +96,7 @@ public abstract class FreeColGameObject extends FreeColObject {
     /**
      * Instantiate an uninitialized FreeColGameObject within a game.
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to instantiate within.
      * @param returnClass The required <code>FreeColObject</code> class.
      * @return The new uninitialized object, or null on error.

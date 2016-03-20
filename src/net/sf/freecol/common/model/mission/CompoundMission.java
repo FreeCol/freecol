@@ -83,7 +83,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * Get the <code>Missions</code> value.
      *
-     * @return a <code>List<Mission></code> value
+     * @return A list of <code>Mission</code>s.
      */
     public final List<Mission> getMissions() {
         return missions;

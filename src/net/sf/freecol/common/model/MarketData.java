@@ -81,6 +81,7 @@ public class MarketData extends FreeColGameObject {
     /**
      * Creates a new <code>MarketData</code> instance.
      *
+     * @param game The enclosing <code>Game</code>.
      * @param goodsType The <code>GoodsType</code> this market data describes.
      */
     public MarketData(Game game, GoodsType goodsType) {

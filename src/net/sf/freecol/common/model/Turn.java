@@ -125,7 +125,9 @@ public class Turn {
     }
 
     /**
-     * Increases the turn number by one.
+     * Get the next turn, with a turn number one greater.
+     *
+     * @return The new <code>Turn</code>.
      */
     public Turn next() {
         return new Turn(turn + 1);
@@ -152,6 +154,7 @@ public class Turn {
     /**
      * Gets the year the given turn is in.
      *
+     * @param turn The turn number to get the year for.
      * @return The calculated year based on the turn number.
      */
     public static int getYear(int turn) {

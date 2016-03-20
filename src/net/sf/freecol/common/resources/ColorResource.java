@@ -53,7 +53,7 @@ public class ColorResource extends Resource {
      * @param resourceLocator The <code>URI</code> used when loading this
      *     resource.
      */
-    public ColorResource(URI resourceLocator) throws Exception {
+    public ColorResource(URI resourceLocator) { //throws Exception {
         super(resourceLocator);
 
         String colorName = resourceLocator.getSchemeSpecificPart()

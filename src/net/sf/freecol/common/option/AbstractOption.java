@@ -213,8 +213,10 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      *
      * @param xr The <code>FreeColXMLReader</code> to read from.
      * @return An option.
+     * @exception XMLStreamException on stream errors.
      */
-    protected AbstractOption readOption(FreeColXMLReader xr) throws XMLStreamException {
+    protected AbstractOption readOption(FreeColXMLReader xr)
+        throws XMLStreamException {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
         AbstractOption option = null;

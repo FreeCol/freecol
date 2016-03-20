@@ -28,8 +28,6 @@ import net.sf.freecol.common.model.Unit;
  * Used by {@link net.sf.freecol.common.model.Map#search} in order to
  * determine a goal.
  * 
- * <br /><br />
- * 
  * The method {@link #check(Unit, PathNode)} will be called by {@link
  * net.sf.freecol.common.model.Map#search} until:
  * 

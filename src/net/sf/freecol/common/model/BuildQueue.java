@@ -189,7 +189,6 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return result;
     }
 
-
     /**
      * The priority of this Consumer. The higher the priority, the
      * earlier will the Consumer be allowed to consume the goods it
@@ -202,20 +201,19 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return priority;
     }
 
-
-   /**
-    * Does the consumer have the ability with the given identifier?
-    *
-    * The two abilities most relevant to consumers are
-    * "consumeAllOrNothing", which implies that the consumer will not
-    * consume any goods if its requirements can not be met (used by
-    * the Colony when building), as well as
-    * "consumeOnlySurplusProduction", which implies that the consumer
-    * does not consume stored goods (used by the country and stables).
-    *
-    * @param id The object identifier.
-    * @return a <code>boolean</code> value
-    */
+    /**
+     * Does the consumer have the ability with the given identifier?
+     *
+     * The two abilities most relevant to consumers are
+     * "consumeAllOrNothing", which implies that the consumer will not
+     * consume any goods if its requirements can not be met (used by
+     * the Colony when building), as well as
+     * "consumeOnlySurplusProduction", which implies that the consumer
+     * does not consume stored goods (used by the country and stables).
+     *
+     * @param id The object identifier.
+     * @return a <code>boolean</code> value
+     */
     @Override
     public boolean hasAbility(String id) {
         return Ability.CONSUME_ALL_OR_NOTHING.equals(id);

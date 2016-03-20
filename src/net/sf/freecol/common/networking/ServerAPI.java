@@ -93,6 +93,8 @@ public abstract class ServerAPI {
 
     /**
      * Get the connection to communicate with the server.
+     *
+     * @return The <code>Connection</code> to the server.
      */
     protected abstract Connection getConnection();
 
@@ -197,11 +199,11 @@ public abstract class ServerAPI {
      * client-server communication.
      *
      * In following routines we follow the convention that server I/O
-     * is confined to the ask<foo>() routine, which typically returns
-     * true if the server interaction succeeded, which does *not*
-     * necessarily imply that the actual substance of the request was
-     * allowed (e.g. a move may result in the death of a unit rather
-     * than actually moving).
+     * is confined to the ask<em>foo</em>() routine, which typically
+     * returns true if the server interaction succeeded, which does
+     * *not* necessarily imply that the actual substance of the
+     * request was allowed (e.g. a move may result in the death of a
+     * unit rather than actually moving).
      *
      * @param game The current <code>Game</code>.
      * @param message A <code>DOMMessage</code> to send.
@@ -431,6 +433,7 @@ public abstract class ServerAPI {
     /**
      * Send a chat message (pre and in-game).
      *
+     * @param player The <code>Player</code> to chat to.
      * @param chat The text of the message.
      * @return True if the send succeeded.
      */
@@ -750,12 +753,12 @@ public abstract class ServerAPI {
      * Server query-response for asking for the high scores list.
      *
      * @param game The <code>Game</code> to extract scores from.
+     * @param key The high score key to query.
      * @return True if the server interaction succeeded.
      */
     public boolean getHighScores(Game game, String key) {
         return askHandling(game,
-            new HighScoreMessage(key),
-            null);
+            new HighScoreMessage(key), null);
     }
 
     /**
@@ -775,7 +778,7 @@ public abstract class ServerAPI {
      * Server query-response for inciting the natives.
      *
      * @param unit The missionary <code>Unit</code>.
-     * @param settlement The <code>IndianSettlement</code> to incite.
+     * @param is The <code>IndianSettlement</code> to incite.
      * @param enemy An enemy <code>Player</code>.
      * @param gold The amount of bribe, negative to enquire.
      * @return True if the server interaction succeeded.

@@ -171,6 +171,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Trivial constructor required for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> this object belongs to.
+     * @param id The object identifier.
      */
     public ServerPlayer(Game game, String id) {
         super(game, id);
@@ -263,7 +266,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * This allows an override of the default check of whether
      * this.connection is null, and is used to allow a reconnection
      * after a player logs out.
-     * @see InGameInputHandler#logout
      *
      * @param connected True if this player should be considered as
      *     connected to the server.
@@ -312,7 +314,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Send a message to the player, and return the resulting message.
      *
      * @param game The <code>Game</code> to build the return message in.
-     * @param message The <code>DOMMessage</code> to send.
+     * @param request The <code>DOMMessage</code> to send.
      * @return The resulting <code>DOMMessage</code>.
      */
     public DOMMessage ask(Game game, DOMMessage request) {
@@ -918,6 +920,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * +til: Exploring the tile also updates the pet.
      *
+     * @param tile The <code>Tile</code> to explore.
      * @return True if the tile is newly explored by this action.
      */
     public boolean exploreTile(Tile tile) {
@@ -948,6 +951,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * tiles.  Note that the player does not necessarily own the settlement
      * (e.g. missionary at native settlement).
      *
+     * @param settlement The <code>Settlement</code> that is exploring.
      * @return A list of newly explored <code>Tile</code>s.
      */
     public Set<Tile> exploreForSettlement(Settlement settlement) {

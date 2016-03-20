@@ -293,10 +293,10 @@ public class LabourData {
         }
 
         /**
-         * get labour data (create on demand)
+         * Get the labour data (create on demand).
          *
-         * @param colony
-         * @return labour data
+         * @param colony The <code>Colony</code> to query.
+         * @return The <code>LocationData</code> found.
          */
         private LocationData getLocationData(Colony colony) {
             LocationData colonyData = details.get(colony);

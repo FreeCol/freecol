@@ -55,6 +55,7 @@ public class Utils {
     /**
      * Check if two objects are equal but also checks for null.
      *
+     * @param <T> The object type.
      * @param one First object to compare
      * @param two Second object to compare
      * @return True if the arguments are either both null or equal in the
@@ -79,6 +80,7 @@ public class Utils {
      * string.  It would have been more convenient to simply return
      * the current seed, but unfortunately it is private.
      *
+     * @param random A pseudo-random number source.
      * @return A <code>String</code> encapsulating the object state.
      */
     public static synchronized String getRandomState(Random random) {

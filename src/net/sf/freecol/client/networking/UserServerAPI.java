@@ -47,6 +47,8 @@ public class UserServerAPI extends ServerAPI {
 
     /**
      * Create the new user wrapper for the server API.
+     *
+     * @param gui The <code>GUI</code> to use for user interaction.
      */
     public UserServerAPI(GUI gui) {
         super();
@@ -64,6 +66,8 @@ public class UserServerAPI extends ServerAPI {
      * @param host The name of the machine running the
      *     <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
+     * @param messageHandler The <code>MessageHandler</code> to use on this
+     *     connection.
      * @return True if the connection succeeded.
      * @exception IOException on connection failure.
      */
@@ -91,6 +95,8 @@ public class UserServerAPI extends ServerAPI {
 
     /**
      * Disconnect the client connection..
+     *
+     * @exception IOException on failure to send the required messages.
      */
     public void disconnect() throws IOException {
         if (this.clientConnection != null) {
@@ -131,7 +137,7 @@ public class UserServerAPI extends ServerAPI {
     /**
      * Sets the message handler for the connection.
      *
-     * @param messageHandler The new <code>MessageHandler</code>.
+     * @param mh The new <code>MessageHandler</code>.
      */
     public void setMessageHandler(MessageHandler mh) {
         if (this.clientConnection != null) {

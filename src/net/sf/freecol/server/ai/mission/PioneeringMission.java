@@ -118,6 +118,7 @@ public class PioneeringMission extends Mission {
     /**
      * Get the best improvement associated with a tile.
      *
+     * @param tile The <code>Tile</code> to get a plan for.
      * @return The <code>TileImprovementPlan</code>, or null if not found.
      */
     private TileImprovementPlan getBestPlan(Tile tile) {
@@ -129,6 +130,8 @@ public class PioneeringMission extends Mission {
      * Take care to first check if the unit has a plan already, if so,
      * return that.
      *
+     * @param aiUnit The <code>AIUnit</code> to get a plan for.
+     * @param tile The <code>Tile</code> to get a plan for.
      * @return The <code>TileImprovementPlan</code>, or null if not found.
      */
     private static TileImprovementPlan getBestPlan(AIUnit aiUnit, Tile tile) {

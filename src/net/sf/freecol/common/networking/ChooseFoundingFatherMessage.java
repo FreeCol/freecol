@@ -103,6 +103,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * Sets the chosen father.
      *
      * @param ff The <code>FoundingFather</code> to choose.
+     * @return This message.
      */
     public final ChooseFoundingFatherMessage setFather(FoundingFather ff) {
         this.foundingFatherId = (ff == null) ? null : ff.getId();

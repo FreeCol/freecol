@@ -130,6 +130,10 @@ public final class Canvas extends JDesktopPane {
 
         /**
          * Constructor.
+         *
+         * @param fcd The parent <code>FreeColDialog</code>.
+         * @param tile An optional <code>Tile</code> to display.
+         * @param handler The <code>DialogHandler</code> to call when run.
          */
         public DialogCallback(FreeColDialog<T> fcd, Tile tile,
                               DialogHandler<T> handler) {
@@ -335,7 +339,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Quit the GUI.  All that is required is to exit the full screen.
      */
-    void quit() throws Exception {
+    void quit() {
         if (frame != null && !windowed) {
             frame.exitFullScreen();
         }
@@ -671,6 +675,7 @@ public final class Canvas extends JDesktopPane {
      * @param y A starting y coordinate.
      * @param w The component width to use.
      * @param h The component height to use.
+     * @param tries The number of attempts to find a clear space.
      * @return A <code>Point</code> to place the component at or null
      *     on failure.
      */
@@ -982,6 +987,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
+     * @param <T> The type to be returned from the dialog.
      * @param freeColDialog The dialog to be displayed
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
@@ -1153,6 +1159,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Gets a currently displayed FreeColPanel of a given type.
      *
+     * @param <T> The actual panel type.
      * @param type The type of <code>FreeColPanel</code> to look for.
      * @return A currently displayed <code>FreeColPanel</code> of the
      *     requested type, or null if none found.
@@ -1510,6 +1517,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a modal dialog with text and a choice of options.
      *
+     * @param <T> The type to be returned from the dialog.
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
      * @param obj An object that explains the choice for the user.
@@ -1520,8 +1528,8 @@ public final class Canvas extends JDesktopPane {
      * @return The corresponding member of the values array to the selected
      *     option.
      */
-    <T> T showChoiceDialog(Tile tile, Object obj, ImageIcon icon,
-                           String cancelKey, List<ChoiceItem<T>> choices) {
+    public <T> T showChoiceDialog(Tile tile, Object obj, ImageIcon icon,
+        String cancelKey, List<ChoiceItem<T>> choices) {
         FreeColChoiceDialog<T> fcd
             = new FreeColChoiceDialog<>(freeColClient, frame, true, obj, icon,
                                          cancelKey, choices);
@@ -1571,12 +1579,13 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the given dialog, optionally making sure a tile is visible.
      *
+     * @param <T> The type to be returned from the dialog.
      * @param freeColDialog The dialog to be displayed
      * @param tile An optional <code>Tile</code> to make visible (not
      *     under the dialog!)
      */
     private <T> void viewFreeColDialog(final FreeColDialog<T> freeColDialog,
-                                      Tile tile) {
+                                       Tile tile) {
         PopupPosition pp = setOffsetFocus(tile);
 
         // TODO: Remove compatibility code when all non-modal dialogs
@@ -2480,6 +2489,9 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Display the statistics panel.
+     *
+     * @param serverStats A map of server statistics key,value pairs.
+     * @param clientStats A map of client statistics key,value pairs.
      */
     public void showStatisticsPanel(Map<String, String> serverStats,
                                     Map<String, String> clientStats) {

@@ -735,6 +735,10 @@ public final class TileViewer extends FreeColClientHolder {
 
     /**
      * Draws the given TileItem on the given Tile.
+     *
+     * @param g The <code>Graphics</code> to draw to.
+     * @param tile The <code>Tile</code> to draw from.
+     * @param item The <code>TileItem</code> to draw.
      */
     private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
         if (item instanceof TileImprovement) {

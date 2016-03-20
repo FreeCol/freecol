@@ -397,6 +397,8 @@ public class River {
 
     /**
      * Draws the completed river to the map.
+     *
+     * @param sections A list of <code>RiverSection</code>s to draw.
      */
     private void drawToMap(List<RiverSection> sections) {
         RiverSection oldSection = null;

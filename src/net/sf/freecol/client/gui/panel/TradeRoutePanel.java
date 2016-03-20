@@ -204,6 +204,8 @@ public final class TradeRoutePanel extends FreeColPanel {
 
     /**
      * Gets the currently selected route.
+     *
+     * @return The selected <code>TradeRoute</code>.
      */
     private TradeRoute getRoute() {
         return this.tradeRoutes.getSelectedValue();

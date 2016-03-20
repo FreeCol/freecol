@@ -202,6 +202,7 @@ public class RandomRange {
      * the given stream.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param tag The tag for this range.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */

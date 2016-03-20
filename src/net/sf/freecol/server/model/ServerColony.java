@@ -71,6 +71,9 @@ public class ServerColony extends Colony implements ServerModelObject {
 
     /**
      * Trivial constructor required for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> in which this object belongs.
+     * @param id The object identifier.
      */
     public ServerColony(Game game, String id) {
         super(game, id);

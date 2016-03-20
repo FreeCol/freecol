@@ -49,6 +49,7 @@ public class AbstractCanvasListener extends FreeColClientHolder {
      * Create a new AbstractCanvasListener.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param canvas The <code>Canvas</code> to listen on.
      */
     public AbstractCanvasListener(FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient);

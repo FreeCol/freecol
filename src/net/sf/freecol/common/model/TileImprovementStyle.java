@@ -31,14 +31,14 @@ import java.util.Map;
  * branches), the class caches all styles actually used. This should
  * also speed up reading maps with old base-three styles.
  *
- * This is the documentation for the old style (<= 0.10.5):
+ * This is the documentation for the old style (&le; 0.10.5):
  *   Tile improvement styles should be encoded as a string of base-36
  *   values, one for each of the directions the improvement might be
  *   connected to (counting clockwise from N). In the case of rivers,
  *   which can only be connected via the "long sides" (NE, SE, SW, NW),
  *   possible values range from "0000" to "zzzz". Improvement styles
  *   that use only four directions can add up to three characters of
- *   arbitrary style information (such as "%$&", for example).
+ *   arbitrary style information (such as "%$#", for example).
  *   Improvement styles that use eight directions can add an arbitrary
  *   amount of style information.
  * As of 0.10.6 we use:

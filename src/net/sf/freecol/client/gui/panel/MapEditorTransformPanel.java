@@ -153,12 +153,15 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * @param image an <code>Image</code> value
      * @param text a <code>String</code> value
      * @param mt a <code>MapTransform</code> value
+     * @return A suitable button.
      */
-    private JToggleButton buildButton(Image image, String text, final MapTransform mt) {
-
+    private JToggleButton buildButton(Image image, String text,
+                                      final MapTransform mt) {
         JPanel descriptionPanel = new JPanel(new BorderLayout());
-        descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
-        descriptionPanel.add(new JLabel(text, JLabel.CENTER), BorderLayout.SOUTH);
+        descriptionPanel.add(new JLabel(new ImageIcon(image)),
+                             BorderLayout.CENTER);
+        descriptionPanel.add(new JLabel(text, JLabel.CENTER),
+                             BorderLayout.SOUTH);
         descriptionPanel.setBackground(Color.RED);
         mt.setDescriptionPanel(descriptionPanel);
 

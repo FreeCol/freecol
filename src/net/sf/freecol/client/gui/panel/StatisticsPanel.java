@@ -72,6 +72,8 @@ public final class StatisticsPanel extends FreeColPanel {
          * table. This method should only be called to initialize the
          * data set. To modify or extend the data set use other
          * methods.
+         *
+         * @param statsData The map of key,value pairs to enter.
          */
         public void setData(java.util.Map<String, String> statsData) {
             this.data = new Object[2][statsData.size()];

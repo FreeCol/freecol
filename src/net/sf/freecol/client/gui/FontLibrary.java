@@ -102,9 +102,10 @@ public class FontLibrary {
      * Create a default <code>Font</code> set on initialization of the GUI.
      * 
      * @param fontName Can be used to choose a different font from a
-     *                 user-provided name.
-     * @param scaleFactor  The applied scale factor.
-    */
+     *     user-provided name.
+     * @param scaleFactor The applied scale factor.
+     * @return The new <code>Font</code>.
+     */
     static Font createMainFont(String fontName, float scaleFactor) {
         final float defaultSize = 12f * scaleFactor;
         mainFont = null;

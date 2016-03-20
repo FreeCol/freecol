@@ -187,11 +187,10 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Get the limits on this buildable.
      *
-     * @return A <code>List<Limit></code> of limits.
+     * @return A list of <code>Limit</code>s.
      */
     public List<Limit> getLimits() {
-        return (limits == null) ? Collections.<Limit>emptyList()
-            : limits;
+        return (limits == null) ? Collections.<Limit>emptyList() : limits;
     }
 
     /**

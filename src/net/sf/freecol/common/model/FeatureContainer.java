@@ -105,6 +105,7 @@ public final class FeatureContainer {
      * Is the given set of abilities non-empty and contains no
      * false-valued members?
      *
+     * @param abilitySet A set of abilities to check.
      * @return True if the ability set is `satisfied'.
      */
     public static boolean hasAbility(Set<Ability> abilitySet) {

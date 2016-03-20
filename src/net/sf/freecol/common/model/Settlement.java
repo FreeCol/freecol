@@ -313,11 +313,8 @@ public abstract class Settlement extends GoodsLocation
      * @return A high seas count, INFINITY if not connected.
      */
     public int getHighSeasCount() {
-        final Predicate<Tile> pred = t ->
-            !t.isLand() && t.getHighSeasCount() >= 0;
-        final Comparator<Tile> comp
-            = Comparator.comparingInt(Tile::getHighSeasCount);
-        Tile best = minimize(getTile().getSurroundingTiles(1, 1), pred, comp);
+        Tile best = minimize(getTile().getSurroundingTiles(1, 1),
+                             Tile.isSeaTile, Tile.highSeasComparator);
         return (best == null) ? INFINITY : best.getHighSeasCount();
     }
 

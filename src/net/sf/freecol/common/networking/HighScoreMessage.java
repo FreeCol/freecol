@@ -49,6 +49,8 @@ public class HighScoreMessage extends DOMMessage {
     /**
      * Create a new <code>HighScoreMessage</code> in request form (no
      * scores attached).
+     *
+     * @param key A message key for the final display.
      */
     public HighScoreMessage(String key) {
         super(getTagName());

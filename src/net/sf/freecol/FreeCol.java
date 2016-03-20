@@ -347,9 +347,12 @@ public final class FreeCol {
     /**
      * Get the JarURLConnection from a class.
      *
+     * @param c The <code>Class</code> to get the connection for.
      * @return The <code>JarURLConnection</code>.
+     * @exception IOException if the connection fails to open.
      */
-    private static JarURLConnection getJarURLConnection(Class c) throws IOException {
+    private static JarURLConnection getJarURLConnection(Class c)
+        throws IOException {
         String resourceName = "/" + c.getName().replace('.', '/') + ".class";
         URL url = c.getResource(resourceName);
         return (JarURLConnection)url.openConnection();
@@ -360,6 +363,7 @@ public final class FreeCol {
      *
      * @param juc The <code>JarURLConnection</code> to extract from.
      * @return A value of the package version attribute.
+     * @exception IOException if the manifest is not available.
      */
     private static String readVersion(JarURLConnection juc) throws IOException {
         Manifest mf = juc.getManifest();
@@ -375,8 +379,10 @@ public final class FreeCol {
      *
      * @param juc The <code>JarURLConnection</code> to extract from.
      * @return A suitable <code>InputStream</code>, or null on error.
+     * @exception IOException if the connection fails to open.
      */
-    private static InputStream getDefaultSplashStream(JarURLConnection juc) throws IOException {
+    private static InputStream getDefaultSplashStream(JarURLConnection juc)
+        throws IOException {
         JarFile jf = juc.getJarFile();
         ZipEntry ze = jf.getEntry(SPLASH_DEFAULT);
         return jf.getInputStream(ze);
@@ -1033,6 +1039,8 @@ public final class FreeCol {
 
     /**
      * Get the number of European nations to enable by default.
+     *
+     * @return The default European nation count.
      */
     public static int getEuropeanCount() {
         return europeanCount;

@@ -39,7 +39,7 @@ public class RandomUtils {
      * @param logMe A string to log with the result.
      * @param random A pseudo-<code>Random</code> number source.
      * @param range The exclusive maximum integer to return.
-     * @return A pseudo-random integer r, 0 <= r < range.
+     * @return A pseudo-random integer r, 0 &le; r &lt; range.
      */
     public static int randomInt(Logger logger, String logMe, Random random,
                                 int range) {
@@ -58,7 +58,7 @@ public class RandomUtils {
      * @param random A pseudo-<code>Random</code> number source.
      * @param range The exclusive maximum integer to return.
      * @param n The number of randoms.
-     * @return A vector of pseudo-random integers r, 0 <= r < range.
+     * @return A vector of pseudo-random integers r, 0 &le; r &lt; range.
      */
     public static int[] randomInts(Logger logger, String logMe, Random random,
                                    int range, int n) {
@@ -80,7 +80,7 @@ public class RandomUtils {
      * @param logger The <code>Logger</code> to log to.
      * @param logMe A string to log with the result.
      * @param random A pseudo-<code>Random</code> number source.
-     * @return A pseudo-random double r, 0 <= r < 1.0.
+     * @return A pseudo-random double r, 0 &le; r &lt; 1.0.
      */
     public static float randomFloat(Logger logger, String logMe,
                                     Random random) {
@@ -97,7 +97,7 @@ public class RandomUtils {
      * @param logger The <code>Logger</code> to log to.
      * @param logMe A string to log with the result.
      * @param random A pseudo-<code>Random</code> number source.
-     * @return A pseudo-random double r, 0 <= r < 1.0.
+     * @return A pseudo-random double r, 0 &le; r &lt; 1.0.
      */
     public static double randomDouble(Logger logger, String logMe,
                                       Random random) {
@@ -111,6 +111,7 @@ public class RandomUtils {
     /**
      * Gets a random member of a list.
      *
+     * @param <T> The list member type.
      * @param logger The <code>Logger</code> to log to.
      * @param logMe A string to log with the result.
      * @param list The list.

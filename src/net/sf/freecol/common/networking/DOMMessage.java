@@ -424,6 +424,7 @@ public class DOMMessage {
     /**
      * Convenience method to extract a child element of a particular class.
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param index The index of the child element.
@@ -444,6 +445,7 @@ public class DOMMessage {
     /**
      * Convenience method to extract a child element of a particular class.
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param index The index of the child element.
@@ -464,6 +466,7 @@ public class DOMMessage {
      * Convenience method to extract all child elements of a
      * particular class.
      *
+     * @param <T> The actual list member return type.
      * @param game The <code>Game</code> to instantiate within.
      * @param element The parent <code>Element</code>.
      * @param returnClass The expected class of the child.
@@ -483,6 +486,7 @@ public class DOMMessage {
     /**
      * Convenience method to map a function over the children of an Element.
      *
+     * @param <T> The actual list member return type.
      * @param element The <code>Element</code> to extract children from.
      * @param mapper A mapper function.
      * @return A list of results of the mapping.
@@ -554,6 +558,7 @@ public class DOMMessage {
     /**
      * Get an enum attribute value from an element.
      *
+     * @param <T> The actual enum return type.
      * @param element The <code>Element</code> to query.
      * @param tag The attribute name.
      * @param returnClass The class of the return value.
@@ -610,7 +615,7 @@ public class DOMMessage {
     /**
      * Read a Document from an input source.
      * 
-     * @param An <code>InputSource</code> to read from.
+     * @param inputSource An <code>InputSource</code> to read from.
      * @return The resulting <code>Document</code>.
      * @exception IOException if thrown by the <code>InputStream</code>.
      * @exception SAXException if thrown during parsing.
@@ -704,6 +709,7 @@ public class DOMMessage {
     /**
      * Read a new FreeCol game object from an element.
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to check for existing objects.
      * @param element The <code>Element</code> to read from.
      * @param intern Whether to intern the instantiated object.
@@ -749,6 +755,7 @@ public class DOMMessage {
     /**
      * Read a new FreeCol object from an element.
      *
+     * @param <T> The actual return type.
      * @param game The <code>Game</code> to check for existing objects.
      * @param element The <code>Element</code> to read from.
      * @param returnClass The expected return class.

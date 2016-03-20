@@ -100,7 +100,7 @@ public enum Direction implements Named {
      * Gets this direction rotated by n places.
      *
      * @param n The number of places to rotate
-     *     (-#directions <= n <= #directions).
+     *     (-#directions &le; n &le; #directions).
      * @return The rotated direction.
      */
     private Direction rotate(int n) {

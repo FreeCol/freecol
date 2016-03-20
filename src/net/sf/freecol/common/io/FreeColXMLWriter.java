@@ -152,6 +152,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     /**
      * Creates a new <code>FreeColXMLWriter</code>.
      *
+     * @param writer A <code>Writer</code> to create an
+     *     <code>FreeColXMLWriter</code> for.
      * @param scope The <code>WriteScope</code> to use for FreeCol
      *     object writes.
      * @param indent If true, produce indented output if supported.
@@ -332,6 +334,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     /**
      * Writes an XML-representation of a collection object to the given stream.
      *
+     * @param <T> The collection type.
      * @param tag The tag for the array.
      * @param members The members of the array.
      * @exception XMLStreamException if a problem was encountered

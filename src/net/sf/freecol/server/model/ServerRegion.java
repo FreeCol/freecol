@@ -59,6 +59,7 @@ public class ServerRegion extends Region {
      * Trivial constructor for serialization.
      *
      * @param game The <code>Game</code> to create in.
+     * @param id The object identifier.
      */
     public ServerRegion(Game game, String id) {
         super(game, id);
@@ -66,6 +67,9 @@ public class ServerRegion extends Region {
 
     /**
      * Constructor for copying in a new region from an imported game.
+     *
+     * @param game The <code>Game</code> to create in.
+     * @param region A <code>Region</code> to copy.
      */
     public ServerRegion(Game game, Region region) {
         super(game);
@@ -237,6 +241,7 @@ public class ServerRegion extends Region {
      *
      * @param map The <code>Map</code> to check.
      * @param lb A <code>LogBuilder</code> to log to.
+     * @return A list of fixed server regions.
      */     
     public static List<ServerRegion> requireFixedRegions(Map map, LogBuilder lb) {
         final Game game = map.getGame();

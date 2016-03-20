@@ -833,6 +833,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     /**
      * Remove a <code>TileImprovementPlan</code> from the relevant colony.
+     *
+     * @param plan The <code>TileImprovementPlan</code> to remove.
      */
     public void removeTileImprovementPlan(TileImprovementPlan plan) {
         if (plan == null) return;
@@ -1430,6 +1432,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * FIXME: Move this to a specialized Handler class (AIEurope?)
      * FIXME: Give protected access?
      *
+     * @param unitType The <code>UnitType</code> to train.
      * @return the new AIUnit created by this action. May be null.
      */
     public AIUnit trainAIUnitInEurope(UnitType unitType) {

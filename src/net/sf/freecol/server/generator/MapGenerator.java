@@ -33,6 +33,7 @@ public interface MapGenerator {
      *
      * @param width The map width.
      * @param height The map height.
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return A new empty <code>Map</code>.
      */
     public abstract Map createEmptyMap(int width, int height, LogBuilder lb);
@@ -40,6 +41,7 @@ public interface MapGenerator {
     /**
      * Creates the map with the current set options
      *
+     * @param lb A <code>LogBuilder</code> to log to.
      * @return The new <code>Map</code>.
      */
     public abstract Map createMap(LogBuilder lb);

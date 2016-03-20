@@ -70,7 +70,8 @@ public class ConceptDetailPanel extends FreeColPanel
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
      */
     public ConceptDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {
@@ -80,6 +81,9 @@ public class ConceptDetailPanel extends FreeColPanel
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return Messages.getName(id);

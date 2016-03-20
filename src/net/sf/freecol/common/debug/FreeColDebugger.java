@@ -140,6 +140,7 @@ public class FreeColDebugger {
      * Configures the debug modes.
      *
      * @param optionValue The command line option.
+     * @return True if the modes were set as specified.
      */
     public static boolean setDebugModes(String optionValue) {
         if (optionValue == null) return false;

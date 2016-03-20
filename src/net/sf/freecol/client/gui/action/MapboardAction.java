@@ -33,6 +33,7 @@ public abstract class MapboardAction extends FreeColAction {
      * Creates a new <code>MapboardAction</code>.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param id The action identifier.
      */
     protected MapboardAction(FreeColClient freeColClient, String id) {
         super(freeColClient, id);

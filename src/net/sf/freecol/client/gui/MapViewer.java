@@ -1687,6 +1687,11 @@ public final class MapViewer extends FreeColClientHolder {
 
     /**
      * Draws the pentagram indicating a native capital.
+     *
+     * @param extent The nominal height of the image.
+     * @param padding Padding to add around the image.
+     * @param backgroundColor The image background color.
+     * @return A suitable <code>BufferedImage</code>.
      */
     private static BufferedImage createCapitalLabel(int extent, int padding,
                                                     Color backgroundColor) {
@@ -1796,6 +1801,12 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Draws a cross indicating a religious mission is present in the
      * native village.
+     *
+     * @param extent The nominal height of the image.
+     * @param padding Padding to add around the image.
+     * @param backgroundColor The image background color.
+     * @param expertMissionary True if the label should show expertise.
+     * @return A suitable <code>BufferedImage</code>.
      */
     private static BufferedImage createReligiousMissionLabel(int extent,
             int padding, Color backgroundColor, boolean expertMissionary) {

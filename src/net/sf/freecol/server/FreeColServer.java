@@ -246,6 +246,7 @@ public final class FreeColServer {
      * @param name An optional name for the server.
      * @exception IOException If save game can not be found.
      * @exception FreeColException If the savegame could not be loaded.
+     * @exception XMLStreamException If the server comms fail.
      */
     public FreeColServer(final FreeColSavegameFile savegame, 
                          Specification specification, int port, String name)
@@ -1236,9 +1237,12 @@ public final class FreeColServer {
      * Removes automatically created save games.
      * Call this function to delete the automatically created save games from
      * a previous game.
+     *
+     * @param prefix The prefix for the files to delete.
      */
     public static void removeAutosaves(final String prefix) {
-        for (File autosaveFile : FreeColDirectories.getAutosaveDirectory().listFiles()) {
+        for (File autosaveFile : FreeColDirectories.getAutosaveDirectory()
+                 .listFiles()) {
             if (autosaveFile.getName().startsWith(prefix)) {
                 autosaveFile.delete();
             }

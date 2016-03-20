@@ -272,6 +272,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Does this unit have a particular class of mission?
      *
+     * @param <T> The type of the mission.
      * @param returnClass The <code>Class</code> of mission to check.
      * @return True if the mission is of the given class.
      */
@@ -282,6 +283,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Get the unit mission if it is of a given class.
      *
+     * @param <T> The type of the mission.
      * @param returnClass The <code>Class</code> of the mission.
      * @return The <code>Mission</code>, or null if it is not of the
      *     given class.

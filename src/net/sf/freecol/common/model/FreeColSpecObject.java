@@ -51,6 +51,7 @@ public abstract class FreeColSpecObject extends FreeColObject {
     /**
      * Instantiate a FreeCol specification object.
      *
+     * @param <T> The actual instance type.
      * @param spec The <code>Specification</code> to use in the constructor.
      * @param returnClass The expected class of the object.
      * @return The new spec object, or null on error.

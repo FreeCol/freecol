@@ -92,7 +92,7 @@ public final class PlayersTable extends JTable {
         /**
          * A standard constructor.
          *
-         * @param nationTypes List of <code>EuropeanNationType></code>
+         * @param nationTypes The list of <code>EuropeanNationType</code>s.
          */
         public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
             this(new JComboBox<>(nationTypes

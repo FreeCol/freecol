@@ -208,7 +208,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Does a goods collection contain an element with a given type?
      *
-     * @param goods The <code>Goods<code> collection to search.
+     * @param goods The <code>Goods</code> collection to search.
      * @param type The <code>GoodsType</code> to search for.
      * @return True if the goods type was found.
      */

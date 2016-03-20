@@ -40,15 +40,15 @@ import net.sf.freecol.server.ai.AIUnit;
 /**
  * A Goal is used to encapsulate a specific part of the
  * decision-making process of an AI.
- * </p><p>
+ *
  * Using a top-down approach, every {@link AIPlayer} has a set of Goals which,
  * in turn, may have further subgoals. In combination, this tree of goals
  * and subgoals reflects the current strategy of the AIPlayer.
- * </p><p>
+ *
  * Units (each one wrapped in an {@link AIUnit} object) will be moved between
  * existing Goal objects.
  * FIXME: Turn {@link AIUnit} into a simple wrapper for individual units.
- * </p><p>
+ *
  * Specific AI goals are created by extending this class; some of
  * these could also be used to assist the human player (i.e. GoTo,
  * Scouting, Trade, Piracy).
@@ -109,11 +109,12 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Cancels a goal and all of its subgoals.
-     * If a goal is cancelled, it will recursively cancelGoal() its subgoals first,
-     * and return all units to the object calling this.
-     * After this method has been called, it should be safe for the parent
-     * to remove this goal from its list of subgoals.
-     * </p><p>
+     *
+     * If a goal is cancelled, it will recursively cancelGoal() its
+     * subgoals first, and return all units to the object calling
+     * this.  After this method has been called, it should be safe for
+     * the parent to remove this goal from its list of subgoals.
+     *
      * NOTE: Preferably, only the direct parent should call this.
      *
      * @return A list of all {@link AIUnit} being freed up by this action
@@ -207,8 +208,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
     }
 
     /**
-     * Returns the relativeWeight this goal has been weighted with by its parent.
-     * </p><p>
+     * Returns the relativeWeight this goal has been weighted with by
+     * its parent.
+     *
      * NOTE: In many cases, you will want to use {@link #getAbsoluteWeight()} instead.
      *
      * @return The relative weight {@link #relativeWeight} of this goal
@@ -220,7 +222,8 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Gets the weight of the parent goal, or 1 if there is no parent goal.
      *
-     * @return The absolute weight [0;1] of the parent goal, or 1 if a parent goal does not exist
+     * @return The absolute weight [0;1] of the parent goal, or 1 if a
+     *     parent goal does not exist
      */
     public float getParentWeight() {
         if (parentGoal == null) {
@@ -233,10 +236,10 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Returns the absolute weight of this goal.
-     * </p><p>
-     * The absolute weight is the weight of this goal in relation to the {@link AIPlayer}.
-     * This is used when making requests, to allow the AIPlayer to find the
-     * "most important" request.
+     *
+     * The absolute weight is the weight of this goal in relation to
+     * the {@link AIPlayer}.  This is used when making requests, to
+     * allow the AIPlayer to find the "most important" request.
      *
      * @return The absolute weight [0;1] of this goal
      */
@@ -258,7 +261,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Calling this ensures that the relative weights given to
      * subgoals add up to 1.
-     * </p><p>
+     *
      * NOTE: This allows for a small margin of error (+/- 0.05),
      * to avoid recalculating too often.
      */
@@ -283,15 +286,15 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
 //     /**
 //      * Wrapper method for a unit request sent to the {@link AIPlayer}.
-//      * </p><p>
+//      *
 //      * Each Goal can request necessary units from the AIPlayer.
 //      * Here, such a request is wrapped in a private method for convenience.
 //      * Each request contains a weight, which is {@link #getAbsoluteWeight()}
 //      * of this goal, and the number of turns since a unit request has last been granted.
 //      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
-//      * </p><p>
+//      *
 //      * FIXME:Should that be role, instead or alternatively?
-//      * </p><p>
+//      *
 //      * FIXME: {@link AIPlayer#addUnitWish(Goal,UnitType,float,int)}; should add
 //      * requests to a set-like structure, so that there's only one active request
 //      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
@@ -309,13 +312,13 @@ public abstract class Goal extends AIObject implements GoalConstants {
 
     /**
      * Wrapper method for a worker request sent to the {@link AIPlayer}.
-     * </p><p>
+     *
      * Each Goal can request necessary units from the AIPlayer.
      * Here, such a request is wrapped in a private method for convenience.
      * Each request contains a weight, which is {@link #getAbsoluteWeight()}
      * of this goal, and the number of turns since a unit request has last been granted.
      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
-     * </p><p>
+     *
      * FIXME: AIPlayer#addUnitWish(Goal,GoodsType,int,float,int); should add
      * requests to a set-like structure, so that there's only one active request
      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
@@ -336,7 +339,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * Adds a unit to this goal.
      * This may be from {@link AIPlayer} fulfilling a unit request,
      * by the parent goal, or by a subgoal that no longer needs the unit.
-     * </p><p>
+     *
      * Possible FIXME: If the unit we're requesting is a high-interest one,
      * such as a Galleon, AIUnit#setLoaningGoal() may be used to
      * signal that this unit may _only_ be moved to subgoals, or back to
@@ -374,9 +377,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Used by a parent goal to check whether this goal, including subgoals,
      * can yield a specific unit.
-     * </p><p>
+     *
      * This recursively checks its subgoals, if there's no match among the own units.
-     * </p><p>
+     *
      * Possible FIXME: Check whether AIUnit#isOnLoan() - in which case, we mustn't
      * yield a unit unless it's the {@link AIPlayer} that requests.
      *
@@ -446,7 +449,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Removes a unit from the goal, potentially from a subgoal,
      * and yields it to the caller.
-     * </p><p>
+     *
      * Returned unit should be the one with minimum absolute weight,
      * see {@link #getYieldedUnitWeight(UnitType,AIObject)}.
      *
@@ -493,7 +496,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * Checks all owned AIUnits for validity, and removes invalid ones.
      * An AIUnit is supposed to be invalid if it no longer contains a valid Unit.
      * This may be the case if the Unit has been removed from the game between turns.
-     * </p><p>
+     *
      * NOTE: The assumption here is that AIUnit#isValid() will return true
      * as long as the {@link net.sf.freecol.common.model.Unit} wrapped in it exists.
      */
@@ -575,7 +578,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * If a unit is removed from this goal via {@link #yieldUnit(UnitType,AIObject)},
      * or if the Unit contained in the {@link AIUnit} no longer is valid,
      * this method is called to clean up any remaining references to the unit.
-     * </p><p>
+     *
      * Any implementation of this will need to iterate over all AIUnit object
      * references used by this goal, and remove those that equal the given parameter.
      *

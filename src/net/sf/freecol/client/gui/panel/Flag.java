@@ -995,6 +995,7 @@ public class Flag {
      *
      * @param unionShape The shape of the union.
      * @param small Whether the shape is limited by decorations.
+     * @return The triangle shape.
      */
     private GeneralPath getTriangle(UnionShape unionShape, boolean small) {
         GeneralPath path = new GeneralPath();
@@ -1126,6 +1127,7 @@ public class Flag {
      *
      * @param x The x coordinate of the star.
      * @param y The y coordinate of the star.
+     * @return The star shape.
      */
     public GeneralPath getStar(double x, double y) {
         return getStar(-1, x, y);
@@ -1137,6 +1139,7 @@ public class Flag {
      * @param scale The scale of the star.
      * @param x The x coordinate of the star.
      * @param y The y coordinate of the star.
+     * @return The star shape.
      */
     public GeneralPath getStar(double scale, double x, double y) {
         GeneralPath newStar = new GeneralPath(star);

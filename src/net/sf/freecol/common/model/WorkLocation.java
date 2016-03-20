@@ -572,6 +572,7 @@ public abstract class WorkLocation extends UnitLocation
      * Used below, only public for the test suite.
      *
      * @param unit The <code>Unit</code> to check.
+     * @param goodsType The <code>GoodsType</code> to check the production of.
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {

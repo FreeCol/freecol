@@ -69,6 +69,9 @@ public class ServerIndianSettlement extends IndianSettlement
 
     /**
      * Trivial constructor for all ServerModelObjects.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The object identifier.
      */
     public ServerIndianSettlement(Game game, String id) {
         super(game, id);

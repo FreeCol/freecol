@@ -50,6 +50,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * supplied unit.
      *
      * @param unit A <code>Unit</code> whose stop is to be setd.
+     * @param index The stop index.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
         super(getTagName());

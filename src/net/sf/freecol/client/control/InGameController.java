@@ -3854,6 +3854,7 @@ public final class InGameController extends FreeColClientHolder
      *
      * @param goods The <code>Goods</code> which are going aboard the carrier.
      * @param carrier The <code>Unit</code> acting as carrier.
+     * @return True if the goods were loaded.
      */
     public boolean loadCargo(Goods goods, Unit carrier) {
         if (!requireOurTurn() || goods == null || goods.getAmount() <= 0
@@ -4438,6 +4439,7 @@ public final class InGameController extends FreeColClientHolder
      * Called from IGIH.remove().
      *
      * @param objects A list of <code>FreeColGameObject</code>s to remove.
+     * @param divert An object to divert to when the original disappears.
      */
     public void remove(List<FreeColGameObject> objects,
                        FreeColGameObject divert) {

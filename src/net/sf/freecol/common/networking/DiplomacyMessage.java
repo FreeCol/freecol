@@ -178,6 +178,7 @@ public class DiplomacyMessage extends DOMMessage {
      * Set the agreement (a <code>DiplomaticTrade</code>) in this message.
      *
      * @param agreement The <code>DiplomaticTrade</code> to set.
+     * @return This message.
      */
     public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
         this.agreement = agreement;

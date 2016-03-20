@@ -167,6 +167,8 @@ public abstract class CombatModel {
     /**
      * Is this a combat between a rebel player and the REF at a colony?
      *
+     * @param attacker The attacker object.
+     * @param defender The defender object.
      * @return True if the attack is a war of independence battle for a colony.
      */
     public boolean combatIsWarOfIndependence(FreeColGameObject attacker,

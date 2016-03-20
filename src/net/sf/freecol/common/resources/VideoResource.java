@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.resources;
 
+import java.io.IOException;
 import java.net.URI;
 
 
@@ -38,8 +39,9 @@ public class VideoResource extends Resource {
      *
      * @param resourceLocator The <code>URI</code> used when loading this
      *     resource.
+     * @exception IOException if the URI is malformed.
      */
-    public VideoResource(URI resourceLocator) throws Exception {
+    public VideoResource(URI resourceLocator) throws IOException {
         super(resourceLocator);
         
         this.video = new Video(resourceLocator.toURL());

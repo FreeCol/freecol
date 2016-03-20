@@ -58,6 +58,7 @@ public class SellPropositionMessage extends DOMMessage {
      * Create a new <code>SellPropositionMessage</code>.
      *
      * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
      * @param goods The <code>Goods</code> to sell.
      * @param gold The price of the goods (negative if unknown).
      */

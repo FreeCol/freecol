@@ -870,6 +870,7 @@ public final class Specification {
      * Get all the Abilities with the given identifier.
      *
      * @param id The object identifier to look for.
+     * @return A list of <code>Ability</code>s.
      */
     public List<Ability> getAbilities(String id) {
         return allAbilities.get(id);
@@ -892,6 +893,7 @@ public final class Specification {
      * Get all the Modifiers with the given identifier.
      *
      * @param id The object identifier to look for.
+     * @return A list of <code>Modifier</code>s.
      */
     public List<Modifier> getModifiers(String id) {
         List<Modifier> result = allModifiers.get(id);
@@ -1248,7 +1250,7 @@ public final class Specification {
      * @return The free colonist unit type.
      */
     public UnitType getDefaultUnitType(NationType nationType) {
-        Predicate<UnitType> p = (nationType == null)
+        final Predicate<UnitType> p = (nationType == null)
             ? ut -> !ut.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
                 && !ut.hasAbility(Ability.REF_UNIT)
             : (nationType.isIndian())
@@ -1350,6 +1352,7 @@ public final class Specification {
      * Gets the REF unit types.
      *
      * @param naval If true, choose naval units, if not, land units.
+     * @return A list of <code>UnitType</code>s allowed for the REF.
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
         return transform(getUnitTypesWithAbility(Ability.REF_UNIT),
@@ -1536,6 +1539,7 @@ public final class Specification {
      * Gets the roles suitable for a REF unit.
      *
      * @param naval If true, choose roles for naval units, if not, land units.
+     * @return A list of <code>Role</code>s suitable for REF units.
      */
     public List<Role> getREFRoles(boolean naval) {
         return transform(((naval) ? Stream.of(getDefaultRole())
@@ -1700,22 +1704,24 @@ public final class Specification {
     /**
      * Get the <code>FreeColSpecObjectType</code> with the given identifier.
      *
+     * @param <T> The actual return type.
      * @param id The object identifier to look for.
-     * @param type The expected <code>Class</code>.
+     * @param returnClass The expected <code>Class</code>.
      * @return The <code>FreeColSpecObjectType</code> found.
      */
-    public <T extends FreeColSpecObjectType> T getType(String id, Class<T> type) {
+    public <T extends FreeColSpecObjectType> T getType(String id,
+                                                       Class<T> returnClass) {
         FreeColSpecObjectType o = findType(id);
         if (o != null) {
-            return type.cast(allTypes.get(id));
+            return returnClass.cast(allTypes.get(id));
 
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FCGOT: " + id);
 
         } else { // forward declaration of new type
             try {
-                Constructor<T> c = type.getConstructor(String.class,
-                                                       Specification.class);
+                Constructor<T> c = returnClass.getConstructor(String.class,
+                    Specification.class);
                 T result = c.newInstance(id, this);
                 allTypes.put(id, result);
                 return result;
@@ -1763,7 +1769,9 @@ public final class Specification {
     /**
      * Get all types which have any of the given abilities.
      *
-     * @param abilities The abilities for the search
+     * @param <T> The actual return type.
+     * @param resultType The expected result type.
+     * @param abilities The abilities for the search.
      * @return A list of <code>FreeColSpecObjectType</code>s with at
      *     least one of the given abilities.
      */
@@ -1779,6 +1787,8 @@ public final class Specification {
     /**
      * Get all types which have none of the given abilities.
      *
+     * @param <T> The actual return type.
+     * @param resultType The expected result type.
      * @param abilities The abilities for the search
      * @return A list of <code>FreeColSpecObjectType</code>s without the
      *     given abilities.

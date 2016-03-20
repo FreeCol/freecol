@@ -183,6 +183,7 @@ public class StringTemplate extends FreeColObject {
      * Wrapper for subclasses to set the default identifier and return the
      * setting object.
      *
+     * @param <T> The actual return type.
      * @param id The new default identifier
      * @param returnClass The expected return class.
      * @return The setting object.
@@ -269,8 +270,9 @@ public class StringTemplate extends FreeColObject {
      * Add an optional key and replacement.  Helper function for the add*()
      * routines that follow.
      *
+     * @param <T> The actual return type.
      * @param key The optional key.
-     * @param replacement The replacement template.
+     * @param value The replacement <code>StringTemplate</code>.
      * @return This object, cast back to its original class.
      */
     @SuppressWarnings("unchecked")
@@ -286,6 +288,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the template is of type TEMPLATE.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param value The corresponding replacement.
      * @return This.
@@ -303,6 +306,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the template is of type LABEL.
      *
+     * @param <T> The actual return type.
      * @param value The replacement value.
      * @return This.
      */
@@ -319,6 +323,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the template is of type TEMPLATE.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param value The corresponding replacement.
      * @return This.
@@ -336,6 +341,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the StringTemplate is of type TEMPLATE.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param object The replacement <code>FreeColObject</code>.
      * @return This.
@@ -353,6 +359,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the StringTemplate is of type LABEL.
      *
+     * @param <T> The actual return type.
      * @param value The replacement value.
      * @return This.
      */
@@ -367,6 +374,7 @@ public class StringTemplate extends FreeColObject {
     /**
      * Add a key and named object to this template.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param named The <code>Named</code> to add.
      * @return This.
@@ -378,6 +386,7 @@ public class StringTemplate extends FreeColObject {
     /**
      * Add named object without key to this template.
      *
+     * @param <T> The actual return type.
      * @param named The <code>Named</code> to add.
      * @return This.
      */
@@ -388,6 +397,7 @@ public class StringTemplate extends FreeColObject {
     /**
      * Add a key and an integer value to replace it to this template.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param amount The <code>Number</code> value to add.
      * @return This.
@@ -401,6 +411,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the StringTemplate is of type TEMPLATE.
      *
+     * @param <T> The actual return type.
      * @param key The key to add.
      * @param template The <code>StringTemplate</code> value.
      * @return This.
@@ -419,6 +430,7 @@ public class StringTemplate extends FreeColObject {
      *
      * This is only possible if the StringTemplate is of type LABEL.
      *
+     * @param <T> The actual return type.
      * @param template The replacement <code>StringTemplate</code>.
      * @return This.
      */
@@ -436,6 +448,7 @@ public class StringTemplate extends FreeColObject {
      * Functionally identical to add(), but used to distinguish the special
      * cases at the point they are used.
      *
+     * @param <T> The actual return type.
      * @param key The tag.
      * @param value The special tag value.
      * @return This.

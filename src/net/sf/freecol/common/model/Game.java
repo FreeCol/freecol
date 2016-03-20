@@ -228,6 +228,7 @@ public class Game extends FreeColGameObject {
     /**
      * Instantiate an uninitialized FreeColGameObject within this game.
      *
+     * @param <T> The actual return type.
      * @param returnClass The required <code>FreeColObject</code> class.
      * @param server Create a server object if possible.
      * @return The new uninitialized object, or null on error.
@@ -292,7 +293,6 @@ public class Game extends FreeColGameObject {
      * Stub for routine only meaningful in the server.
      *
      * @return Nothing.
-     * @exception IllegalStateException, unimplemented in the client.
      */
     public String getNextId() {
         throw new IllegalStateException("game.getNextId not implemented");
@@ -320,6 +320,7 @@ public class Game extends FreeColGameObject {
      * Gets the <code>FreeColGameObject</code> with the specified
      * identifier and class.
      *
+     * @param <T> The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
@@ -785,7 +786,7 @@ public class Game extends FreeColGameObject {
     /**
      * Set the current nation options.
      *
-     * @param newNationOptions The new <code>NationOptions<code> value.
+     * @param newNationOptions The new <code>NationOptions</code> value.
      */
     public final void setNationOptions(final NationOptions newNationOptions) {
         this.nationOptions = newNationOptions;
@@ -1087,6 +1088,7 @@ public class Game extends FreeColGameObject {
      * Get a location class from an identifier.
      *
      * @param id The identifier to dissect.
+     * @return The location class.
      */
     public static Class<? extends FreeColGameObject> getLocationClass(String id) {
         String tag = FreeColObject.getIdType(id);
@@ -1097,8 +1099,9 @@ public class Game extends FreeColGameObject {
     /**
      * Unserialize from XML to a FreeColObject in this game.
      *
+     * @param <T> The actual return type.
      * @param xml The xml serialized version of an object.
-     * @param returnClass The required object class.
+     * @param returnClass The expected object class.
      * @return The unserialized object.
      * @exception XMLStreamException if there are any problems reading from
      *     the stream.

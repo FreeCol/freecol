@@ -136,7 +136,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Gets the PRNG to use for this player.
      *
-     * @return A <code>Random<code> to use for this player.
+     * @return A <code>Random</code> to use for this player.
      */
     public Random getAIRandom() {
         return aiRandom;

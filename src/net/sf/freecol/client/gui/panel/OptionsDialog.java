@@ -143,6 +143,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     /**
      * Load the panel.
+     *
+     * @param headerKey A message key for the panel title.
+     * @param ui The <code>OptionGroupUI</code> to encapsulate.
      */
     private void preparePanel(String headerKey, OptionGroupUI ui) {
         this.optionPanel = new MigPanel("ReportPanelUI");

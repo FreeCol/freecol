@@ -51,6 +51,8 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
     /**
      * Sets the value of this UI's component.
+     *
+     * @param b The new boolean value.
      */
     public void setValue(boolean b) {
         box.setSelected(b);

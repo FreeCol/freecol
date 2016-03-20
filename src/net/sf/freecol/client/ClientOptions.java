@@ -653,7 +653,8 @@ public class ClientOptions extends OptionGroup {
     /**
      * Return the client's preferred comparator for ModelMessages.
      *
-     * @return a <code>Comparator</code> value
+     * @param game The <code>Game</code> to extract a comparator for.
+     * @return The preferred <code>Comparator</code>.
      */
     public Comparator<ModelMessage> getModelMessageComparator(Game game) {
         switch (getInteger(MESSAGES_GROUP_BY)) {
@@ -673,7 +674,7 @@ public class ClientOptions extends OptionGroup {
      * @return a <code>BooleanOption</code> value
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
-        return (BooleanOption) getOption(message.getMessageType()
+        return (BooleanOption)getOption(message.getMessageType()
             .getOptionName());
     }
 

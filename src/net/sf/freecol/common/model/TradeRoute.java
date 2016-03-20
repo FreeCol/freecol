@@ -236,7 +236,6 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Check that the trade route is valid.
      *
-     * @param other Ignore this name from the name collision check.
      * @return Null if the route is valid, or a <code>StringTemplate</code>
      *     explaining the problem if invalid.
      */

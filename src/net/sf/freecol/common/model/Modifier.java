@@ -176,6 +176,8 @@ public class Modifier extends Feature {
 
     /**
      * Deliberately empty constructor.
+     *
+     * @param specification The defining <code>Specification</code>.
      */
     protected Modifier(Specification specification) {
         super(specification);

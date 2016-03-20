@@ -303,6 +303,7 @@ public class OggVorbisDecoderFactory {
         /**
          * Refills the conversion buffer.
          *
+         * @param is The <code>InputStream</code> to read from.
          * @return The number of bytes waiting in the convBuf.
          */
         public int getBody(InputStream is) {
@@ -339,6 +340,7 @@ public class OggVorbisDecoderFactory {
         /**
          * Decode the PCM data.
          *
+         * @param samples The number of samples to decode.
          * @return The number of bytes waiting in the conversion buffer to
          *     be written.
          */
@@ -377,6 +379,7 @@ public class OggVorbisDecoderFactory {
          * Create a new player.
          *
          * @param os The <code>OggStream</code> to read from.
+         * @exception IOException if unable to open the stream.
          */
         public OggVorbisAudioInputStream(OggStream os) throws IOException {
             super(os, os.getFormat(), AudioSystem.NOT_SPECIFIED);
@@ -450,7 +453,7 @@ public class OggVorbisDecoderFactory {
      *
      * @param file The <code>File</code> containing the content.
      * @return A new <code>AudioInputStream</code> to decode the input.
-     * @throws java.io.IOException
+     * @exception IOException if unable to open the stream.
      */
     public AudioInputStream getOggStream(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);

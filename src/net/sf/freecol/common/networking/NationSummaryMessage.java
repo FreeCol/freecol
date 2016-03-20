@@ -76,6 +76,7 @@ public class NationSummaryMessage extends DOMMessage {
     /**
      * Client side helper to get the player.
      *
+     * @param game The <code>Game</code> to look for a player within.
      * @return The player.
      */
     public Player getPlayer(Game game) {

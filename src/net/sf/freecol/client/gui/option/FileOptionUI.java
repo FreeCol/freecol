@@ -42,21 +42,26 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     private final JPanel panel = new JPanel();
     private final JTextField fileField;
 
+
     /**
-    * Creates a new <code>FileOptionUI</code> for the given
-    * <code>FileOption</code>.
-    *
-    * @param option The <code>FileOption</code> to make a user interface for.
-    * @param editable boolean whether user can modify the setting
-    */
-    public FileOptionUI(final GUI gui, final FileOption option, boolean editable) {
+     * Creates a new <code>FileOptionUI</code> for the given
+     * <code>FileOption</code>.
+     *
+     * @param gui The <code>GUI</code> to create a change dialog on.
+     * @param option The <code>FileOption</code> to make a user interface for.
+     * @param editable boolean whether user can modify the setting
+     */
+    public FileOptionUI(final GUI gui, final FileOption option,
+                        boolean editable) {
         super(option, editable);
 
         panel.add(getJLabel());
 
         File file = option.getValue();
-        fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 20);
-        fileField.setToolTipText((file == null) ? null : file.getAbsolutePath());
+        fileField = new JTextField((file == null) ? null
+            : file.getAbsolutePath(), 20);
+        fileField.setToolTipText((file == null) ? null
+            : file.getAbsolutePath());
         fileField.setDisabledTextColor(Color.BLACK);
         panel.add(fileField);
 
@@ -96,11 +101,13 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
             }
         });
         */
-
     }
+
 
     /**
      * Sets the value of this UI's component.
+     *
+     * @param f The new <code>File</code> value.
      */
     public void setValue(File f) {
         getOption().setValue(f);

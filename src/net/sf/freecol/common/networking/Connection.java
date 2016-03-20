@@ -124,7 +124,8 @@ public class Connection implements Closeable {
      * @param socket The socket to the client.
      * @param messageHandler The MessageHandler to call for each message
      *     received.
-     * @exception IOException
+     * @param name The connection name.
+     * @exception IOException if streams can not be derived from the socket.
      */
     public Connection(Socket socket, MessageHandler messageHandler,
                       String name) throws IOException {
@@ -148,7 +149,8 @@ public class Connection implements Closeable {
      * @param port The port to connect to.
      * @param messageHandler The MessageHandler to call for each message
      *     received.
-     * @exception IOException
+     * @param name The name for the connection.
+     * @exception IOException if the socket creation is problematic.
      */
     public Connection(String host, int port, MessageHandler messageHandler,
                       String name) throws IOException {
@@ -161,8 +163,8 @@ public class Connection implements Closeable {
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
-     * @exception IOException on failure to create/connect the socket.
      * @return A new socket.
+     * @exception IOException on failure to create/connect the socket.
      */
     private static Socket createSocket(String host, int port)
         throws IOException {
@@ -521,6 +523,8 @@ public class Connection implements Closeable {
 
     /**
      * Send a disconnect message.
+     *
+     * @exception IOException if failed to send the message.
      */
     public void disconnect() throws IOException {
         this.send(new DOMMessage(DISCONNECT_TAG));

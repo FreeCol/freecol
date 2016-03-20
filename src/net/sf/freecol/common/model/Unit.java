@@ -2119,7 +2119,7 @@ public class Unit extends GoodsLocation
      * Gets the type of a move that is made when moving a naval unit
      * from one tile to another.
      *
-     * @param from The origin <code>Tile<code> of the move.
+     * @param from The origin <code>Tile</code> of the move.
      * @param target The target <code>Tile</code> of the move.
      * @return The move type.
      */
@@ -3600,6 +3600,12 @@ public class Unit extends GoodsLocation
      * This can be replaced with just getModifiers() when accepted
      * specifications have all combat modifiers with correct index
      * values.
+     *
+     * @param id The identifier to get combat modifiers for.
+     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return The set of <code>Modifier</code>s found.
      */
     public Set<Modifier> getCombatModifiers(String id,
         FreeColSpecObjectType fcgot, Turn turn) {

@@ -486,7 +486,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * in the classic ruleset and made-from grain in the freecol
      * ruleset.
      *
-     * @param spec The <code>Specification<code> to operate on.
+     * @param spec The <code>Specification</code> to operate on.
      */
     public static void setDerivedAttributes(Specification spec) {
         // Reset to default state

@@ -37,7 +37,7 @@ import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * This {@link Goal} deals with one missionary unit.
- * </p><p>
+ *
  * On construction, an {@link AIUnit} and an {@link IndianSettlement}
  * are given to this.
  * The Goal will try to create a mission at that settlement,

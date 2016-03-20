@@ -1948,6 +1948,7 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
      * @param unit The <code>Unit</code> that is delivering.
+     * @param settlement The <code>Settlement</code> to deliver to.
      * @param goods The <code>Goods</code> to deliver.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
@@ -3889,6 +3890,7 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @param unit The <code>Unit</code> to set the destination for.
+     * @param index The stop index.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet setCurrentStop(ServerPlayer serverPlayer, Unit unit,

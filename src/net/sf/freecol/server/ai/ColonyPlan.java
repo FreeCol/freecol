@@ -134,6 +134,7 @@ public class ColonyPlan {
          * Chooses a suitable profile type given a size of colony.
          *
          * @param size A proposed colony size.
+         * @return The colony profile type.
          */
         public static ProfileType getProfileTypeFromSize(int size) {
             return (size <= 1) ? ProfileType.OUTPOST
@@ -832,6 +833,8 @@ public class ColonyPlan {
      * going to be helpful for unit allocation.
      *
      * Finally sort by desirability.
+     *
+     * @param production A map of the goods type and production.
      */
     private void updatePlans(Map<GoodsType, Map<WorkLocation, Integer>> production) {
         workPlans.clear();
@@ -880,6 +883,8 @@ public class ColonyPlan {
      * Add the other goods types to the production list.  When this is
      * called the new world goods production is already present on the
      * produce list.  Ignores food which is treated separately.
+     *
+     * @param production A map of the production.
      */
     private void updateProductionList(final Map<GoodsType, Map<WorkLocation, Integer>> production) {
         final Comparator<GoodsType> productionComparator
@@ -1114,6 +1119,7 @@ public class ColonyPlan {
     /**
      * Equips a unit for a role, trying extra possibilities.
      *
+     * @param spec The <code>Specification</code> defining the roles.
      * @param unit The <code>Unit</code> to equip if possible.
      * @param role The <code>Role</code> for the unit to take.
      * @param colony The <code>Colony</code> storing the equipment.

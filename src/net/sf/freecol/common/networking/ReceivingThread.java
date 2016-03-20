@@ -47,10 +47,10 @@ final class ReceivingThread extends Thread {
      * Input stream for buffering the data from the network.
      * 
      * This is just an input stream that signals end-of-stream when a
-     * given token {@link #END_OF_STREAM} is encountered.  In order to
-     * continue receiving data, the method {@link #enable} has to be
-     * called.  Calls to <code>close()</code> have no effect, the
-     * underlying input stream has to be closed directly.
+     * given token {@link Connection#END_OF_STREAM} is encountered.
+     * In order to continue receiving data, the method {@link #enable}
+     * has to be called.  Calls to <code>close()</code> have no
+     * effect, the underlying input stream has to be closed directly.
      */
     private static class FreeColNetworkInputStream extends InputStream {
 
@@ -131,7 +131,7 @@ final class ReceivingThread extends Thread {
          * @param len The maximum number of bytes to read.
          * @return The actual number of bytes read, or EOS_RESULT if
          *     the message has ended
-         *     ({@link #Connection.END_OF_STREAM} was encountered).
+         *     ({@link Connection#END_OF_STREAM} was encountered).
          */
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
@@ -184,8 +184,10 @@ final class ReceivingThread extends Thread {
      * @param connection The <code>Connection</code> this
      *            <code>ReceivingThread</code> belongs to.
      * @param in The stream to read from.
+     * @param threadName The base name for the thread.
      */
-    ReceivingThread(Connection connection, InputStream in, String threadName) {
+    public ReceivingThread(Connection connection, InputStream in,
+                           String threadName) {
         super(threadName + "-ReceivingThread-" + connection);
 
         this.in = new FreeColNetworkInputStream(in);
@@ -221,6 +223,8 @@ final class ReceivingThread extends Thread {
 
     /**
      * Checks if this thread should run.
+     *
+     * @return True if the thread should run.
      */
     private synchronized boolean shouldRun() {
         return this.shouldRun;
@@ -240,6 +244,8 @@ final class ReceivingThread extends Thread {
 
     /**
      * Disconnects this thread.
+     *
+     * @param reason The reason to disconnect.
      */
     private void disconnect(String reason) {
         askToStop();

@@ -435,6 +435,10 @@ public final class InfoPanel extends FreeColPanel {
 
     /**
      * Adds a panel to show information
+     *
+     * @param panel The panel to add.
+     * @param internalTop The top position.
+     * @param internalHeight The enclosing height.
      */
     private void add(JPanel panel, int internalTop, int internalHeight) {
         panel.setVisible(false);

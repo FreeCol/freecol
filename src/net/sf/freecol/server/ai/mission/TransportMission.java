@@ -391,7 +391,7 @@ public class TransportMission extends Mission {
      * collection point.
      *
      * @param t The <code>TransportableAIObject</code> to collect.
-     * @return The collection <code>Location<code>, or null if not found.
+     * @return The collection <code>Location</code>, or null if not found.
      */
     public Location getTransportTarget(TransportableAIObject t) {
         if (isCarrying(t)) return null;

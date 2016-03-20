@@ -42,11 +42,13 @@ public final class DummyConnection extends Connection {
     /**
      * Sets up a dummy connection using the specified {@link MessageHandler}s.
      *
+     * @param name A name for this connection.
      * @param incomingMessageHandler The <code>MessageHandler</code>
      *     to call for each message received.
      */
     public DummyConnection(String name, MessageHandler incomingMessageHandler) {
         super(name);
+        
         setMessageHandler(incomingMessageHandler);
     }
 

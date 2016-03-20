@@ -415,6 +415,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Create a list of choices.
      *
+     * @param <T> The choice type.
      * @return An empty list of choices.
      */
     public static <T> List<ChoiceItem<T>> choices() {

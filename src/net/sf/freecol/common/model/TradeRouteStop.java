@@ -112,6 +112,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Is this stop valid?
      *
+     * @param player The <code>Player</code> that owns this route.
      * @return True if the stop is valid.
      */
     public boolean isValid(Player player) {

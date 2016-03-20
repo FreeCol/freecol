@@ -298,8 +298,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Add the objects which are the children of this Element.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element addObject(Element element) {
@@ -339,8 +338,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "addPlayer"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element addPlayer(Element element) {
@@ -352,10 +350,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * Handle an "animateAttack"-message.  This only performs animation, if
      * required.  It does not actually perform any attacks.
      *
-     * @param element An element (root element in a DOM-parsed XML
-     *     tree) that holds attributes for the old and new tiles and
-     *     an element for the unit that is moving (which are used
-     *     solely to operate the animation).
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element animateAttack(Element element) {
@@ -422,10 +417,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * animation, if required.  It does not actually change unit
      * positions, which happens in an "update".
      *
-     * @param element An element (root element in a DOM-parsed XML
-     *     tree) that holds attributes for the old and new tiles and
-     *     an element for the unit that is moving (which are used
-     *     solely to operate the animation).
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element animateMove(Element element) {
@@ -483,8 +475,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "chat"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element chat(Element element) {
@@ -500,8 +491,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "chooseFoundingFather"-request.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.  The choice is returned asynchronously.
      */
     private Element chooseFoundingFather(Element element) {
@@ -534,8 +524,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * null.  If the message is a proposal, then ask the user about
      * it and return the response with appropriate response set.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) containing a "diplomacy"-message.
+     * @param element The <code>Element</code> to process.
      * @return A diplomacy response, or null if none required.
      */
     private Element diplomacy(Element element) {
@@ -567,8 +556,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * Disposes of the <code>Unit</code>s which are the children of this
      * Element.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element disposeUnits(Element element) {
@@ -593,8 +581,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "error"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element error(Element element) {
@@ -607,8 +594,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Adds a feature to or removes a feature from a FreeColGameObject.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element featureChange(Element element) {
@@ -649,8 +635,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a first contact with a native nation.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element firstContact(Element element) {
@@ -682,8 +667,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Ask the player to choose migrants from a fountain of youth event.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element fountainOfYouth(Element element) {
@@ -701,8 +685,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "gameEnded"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element gameEnded(Element element) {
@@ -725,8 +708,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "goodsForSale"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element goodsForSale(Element element) {
@@ -744,7 +726,6 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "incite" message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
      * @param element The <code>Element</code> to process.
      * @return Null.
      */
@@ -764,7 +745,6 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an incoming nation summary.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
      * @param element The <code>Element</code> to process.
      * @return Null.
      */
@@ -799,8 +779,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "indianDemand"-request.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return An <code>IndianDemand</code> message containing the response,
      *     or null on error.
      */
@@ -832,9 +811,8 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Ask the player to choose something to loot.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.  The choice is returned asynchronously.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
      */
     private Element lootCargo(Element element) {
         final Game game = getGame();
@@ -851,9 +829,8 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "monarchAction"-request.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.  The response is returned asynchronously.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
      */
     private Element monarchAction(Element element) {
         final Game game = getGame();
@@ -879,9 +856,8 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Ask the player to name the new land.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.  The name is returned asynchronously.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
      */
     private Element newLandName(Element element) {
         final Game game = getGame();
@@ -898,9 +874,8 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Ask the player to name a new region.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
-     * @return Null.  The name is returned asynchronously.
+     * @param element The <code>Element</code> to process.
+     * @return Null.
      */
     private Element newRegionName(Element element) {
         final Game game = getGame();
@@ -918,8 +893,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "newTradeRoute" message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element newTradeRoute(Element element) {
@@ -936,8 +910,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "newTurn"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element newTurn(Element element) {
@@ -964,8 +937,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "remove"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element remove(Element element) {
@@ -995,8 +967,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element scoutSpeakToChief(Element element) {
@@ -1016,8 +987,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setAI"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element setAI(Element element) {
@@ -1032,8 +1002,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setCurrentPlayer"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element setCurrentPlayer(Element element) {
@@ -1052,8 +1021,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setDead"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element setDead(Element element) {
@@ -1071,8 +1039,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "setStance"-request.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element setStance(Element element) {
@@ -1103,8 +1070,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle a "spyResult" message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element spySettlement(Element element) {
@@ -1119,8 +1085,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     /**
      * Handle an "update"-message.
      *
-     * @param element The element (root element in a DOM-parsed XML
-     *     tree) that holds all the information.
+     * @param element The <code>Element</code> to process.
      * @return Null.
      */
     private Element update(Element element) {

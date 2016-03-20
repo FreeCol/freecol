@@ -71,6 +71,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * Create a new save game file from a given file.
      *
      * @param file The base <code>File</code>.
+     * @exception IOException if the file can not be read.
      */
     public FreeColSavegameFile(File file) throws IOException {
         super(file);

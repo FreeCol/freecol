@@ -318,6 +318,7 @@ public class Introspector {
      * Constructs a new instance of an object of a class specified by name,
      * with supplied parameters.
      *
+     * @param <T> The actual return type.
      * @param messageClass The class to instantiate.
      * @param types The argument types of the constructor to call.
      * @param params The parameters to call the constructor with.
@@ -351,12 +352,14 @@ public class Introspector {
     /**
      * Invoke an object method by name.
      *
+     * @param <T> The actual return type.
      * @param object The base object.
      * @param methodName The name of the method to invoke.
      * @param returnClass The expected class to return.
      * @return The result of invoking the method.
-     * @exception IllegalAccessException, InvocationTargetException,
-     *     NoSuchMethodException if the invocation fails.
+     * @exception IllegalAccessException if the method exists but is hidden.
+     * @exception InvocationTargetException if the target can not be invoked.
+     * @exception NoSuchMethodException if the invocation fails.
      */
     public static <T> T invokeMethod(Object object, String methodName,
                                      Class<T> returnClass)

@@ -630,6 +630,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets a work location of a specific class with a given ability.
      *
+     * @param <T> The actual return type.
      * @param ability An ability key.
      * @param returnClass The expected subclass.
      * @return A <code>WorkLocation</code> with the required
@@ -659,6 +660,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets a work location of a specific class with a given modifier.
      *
+     * @param <T> The actual return type.
      * @param modifier A modifier key.
      * @param returnClass The expected subclass.
      * @return A <code>WorkLocation</code> with the required
@@ -1098,8 +1100,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Check if the owner can buy the remaining hammers and tools for
      * the {@link Building} that is currently being built.
      *
-     * @exception IllegalStateException If the owner of this <code>Colony</code>
-     *                has an insufficient amount of gold.
+     * @return True if the user can afford to pay.
+     * @exception IllegalStateException If the owner of this
+     *     <code>Colony</code> has an insufficient amount of gold.
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding() {
@@ -1111,9 +1114,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * the {@link Building} given.
      *
      * @param buildableType a <code>BuildableType</code> value
-     * @return a <code>boolean</code> value
-     * @exception IllegalStateException If the owner of this <code>Colony</code>
-     *                has an insufficient amount of gold.
+     * @return True if the user can afford to pay.
+     * @exception IllegalStateException If the owner of this
+     *     <code>Colony</code> has an insufficient amount of gold.
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding(BuildableType buildableType) {
@@ -1216,6 +1219,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @param uc The number of units in the colony.
      * @param solPercent The percentage of SoLs.
+     * @return The number of rebels.
      */
     public static int calculateRebels(int uc, int solPercent) {
         return (int)Math.floor(0.01 * solPercent * uc);
@@ -1603,9 +1607,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             ut.getDefence() > 0
             && !ut.isNaval()
             && ut.isAvailableTo(getOwner());
-        final Comparator<UnitType> comp
-            = Comparator.comparingDouble(UnitType::getDefence);
-        return maximize(getSpecification().getUnitTypeList(), pred, comp);
+        return maximize(getSpecification().getUnitTypeList(), pred,
+                        UnitType.defenceComparator);
     }
 
     /**
@@ -2318,6 +2321,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * ports.
      *
      * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if these goods are still useful here.
      */
     public boolean goodsUseful(GoodsType goodsType) {
         if (getOwner().getPlayerType() == Player.PlayerType.INDEPENDENT) {
@@ -2389,6 +2393,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Finds the corresponding FreeColObject from another copy of this colony.
      *
+     * @param <T> The actual return type.
      * @param fco The <code>FreeColObject</code> in the other colony.
      * @return The corresponding <code>FreeColObject</code> in this
      *     colony, or null if not found.

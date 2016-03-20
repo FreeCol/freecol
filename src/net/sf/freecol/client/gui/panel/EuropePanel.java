@@ -83,6 +83,9 @@ public final class EuropePanel extends PortPanel {
 
         /**
          * Initialize this DestinationPanel.
+         *
+         * @param destination The destination <code>Location</code>
+         *     for this panel.
          */
         public void initialize(Location destination) {
             this.destination = destination;

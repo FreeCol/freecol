@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +38,10 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * The various types of units in FreeCol.
  */
 public final class UnitType extends BuildableType implements Consumer {
+
+    /** Comparator for defence ability. */
+    public static final Comparator<UnitType> defenceComparator
+        = Comparator.comparingDouble(UnitType::getDefence);
 
     /** The default offence value. */
     public static final int DEFAULT_OFFENCE = 0;
@@ -598,6 +603,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * Gets the number of units of the given GoodsType this UnitType
      * consumes per turn (when in a settlement).
      *
+     * @param goodsType The <code>GoodsType</code> to consume.
      * @return The amount of goods consumed per turn.
      */
     public int getConsumptionOf(GoodsType goodsType) {

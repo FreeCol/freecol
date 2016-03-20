@@ -87,6 +87,7 @@ public class LootCargoMessage extends DOMMessage {
     /**
      * Public accessor to help the client in game controller.
      *
+     * @param game The <code>Game</code> to look for the unit in.
      * @return The winner unit.
      */
     public Unit getUnit(Game game) throws ClassCastException {

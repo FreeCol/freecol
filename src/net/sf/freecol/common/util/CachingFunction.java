@@ -28,7 +28,7 @@ import java.util.function.ToIntFunction;
 
 
 /**
- * Wrapper for a Function<T, R> that caches its results.
+ * Wrapper for a Function that caches its results.
  */
 public class CachingFunction<T, R> implements Function<T, R> {
 
