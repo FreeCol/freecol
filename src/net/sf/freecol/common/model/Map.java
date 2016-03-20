@@ -968,8 +968,21 @@ public class Map extends FreeColGameObject implements Location {
         if (realEnd instanceof Tile && !((Tile)realEnd).isExplored()) {
             // Do not allow finding a path into unexplored territory,
             // as we do not have the terrain type and thus can not
-            // calculate costs.
-            path = null;
+            // calculate costs, but relent if the unexplored tile borders
+            // an explored one on the same contiguity.
+            Tile closest = (realStart instanceof Tile)
+                ? getClosestTile((Tile)realStart,
+                    toList(((Tile)realEnd).getSurroundingTiles(1, 1).stream()
+                        .filter(t -> t.isExplored()
+                            && isSameContiguity(t, realStart))))
+                : null;
+            path = (closest == null) ? null
+                : findPath(unit, realStart, closest, carrier, costDecider, lb);
+            if (path != null) {
+                PathNode last = path.getLastNode();
+                last.next = new PathNode((Tile)realEnd, 0,
+                    last.getTurns()+1, last.isOnCarrier(), last, null);
+            }
 
         } else if (realStart instanceof Europe && realEnd instanceof Europe) {
             // 0: Europe->Europe: Create a trivial path.
