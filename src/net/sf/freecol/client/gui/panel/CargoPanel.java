@@ -185,14 +185,14 @@ public class CargoPanel extends FreeColPanel
      * {@inheritDoc}
      */
     public boolean accepts(Unit unit) {
-        return true;
+        return carrier.canAdd(unit);
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean accepts(Goods goods) {
-        return true;
+        return carrier.canAdd(goods);
     }
 
     /**
@@ -204,14 +204,12 @@ public class CargoPanel extends FreeColPanel
         if (editState) {
             if (comp instanceof GoodsLabel) {
                 Goods goods = ((GoodsLabel)comp).getGoods();
-                int loadableAmount = carrier.getLoadableAmount(goods.getType());
-                if (loadableAmount == 0) return null;
-                if (loadableAmount > goods.getAmount()) {
-                    loadableAmount = goods.getAmount();
-                }
+                int loadable = carrier.getLoadableAmount(goods.getType());
+                if (loadable <= 0) return null;
+                if (loadable > goods.getAmount()) loadable = goods.getAmount();
                 Goods toAdd = new Goods(goods.getGame(), goods.getLocation(),
-                                        goods.getType(), loadableAmount);
-                goods.setAmount(goods.getAmount() - loadableAmount);
+                                        goods.getType(), loadable);
+                goods.setAmount(goods.getAmount() - loadable);
                 igc().loadCargo(toAdd, carrier);
                 update();
                 return comp;
@@ -223,7 +221,10 @@ public class CargoPanel extends FreeColPanel
                     igc().payArrears(label.getType());
                     return null;
                 }
-                igc().buyGoods(label.getType(), label.getAmount(), carrier);
+                int loadable = carrier.getLoadableAmount(label.getType());
+                if (loadable <= 0) return null;
+                if (loadable > label.getAmount()) loadable = label.getAmount();
+                igc().buyGoods(label.getType(), loadable, carrier);
                 igc().nextModelMessage();
                 update();
                 return comp;
