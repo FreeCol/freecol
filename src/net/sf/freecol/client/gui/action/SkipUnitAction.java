@@ -52,6 +52,13 @@ public class SkipUnitAction extends UnitAction {
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        igc().changeState(getGUI().getActiveUnit(), Unit.UnitState.SKIPPED);
+        final Unit unit = getGUI().getActiveUnit();
+        if (unit == null) return;
+        if (unit.getState() != Unit.UnitState.SKIPPED) {
+            igc().changeState(unit, Unit.UnitState.SKIPPED);
+        }
+        if (unit.getState() == Unit.UnitState.SKIPPED) {
+            igc().nextActiveUnit();
+        }
     }
 }
