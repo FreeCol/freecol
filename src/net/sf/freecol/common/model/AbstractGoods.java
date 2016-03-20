@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -51,6 +52,10 @@ public class AbstractGoods extends FreeColObject implements Named {
         = Comparator.comparingInt(AbstractGoods::getAmount).reversed()
             .thenComparing(AbstractGoods::getType,
                            GoodsType.goodsTypeComparator);
+
+    /** A predicate for food types. */
+    public static final Predicate<AbstractGoods> isFoodType = ag ->
+        ag.getType().isFoodType();
 
     /** The type of goods. */
     protected GoodsType type;

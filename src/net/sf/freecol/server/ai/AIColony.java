@@ -1269,17 +1269,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             // Require food for the center tile, but otherwise insist
             // the tile is being used, and try to improve the
             // production that is underway.
-            GoodsType goodsType = null;
+            GoodsType goodsType;
             if (colonyTile.isColonyCenterTile()) {
-                for (AbstractGoods ag : colonyTile.getProduction()) {
-                    if (ag.getType().isFoodType()) {
-                        goodsType = ag.getType();
-                        break;
-                    }
-                }
+                AbstractGoods food = find(colonyTile.getProduction(),
+                                          AbstractGoods.isFoodType);
+                goodsType = (food == null) ? null : food.getType();
             } else {
-                if (colonyTile.isEmpty()) continue;
-                goodsType = colonyTile.getCurrentWorkType();
+                goodsType = (colonyTile.isEmpty()) ? null
+                    : colonyTile.getCurrentWorkType();
             }
             if (goodsType == null) continue;
 

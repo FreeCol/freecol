@@ -1776,6 +1776,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return goodsTypeList;
     }
 
+    /**
+     * Get the best food type to produce here.
+     *
+     * @return The <code>AbstractGoods</code> to produce.
+     */
+    public AbstractGoods getBestFoodProduction() {
+        final Comparator<AbstractGoods> comp = Comparator.comparingInt(ag ->
+            getPotentialProduction(ag.getType(), null));
+        return maximize(flatten(getType().getAvailableProductionTypes(true),
+                                pt -> pt.getOutputs()),
+                        AbstractGoods.isFoodType, comp);
+    }
+
 
     //
     // Colony and cached Tile maintenance

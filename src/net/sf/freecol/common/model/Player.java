@@ -3562,12 +3562,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Initialize tile value with food production.
         final GoodsType foodType = spec.getPrimaryFoodType();
-        final Comparator<AbstractGoods> comp = Comparator.comparingInt(ag ->
-            tile.getPotentialProduction(ag.getType(), null));
-        AbstractGoods bestFood = maximize(tile.getType()
-                .getAvailableProductionTypes(true).stream()
-                .flatMap(pt -> pt.getOutputs().stream()),
-            ag -> ag.getType().isFoodType(), comp);
+        final AbstractGoods bestFood = tile.getBestFoodProduction();
         int initialFood = (bestFood == null) ? 0 : bestFood.getAmount();
         if (initialFood <= FOOD_VERY_LOW) {
             values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),

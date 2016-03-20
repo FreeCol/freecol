@@ -218,8 +218,8 @@ public class ColonyTile extends WorkLocation {
             // Tile type change.
             final List<AbstractGoods> newProd
                 = newType.getPossibleProduction(true);
-            int food = sum(newProd, ag -> ag.getType().isFoodType(),
-                           ag -> ag.getAmount());
+            int food = sum(newProd, AbstractGoods.isFoodType,
+                           AbstractGoods::getAmount);
             // Get the current food production.  Otherwise for goods
             // that are being passively produced and consumed, check
             // if production remains in surplus following a negative change.
