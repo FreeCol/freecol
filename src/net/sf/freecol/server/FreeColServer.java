@@ -1196,7 +1196,7 @@ public final class FreeColServer {
         // Ensure that option groups can not be edited any more.
         spec.getMapGeneratorOptions().setEditable(false);
         spec.getGameOptions().setEditable(false);
-        spec.getOptionGroup("difficultyLevels").setEditable(false);
+        spec.getOptionGroup(Specification.DIFFICULTY_LEVELS).setEditable(false);
 
         // Let the AIMain scan for objects it should be managing.
         aiMain.findNewObjects(true);

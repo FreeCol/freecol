@@ -223,8 +223,9 @@ public final class NewPanel extends FreeColPanel
 
         this.rulesLabel = Utility.localizedLabel("rules");
         this.rulesBox = new JComboBox<>();
+        String selectTC;
         if (this.fixedSpecification == null) { // Allow TC selection
-            String selectTC = FreeCol.getTC();
+            selectTC = FreeCol.getTC();
             for (FreeColTcFile tc : Mods.getRuleSets()) {
                 this.rulesBox.addItem(tc);
                 if (selectTC.equals(tc.getId())) {
@@ -232,7 +233,7 @@ public final class NewPanel extends FreeColPanel
                 }
             }
         } else { // Force the use of the TC that contains the given spec
-            String selectTC = this.fixedSpecification.getId();
+            selectTC = this.fixedSpecification.getId();
             for (FreeColTcFile tc : Mods.getRuleSets()) {
                 if (selectTC.equals(tc.getId())) {
                     this.rulesBox.addItem(tc);
@@ -240,11 +241,17 @@ public final class NewPanel extends FreeColPanel
                 }
             }
         }
+        if (this.rulesBox.getSelectedItem() == null) {
+            this.rulesBox.setSelectedItem(this.rulesBox.getItemCount()-1);
+            logger.warning("No TC found for: " + selectTC
+                + ", failling back to " + this.rulesBox.getSelectedItem());
+        }
         this.rulesBox
             .setRenderer(new FreeColComboBoxRenderer<FreeColTcFile>("mod."));
         this.rulesBox.addItemListener(this);
 
-        this.publicServer = new JCheckBox(Messages.message("newPanel.publicServer"));
+        this.publicServer
+            = new JCheckBox(Messages.message("newPanel.publicServer"));
 
         this.difficultyLabel = Utility.localizedLabel("difficulty");
         this.difficultyBox = new JComboBox<>();
@@ -273,7 +280,8 @@ public final class NewPanel extends FreeColPanel
         setCancelComponent(cancel);
 
         // Add all the components
-        add(Utility.localizedHeader("newPanel.newGamePanel", false), "span 6, center");
+        add(Utility.localizedHeader("newPanel.newGamePanel", false),
+            "span 6, center");
         add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
         add(Utility.localizedLabel("name"), "span, split 2");
@@ -311,67 +319,73 @@ public final class NewPanel extends FreeColPanel
         };
 
         this.specification = getSpecification();
-        this.difficulty = null;
-        updateDifficulty();
+        if (this.specification == null) {
+            throw new RuntimeException("No specification found");
+        }
+        this.difficulty = this.specification
+            .getDifficultyOptionGroup(FreeCol.getDifficulty());
+        updateDifficultyBox();
+        if (this.difficulty == null) {
+            int index = this.difficultyBox.getItemCount() / 2;
+            this.difficultyBox.setSelectedItem(index);
+            this.difficulty = getSelectedDifficulty();
+        }
+        if (this.difficulty == null) {
+            throw new RuntimeException("No difficulty found");
+        }
+        logger.info("NewPanel initialized with " + this.specification.getId()
+            + "/" + this.difficulty.getId());
         enableComponents();
         setSize(getPreferredSize());
     }
 
     
     /**
-     * If the TC box changed, update the specification.
+     * Update specification and difficulty as needed.
      */
-    private void updateSpecification() {
-        if (this.specification.getId().equals(getSelectedTC().getId())) return;
-        this.specification = getSpecification();
-        // Spec changed.  If using a custom difficulty, preserve it.
-        // Otherwise reset the difficulty wrt the new spec.
-        if (this.difficulty.isEditable()) {
-            this.specification.prepare(null, this.difficulty);
-        } else {
-            String oldId = this.difficulty.getId();
-            this.difficulty = this.specification
-                .getDifficultyOptionGroup(oldId);
+    private void update() {
+        // If the TC box changed, update the specification.
+        boolean changed = !this.specification.getId().equals(getSelectedTC().getId());
+        if (changed) this.specification = getSpecification();
+            
+        // If the difficulty box changed, update the difficulty.
+        if (!this.difficulty.getId().equals(getSelectedDifficulty().getId())) {
+            this.difficulty = getSelectedDifficulty();
+            changed = true;
         }
-        updateDifficulty();
+
+        // Harmonize the new spec and difficulty if something changed.
+        if (changed) {
+            // If using a custom difficulty, update it within the
+            // spec, otherwise read the difficulty from the new spec.
+            if (this.difficulty.isEditable()) {
+                this.specification.prepare(null, this.difficulty);
+            } else {
+                String oldId = this.difficulty.getId();
+                this.difficulty = this.specification
+                    .getDifficultyOptionGroup(oldId);
+            }
+            updateDifficultyBox();
+        }
     }
-        
-    /**
-     * Update the contents of the difficulty level box depending on
-     * the specification currently selected.
-     */
-    private void updateDifficulty() {
+
+    private void updateDifficultyBox() {
+        // Update the contents of the difficulty level box depending on
+        // the specification currently selected.
         this.difficultyBox.removeItemListener(this);
         this.difficultyBox.removeAllItems();
         for (OptionGroup og : this.specification.getDifficultyLevels()) {
             this.difficultyBox.addItem(og);
         }
-        if (this.difficulty == null) {
-            this.difficulty = this.specification
-                .getDifficultyOptionGroup(FreeCol.getDifficulty());
-            if (this.difficulty == null) {
-                int index = this.difficultyBox.getItemCount() / 2;
-                this.difficulty = this.difficultyBox.getItemAt(index);
-            }
+        if (this.difficulty != null) {
+            this.difficultyBox.setSelectedItem(this.difficulty);
         }
-        this.difficultyBox.setSelectedItem(this.difficulty);
-        updateShowButton();
+        this.difficultyButton.setEnabled(this.difficulty != null);
+        String text = (this.difficulty != null && this.difficulty.isEditable())
+            ? "newPanel.editDifficulty"
+            : "newPanel.showDifficulty";
+        this.difficultyButton.setText(Messages.message(text));
         this.difficultyBox.addItemListener(this);
-    }
-
-    /**
-     * Update the show button.
-     */
-    private void updateShowButton() {
-        if (this.difficulty == null) {
-            this.difficultyButton.setEnabled(false);
-        } else {
-            this.difficultyButton.setEnabled(true);
-            String text = (this.difficulty.isEditable())
-                ? "newPanel.editDifficulty"
-                : "newPanel.showDifficulty";
-            this.difficultyButton.setText(Messages.message(text));
-        }
     }
 
     /**
@@ -547,7 +561,7 @@ public final class NewPanel extends FreeColPanel
         case SHOW_DIFFICULTY:
             this.difficulty = gui.showDifficultyDialog(this.specification,
                                                        this.difficulty);
-            updateDifficulty();
+            update(); // Brings in new difficulty if edited
             break;
         case SINGLE: case JOIN: case START: case META_SERVER:
             enableComponents();
@@ -566,11 +580,6 @@ public final class NewPanel extends FreeColPanel
      */
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() == this.rulesBox) {
-            updateSpecification();
-        } else if (e.getSource() == this.difficultyBox) {
-            this.difficulty = getSelectedDifficulty();
-            updateShowButton();
-        }
+        update();
     }
 }

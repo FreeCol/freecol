@@ -74,7 +74,7 @@ public final class Specification {
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     /** The difficulty levels option group is special. */
-    private static final String DIFFICULTY_LEVELS = "difficultyLevels";
+    public static final String DIFFICULTY_LEVELS = "difficultyLevels";
 
     /** Roles backward compatibility fragment. */
     public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
@@ -84,6 +84,13 @@ public final class Specification {
 
     /** How many game ages. */
     public static final int NUMBER_OF_AGES = 3;
+
+    /** The option groups to save. */
+    private static final String[] coreOptionGroups = {
+        GameOptions.getTagName(),
+        MapGeneratorOptions.getTagName(),
+        DIFFICULTY_LEVELS
+    };
 
 
     public static class Source extends FreeColSpecObjectType {
@@ -395,7 +402,7 @@ public final class Specification {
             clearEuropeanNationalAdvantages();
         }
         if (difficulty != null) {
-            allOptionGroups.put(difficulty.getId(), difficulty);
+            setDifficultyOptionGroup(difficulty);
             applyDifficultyLevel(difficulty);
         }
     }
@@ -628,6 +635,7 @@ public final class Specification {
             + ", season year=" + Turn.getSeasonYear()
             + ", ages=[" + ages[0] + "," + ages[1] + "," + ages[2] + "]"
             + ", seasons=" + Turn.getSeasonNumber()
+            + ", difficulty=" + difficultyLevel
             + ", " + allTypes.size() + " FreeColSpecObjectTypes"
             + ", " + allAbilities.size() + " Abilities"
             + ", " + buildingTypeList.size() + " BuildingTypes"
@@ -1591,20 +1599,31 @@ public final class Specification {
      * @return The current difficulty level <code>OptionGroup</code>.
      */
     public OptionGroup getDifficultyOptionGroup() {
-        return allOptionGroups.get(this.difficultyLevel);
+        return getDifficultyOptionGroup(this.difficultyLevel);
     }
 
     /**
      * Gets difficulty level options by id.
      *
-     * @param id The id to look for.
-     * @return The corresponding difficulty level
-     *     <code>OptionGroup</code>, if any.
+     * @param id The difficulty level identifier to look for.
+     * @return The corresponding difficulty level <code>OptionGroup</code>,
+     *     if any.
      */
     public OptionGroup getDifficultyOptionGroup(String id) {
-        return allOptionGroups.get(id);
+        return find(getDifficultyLevels(), og -> og.getId().equals(id));
     }
 
+    /**
+     * Add/overwrite a difficulty option group.
+     *
+     * @param difficulty The <code>OptionGroup</code> to add.
+     */
+    private void setDifficultyOptionGroup(OptionGroup difficulty) {
+        OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
+        if (group != null) group.add(difficulty);
+        allOptionGroups.put(difficulty.getId(), difficulty);
+    }
+            
     /**
      * Applies the difficulty level identified by the given String to
      * the current specification.
@@ -2734,10 +2753,10 @@ public final class Specification {
         writeSection(xw, INDIAN_NATION_TYPES_TAG, indianNationTypes);
         writeSection(xw, NATIONS_TAG, nations);
 
-        // option tree has been flattened
         xw.writeStartElement(OPTIONS_TAG);
-        for (OptionGroup item : allOptionGroups.values()) {
-            if (item.getGroup().isEmpty()) item.toXML(xw);
+        for (String id : coreOptionGroups) {
+            OptionGroup og = allOptionGroups.get(id);
+            if (og != null) og.toXML(xw);
         }
         xw.writeEndElement();
 
