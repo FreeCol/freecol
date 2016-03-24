@@ -2104,20 +2104,20 @@ outer:  for (Effect effect : effects) {
         final Turn turn = game.getTurn();
         boolean europeDirty = false, visibilityChange = false;
 
+        addFather(father);
+        addHistory(new HistoryEvent(turn,
+                HistoryEvent.HistoryEventType.FOUNDING_FATHER, this)
+                    .addNamed("%father%", father));
         // FIXME: We do not want to have to update the whole player
-        // just to get the FF into the client.  Use this hack until
-        // the client gets proper containers.
-        cs.addFather(this, father);
+        // just to get the FF into the client, but for now if there
+        // are modifiers that is the only way to do it.
+        cs.add(See.only(this), this);
         cs.addMessage(See.only(this),
             new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
                              "model.player.foundingFatherJoinedCongress",
                              this)
                       .addNamed("%foundingFather%", father)
                       .add("%description%", father.getDescriptionKey()));
-        cs.addHistory(this,
-            new HistoryEvent(turn,
-                HistoryEvent.HistoryEventType.FOUNDING_FATHER, this)
-                    .addNamed("%father%", father));
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {
@@ -2137,38 +2137,30 @@ outer:  for (Effect effect : effects) {
             }
         }
 
-        if (!father.getModifiers().isEmpty()) {
-            cs.add(See.only(this), this);
-            // Some modifiers are special
-            if (father.hasModifier(Modifier.LINE_OF_SIGHT_BONUS)) {
+        // Some modifiers are special
+        for (Modifier m : father.getModifiers()) {
+            if (Modifier.LINE_OF_SIGHT_BONUS.equals(m.getId())) {
                 List<Tile> tiles = new ArrayList<>();
                 for (Colony c : getColonies()) {
                     tiles.addAll(exploreForSettlement(c));
                 }
                 for (Unit u : getUnits()) tiles.addAll(exploreForUnit(u));
                 if (hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    for (Player other : getGame().getLiveEuropeanPlayers(this)) {
-                        for (Colony c : other.getColonies()) {
-                            tiles.addAll(exploreForSettlement(c));
-                        }
+                    for (Colony c : getGame().getAllColonies(this)) {
+                        tiles.addAll(exploreForSettlement(c));
                     }
                 }
                 cs.add(See.only(this), tiles);
                 visibilityChange = true;
-            } else if (father.hasModifier(Modifier.SOL)) {
+            } else if (Modifier.SOL.equals(m.getId())) {
                 for (Colony c : getColonies()) {
                     c.addLiberty(0); // Kick the SoL and production bonus
                     c.invalidateCache();
                 }
-            } else {
-                boolean recache = false;
-                for (Modifier m : father.getModifiers()) {
-                    recache |= m.getId().startsWith("model.goods.");
-                }
-                for (Colony c : getColonies()) c.invalidateCache();
-            }                
+            }
         }
 
+        // Some events are special
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
             if ("model.event.resetBannedMissions".equals(eventId)) {
@@ -2178,6 +2170,7 @@ outer:  for (Effect effect : effects) {
                         cs.add(See.only(this), p);
                     }
                 }
+
             } else if ("model.event.resetNativeAlarm".equals(eventId)) {
                 for (Player p : game.getLiveNativePlayers(null)) {
                     if (!p.hasContacted(this)) continue;
