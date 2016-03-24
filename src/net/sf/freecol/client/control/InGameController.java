@@ -1870,7 +1870,7 @@ public final class InGameController extends FreeColClientHolder
             break;
         }
         return StringTemplate.template("trade.noTrade")
-            .addName("%settlement%",
+            .addStringTemplate("%settlement%",
                 settlement.getLocationLabelFor(getMyPlayer()));
     }
 
