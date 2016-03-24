@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -59,10 +60,8 @@ public class SetBuildQueueMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = colony.getId();
-        this.queue = new String[queue.size()];
-        for (int i = 0; i < queue.size(); i++) {
-            this.queue[i] = queue.get(i).getId();
-        }
+        this.queue = toList(map(queue, bt -> bt.getId()))
+            .toArray(new String[0]);
     }
 
     /**
@@ -76,13 +75,25 @@ public class SetBuildQueueMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
-        List<String> q = getArrayAttributes(element);
-        this.queue = new String[q.size()];
-        int i = 0;
-        for (String s : q) this.queue[i++] = s;
+        this.queue = getArrayAttributes(element).toArray(new String[0]);
     }
 
 
+    // Public interface
+
+    public Colony getColony(Player player) {
+        return player.getOurFreeColGameObject(this.colonyId, Colony.class);
+    }
+
+    public List<BuildableType> getQueue(Specification spec) {
+        List<BuildableType> ret = new ArrayList<>();
+        for (int i = 0; i < this.queue.length; i++) {
+            ret.add(i, spec.getType(this.queue[i], BuildableType.class));
+        }
+        return ret;
+    }
+
+    
     /**
      * Handle a "setBuildQueue"-message.
      *
@@ -101,7 +112,7 @@ public class SetBuildQueueMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
+            colony = getColony(player);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -111,15 +122,12 @@ public class SetBuildQueueMessage extends DOMMessage {
             return serverPlayer.clientError("Empty queue")
                 .build(serverPlayer);
         }
-        List<BuildableType> buildQueue = new ArrayList<>();
-        for (int i = 0; i < this.queue.length; i++) {
-            try {
-                buildQueue.add(i, spec.getType(this.queue[i], BuildableType.class));
-            } catch (Exception cce) {
-                return serverPlayer.clientError("Not a buildable type: "
-                    + this.queue[i])
-                    .build(serverPlayer);
-            }
+        List<BuildableType> buildQueue;
+        try {
+            buildQueue = getQueue(spec);
+        } catch (Exception e) {
+            return serverPlayer.clientError(e.getMessage())
+                .build(serverPlayer);
         }
 
         // Proceed to set the build queue.

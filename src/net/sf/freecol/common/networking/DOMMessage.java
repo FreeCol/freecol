@@ -243,7 +243,6 @@ public class DOMMessage {
             for (int i = 0; i < attributes.length; i++) {
                 String key = "x" + Integer.toString(i);
                 setAttribute(key, attributes[i]);
-                i++;
             }
         }
         return this;
