@@ -449,7 +449,10 @@ public final class ConnectController extends FreeColClientHolder {
                 + file.getName());
             return false;
         }
-        options.merge(fis);
+        if (!options.merge(fis)) {
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
+            return false;
+        }
         options.fixClientOptions();
 
         // Get suggestions for "singlePlayer" and "publicServer"
@@ -475,9 +478,9 @@ public final class ConnectController extends FreeColClientHolder {
                 e);
             return false;
         } catch (XMLStreamException e) {
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
             logger.log(Level.WARNING, "Error reading game from: "
                 + file.getName(), e);
-            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
             return false;
         } catch (Exception e) {
             SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));

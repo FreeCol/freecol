@@ -58,8 +58,11 @@ public class ContinueAction extends FreeColAction {
     public void actionPerformed(ActionEvent ae) {
         File lastSave = FreeColDirectories.getLastSaveGameFile();
         if (lastSave != null) {
-            getGUI().removeInGameComponents();
-            getConnectController().startSavedGame(lastSave, null);
+            if (getConnectController().startSavedGame(lastSave, null)) {
+                getGUI().removeInGameComponents();
+            } else {
+                getGUI().showMainPanel(null);
+            }
         }
     }
 }
