@@ -42,6 +42,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe;
@@ -76,7 +77,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.networking.NetworkConstants;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -2606,7 +2606,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             } else if (gold < (price * 9) / 10) {
                 logger.warning("Cheating attempt: sending a offer too low");
                 sessionRegister.put(goldKey, -1);
-                return NetworkConstants.NO_TRADE;
+                return Constants.NO_TRADE;
             } else {
                 int haggling = 1;
                 if (sessionRegister.containsKey(hagglingKey)) {
@@ -2619,7 +2619,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                     return gold;
                 } else {
                     sessionRegister.put(goldKey, -1);
-                    return NetworkConstants.NO_TRADE_HAGGLE;
+                    return Constants.NO_TRADE_HAGGLE;
                 }
             }
         }

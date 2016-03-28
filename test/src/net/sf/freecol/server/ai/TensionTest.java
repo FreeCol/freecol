@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -30,7 +31,6 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -100,7 +100,7 @@ public class TensionTest extends FreeColTestCase {
         // the european player steals 1 tile from the indians
         assertEquals(indian, tile2.getOwner());
         
-        igc.claimLand(european, tile2, null, NetworkConstants.STEAL_LAND);
+        igc.claimLand(european, tile2, null, Constants.STEAL_LAND);
         assertEquals(european, tile2.getOwner());
 
         // check the tension and stance have expected values

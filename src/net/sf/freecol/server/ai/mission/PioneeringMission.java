@@ -29,6 +29,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Direction;
@@ -42,7 +43,6 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.networking.NetworkConstants;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.AIColony;
@@ -718,7 +718,7 @@ public class PioneeringMission extends Mission {
                 fail = true;
             } else {
                 if (price > 0 && !player.checkGold(price)) {
-                    price = NetworkConstants.STEAL_LAND;
+                    price = Constants.STEAL_LAND;
                 }
                 fail = !AIMessage.askClaimLand(tile, aiUnit, price)
                     || !player.owns(tile); // Failed to claim ownership

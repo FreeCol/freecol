@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -60,7 +61,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
-import net.sf.freecol.common.networking.NetworkConstants;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -841,7 +841,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 price *= 2;
                 break;
             default:
-                return NetworkConstants.NO_TRADE_HOSTILE;
+                return Constants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<>();
             if (is.hasMissionary(buyer)
@@ -862,7 +862,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         if (gold < (price * 9) / 10) {
             logger.warning("Cheating attempt: sending offer too low");
             sessionRegister.put(goldKey, -1);
-            return NetworkConstants.NO_TRADE;
+            return Constants.NO_TRADE;
         }
 
         int haggling = 1;
@@ -871,7 +871,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
         if (randomInt(logger, "Haggle-buy", getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, -1);
-            return NetworkConstants.NO_TRADE_HAGGLE;
+            return Constants.NO_TRADE_HAGGLE;
         }
         sessionRegister.put(goldKey, gold);
         sessionRegister.put(hagglingKey, haggling + 1);
@@ -905,11 +905,11 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 break;
             case ANGRY:
                 if (!goods.getType().isMilitaryGoods())
-                    return NetworkConstants.NO_TRADE_HOSTILE;
+                    return Constants.NO_TRADE_HOSTILE;
                 price /= 2;
                 break;
             default:
-                return NetworkConstants.NO_TRADE_HOSTILE;
+                return Constants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<>();
             if (is.hasMissionary(seller)
@@ -929,7 +929,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         if (gold > (price * 11) / 10) {
             logger.warning("Cheating attempt: haggling request too high");
             sessionRegister.put(goldKey, -1);
-            return NetworkConstants.NO_TRADE;
+            return Constants.NO_TRADE;
         }
         int haggling = 1;
         if (sessionRegister.containsKey(hagglingKey)) {
@@ -937,7 +937,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
         if (randomInt(logger, "Haggle-sell", getAIRandom(), 3 + haggling) >= 3) {
             sessionRegister.put(goldKey, -1);
-            return NetworkConstants.NO_TRADE_HAGGLE;
+            return Constants.NO_TRADE_HAGGLE;
         }
         sessionRegister.put(goldKey, gold);
         sessionRegister.put(hagglingKey, haggling + 1);

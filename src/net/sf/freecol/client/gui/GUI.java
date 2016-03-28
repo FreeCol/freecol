@@ -38,8 +38,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.control.InGameController.*;
 import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.common.FreeColException;
@@ -49,6 +47,8 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants;
+import net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -680,9 +680,9 @@ public class GUI extends FreeColClientHolder {
 
         List<ChoiceItem<BoycottAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("payArrears"),
-                BoycottAction.PAY_ARREARS));
+                                     BoycottAction.BOYCOTT_PAY_ARREARS));
         choices.add(new ChoiceItem<>(Messages.message("boycottedGoods.dumpGoods"),
-                BoycottAction.DUMP_CARGO));
+                                     BoycottAction.BOYCOTT_DUMP_CARGO));
 
         return getChoice(null, template,
                          goods.getType(), "cancel", choices);
@@ -698,18 +698,18 @@ public class GUI extends FreeColClientHolder {
      * @param canBuy True if buy is a valid option.
      * @return The chosen action, buy, haggle, or cancel.
      */
-    public BuyAction getBuyChoice(Unit unit, Settlement settlement,
-                                  Goods goods, int gold, boolean canBuy) {
+    public TradeBuyAction getBuyChoice(Unit unit, Settlement settlement,
+                                       Goods goods, int gold, boolean canBuy) {
         StringTemplate template = StringTemplate.template("buy.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goods.getLabel(true))
             .addAmount("%gold%", gold);
 
-        List<ChoiceItem<BuyAction>> choices = new ArrayList<>();
+        List<ChoiceItem<TradeBuyAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("buy.takeOffer"),
-                                     BuyAction.BUY, canBuy));
+                                     TradeBuyAction.BUY, canBuy));
         choices.add(new ChoiceItem<>(Messages.message("buy.moreGold"),
-                                     BuyAction.HAGGLE));
+                                     TradeBuyAction.HAGGLE));
 
         return getChoice(unit.getTile(), template,
                          goods.getType(), "cancel", choices);
@@ -734,14 +734,14 @@ public class GUI extends FreeColClientHolder {
             StringTemplate pay = StringTemplate.template("indianLand.pay")
                 .addAmount("%amount%", price);
             choices.add(new ChoiceItem<>(Messages.message(pay),
-                                         ClaimAction.ACCEPT,
+                                         ClaimAction.CLAIM_ACCEPT,
                                          player.checkGold(price)));
         } else {
             template = StringTemplate.template("indianLand.unknown");
         }
 
         choices.add(new ChoiceItem<>(Messages.message("indianLand.take"),
-                                     ClaimAction.STEAL));
+                                     ClaimAction.CLAIM_STEAL));
 
         return getChoice(tile, template,
                          owner.getNation(), "indianLand.cancel", choices);
@@ -807,16 +807,16 @@ public class GUI extends FreeColClientHolder {
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
             choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.establish"),
-                                         MissionaryAction.ESTABLISH_MISSION,
-                                         canEstablish));
+                    MissionaryAction.MISSIONARY_ESTABLISH_MISSION,
+                    canEstablish));
         }
         if (canDenounce) {
             choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.heresy"),
-                                         MissionaryAction.DENOUNCE_HERESY,
-                                         canDenounce));
+                    MissionaryAction.MISSIONARY_DENOUNCE_HERESY,
+                    canDenounce));
         }
         choices.add(new ChoiceItem<>(Messages.message("missionarySettlement.incite"),
-                                     MissionaryAction.INCITE_INDIANS));
+                MissionaryAction.MISSIONARY_INCITE_INDIANS));
 
         return getChoice(unit.getTile(), template,
                          settlement, "cancel", choices);
@@ -867,12 +867,12 @@ public class GUI extends FreeColClientHolder {
 
         List<ChoiceItem<ScoutColonyAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.negotiate"),
-                                     ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE,
+                                     ScoutColonyAction.SCOUT_COLONY_NEGOTIATE,
                                      neg));
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.spy"),
-                                     ScoutColonyAction.FOREIGN_COLONY_SPY));
+                                     ScoutColonyAction.SCOUT_COLONY_SPY));
         choices.add(new ChoiceItem<>(Messages.message("scoutColony.attack"),
-                                     ScoutColonyAction.FOREIGN_COLONY_ATTACK));
+                                     ScoutColonyAction.SCOUT_COLONY_ATTACK));
 
         return getChoice(unit.getTile(), template,
                          colony, "cancel", choices);
@@ -927,11 +927,11 @@ public class GUI extends FreeColClientHolder {
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.speak"),
-                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
+                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_SPEAK));
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.tribute"),
-                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_TRIBUTE));
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
-                                     ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_ATTACK));
 
         return getChoice(settlement.getTile(), template,
                          settlement, "cancel", choices);
@@ -946,23 +946,23 @@ public class GUI extends FreeColClientHolder {
      * @param gold The current negotiated price.
      * @return The chosen action, sell, gift or haggle, or null.
      */
-    public SellAction getSellChoice(Unit unit, Settlement settlement,
-                                    Goods goods, int gold) {
+    public TradeSellAction getSellChoice(Unit unit, Settlement settlement,
+                                         Goods goods, int gold) {
         StringTemplate goodsTemplate = goods.getLabel(true);
         StringTemplate template = StringTemplate.template("sell.text")
             .addStringTemplate("%nation%", settlement.getOwner().getNationLabel())
             .addStringTemplate("%goods%", goodsTemplate)
             .addAmount("%gold%", gold);
 
-        List<ChoiceItem<SellAction>> choices = new ArrayList<>();
+        List<ChoiceItem<TradeSellAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("sell.takeOffer"),
-                                     SellAction.SELL));
+                                     TradeSellAction.SELL));
         choices.add(new ChoiceItem<>(Messages.message("sell.moreGold"),
-                                     SellAction.HAGGLE));
+                                     TradeSellAction.HAGGLE));
         choices.add(new ChoiceItem<>(Messages.message(StringTemplate
                     .template("sell.gift")
                     .addStringTemplate("%goods%", goodsTemplate)),
-                SellAction.GIFT));
+                TradeSellAction.GIFT));
 
         return getChoice(unit.getTile(), template,
                          goods.getType(), "cancel", choices);

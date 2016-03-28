@@ -34,6 +34,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
@@ -378,7 +379,7 @@ public abstract class ServerAPI {
             BuyPropositionMessage.getTagName());
         return (reply == null
             || !BuyPropositionMessage.getTagName().equals(reply.getTagName()))
-            ? NetworkConstants.NO_TRADE
+            ? Constants.NO_TRADE
             : new BuyPropositionMessage(unit.getGame(), reply).getGold();
     }
 
@@ -1104,7 +1105,7 @@ public abstract class ServerAPI {
             SellPropositionMessage.getTagName());
         return (reply == null
             || !SellPropositionMessage.getTagName().equals(reply.getTagName()))
-            ? NetworkConstants.NO_TRADE
+            ? Constants.NO_TRADE
             : new SellPropositionMessage(unit.getGame(), reply).getGold();
     }
 

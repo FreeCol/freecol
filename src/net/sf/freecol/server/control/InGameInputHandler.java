@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
@@ -71,7 +72,6 @@ import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
-import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -104,8 +104,7 @@ import org.w3c.dom.NodeList;
  * Handles the network messages that arrives while
  * {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME in game}.
  */
-public final class InGameInputHandler extends ServerInputHandler
-    implements NetworkConstants {
+public final class InGameInputHandler extends ServerInputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 

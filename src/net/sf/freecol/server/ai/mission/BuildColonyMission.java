@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
@@ -41,7 +42,6 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.networking.NetworkConstants;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -492,7 +492,7 @@ public class BuildColonyMission extends Mission {
                 if (price >= 0) {
                     fail = !AIMessage.askClaimLand(tile, aiUnit,
                         ((price == 0) ? 0 : (player.checkGold(price)) ? price
-                            : NetworkConstants.STEAL_LAND))
+                            : Constants.STEAL_LAND))
                         || !player.owns(tile);
                 }
                 if (fail) return retargetMission("tile-claim-at-" + tile, lb);

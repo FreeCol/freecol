@@ -351,7 +351,7 @@ public abstract class AIPlayer extends AIObject {
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
      */
     public abstract int buyProposition(Unit unit, Settlement settlement,
                                        Goods goods, int gold);
@@ -366,7 +366,7 @@ public abstract class AIPlayer extends AIObject {
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or
-     *     {@link net.sf.freecol.common.networking.NetworkConstants#NO_TRADE}.
+     *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
      */
     public abstract int sellProposition(Unit unit, Settlement settlement,
                                         Goods goods, int gold);

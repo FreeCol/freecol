@@ -48,9 +48,9 @@ import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController.BoycottAction;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -412,10 +412,10 @@ public final class EuropePanel extends PortPanel {
                         .getBoycottChoice(goods, europe);
                     if (act != null) {
                         switch (act) {
-                        case PAY_ARREARS:
+                        case BOYCOTT_PAY_ARREARS:
                             igc().payArrears(goods.getType());
                             break;
-                        case DUMP_CARGO:
+                        case BOYCOTT_DUMP_CARGO:
                             igc().unloadCargo(goods, true);
                             break;
                         default:

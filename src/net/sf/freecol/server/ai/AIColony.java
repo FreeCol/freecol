@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -62,7 +63,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
-import net.sf.freecol.common.networking.NetworkConstants;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -563,7 +563,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 || owner.isEuropean()
                 || !player.canClaimForSettlement(t)) continue;
             if (owner.atWarWith(player)) {
-                if (AIMessage.askClaimLand(t, this, NetworkConstants.STEAL_LAND)
+                if (AIMessage.askClaimLand(t, this, Constants.STEAL_LAND)
                     && player.owns(t)) {
                     lb.add(", stole tile ", t,
                           " from hostile ", owner.getName());
@@ -584,7 +584,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         if (steal != null) {
             Player owner = steal.getOwner();
-            if (AIMessage.askClaimLand(steal, this, NetworkConstants.STEAL_LAND)
+            if (AIMessage.askClaimLand(steal, this, Constants.STEAL_LAND)
                 && player.owns(steal)) {
                 lb.add(", stole tile ", steal, " (score = ", score,
                       ") from ", owner.getName());

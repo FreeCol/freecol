@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ColonyWas;
+import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -100,81 +101,19 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
-
-import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
  * The controller that will be used while the game is played.
  */
-public final class InGameController extends FreeColClientHolder
-    implements NetworkConstants {
+public final class InGameController extends FreeColClientHolder {
 
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
-
-    /** Actions when an armed unit contacts a settlement. */
-    public static enum ArmedUnitSettlementAction {
-        SETTLEMENT_ATTACK,
-        SETTLEMENT_TRIBUTE,
-    }
-
-    /** Actions when dealing with a boycott. */
-    public static enum BoycottAction {
-        PAY_ARREARS,
-        DUMP_CARGO
-    }
-
-    /** Actions when buying from the natives. */
-    public static enum BuyAction {
-        BUY,
-        HAGGLE
-    }
-
-    /** Actions when claiming land. */
-    public static enum ClaimAction {
-        ACCEPT,
-        STEAL
-    }
-
-    /** Actions with a missionary at a native settlement. */
-    public static enum MissionaryAction {
-        ESTABLISH_MISSION,
-        DENOUNCE_HERESY,
-        INCITE_INDIANS
-    }
-
-    /** Actions in scouting a colony. */
-    public static enum ScoutColonyAction {
-        FOREIGN_COLONY_NEGOTIATE,
-        FOREIGN_COLONY_SPY,
-        FOREIGN_COLONY_ATTACK
-    }
-
-    /** Actions in scouting a native settlement. */
-    public static enum ScoutIndianSettlementAction {
-        INDIAN_SETTLEMENT_SPEAK,
-        INDIAN_SETTLEMENT_TRIBUTE,
-        INDIAN_SETTLEMENT_ATTACK
-    }
-
-    /** Actions when selling to the natives. */
-    public static enum SellAction {
-        SELL,
-        HAGGLE,
-        GIFT
-    }
-
-    /** Choice of sales action at a native settlement. */
-    public static enum TradeAction {
-        BUY,
-        SELL,
-        GIFT
-    }
 
     /**
      * Selecting next unit depends on mode--- either from the active list,
@@ -357,13 +296,14 @@ public final class InGameController extends FreeColClientHolder
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale
-            ClaimAction act = getGUI().getClaimChoice(tile, player, price, owner);
+            ClaimAction act
+                = getGUI().getClaimChoice(tile, player, price, owner);
             if (act == null) return false; // Cancelled
             switch (act) {
-            case ACCEPT: // accepted price
+            case CLAIM_ACCEPT: // accepted price
                 break;
-            case STEAL:
-                price = NetworkConstants.STEAL_LAND;
+            case CLAIM_STEAL:
+                price = STEAL_LAND;
                 break;
             default:
                 logger.warning("Claim dialog fail: " + act);
@@ -1655,9 +1595,9 @@ public final class InGameController extends FreeColClientHolder
             = getGUI().getScoutForeignColonyChoice(colony, unit, canNeg);
         if (act == null) return true; // Cancelled
         switch (act) {
-        case FOREIGN_COLONY_ATTACK:
+        case SCOUT_COLONY_ATTACK:
             return moveAttackSettlement(unit, direction);
-        case FOREIGN_COLONY_NEGOTIATE:
+        case SCOUT_COLONY_NEGOTIATE:
             Player player = unit.getOwner();
             DiplomaticTrade agreement
                 = new DiplomaticTrade(game, TradeContext.DIPLOMATIC,
@@ -1667,7 +1607,7 @@ public final class InGameController extends FreeColClientHolder
             return (agreement == null
                 || agreement.getStatus() == TradeStatus.REJECT_TRADE) ? true
                 : moveDiplomacy(unit, direction, agreement);
-        case FOREIGN_COLONY_SPY:
+        case SCOUT_COLONY_SPY:
             return moveSpy(unit, direction);
         default:
             logger.warning("showScoutForeignColonyDialog fail: " + act);
@@ -1704,16 +1644,16 @@ public final class InGameController extends FreeColClientHolder
             = getGUI().getScoutIndianSettlementChoice(settlement, number);
         if (act == null) return true; // Cancelled
         switch (act) {
-        case INDIAN_SETTLEMENT_ATTACK:
+        case SCOUT_SETTLEMENT_ATTACK:
             if (!getGUI().confirmPreCombat(unit, tile)) return true;
             askServer().attack(unit, direction);
             return false;
-        case INDIAN_SETTLEMENT_SPEAK:
+        case SCOUT_SETTLEMENT_SPEAK:
             // Prevent turn ending to allow speaking results to complete
             moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
             askServer().scoutSpeakToChief(unit, settlement);
             return false;
-        case INDIAN_SETTLEMENT_TRIBUTE:
+        case SCOUT_SETTLEMENT_TRIBUTE:
             return moveTribute(unit, 1, direction);
         default:
             logger.warning("showScoutIndianSettlementDialog fail: " + act);
@@ -1914,7 +1854,7 @@ public final class InGameController extends FreeColClientHolder
 
                 // Show dialog for buy proposal
                 boolean canBuy = player.checkGold(gold);
-                BuyAction act
+                TradeBuyAction act
                     = getGUI().getBuyChoice(unit, is, goods, gold, canBuy);
                 if (act == null) break; // User cancelled
                 switch (act) {
@@ -1962,7 +1902,8 @@ public final class InGameController extends FreeColClientHolder
                 }
 
                 // Show dialog for sale proposal
-                SellAction act = getGUI().getSellChoice(unit, is, goods, gold);
+                TradeSellAction act
+                    = getGUI().getSellChoice(unit, is, goods, gold);
                 if (act == null) break; // Cancelled
                 switch (act) {
                 case SELL: // Accepted price, make the sale
@@ -2059,15 +2000,15 @@ public final class InGameController extends FreeColClientHolder
             canEstablish, canDenounce);
         if (act == null) return true;
         switch (act) {
-        case ESTABLISH_MISSION: case DENOUNCE_HERESY:
+        case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction,
-                    act == MissionaryAction.DENOUNCE_HERESY)
+                    act == MissionaryAction.MISSIONARY_DENOUNCE_HERESY)
                 && settlement.hasMissionary(player)) {
                 sound("sound.event.missionEstablished");
                 player.invalidateCanSeeTiles();
             }
             break;
-        case INCITE_INDIANS:
+        case MISSIONARY_INCITE_INDIANS:
             Player enemy = getGUI().getChoice(unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
                 unit, "missionarySettlement.cancel",
