@@ -2140,16 +2140,27 @@ outer:  for (Effect effect : effects) {
         // Some modifiers are special
         for (Modifier m : father.getModifiers()) {
             if (Modifier.LINE_OF_SIGHT_BONUS.equals(m.getId())) {
-                List<Tile> tiles = new ArrayList<>();
-                for (Colony c : getColonies()) {
-                    tiles.addAll(exploreForSettlement(c));
-                }
-                for (Unit u : getUnits()) tiles.addAll(exploreForUnit(u));
-                if (hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    for (Colony c : getGame().getAllColonies(this)) {
-                        tiles.addAll(exploreForSettlement(c));
+                // Check for tiles that are now visible.  They need to be
+                // explored, and always updated so that units are visible.
+                // *Requires that canSee[] has **not** been updated yet!*
+                Set<Tile> tiles = new HashSet<>();
+                int los;
+                for (Colony c : (hasAbility(Ability.SEE_ALL_COLONIES))
+                         ? getGame().getAllColonies(null)
+                         : getColonies()) {
+                    los = c.getLineOfSight();
+                    for (Tile t : c.getTile().getSurroundingTiles(1, los)) {
+                        if (!canSee(t)) tiles.add(t);
                     }
                 }
+                for (Unit u : getUnits()) {
+                    if (!u.hasTile()) continue;
+                    los = u.getLineOfSight();
+                    for (Tile t : u.getTile().getSurroundingTiles(1, los)) {
+                        if (!canSee(t)) tiles.add(t);
+                    }
+                }
+                exploreTiles(tiles); // Explore the new tiles
                 cs.add(See.only(this), tiles);
                 visibilityChange = true;
             } else if (Modifier.SOL.equals(m.getId())) {
