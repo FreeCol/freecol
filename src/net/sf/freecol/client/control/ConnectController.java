@@ -449,10 +449,7 @@ public final class ConnectController extends FreeColClientHolder {
                 + file.getName());
             return false;
         }
-        if (!options.merge(fis)) {
-            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
-            return false;
-        }
+        options.merge(fis);
         options.fixClientOptions();
 
         // Get suggestions for "singlePlayer" and "publicServer"
