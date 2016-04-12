@@ -830,6 +830,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (oldOwner.csChangeOwner(brave, newOwner, ChangeType.CONVERSION, 
                                    getTile(), cs)) { //-vis(other)
             brave.changeRole(getSpecification().getDefaultRole(), 0);
+            for (Goods g : brave.getGoods()) brave.removeGoods(g);
             brave.setMovesLeft(0);
             brave.setState(Unit.UnitState.ACTIVE);
             cs.addDisappear(newOwner, tile, brave);

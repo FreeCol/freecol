@@ -3078,6 +3078,7 @@ outer:  for (Effect effect : effects) {
                                        attacker.getTile(),
                                        cs)) { //-vis(attackerPlayer)
             convert.changeRole(spec.getDefaultRole(), 0);
+            for (Goods g : convert.getGoods()) convert.removeGoods(g);
             convert.setMovesLeft(0);
             convert.setState(Unit.UnitState.ACTIVE);
             cs.add(See.only(nativePlayer), is.getTile());
