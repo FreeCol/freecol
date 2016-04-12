@@ -362,13 +362,7 @@ public final class TilePopup extends JPopupMenu {
 
         for (Unit u : tile.getUnitList()) {
             if (u.canCarryGoods() && u.hasSpaceLeft()) {
-                JMenuItem addg = new JMenuItem("Add goods");
-                addg.setOpaque(false);
-                final Unit unit = u;
-                addg.addActionListener((ActionEvent ae) -> {
-                        DebugUtils.addUnitGoods(freeColClient, unit);
-                    });
-                add(addg);
+                DebugUtils.addGoodsAdditionEntry(freeColClient, u, this);
                 break;
             }
         }

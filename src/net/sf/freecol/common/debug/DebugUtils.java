@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.debug;
 
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 
 import net.sf.freecol.client.FreeColClient;
@@ -211,6 +213,24 @@ public class DebugUtils {
         }
         player.modifyGold(gold);
         sPlayer.modifyGold(gold);
+    }
+
+    /**
+     * Add an "add goods" menu item to a unit menu.
+     *
+     * @param fcc The enclosing <code>FreeColClient</code>.
+     * @param unit The <code>Unit</code> to add goods to.
+     * @param menu The <code>JPopupMenu</code> to add the entry to.
+     */
+    public static void addGoodsAdditionEntry(final FreeColClient fcc,
+                                             final Unit unit, JPopupMenu menu) {
+        JMenuItem addg = new JMenuItem("Add goods");
+        addg.setOpaque(false);
+        addg.addActionListener((ActionEvent ae) -> {
+                DebugUtils.addUnitGoods(fcc, unit);
+            });
+        addg.setEnabled(true);
+        menu.add(addg);
     }
 
     /**

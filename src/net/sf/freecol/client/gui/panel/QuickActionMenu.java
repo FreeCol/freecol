@@ -47,6 +47,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.SwingGUI;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -541,6 +542,10 @@ public final class QuickActionMenu extends JPopupMenu {
             menuItem.addActionListener(unitLabel);
             menuItem.setEnabled(tempUnit.hasCargo() && !isUnitAtSea);
             this.add(menuItem);
+        }
+
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            DebugUtils.addGoodsAdditionEntry(freeColClient, tempUnit, this);
         }
 
         return true;

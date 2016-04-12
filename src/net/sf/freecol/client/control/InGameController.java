@@ -489,6 +489,7 @@ public final class InGameController extends FreeColClientHolder {
 
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         if (askServer().unloadGoods(type, amount, carrier)
+            && !(carrier.isInEurope() && !player.canTrade(type))
             && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             if (marketWas != null) marketWas.fireChanges(type, -amount);
             return true;
