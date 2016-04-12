@@ -898,7 +898,7 @@ public final class ColonyPanel extends PortPanel
                                   "abandonColony.no")) return;
             abandon = true;
         }
-        if (!abandon) {
+        if (abandon) {
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getRequiredPopulation() > colony.getUnitCount()
