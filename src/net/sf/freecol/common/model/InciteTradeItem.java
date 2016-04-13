@@ -115,7 +115,7 @@ public class InciteTradeItem extends TradeItem {
             break;
         }
         // FIXME: magic#, needs rebalancing
-        return (int)Math.round(30 * player.getStrengthRatio(victim, false));
+        return (int)Math.round(50.0 / player.getStrengthRatio(victim, false));
     }
     
 
