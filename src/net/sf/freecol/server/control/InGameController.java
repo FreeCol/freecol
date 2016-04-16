@@ -129,6 +129,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 import net.sf.freecol.server.model.DiplomacySession;
 import net.sf.freecol.server.model.LootSession;
 import net.sf.freecol.server.model.MonarchSession;
+import net.sf.freecol.server.model.NativeTradeSession;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerEurope;
 import net.sf.freecol.server.model.ServerGame;
@@ -136,7 +137,6 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.model.TradeSession;
 import net.sf.freecol.server.model.TransactionSession;
 
 
@@ -1249,8 +1249,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
 
-        TradeSession session
-            = TradeSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return serverPlayer.clientError("Trying to buy without opening a transaction session");
         }
@@ -1344,8 +1344,8 @@ public final class InGameController extends Controller {
      */
     public DOMMessage buyProposition(ServerPlayer serverPlayer,
         Unit unit, Settlement settlement, Goods goods, int price) {
-        TradeSession session
-            = TradeSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return new ErrorMessage("Proposing to buy without opening a transaction session?!");
         }
@@ -1605,8 +1605,8 @@ public final class InGameController extends Controller {
      */
     public ChangeSet closeTransaction(ServerPlayer serverPlayer, Unit unit,
                                       Settlement settlement) {
-        TradeSession session
-            = TradeSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return serverPlayer.clientError("No such transaction session.");
         }
@@ -1955,8 +1955,8 @@ public final class InGameController extends Controller {
     public ChangeSet deliverGiftToSettlement(ServerPlayer serverPlayer,
                                              Unit unit, Settlement settlement,
                                              Goods goods) {
-        TradeSession session
-            = TransactionSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return serverPlayer.clientError("Trying to deliver gift without opening a session");
         }
@@ -2810,14 +2810,14 @@ public final class InGameController extends Controller {
     public ChangeSet getTransaction(ServerPlayer serverPlayer, Unit unit,
                                     Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        TradeSession session = TransactionSession.lookup(TradeSession.class,
+        NativeTradeSession session = TransactionSession.lookup(NativeTradeSession.class,
             unit, settlement);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
                 return serverPlayer.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            session = new TradeSession(unit, settlement);
+            session = new NativeTradeSession(unit, settlement);
             // Sets unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
             // closing the session
@@ -3776,8 +3776,8 @@ public final class InGameController extends Controller {
      */
     public DOMMessage sellProposition(ServerPlayer serverPlayer,
         Unit unit, Settlement settlement, Goods goods, int price) {
-        TradeSession session
-            = TradeSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return new ErrorMessage("Proposing to sell without opening a transaction session");
         }
@@ -3814,8 +3814,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, 0, cs);
 
-        TradeSession session
-            = TransactionSession.lookup(TradeSession.class, unit, settlement);
+        NativeTradeSession session
+            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return serverPlayer.clientError("Trying to sell without opening a transaction session");
         }

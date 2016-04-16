@@ -27,11 +27,11 @@ import net.sf.freecol.server.control.ChangeSet;
 
 
 /**
- * A type of session to handle trading.
+ * A type of session to handle trading with a native settlement.
  */
-public class TradeSession extends TransactionSession {
+public class NativeTradeSession extends TransactionSession {
 
-    private static final Logger logger = Logger.getLogger(TradeSession.class.getName());
+    private static final Logger logger = Logger.getLogger(NativeTradeSession.class.getName());
 
     /** The moves the trading unit has left at start of session. */
     private final int movesLeft;
@@ -50,13 +50,13 @@ public class TradeSession extends TransactionSession {
 
 
     /**
-     * Creates a new <code>TradeSession</code>.
+     * Creates a new <code>NativeTradeSession</code>.
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> to trade with.
      */
-    public TradeSession(Unit unit, Settlement settlement) {
-        super(makeSessionKey(TradeSession.class, unit, settlement));
+    public NativeTradeSession(Unit unit, Settlement settlement) {
+        super(makeSessionKey(NativeTradeSession.class, unit, settlement));
         movesLeft = unit.getMovesLeft();
         actionTaken = false;
         boolean atWar = settlement.getOwner().atWarWith(unit.getOwner());
