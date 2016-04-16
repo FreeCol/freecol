@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NationType;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
@@ -480,18 +481,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to close a session for a trade.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean closeSession(Unit unit, IndianSettlement is) {
-        return askHandling(unit.getGame(),
-            new CloseSessionMessage(unit, is), null);
-    }
-
-    /**
      * Server query-response to continue with a won game.
      *
      * @return True if the server interaction succeeded.
@@ -682,6 +671,19 @@ public abstract class ServerAPI {
      */
     public boolean emigrate(Game game, int slot) {
         return askHandling(game, new EmigrateUnitMessage(slot), null);
+    }
+
+    /**
+     * Server query-response to close a session for a trade.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean endNativeTradeSession(NativeTrade nt) {
+        return askHandling(nt.getUnit().getGame(),
+            new NativeTradeMessage(NativeTrade.NativeTradeAction.CLOSE, nt),
+            null);
     }
 
     /**
@@ -946,6 +948,18 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response to get the session for a trade.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean newNativeTradeSession(Unit unit, IndianSettlement is) {
+        return askHandling(unit.getGame(),
+            new NativeTradeMessage(unit, is), null);
+    }
+
+    /**
      * Server query-response for naming a new region.
      *
      * @param region The <code>Region</code> that is being discovered.
@@ -969,25 +983,6 @@ public abstract class ServerAPI {
     public boolean newTradeRoute(Game game) {
         return askHandling(game,
             new NewTradeRouteMessage(), null);
-    }
-
-    /**
-     * Server query-response to get the session for a trade.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @return An array of booleans for the buy/sell/gift status,
-     *     or null if the server interaction failed.
-     */
-    public boolean[] openSession(Unit unit, IndianSettlement is) {
-        Element reply = askExpecting(unit.getGame(),
-            new GetSessionMessage(unit, is),
-            null);
-        return new boolean[] {
-            DOMMessage.getBooleanAttribute(reply, "canBuy", false),
-            DOMMessage.getBooleanAttribute(reply, "canSell", false),
-            DOMMessage.getBooleanAttribute(reply, "canGift", false)
-        };
     }
 
     /**

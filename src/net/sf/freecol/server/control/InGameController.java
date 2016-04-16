@@ -75,6 +75,8 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -111,6 +113,7 @@ import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
+import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
@@ -1597,35 +1600,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Close a session.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A <code>ChangeSet</code> encapsulating this action.
-     */
-    public ChangeSet closeSession(ServerPlayer serverPlayer, Unit unit,
-                                  Settlement settlement) {
-        NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, settlement);
-        if (session == null) {
-            return serverPlayer.clientError("No such session.");
-        }
-
-        ChangeSet cs = new ChangeSet();
-        // Restore unit movement if no action taken.
-        if (!session.getActionTaken()) {
-            unit.setMovesLeft(session.getMovesLeft());
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-        }
-        session.complete(cs);
-
-        // Others can not see end of transaction.
-        return cs;
-    }
-
-
-    /**
      * Combat.  Public for the test suite.
      *
      * @param attackerPlayer The <code>ServerPlayer</code> who is attacking.
@@ -2796,45 +2770,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Gets a settlement session, either existing or newly opened.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @return A <code>ChangeSet</code> encapsulating this action.
-     */
-    public ChangeSet getSession(ServerPlayer serverPlayer, Unit unit,
-                                IndianSettlement is) {
-        ChangeSet cs = new ChangeSet();
-        NativeTradeSession session = Session.lookup(NativeTradeSession.class,
-                                                    unit, is);
-        if (session == null) {
-            if (unit.getMovesLeft() <= 0) {
-                return serverPlayer.clientError("Unit " + unit.getId()
-                    + " has no moves left.");
-            }
-            session = new NativeTradeSession(unit, is);
-            // Sets unit moves to zero to avoid cheating.  If no
-            // action is taken, the moves will be restored when
-            // closing the session
-            unit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-        }
-
-        // Add just the attributes the client needs.
-        cs.addAttribute(See.only(serverPlayer), "canBuy",
-            Boolean.toString(session.getBuy()));
-        cs.addAttribute(See.only(serverPlayer), "canSell",
-            Boolean.toString(session.getSell()));
-        cs.addAttribute(See.only(serverPlayer), "canGift",
-            Boolean.toString(session.getGift()));
-
-        // Others can not see transactions.
-        return cs;
-    }
-
-
-    /**
      * Incite a settlement against an enemy.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is inciting.
@@ -3394,6 +3329,75 @@ public final class InGameController extends Controller {
 
         // Others might see unit capacity?
         getGame().sendToOthers(serverPlayer, cs);
+        return cs;
+    }
+
+
+    /**
+     * Handle native trade sessions.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param action The <code>NativeTradeAction</code> to perform.
+     * @param nt The <code>NativeTrade</code> underway.
+     * @return A <code>ChangeSet</code> encapsulating this action.
+     */
+    public ChangeSet nativeTrade(ServerPlayer serverPlayer,
+                                 NativeTradeAction action, NativeTrade nt) {
+        if (nt == null) {
+            return serverPlayer.clientError("Null NativeTrade");
+        }
+        final Unit unit = nt.getUnit();
+        final IndianSettlement is = nt.getIndianSettlement();
+        if (unit == null || is == null) {
+            String dat = null;
+            try { dat = nt.serialize(); } catch (Exception e) {}
+            return serverPlayer.clientError("Bogus NativeTrade: " + dat);
+        }
+        final ServerPlayer otherPlayer = (ServerPlayer)
+            ((serverPlayer.owns(unit)) ? is.getOwner() : unit.getOwner());
+
+        NativeTradeSession session = Session.lookup(NativeTradeSession.class,
+            nt.getUnit(), nt.getIndianSettlement());
+        ChangeSet cs = new ChangeSet();
+        switch (action) {
+        case UPDATE:
+            return serverPlayer.clientError("Server sent update!?!");
+        case OPEN:
+            if (session != null) {
+                return serverPlayer.clientError("Session already open");
+            } else if (unit.getMovesLeft() <= 0) {
+                return serverPlayer.clientError("Unit " + unit.getId()
+                    + " has no moves left.");
+            }
+            session = new NativeTradeSession(nt);
+            // Sets unit moves to zero to avoid cheating.  If no
+            // action is taken, the moves will be restored when
+            // closing the session
+            unit.setMovesLeft(0);
+            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            break;
+        case CLOSE:
+            if (session == null) {
+                return serverPlayer.clientError("No such session");
+            }
+            if (!session.getActionTaken()) {
+                unit.setMovesLeft(session.getMovesLeft());
+                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+            }
+            nt = session.getNativeTrade();
+            nt.setDone();
+            session.complete(cs);
+            break;
+            
+        default:
+            return serverPlayer.clientError("Bogus action: " + action);
+        }
+
+        // Update the client with the current session state.
+        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_NORMAL,
+            new NativeTradeMessage(NativeTradeAction.UPDATE, nt));
+
+        // Others can not see transactions.
         return cs;
     }
 

@@ -41,7 +41,6 @@ import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
-import net.sf.freecol.common.networking.CloseSessionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -57,7 +56,6 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GetSessionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
@@ -73,6 +71,7 @@ import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeGiftMessage;
+import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -242,14 +241,6 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ClearSpecialityMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(CloseSessionMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new CloseSessionMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
         register(DeclareIndependenceMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -337,14 +328,6 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new EquipForRoleMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(GetSessionMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new GetSessionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(GoodsForSaleMessage.getTagName(),
@@ -449,6 +432,14 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new NativeGiftMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(NativeTradeMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new NativeTradeMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(NewLandNameMessage.getTagName(),

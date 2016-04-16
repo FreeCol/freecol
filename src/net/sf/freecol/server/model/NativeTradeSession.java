@@ -50,12 +50,13 @@ public class NativeTradeSession extends Session {
      * @param unit The <code>Unit</code> that is trading.
      * @param is The <code>IndianSettlement</code> to trade with.
      */
-    public NativeTradeSession(Unit unit, IndianSettlement is) {
-        super(makeSessionKey(NativeTradeSession.class, unit, is));
+    public NativeTradeSession(NativeTrade nt) {
+        super(makeSessionKey(NativeTradeSession.class, nt.getUnit(),
+                             nt.getIndianSettlement()));
 
-        this.movesLeft = unit.getMovesLeft();
+        this.movesLeft = nt.getUnit().getMovesLeft();
         this.actionTaken = false;
-        this.nt = new NativeTrade(unit, is);
+        this.nt = nt;
     }
 
     @Override
@@ -71,6 +72,10 @@ public class NativeTradeSession extends Session {
         return this.actionTaken;
     }
 
+    public NativeTrade getNativeTrade() {
+        return this.nt;
+    }
+    
     public boolean getBuy() {
         return this.nt.getBuy();
     }
@@ -96,9 +101,5 @@ public class NativeTradeSession extends Session {
     public void setGift() {
         this.actionTaken = true;
         this.nt.setGift(false);
-    }
-
-    public boolean getDone() {
-        return this.nt.getDone();
     }
 }

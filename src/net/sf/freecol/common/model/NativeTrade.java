@@ -72,7 +72,7 @@ public class NativeTrade extends FreeColGameObject {
     private Unit unit;
 
     /** The settlement to trade with. */
-    private IndianSettlement settlement;
+    private IndianSettlement is;
 
     /** How many times this trade has been tried. */
     private int count;
@@ -94,24 +94,23 @@ public class NativeTrade extends FreeColGameObject {
      * @param id The identifier (ignored).
      */
     public NativeTrade(Game game, String id) {
-        super(game, ""); // Identifier not required
+        super(game, id);
     }
 
     /**
      * Create a new trade session.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>IndianSettlement</code> to trade with.
+     * @param is The <code>IndianSettlement</code> to trade with.
      */
-    public NativeTrade(Unit unit, IndianSettlement settlement) {
-        this(unit.getGame(), null);
+    public NativeTrade(Unit unit, IndianSettlement is) {
+        this(unit.getGame(), ""); // Identifier not needed
 
         this.unit = unit;
-        this.settlement = settlement;
+        this.is = is;
         this.count = 0;
 
-        boolean atWar = this.settlement.getOwner()
-            .atWarWith(this.unit.getOwner());
+        boolean atWar = this.is.getOwner().atWarWith(this.unit.getOwner());
         this.buy = !atWar;
         this.sell = !atWar && this.unit.hasGoodsCargo();
         this.gift = this.unit.hasGoodsCargo();
@@ -119,7 +118,7 @@ public class NativeTrade extends FreeColGameObject {
 
 
     public String getKey() {
-        return getKey(this.unit, this.settlement);
+        return getKey(this.unit, this.is);
     }
     
     public static String getKey(Unit unit, IndianSettlement is) {
@@ -130,8 +129,8 @@ public class NativeTrade extends FreeColGameObject {
         return this.unit;
     }
 
-    public IndianSettlement getSettlement() {
-        return this.settlement;
+    public IndianSettlement getIndianSettlement() {
+        return this.is;
     }
 
     public boolean getBuy() {
@@ -176,6 +175,16 @@ public class NativeTrade extends FreeColGameObject {
     }
 
 
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isInternable() {
+        return false;
+    }
+
+
     // Serialization
 
     private static final String BUY_TAG = "buy";
@@ -201,7 +210,7 @@ public class NativeTrade extends FreeColGameObject {
 
         xw.writeAttribute(SELL_TAG, this.sell);
 
-        xw.writeAttribute(SETTLEMENT_TAG, this.settlement);
+        xw.writeAttribute(SETTLEMENT_TAG, this.is);
 
         xw.writeAttribute(UNIT_TAG, this.unit);
     }
@@ -221,9 +230,8 @@ public class NativeTrade extends FreeColGameObject {
 
         this.sell = xr.getAttribute(SELL_TAG, false);
 
-        this.settlement = xr.getAttribute(getGame(), SETTLEMENT_TAG,
-                                          IndianSettlement.class,
-                                          (IndianSettlement)null);
+        this.is = xr.getAttribute(getGame(), SETTLEMENT_TAG,
+            IndianSettlement.class, (IndianSettlement)null);
 
         this.unit = xr.getAttribute(getGame(), UNIT_TAG,
                                     Unit.class, (Unit)null);
@@ -237,7 +245,7 @@ public class NativeTrade extends FreeColGameObject {
         StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId())
             .append(" ").append(getUnit().getId())
-            .append(" ").append(getSettlement().getId())
+            .append(" ").append(getIndianSettlement().getId())
             .append(" buy=").append(getBuy())
             .append(" sell=").append(getSell())
             .append(" gift=").append(getGift())

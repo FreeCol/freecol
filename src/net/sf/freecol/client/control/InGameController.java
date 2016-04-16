@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -153,6 +154,9 @@ public final class InGameController extends FreeColClientHolder {
     /** The messages in the last turn report. */
     private final List<ModelMessage> turnReportMessages = new ArrayList<>();
 
+    /** Current native trades. */
+    private final HashMap<String, NativeTrade> nativeTrades = new HashMap<>();
+    
 
     /**
      * The constructor to use.
@@ -416,7 +420,18 @@ public final class InGameController extends FreeColClientHolder {
             player.addModelMessage(player.getEmigrationMessage(u));
         }
     }
-   
+
+    /**
+     * End a native trade.
+     *
+     * @param nt The <code>NativeTrade</code> to finish.
+     */
+    private void askEndNativeTradeSession(NativeTrade nt) {
+        if (askServer().endNativeTradeSession(nt)) {
+            this.nativeTrades.remove(nt.getKey());
+        }
+    }
+
     /**
      * Load some goods onto a carrier.
      *
@@ -1724,22 +1739,26 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+        if (!askServer().newNativeTradeSession(unit, is)) return true;
 
+        NativeTrade nt = this.nativeTrades.get(NativeTrade.getKey(unit, is));
+        if (nt == null) return true;
+        boolean buy = nt.getBuy();
+        boolean sel = nt.getSell();
+        boolean gif = nt.getGift();
         StringTemplate baseTemplate = StringTemplate
             .template("tradeProposition.welcome")
             .addStringTemplate("%nation%",
                 is.getOwner().getNationLabel())
             .addName("%settlement%", is.getName());
         StringTemplate template = baseTemplate;
-        boolean[] results = askServer().openSession(unit, is);
-        while (results != null) {
+        while (buy || sel || gif) {
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
             // the session allows it and the carrier is in good shape.
-            boolean buy = results[0] && unit.hasSpaceLeft();
-            boolean sel = results[1] && unit.hasGoodsCargo();
-            boolean gif = results[2] && unit.hasGoodsCargo();
-            if (!buy && !sel && !gif) break;
+            buy = buy && unit.hasSpaceLeft();
+            sel = sel && unit.hasGoodsCargo();
+            gif = gif && unit.hasGoodsCargo();
 
             TradeAction act = getGUI().getIndianSettlementTradeChoice(is,
                 template, buy, sel, gif);
@@ -1748,41 +1767,25 @@ public final class InGameController extends FreeColClientHolder {
             switch (act) {
             case BUY:
                 t = attemptBuyFromSettlement(unit, is);
-                if (t == null) {
-                    results[0] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
+                if (t == null) buy = false;
                 break;
             case SELL:
                 t = attemptSellToSettlement(unit, is);
-                if (t == null) {
-                    results[1] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
+                if (t == null) sel = false;
                 break;
             case GIFT:
                 t = attemptGiftToSettlement(unit, is);
-                if (t == null) {
-                    results[2] = false;
-                    template = baseTemplate;
-                } else {
-                    template = t;
-                }
+                if (t == null) gif = false;
                 break;
             default:
                 logger.warning("showIndianSettlementTradeDialog fail: "
                     + act);
-                results = null;
-                break;
+                continue;
             }
-            if (template == abortTrade) template = baseTemplate;
+            template = (t == null || t == abortTrade) ? baseTemplate : t;
         }
 
-        askServer().closeSession(unit, is);
+        askEndNativeTradeSession(nt);
         if (unit.getMovesLeft() > 0) getGUI().setActiveUnit(unit); // No trade?
         return false;
     }
@@ -4102,6 +4105,18 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * Cache a native trade update.
+     *
+     * Called from IGIH.nativeTrade.
+     *
+     * @param nt The <code>NativeTrade</code> to update.
+     */
+    public void nativeTrade(NativeTrade nt) {
+        if (nt == null) return;
+        this.nativeTrades.put(nt.getKey(), nt);
+    }
+
+    /**
      * Ask the player to name the new land.
      *
      * Called from IGIH.newLandName.
@@ -4187,8 +4202,9 @@ public final class InGameController extends FreeColClientHolder {
         game.setTurn(newTurn);
         logger.info("New turn: " + newTurn + "/" + turn);
 
-        final boolean alert = getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS);
-        if (alert) sound("sound.event.alertSound");
+        if (getClientOptions().getBoolean(ClientOptions.AUDIO_ALERTS)) {
+            sound("sound.event.alertSound");
+        }
 
         final Turn currTurn = game.getTurn();
         if (currTurn.isFirstSeasonTurn()) {
@@ -4198,6 +4214,7 @@ public final class InGameController extends FreeColClientHolder {
                 .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
         player.clearNationCache();
+        nativeTrades.clear();
         return true;
     }
 

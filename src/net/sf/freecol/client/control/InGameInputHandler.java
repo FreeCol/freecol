@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
@@ -68,6 +69,7 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
+import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -165,6 +167,8 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> multiple(c, e));
         register(NationSummaryMessage.TAG,
             (Connection c, Element e) -> nationSummary(e));
+        register(NativeTradeMessage.TAG,
+            (Connection c, Element e) -> nativeTrade(e));
         register("newLandName",
             (Connection c, Element e) -> newLandName(e));
         register("newRegionName",
@@ -760,7 +764,28 @@ public final class InGameInputHandler extends ClientInputHandler {
             + " for " + player.getSuffix() + " with " + ns);
         return null;
     }
-        
+
+    /**
+     * Handle a native trade update.
+     *
+     * @param element The <code>Element</code> to process.
+     * @return Null.
+     */
+    private Element nativeTrade(Element element) {
+        final Game game = getGame();
+        final Player player = getMyPlayer();
+
+        NativeTradeMessage message = new NativeTradeMessage(game, element);
+        NativeTrade nt = message.getNativeTrade();
+        if (message.getAction() != NativeTrade.NativeTradeAction.UPDATE) {
+            logger.warning("Bogus server native trade action: "
+                + message.getAction());
+        } else {
+            invokeLater(() -> igc().nativeTrade(nt));
+        }
+        return null;
+    }
+
     /**
      * Handle a "highScore" message.
      *
