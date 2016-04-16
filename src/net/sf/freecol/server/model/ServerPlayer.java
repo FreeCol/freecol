@@ -384,6 +384,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Get a new trade route.
+     *
+     * @return The new <code>TradeRoute</code>.
+     */
+    public TradeRoute newTradeRoute() {
+        TradeRoute route = new TradeRoute(getGame(), getNameForTradeRoute(),
+                                          this);
+        addTradeRoute(route);
+        return route;
+    }
+
+    /**
      * Accumulate extra trades.
      *
      * @param ag The <code>AbstractGoods</code> describing the sale.

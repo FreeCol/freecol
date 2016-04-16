@@ -3365,21 +3365,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get a new trade route for a player.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> to get a trade
-     *    route for.
-     * @return The new <code>TradeRoute</code>.
-     */
-    public TradeRoute newTradeRoute(ServerPlayer serverPlayer) {
-        TradeRoute route = new TradeRoute(getGame(), 
-            serverPlayer.getNameForTradeRoute(), serverPlayer);
-        serverPlayer.addTradeRoute(route);
-        return route;
-    }
-
-
-    /**
      * Pay arrears.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
