@@ -31,7 +31,7 @@ import net.sf.freecol.server.control.ChangeSet;
 /**
  * A type of session to handle monarch actions that require response.
  */
-public class MonarchSession extends TransactionSession {
+public class MonarchSession extends Session {
 
     private static final Logger logger = Logger.getLogger(MonarchSession.class.getName());
 

@@ -30,14 +30,14 @@ import net.sf.freecol.server.control.ChangeSet;
 /**
  * Root class for sessions.
  */
-public abstract class TransactionSession {
+public abstract class Session {
 
-    private static final Logger logger = Logger.getLogger(TransactionSession.class.getName());
+    private static final Logger logger = Logger.getLogger(Session.class.getName());
 
     /**
      * A map of all active sessions.
      */
-    protected static final Map<String, TransactionSession> allSessions
+    protected static final Map<String, Session> allSessions
         = new HashMap<>();
 
     /** Has this session been completed? */
@@ -50,7 +50,7 @@ public abstract class TransactionSession {
      *
      * @param key A unique key to lookup this transaction with.
      */
-    protected TransactionSession(String key) {
+    protected Session(String key) {
         if (allSessions.get(key) != null) {
             throw new IllegalArgumentException("Duplicate session: " + key);
         }
@@ -107,7 +107,7 @@ public abstract class TransactionSession {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public static void completeAll(ChangeSet cs) {
-        for (TransactionSession ts : allSessions.values()) {
+        for (Session ts : allSessions.values()) {
             if (!ts.completed) ts.complete(cs);
         }
         clearAll();
@@ -129,7 +129,7 @@ public abstract class TransactionSession {
      * @param o2 The second <code>FreeColGameObject</code> in the session.
      * @return A session of the specified type, or null if not found.
      */
-    public static <T extends TransactionSession> T lookup(Class<T> type,
+    public static <T extends Session> T lookup(Class<T> type,
         FreeColGameObject o1, FreeColGameObject o2) {
         return lookup(type, o1.getId(), o2.getId());
     }
@@ -145,10 +145,10 @@ public abstract class TransactionSession {
      * @param s2 The identifier of the second object in the session.
      * @return A session of the specified type, or null if not found.
      */
-    public static <T extends TransactionSession> T lookup(Class<T> type,
+    public static <T extends Session> T lookup(Class<T> type,
         String s1, String s2) {
-    	String key = makeSessionKey(type, s1, s2);
-        TransactionSession ts = allSessions.get(key);
+        String key = makeSessionKey(type, s1, s2);
+        Session ts = allSessions.get(key);
         if (ts != null && ts.completed) {
             allSessions.remove(key);
             ts = null;

@@ -31,7 +31,7 @@ import net.sf.freecol.server.control.ChangeSet.See;
 /**
  * A type of session to handle diplomacy.
  */
-public class DiplomacySession extends TransactionSession {
+public class DiplomacySession extends Session {
 
     private static final Logger logger = Logger.getLogger(DiplomacySession.class.getName());
 

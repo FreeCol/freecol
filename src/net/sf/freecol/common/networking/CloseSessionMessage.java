@@ -30,33 +30,33 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent to initiate a transaction.
+ * The message sent to end a session.
  */
-public class CloseTransactionMessage extends DOMMessage {
+public class CloseSessionMessage extends DOMMessage {
 
-    public static final String TAG = "closeTransaction";
+    public static final String TAG = "closeSession";
     private static final String SETTLEMENT_TAG = "settlement";
     private static final String UNIT_TAG = "unit";
 
-    /** The object identifier of the unit performing the transaction. */
+    /** The object identifier of the unit performing the session. */
     private final String unitId;
 
     /**
      * The object identifier of the settlement at which the
-     * transaction occurs.
+     * session occurs.
      */
     private final String settlementId;
 
 
     /**
-     * Create a new <code>CloseTransactionMessage</code> with the
+     * Create a new <code>CloseSessionMessage</code> with the
      * supplied unit and settlement.
      *
-     * @param unit The <code>Unit</code> performing the transaction.
+     * @param unit The <code>Unit</code> performing the session.
      * @param settlement The <code>Settlement</code> where the
-     *        transaction occurs.
+     *     session occurs.
      */
-    public CloseTransactionMessage(Unit unit, Settlement settlement) {
+    public CloseSessionMessage(Unit unit, Settlement settlement) {
         super(getTagName());
 
         this.unitId = unit.getId();
@@ -64,13 +64,13 @@ public class CloseTransactionMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>CloseTransactionMessage</code> from a
+     * Create a new <code>CloseSessionMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public CloseTransactionMessage(Game game, Element element) {
+    public CloseSessionMessage(Game game, Element element) {
         super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
@@ -79,7 +79,7 @@ public class CloseTransactionMessage extends DOMMessage {
 
 
     /**
-     * Handle a "closeTransaction"-message.
+     * Handle a "closeSession"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
@@ -108,12 +108,12 @@ public class CloseTransactionMessage extends DOMMessage {
 
         // Proceed to close
         return server.getInGameController()
-            .closeTransaction(serverPlayer, unit, settlement)
+            .closeSession(serverPlayer, unit, settlement)
             .build(serverPlayer);
     }
 
     /**
-     * Convert this CloseTransactionMessage to XML.
+     * Convert this CloseSessionMessage to XML.
      *
      * @return The XML representation of this message.
      */
@@ -127,7 +127,7 @@ public class CloseTransactionMessage extends DOMMessage {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "closeTransaction".
+     * @return "closeSession".
      */
     public static String getTagName() {
         return TAG;

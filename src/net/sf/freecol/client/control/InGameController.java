@@ -1731,8 +1731,7 @@ public final class InGameController extends FreeColClientHolder {
                 is.getOwner().getNationLabel())
             .addName("%settlement%", is.getName());
         StringTemplate template = baseTemplate;
-        boolean[] results = askServer()
-            .openTransactionSession(unit, is);
+        boolean[] results = askServer().openSession(unit, is);
         while (results != null) {
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
@@ -1783,7 +1782,7 @@ public final class InGameController extends FreeColClientHolder {
             if (template == abortTrade) template = baseTemplate;
         }
 
-        askServer().closeTransactionSession(unit, is);
+        askServer().closeSession(unit, is);
         if (unit.getMovesLeft() > 0) getGUI().setActiveUnit(unit); // No trade?
         return false;
     }

@@ -137,7 +137,7 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
-import net.sf.freecol.server.model.TransactionSession;
+import net.sf.freecol.server.model.Session;
 
 
 /**
@@ -1250,9 +1250,9 @@ public final class InGameController extends Controller {
         csVisit(serverPlayer, settlement, 0, cs);
 
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
-            return serverPlayer.clientError("Trying to buy without opening a transaction session");
+            return serverPlayer.clientError("Trying to buy without opening a session");
         }
         if (!session.getBuy()) {
             return serverPlayer.clientError("Trying to buy in a session where buying is not allowed.");
@@ -1345,9 +1345,9 @@ public final class InGameController extends Controller {
     public DOMMessage buyProposition(ServerPlayer serverPlayer,
         Unit unit, Settlement settlement, Goods goods, int price) {
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
-            return new ErrorMessage("Proposing to buy without opening a transaction session?!");
+            return new ErrorMessage("Proposing to buy without opening a session?!");
         }
         if (!session.getBuy()) {
             return new ErrorMessage("Proposing to buy in a session where buying is not allowed.");
@@ -1596,19 +1596,19 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Close a transaction.
+     * Close a session.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
-    public ChangeSet closeTransaction(ServerPlayer serverPlayer, Unit unit,
-                                      Settlement settlement) {
+    public ChangeSet closeSession(ServerPlayer serverPlayer, Unit unit,
+                                  Settlement settlement) {
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
-            return serverPlayer.clientError("No such transaction session.");
+            return serverPlayer.clientError("No such session.");
         }
 
         ChangeSet cs = new ChangeSet();
@@ -1956,7 +1956,7 @@ public final class InGameController extends Controller {
                                              Unit unit, Settlement settlement,
                                              Goods goods) {
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
             return serverPlayer.clientError("Trying to deliver gift without opening a session");
         }
@@ -2149,8 +2149,8 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         TradeStatus status = agreement.getStatus();
         DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class,
-                                        ourUnit, otherColony);
+            = Session.lookup(DiplomacySession.class,
+                             ourUnit, otherColony);
         if (session == null) {
             if (status != TradeStatus.PROPOSE_TRADE) {
                 return serverPlayer.clientError("Mission uc-diplomacy session for "
@@ -2181,9 +2181,8 @@ public final class InGameController extends Controller {
     public ChangeSet diplomacy(ServerPlayer serverPlayer, Colony ourColony,
                                Unit otherUnit, DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class,
-                                        otherUnit, ourColony);
+        DiplomacySession session = Session.lookup(DiplomacySession.class,
+            otherUnit, ourColony);
         if (session == null) {
             return serverPlayer.clientError("Mission cu-diplomacy session for "
                 + otherUnit.getId() + "/" + ourColony.getId()
@@ -2662,12 +2661,11 @@ public final class InGameController extends Controller {
                                           Unit ourUnit, Unit otherUnit,
                                           DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class, 
-                                        ourUnit, otherUnit);
+        DiplomacySession session = Session.lookup(DiplomacySession.class, 
+                                                  ourUnit, otherUnit);
         if (session == null) {
-            session = TransactionSession.lookup(DiplomacySession.class,
-                                                otherUnit, ourUnit);
+            session = Session.lookup(DiplomacySession.class,
+                                     otherUnit, ourUnit);
         }
         if (session == null) {
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
@@ -2703,9 +2701,8 @@ public final class InGameController extends Controller {
                                           Unit ourUnit, Colony otherColony,
                                           DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class,
-                                        ourUnit, otherColony);
+        DiplomacySession session = Session.lookup(DiplomacySession.class,
+                                                  ourUnit, otherColony);
         if (session == null) {
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
                 return serverPlayer.clientError("Missing uc1-diplomacy session for "
@@ -2740,9 +2737,8 @@ public final class InGameController extends Controller {
                                           Colony ourColony, Unit otherUnit,
                                           DiplomaticTrade agreement) {
         ChangeSet cs = new ChangeSet();
-        DiplomacySession session
-            = TransactionSession.lookup(DiplomacySession.class,
-                                        otherUnit, ourColony);
+        DiplomacySession session = Session.lookup(DiplomacySession.class,
+                                                  otherUnit, ourColony);
         if (session == null) {
             return serverPlayer.clientError("Missing cu1-diplomacy session for "
                 + ourColony.getId() + "," + otherUnit.getId()
@@ -2799,18 +2795,17 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Gets a settlement transaction session, either existing or
-     * newly opened.
+     * Gets a settlement session, either existing or newly opened.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
-    public ChangeSet getTransaction(ServerPlayer serverPlayer, Unit unit,
-                                    Settlement settlement) {
+    public ChangeSet getSession(ServerPlayer serverPlayer, Unit unit,
+                                Settlement settlement) {
         ChangeSet cs = new ChangeSet();
-        NativeTradeSession session = TransactionSession.lookup(NativeTradeSession.class,
+        NativeTradeSession session = Session.lookup(NativeTradeSession.class,
             unit, settlement);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
@@ -3139,8 +3134,8 @@ public final class InGameController extends Controller {
      */
     public ChangeSet lootCargo(ServerPlayer serverPlayer, Unit winner,
                                String loserId, List<Goods> loot) {
-        LootSession session = TransactionSession.lookup(LootSession.class,
-            winner.getId(), loserId);
+        LootSession session = Session.lookup(LootSession.class,
+                                             winner.getId(), loserId);
         if (session == null) {
             return serverPlayer.clientError("Bogus looting!");
         }
@@ -3185,7 +3180,7 @@ public final class InGameController extends Controller {
      */
     public ChangeSet monarchAction(ServerPlayer serverPlayer,
                                    MonarchAction action, boolean result) {
-        MonarchSession session = TransactionSession.lookup(MonarchSession.class,
+        MonarchSession session = Session.lookup(MonarchSession.class,
             serverPlayer.getId(), "");
         if (session == null) {
             return serverPlayer.clientError("Bogus monarch action: " + action);
@@ -3341,8 +3336,7 @@ public final class InGameController extends Controller {
             if (tile != null) {
                 Unit u = tile.getFirstUnit();
                 Settlement s = tile.getOwningSettlement();
-                DiplomacySession session
-                    = TransactionSession.lookup(DiplomacySession.class, u, s);
+                DiplomacySession session = Session.lookup(DiplomacySession.class, u, s);
                 if (session == null) {
                     return serverPlayer.clientError("No diplomacy in effect for: "
                         + tile.getId());
@@ -3762,9 +3756,9 @@ public final class InGameController extends Controller {
     public DOMMessage sellProposition(ServerPlayer serverPlayer,
         Unit unit, Settlement settlement, Goods goods, int price) {
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
-            return new ErrorMessage("Proposing to sell without opening a transaction session");
+            return new ErrorMessage("Proposing to sell without opening a session");
         }
         if (!session.getSell()) {
             return new ErrorMessage("Proposing to sell in a session where selling is not allowed.");
@@ -3800,9 +3794,9 @@ public final class InGameController extends Controller {
         csVisit(serverPlayer, settlement, 0, cs);
 
         NativeTradeSession session
-            = TransactionSession.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, settlement);
         if (session == null) {
-            return serverPlayer.clientError("Trying to sell without opening a transaction session");
+            return serverPlayer.clientError("Trying to sell without opening a session");
         }
         if (!session.getSell()) {
             return serverPlayer.clientError("Trying to sell in a session where selling is not allowed.");

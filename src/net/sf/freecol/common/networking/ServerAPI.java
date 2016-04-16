@@ -480,15 +480,15 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to close a transaction session for a trade.
+     * Server query-response to close a session for a trade.
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @return True if the server interaction succeeded.
      */
-    public boolean closeTransactionSession(Unit unit, Settlement settlement) {
+    public boolean closeSession(Unit unit, Settlement settlement) {
         return askHandling(unit.getGame(),
-            new CloseTransactionMessage(unit, settlement), null);
+            new CloseSessionMessage(unit, settlement), null);
     }
 
     /**
@@ -960,16 +960,16 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to get the transaction session for a trade.
+     * Server query-response to get the session for a trade.
      *
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @return An array of booleans for the buy/sell/gift status,
      *     or null if the server interaction failed.
      */
-    public boolean[] openTransactionSession(Unit unit, Settlement settlement) {
+    public boolean[] openSession(Unit unit, Settlement settlement) {
         Element reply = askExpecting(unit.getGame(),
-            new GetTransactionMessage(unit, settlement),
+            new GetSessionMessage(unit, settlement),
             null);
         return new boolean[] {
             DOMMessage.getBooleanAttribute(reply, "canBuy", false),

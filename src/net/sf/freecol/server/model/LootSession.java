@@ -30,7 +30,7 @@ import net.sf.freecol.server.control.ChangeSet;
 /**
  * A type of session to handle looting of cargo.
  */
-public class LootSession extends TransactionSession {
+public class LootSession extends Session {
 
     private static final Logger logger = Logger.getLogger(LootSession.class.getName());
 

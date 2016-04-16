@@ -90,7 +90,7 @@ import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.model.TransactionSession;
+import net.sf.freecol.server.model.Session;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
 
@@ -264,7 +264,7 @@ public final class FreeColServer {
 
         this.game = loadGame(savegame, specification, server);
         // NationOptions will be read from the saved game.
-        TransactionSession.clearAll();
+        Session.clearAll();
 
         // Replace the PRNG in the game if it is missing or a command line
         // option was present.

@@ -41,7 +41,7 @@ import net.sf.freecol.common.networking.ChangeWorkTypeMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
-import net.sf.freecol.common.networking.CloseTransactionMessage;
+import net.sf.freecol.common.networking.CloseSessionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -57,7 +57,7 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GetTransactionMessage;
+import net.sf.freecol.common.networking.GetSessionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
@@ -241,12 +241,12 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new ClearSpecialityMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(CloseTransactionMessage.getTagName(),
+        register(CloseSessionMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new CloseTransactionMessage(getGame(), element)
+                return new CloseSessionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(DeclareIndependenceMessage.getTagName(),
@@ -338,12 +338,12 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new EquipForRoleMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(GetTransactionMessage.getTagName(),
+        register(GetSessionMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
             public Element handle(Player player, Connection connection,
                                   Element element) {
-                return new GetTransactionMessage(getGame(), element)
+                return new GetSessionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(GoodsForSaleMessage.getTagName(),

@@ -29,7 +29,7 @@ import net.sf.freecol.server.control.ChangeSet;
 /**
  * A type of session to handle trading with a native settlement.
  */
-public class NativeTradeSession extends TransactionSession {
+public class NativeTradeSession extends Session {
 
     private static final Logger logger = Logger.getLogger(NativeTradeSession.class.getName());
 

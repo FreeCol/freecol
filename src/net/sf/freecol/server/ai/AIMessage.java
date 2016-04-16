@@ -159,16 +159,16 @@ public class AIMessage {
     }
 
     /**
-     * An AIUnit closes a transaction.
+     * An AIUnit closes a session.
      *
      * @param aiUnit The <code>AIUnit</code> that closes the transaction.
      * @param settlement The target <code>Settlement</code>.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askCloseTransaction(AIUnit aiUnit,
-                                              Settlement settlement) {
+    public static boolean askCloseSession(AIUnit aiUnit,
+                                          Settlement settlement) {
         return aiUnit.getAIOwner().askServer()
-            .closeTransactionSession(aiUnit.getUnit(), settlement);
+            .closeSession(aiUnit.getUnit(), settlement);
     }
 
     /**
@@ -286,16 +286,16 @@ public class AIMessage {
     }
 
     /**
-     * An AIUnit gets a transaction.
+     * An AIUnit opens a session.
      *
-     * @param aiUnit The <code>AIUnit</code> that gets a transaction.
+     * @param aiUnit The <code>AIUnit</code> that gets a session.
      * @param settlement The target <code>Settlement</code>.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askGetTransaction(AIUnit aiUnit,
-                                            Settlement settlement) {
+    public static boolean askGetSession(AIUnit aiUnit,
+                                        Settlement settlement) {
         return aiUnit.getAIOwner().askServer()
-            .openTransactionSession(aiUnit.getUnit(), settlement) != null;
+            .openSession(aiUnit.getUnit(), settlement) != null;
     }
 
     /**
