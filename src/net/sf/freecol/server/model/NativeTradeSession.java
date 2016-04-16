@@ -21,7 +21,8 @@ package net.sf.freecol.server.model;
 
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.control.ChangeSet;
 
@@ -39,30 +40,22 @@ public class NativeTradeSession extends Session {
     /** Whether any action has been taken in this session. */
     private boolean actionTaken;
 
-    /** Whether buying is still valid in this session. */
-    private boolean canBuy;
-
-    /** Whether selling is still valid in this session. */
-    private boolean canSell;
-
-    /** Whether giving a gift is still valid in this session. */
-    private boolean canGift;
+    /** The native trade information. */
+    private NativeTrade nt;
 
 
     /**
      * Creates a new <code>NativeTradeSession</code>.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> to trade with.
+     * @param is The <code>IndianSettlement</code> to trade with.
      */
-    public NativeTradeSession(Unit unit, Settlement settlement) {
-        super(makeSessionKey(NativeTradeSession.class, unit, settlement));
-        movesLeft = unit.getMovesLeft();
-        actionTaken = false;
-        boolean atWar = settlement.getOwner().atWarWith(unit.getOwner());
-        canBuy = !atWar;
-        canSell = !atWar && unit.hasGoodsCargo();
-        canGift = unit.hasGoodsCargo();
+    public NativeTradeSession(Unit unit, IndianSettlement is) {
+        super(makeSessionKey(NativeTradeSession.class, unit, is));
+
+        this.movesLeft = unit.getMovesLeft();
+        this.actionTaken = false;
+        this.nt = new NativeTrade(unit, is);
     }
 
     @Override
@@ -71,37 +64,41 @@ public class NativeTradeSession extends Session {
     }
 
     public int getMovesLeft() {
-        return movesLeft;
+        return this.movesLeft;
     }
 
     public boolean getActionTaken() {
-        return actionTaken;
+        return this.actionTaken;
     }
 
     public boolean getBuy() {
-        return canBuy;
+        return this.nt.getBuy();
     }
 
     public boolean getSell() {
-        return canSell;
+        return this.nt.getSell();
     }
 
     public boolean getGift() {
-        return canGift;
+        return this.nt.getGift();
     }
 
     public void setBuy() {
-        actionTaken = true;
-        canBuy = false;
+        this.actionTaken = true;
+        this.nt.setBuy(false);
     }
 
     public void setSell() {
-        actionTaken = true;
-        canSell = false;
+        this.actionTaken = true;
+        this.nt.setSell(false);
     }
 
     public void setGift() {
-        actionTaken = true;
-        canGift = false;
+        this.actionTaken = true;
+        this.nt.setGift(false);
+    }
+
+    public boolean getDone() {
+        return this.nt.getDone();
     }
 }

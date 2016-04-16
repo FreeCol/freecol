@@ -42,7 +42,7 @@ public class GetSessionMessage extends DOMMessage {
     private final String unitId;
 
     /**
-     * The object identifier of the settlement at which the
+     * The object identifier of the native settlement at which the
      * session occurs.
      */
     private final String settlementId;

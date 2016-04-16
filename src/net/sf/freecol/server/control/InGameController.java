@@ -2800,20 +2800,20 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet getSession(ServerPlayer serverPlayer, Unit unit,
-                                Settlement settlement) {
+                                IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
         NativeTradeSession session = Session.lookup(NativeTradeSession.class,
-            unit, settlement);
+                                                    unit, is);
         if (session == null) {
             if (unit.getMovesLeft() <= 0) {
                 return serverPlayer.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            session = new NativeTradeSession(unit, settlement);
+            session = new NativeTradeSession(unit, is);
             // Sets unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
             // closing the session
