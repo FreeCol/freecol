@@ -330,15 +330,15 @@ public class CombatTest extends FreeColTestCase {
 
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(inca)
+        IndianSettlement is = builder.player(inca)
             .settlementTile(tile1).skillToTeach(null).capital(true).build();
 
-        Unit defender = new ServerUnit(game, settlement, inca, braveType,
+        Unit defender = new ServerUnit(game, is, inca, braveType,
                                        nativeDragoonRole);
         Unit attacker = new ServerUnit(game, tile2, dutch, colonistType,
                                        dragoonRole);
         for (AbstractGoods ag : nativeDragoonRole.getRequiredGoods()) {
-            settlement.addGoods(ag);
+            is.addGoods(ag);
         }
 
         Set<Modifier> defenceModifiers = combatModel
@@ -559,7 +559,7 @@ public class CombatTest extends FreeColTestCase {
                                          jesuitMissionaryType, missionaryRole);
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(inca)
+        IndianSettlement is = builder.player(inca)
             .settlementTile(tile1).skillToTeach(null).capital(true)
             .initialBravesInCamp(8).missionary(missionary).build();
 
@@ -569,7 +569,7 @@ public class CombatTest extends FreeColTestCase {
 
         Unit soldier = new ServerUnit(game, tile2, dutch, veteranType,
                                       soldierRole);
-        Unit defender = settlement.getDefendingUnit(soldier);
+        Unit defender = is.getDefendingUnit(soldier);
         assertNotNull(defender);
         assertTrue(defender.getOwner().isIndian());
         

@@ -126,10 +126,10 @@ public class SellPropositionMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        IndianSettlement settlement;
+        IndianSettlement is;
         try {
-            settlement = unit
-                .getAdjacentIndianSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -144,8 +144,7 @@ public class SellPropositionMessage extends DOMMessage {
 
         // Proceed to price.
         return server.getInGameController()
-            .sellProposition(serverPlayer, unit, settlement,
-                             this.goods, getGold())
+            .sellProposition(serverPlayer, unit, is, this.goods, getGold())
             .toXMLElement();
     }
 

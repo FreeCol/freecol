@@ -676,12 +676,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Clean up missions and remove tension/alarm/stance.
         for (Player other : getGame().getLivePlayers(this)) {
             if (isEuropean() && other.isIndian()) {
-                for (IndianSettlement s : other.getIndianSettlements()) {
-                    if (s.hasMissionary(this)) {
-                        ((ServerIndianSettlement)s).csKillMissionary(null, cs);
-                    }
-                    s.getTile().cacheUnseen();//+til
-                    ((ServerIndianSettlement)s).removeAlarm(this);//-til
+                for (IndianSettlement is : other.getIndianSettlements()) {
+                    ServerIndianSettlement sis = (ServerIndianSettlement)is;
+                    if (is.hasMissionary(this)) sis.csKillMissionary(null, cs);
+                    is.getTile().cacheUnseen();//+til
+                    sis.removeAlarm(this);//-til
                 }
                 other.removeTension(this);
             }
@@ -1956,27 +1955,26 @@ outer:  for (Effect effect : effects) {
             List<IndianSettlement> allSettlements = getIndianSettlements();
             java.util.Map<IndianSettlement,
                 java.util.Map<Player, Tension.Level>> oldLevels = new HashMap<>();
-            for (IndianSettlement settlement : allSettlements) {
+            for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel = new HashMap<>();
-                oldLevels.put(settlement, oldLevel);
+                oldLevels.put(is, oldLevel);
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
-                    Tension alarm = settlement.getAlarm(enemy);
+                    Tension alarm = is.getAlarm(enemy);
                     oldLevel.put(enemy,
                         (alarm == null) ? null : alarm.getLevel());
                 }
             }
 
             // Do the settlement alarms first.
-            for (IndianSettlement settlement : allSettlements) {
+            for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Integer> extra = new HashMap<>();
                 for (Player enemy : game.getLiveEuropeanPlayers(this)) {
                     extra.put(enemy, 0);
                 }
 
                 // Look at the uses of tiles surrounding the settlement.
-                int alarmRadius = settlement.getRadius() + ALARM_RADIUS;
-                for (Tile tile: settlement.getTile()
-                         .getSurroundingTiles(alarmRadius)) {
+                int alarmRadius = is.getRadius() + ALARM_RADIUS;
+                for (Tile tile : is.getTile().getSurroundingTiles(alarmRadius)) {
                     Colony colony = tile.getColony();
                     if (tile.getFirstUnit() != null) { // Military units
                         Player enemy =  tile.getFirstUnit().getOwner();
@@ -2002,8 +2000,8 @@ outer:  for (Effect effect : effects) {
                     }
                 }
                 // Missionary helps reducing alarm a bit
-                if (settlement.hasMissionary()) {
-                    Unit missionary = settlement.getMissionary();
+                if (is.hasMissionary()) {
+                    Unit missionary = is.getMissionary();
                     int missionAlarm = getGame().getSpecification()
                         .getInteger(GameOptions.MISSION_INFLUENCE);
                     if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
@@ -2021,7 +2019,7 @@ outer:  for (Effect effect : effects) {
                         change = (int)player.applyModifiers((float)change,
                             game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);
                         ServerIndianSettlement sis
-                            = (ServerIndianSettlement)settlement;
+                            = (ServerIndianSettlement)is;
                         sis.csModifyAlarm(player, change,
                                           true, cs);//+til
                     }
@@ -2039,40 +2037,39 @@ outer:  for (Effect effect : effects) {
             // Now collect the settlements that changed.
             // Update those that changed, and add messages for selected
             // worsening relation transitions.
-            for (IndianSettlement settlement : allSettlements) {
+            for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel
-                    = oldLevels.get(settlement);
+                    = oldLevels.get(is);
                 for (Entry<Player, Tension.Level> entry : oldLevel.entrySet()) {
                     Player enemy = entry.getKey();
-                    Tension newTension = settlement.getAlarm(enemy);
+                    Tension newTension = is.getAlarm(enemy);
                     Tension.Level newLevel = (newTension == null) ? null
                         : newTension.getLevel();
                     if (entry.getValue() == null
                         || entry.getValue() == newLevel
-                        || !settlement.hasContacted(enemy)
-                        || !enemy.hasExplored(settlement.getTile()))
+                        || !is.hasContacted(enemy)
+                        || !enemy.hasExplored(is.getTile()))
                         continue;
-                    cs.add(See.only(null).perhaps((ServerPlayer)enemy),
-                           settlement);
+                    cs.add(See.only(null).perhaps((ServerPlayer)enemy), is);
                     // No messages about improving tension
                     if (newLevel == null
                         || (entry.getValue() != null 
                             && entry.getValue().getLimit()
                             > newLevel.getLimit())) continue;
                     String key = "model.player.alarmIncrease."
-                        + settlement.getAlarm(enemy).getKey();
+                        + is.getAlarm(enemy).getKey();
                     if (!Messages.containsKey(key)) continue;
                     cs.addMessage(See.only((ServerPlayer)enemy),
                         new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                         key, settlement)
+                                         key, is)
                             .addStringTemplate("%nation%", getNationLabel())
                             .addStringTemplate("%enemy%", enemy.getNationLabel())
-                            .addName("%settlement%", settlement.getName()));
+                            .addName("%settlement%", is.getName()));
                 }
             }
 
-            for (IndianSettlement settlement : allSettlements) {
-                ((ServerIndianSettlement)settlement).csStartTurn(random, cs);
+            for (IndianSettlement is : allSettlements) {
+                ((ServerIndianSettlement)is).csStartTurn(random, cs);
             }
         }
     }
@@ -2313,13 +2310,13 @@ outer:  for (Effect effect : effects) {
             owner.modifyGold(price);
             cs.addPartial(See.only(this), this, "gold");
         } else if (price < 0 && owner.isIndian()) {
-            ServerIndianSettlement is = (ServerIndianSettlement)ownerSettlement;
-            if (is == null) {
+            ServerIndianSettlement sis = (ServerIndianSettlement)ownerSettlement;
+            if (sis == null) {
                 owner.csModifyTension(this, Tension.TENSION_ADD_LAND_TAKEN,
                                       cs);
             } else {
-                is.csModifyAlarm(this, Tension.TENSION_ADD_LAND_TAKEN,
-                                 true, cs);
+                sis.csModifyAlarm(this, Tension.TENSION_ADD_LAND_TAKEN,
+                                  true, cs);
             }
         }
         logger.finest(this.getName() + " claimed " + tile
@@ -2922,32 +2919,32 @@ outer:  for (Effect effect : effects) {
      * Burns a players missions.
      *
      * @param attacker The <code>Unit</code> that attacked.
-     * @param settlement The <code>IndianSettlement</code> that was attacked.
+     * @param is The <code>IndianSettlement</code> that was attacked.
      * @param cs The <code>ChangeSet</code> to update.
      */
-    private void csBurnMissions(Unit attacker, IndianSettlement settlement,
+    private void csBurnMissions(Unit attacker, IndianSettlement is,
                                 ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationLabel();
-        ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
+        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         StringTemplate nativeNation = nativePlayer.getNationLabel();
 
         // Message only for the European player
         cs.addMessage(See.only(attackerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             "combat.burnMissions", attacker, settlement)
+                             "combat.burnMissions", attacker, is)
                 .addStringTemplate("%nation%", attackerNation)
                 .addStringTemplate("%enemyNation%", nativeNation));
 
         // Burn down the missions
-        boolean here = settlement.hasMissionary(attackerPlayer);
+        boolean here = is.hasMissionary(attackerPlayer);
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
             if (s.hasMissionary(attackerPlayer)) {
                 ((ServerIndianSettlement)s).csKillMissionary(null, cs);
             }
         }
         // Backtrack on updating this tile, avoiding duplication in csCombat
-        if (here) cs.remove(settlement.getTile());
+        if (here) cs.remove(is.getTile());
     }
 
     /**
@@ -3152,14 +3149,14 @@ outer:  for (Effect effect : effects) {
                 // back to a potentially remote settlement is pretty
                 // dubious.  Apparently Col1 did it.  Better would be
                 // to give the capturing unit a go-home-with-plunder mission.
-                IndianSettlement settlement = winner.getHomeIndianSettlement();
-                if (settlement != null) {
+                IndianSettlement is = winner.getHomeIndianSettlement();
+                if (is != null) {
                     for (AbstractGoods ag : newGoods) {
-                        settlement.addGoods(ag);
+                        is.addGoods(ag);
                         winnerPlayer.logCheat("teleported " + ag
-                            + " back to " + settlement.getName());
+                            + " back to " + is.getName());
                     }
-                    cs.add(See.only(winnerPlayer), settlement);
+                    cs.add(See.only(winnerPlayer), is);
                 }
             }
         }
@@ -3466,33 +3463,32 @@ outer:  for (Effect effect : effects) {
     /**
      * Destroys an Indian settlement.
      *
-     * @param attacker an <code>Unit</code> value
-     * @param settlement an <code>IndianSettlement</code> value
+     * @param attacker The attacking <code>Unit</code>.
+     * @param is An <code>IndianSettlement</code> to destroy.
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDestroySettlement(Unit attacker,
-                                     IndianSettlement settlement,
+    private void csDestroySettlement(Unit attacker, IndianSettlement is,
                                      Random random, ChangeSet cs) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        Tile tile = settlement.getTile();
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
+        Tile tile = is.getTile();
+        ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
+        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationLabel();
         StringTemplate nativeNation = nativePlayer.getNationLabel();
-        String settlementName = settlement.getName();
-        boolean capital = settlement.isCapital();
-        int plunder = settlement.getPlunder(attacker, random);
+        String settlementName = is.getName();
+        boolean capital = is.isCapital();
+        int plunder = is.getPlunder(attacker, random);
 
         // Remaining units lose their home.
-        for (Unit u : settlement.getOwnedUnits()) {
+        for (Unit u : is.getOwnedUnits()) {
             u.setHomeIndianSettlement(null);
             cs.add(See.only(nativePlayer), u);
         }
                 
         // Destroy the settlement, update settlement tiles.
-        csDisposeSettlement(settlement, cs);
+        csDisposeSettlement(is, cs);
 
         // Make the treasure train if there is treasure.
         if (plunder > 0) {

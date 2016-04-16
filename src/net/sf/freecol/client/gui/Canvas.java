@@ -1848,10 +1848,10 @@ public final class Canvas extends JDesktopPane {
     /**
      * Display the EditSettlementDialog.
      *
-     * @param settlement The <code>IndianSettlement</code> to edit.
+     * @param is The <code>IndianSettlement</code> to edit.
      */
-    void showEditSettlementDialog(IndianSettlement settlement) {
-        showFreeColDialog(new EditSettlementDialog(freeColClient, frame, settlement),
+    void showEditSettlementDialog(IndianSettlement is) {
+        showFreeColDialog(new EditSettlementDialog(freeColClient, frame, is),
                           null);
     }
 
@@ -2020,12 +2020,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the panel of the given native settlement.
      *
-     * @param indianSettlement The <code>IndianSettlement</code> to display.
+     * @param is The <code>IndianSettlement</code> to display.
      */
-    void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+    void showIndianSettlementPanel(IndianSettlement is) {
         IndianSettlementPanel panel
-            = new IndianSettlementPanel(freeColClient, indianSettlement);
-        showFreeColPanel(panel, indianSettlement.getTile(), true);
+            = new IndianSettlementPanel(freeColClient, is);
+        showFreeColPanel(panel, is.getTile(), true);
     }
 
     /**

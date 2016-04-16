@@ -459,18 +459,18 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Adds an indian settlement entry to this popup.
      *
-     * @param settlement The Indian settlement that will be
+     * @param is The <code>IndianSettlement</code> that will be
      *     represented on the popup.
      */
-    private void addIndianSettlement(final IndianSettlement settlement) {
+    private void addIndianSettlement(final IndianSettlement is) {
         StringTemplate name
-            = settlement.getLocationLabelFor(freeColClient.getMyPlayer());
+            = is.getLocationLabelFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = Utility.localizedMenuItem(name);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,
             gui.getImageLibrary().getScaleFactor()));
         menuItem.addActionListener((ActionEvent ae) -> {
-                gui.showIndianSettlementPanel(settlement);
+                gui.showIndianSettlementPanel(is);
             });
         add(menuItem);
         hasAnItem = true;

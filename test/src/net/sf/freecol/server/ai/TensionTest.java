@@ -72,17 +72,18 @@ public class TensionTest extends FreeColTestCase {
         Tile tile = map.getTile(6, 9);
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(indian).settlementTile(tile).skillToTeach(null).capital(true).build();
+        IndianSettlement is = builder.player(indian).settlementTile(tile)
+            .skillToTeach(null).capital(true).build();
 
-        int unitCount = settlement.getType().getMaximumSize();
+        int unitCount = is.getType().getMaximumSize();
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = spec().getDefaultUnitType(indian);
-            Unit unit = new ServerUnit(game, settlement, indian, unitType);
-            unit.setHomeIndianSettlement(settlement);
+            Unit unit = new ServerUnit(game, is, indian, unitType);
+            unit.setHomeIndianSettlement(is);
             if (i == 0) {
                 unit.setLocation(tile);
             } else {
-                unit.setLocation(settlement);
+                unit.setLocation(is);
             }
         }
         Player.makeContact(indian, european);
@@ -111,7 +112,7 @@ public class TensionTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, stance);
 
         // ask the AI to secure the settlement
-        indianAI.secureIndianSettlement(settlement, new LogBuilder(0));
+        indianAI.secureIndianSettlement(is, new LogBuilder(0));
 
         // the tension and stance have not changed
         tension = indian.getTension(european);

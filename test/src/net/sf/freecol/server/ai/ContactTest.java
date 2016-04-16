@@ -173,7 +173,8 @@ public class ContactTest extends FreeColTestCase {
         assertFalse(dutch.hasContacted(iroquois));
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(iroquois).settlementTile(tile3).skillToTeach(null).build();
+        IndianSettlement is = builder.player(iroquois).settlementTile(tile3)
+            .skillToTeach(null).build();
         ServerUnit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         colonist.setState(Unit.UnitState.FORTIFYING);
         colonist.setState(Unit.UnitState.FORTIFIED);
@@ -185,7 +186,7 @@ public class ContactTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, dutch.getStance(iroquois));
 
         assertNotNull(iroquois.getTension(dutch));
-        assertNotNull(settlement.getAlarm(dutch));
+        assertNotNull(is.getAlarm(dutch));
     }
 
     public void testNativeMeetsEuropean() throws Exception {

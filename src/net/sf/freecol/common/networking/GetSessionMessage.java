@@ -20,8 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -50,17 +50,17 @@ public class GetSessionMessage extends DOMMessage {
 
     /**
      * Create a new <code>GetSessionMessage</code> with the
-     * supplied unit and settlement.
+     * supplied unit and native settlement.
      *
      * @param unit The <code>Unit</code> performing the session.
-     * @param settlement The <code>Settlement</code> where the
+     * @param is The <code>IndianSettlement</code> where the
      *     session occurs.
      */
-    public GetSessionMessage(Unit unit, Settlement settlement) {
+    public GetSessionMessage(Unit unit, IndianSettlement is) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
     }
 
     /**
@@ -99,16 +99,17 @@ public class GetSessionMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Settlement settlement;
+        IndianSettlement is;
         try {
-            settlement = unit.getAdjacentSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         return server.getInGameController()
-            .getSession(serverPlayer, unit, settlement)
+            .getSession(serverPlayer, unit, is)
             .build(serverPlayer);
     }
 

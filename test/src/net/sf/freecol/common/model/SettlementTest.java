@@ -54,30 +54,30 @@ public class SettlementTest extends FreeColTestCase {
 
         Player arawak = game.getPlayerByNationId("model.nation.arawak");
         builder.player(arawak);
-        IndianSettlement settlement = builder.build();
+        IndianSettlement is = builder.build();
         assertEquals(1, arawak.getNationType().getSettlementType(false).getClaimableRadius());
-        assertEquals(1, settlement.getType().getClaimableRadius());
-        settlement.dispose();
+        assertEquals(1, is.getType().getClaimableRadius());
+        is.dispose();
 
         builder.capital(true);
-        settlement = builder.build();
+        is = builder.build();
         assertEquals(2, arawak.getNationType().getCapitalType().getClaimableRadius());
-        assertEquals(2, settlement.getType().getClaimableRadius());
-        settlement.dispose();
+        assertEquals(2, is.getType().getClaimableRadius());
+        is.dispose();
 
         Player inca = game.getPlayerByNationId("model.nation.inca");
         builder.player(inca);
         builder.capital(false);
-        settlement = builder.build();
+        is = builder.build();
         assertEquals(2, inca.getNationType().getSettlementType(false).getClaimableRadius());
-        assertEquals(2, settlement.getType().getClaimableRadius());
-        settlement.dispose();
+        assertEquals(2, is.getType().getClaimableRadius());
+        is.dispose();
 
         builder.capital(true);
-        settlement = builder.build();
+        is = builder.build();
         assertEquals(3, inca.getNationType().getCapitalType().getClaimableRadius());
-        assertEquals(3, settlement.getType().getClaimableRadius());
-        settlement.dispose();
+        assertEquals(3, is.getType().getClaimableRadius());
+        is.dispose();
     }
 
     public void testColonyRadius() {
@@ -105,10 +105,10 @@ public class SettlementTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder =
             new FreeColTestCase.IndianSettlementBuilder(game);
 
-        IndianSettlement settlement = builder.build();
-        for (Tile tile : settlement.getTile().getSurroundingTiles(1)) {
-            assertEquals(tile.isLand(), tile.getOwner() == settlement.getOwner());
-            assertEquals(tile.isLand(), tile.getOwningSettlement() == settlement);
+        IndianSettlement is = builder.build();
+        for (Tile tile : is.getTile().getSurroundingTiles(1)) {
+            assertEquals(tile.isLand(), tile.getOwner() == is.getOwner());
+            assertEquals(tile.isLand(), tile.getOwningSettlement() == is);
         }
     }
 
@@ -190,29 +190,29 @@ public class SettlementTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game)
             .player(arawak).initialBravesInCamp(4);
-        IndianSettlement settlement = builder.build();
+        IndianSettlement is = builder.build();
 
-        Unit brave = settlement.getUnitList().get(0);
-        assertNull(settlement.canImproveUnitMilitaryRole(brave));
+        Unit brave = is.getUnitList().get(0);
+        assertNull(is.canImproveUnitMilitaryRole(brave));
         
-        settlement.addGoods(horsesType, 20);
-        assertNull(settlement.canImproveUnitMilitaryRole(brave));
+        is.addGoods(horsesType, 20);
+        assertNull(is.canImproveUnitMilitaryRole(brave));
 
-        settlement.addGoods(horsesType, 10); // avoid breeding number
+        is.addGoods(horsesType, 10); // avoid breeding number
         assertEquals(mountedBraveRole,
-                     settlement.canImproveUnitMilitaryRole(brave));
+                     is.canImproveUnitMilitaryRole(brave));
 
-        assertTrue(settlement.equipForRole(brave, mountedBraveRole, 1));
-        assertNull(settlement.canImproveUnitMilitaryRole(brave));
+        assertTrue(is.equipForRole(brave, mountedBraveRole, 1));
+        assertNull(is.canImproveUnitMilitaryRole(brave));
 
-        settlement.addGoods(horsesType, 100);
-        assertNull(settlement.canImproveUnitMilitaryRole(brave));
+        is.addGoods(horsesType, 100);
+        assertNull(is.canImproveUnitMilitaryRole(brave));
 
-        settlement.addGoods(musketsType, 100);
+        is.addGoods(musketsType, 100);
         assertEquals(nativeDragoonRole,
-                     settlement.canImproveUnitMilitaryRole(brave));
+                     is.canImproveUnitMilitaryRole(brave));
 
-        assertTrue(settlement.equipForRole(brave, nativeDragoonRole, 1));
-        assertNull(settlement.canImproveUnitMilitaryRole(brave));
+        assertTrue(is.equipForRole(brave, nativeDragoonRole, 1));
+        assertNull(is.canImproveUnitMilitaryRole(brave));
     }
 }

@@ -82,11 +82,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         /**
          * Update the internal information from a native settlement.
          *
-         * @param indianSettlement The <code>IndianSettlement</code> to update.
+         * @param is The <code>IndianSettlement</code> to update.
          */
-        public void update(IndianSettlement indianSettlement) {
-            setValues(indianSettlement.getLearnableSkill(),
-                      indianSettlement.getWantedGoods());
+        public void update(IndianSettlement is) {
+            setValues(is.getLearnableSkill(), is.getWantedGoods());
         }
 
         /**

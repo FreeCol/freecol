@@ -228,8 +228,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * the Unit was removed.
      *
      * @param unit The <code>Unit</code> to be removed from the
-     *       list of the units this <code>IndianSettlement</code>
-     *       owns.
+     *     list of the units this <code>IndianSettlement</code> owns.
      * @return a <code>boolean</code> value
      */
     public boolean removeOwnedUnit(Unit unit) {
@@ -958,9 +957,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * FIXME: the hardwired goods/equipment types are a wart.
      *
-     * @param settlement The other <code>IndianSettlement</code> to trade with.
+     * @param is The other <code>IndianSettlement</code> to trade with.
      */
-    public void tradeGoodsWithSettlement(IndianSettlement settlement) {
+    public void tradeGoodsWithSettlement(IndianSettlement is) {
         GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
         GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
         List<GoodsType> goodsToTrade = new ArrayList<>();
@@ -973,7 +972,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 continue;
             }
             int goodsTraded = goodsInStock / 2;
-            settlement.addGoods(goods, goodsTraded);
+            is.addGoods(goods, goodsTraded);
             removeGoods(goods, goodsTraded);
         }
     }

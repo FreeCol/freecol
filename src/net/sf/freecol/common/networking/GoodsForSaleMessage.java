@@ -95,7 +95,8 @@ public class GoodsForSaleMessage extends DOMMessage {
     }
 
     public IndianSettlement getSettlement(Unit unit) {
-        return unit.getAdjacentIndianSettlementSafely(this.settlementId);
+        return unit.getAdjacentSettlement(this.settlementId,
+                                          IndianSettlement.class);
     }
 
     public List<Goods> getGoods() {
@@ -125,9 +126,9 @@ public class GoodsForSaleMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        IndianSettlement settlement;
+        IndianSettlement is;
         try {
-            settlement = getSettlement(unit);
+            is = getSettlement(unit);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -135,7 +136,7 @@ public class GoodsForSaleMessage extends DOMMessage {
 
         // Try to collect the goods for sale.
         return server.getInGameController()
-            .getGoodsForSale(serverPlayer, unit, settlement)
+            .getGoodsForSale(serverPlayer, unit, is)
             .toXMLElement();
     }
 

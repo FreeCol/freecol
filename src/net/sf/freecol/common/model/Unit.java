@@ -3675,61 +3675,36 @@ public class Unit extends GoodsLocation
      * @param settlementId The identifier of the
      *     <code>Settlement</code> to be found.
      * @return The settlement corresponding to the settlementId argument.
-     * @throws IllegalStateException on failure to validate the settlementId
-     *     in any way.
      */
-    public Settlement getAdjacentSettlementSafely(String settlementId)
-        throws IllegalStateException {
+    public <T extends Settlement> T getAdjacentSettlement(String settlementId,
+        Class<T> returnClass) {
         Game game = getOwner().getGame();
 
-        Settlement settlement = game.getFreeColGameObject(settlementId,
-                                                          Settlement.class);
-        if (settlement == null) {
+        T ret = game.getFreeColGameObject(settlementId, returnClass);
+        if (ret == null) {
             throw new IllegalStateException("Not a settlement: "
                 + settlementId);
-        } else if (settlement.getTile() == null) {
+        } else if (ret.getTile() == null) {
             throw new IllegalStateException("Settlement is not on the map: "
                 + settlementId);
+        } else if (!getOwner().hasContacted(ret.getOwner())) {
+            throw new IllegalStateException("Player has not contacted: "
+                + ret.getOwner().getId());
         }
 
         if (!hasTile()) {
             throw new IllegalStateException("Unit is not on the map: "
                 + getId());
-        } else if (getTile().getDistanceTo(settlement.getTile()) > 1) {
+        } else if (getTile().getDistanceTo(ret.getTile()) > 1) {
             throw new IllegalStateException("Unit " + getId()
                 + " is not adjacent to settlement: " + settlementId);
-        } else if (getOwner() == settlement.getOwner()) {
+        } else if (getOwner() == ret.getOwner()) {
             throw new IllegalStateException("Unit: " + getId()
                 + " and settlement: " + settlementId
                 + " are both owned by player: " + getOwner().getId());
         }
 
-        return settlement;
-    }
-
-    /**
-     * Get an adjacent Indian settlement by identifier, validating as
-     * much as possible, including checking whether the nation
-     * involved has been contacted.  Designed for message unpacking
-     * where the identifier should not be trusted.
-     *
-     * @param id The identifier of the <code>IndianSettlement</code>
-     *     to be found.
-     * @return The settlement corresponding to the settlementId argument.
-     * @throws IllegalStateException on failure to validate the settlementId
-     *     in any way.
-     */
-    public IndianSettlement getAdjacentIndianSettlementSafely(String id)
-        throws IllegalStateException {
-        Settlement settlement = getAdjacentSettlementSafely(id);
-        if (!(settlement instanceof IndianSettlement)) {
-            throw new IllegalStateException("Not an indianSettlement: " + id);
-        } else if (!getOwner().hasContacted(settlement.getOwner())) {
-            throw new IllegalStateException("Player has not contacted the "
-                + settlement.getOwner().getNation());
-        }
-
-        return (IndianSettlement)settlement;
+        return ret;
     }
 
 

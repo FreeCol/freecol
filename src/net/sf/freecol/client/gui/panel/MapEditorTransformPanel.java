@@ -353,14 +353,13 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             Player nativePlayer = getGame().getPlayerByNation(nativeNation);
             if (nativePlayer == null) return;
             String name = nativePlayer.getSettlementName(null);
-            ServerIndianSettlement settlement
+            ServerIndianSettlement sis
                 = new ServerIndianSettlement(t.getGame(),
                     nativePlayer, name, t, false, skill, null);
-            nativePlayer.addSettlement(settlement);
-            settlement.placeSettlement(true);
-            settlement.addUnits(null);
-            logger.info("Add settlement " + settlement.getName()
-                + " to tile " + t);
+            nativePlayer.addSettlement(sis);
+            sis.placeSettlement(true);
+            sis.addUnits(null);
+            logger.info("Add settlement " + sis.getName() + " to tile " + t);
         }
     }
 }

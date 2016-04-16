@@ -20,8 +20,8 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -42,7 +42,7 @@ public class CloseSessionMessage extends DOMMessage {
     private final String unitId;
 
     /**
-     * The object identifier of the settlement at which the
+     * The object identifier of the native settlement at which the
      * session occurs.
      */
     private final String settlementId;
@@ -53,14 +53,14 @@ public class CloseSessionMessage extends DOMMessage {
      * supplied unit and settlement.
      *
      * @param unit The <code>Unit</code> performing the session.
-     * @param settlement The <code>Settlement</code> where the
+     * @param is The <code>IndianSettlement</code> where the
      *     session occurs.
      */
-    public CloseSessionMessage(Unit unit, Settlement settlement) {
+    public CloseSessionMessage(Unit unit, IndianSettlement is) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
     }
 
     /**
@@ -98,9 +98,10 @@ public class CloseSessionMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Settlement settlement;
+        IndianSettlement is;
         try {
-            settlement = unit.getAdjacentSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -108,7 +109,7 @@ public class CloseSessionMessage extends DOMMessage {
 
         // Proceed to close
         return server.getInGameController()
-            .closeSession(serverPlayer, unit, settlement)
+            .closeSession(serverPlayer, unit, is)
             .build(serverPlayer);
     }
 

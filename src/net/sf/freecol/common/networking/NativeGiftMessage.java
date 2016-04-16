@@ -97,7 +97,7 @@ public class NativeGiftMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = (Colony)unit.getAdjacentSettlementSafely(this.colonyId);
+            colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

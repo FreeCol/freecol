@@ -21,8 +21,8 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -53,14 +53,14 @@ public class DeliverGiftMessage extends DOMMessage {
      * Create a new <code>DeliverGiftMessage</code>.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to deliverGift.
      */
-    public DeliverGiftMessage(Unit unit, Settlement settlement, Goods goods) {
+    public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
         this.goods = goods;
     }
 
@@ -101,9 +101,9 @@ public class DeliverGiftMessage extends DOMMessage {
      *
      * @return The <code>Settlement</code>, or null if none.
      */
-    public Settlement getSettlement() {
+    public IndianSettlement getSettlement() {
         return this.goods.getGame().getFreeColGameObject(this.settlementId,
-                                                         Settlement.class);
+            IndianSettlement.class);
     }
 
     /**
@@ -139,9 +139,10 @@ public class DeliverGiftMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        Settlement settlement;
+        IndianSettlement is;
         try {
-            settlement = unit.getAdjacentSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -156,7 +157,7 @@ public class DeliverGiftMessage extends DOMMessage {
 
         // Proceed to deliver.
         return server.getInGameController()
-            .deliverGiftToSettlement(serverPlayer, unit, settlement, goods)
+            .deliverGiftToSettlement(serverPlayer, unit, is, goods)
             .build(serverPlayer);
     }
 

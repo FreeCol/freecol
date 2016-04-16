@@ -26,7 +26,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -61,17 +60,17 @@ public class InciteMessage extends DOMMessage {
      * supplied name.
      *
      * @param unit The inciting <code>Unit</code>.
-     * @param settlement The <code>IndianSettlement</code> to incite.
+     * @param is The <code>IndianSettlement</code> to incite.
      * @param enemy The enemy <code>Player</code>.
      * @param gold The amount of gold in the bribe (negative for the
      *             initial inquiry).
      */
-    public InciteMessage(Unit unit, IndianSettlement settlement, Player enemy,
+    public InciteMessage(Unit unit, IndianSettlement is, Player enemy,
                          int gold) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
         this.enemyId = enemy.getId();
         this.goldString = Integer.toString(gold);
     }
@@ -100,7 +99,8 @@ public class InciteMessage extends DOMMessage {
     }
 
     public IndianSettlement getSettlement(Unit unit) {
-        return unit.getAdjacentIndianSettlementSafely(this.settlementId);
+        return unit.getAdjacentSettlement(this.settlementId,
+                                          IndianSettlement.class);
     }
 
     public Player getEnemy(Game game) {
@@ -136,7 +136,7 @@ public class InciteMessage extends DOMMessage {
 
         IndianSettlement is;
         try {
-            is = (ServerIndianSettlement)getSettlement(unit);
+            is = getSettlement(unit);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

@@ -200,14 +200,7 @@ public class IndianDemandMessage extends DOMMessage {
 
         Colony colony;
         try {
-            Settlement settlement
-                = unit.getAdjacentSettlementSafely(this.colonyId);
-            if (!(settlement instanceof Colony)) {
-                return serverPlayer.clientError("Not a colony: "
-                    + this.colonyId)
-                    .build(serverPlayer);
-            }
-            colony = (Colony)settlement;
+            colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

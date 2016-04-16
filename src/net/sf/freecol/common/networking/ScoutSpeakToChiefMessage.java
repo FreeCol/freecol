@@ -60,15 +60,15 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      * Result is null in a request.
      *
      * @param unit The <code>Unit</code> that is learning.
-     * @param settlement The <code>IndianSettlement</code> to talk to.
+     * @param is The <code>IndianSettlement</code> to talk to.
      * @param result The result of speaking.
      */
-    public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement settlement,
+    public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement is,
                                     String result) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
         this.result = result;
     }
 
@@ -132,8 +132,8 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
 
         IndianSettlement is;
         try {
-            is = (IndianSettlement)unit
-                .getAdjacentIndianSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);

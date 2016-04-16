@@ -112,9 +112,9 @@ public class FreeColMapLoader implements MapLoader {
                                     }
                                     tile.setOwner(player);
                                     if (template.getOwningSettlement() != null) {
-                                        IndianSettlement settlement = (IndianSettlement) template.getOwningSettlement();
+                                        IndianSettlement is = (IndianSettlement) template.getOwningSettlement();
                                         tile.setOwningSettlement(new ServerIndianSettlement(game,
-                                            player, tile, settlement));
+                                            player, tile, is));
                                     }
                                 }
                             }

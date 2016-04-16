@@ -20,14 +20,14 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -115,8 +115,7 @@ public class MissionaryMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        ServerIndianSettlement is
-            = (ServerIndianSettlement)tile.getIndianSettlement();
+        IndianSettlement is = tile.getIndianSettlement();
         if (is == null) {
             return serverPlayer.clientError("There is no native settlement at: "
                 + tile.getId())

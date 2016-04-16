@@ -20,14 +20,14 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -115,9 +115,8 @@ public class DemandTributeMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        ServerIndianSettlement settlement
-            = (ServerIndianSettlement)tile.getIndianSettlement();
-        if (settlement == null) {
+        IndianSettlement is = tile.getIndianSettlement();
+        if (is == null) {
             return serverPlayer.clientError("There is native settlement at: "
                 + tile.getId())
                 .build(serverPlayer);
@@ -127,13 +126,13 @@ public class DemandTributeMessage extends DOMMessage {
         if (type != MoveType.ATTACK_SETTLEMENT
             && type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
             return serverPlayer.clientError("Unable to demand tribute at: "
-                + settlement.getName() + ": " + type.whyIllegal())
+                + is.getName() + ": " + type.whyIllegal())
                 .build(serverPlayer);
         }
 
         // Do the demand
         return server.getInGameController()
-            .demandTribute(serverPlayer, unit, settlement)
+            .demandTribute(serverPlayer, unit, is)
             .build(serverPlayer);
     }
 

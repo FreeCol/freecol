@@ -53,35 +53,35 @@ public final class IndianSettlementPanel extends FreeColPanel {
      * Creates a panel to show information about a native settlement.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param settlement The <code>IndianSettlement</code> to display.
+     * @param is The <code>IndianSettlement</code> to display.
      */
     public IndianSettlementPanel(FreeColClient freeColClient,
-                                 IndianSettlement settlement) {
+                                 IndianSettlement is) {
         super(freeColClient, new MigLayout("wrap 2, gapx 20", "", ""));
 
         ImageLibrary lib = getImageLibrary();
         JLabel settlementLabel = new JLabel(new ImageIcon(
-            lib.getSettlementImage(settlement)));
-        Player indian = settlement.getOwner();
-        Player player = getMyPlayer();
-        boolean contacted = settlement.hasContacted(player);
-        boolean visited = settlement.hasVisited(player);
-        String text = Messages.message(settlement.getLocationLabelFor(player))
+            lib.getSettlementImage(is)));
+        final Player indian = is.getOwner();
+        final Player player = getMyPlayer();
+        boolean contacted = is.hasContacted(player);
+        boolean visited = is.hasVisited(player);
+        String text = Messages.message(is.getLocationLabelFor(player))
             + ", "
             + Messages.message(StringTemplate
-                .template(settlement.isCapital()
+                .template(is.isCapital()
                     ? "indianSettlementPanel.indianCapital"
                     : "indianSettlementPanel.indianSettlement")
                 .addStringTemplate("%nation%", indian.getNationLabel()));
-        Tension tension = settlement.getAlarm(player);
+        Tension tension = is.getAlarm(player);
         if (tension != null) text += " (" + Messages.getName(tension) + ")";
-        if (settlement.worthScouting(player)) {
+        if (is.worthScouting(player)) {
             text += ResourceManager.getString("unscoutedIndianSettlement");
         }
         settlementLabel.setText(text);
         add(settlementLabel);
 
-        final Unit missionary = settlement.getMissionary();
+        final Unit missionary = is.getMissionary();
         if (missionary != null) {
             add(Utility.localizedLabel(missionary.getLabel(Unit.UnitLabelType.NATIONAL),
                 new ImageIcon(lib.getSmallUnitImage(missionary)),
@@ -89,24 +89,24 @@ public final class IndianSettlementPanel extends FreeColPanel {
         }
 
         add(Utility.localizedLabel("indianSettlementPanel.learnableSkill"), "newline");
-        final UnitType skillType = settlement.getLearnableSkill();
-        add(Utility.localizedLabel(settlement.getLearnableSkillLabel(visited),
+        final UnitType skillType = is.getLearnableSkill();
+        add(Utility.localizedLabel(is.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
                     ? new ImageIcon(lib.getSmallUnitImage(skillType))
                     : null),
                 JLabel.CENTER));
 
         add(Utility.localizedLabel("indianSettlementPanel.mostHated"), "newline");
-        final Player mostHated = settlement.getMostHated();
-        add(Utility.localizedLabel(settlement.getMostHatedLabel(contacted),
+        final Player mostHated = is.getMostHated();
+        add(Utility.localizedLabel(is.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
                     ? new ImageIcon(lib.getSmallMiscIconImage(mostHated.getNation()))
                     : null),
                 JLabel.CENTER));
 
-        GoodsType[] wantedGoods = settlement.getWantedGoods();
-        final int n = (visited) ? settlement.getWantedGoodsAmount() : 2;
-        List<StringTemplate> wants = settlement.getWantedGoodsLabel(0, player);
+        GoodsType[] wantedGoods = is.getWantedGoods();
+        final int n = (visited) ? is.getWantedGoodsAmount() : 2;
+        List<StringTemplate> wants = is.getWantedGoodsLabel(0, player);
         add(Utility.localizedLabel("indianSettlementPanel.highlyWanted"), "newline");
         JLabel label = Utility.localizedLabel(wants.get(0),
             ((visited && wantedGoods[0] != null)
@@ -118,7 +118,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         add(Utility.localizedLabel("indianSettlementPanel.otherWanted"), "newline");
         String x = "split " + Integer.toString(n-1);
         for (int i = 1; i < n; i++) {
-            wants = settlement.getWantedGoodsLabel(i, player);
+            wants = is.getWantedGoodsLabel(i, player);
             label = Utility.localizedLabel(wants.get(0),
                 ((visited && wantedGoods[i] != null)
                     ? new ImageIcon(lib.getIconImage(wantedGoods[i]))

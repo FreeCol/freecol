@@ -1046,19 +1046,19 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Ask about learning a skill at an IndianSettlement.
+     * Ask about learning a skill at a native settlement.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is learning.
      * @param unit The <code>Unit</code> that is learning.
-     * @param settlement The <code>Settlement</code> to learn from.
+     * @param is The <code>IndianSettlement</code> to learn from.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet askLearnSkill(ServerPlayer serverPlayer, Unit unit,
-                                   IndianSettlement settlement) {
+                                   IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
 
-        csVisit(serverPlayer, settlement, 0, cs);
-        Tile tile = settlement.getTile();
+        csVisit(serverPlayer, is, 0, cs);
+        Tile tile = is.getTile();
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
@@ -1238,19 +1238,19 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is buying.
      * @param unit The <code>Unit</code> that will carry the goods.
-     * @param settlement The <code>ServerIndianSettlement</code> to buy from.
+     * @param is The <code>IndianSettlement</code> to buy from.
      * @param goods The <code>Goods</code> to buy.
      * @param amount How much gold to pay.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
-                                       ServerIndianSettlement settlement,
+                                       IndianSettlement is,
                                        Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, 0, cs);
+        csVisit(serverPlayer, is, 0, cs);
 
         NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, is);
         if (session == null) {
             return serverPlayer.clientError("Trying to buy without opening a session");
         }
@@ -1262,8 +1262,8 @@ public final class InGameController extends Controller {
         }
 
         // Check that this is the agreement that was made
-        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
-        int returnGold = ai.buyProposition(unit, settlement, goods, amount);
+        AIPlayer ai = getFreeColServer().getAIPlayer(is.getOwner());
+        int returnGold = ai.buyProposition(unit, is, goods, amount);
         if (returnGold != amount) {
             return serverPlayer.clientError("This was not the price we agreed upon! Cheater?");
         }
@@ -1272,21 +1272,22 @@ public final class InGameController extends Controller {
         }
 
         // Valid, make the trade.
-        moveGoods(settlement, goods.getType(), goods.getAmount(), unit);
+        moveGoods(is, goods.getType(), goods.getAmount(), unit);
         cs.add(See.perhaps(), unit);
 
-        Player settlementPlayer = settlement.getOwner();
-        Tile tile = settlement.getTile();
-        settlement.updateWantedGoods();
+        Player settlementPlayer = is.getOwner();
+        Tile tile = is.getTile();
+        is.updateWantedGoods();
         settlementPlayer.modifyGold(amount);
         serverPlayer.modifyGold(-amount);
-        settlement.csModifyAlarm(serverPlayer, -amount / 50, true, cs);
+        ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
+            -amount / 50, true, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setBuy();
         logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
-                      + " at " + settlement.getName() + " for " + amount);
+                      + " at " + is.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         getGame().sendToOthers(serverPlayer, cs);
@@ -2010,21 +2011,21 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
      * @param unit The <code>Unit</code> that is demanding the tribute.
-     * @param settlement The <code>ServerIndianSettlement</code> demanded of.
+     * @param is The <code>IndianSettlement</code> demanded of.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet demandTribute(ServerPlayer serverPlayer, Unit unit,
-                                   ServerIndianSettlement settlement) {
+                                   IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
         final int TURNS_PER_TRIBUTE = 5;
 
-        csVisit(serverPlayer, settlement, 0, cs);
+        csVisit(serverPlayer, is, 0, cs);
 
-        Player indianPlayer = settlement.getOwner();
+        Player indianPlayer = is.getOwner();
         int gold = 0;
         int year = getGame().getTurn().getNumber();
-        RandomRange gifts = settlement.getType().getGifts(unit);
-        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year
+        RandomRange gifts = is.getType().getGifts(unit);
+        if (is.getLastTribute() + TURNS_PER_TRIBUTE < year
             && gifts != null) {
             switch (indianPlayer.getTension(serverPlayer).getLevel()) {
             case HAPPY: case CONTENT:
@@ -2044,9 +2045,9 @@ public final class InGameController extends Controller {
 
         // Increase tension whether we paid or not.  Apply tension
         // directly to the settlement and let propagation work.
-        settlement.csModifyAlarm(serverPlayer, Tension.TENSION_ADD_NORMAL,
-                                 true, cs);
-        settlement.setLastTribute(year);
+        ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
+            Tension.TENSION_ADD_NORMAL, true, cs);
+        is.setLastTribute(year);
         ModelMessage m;
         if (gold > 0) {
             indianPlayer.modifyGold(-gold);
@@ -2054,15 +2055,15 @@ public final class InGameController extends Controller {
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
             m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "scoutSettlement.tributeAgree",
-                                 unit, settlement)
+                                 unit, is)
                 .addAmount("%amount%", gold);
         } else {
             m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "scoutSettlement.tributeDisagree",
-                                 unit, settlement);
+                                 unit, is);
         }
         cs.addMessage(See.only(serverPlayer), m);
-        Tile tile = settlement.getTile();
+        final Tile tile = is.getTile();
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         unit.setMovesLeft(0);
@@ -2078,21 +2079,21 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is denouncing.
      * @param unit The <code>Unit</code> denouncing.
-     * @param settlement The <code>ServerIndianSettlement</code>
-     *     containing the mission to denounce.
+     * @param is The <code>IndianSettlement</code> containing the mission
+     *     to denounce.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet denounceMission(ServerPlayer serverPlayer, Unit unit,
-                                     ServerIndianSettlement settlement) {
+                                     IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, 0, cs);
+        csVisit(serverPlayer, is, 0, cs);
 
         // Determine result
-        Unit missionary = settlement.getMissionary();
+        Unit missionary = is.getMissionary();
         if (missionary == null) {
             return serverPlayer.clientError("Denouncing null missionary");
         }
-        ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
+        ServerPlayer enemy = (ServerPlayer)missionary.getOwner();
         double denounce = randomDouble(logger, "Denounce base", random)
             * enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
         if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
@@ -2103,12 +2104,12 @@ public final class InGameController extends Controller {
         }
 
         if (denounce < 0.5) { // Success, remove old mission and establish ours
-            return establishMission(serverPlayer, unit, settlement);
+            return establishMission(serverPlayer, unit, is);
         }
 
         // Denounce failed
-        Player owner = settlement.getOwner();
-        cs.add(See.only(serverPlayer), settlement);
+        final Player owner = is.getOwner();
+        cs.add(See.only(serverPlayer), is);
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.noDenounce",
@@ -2117,10 +2118,10 @@ public final class InGameController extends Controller {
         cs.addMessage(See.only(enemy),
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission.enemyDenounce",
-                             enemy, settlement)
+                             enemy, is)
                 .addStringTemplate("%enemy%", serverPlayer.getNationLabel())
                 .addStringTemplate("%settlement%",
-                    settlement.getLocationLabelFor(enemy))
+                    is.getLocationLabelFor(enemy))
                 .addStringTemplate("%nation%", owner.getNationLabel()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
@@ -2574,7 +2575,8 @@ public final class InGameController extends Controller {
             ret = serverColony.csEquipForRole(unit, role, roleCount,
                                               random, cs);
         } else if (unit.getIndianSettlement() != null) {
-            ServerIndianSettlement sis = (ServerIndianSettlement)unit.getIndianSettlement();
+            ServerIndianSettlement sis
+                = (ServerIndianSettlement)unit.getIndianSettlement();
             ret = sis.csEquipForRole(unit, role, roleCount, random, cs);
         } else {
             return serverPlayer.clientError("Unsuitable equip location for: "
@@ -2600,18 +2602,17 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is establishing.
      * @param unit The missionary <code>Unit</code>.
-     * @param settlement The <code>ServerIndianSettlement</code> to
-     *     establish at.
+     * @param is The <code>IndianSettlement</code> to establish at.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet establishMission(ServerPlayer serverPlayer, Unit unit,
-                                      ServerIndianSettlement settlement) {
+                                      IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, 0, cs);
+        csVisit(serverPlayer, is, 0, cs);
 
         // Result depends on tension wrt this settlement.
         // Establish if at least not angry.
-        final Tension tension = settlement.getAlarm(serverPlayer);
+        final Tension tension = is.getAlarm(serverPlayer);
         switch (tension.getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
@@ -2623,18 +2624,18 @@ public final class InGameController extends Controller {
             break;
 
         case HAPPY: case CONTENT: case DISPLEASED:
-            if (settlement.hasMissionary()) {
-                settlement.csKillMissionary(false, cs);
-            }
+            ServerIndianSettlement sis = (ServerIndianSettlement)is;
+            if (is.hasMissionary()) sis.csKillMissionary(false, cs);
+
             // Always show the tile the unit was on
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
             
-            settlement.csChangeMissionary(unit, cs);//+vis(serverPlayer)
+            sis.csChangeMissionary(unit, cs);//+vis(serverPlayer)
             break;
         }
 
         // Add the descriptive message.
-        final StringTemplate nation = settlement.getOwner().getNationLabel();
+        final StringTemplate nation = is.getOwner().getNationLabel();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                              "indianSettlement.mission." + tension.getKey(),
@@ -2838,24 +2839,23 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is inciting.
      * @param unit The missionary <code>Unit</code> inciting.
-     * @param settlement The <code>IndianSettlement</code> to incite.
+     * @param is The <code>IndianSettlement</code> to incite.
      * @param enemy The <code>ServerPlayer</code> to be incited against.
      * @param gold The amount of gold in the bribe.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet incite(ServerPlayer serverPlayer, Unit unit,
-                            IndianSettlement settlement,
-                            ServerPlayer enemy, int gold) {
+        IndianSettlement is, ServerPlayer enemy, int gold) {
         ChangeSet cs = new ChangeSet();
 
-        Tile tile = settlement.getTile();
-        csVisit(serverPlayer, settlement, 0, cs);
+        Tile tile = is.getTile();
+        csVisit(serverPlayer, is, 0, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
 
         // How much gold will be needed?
         ServerPlayer enemyPlayer = enemy;
-        ServerPlayer nativePlayer = (ServerPlayer)settlement.getOwner();
+        ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         int payingValue = nativePlayer.getTension(serverPlayer).getValue();
         int targetValue = nativePlayer.getTension(enemyPlayer).getValue();
         int goldToPay = (payingValue > targetValue) ? 10000 : 5000;
@@ -2865,12 +2865,12 @@ public final class InGameController extends Controller {
         // Try to incite?
         if (gold < 0) { // Initial inquiry
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_NORMAL,
-                new InciteMessage(unit, settlement, enemy, goldToPay));
+                new InciteMessage(unit, is, enemy, goldToPay));
         } else if (gold < goldToPay || !serverPlayer.checkGold(gold)) {
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                  "missionarySettlement.inciteGoldFail",
-                                 serverPlayer, settlement)
+                                 serverPlayer, is)
                     .addStringTemplate("%player%",
                         enemyPlayer.getNationLabel())
                     .addAmount("%amount%", goldToPay));
@@ -2954,12 +2954,12 @@ public final class InGameController extends Controller {
                 //cs.add(See.only(serverPlayer), unitContainer);
             }
             int tension = -(5 - difficulty) * 50;
-            ServerIndianSettlement is = (ServerIndianSettlement)
+            ServerIndianSettlement sis = (ServerIndianSettlement)
                 unit.getHomeIndianSettlement();
-            if (is == null) {
+            if (sis == null) {
                 serverPlayer.csModifyTension(victim, tension, cs);
             } else {
-                is.csModifyAlarm(victim, tension, true, cs);
+                sis.csModifyAlarm(victim, tension, true, cs);
             }
         }
 
@@ -3008,30 +3008,28 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is learning.
      * @param unit The <code>Unit</code> that is learning.
-     * @param settlement The <code>Settlement</code> to learn from.
+     * @param is The <code>IndianSettlement</code> to learn from.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet learnFromIndianSettlement(ServerPlayer serverPlayer,
-                                               Unit unit,
-                                               IndianSettlement settlement) {
+                                               Unit unit, IndianSettlement is) {
         // Sanity checks.
-        UnitType skill = settlement.getLearnableSkill();
+        UnitType skill = is.getLearnableSkill();
         if (skill == null) {
             return serverPlayer.clientError("No skill to learn at "
-                + settlement.getName());
+                + is.getName());
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             return serverPlayer.clientError("Unit " + unit
-                + " can not learn skill " + skill
-                + " at " + settlement.getName());
+                + " can not learn skill " + skill + " at " + is.getName());
         }
 
         // Try to learn
         final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
-        csVisit(serverPlayer, settlement, 0, cs);
-        switch (settlement.getAlarm(serverPlayer).getLevel()) {
+        csVisit(serverPlayer, is, 0, cs);
+        switch (is.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
@@ -3049,14 +3047,14 @@ public final class InGameController extends Controller {
             unit.changeType(skill);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.add(See.perhaps(), unit);
-            if (!settlement.isCapital()
-                && !(settlement.hasMissionary(serverPlayer)
+            if (!is.isCapital()
+                && !(is.hasMissionary(serverPlayer)
                     && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES))) {
-                settlement.setLearnableSkill(null);
+                is.setLearnableSkill(null);
             }
             break;
         }
-        Tile tile = settlement.getTile();
+        Tile tile = is.getTile();
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
 
@@ -3622,17 +3620,16 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
      * @param unit The scout <code>Unit</code>.
-     * @param settlement The <code>IndianSettlement</code> to scout.
+     * @param is The <code>IndianSettlement</code> to scout.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet scoutIndianSettlement(ServerPlayer serverPlayer,
-                                           Unit unit,
-                                           IndianSettlement settlement) {
-        final Player owner = settlement.getOwner();
+                                           Unit unit, IndianSettlement is) {
+        final Player owner = is.getOwner();
         ChangeSet cs = new ChangeSet();
-        Tile tile = settlement.getTile();
+        Tile tile = is.getTile();
 
-        csVisit(serverPlayer, settlement, -1, cs);
+        csVisit(serverPlayer, is, -1, cs);
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
@@ -3649,18 +3646,18 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
      * @param unit The scout <code>Unit</code>.
-     * @param settlement The <code>IndianSettlement</code> to scout.
+     * @param is The <code>IndianSettlement</code> to scout.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet scoutSpeakToChief(ServerPlayer serverPlayer,
-                                       Unit unit, IndianSettlement settlement) {
+                                       Unit unit, IndianSettlement is) {
         ChangeSet cs = new ChangeSet();
-        Tile tile = settlement.getTile();
-        boolean tileDirty = settlement.setVisited(serverPlayer);
+        Tile tile = is.getTile();
+        boolean tileDirty = is.setVisited(serverPlayer);
         String result;
 
         // Hateful natives kill the scout right away.
-        Tension tension = settlement.getAlarm(serverPlayer);
+        Tension tension = is.getAlarm(serverPlayer);
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
@@ -3676,9 +3673,9 @@ public final class InGameController extends Controller {
             UnitType scoutSkill = (scoutTypes.isEmpty()) ? null
                 : scoutTypes.get(0);
             int radius = unit.getLineOfSight();
-            UnitType skill = settlement.getLearnableSkill();
+            UnitType skill = is.getLearnableSkill();
             int rnd = randomInt(logger, "scouting", random, 10);
-            if (settlement.hasAnyScouted()) {
+            if (is.hasAnyScouted()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
             } else if (scoutSkill != null && unit.getType() != scoutSkill
@@ -3690,7 +3687,7 @@ public final class InGameController extends Controller {
                 result = "expert";
             } else {
                 // Choose tales 1/3 of the time, or if there are no beads.
-                RandomRange gifts = settlement.getType().getGifts(unit);
+                RandomRange gifts = is.getType().getGifts(unit);
                 int gold = (gifts == null) ? 0
                     : gifts.getAmount("Base beads amount", random, true);
                 if (gold <= 0 || rnd <= 3) {
@@ -3701,7 +3698,7 @@ public final class InGameController extends Controller {
                         gold = (gold * 11) / 10; // FIXME: magic number
                     }
                     serverPlayer.modifyGold(gold);
-                    settlement.getOwner().modifyGold(-gold);
+                    is.getOwner().modifyGold(-gold);
                     result = Integer.toString(gold);
                     cs.addPartial(See.only(serverPlayer), serverPlayer,
                                   "gold", "score");
@@ -3709,7 +3706,7 @@ public final class InGameController extends Controller {
             }
 
             // Have now spoken to the chief.
-            csVisit(serverPlayer, settlement, 1, cs);
+            csVisit(serverPlayer, is, 1, cs);
             tileDirty = true;
 
             // Update settlement tile with new information, and any
@@ -3735,7 +3732,7 @@ public final class InGameController extends Controller {
 
         // Always add result.
         cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
-            new ScoutSpeakToChiefMessage(unit, settlement, result));
+            new ScoutSpeakToChiefMessage(unit, is, result));
 
         // Other players may be able to see unit disappearing, or
         // learning.
@@ -3824,51 +3821,52 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is selling.
      * @param unit The <code>Unit</code> carrying the goods.
-     * @param settlement The <code>ServerIndianSettlement</code> to sell to.
+     * @param is The <code>IndianSettlement</code> to sell to.
      * @param goods The <code>Goods</code> to sell.
      * @param amount How much gold to expect.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet sellToSettlement(ServerPlayer serverPlayer, Unit unit,
-                                      ServerIndianSettlement settlement,
+                                      IndianSettlement is,
                                       Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, 0, cs);
+        csVisit(serverPlayer, is, 0, cs);
 
         NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, settlement);
+            = Session.lookup(NativeTradeSession.class, unit, is);
         if (session == null) {
             return serverPlayer.clientError("Trying to sell without opening a session");
         }
         if (!session.getSell()) {
             return serverPlayer.clientError("Trying to sell in a session where selling is not allowed.");
         }
+        final Player settlementPlayer = is.getOwner();
 
         // Check that the gold is the agreed amount
-        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
-        int returnGold = ai.sellProposition(unit, settlement, goods, amount);
+        AIPlayer ai = getFreeColServer().getAIPlayer(settlementPlayer);
+        int returnGold = ai.sellProposition(unit, is, goods, amount);
         if (returnGold != amount) {
             return serverPlayer.clientError("This was not the price we agreed upon! Cheater?");
         }
 
         // Valid, make the trade.
-        moveGoods(unit, goods.getType(), goods.getAmount(), settlement);
+        moveGoods(unit, goods.getType(), goods.getAmount(), is);
         cs.add(See.perhaps(), unit);
 
-        Player settlementPlayer = settlement.getOwner();
         settlementPlayer.modifyGold(-amount);
         serverPlayer.modifyGold(amount);
-        settlement.csModifyAlarm(serverPlayer, -amount / 500, true, cs);
-        Tile tile = settlement.getTile();
-        settlement.updateWantedGoods();
+        ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
+            -amount / 500, true, cs);
+        final Tile tile = is.getTile();
+        is.updateWantedGoods();
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         session.setSell();
-        cs.addSale(serverPlayer, settlement, goods.getType(),
+        cs.addSale(serverPlayer, is, goods.getType(),
                 Math.round((float) amount / goods.getAmount()));
         logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
-                      + " at " + settlement.getName() + " for " + amount);
+                      + " at " + is.getName() + " for " + amount);
 
         // Others can see the unit capacity.
         getGame().sendToOthers(serverPlayer, cs);

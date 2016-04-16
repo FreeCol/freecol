@@ -132,15 +132,16 @@ public class BuyPropositionMessage extends DOMMessage {
                 .build(serverPlayer);
         }
  
-        IndianSettlement settlement;
+        IndianSettlement is;
         try {
-            settlement = unit.getAdjacentIndianSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
         // Make sure we are trying to buy something that is there
-        if (goods.getLocation() != settlement) {
+        if (goods.getLocation() != is) {
             return serverPlayer.clientError("Goods " + goods.getId()
                 + " are not in settlement " + this.settlementId)
                 .build(serverPlayer);
@@ -148,7 +149,7 @@ public class BuyPropositionMessage extends DOMMessage {
  
         // Proceed to price.
         return server.getInGameController()
-            .buyProposition(serverPlayer, unit, settlement, goods, getGold())
+            .buyProposition(serverPlayer, unit, is, goods, getGold())
             .toXMLElement();
     }
 

@@ -21,11 +21,10 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -58,16 +57,16 @@ public class BuyMessage extends DOMMessage {
      * Create a new <code>BuyMessage</code>.
      *
      * @param unit The <code>Unit</code> that is buying.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to buy.
      * @param gold The price of the goods.
      */
-    public BuyMessage(Unit unit, Settlement settlement, Goods goods,
+    public BuyMessage(Unit unit, IndianSettlement is, Goods goods,
                       int gold) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
         this.goods = goods;
         this.goldString = Integer.toString(gold);
     }
@@ -126,17 +125,17 @@ public class BuyMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        ServerIndianSettlement settlement;
+        IndianSettlement is;
         try {
-            settlement = (ServerIndianSettlement)unit
-                .getAdjacentIndianSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // Make sure we are trying to buy something that is there
-        if (goods.getLocation() != settlement) {
+        if (goods.getLocation() != is) {
             return serverPlayer.clientError("Goods " + goods
                 + " is not at settlement " + this.settlementId)
                 .build(serverPlayer);
@@ -150,7 +149,7 @@ public class BuyMessage extends DOMMessage {
 
         // Try to buy.
         return server.getInGameController()
-            .buyFromSettlement(serverPlayer, unit, settlement, goods, gold)
+            .buyFromSettlement(serverPlayer, unit, is, goods, gold)
             .build(serverPlayer);
     }
 

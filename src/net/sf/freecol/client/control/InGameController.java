@@ -1478,13 +1478,13 @@ public final class InGameController extends FreeColClientHolder {
         // learned by another player.
         if (!askServer().askSkill(unit, direction)) return false;
 
-        IndianSettlement settlement
+        IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        UnitType skill = settlement.getLearnableSkill();
+        UnitType skill = is.getLearnableSkill();
         if (skill == null) {
-            getGUI().showInformationMessage(settlement, "info.noMoreSkill");
+            getGUI().showInformationMessage(is, "info.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            getGUI().showInformationMessage(settlement, StringTemplate
+            getGUI().showInformationMessage(is, StringTemplate
                 .template("info.cantLearnSkill")
                 .addStringTemplate("%unit%",
                     unit.getLabel(Unit.UnitLabelType.NATIONAL))
@@ -1495,11 +1495,11 @@ public final class InGameController extends FreeColClientHolder {
                 unit, "learnSkill.yes", "learnSkill.no")) {
             if (askServer().learnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
-                    getGUI().showInformationMessage(settlement, "learnSkill.die");
+                    getGUI().showInformationMessage(is, "learnSkill.die");
                     return false;
                 }
                 if (unit.getType() != skill) {
-                    getGUI().showInformationMessage(settlement, "learnSkill.leave");
+                    getGUI().showInformationMessage(is, "learnSkill.leave");
                 }
             }
         }
@@ -1631,18 +1631,18 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
-        IndianSettlement settlement = tile.getIndianSettlement();
+        IndianSettlement is = tile.getIndianSettlement();
         Player player = unit.getOwner();
         askClearGotoOrders(unit);
 
         // Offer the choices.
         if (!askServer().scoutSettlement(unit, direction)) return false;
-        int count = player.getNationSummary(settlement.getOwner())
+        int count = player.getNationSummary(is.getOwner())
             .getNumberOfSettlements();
         String number = (count <= 0) ? Messages.message("many")
             : Integer.toString(count);
         ScoutIndianSettlementAction act
-            = getGUI().getScoutIndianSettlementChoice(settlement, number);
+            = getGUI().getScoutIndianSettlementChoice(is, number);
         if (act == null) return true; // Cancelled
         switch (act) {
         case SCOUT_SETTLEMENT_ATTACK:
@@ -1652,7 +1652,7 @@ public final class InGameController extends FreeColClientHolder {
         case SCOUT_SETTLEMENT_SPEAK:
             // Prevent turn ending to allow speaking results to complete
             moveMode = moveMode.minimize(MoveMode.EXECUTE_GOTO_ORDERS);
-            askServer().scoutSpeakToChief(unit, settlement);
+            askServer().scoutSpeakToChief(unit, is);
             return false;
         case SCOUT_SETTLEMENT_TRIBUTE:
             return moveTribute(unit, 1, direction);
@@ -1987,23 +1987,23 @@ public final class InGameController extends FreeColClientHolder {
      * @return True if the unit can move further.
      */
     private boolean moveUseMissionary(Unit unit, Direction direction) {
-        IndianSettlement settlement
+        IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
         Player player = unit.getOwner();
-        boolean canEstablish = !settlement.hasMissionary();
+        boolean canEstablish = !is.hasMissionary();
         boolean canDenounce = !canEstablish
-            && !settlement.hasMissionary(player);
+            && !is.hasMissionary(player);
         askClearGotoOrders(unit);
 
         // Offer the choices.
-        MissionaryAction act = getGUI().getMissionaryChoice(unit, settlement,
+        MissionaryAction act = getGUI().getMissionaryChoice(unit, is,
             canEstablish, canDenounce);
         if (act == null) return true;
         switch (act) {
         case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction,
                     act == MissionaryAction.MISSIONARY_DENOUNCE_HERESY)
-                && settlement.hasMissionary(player)) {
+                && is.hasMissionary(player)) {
                 sound("sound.event.missionEstablished");
                 player.invalidateCanSeeTiles();
             }
@@ -2015,7 +2015,7 @@ public final class InGameController extends FreeColClientHolder {
                 toList(map(getGame().getLiveEuropeanPlayers(player), p ->
                         new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))));
             if (enemy == null) return true;
-            askServer().incite(unit, settlement, enemy, -1);
+            askServer().incite(unit, is, enemy, -1);
             break;
         default:
             logger.warning("showUseMissionaryDialog fail");
@@ -4505,34 +4505,34 @@ public final class InGameController extends FreeColClientHolder {
      * Called from IGIH.scoutSpeakToChief.
      *
      * @param unit The <code>Unit</code> that was speaking.
-     * @param settlement The <code>IndianSettlement</code> spoken to.
+     * @param is The <code>IndianSettlement</code> spoken to.
      * @param result The result.
      */
-    public void scoutSpeakToChief(Unit unit, IndianSettlement settlement,
+    public void scoutSpeakToChief(Unit unit, IndianSettlement is,
                                   String result) {
         switch (result) {
         case "":
             break;
         case "die":
-            getGUI().showInformationMessage(settlement,
+            getGUI().showInformationMessage(is,
                 "scoutSettlement.speakDie");
             break;
         case "expert":
-            getGUI().showInformationMessage(settlement, StringTemplate
+            getGUI().showInformationMessage(is, StringTemplate
                 .template("scoutSettlement.expertScout")
                 .addNamed("%unit%", unit.getType()));
             break;
         case "tales":
-            getGUI().showInformationMessage(settlement,
+            getGUI().showInformationMessage(is,
                 "scoutSettlement.speakTales");
             break;
         case "nothing":
-            getGUI().showInformationMessage(settlement, StringTemplate
+            getGUI().showInformationMessage(is, StringTemplate
                 .template("scoutSettlement.speakNothing")
                 .addStringTemplate("%nation%", unit.getOwner().getNationLabel()));
             break;
         default: // result == amount of gold
-            getGUI().showInformationMessage(settlement, StringTemplate
+            getGUI().showInformationMessage(is, StringTemplate
                 .template("scoutSettlement.speakBeads")
                 .add("%amount%", result));
             break;

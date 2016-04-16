@@ -21,11 +21,10 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -58,16 +57,16 @@ public class SellMessage extends DOMMessage {
      * Create a new <code>SellMessage</code>.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to sell.
      * @param gold The price of the goods.
      */
-    public SellMessage(Unit unit, Settlement settlement, Goods goods,
+    public SellMessage(Unit unit, IndianSettlement is, Goods goods,
                        int gold) {
         super(getTagName());
 
         this.unitId = unit.getId();
-        this.settlementId = settlement.getId();
+        this.settlementId = is.getId();
         this.goldString = Integer.toString(gold);
         this.goods = goods;
     }
@@ -126,10 +125,10 @@ public class SellMessage extends DOMMessage {
                 .build(serverPlayer);
         }
 
-        ServerIndianSettlement settlement;
+        IndianSettlement is;
         try {
-            settlement = (ServerIndianSettlement)unit
-                .getAdjacentIndianSettlementSafely(this.settlementId);
+            is = unit.getAdjacentSettlement(this.settlementId,
+                                            IndianSettlement.class);
         } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
@@ -150,7 +149,7 @@ public class SellMessage extends DOMMessage {
 
         // Proceed to sell
         return server.getInGameController()
-            .sellToSettlement(serverPlayer, unit, settlement, this.goods, gold)
+            .sellToSettlement(serverPlayer, unit, is, this.goods, gold)
             .build(serverPlayer);
     }
 

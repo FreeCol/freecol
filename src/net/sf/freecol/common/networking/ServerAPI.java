@@ -352,15 +352,15 @@ public abstract class ServerAPI {
      * Server query-response to buy the given goods from the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to buy.
      * @param gold The agreed price.
      * @return True if the server interaction succeeded.
      */
-    public boolean buyFromSettlement(Unit unit, Settlement settlement,
+    public boolean buyFromSettlement(Unit unit, IndianSettlement is,
                                      Goods goods, int gold) {
         return askHandling(unit.getGame(),
-            new BuyMessage(unit, settlement, goods, gold), null);
+            new BuyMessage(unit, is, goods, gold), null);
     }
 
     /**
@@ -483,12 +483,12 @@ public abstract class ServerAPI {
      * Server query-response to close a session for a trade.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @return True if the server interaction succeeded.
      */
-    public boolean closeSession(Unit unit, Settlement settlement) {
+    public boolean closeSession(Unit unit, IndianSettlement is) {
         return askHandling(unit.getGame(),
-            new CloseSessionMessage(unit, settlement), null);
+            new CloseSessionMessage(unit, is), null);
     }
 
     /**
@@ -542,14 +542,14 @@ public abstract class ServerAPI {
      * Server query-response to give the given goods to the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to give.
      * @return True if the server interaction succeeded.
      */
-    public boolean deliverGiftToSettlement(Unit unit, Settlement settlement,
+    public boolean deliverGiftToSettlement(Unit unit, IndianSettlement is,
                                            Goods goods) {
         return askHandling(unit.getGame(),
-            new DeliverGiftMessage(unit, settlement, goods), null);
+            new DeliverGiftMessage(unit, is, goods), null);
     }
 
     /**
@@ -975,13 +975,13 @@ public abstract class ServerAPI {
      * Server query-response to get the session for a trade.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @return An array of booleans for the buy/sell/gift status,
      *     or null if the server interaction failed.
      */
-    public boolean[] openSession(Unit unit, Settlement settlement) {
+    public boolean[] openSession(Unit unit, IndianSettlement is) {
         Element reply = askExpecting(unit.getGame(),
-            new GetSessionMessage(unit, settlement),
+            new GetSessionMessage(unit, is),
             null);
         return new boolean[] {
             DOMMessage.getBooleanAttribute(reply, "canBuy", false),
@@ -1092,12 +1092,12 @@ public abstract class ServerAPI {
      * Server query-response for speaking with a native chief.
      *
      * @param unit The <code>Unit</code> that is speaking.
-     * @param settlement The <code>IndianSettlement</code> to ask.
+     * @param is The <code>IndianSettlement</code> to ask.
      * @return True if the server interaction succeeded.
      */
-    public boolean scoutSpeakToChief(Unit unit, IndianSettlement settlement) {
+    public boolean scoutSpeakToChief(Unit unit, IndianSettlement is) {
         return askHandling(unit.getGame(),
-            new ScoutSpeakToChiefMessage(unit, settlement, null),
+            new ScoutSpeakToChiefMessage(unit, is, null),
             null);
     }
 
@@ -1125,15 +1125,15 @@ public abstract class ServerAPI {
      * Server query-response to sell the given goods to the natives.
      *
      * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param is The <code>IndianSettlement</code> that is trading.
      * @param goods The <code>Goods</code> to sell.
      * @param gold The agreed price.
      * @return True if the server interaction succeeded.
      */
-    public boolean sellToSettlement(Unit unit, Settlement settlement,
+    public boolean sellToSettlement(Unit unit, IndianSettlement is,
                                     Goods goods, int gold) {
         return askHandling(unit.getGame(),
-            new SellMessage(unit, settlement, goods, gold), null);
+            new SellMessage(unit, is, goods, gold), null);
     }
 
     /**

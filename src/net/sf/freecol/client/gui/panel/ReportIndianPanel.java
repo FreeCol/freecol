@@ -143,37 +143,37 @@ public final class ReportIndianPanel extends ReportPanel {
             }
             List<IndianSettlement> settlements
                 = new ArrayList<>(nativeSettlements.size());
-            for (IndianSettlement settlement : nativeSettlements) {
-                if (settlement.isCapital()) {
-                    settlements.add(0, settlement);
+            for (IndianSettlement is : nativeSettlements) {
+                if (is.isCapital()) {
+                    settlements.add(0, is);
                 } else {
-                    settlements.add(settlement);
+                    settlements.add(is);
                 }
             }
-            for (IndianSettlement settlement : settlements) {
-                final Tile tile = settlement.getTile();
+            for (IndianSettlement is : settlements) {
+                final Tile tile = is.getTile();
                 final boolean known = tile.isExplored();
-                final boolean contacted = settlement.hasContacted(player);
-                final boolean visited = settlement.hasVisited(player);
-                // final boolean scouted = settlement.hasScouted(player);
+                final boolean contacted = is.hasContacted(player);
+                final boolean visited = is.hasVisited(player);
+                // final boolean scouted = is.hasScouted(player);
                 String locationName
-                    = Messages.message(settlement.getLocationLabelFor(player));
-                if (known && settlement.isCapital()) {
+                    = Messages.message(is.getLocationLabelFor(player));
+                if (known && is.isCapital()) {
                     locationName += ResourceManager
                             .getString("indianSettlementChip.capital");
                 }
-                if (settlement.worthScouting(player)) {
+                if (is.worthScouting(player)) {
                     locationName += ResourceManager
                             .getString("unscoutedIndianSettlement");
                 }
                 JButton settlementButton = Utility.getLinkButton(locationName,
-                    null, settlement.getTile().getId());
-                Utility.localizeToolTip(settlementButton, settlement.getTile()
+                    null, is.getTile().getId());
+                Utility.localizeToolTip(settlementButton, is.getTile()
                     .getDetailedLocationLabelFor(player));
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 
-                final Unit missionary = settlement.getMissionary();
+                final Unit missionary = is.getMissionary();
                 JLabel missionLabel = new JLabel("");
                 if (missionary != null) {
                     BufferedImage dummy = new BufferedImage(1, 1,
@@ -191,33 +191,33 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(missionLabel);
 
                 reportPanel.add(Utility
-                    .localizedLabel(settlement.getAlarmLevelKey(player)));
+                    .localizedLabel(is.getAlarmLevelKey(player)));
 
-                final UnitType skillType = settlement.getLearnableSkill();
+                final UnitType skillType = is.getLearnableSkill();
                 JLabel skillLabel;
                 if (visited && skillType != null) {
                     skillLabel = new JLabel("");
                     skillLabel.setIcon(new ImageIcon(
                         lib.getSmallUnitImage(skillType)));
                     Utility.localizeToolTip(skillLabel, Messages
-                        .message(settlement.getLearnableSkillLabel(visited)));
+                        .message(is.getLearnableSkillLabel(visited)));
                 } else {
-                    skillLabel = Utility.localizedLabel(settlement
+                    skillLabel = Utility.localizedLabel(is
                         .getLearnableSkillLabel(visited));
                 }
                 reportPanel.add(skillLabel);
 
-                reportPanel.add(Utility.localizedLabel(settlement
+                reportPanel.add(Utility.localizedLabel(is
                         .getMostHatedLabel(contacted)));
 
-                GoodsType[] wantedGoods = settlement.getWantedGoods();
-                final int n = (visited) ? settlement.getWantedGoodsAmount()
+                GoodsType[] wantedGoods = is.getWantedGoods();
+                final int n = (visited) ? is.getWantedGoodsAmount()
                     : 1;
                 String x = (n > 1) ? "split " + Integer.toString(n) : null;
                 for (int i = 0; i < n; i++) {
                     JLabel goodsLabel;
                     List<StringTemplate> gl
-                        = settlement.getWantedGoodsLabel(i, player);
+                        = is.getWantedGoodsLabel(i, player);
                     if (visited && wantedGoods[i] != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(

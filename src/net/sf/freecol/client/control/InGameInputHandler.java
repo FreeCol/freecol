@@ -976,10 +976,10 @@ public final class InGameInputHandler extends ClientInputHandler {
             = new ScoutSpeakToChiefMessage(game, element);
         if (message != null) {
             final Unit unit = message.getUnit(game);
-            final IndianSettlement settlement = message.getSettlement(game);
+            final IndianSettlement is = message.getSettlement(game);
             final String result = message.getResult();
             invokeLater(() ->
-                igc().scoutSpeakToChief(unit, settlement, result));
+                igc().scoutSpeakToChief(unit, is, result));
         }
         return null;
     }

@@ -788,21 +788,21 @@ public class GUI extends FreeColClientHolder {
      * settlement.
      *
      * @param unit The <code>Unit</code> speaking to the settlement.
-     * @param settlement The <code>IndianSettlement</code> being visited.
+     * @param is The <code>IndianSettlement</code> being visited.
      * @param canEstablish Is establish a valid option.
      * @param canDenounce Is denounce a valid option.
      * @return The chosen action, establish mission, denounce, incite
      *     or cancel.
      */
     public MissionaryAction getMissionaryChoice(Unit unit,
-                                                IndianSettlement settlement,
+                                                IndianSettlement is,
                                                 boolean canEstablish,
                                                 boolean canDenounce) {
         StringTemplate template = StringTemplate.label("\n\n")
-            .addStringTemplate(settlement.getAlarmLevelLabel(unit.getOwner()))
+            .addStringTemplate(is.getAlarmLevelLabel(unit.getOwner()))
             .addStringTemplate(StringTemplate
                 .template("missionarySettlement.question")
-                .addName("%settlement%", settlement.getName()));
+                .addName("%settlement%", is.getName()));
 
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<>();
         if (canEstablish) {
@@ -819,7 +819,7 @@ public class GUI extends FreeColClientHolder {
                 MissionaryAction.MISSIONARY_INCITE_INDIANS));
 
         return getChoice(unit.getTile(), template,
-                         settlement, "cancel", choices);
+                         is, "cancel", choices);
     }
 
     /**
@@ -881,35 +881,35 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the user choice for what to do at a native settlement.
      *
-     * @param settlement The <code>IndianSettlement</code> to be scouted.
+     * @param is The <code>IndianSettlement</code> to be scouted.
      * @param numberString The number of settlements in the settlement
      *     owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
      */
-    public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement settlement,
+    public ScoutIndianSettlementAction getScoutIndianSettlementChoice(IndianSettlement is,
         String numberString) {
         final Player player = getMyPlayer();
-        final Player owner = settlement.getOwner();
+        final Player owner = is.getOwner();
 
         StringTemplate template = StringTemplate.label("")
-            .addStringTemplate(settlement.getAlarmLevelLabel(player))
+            .addStringTemplate(is.getAlarmLevelLabel(player))
             .addName("\n\n")
             .addStringTemplate(StringTemplate
                 .template("scoutSettlement.greetings")
                 .addStringTemplate("%nation%", owner.getNationLabel())
-                .addName("%settlement%", settlement.getName())
+                .addName("%settlement%", is.getName())
                 .addName("%number%", numberString)
                 .add("%settlementType%",
                     ((IndianNationType)owner.getNationType()).getSettlementTypeKey(true)))
             .addName(" ");
-        if (settlement.getLearnableSkill() != null) {
+        if (is.getLearnableSkill() != null) {
             template
                 .addStringTemplate(StringTemplate
                     .template("scoutSettlement.skill")
-                    .addNamed("%skill%", settlement.getLearnableSkill()))
+                    .addNamed("%skill%", is.getLearnableSkill()))
                 .addName(" ");
         }
-        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        GoodsType[] wantedGoods = is.getWantedGoods();
         int present = 0;
         for (; present < wantedGoods.length; present++) {
             if (wantedGoods[present] == null) break;
@@ -933,8 +933,7 @@ public class GUI extends FreeColClientHolder {
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
                                      ScoutIndianSettlementAction.SCOUT_SETTLEMENT_ATTACK));
 
-        return getChoice(settlement.getTile(), template,
-                         settlement, "cancel", choices);
+        return getChoice(is.getTile(), template, is, "cancel", choices);
     }
 
     /**

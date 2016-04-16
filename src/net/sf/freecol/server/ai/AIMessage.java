@@ -370,13 +370,13 @@ public class AIMessage {
      * An AI unit speaks to the chief of a native settlement.
      *
      * @param aiUnit The <code>AIUnit</code> that is scouting.
-     * @param settlement The <code>IndianSettlement</code> to scout.
+     * @param is The <code>IndianSettlement</code> to scout.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askScoutSpeakToChief(AIUnit aiUnit,
-                                               IndianSettlement settlement) {
+                                               IndianSettlement is) {
         return aiUnit.getAIOwner().askServer()
-            .scoutSpeakToChief(aiUnit.getUnit(), settlement);
+            .scoutSpeakToChief(aiUnit.getUnit(), is);
     }
 
     /**

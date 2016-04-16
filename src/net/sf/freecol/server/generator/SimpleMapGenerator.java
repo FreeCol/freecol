@@ -273,43 +273,43 @@ public class SimpleMapGenerator implements MapGenerator {
             IndianSettlement is = tile.getIndianSettlement();
             if (is == null) continue;
             Player indian = game.getPlayerByNationId(is.getOwner().getNationId());
-            ServerIndianSettlement settlement
+            ServerIndianSettlement sis
                 = new ServerIndianSettlement(game, indian, is.getName(),
                     map.getTile(tile.getX(), tile.getY()), is.isCapital(),
                     is.getLearnableSkill(), null);
-            settlement.placeSettlement(false);
+            sis.placeSettlement(false);
             for (Tile t : is.getOwnedTiles()) {
                 map.getTile(t.getX(), t.getY())
-                    .changeOwnership(indian, settlement);
+                    .changeOwnership(indian, sis);
             }
                 
             List<Unit> units = is.getUnitList();
             if (units.isEmpty()) {
-                settlement.addUnits(random);
+                sis.addUnits(random);
             } else {
                 for (Unit unit : units) {
                     UnitType t = spec.getUnitType(unit.getType().getId());
                     if (t != null) {
-                        Unit u = new ServerUnit(game, settlement, indian, t);
-                        settlement.add(u);
-                        settlement.addOwnedUnit(u);
+                        Unit u = new ServerUnit(game, sis, indian, t);
+                        sis.add(u);
+                        sis.addOwnedUnit(u);
                     }
                 }
             }
             
             List<Goods> goods = is.getCompactGoods();
             if (goods.isEmpty()) {
-                settlement.addRandomGoods(random);
+                sis.addRandomGoods(random);
             } else {
                 for (Goods g : goods) {
                     GoodsType t = spec.getGoodsType(g.getType().getId());
                     if (t != null) {
-                        settlement.addGoods(t, g.getAmount());
+                        sis.addGoods(t, g.getAmount());
                     }
                 }
             }
-            settlement.setWantedGoods(is.getWantedGoods());
-            indian.addSettlement(settlement);
+            sis.setWantedGoods(is.getWantedGoods());
+            indian.addSettlement(sis);
             nSettlements++;
         }
 
@@ -710,18 +710,17 @@ public class SimpleMapGenerator implements MapGenerator {
             : player.getSettlementName(random);
         UnitType skill
             = generateSkillForLocation(map, tile, player.getNationType());
-        ServerIndianSettlement settlement
+        ServerIndianSettlement sis
             = new ServerIndianSettlement(map.getGame(), player, name, tile,
                                          capital, skill, null);
-        player.addSettlement(settlement);
-        lb.add("Generated skill for ", settlement.getName(),
-            ": ", settlement.getLearnableSkill().getSuffix(), "\n");
+        player.addSettlement(sis);
+        lb.add("Generated skill for ", sis.getName(),
+            ": ", sis.getLearnableSkill().getSuffix(), "\n");
 
-        settlement.placeSettlement(true);
-        settlement.addRandomGoods(random);
-        settlement.addUnits(random);
-
-        return settlement;
+        sis.placeSettlement(true);
+        sis.addRandomGoods(random);
+        sis.addUnits(random);
+        return sis;
     }
 
     /**
