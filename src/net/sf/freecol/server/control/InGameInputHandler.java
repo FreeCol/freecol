@@ -72,6 +72,7 @@ import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
+import net.sf.freecol.common.networking.NativeGiftMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NewTradeRouteMessage;
@@ -440,6 +441,14 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new MultipleMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(NativeGiftMessage.getTagName(),
+                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new NativeGiftMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(NewLandNameMessage.getTagName(),

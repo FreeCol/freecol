@@ -315,13 +315,7 @@ public class IndianBringGiftMission extends Mission {
         
             // Deliver the goods.
             lbAt(lb);
-            Settlement settlement = (Settlement)getTarget();
-            boolean result = false;
-            if (AIMessage.askGetSession(aiUnit, settlement)) {
-                result = AIMessage.askDeliverGift(aiUnit, settlement,
-                    unit.getGoodsList().get(0));
-                AIMessage.askCloseSession(aiUnit, settlement);
-            }
+            boolean result = AIMessage.askNativeGift(aiUnit, this.colony);
             return (result)
                 ? lbDone(lb, false, "delivered")
                 : lbFail(lb, false, "delivery");

@@ -52,6 +52,7 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.NativeGiftMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
@@ -189,6 +190,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             case "gameEnded":
             case GoodsForSaleMessage.TAG:
             case "logout":
+            case NativeGiftMessage.TAG:
             case "newTurn":
             case "newTradeRoute":
             case "remove":

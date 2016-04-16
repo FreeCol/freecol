@@ -157,34 +157,7 @@ public class AIMessage {
         return aiUnit.getAIOwner().askServer()
             .clearSpeciality(aiUnit.getUnit());
     }
-
-    /**
-     * An AIUnit closes a session.
-     *
-     * @param aiUnit The <code>AIUnit</code> that closes the transaction.
-     * @param settlement The target <code>Settlement</code>.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askCloseSession(AIUnit aiUnit,
-                                          Settlement settlement) {
-        return aiUnit.getAIOwner().askServer()
-            .closeSession(aiUnit.getUnit(), settlement);
-    }
-
-    /**
-     * An AIUnit delivers a gift.
-     *
-     * @param aiUnit The <code>AIUnit</code> delivering the gift.
-     * @param settlement The <code>Settlement</code> to give to.
-     * @param goods The <code>Goods</code> to give.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askDeliverGift(AIUnit aiUnit, Settlement settlement,
-                                         Goods goods) {
-        return aiUnit.getAIOwner().askServer()
-            .deliverGiftToSettlement(aiUnit.getUnit(), settlement, goods);
-    }
-
+ 
     /**
      * An AIUnit disbands.
      *
@@ -274,31 +247,6 @@ public class AIMessage {
     }
 
     /**
-     * Gets a nation summary for a player.
-     *
-     * @param owner The <code>AIPlayer</code> making the inquiry.
-     * @param player The <code>Player</code> to summarize.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askNationSummary(AIPlayer owner, Player player) {
-        return owner.askServer()
-            .nationSummary(owner.getPlayer(), player);
-    }
-
-    /**
-     * An AIUnit opens a session.
-     *
-     * @param aiUnit The <code>AIUnit</code> that gets a session.
-     * @param settlement The target <code>Settlement</code>.
-     * @return True if the message was sent, and a non-error reply returned.
-     */
-    public static boolean askGetSession(AIUnit aiUnit,
-                                        Settlement settlement) {
-        return aiUnit.getAIOwner().askServer()
-            .openSession(aiUnit.getUnit(), settlement) != null;
-    }
-
-    /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
      *
      * @param aiUnit The <code>AIUnit</code> that is demanding.
@@ -365,6 +313,30 @@ public class AIMessage {
     public static boolean askMoveTo(AIUnit aiUnit, Location destination) {
         return aiUnit.getAIOwner().askServer()
             .moveTo(aiUnit.getUnit(), destination);
+    }
+
+    /**
+     * Gets a nation summary for a player.
+     *
+     * @param owner The <code>AIPlayer</code> making the inquiry.
+     * @param player The <code>Player</code> to summarize.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askNationSummary(AIPlayer owner, Player player) {
+        return owner.askServer()
+            .nationSummary(owner.getPlayer(), player);
+    }
+
+    /**
+     * A native AIUnit delivers a gift to a colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> delivering the gift.
+     * @param colony The <code>Colony</code> to give to.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askNativeGift(AIUnit aiUnit, Colony colony) {
+        return aiUnit.getAIOwner().askServer()
+            .nativeGift(aiUnit.getUnit(), colony);
     }
 
     /**

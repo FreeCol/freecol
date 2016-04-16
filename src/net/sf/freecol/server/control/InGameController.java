@@ -3359,6 +3359,48 @@ public final class InGameController extends Controller {
 
 
     /**
+     * A native unit delivers its gift to a colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
+     * @param unit The <code>Unit</code> that is delivering.
+     * @param colony The <code>Colony</code> to deliver to.
+     * @return A <code>ChangeSet</code> encapsulating this action.
+     */
+    public ChangeSet nativeGift(ServerPlayer serverPlayer,
+                                Unit unit, Colony colony) {
+        List<Goods> gl = unit.getGoods();
+        if (gl.isEmpty()) {
+            return serverPlayer.clientError("No gift to deliver: "
+                + unit.getId());
+        }
+        final Goods goods = gl.get(0);
+        final ServerPlayer otherPlayer = (ServerPlayer)colony.getOwner();
+
+        ChangeSet cs = new ChangeSet();
+        Tile tile = colony.getTile();
+        moveGoods(unit, goods.getType(), goods.getAmount(), colony);
+        cs.add(See.perhaps(), unit);
+
+        // Inform the receiver of the gift.
+        ModelMessage m = new ModelMessage(MessageType.GIFT_GOODS,
+                                          "deliverGift.goods",
+                                          colony, goods.getType())
+            .addStringTemplate("%player%", serverPlayer.getNationLabel())
+            .addNamed("%type%", goods)
+            .addAmount("%amount%", goods.getAmount())
+            .addName("%settlement%", colony.getName());
+        cs.addMessage(See.only(otherPlayer), m);
+        cs.add(See.only(otherPlayer), colony);
+        logger.info("Gift delivered by unit: " + unit.getId()
+            + " to colony " + colony.getName() + ": " + goods.toString());
+
+        // Others might see unit capacity?
+        getGame().sendToOthers(serverPlayer, cs);
+        return cs;
+    }
+
+
+    /**
      * Pay arrears.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.

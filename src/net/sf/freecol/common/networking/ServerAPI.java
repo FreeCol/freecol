@@ -922,6 +922,18 @@ public abstract class ServerAPI {
     }
 
     /**
+     * A native Unit delivers the gift it is carrying to a colony.
+     *
+     * @param unit The <code>Unit</code> delivering the gift.
+     * @param colony The <code>Colony</code> to give to.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean nativeGift(Unit unit, Colony colony) {
+        return askHandling(unit.getGame(),
+            new NativeGiftMessage(unit, colony), null);
+    }
+
+    /**
      * Server query-response for naming a new land.
      *
      * @param unit The <code>Unit</code> that has come ashore.
