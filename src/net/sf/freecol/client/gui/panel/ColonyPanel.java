@@ -891,24 +891,22 @@ public final class ColonyPanel extends PortPanel
     public void closeColonyPanel() {
         final Colony colony = getColony();
         boolean abandon = false;
-        if (colony.getUnitCount() == 0 && getMyPlayer().owns(colony)) {
-            if (!getGUI().confirm(null,
-                                  StringTemplate.key("abandonColony.text"),
-                                  "abandonColony.yes",
-                                  "abandonColony.no")) return;
-            abandon = true;
-        }
-        if (abandon) {
-            BuildableType buildable = colony.getCurrentlyBuilding();
-            if (buildable != null
-                && buildable.getRequiredPopulation() > colony.getUnitCount()
-                && !getGUI().confirm(null, StringTemplate
-                    .template("colonyPanel.reducePopulation")
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%number%", buildable.getRequiredPopulation())
-                    .addNamed("%buildable%", buildable),
-                    "ok", "cancel")) {
-                return;
+        if (getMyPlayer().owns(colony)) {
+            if (colony.getUnitCount() == 0) {
+                if (!getGUI().confirm(null, StringTemplate
+                        .key("abandonColony.text"),
+                             "abandonColony.yes", "abandonColony.no")) return;
+                abandon = true;
+            } else {
+                BuildableType buildable = colony.getCurrentlyBuilding();
+                int required = buildable.getRequiredPopulation();
+                if (buildable != null && required > colony.getUnitCount()
+                    && !getGUI().confirm(null, StringTemplate
+                        .template("colonyPanel.reducePopulation")
+                            .addName("%colony%", colony.getName())
+                            .addAmount("%number%", required)
+                            .addNamed("%buildable%", buildable),
+                        "ok", "cancel")) return;
             }
         }
 
