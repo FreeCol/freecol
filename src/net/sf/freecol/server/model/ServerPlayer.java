@@ -1010,22 +1010,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Try to reassign the ownership of a collection of tiles.
+     * Try to reassign the ownership of a collection of tiles,
+     * preferring this player.
      *
      * Do it in two passes so the first successful claim does not give
      * a large advantage.
      *
      * @param tiles The collection of <code>Tile</code>s to reassign.
-     * @param prefer An optional <code>Player</code> to prefer to reassign to.
      * @param avoid An optional <code>Settlement</code> to consider last
      *     when making claims.
      */
-    private static void reassignTiles(Collection<Tile> tiles,
-                                      Player prefer,
-                                      Settlement avoid) {
+    public void reassignTiles(Collection<Tile> tiles, Settlement avoid) {
         HashMap<Settlement, Integer> votes = new HashMap<>();
         HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
+        for (Tile t : tiles) t.changeOwnership(null, null);//-til
         for (Tile tile : tiles) {
             if (tile.isOccupied()) continue;
             votes.clear();
@@ -1045,10 +1044,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player
                     //     > other settlements
-                    int value = (prefer == null) ? 1
-                        : (claimant.getOwner() == prefer) ? 3
+                    int value = (claimant.getOwner() == this) ? 3
                         : (claimant.getOwner().isEuropean()
-                            == prefer.isEuropean()) ? 2
+                            == this.isEuropean()) ? 2
                         : 1;
                     if (votes.get(claimant) != null) {
                         value += votes.get(claimant);
@@ -3020,38 +3018,11 @@ outer:  for (Effect effect : effects) {
             }
         }
 
-        // The colony is falling, so allow other neighbours a chance
-        // to claim its tiles.  Make sure units are ejected when a tile
-        // is claimed.
-        Set<Tile> tiles = colony.getOwnedTiles();
-        tile.cacheUnseen();
-        tiles.remove(tile);
-        for (Tile t : tiles) {
-            t.cacheUnseen();
-            t.changeOwnership(null, null);//-til
-        }
-        reassignTiles(tiles, colonyPlayer, colony);//-til
-        for (Tile t : tiles) {
-            if (t.getOwningSettlement() != colony) {
-                ColonyTile ct = colony.getColonyTile(t);
-                colony.ejectUnits(ct, ct.getUnitList());
-            }
-        }
-
         // Hand over the colony.  Inform former owner of loss of owned
         // tiles, and process possible increase in line of sight.
         // No need to display the colony tile or the attacker tile to
         // the attacking player as the unit is yet to move
-        Set<Tile> explored = colony//-til
-            .csChangeOwner(attackerPlayer, cs);//-vis(attackerPlayer,colonyPlayer)
-        explored.addAll(tiles);
-        if (attacker.hasTile()) explored.remove(attacker.getTile());
-        cs.add(See.only(attackerPlayer), explored);
-        cs.add(See.perhaps().always(colonyPlayer).except(attackerPlayer),
-               tiles);
-
-        // Inform the former owner of loss of units, and add sound.
-        cs.addRemoves(See.only(colonyPlayer), null, units);
+        colony.csChangeOwner(attackerPlayer, true, cs);//-til,-vis(attackerPlayer,colonyPlayer)
         cs.addAttribute(See.only(attackerPlayer), "sound",
                         "sound.event.captureColony");
 
@@ -3569,7 +3540,7 @@ outer:  for (Effect effect : effects) {
         }
 
         // Reassign the tiles owned by the settlement, if possible
-        reassignTiles(owned, owner, null);
+        owner.reassignTiles(owned, null);
 
         See vis = See.perhaps().always(owner);
         if (missionaryOwner != null) vis.except(missionaryOwner);

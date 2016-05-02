@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
@@ -718,25 +719,47 @@ public class ServerColony extends Colony implements ServerModelObject {
      * -vis: Owner and new owner
      *
      * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param reassign If true, reassign the colony tiles.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return A set of newly explored <code>Tile</code>s as a result of the
-     *     ownership change.
      */
-    public Set<Tile> csChangeOwner(ServerPlayer newOwner, ChangeSet cs) {
-        final ServerPlayer owner = (ServerPlayer)getOwner();
+    public void csChangeOwner(ServerPlayer newOwner, boolean reassign,
+                              ChangeSet cs) {
+        final ServerPlayer oldOwner = (ServerPlayer)getOwner();
+        final Tile tile = getTile();
+        final Set<Tile> owned = getOwnedTiles();
+        final Set<Tile> unseen
+            = transform(tile.getSurroundingTiles(1, getLineOfSight()),
+                t -> !newOwner.hasExplored(t) || !newOwner.canSee(t),
+                Collectors.toSet());
 
-        for (Tile t : getOwnedTiles()) t.cacheUnseen(newOwner);//+til
+        for (Tile t : owned) t.cacheUnseen(newOwner);//+til
+        
+        if (reassign) {
+            // Allow other neighbouring settlements a chance to claim
+            // this colony's tiles except for the center.
+            owned.remove(tile);
+            oldOwner.reassignTiles(owned, this);//-til
 
+            // Make sure units are ejected when a tile is claimed.
+            for (Tile t : owned) {
+                if (t != tile && t.getOwningSettlement() != this) {
+                    ColonyTile ct = getColonyTile(t);
+                    ejectUnits(ct, ct.getUnitList());
+                }
+            }
+            owned.add(tile);
+        }
+        
         changeOwner(newOwner);//-vis(both),-til
 
         ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
             : ChangeType.CAPTURE;
         List<Unit> units = getUnitList();
-        units.addAll(getTile().getUnitList());
+        units.addAll(tile.getUnitList());
         for (Unit u : units) {//-vis(both)
-            owner.csChangeOwner(u, newOwner, change, null, cs);
+            oldOwner.csChangeOwner(u, newOwner, change, null, cs);
         }
-        cs.addRemoves(See.only(owner), this, units);
+        cs.addRemoves(See.only(oldOwner), this, units);
 
         // Disable all exports
         for (ExportData exportDatum : exportData.values()) {
@@ -754,7 +777,13 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Changing the owner might alter bonuses applied by founding fathers:
         updateSoL();
         updateProductionBonus();
-        return newOwner.exploreForSettlement(this);
+
+        // Always update the new owner
+        unseen.addAll(getOwnedTiles());
+        cs.add(See.only(newOwner), unseen);
+
+        // Always update the old owner, and perhaps others.
+        cs.add(See.perhaps().always(oldOwner).except(newOwner), owned);
     }
 
     /**

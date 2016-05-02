@@ -278,8 +278,7 @@ public final class InGameController extends Controller {
                                  ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
         ServerPlayer owner = (ServerPlayer)colony.getOwner();
-        colony.csChangeOwner(serverPlayer, cs);//-vis(serverPlayer,owner)
-        cs.add(See.perhaps().always(owner), colony.getOwnedTiles());
+        colony.csChangeOwner(serverPlayer, false, cs);//-vis(serverPlayer,owner)
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         owner.invalidateCanSeeTiles();//+vis(owner)
         getGame().sendToAll(cs);
@@ -850,13 +849,7 @@ public final class InGameController extends Controller {
             }
             Colony colony = tradeItem.getColony(getGame());
             if (colony != null) {
-                ServerPlayer former = (ServerPlayer) colony.getOwner();
-                for (Tile t : colony.getOwnedTiles()) {
-                    t.cacheUnseen(dest);//+til
-                }
-                ((ServerColony)colony).csChangeOwner(dest, cs);//-vis(both),-til
-                cs.add(See.only(dest), dest.exploreForSettlement(colony));
-                cs.add(See.perhaps().always(former), colony.getOwnedTiles());
+                ((ServerColony)colony).csChangeOwner(dest, false, cs);//-vis(both),-til
                 visibilityChange = true;
             }
             int gold = tradeItem.getGold();

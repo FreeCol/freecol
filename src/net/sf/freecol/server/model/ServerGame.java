@@ -31,10 +31,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -418,6 +420,7 @@ public class ServerGame extends Game implements ServerModelObject {
         lb.add(" ]=> ", weakestAIPlayer.getName(),
                " cedes to ", strongestAIPlayer.getName(), ":");
         List<Tile> tiles = new ArrayList<>();
+        Set<Tile> updated = new HashSet<>();
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
         ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
         for (Player player : getLiveNativePlayers(null)) {
@@ -436,14 +439,8 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
         for (Colony colony : weakest.getColonies()) {
-            for (Tile t : colony.getOwnedTiles()) {
-                t.cacheUnseen();//+til
-                tiles.add(t);
-            }
-            ((ServerColony)colony).csChangeOwner(strongest,
-                                                 cs);//-vis(both),-til
-            cs.add(See.only(strongest),
-                strongest.exploreForSettlement(colony));
+            updated.addAll(colony.getOwnedTiles());
+            ((ServerColony)colony).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", colony.getName());
         }
         for (Unit unit : weakest.getUnits()) {
@@ -479,6 +476,7 @@ public class ServerGame extends Game implements ServerModelObject {
                    .addStringTemplate("%nation%", winner));
         setSpanishSuccession(true);
         cs.addPartial(See.all(), this, "spanishSuccession");
+        tiles.removeAll(updated);
         cs.add(See.perhaps(), tiles);
         
         weakest.csKill(cs);//+vis(weakest)
