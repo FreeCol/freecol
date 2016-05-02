@@ -891,16 +891,16 @@ public final class ColonyPanel extends PortPanel
     public void closeColonyPanel() {
         final Colony colony = getColony();
         boolean abandon = false;
+        BuildableType buildable;
         if (getMyPlayer().owns(colony)) {
             if (colony.getUnitCount() == 0) {
                 if (!getGUI().confirm(null, StringTemplate
                         .key("abandonColony.text"),
                              "abandonColony.yes", "abandonColony.no")) return;
                 abandon = true;
-            } else {
-                BuildableType buildable = colony.getCurrentlyBuilding();
+            } else if ((buildable = colony.getCurrentlyBuilding()) != null) {
                 int required = buildable.getRequiredPopulation();
-                if (buildable != null && required > colony.getUnitCount()
+                if (required > colony.getUnitCount()
                     && !getGUI().confirm(null, StringTemplate
                         .template("colonyPanel.reducePopulation")
                             .addName("%colony%", colony.getName())
