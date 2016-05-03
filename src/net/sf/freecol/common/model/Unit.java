@@ -970,7 +970,6 @@ public class Unit extends GoodsLocation
         return getTile() != null;
     }
 
-
     /**
      * Gets the work location this unit is working in.
      *
@@ -978,26 +977,6 @@ public class Unit extends GoodsLocation
      */
     public WorkLocation getWorkLocation() {
         return (isInColony()) ? (WorkLocation)getLocation() : null;
-    }
-
-    /**
-     * Gets the <code>Building</code> this unit is working in.
-     *
-     * @return The current <code>Building</code>, or null if none.
-     */
-    public Building getWorkBuilding() {
-        return (getLocation() instanceof Building) ? (Building)getLocation()
-            : null;
-    }
-
-    /**
-     * Gets the <code>ColonyTile</code> this unit is working in.
-     *
-     * @return The current <code>ColonyTile</code>, or null if none.
-     */
-    public ColonyTile getWorkTile() {
-        return (getLocation() instanceof ColonyTile) ? (ColonyTile)getLocation()
-            : null;
     }
 
     /**

@@ -2190,7 +2190,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
             // Get the current and potential productions for the
             // work location of the non-expert.
-            WorkLocation nwl = nonExpert.getWorkTile();
+            WorkLocation nwl = nonExpert.getWorkLocation();
             if (nwl != null) {
                 nonExpertProductionNow = nwl.getPotentialProduction(expertise,
                     nonExpert.getType());

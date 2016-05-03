@@ -635,8 +635,7 @@ public final class ColonyPanel extends PortPanel
         JMenuItem subMenu = null;
 
         for (final Unit unit : colony.getUnitList()) {
-            Building workingInBuilding = unit.getWorkBuilding();
-            ColonyTile workingOnLand = unit.getWorkTile();
+            WorkLocation wl = unit.getWorkLocation();
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();
 
@@ -644,34 +643,31 @@ public final class ColonyPanel extends PortPanel
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("colonyPanel.producing"))
-                    .append(" ").append(Messages.getName(unit.getType()
+                    .append(" ")
+                    .append(Messages.message("colonyPanel.producing"))
+                    .append(" ")
+                    .append(Messages.getName(unit.getType()
                             .getSkillTaught()))
-                    .append(" ").append(unit.getTurnsOfTraining())
-                    .append("/").append(unit.getNeededTurnsOfTraining());
-            } else if (workingOnLand != null && goodsType != null) {
-                int producing = workingOnLand.getProductionOf(unit, goodsType);
-                String nominative = Messages.message(StringTemplate
-                    .template(goodsType)
-                    .addAmount("%amount%", producing));
+                    .append(" ")
+                    .append(unit.getTurnsOfTraining())
+                    .append("/")
+                    .append(unit.getNeededTurnsOfTraining());
+            } else if (wl != null && goodsType != null) {
+                int producing = wl.getProductionOf(unit, goodsType);
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("colonyPanel.producing"))
-                    .append(" ").append(producing)
-                    .append(" ").append(nominative);
-            } else if (workingInBuilding != null && goodsType != null) {
-                int producing = workingInBuilding.getProductionOf(unit,
-                                                                  goodsType);
-                String nominative = Messages.message(StringTemplate
-                    .template(goodsType)
-                    .addAmount("%amount%", producing));
-                sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("colonyPanel.producing"))
-                    .append(" ").append(producing)
-                    .append(" ").append(nominative);
+                    .append(" ")
+                    .append(Messages.message("colonyPanel.producing"))
+                    .append(" ")
+                    .append(producing)
+                    .append(" ")
+                    .append(Messages.message(StringTemplate.template(goodsType)
+                            .addAmount("%amount%", producing)));
             } else {
                 sb.append(unit.getDescription())
-                    .append(" ").append(Messages.message("colonyPanel.producing"))
-                    .append(" ").append(Messages.message("nothing"));
+                    .append(" ")
+                    .append(Messages.message("colonyPanel.producing"))
+                    .append(" ")
+                    .append(Messages.message("nothing"));
             }
             String menuTitle = sb.toString();
             subMenu = new JMenuItem(menuTitle, unitIcon);
