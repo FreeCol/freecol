@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
 
     public static final String TAG = "chooseFoundingFather";
     private static final String FOUNDING_FATHER_TAG = "foundingFather";
+    private static final List<String> fatherKeys
+        = Collections.<String>unmodifiableList(toList(map(FoundingFatherType.values(),
+                    ft -> ft.toString())));
 
     /** The fathers to offer. */
     private final List<FoundingFather> fathers;
@@ -77,8 +81,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         super(getTagName());
 
         final Specification spec = game.getSpecification();
-        this.fathers = transform(map(FoundingFatherType.values(),
-                                     ft -> element.getAttribute(ft.toString())),
+        List<String> found = toList(map(fatherKeys,
+                                        k -> element.getAttribute(k)));
+        this.fathers = transform(found,
             id -> id != null && !id.isEmpty(),
             id -> spec.getFoundingFather(id),
             Collectors.toList());
@@ -164,7 +169,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         return new DOMMessage(getTagName(),
             FOUNDING_FATHER_TAG, this.foundingFatherId)
             .setAttributes(toMap(getFathers(),
-                    f -> f.getType().toString(), f -> f.getId()))
+                                 f -> f.getType().toString(), f -> f.getId()))
             .toXMLElement();
     }
 
