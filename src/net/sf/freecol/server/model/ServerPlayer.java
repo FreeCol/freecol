@@ -967,8 +967,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public Set<Tile> exploreForSettlement(Settlement settlement) {
         Set<Tile> tiles = new HashSet<>(settlement.getOwnedTiles());
-        tiles.addAll(settlement.getTile().getSurroundingTiles(1,
-                     settlement.getLineOfSight()));
+        tiles.addAll(settlement.getVisibleTiles());
+        tiles.remove(settlement.getTile());
         return exploreTiles(tiles);
     }
 
@@ -984,8 +984,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         return (getGame() == null || getGame().getMap() == null || unit == null
             || !(unit.getLocation() instanceof Tile)) 
             ? Collections.<Tile>emptySet()
-            : exploreTiles(unit.getTile().getSurroundingTiles(0,
-                    unit.getLineOfSight()));
+            : exploreTiles(unit.getVisibleTiles());
     }
 
     /**
@@ -2157,15 +2156,12 @@ outer:  for (Effect effect : effects) {
                 for (Colony c : (hasAbility(Ability.SEE_ALL_COLONIES))
                          ? getGame().getAllColonies(null)
                          : getColonies()) {
-                    los = c.getLineOfSight();
-                    for (Tile t : c.getTile().getSurroundingTiles(1, los)) {
+                    for (Tile t : c.getVisibleTiles()) {
                         if (!canSee(t)) tiles.add(t);
                     }
                 }
                 for (Unit u : getUnits()) {
-                    if (!u.hasTile()) continue;
-                    los = u.getLineOfSight();
-                    for (Tile t : u.getTile().getSurroundingTiles(1, los)) {
+                    for (Tile t : u.getVisibleTiles()) {
                         if (!canSee(t)) tiles.add(t);
                     }
                 }

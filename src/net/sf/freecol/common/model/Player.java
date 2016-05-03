@@ -2815,16 +2815,14 @@ public class Player extends FreeColGameObject implements Nameable {
             if (!(unit.getLocation() instanceof Tile)) continue;
 
             // All the units.
-            for (Tile t : ((Tile)unit.getLocation()).getSurroundingTiles(0,
-                    unit.getLineOfSight())) {
+            for (Tile t : unit.getVisibleTiles()) {
                 cST[t.getX()][t.getY()] = true;
                 t.seeTile(this);
             }
         }
         // All the settlements.
         for (Settlement settlement : getSettlements()) {
-            for (Tile t : settlement.getTile().getSurroundingTiles(0,
-                    settlement.getLineOfSight())) {
+            for (Tile t : settlement.getVisibleTiles()) {
                 cST[t.getX()][t.getY()] = true;
                 t.seeTile(this);
             }
@@ -2837,8 +2835,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     if (!is.hasMissionary(this)) {
                         continue;
                     }
-                    for (Tile t : is.getTile().getSurroundingTiles(0,
-                            is.getLineOfSight())) {
+                    for (Tile t : is.getVisibleTiles()) {
                         cST[t.getX()][t.getY()] = true;
                         t.seeTile(this);
                     }
@@ -2848,8 +2845,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // All other European settlements if can see all colonies.
         if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
             for (Colony c : getGame().getAllColonies(this)) {
-                for (Tile t : c.getTile().getSurroundingTiles(0,
-                        c.getLineOfSight())) {
+                for (Tile t : c.getVisibleTiles()) {
                     cST[t.getX()][t.getY()] = true;
                     t.seeTile(this);
                 }

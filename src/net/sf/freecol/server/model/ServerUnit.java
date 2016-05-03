@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -865,9 +866,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
         final Location oldLocation = getLocation();
-        List<Tile> oldTiles = (oldLocation.getTile() == null)
-            ? Collections.<Tile>emptyList()
-            : oldLocation.getTile().getSurroundingTiles(1, getLineOfSight());
+        Set<Tile> oldTiles = getVisibleTiles();
         List<Tile> newTiles = collectNewTiles(newTile);
 
         // Update unit state.

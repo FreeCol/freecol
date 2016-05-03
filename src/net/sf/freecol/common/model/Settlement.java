@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -214,6 +215,17 @@ public abstract class Settlement extends GoodsLocation
         RandomRange range = getPlunderRange(attacker);
         return (range == null) ? 0
             : range.getAmount("Plunder " + getName(), random, false);
+    }
+
+    /**
+     * Get the tiles visible from this settlement.
+     *
+     * @param A set of visible tiles.
+     */
+    public Set<Tile> getVisibleTiles() {
+        final Tile tile = getTile();
+        return (tile == null) ? Collections.<Tile>emptySet()
+            : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
     }
 
     /**

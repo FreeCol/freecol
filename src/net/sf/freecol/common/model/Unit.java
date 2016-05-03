@@ -3162,7 +3162,18 @@ public class Unit extends GoodsLocation
         return (int)applyModifiers(base, turn, result);
     }
 
-
+    /**
+     * Get the tiles visible to this unit.
+     *
+     * @return A set of visible <code>Tile</code>s.
+     */
+    public Set<Tile> getVisibleTiles() {
+        final Tile tile = getTile();
+        return (tile == null) ? Collections.<Tile>emptySet()
+            : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
+    }
+           
+    
     // Goods handling
 
     /**
