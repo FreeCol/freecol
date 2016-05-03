@@ -93,7 +93,7 @@ public class ColonyTile extends WorkLocation {
      * @return True if this is the colony center tile.
      */
     public boolean isColonyCenterTile() {
-        return getWorkTile() == getTile();
+        return this.workTile == getTile();
     }
 
     /**

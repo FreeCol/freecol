@@ -358,7 +358,7 @@ public abstract class WorkLocation extends UnitLocation
         if (this instanceof ColonyTile) {
             // Assume the work is worth doing for owned or trivially
             // claimable colony tiles.
-            Tile tile = ((ColonyTile)this).getWorkTile();
+            Tile tile = getWorkTile();
             ok = owner.owns(tile) || owner.canClaimForSettlement(tile);
         } else if (this instanceof Building) {
             Building bu = (Building)this;
@@ -797,6 +797,13 @@ public abstract class WorkLocation extends UnitLocation
      */
     public abstract NoAddReason getNoWorkReason();
 
+    /**
+     * Get an associated tile, if any.
+     *
+     * @return The underlying <code>Tile</code> which is worked, if any.
+     */
+    public abstract Tile getWorkTile();
+    
     /**
      * Get the "level" of this work location.
      *

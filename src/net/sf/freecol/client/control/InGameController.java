@@ -5025,7 +5025,7 @@ public final class InGameController extends FreeColClientHolder {
 
         Colony colony = workLocation.getColony();
         if (workLocation instanceof ColonyTile) {
-            Tile tile = ((ColonyTile)workLocation).getWorkTile();
+            Tile tile = workLocation.getWorkTile();
             if (tile.hasLostCityRumour()) {
                 getGUI().showInformationMessage("tileHasRumour");
                 return false;

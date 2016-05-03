@@ -469,6 +469,14 @@ public class Building extends WorkLocation
     /**
      * {@inheritDoc}
      */
+    @Override
+    public Tile getWorkTile() {
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int getLevel() {
         return getType().getLevel(); // Delegate to type
     }

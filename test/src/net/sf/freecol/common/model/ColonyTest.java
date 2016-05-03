@@ -518,8 +518,8 @@ public class ColonyTest extends FreeColTestCase {
             assertFalse(wl == owl);
             assertEquals(wl.getId(), owl.getId());
             if (wl instanceof ColonyTile) {
-                Tile wt = ((ColonyTile)wl).getWorkTile();
-                Tile owt = ((ColonyTile)owl).getWorkTile();
+                Tile wt = wl.getWorkTile();
+                Tile owt = owl.getWorkTile();
                 assertFalse(wt == owt);
                 assertEquals(wt.getId(), owt.getId());
                 assertEquals(wt.getType(), owt.getType());

@@ -1261,9 +1261,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public void updateTileImprovementPlans(LogBuilder lb) {
         List<TileImprovementPlan> newPlans = new ArrayList<>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-            if (!(wl instanceof ColonyTile)) continue;
-            ColonyTile colonyTile = (ColonyTile) wl;
-            Tile workTile = colonyTile.getWorkTile();
+            Tile workTile = wl.getWorkTile();
+            if (workTile == null) continue;
+            ColonyTile colonyTile = (ColonyTile)wl;
             if (workTile.getOwningSettlement() != colony
                 || getPlanFor(workTile, newPlans) != null) continue;
 
@@ -1301,9 +1301,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 && !change.isForested()
                 && !colonyTile.isColonyCenterTile()
                 && count(colony.getAvailableWorkLocations(),
-                         ct -> ct instanceof ColonyTile
-                             && !((ColonyTile)ct).isColonyCenterTile()
-                             && ((ColonyTile)ct).getWorkTile().isForested())
+                    cwl -> cwl instanceof ColonyTile
+                        && !((ColonyTile)cwl).isColonyCenterTile()
+                        && cwl.getWorkTile().isForested())
                     <= FOREST_MINIMUM) continue;
 
             newPlans.add(plan); // Otherwise add the plan.

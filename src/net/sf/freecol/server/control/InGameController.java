@@ -4179,7 +4179,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         if (workLocation instanceof ColonyTile) {
-            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            Tile tile = workLocation.getWorkTile();
             if (tile.getOwningSettlement() != colony) {
                 // Claim known free land (because canAdd() succeeded).
                 serverPlayer.csClaimLand(tile, colony, 0, cs);
