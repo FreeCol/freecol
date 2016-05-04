@@ -274,10 +274,10 @@ public final class UnitLabel extends JLabel
         if (ignoreLocation)
             return;
 
-        if (unit.getLocation() instanceof ColonyTile) {
+        if (unit.getLocation() instanceof WorkLocation) {
             GoodsType workType = unit.getWorkType();
             if (workType != null) {
-                int production = ((ColonyTile)unit.getLocation())
+                int production = ((WorkLocation)unit.getLocation())
                     .getTotalProductionOf(workType);
                 ProductionLabel pl = new ProductionLabel(freeColClient, lib,
                     new AbstractGoods(workType, production));

@@ -84,11 +84,10 @@ public class WorkProductionPanel extends FreeColPanel {
 
         // FIXME: Fix OO.
         if (wl instanceof ColonyTile) {
-            final ColonyTile colonyTile = (ColonyTile)wl;
-            final Tile tile = colonyTile.getWorkTile();
+            final Tile tile = wl.getWorkTile();
             final TileType tileType = tile.getType();
             shortName = Messages.getName(tileType);
-            longName = Messages.message(colonyTile.getLabel());
+            longName = Messages.message(wl.getLabel());
             image = getGUI().createColonyTileImage(tile, colony);
 
         } else if (wl instanceof Building) {

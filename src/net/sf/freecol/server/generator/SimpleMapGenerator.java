@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -958,18 +959,19 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
         buildColonyUnit.setLocation(colony);
-        if (buildColonyUnit.getLocation() instanceof ColonyTile) {
-            Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
+        Tile ct = (buildColonyUnit.getLocation() instanceof WorkLocation)
+            ? ((WorkLocation)buildColonyUnit.getLocation()).getWorkTile()
+            : null;
+        if (ct != null) {
             for (TileType t : spec.getTileTypeList()) {
-                if (!t.isWater()) {
-                    ct.setType(t);
-                    TileImprovementType plowType = map.getSpecification()
-                        .getTileImprovementType("model.improvement.plow");
-                    TileImprovement plow = new TileImprovement(game, ct, plowType);
-                    plow.setTurnsToComplete(0);
-                    ct.add(plow);
-                    break;
-                }
+                if (t.isWater()) continue;
+                ct.setType(t);
+                TileImprovementType plowType = map.getSpecification()
+                    .getTileImprovementType("model.improvement.plow");
+                TileImprovement plow = new TileImprovement(game, ct, plowType);
+                plow.setTurnsToComplete(0);
+                ct.add(plow);
+                break;
             }
         }
         BuildingType schoolType = spec.getBuildingType("model.building.schoolhouse");
@@ -984,7 +986,7 @@ public class SimpleMapGenerator implements MapGenerator {
         unitType = spec.getUnitType("model.unit.expertLumberJack");
         Unit lumberjack = new ServerUnit(game, colony, player, unitType);
         if (lumberjack.getLocation() instanceof ColonyTile) {
-            Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
+            Tile lt = ((WorkLocation)lumberjack.getLocation()).getWorkTile();
             for (TileType t : spec.getTileTypeList()) {
                 if (t.isForested()) {
                     lt.setType(t);

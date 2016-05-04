@@ -1272,12 +1272,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             // production that is underway.
             GoodsType goodsType;
             if (colonyTile.isColonyCenterTile()) {
-                AbstractGoods food = find(colonyTile.getProduction(),
+                AbstractGoods food = find(wl.getProduction(),
                                           AbstractGoods.isFoodType);
                 goodsType = (food == null) ? null : food.getType();
             } else {
-                goodsType = (colonyTile.isEmpty()) ? null
-                    : colonyTile.getCurrentWorkType();
+                goodsType = (wl.isEmpty()) ? null : wl.getCurrentWorkType();
             }
             if (goodsType == null) continue;
 

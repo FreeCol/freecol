@@ -606,9 +606,9 @@ public class BuildingTest extends FreeColTestCase {
         final Building weaver = colony.getBuilding(weaverHouseType);
 
         assertTrue(colonist.getLocation() instanceof ColonyTile);
-        assertEquals(plainsType, ((ColonyTile)colonist.getLocation()).getWorkTile().getType());
+        assertEquals(plainsType, ((WorkLocation)colonist.getLocation()).getWorkTile().getType());
         assertTrue(worker.getLocation() instanceof ColonyTile);
-        assertEquals(plainsType, ((ColonyTile)worker.getLocation()).getWorkTile().getType());
+        assertEquals(plainsType, ((WorkLocation)worker.getLocation()).getWorkTile().getType());
 
         assertTrue(weaver.add(worker));
         assertEquals(worker, weaver.getUnitList().get(0));
