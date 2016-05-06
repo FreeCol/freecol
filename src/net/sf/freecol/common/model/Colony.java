@@ -798,8 +798,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<RandomChoice<Disaster>> getDisasters() {
         List<RandomChoice<Disaster>> disasters = new ArrayList<>();
-        for (ColonyTile tile : getColonyTiles()) {
-            disasters.addAll(tile.getWorkTile().getDisasters());
+        for (ColonyTile ct : getColonyTiles()) {
+            disasters.addAll(ct.getWorkTile().getDisasters());
         }
         return disasters;
     }

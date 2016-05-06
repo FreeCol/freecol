@@ -4171,12 +4171,10 @@ public final class InGameController extends Controller {
         colony.getGoodsContainer().saveState();
 
         ChangeSet cs = new ChangeSet();
-        if (workLocation instanceof ColonyTile) {
-            Tile tile = workLocation.getWorkTile();
-            if (tile.getOwningSettlement() != colony) {
-                // Claim known free land (because canAdd() succeeded).
-                serverPlayer.csClaimLand(tile, colony, 0, cs);
-            }
+        Tile tile = workLocation.getWorkTile();
+        if (tile != null && tile.getOwningSettlement() != colony) {
+            // Claim known free land (because canAdd() succeeded).
+            serverPlayer.csClaimLand(tile, colony, 0, cs);
         }
 
         colony.equipForRole(unit, spec.getDefaultRole(), 0);

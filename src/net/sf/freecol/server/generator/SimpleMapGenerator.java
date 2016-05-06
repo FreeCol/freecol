@@ -959,9 +959,7 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
         buildColonyUnit.setLocation(colony);
-        Tile ct = (buildColonyUnit.getLocation() instanceof WorkLocation)
-            ? ((WorkLocation)buildColonyUnit.getLocation()).getWorkTile()
-            : null;
+        Tile ct = buildColonyUnit.getWorkTile();
         if (ct != null) {
             for (TileType t : spec.getTileTypeList()) {
                 if (t.isWater()) continue;
@@ -985,8 +983,8 @@ public class SimpleMapGenerator implements MapGenerator {
 
         unitType = spec.getUnitType("model.unit.expertLumberJack");
         Unit lumberjack = new ServerUnit(game, colony, player, unitType);
-        if (lumberjack.getLocation() instanceof ColonyTile) {
-            Tile lt = ((WorkLocation)lumberjack.getLocation()).getWorkTile();
+        Tile lt = lumberjack.getWorkTile();
+        if (lt != null) {
             for (TileType t : spec.getTileTypeList()) {
                 if (t.isForested()) {
                     lt.setType(t);

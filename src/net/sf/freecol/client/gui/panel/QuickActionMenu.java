@@ -852,8 +852,7 @@ public final class QuickActionMenu extends JPopupMenu {
      */
     private boolean addTileItem(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
-        final WorkLocation wl = unit.getWorkLocation();
-        final Tile tile = (wl == null) ? null : wl.getWorkTile();
+        final Tile tile = (unit == null) ? null : unit.getWorkTile();
         if (tile != null) {
             addTileItem(tile);
             return true;

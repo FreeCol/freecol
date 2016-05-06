@@ -980,6 +980,17 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get the work tile this unit is working in, if any.
+     *
+     * @return The current work <code>Tile</code>, if any.
+     */
+    public Tile getWorkTile() {
+        return (getLocation() instanceof WorkLocation)
+            ? ((WorkLocation)getLocation()).getWorkTile()
+            : null;
+    }
+
+    /**
      * Gets the entry location for this unit to use when returning from
      * {@link Europe}.
      *

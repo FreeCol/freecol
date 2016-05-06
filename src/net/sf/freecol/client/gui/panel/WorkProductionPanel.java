@@ -83,21 +83,18 @@ public class WorkProductionPanel extends FreeColPanel {
                                             workType, unitType);
 
         // FIXME: Fix OO.
-        if (wl instanceof ColonyTile) {
-            final Tile tile = wl.getWorkTile();
+        final Tile tile = wl.getWorkTile();
+        if (tile != null) { // ColonyTile
             final TileType tileType = tile.getType();
             shortName = Messages.getName(tileType);
             longName = Messages.message(wl.getLabel());
             image = getGUI().createColonyTileImage(tile, colony);
 
-        } else if (wl instanceof Building) {
+        } else { // Building
             final Building building = (Building)wl;
             shortName = Messages.getName(building.getType());
             longName = shortName;
             image = lib.getBuildingImage(building);
-
-        } else {
-            throw new IllegalStateException("WorkLocation OO fail.");
         }
 
         add(new JLabel(longName), "span, align center, wrap 30");
