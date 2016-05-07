@@ -340,6 +340,7 @@ public class ModelMessage extends StringTemplate {
             // Then for each key, check if it can be made into a link.
             // If not, ignore it.
             String val = Messages.message(getReplacement(key));
+            if (val == null) continue;
             Object b = Utility.getMessageButton(key, val, player, source);
             if (b == null) continue;
 

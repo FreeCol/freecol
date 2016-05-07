@@ -277,7 +277,7 @@ public final class ReportTurnPanel extends ReportPanel {
         Font font = FontLibrary.createCompatibleFont(text,
             FontLibrary.FontType.HEADER, FontLibrary.FontSize.SMALL);
         JComponent headline;
-        if(commandId != null) {
+        if (commandId != null) {
             JButton button = new JButton(text);
             button.addActionListener(this);
             button.setActionCommand(commandId);

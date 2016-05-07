@@ -205,8 +205,12 @@ public final class Utility {
             if (source instanceof Location) {
                 link = source.getLinkTarget(player);
             }
-        } else if ("%unit%".equals(key) || key.endsWith("Unit%")) {
-            if (source instanceof Unit) {
+        } else if ("%unit%".equals(key)) {
+            if (source instanceof Unit && player.owns((Unit)source)) {
+                link = source.getLinkTarget(player);
+            }
+        } else if ("%enemyUnit%".equals(key)) {
+            if (source instanceof Unit && !player.owns((Unit)source)) {
                 link = source.getLinkTarget(player);
             }
         }
