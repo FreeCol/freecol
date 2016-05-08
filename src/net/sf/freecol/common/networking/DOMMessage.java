@@ -160,7 +160,17 @@ public class DOMMessage {
     private Element getElement() {
         return this.document.getDocumentElement();
     }
-    
+
+    /**
+     * Gets the type of an element.
+     *
+     * @param element The <code>Element</code> to query.
+     * @return The type of the element.
+     */
+    public static String getType(Element element) {
+        return (element == null) ? null : element.getTagName();
+    }
+
     /**
      * Gets the type of this DOMMessage.
      *
@@ -168,7 +178,7 @@ public class DOMMessage {
      */
     public String getType() {
         return (this.document != null && getElement() != null)
-            ? getElement().getTagName()
+            ? getType(getElement())
             : INVALID_MESSAGE;
     }
 

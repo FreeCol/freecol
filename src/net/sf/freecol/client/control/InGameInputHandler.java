@@ -604,7 +604,7 @@ public final class InGameInputHandler extends ClientInputHandler {
     private Element featureChange(Element element) {
         final Game game = getGame();
         final Specification spec = game.getSpecification();
-        final boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
+        final boolean add = DOMMessage.getBooleanAttribute(element, "add", false);
         final String id = DOMMessage.readId(element);
         final FreeColGameObject object = game.getFreeColGameObject(id);
         if (object == null) {
@@ -613,7 +613,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         }
 
         DOMMessage.mapChildren(element, (e) -> {
-                final String tag = DOMMessage.readId(e);
+                final String tag = DOMMessage.getType(e);
                 if (Ability.getTagName().equals(tag)) {
                     if (add) {
                         object.addAbility(new Ability(e, spec));
