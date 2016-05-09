@@ -299,7 +299,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
                         if (game != null && game.getMap() != null) break;
                         try {
                             Thread.sleep(200);
-                        } catch (Exception ex) {}
+                        } catch (InterruptedException ie) {}
                     }
                     
                     SwingUtilities.invokeLater(() -> {

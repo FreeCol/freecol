@@ -62,7 +62,9 @@ public final class DefaultHandler extends Handler {
                 throw new FreeColException("Log file \"" + fileName
                     + "\" could not be created.");
             } else if (file.isFile()) {
-                file.delete();
+                try {
+                    file.delete();
+                } catch (SecurityException ex) {} // Do what?
             }
         }
 
