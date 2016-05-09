@@ -786,8 +786,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (!tipMap.isEmpty()) {
             lb.add("\n  Improvements:");
-            for (Tile t : tipMap.keySet()) {
-                TileImprovementPlan tip = tipMap.get(t);
+            for (Entry<Tile, TileImprovementPlan> e : tipMap.entrySet()) {
+                Tile t = e.getKey();
+                TileImprovementPlan tip = e.getValue();
                 AIUnit pioneer = tip.getPioneer();
                 lb.add(" ", t, "=", tip.getType().getSuffix());
                 if (pioneer != null) lb.add("/", pioneer.getUnit());
@@ -1022,9 +1023,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (!transportDemand.isEmpty()) {
             lb.add("\n  Transport Demand:");
-            for (Location ld : transportDemand.keySet()) {
+            for (Entry<Location, List<Wish>> e : transportDemand.entrySet()) {
+                Location ld = e.getKey();
                 lb.add("\n    ", ld, "[");
-                for (Wish w : transportDemand.get(ld)) lb.add(" ", w);
+                for (Wish w : e.getValue()) lb.add(" ", w);
                 lb.add(" ]");
             }
         }
@@ -1249,8 +1251,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
         if (!workerWishes.isEmpty()) {
             lb.add("\n  Wishes (workers):");
-            for (UnitType ut : workerWishes.keySet()) {
-                List<WorkerWish> wl = workerWishes.get(ut);
+            for (Entry<UnitType, List<WorkerWish>> e
+                     : workerWishes.entrySet()) {
+                UnitType ut = e.getKey();
+                List<WorkerWish> wl = e.getValue();
                 if (!wl.isEmpty()) {
                     lb.add("\n    ", ut.getSuffix(), ":");
                     for (WorkerWish ww : wl) {
@@ -1262,8 +1266,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (!goodsWishes.isEmpty()) {
             lb.add("\n  Wishes (goods):");
-            for (GoodsType gt : goodsWishes.keySet()) {
-                List<GoodsWish> gl = goodsWishes.get(gt);
+            for (Entry<GoodsType, List<GoodsWish>> e : goodsWishes.entrySet()) {
+                GoodsType gt = e.getKey();
+                List<GoodsWish> gl = e.getValue();
                 if (!gl.isEmpty()) {
                     lb.add("\n    ", gt.getSuffix(), ":");
                     for (GoodsWish gw : gl) {
