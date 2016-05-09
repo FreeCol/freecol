@@ -1352,7 +1352,7 @@ public class Map extends FreeColGameObject implements Location {
                 .append(" onCarrier=").append(onCarrier)
                 .append(" decider=").append(decider)
                 .append(" cost=").append(cost)
-                .append("]");
+                .append(']');
             return sb.toString();
         }
     };

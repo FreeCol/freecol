@@ -337,12 +337,12 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getXMLTagName())
-            .append(" ").append(getLocation().getId());
+        sb.append('[').append(getXMLTagName())
+            .append(' ').append(getLocation().getId());
         for (GoodsType goodsType : getCargo()) {
-            sb.append(" ").append(goodsType);
+            sb.append(' ').append(goodsType);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();            
     }
 

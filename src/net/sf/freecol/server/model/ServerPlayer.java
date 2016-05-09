@@ -1229,10 +1229,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (market == null) return false;
         boolean ret = false;
         StringBuilder sb = new StringBuilder(32);
-        sb.append("Flush market for ").append(getId()).append(":");
+        sb.append("Flush market for ").append(getId()).append(':');
         for (GoodsType type : getSpecification().getGoodsTypeList()) {
             if (csFlushMarket(type, cs)) {
-                sb.append(" ").append(type.getId());
+                sb.append(' ').append(type.getId());
                 ret = true;
             }
         }
@@ -1669,27 +1669,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .append(" effect/s of disaster ")
             .append(Messages.getName(disaster));
         if (colony != null) sb.append(" to ").append(colony.getName());
-        sb.append(":");
+        sb.append(':');
         List<Effect> effects = new ArrayList<>();
         switch (disaster.getNumberOfEffects()) {
         case ONE:
             effects.add(RandomChoice.getWeightedRandom(logger,
                     "Get effect of disaster", disaster.getEffects(), random));
-            sb.append(" ").append(Messages.getName(effects.get(0)));
+            sb.append(' ').append(Messages.getName(effects.get(0)));
             break;
         case SEVERAL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
                 if (randomInt(logger, "Get effects of disaster", random, 100)
                     < effect.getProbability()) {
                     effects.add(effect.getObject());
-                    sb.append(" ").append(Messages.getName(effect.getObject()));
+                    sb.append(' ').append(Messages.getName(effect.getObject()));
                 }
             }
             break;
         case ALL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
                 effects.add(effect.getObject());
-                sb.append(" ").append(Messages.getName(effect.getObject()));
+                sb.append(' ').append(Messages.getName(effect.getObject()));
             }
         }
         if (effects.isEmpty()) sb.append(" All avoided");
@@ -4512,9 +4512,9 @@ outer:  for (Effect effect : effects) {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[ServerPlayer ").append(getId())
-            .append(" ").append(getName())
-            .append(" ").append(this.connection)
-            .append("]");
+            .append(' ').append(getName())
+            .append(' ').append(this.connection)
+            .append(']');
         return sb.toString();
     }
 

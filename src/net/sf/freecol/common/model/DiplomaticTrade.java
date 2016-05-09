@@ -514,14 +514,14 @@ public class DiplomaticTrade extends FreeColGameObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append("[").append(getId())
-            .append(" ").append(getContext())
-            .append(" ").append(getStatus())
+        sb.append('[').append(getId())
+            .append(' ').append(getContext())
+            .append(' ').append(getStatus())
             .append(" from=").append(getSender().getId())
             .append(" to=").append(getRecipient().getId())
             .append(" version=").append(getVersion())
             .append(" [");
-        for (TradeItem item : getTradeItems()) sb.append(" ").append(item);
+        for (TradeItem item : getTradeItems()) sb.append(' ').append(item);
         sb.append(" ]]");
         return sb.toString();
     }

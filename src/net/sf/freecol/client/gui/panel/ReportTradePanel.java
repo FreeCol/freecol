@@ -194,7 +194,7 @@ public final class ReportTradePanel extends ReportPanel {
                     StringBuilder sb = new StringBuilder();
                     for (StringTemplate warning : warnings) {
                         sb.append(Messages.message(warning))
-                            .append(" ");
+                            .append(' ');
                     }
                     sb.setLength(sb.length()-1);
                     productionLabel.setToolTipText(sb.toString());

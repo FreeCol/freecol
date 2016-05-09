@@ -225,9 +225,9 @@ public class LoginMessage extends DOMMessage {
                 sb.append(userName).append("\" is not present in the game.")
                     .append("\n  Known players = ( ");
                 for (Player p : game.getLiveEuropeanPlayers(null)) {
-                    sb.append(p.getName()).append(" ");
+                    sb.append(p.getName()).append(' ');
                 }
-                sb.append(")");
+                sb.append(')');
                 return new ErrorMessage("server.userNameNotPresent",
                     sb.toString()).toXMLElement();
             } else if (player.isConnected() && !player.isAI()) {

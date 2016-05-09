@@ -643,30 +643,30 @@ public final class ColonyPanel extends PortPanel
             StringBuilder sb = new StringBuilder(64);
             if (student != null) {
                 sb.append(unit.getDescription())
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.message("colonyPanel.producing"))
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.getName(unit.getType()
                             .getSkillTaught()))
-                    .append(" ")
+                    .append(' ')
                     .append(unit.getTurnsOfTraining())
-                    .append("/")
+                    .append('/')
                     .append(unit.getNeededTurnsOfTraining());
             } else if (wl != null && goodsType != null) {
                 int producing = wl.getProductionOf(unit, goodsType);
                 sb.append(unit.getDescription())
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.message("colonyPanel.producing"))
-                    .append(" ")
+                    .append(' ')
                     .append(producing)
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.message(StringTemplate.template(goodsType)
                             .addAmount("%amount%", producing)));
             } else {
                 sb.append(unit.getDescription())
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.message("colonyPanel.producing"))
-                    .append(" ")
+                    .append(' ')
                     .append(Messages.message("nothing"));
             }
             String menuTitle = sb.toString();

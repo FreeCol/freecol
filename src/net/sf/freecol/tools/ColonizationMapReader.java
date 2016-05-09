@@ -168,9 +168,9 @@ public class ColonizationMapReader {
                     System.out.print(terrain);
                     index++;
                 }
-                System.out.println("\n");
+                System.out.println('\n');
             }
-            System.out.println("\n");
+            System.out.println('\n');
         }
     }
 

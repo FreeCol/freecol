@@ -243,14 +243,14 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append("[").append(getId())
-            .append(" ").append(getUnit().getId())
-            .append(" ").append(getIndianSettlement().getId())
+        sb.append('[').append(getId())
+            .append(' ').append(getUnit().getId())
+            .append(' ').append(getIndianSettlement().getId())
             .append(" buy=").append(getBuy())
             .append(" sell=").append(getSell())
             .append(" gift=").append(getGift())
             .append(" count=").append(getCount())
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

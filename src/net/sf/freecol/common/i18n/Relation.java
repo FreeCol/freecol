@@ -87,7 +87,7 @@ public class Relation {
         StringBuilder sb = new StringBuilder(32);
         sb.append("n ");
         if (mod != 1) {
-            sb.append("mod ").append(mod).append(" ");
+            sb.append("mod ").append(mod).append(' ');
         }
         if (low == high) {
             sb.append("is ");

@@ -165,10 +165,10 @@ public final class LastSale extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
+        sb.append('[').append(getId())
             .append(" when=").append(when)
             .append(" price=").append(price)
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

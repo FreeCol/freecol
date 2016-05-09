@@ -531,10 +531,10 @@ public class ColonyTile extends WorkLocation {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getId())
-            .append(" ").append(getWorkTile())
-            .append("/").append(getColony().getName())
-            .append("]");
+        sb.append('[').append(getId())
+            .append(' ').append(getWorkTile())
+            .append('/').append(getColony().getName())
+            .append(']');
         return sb.toString();
     }
 

@@ -199,7 +199,7 @@ public class LogBuilder {
         add(s2, objects);
         int delta = size - s2.length();
         if (left) {
-            for (; delta > 0; delta--) s2.append(" ");
+            for (; delta > 0; delta--) s2.append(' ');
         } else {
             for (; delta > 0; delta--) s2.insert(0, " ");
         }

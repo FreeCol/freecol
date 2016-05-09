@@ -96,12 +96,12 @@ public class TypeCountMap<T extends FreeColSpecObjectType> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getClass().getName());
+        sb.append('[').append(getClass().getName());
         for (Map.Entry<T, Integer> entry : values.entrySet()) {
             sb.append(" [").append(entry.getKey().getIndex())
-                .append(",").append(entry.getValue()).append("]");
+                .append(',').append(entry.getValue()).append(']');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

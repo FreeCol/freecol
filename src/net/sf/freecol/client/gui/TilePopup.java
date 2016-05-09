@@ -390,7 +390,7 @@ public final class TilePopup extends JPopupMenu {
             = unit.getOccupationLabel(freeColClient.getMyPlayer(), true);
         String text = (indent ? "    " : "")
             + unit.getDescription(Unit.UnitLabelType.NATIONAL)
-            + " (" + Messages.message(occ) + ")";
+            + " (" + Messages.message(occ) + ')';
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.setFont(FontLibrary.createFont(FontLibrary.FontType.NORMAL,
             FontLibrary.FontSize.TINY, Font.BOLD,

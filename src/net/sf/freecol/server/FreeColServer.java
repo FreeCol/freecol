@@ -1013,7 +1013,7 @@ public final class FreeColServer {
             logger.warning("Game integrity test failed.");
         } else {
             logger.info("Game integrity test "
-                + ((integrity > 0) ? "succeeded" : "failed, but fixed") + ".");
+                + ((integrity > 0) ? "succeeded." : "failed, but fixed."));
         }
 
         int savegameVersion = fis.getSavegameVersion();

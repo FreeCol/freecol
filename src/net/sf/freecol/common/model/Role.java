@@ -393,9 +393,9 @@ public class Role extends BuildableType {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[Role ").append(getSuffix());
         for (Entry<String, Boolean> entry : getRequiredAbilities().entrySet()) {
-            sb.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
+            sb.append(' ').append(entry.getKey()).append('=').append(entry.getValue());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

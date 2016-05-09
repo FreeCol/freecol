@@ -488,19 +488,19 @@ public final class FeatureContainer {
         if (!abilities.isEmpty()) {
             sb.append(" [abilities");
             for (Ability ability : getAbilities(null, null, null)) {
-                sb.append(" ").append(ability);
+                sb.append(' ').append(ability);
             }
-            sb.append("]");
+            sb.append(']');
         }
         Set<Modifier> modifiers = getModifiers(null, null, null);
         if (!modifiers.isEmpty()) {
             sb.append(" [modifiers");
             for (Modifier modifier : getModifiers(null, null, null)) {
-                sb.append(" ").append(modifier);
+                sb.append(' ').append(modifier);
             }
-            sb.append("]");
+            sb.append(']');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

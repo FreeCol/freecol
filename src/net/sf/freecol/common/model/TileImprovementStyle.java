@@ -124,7 +124,7 @@ public class TileImprovementStyle {
         }
         if (isZero) return null;
         while (sb.length() < pad) {
-            sb.append("0");
+            sb.append('0');
         }
         return sb.toString();
     }

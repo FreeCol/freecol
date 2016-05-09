@@ -131,9 +131,9 @@ public class FileOption extends AbstractOption<File> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
-        sb.append("[").append(getId())
+        sb.append('[').append(getId())
             .append(" value=").append((value == null) ? "null":value.getName())
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

@@ -180,9 +180,9 @@ public class Occupation {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[Occupation ").append(workLocation);
-            //.append(" ").append(productionType)
-        if (workType != null) sb.append(" ").append(workType.getSuffix());
-        sb.append("]");
+            //.append(' ').append(productionType)
+        if (workType != null) sb.append(' ').append(workType.getSuffix());
+        sb.append(']');
         return sb.toString();
     }
 }

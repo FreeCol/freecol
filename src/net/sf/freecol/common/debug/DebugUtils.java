@@ -854,7 +854,7 @@ public class DebugUtils {
         sTile.save(System.err, WriteScope.toServer(), true);
         System.err.println("\n\nSave:");
         sTile.save(System.err, WriteScope.toSave(), true);
-        System.err.println("\n");
+        System.err.println('\n');
     }
 
     /**

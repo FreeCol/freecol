@@ -351,12 +351,12 @@ public class TileImprovementPlan extends ValuedAIObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" ").append((type == null) ? "null" : type.getSuffix())
+        sb.append('[').append(getId())
+            .append(' ').append((type == null) ? "null" : type.getSuffix())
             .append(" at ").append((target == null) ? "null"
                 : target.toShortString())
-            .append("/").append(getValue())
-            .append("]");
+            .append('/').append(getValue())
+            .append(']');
         return sb.toString();
     }
 

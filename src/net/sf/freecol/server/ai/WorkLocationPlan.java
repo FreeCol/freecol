@@ -114,10 +114,10 @@ public class WorkLocationPlan extends AIObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" ").append(goodsType.getSuffix())
+        sb.append('[').append(getId())
+            .append(' ').append(goodsType.getSuffix())
             .append(" at ").append(workLocation.getId())
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

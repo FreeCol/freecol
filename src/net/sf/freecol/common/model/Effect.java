@@ -206,10 +206,10 @@ public class Effect extends FreeColSpecObjectType {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
-        sb.append("[").append(getId())
-            .append(" probability=").append(probability).append("%");
-        for (Scope scope : getScopes()) sb.append(" ").append(scope);
-        sb.append("]");
+        sb.append('[').append(getId())
+            .append(" probability=").append(probability).append('%');
+        for (Scope scope : getScopes()) sb.append(' ').append(scope);
+        sb.append(']');
         return sb.toString();
     }
 

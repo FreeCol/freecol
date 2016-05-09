@@ -354,8 +354,8 @@ public class DebugMenu extends JMenu {
                     builder.append(en.getKey());
                     builder.append(" (");
                     builder.append(en.getValue().getCount());
-                    builder.append(")");
-                    builder.append("\n");
+                    builder.append(')');
+                    builder.append('\n');
                 }
                 gui.showInformationMessage(builder.toString());
             });

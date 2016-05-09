@@ -325,11 +325,11 @@ public class NationOptions extends FreeColSpecObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append(NATIONAL_ADVANTAGES_TAG).append(": ")
-            .append(nationalAdvantages).append("\n");
+            .append(nationalAdvantages).append('\n');
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
-            sb.append(" ").append(entry.getKey().getId())
-                .append(" ").append(entry.getValue())
-                .append("\n");
+            sb.append(' ').append(entry.getKey().getId())
+                .append(' ').append(entry.getValue())
+                .append('\n');
         }
         return sb.toString();
     }

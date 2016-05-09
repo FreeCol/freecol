@@ -305,11 +305,11 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[").append(getId())
+        sb.append('[').append(getId())
             .append(" value=").append(value)
             .append(" addNone=").append(addNone)
             .append(" selector=").append(selector)
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

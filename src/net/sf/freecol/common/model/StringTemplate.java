@@ -640,21 +640,21 @@ public class StringTemplate extends FreeColObject {
         case TEMPLATE:
             sb.append(getId());
             if (this.defaultId != null) {
-                sb.append(" (").append(this.defaultId).append(")");
+                sb.append(" (").append(this.defaultId).append(')');
             }
             sb.append(" [");
             if (this.keys != null) {
                 for (int index = 0; index < this.keys.size(); index++) {
-                    sb.append("[").append(this.keys.get(index)).append(": ")
-                        .append(this.replacements.get(index)).append("]");
+                    sb.append('[').append(this.keys.get(index)).append(": ")
+                        .append(this.replacements.get(index)).append(']');
                 }
             }
-            sb.append("]");
+            sb.append(']');
             break;
         case KEY:
             sb.append(getId());
             if (this.defaultId != null) {
-                sb.append(" (").append(this.defaultId).append(")");
+                sb.append(" (").append(this.defaultId).append(')');
             }
             break;
         case NAME:

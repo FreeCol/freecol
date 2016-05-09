@@ -460,8 +460,8 @@ public class MarketData extends FreeColGameObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append("[").append(getId())
-            .append(" ").append(goodsType.getId())
+        sb.append('[').append(getId())
+            .append(' ').append(goodsType.getId())
             .append(" costToBuy=").append(costToBuy)
             .append(" paidForSale=").append(paidForSale)
             .append(" amountInMarket=").append(amountInMarket)
@@ -472,7 +472,7 @@ public class MarketData extends FreeColGameObject {
             .append(" incomeAfterTaxes=").append(incomeAfterTaxes)
             .append(" oldPrice=").append(oldPrice)
             .append(" traded=").append(traded)
-            .append("]");
+            .append(']');
         return sb.toString();
     }
 

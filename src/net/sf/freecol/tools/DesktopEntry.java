@@ -103,9 +103,9 @@ public class DesktopEntry {
                                 continue;
                         }
                         if (languageCode != null) {
-                            result.append("[" + languageCode + "]");
+                            result.append('[' + languageCode + "]");
                         }
-                        result.append("=");
+                        result.append('=');
                         result.append(line.substring(index + 1).trim());
                         result.append("\n");
                         if (foundGenericName && foundComment) {

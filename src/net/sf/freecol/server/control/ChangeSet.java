@@ -203,13 +203,13 @@ public class ChangeSet {
             sb.append((type == ALL) ? "ALL" : (type == PERHAPS) ? "PERHAPS"
                 : (type == ONLY) ? "ONLY" : "BADTYPE");
             if (seeAlways != null) {
-                sb.append(",always(").append(seeAlways.getId()).append(")");
+                sb.append(",always(").append(seeAlways.getId()).append(')');
             }
             if (seePerhaps != null) {
-                sb.append(",perhaps(").append(seePerhaps.getId()).append(")");
+                sb.append(",perhaps(").append(seePerhaps.getId()).append(')');
             }
             if (seeNever != null) {
-                sb.append(",never(").append(seeNever.getId()).append(")");
+                sb.append(",never(").append(seeNever.getId()).append(')');
             }
             return sb.toString();
         }
@@ -436,15 +436,15 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(64);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(attacker.getId())
-                .append("@").append(attacker.getTile().getId())
-                .append(" ").append(success)
-                .append(" ").append(defender.getId())
-                .append("@").append(defender.getTile().getId())
-                .append("]");
+                .append(' ').append(attacker.getId())
+                .append('@').append(attacker.getTile().getId())
+                .append(' ').append(success)
+                .append(' ').append(defender.getId())
+                .append('@').append(defender.getTile().getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -518,12 +518,12 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(key)
-                .append("=").append(value)
-                .append("]");
+                .append(' ').append(key)
+                .append('=').append(value)
+                .append(']');
             return sb.toString();
         }
     }
@@ -584,11 +584,11 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(message)
-                .append("]");
+                .append(' ').append(message)
+                .append(']');
             return sb.toString();
         }
     }
@@ -710,13 +710,13 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(unit.getId())
-                .append(" ").append(oldLocation.getId())
-                .append(" ").append(newTile.getId())
-                .append("]");
+                .append(' ').append(unit.getId())
+                .append(' ').append(oldLocation.getId())
+                .append(' ').append(newTile.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -817,11 +817,11 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(fcgo.getId())
-                .append("]");
+                .append(' ').append(fcgo.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -877,12 +877,12 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(fcgo.getId());
-            for (String f : fields) sb.append(" ").append(f);
-            sb.append("]");
+                .append(' ').append(fcgo.getId());
+            for (String f : fields) sb.append(' ').append(f);
+            sb.append(']');
             return sb.toString();
         }
     }
@@ -945,11 +945,11 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(player.getId())
-                .append("]");
+                .append(' ').append(player.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -1042,14 +1042,14 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(((tile == null) ? "<null>" : tile.getId()));
+                .append(' ').append(((tile == null) ? "<null>" : tile.getId()));
             for (FreeColGameObject f : contents) {
-                sb.append(" ").append(f.getId());
+                sb.append(' ').append(f.getId());
             }
-            sb.append(" ").append(fcgo.getId()).append("]");
+            sb.append(' ').append(fcgo.getId()).append(']');
             return sb.toString();
         }
     }
@@ -1110,11 +1110,11 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(fco.getId())
-                .append("]");
+                .append(' ').append(fco.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -1183,14 +1183,14 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append((add) ? "add" : "remove")
-                .append(" ").append(feature)
-                .append(" ").append((add) ? "to" : "from")
-                .append(" ").append(object.getId())
-                .append("]");
+                .append(' ').append((add) ? "add" : "remove")
+                .append(' ').append(feature)
+                .append(' ').append((add) ? "to" : "from")
+                .append(' ').append(object.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -1256,11 +1256,11 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(settlement.getId())
-                .append("]");
+                .append(' ').append(settlement.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -1327,13 +1327,13 @@ public class ChangeSet {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("[").append(getClass().getName())
-                .append(" ").append(see)
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
                 .append(" #").append(getPriority())
-                .append(" ").append(first.getId())
-                .append(" ").append(stance)
-                .append(" ").append(second.getId())
-                .append("]");
+                .append(' ').append(first.getId())
+                .append(' ').append(stance)
+                .append(' ').append(second.getId())
+                .append(']');
             return sb.toString();
         }
     }
@@ -1935,7 +1935,7 @@ public class ChangeSet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         Collections.sort(changes, changeComparator);
-        for (Change c : changes) sb.append(c).append("\n");
+        for (Change c : changes) sb.append(c).append('\n');
         return sb.toString();
     }
 }

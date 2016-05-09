@@ -552,9 +552,9 @@ public class Connection implements Closeable {
         sb.append("[Connection ").append(this.name);
         if (this.socket != null) {
             sb.append(" (").append(this.socket.getInetAddress())
-                .append(":").append(this.socket.getPort()).append(")");
+                .append(':').append(this.socket.getPort()).append(')');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }
