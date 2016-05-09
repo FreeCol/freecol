@@ -240,7 +240,6 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
         if (null != tag) switch (tag) {

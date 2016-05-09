@@ -402,7 +402,6 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            final Game game = serverPlayer.getGame();
             Element element = doc.createElement("animateAttack");
             element.setAttribute("attacker", attacker.getId());
             element.setAttribute("defender", defender.getId());

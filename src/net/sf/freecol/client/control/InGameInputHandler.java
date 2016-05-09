@@ -773,7 +773,6 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element nativeTrade(Element element) {
         final Game game = getGame();
-        final Player player = getMyPlayer();
 
         NativeTradeMessage message = new NativeTradeMessage(game, element);
         NativeTrade nt = message.getNativeTrade();

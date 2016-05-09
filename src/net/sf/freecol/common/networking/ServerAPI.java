@@ -223,7 +223,6 @@ public abstract class ServerAPI {
             MultipleMessage mm = new MultipleMessage(game, reply);
             Element e = mm.extract(tag);
             resolve(handle(e));
-            if (mm == null) return null;
             reply = mm.toXMLElement();
         }
 

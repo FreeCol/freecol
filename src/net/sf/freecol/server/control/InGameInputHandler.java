@@ -644,7 +644,7 @@ public final class InGameInputHandler extends ServerInputHandler {
         ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
         if (serverPlayer == null) return null;
         logger.info("Logout by: " + connection
-                    + ((serverPlayer != null) ? " (" + serverPlayer.getName() + ") " : ""));
+            + " (" + serverPlayer.getName() + ") ");
 
         /*
          * FIXME: Setting the player dead directly should be a server

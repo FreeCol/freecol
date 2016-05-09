@@ -266,7 +266,6 @@ public class PrivateerMission extends Mission {
      */
     private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
         final Player player = aiUnit.getUnit().getOwner();
-        final boolean pirate = aiUnit.getUnit().hasAbility(Ability.PIRACY);
         String reason;
         return (unit == null)
             ? Mission.TARGETINVALID

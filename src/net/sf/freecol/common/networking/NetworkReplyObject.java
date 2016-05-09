@@ -49,9 +49,6 @@ public class NetworkReplyObject {
      * @see #getResponse
      */
     public synchronized void setResponse(Object response) {
-        if (response == null) {
-            throw new NullPointerException();
-        }
         this.response = response;
         this.responseGiven = true;
         notify();

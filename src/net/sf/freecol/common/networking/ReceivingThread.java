@@ -66,8 +66,6 @@ final class ReceivingThread extends Thread {
         
         private int bStart = 0;
 
-        private int bEnd = 0;
-
         private int bSize = 0;
 
         private boolean wait = false;
@@ -107,7 +105,7 @@ final class ReceivingThread extends Thread {
             if (r <= 0) return false;
 
             this.bStart = 0;
-            this.bEnd = this.bSize = r;
+            this.bSize = r;
             return true;
         }
 
