@@ -101,8 +101,8 @@ public class Flag {
                 UnionPosition.LEFT, UnionPosition.RIGHT),
         SALTIRE_AND_CROSS(UnionPosition.CANTON);
 
-        public UnionShape unionShape = UnionShape.RECTANGLE;
-        public Set<UnionPosition> unionPositions = EnumSet.allOf(UnionPosition.class);
+        private UnionShape unionShape = UnionShape.RECTANGLE;
+        private Set<UnionPosition> unionPositions = EnumSet.allOf(UnionPosition.class);
 
         Decoration(UnionPosition... positions) {
             this.unionPositions = EnumSet.of(UnionPosition.NONE);
@@ -116,6 +116,13 @@ public class Flag {
             this.unionShape = shape;
         }
 
+        public UnionShape getUnionShape() {
+            return this.unionShape;
+        }
+
+        public Set<UnionPosition> getUnionPositions() {
+            return this.unionPositions;
+        }
     };
 
     /**
@@ -565,9 +572,10 @@ public class Flag {
         GeneralPath starShape = null;
         // draw union
         if (unionShape == null && decoration != null) {
-            unionShape = decoration.unionShape;
+            unionShape = decoration.getUnionShape();
         }
-        switch(unionShape) {
+        if (unionShape == null) return image;
+        switch (unionShape) {
         case RECTANGLE:
             Rectangle2D.Double rectangle = getRectangle();
             union = new GeneralPath(rectangle);
@@ -721,11 +729,11 @@ public class Flag {
                     dy = height / index;
                     offset = (HEIGHT - height) / 2;
                 }
-                double yy = dy / 2;
+                double yy = dy / 2.0;
                 int count = index;
                 if (missing > 0) {
                     count = index - missing;
-                    yy += missing / 2 * dy;
+                    yy += missing / 2.0 * dy;
                     missing = 0;
                 }
                 for (int star = 0; star < count; star++) {
@@ -1051,9 +1059,9 @@ public class Flag {
         if (unionPosition.alignment == Alignment.VERTICAL) {
             if (background.alignment == Alignment.VERTICAL
                 && stripes < 3) {
-                union.width = WIDTH / stripes;
+                union.width = (double)WIDTH / stripes;
                 if (stripes == 2 && unionPosition == UnionPosition.RIGHT) {
-                    union.x = WIDTH /2;
+                    union.x = WIDTH / 2;
                 }
             } else {
                 union.width = WIDTH / 3;
@@ -1063,7 +1071,7 @@ public class Flag {
         } else if (unionPosition.alignment == Alignment.HORIZONTAL) {
             if (background.alignment == Alignment.HORIZONTAL
                 && stripes < 3) {
-                union.height = HEIGHT / stripes;
+                union.height = (double)HEIGHT / stripes;
                 if (stripes == 2 && unionPosition == UnionPosition.BOTTOM) {
                     union.y = HEIGHT / 2;
                 }
@@ -1079,11 +1087,11 @@ public class Flag {
             if (background.alignment == Alignment.HORIZONTAL) {
                 union.height = (stripes < 3)
                     ? HEIGHT / 2
-                    : (stripes / 2) * getStripeHeight(background.alignment);
+                    : (stripes / 2.0) * getStripeHeight(background.alignment);
             } else if (background.alignment == Alignment.VERTICAL) {
                 union.width = (stripes < 3)
                     ? WIDTH / 2
-                    : (stripes / 2) * getStripeWidth(background.alignment);
+                    : (stripes / 2.0) * getStripeWidth(background.alignment);
             }
             if (decoration == Decoration.GREEK_CROSS
                 || decoration == Decoration.CROSS) {

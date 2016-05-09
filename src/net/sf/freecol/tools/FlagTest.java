@@ -194,7 +194,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
                 if (e.getSource() == decoration) {
                     UnionPosition oldPosition = (UnionPosition) union.getSelectedItem();
                     union.removeAllItems();
-                    for (UnionPosition position : newDecoration.unionPositions) {
+                    for (UnionPosition position : newDecoration.getUnionPositions()) {
                         union.addItem(position);
                     }
                     union.setSelectedItem(oldPosition);
