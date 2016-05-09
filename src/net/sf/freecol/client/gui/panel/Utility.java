@@ -137,7 +137,7 @@ public final class Utility {
     public static final Insets EMPTY_MARGIN = new Insets(0, 0, 0, 0);
 
     /** A style context to use for panels and dialogs. */
-    public static StyleContext STYLE_CONTEXT = null;
+    private static StyleContext STYLE_CONTEXT = null;
 
     public static void initStyleContext(Font font) {
         Style defaultStyle = StyleContext.getDefaultStyleContext()

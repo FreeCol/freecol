@@ -87,7 +87,7 @@ public class GUI extends FreeColClientHolder {
     protected static final Logger logger = Logger.getLogger(GUI.class.getName());
 
     /** Warning levels. */
-    protected static final String levels[] = {
+    private static final String levels[] = {
         "low", "normal", "high"
     };
 

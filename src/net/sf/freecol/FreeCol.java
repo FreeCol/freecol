@@ -82,7 +82,7 @@ public final class FreeCol {
     private static final String FREECOL_VERSION = "0.11.6";
 
     /** The difficulty levels. */
-    public static final String[] DIFFICULTIES = {
+    private static final String[] DIFFICULTIES = {
         "veryEasy", "easy", "medium", "hard", "veryHard"
     };
 

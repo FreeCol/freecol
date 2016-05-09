@@ -34,11 +34,8 @@ public abstract class Session {
 
     private static final Logger logger = Logger.getLogger(Session.class.getName());
 
-    /**
-     * A map of all active sessions.
-     */
-    protected static final Map<String, Session> allSessions
-        = new HashMap<>();
+    /** A map of all active sessions. */
+    private static final Map<String, Session> allSessions = new HashMap<>();
 
     /** Has this session been completed? */
     private boolean completed;
