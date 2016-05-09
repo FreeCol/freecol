@@ -1188,11 +1188,11 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     boolean isAtMaxMapScale() {
-        return lib.getScaleFactor() == MAP_SCALE_MAX;
+        return lib.getScaleFactor() >= MAP_SCALE_MAX;
     }
 
     boolean isAtMinMapScale() {
-        return lib.getScaleFactor() == MAP_SCALE_MIN;
+        return lib.getScaleFactor() <= MAP_SCALE_MIN;
     }
 
     void increaseMapScale() {
@@ -1790,7 +1790,7 @@ public final class MapViewer extends FreeColClientHolder {
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
         g2.setColor(ImageLibrary.getForegroundColor(backgroundColor));
-        float y = vPadding / 2;
+        float y = vPadding / 2.0f;
         for (i = 0; i < labels.length; i++) {
             Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
             float x = (width - textRectangle.width) / 2;
