@@ -1451,14 +1451,18 @@ public final class MapViewer extends FreeColClientHolder {
         // Display cursor for selected tile or active unit
         Tile cursorTile = null;
         switch (viewMode) {
-            case GUI.MOVE_UNITS_MODE:
-                if (activeUnit != null &&
-                        (cursor.isActive() || activeUnit.getMovesLeft() <= 0))
-                    cursorTile = activeUnit.getTile();
-                break;
-            case GUI.VIEW_TERRAIN_MODE:
-                if (selectedTile != null)
-                    cursorTile = selectedTile;
+        case GUI.MOVE_UNITS_MODE:
+            if (activeUnit != null
+                && (cursor.isActive() || activeUnit.getMovesLeft() <= 0)) {
+                cursorTile = activeUnit.getTile();
+            }
+            break;
+        case GUI.VIEW_TERRAIN_MODE:
+            if (selectedTile != null) cursorTile = selectedTile;
+            break;
+        default:
+            cursorTile = null;
+            break;
         }
         if (cursorTile != null) {
             final int x = cursorTile.getX();

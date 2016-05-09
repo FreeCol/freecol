@@ -2480,6 +2480,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                         value = 0;
                     }
                     break;
+                default:
+                    break;
                 }
             }
             if (value == Integer.MIN_VALUE) {
