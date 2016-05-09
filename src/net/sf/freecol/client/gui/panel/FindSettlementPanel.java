@@ -63,7 +63,7 @@ public final class FindSettlementPanel extends FreeColPanel
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FindSettlementPanel.class.getName());
 
-    private class SettlementRenderer
+    private static class SettlementRenderer
         extends FreeColComboBoxRenderer<Settlement> {
 
         /**

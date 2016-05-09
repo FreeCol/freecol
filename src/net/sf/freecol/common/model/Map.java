@@ -1191,7 +1191,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Internal class for evaluating a candidate move.
      */
-    private class MoveCandidate {
+    private static class MoveCandidate {
 
         private Unit unit;
         private final PathNode current;

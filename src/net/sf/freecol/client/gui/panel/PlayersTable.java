@@ -74,7 +74,7 @@ public final class PlayersTable extends JTable {
     /**
      * A table cell editor that can be used to select a nation.
      */
-    private class AdvantageCellEditor extends DefaultCellEditor {
+    private static class AdvantageCellEditor extends DefaultCellEditor {
 
         private final JComboBox<EuropeanNationType> box;
 
@@ -113,7 +113,7 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private class AdvantageCellRenderer extends JLabel
+    private static class AdvantageCellRenderer extends JLabel
         implements TableCellRenderer {
 
         /** The national advantages type. */
@@ -386,7 +386,7 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    private final class PlayerCellEditor extends AbstractCellEditor
+    private static final class PlayerCellEditor extends AbstractCellEditor
         implements TableCellEditor {
 
         private final JButton button = Utility.localizedButton("select");

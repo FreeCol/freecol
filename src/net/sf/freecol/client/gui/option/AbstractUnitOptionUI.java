@@ -52,7 +52,7 @@ import net.sf.freecol.common.option.UnitTypeOption;
 public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
     implements ItemListener {
 
-    private class AbstractUnitRenderer
+    private static class AbstractUnitRenderer
         extends FreeColComboBoxRenderer<AbstractUnitOption> {
 
         @Override
@@ -61,7 +61,7 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         }
     }
 
-    private class RoleRenderer
+    private static class RoleRenderer
         extends FreeColComboBoxRenderer<String> {
 
         @Override

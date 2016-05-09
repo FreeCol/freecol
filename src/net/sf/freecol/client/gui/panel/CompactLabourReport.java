@@ -56,18 +56,17 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public final class CompactLabourReport extends ReportPanel {
 
-    private final int COLONY_COLUMN = 0;
-    private final int UNIT_TYPE_COLUMN = 1;
-    private final int WORKING_COLUMN = 2;
-    private final int BUILDING_COLUMN = 3;
-    private final int COLONIST_COLUMN = 4;
-    private final int COLONIST_SUMMARY_COLUMN = 5;
-    private final int PRODUCTION_SYMBOL_COLUMN = 6;
-    private final int PRODUCTION_COLUMN = 7;
-    private final int PRODUCTION_SUMMARY_COLUMN = 8;
-    private final int NETPRODUCTION_SUMMARY_COLUMN = 9;
-
-    private static final int COLUMNS = 10;
+    private static final int COLONY_COLUMN = 0;
+    private static final int UNIT_TYPE_COLUMN = 1;
+    private static final int WORKING_COLUMN = 2;
+    private static final int BUILDING_COLUMN = 3;
+    private static final int COLONIST_COLUMN = 4;
+    private static final int COLONIST_SUMMARY_COLUMN = 5;
+    private static final int PRODUCTION_SYMBOL_COLUMN = 6;
+    private static final int PRODUCTION_COLUMN = 7;
+    private static final int PRODUCTION_SUMMARY_COLUMN = 8;
+    private static final int NETPRODUCTION_SUMMARY_COLUMN = 9;
+    private static final int COLUMNS = NETPRODUCTION_SUMMARY_COLUMN + 1;
 
     private LabourData labourData;
 
