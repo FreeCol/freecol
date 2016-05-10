@@ -2390,7 +2390,7 @@ outer:  for (Effect effect : effects) {
                          FreeColGameObject defender,
                          List<CombatResult> crs,
                          Random random,
-                         ChangeSet cs) throws IllegalStateException {
+                         ChangeSet cs) {
         CombatModel combatModel = getGame().getCombatModel();
         boolean isAttack = combatModel.combatIsAttack(attacker, defender);
         boolean isBombard = combatModel.combatIsBombard(attacker, defender);

@@ -3799,11 +3799,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
-     * @throws IllegalStateException on failure to validate the object
-     *     in any way.
      */
     public <T extends FreeColGameObject> T getOurFreeColGameObject(String id,
-        Class<T> returnClass) throws IllegalStateException {
+        Class<T> returnClass) {
         T t = getGame().getFreeColGameObject(id, returnClass);
         if (t == null) {
             throw new IllegalStateException("Not a " + returnClass.getName()

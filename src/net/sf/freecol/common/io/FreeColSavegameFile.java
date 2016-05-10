@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.BufferedInputStream;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 
@@ -83,15 +84,16 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * @return The saved game version, or negative on error.
      */
     public int getSavegameVersion() {
-        try (
+        int ret;
+        try {
             FreeColXMLReader xr = this.getSavedGameFreeColXMLReader();
-        ) {
             xr.nextTag();
-            return xr.getAttribute(VERSION_TAG, -1);
-        } catch (Exception e) {
-            ; // Just fail
+            ret = xr.getAttribute(VERSION_TAG, -1);
+            xr.close();
+        } catch (IOException|XMLStreamException ex) {
+            ret = -1;
         }
-        return -1;
+        return ret;
     }
 
     /**

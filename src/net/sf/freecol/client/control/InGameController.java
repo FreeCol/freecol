@@ -555,8 +555,19 @@ public final class InGameController extends FreeColClientHolder {
         File beforeLastTurnFile = new File(autoSaveDir, beforeLastTurnName);
         // if "last-turn" file exists, shift it to "before-last-turn" file
         if (lastTurnFile.exists()) {
-            beforeLastTurnFile.delete();
-            lastTurnFile.renameTo(beforeLastTurnFile);
+            try {
+                if (beforeLastTurnFile.delete()) {
+                    try {
+                        lastTurnFile.renameTo(beforeLastTurnFile);
+                    } catch (SecurityException se) {
+                        logger.log(Level.WARNING, "Could not rename: "
+                            + lastTurnFile.getPath(), se);
+                    }
+                }
+            } catch (SecurityException se) {
+                logger.log(Level.WARNING, "Could not delete: "
+                    + beforeLastTurnFile.getPath(), se);
+            }
         }
         saveGame(lastTurnFile);
 

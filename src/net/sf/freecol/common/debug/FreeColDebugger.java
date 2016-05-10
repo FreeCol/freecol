@@ -21,6 +21,8 @@ package net.sf.freecol.common.debug;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -371,13 +373,12 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
-        try (
+        try {
             FileOutputStream fos = new FileOutputStream("/tmp/freecol.debug", true);
             PrintStream prs = new PrintStream(fos, true, "UTF-8");
-        ) {
             prs.println(msg);
-        } catch (Exception e) {
-            ; // Ignore
+        } catch (FileNotFoundException|UnsupportedEncodingException ex) {
+            ; // Ignore failure
         }
     }
 

@@ -929,10 +929,8 @@ public final class Specification {
      *
      * @param id The object identifier.
      * @return The <code>AbstractOption</code> found.
-     * @exception IllegalArgumentException if the identifier is null
-     *     or not present.
      */
-    public AbstractOption getOption(String id) throws IllegalArgumentException {
+    public AbstractOption getOption(String id) {
         if (id == null) {
             throw new IllegalArgumentException("AbstractOption with null id.");
         } else if (!allOptions.containsKey(id)) {
@@ -950,7 +948,7 @@ public final class Specification {
      * @exception IllegalArgumentException if the identifier is null
      *     or not present.
      */
-    public OptionGroup getOptionGroup(String id) throws IllegalArgumentException {
+    public OptionGroup getOptionGroup(String id) {
         if (id == null) {
             throw new IllegalArgumentException("OptionGroup with null id.");
         } else if (!allOptionGroups.containsKey(id)) {
@@ -1757,7 +1755,7 @@ public final class Specification {
      * @param id The identifier to look for, which must not be null.
      * @return The <code>FreeColSpecObjectType</code> found if any.
      */
-    public FreeColSpecObjectType findType(String id) throws IllegalArgumentException {
+    public FreeColSpecObjectType findType(String id) {
         if (id == null) {
             throw new IllegalArgumentException("Null id");
 

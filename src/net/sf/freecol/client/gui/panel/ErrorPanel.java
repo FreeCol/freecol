@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -32,6 +34,7 @@ import javax.swing.JTextArea;
 import net.miginfocom.swing.MigLayout;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 
 
@@ -74,15 +77,15 @@ public final class ErrorPanel extends FreeColPanel {
 
         File logFile = new File(FreeColDirectories.getLogFilePath());
         byte[] buffer = new byte[(int) logFile.length()];
-        String message = null;
-        try (
+        String message;
+        try {
             FileInputStream fis = new FileInputStream(logFile);
             BufferedInputStream logFileStream = new BufferedInputStream(fis);
-        ) {
             logFileStream.read(buffer);
             message = new String(buffer, "UTF-8");
-        } catch (Exception e) {
-            ;// ignore
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Could not read error log", ioe);
+            message = Messages.message("errorPanel.loadError");
         }
 
         JTextArea textArea = Utility.getDefaultTextArea(message, 40);

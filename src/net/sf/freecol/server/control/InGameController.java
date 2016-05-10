@@ -3341,8 +3341,12 @@ public final class InGameController extends Controller {
         final Unit unit = nt.getUnit();
         final IndianSettlement is = nt.getIndianSettlement();
         if (unit == null || is == null) {
-            String dat = null;
-            try { dat = nt.serialize(); } catch (Exception e) {}
+            String dat;
+            try {
+                dat = nt.serialize();
+            } catch (Exception e) {
+                dat = null;
+            }
             return serverPlayer.clientError("Bogus NativeTrade: " + dat);
         }
         final ServerPlayer otherPlayer = (ServerPlayer)

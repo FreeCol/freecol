@@ -90,7 +90,7 @@ public class LootCargoMessage extends DOMMessage {
      * @param game The <code>Game</code> to look for the unit in.
      * @return The winner unit.
      */
-    public Unit getUnit(Game game) throws ClassCastException {
+    public Unit getUnit(Game game) {
         return game.getFreeColGameObject(winnerId, Unit.class);
     }
 

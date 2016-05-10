@@ -268,7 +268,9 @@ public class Messages {
             for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
-                } catch (IOException e) {} // Failures expected
+                } catch (IOException e) { // Failures expected
+                    logger.warning("Failed to load mod messages: " + name);
+                }
             }
         }
     }
@@ -287,7 +289,10 @@ public class Messages {
             for (String name : getModMessageFileNames(locale)) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
-                } catch (IOException e) {} // Failures expected
+                } catch (IOException e) { // Failures expected
+                    logger.warning("Failed to load active mod messages: "
+                        + name);
+                }
             }
         }
     }

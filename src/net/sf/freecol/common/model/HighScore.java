@@ -361,14 +361,19 @@ public class HighScore extends FreeColObject {
      *
      * @return A list of <code>HighScore</code>s from the high score file.
      */
+
     public static List<HighScore> loadHighScores() {
         List<HighScore> scores = new ArrayList<>();
         File hsf = FreeColDirectories.getHighScoreFile();
         if (!hsf.exists()) {
             try {
-                hsf.createNewFile();
-                saveHighScores(scores);
-                logger.info("Created empty high score file: " + hsf.getPath());
+                if (hsf.createNewFile()) {
+                    logger.info("Created empty high score file: "
+                        + hsf.getPath());
+                    saveHighScores(scores);
+                } else {
+                    logger.warning("High score file not created");
+                }
             } catch (IOException ioe) {
                 scores = null;
                 logger.log(Level.WARNING, "Unable to create high score file: "

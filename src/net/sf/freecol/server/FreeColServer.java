@@ -902,7 +902,14 @@ public final class FreeColServer {
         File startGame = FreeColDirectories.getStartMapFile();
         if (startGame != null
             && startGame.getPath().equals(file.getPath())) {
-            file.delete();
+            try {
+                if (!file.delete()) {
+                    logger.warning("Failed to consume map: " + file.getPath());
+                }
+            } catch (SecurityException se) {
+                logger.log(Level.WARNING, "Failed to delete map: "
+                    + file.getPath(), se);
+            }
         }
         return g;
     }
@@ -1244,7 +1251,14 @@ public final class FreeColServer {
         for (File autosaveFile : FreeColDirectories.getAutosaveDirectory()
                  .listFiles()) {
             if (autosaveFile.getName().startsWith(prefix)) {
-                autosaveFile.delete();
+                try {
+                    if (!autosaveFile.delete()) {
+                        logger.warning("Failed to delete: " + autosaveFile.getPath());
+                    }
+                } catch (SecurityException se) {
+                    logger.log(Level.WARNING, "Failed to delete: "
+                        + autosaveFile.getPath());
+                }
             }
         }
     }
