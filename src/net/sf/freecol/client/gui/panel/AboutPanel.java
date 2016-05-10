@@ -127,7 +127,8 @@ public final class AboutPanel extends FreeColPanel {
         apSFProject = Utility.localizedLabel("aboutPanel.sfProject");      
         apSFProject.setFont(fontBold);
         add(apSFProject, "newline 10");
-        JButton apProjectURL = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        JButton apProjectURL
+            = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
         apProjectURL.addActionListener(this);
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");

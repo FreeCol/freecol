@@ -101,7 +101,6 @@ public final class ReportNavalPanel extends ReportUnitPanel {
      */
     @Override
     protected void addOwnUnits() {
-        final Specification spec = getSpecification();
         final Player player = getMyPlayer();
 
         reportPanel.add(Utility.localizedLabel(player.getForcesLabel()),

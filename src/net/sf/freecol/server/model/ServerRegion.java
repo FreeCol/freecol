@@ -244,7 +244,6 @@ public class ServerRegion extends Region {
      * @return A list of fixed server regions.
      */     
     public static List<ServerRegion> requireFixedRegions(Map map, LogBuilder lb) {
-        final Game game = map.getGame();
         final java.util.Map<String, Region> fixed = map.getFixedRegions();
         List<ServerRegion> result = new ArrayList<>();
 

@@ -475,7 +475,6 @@ public class AIUnit extends TransportableAIObject {
      * @return True if the role change was successful.
      */
     public boolean equipForRole(Role role) {
-        final Specification spec = getSpecification();
         final Player player = unit.getOwner();
         Location loc = Location.upLoc(unit.getLocation());
         if (!(loc instanceof UnitLocation)) return false;

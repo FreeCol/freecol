@@ -220,7 +220,6 @@ public final class Limit extends FreeColSpecObjectType {
      * @return The result of the evaluation.
      */
     public boolean evaluate(Settlement settlement) {
-        final Specification spec = getSpecification();
         Integer lhs = null;
         switch (leftHandSide.getScopeLevel()) {
         case SETTLEMENT:

@@ -3667,15 +3667,11 @@ outer:  for (Effect effect : effects) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationLabel();
         Settlement settlement = defender.getSettlement();
-        StringTemplate defenderLocation = defender.getLocation()
-            .getLocationLabelFor(defenderPlayer);
         Role role = defender.getAutomaticRole();
         StringTemplate defenderLabel = Messages.getUnitLabel(null,
             defender.getType().getId(), 1, defenderPlayer.getNation().getId(),
             role.getId(), null);
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate attackerLocation = attacker.getLocation()
-            .getLocationLabelFor(attackerPlayer);
         StringTemplate attackerNation = attacker.getApparentOwnerName();
 
         // Autoequipment is not actually with the unit, it is stored
@@ -3980,7 +3976,6 @@ outer:  for (Effect effect : effects) {
         if (!units.isEmpty()) {
             final ServerPlayer shipPlayer = (ServerPlayer)colony.getOwner();
             final ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
-            final Unit ship = units.get(0);
             StringTemplate t = StringTemplate.label(", ");
             for (Unit u : units) {
                 csSinkShip(u, attackerPlayer, cs);

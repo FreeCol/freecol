@@ -187,8 +187,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
             this.colony = colony;
 
             final Specification spec = colony.getSpecification();
-            final Player owner = colony.getOwner();
-            final GoodsType foodType = spec.getPrimaryFoodType();
 
             this.tileSuggestions.clear();
             this.tileSuggestions.addAll(colony.getTileImprovementSuggestions());

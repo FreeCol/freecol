@@ -130,9 +130,7 @@ public abstract class FreeColGameObject extends FreeColObject {
                     game.removeFreeColGameObject(oldId, "override");
                 }
                 setId(newId);
-                if (newId != null) {
-                    game.setFreeColGameObject(newId, this);
-                }
+                game.setFreeColGameObject(newId, this);
             }
         } else {
             setId(newId);

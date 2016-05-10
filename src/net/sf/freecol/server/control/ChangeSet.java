@@ -927,7 +927,6 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            final Game game = serverPlayer.getGame();
             Element element = doc.createElement("addPlayer");
             element.appendChild(DOMMessage.toXMLElement(this.player, doc, serverPlayer));
             return element;

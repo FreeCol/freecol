@@ -719,8 +719,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
      * @return True if the trade route is valid.
      */
     private boolean verifyNewTradeRoute() {
-        final Player player = getFreeColClient().getMyPlayer();
-
         // Update the trade route with the current settings
         this.newRoute.setName(tradeRouteName.getText());
         this.newRoute.clearStops();

@@ -3303,7 +3303,6 @@ public final class InGameController extends Controller {
         final ServerPlayer otherPlayer = (ServerPlayer)colony.getOwner();
 
         ChangeSet cs = new ChangeSet();
-        Tile tile = colony.getTile();
         moveGoods(unit, goods.getType(), goods.getAmount(), colony);
         cs.add(See.perhaps(), unit);
 

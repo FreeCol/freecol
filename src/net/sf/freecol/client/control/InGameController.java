@@ -1282,12 +1282,10 @@ public final class InGameController extends FreeColClientHolder {
         Colony colony = (Colony)settlement;
 
         // Can not negotiate with the REF.
-        final Game game = getGame();
         final Player player = unit.getOwner();
         final Player other = colony.getOwner();
         if (other == player.getREFPlayer()) return false;
 
-        StringTemplate nation = other.getNationLabel();
         while (dt != null) {
             // Inform server of current agreement.
             dt = askServer().diplomacy(unit, colony, dt);
@@ -1827,7 +1825,6 @@ public final class InGameController extends FreeColClientHolder {
      */
     private StringTemplate attemptBuyFromSettlement(Unit unit,
                                                     IndianSettlement is) {
-        final Game game = getGame();
         Player player = getMyPlayer();
         Goods goods = null;
 
@@ -2421,7 +2418,6 @@ public final class InGameController extends FreeColClientHolder {
 
         // Unload everything that is on the carrier but not listed to
         // be loaded at this stop.
-        Game game = getGame();
         for (Goods goods : unit.getCompactGoodsList()) {
             GoodsType type = goods.getType();
             if (goodsTypesToLoad.contains(type)) continue; // Keep this cargo.
@@ -2744,7 +2740,6 @@ public final class InGameController extends FreeColClientHolder {
         if (!requireOurTurn() || unit == null) return false;
 
         // Check unit, which must be on the map and able to build.
-        if (unit == null) return false;
         final Tile tile = unit.getTile();
         if (tile == null) return false;
         if (!unit.canBuildColony()) {
@@ -3482,8 +3477,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     public boolean firstContact(Player player, Player other, Tile tile,
                                 boolean result) {
-        if (player == null || player == null || player == other
-            || tile == null) return false;
+        if (player == null || player == other || tile == null) return false;
 
         boolean ret = askServer().firstContact(player, other, tile, result);
         if (ret) {
@@ -4007,8 +4001,6 @@ public final class InGameController extends FreeColClientHolder {
 
         if (!askClearGotoOrders(unit)) return false;
 
-        final int unitCount = unit.getUnitCount(),
-            goodsCount = unit.getGoodsList().size();
         final Tile oldTile = unit.getTile();
         UnitWas unitWas = new UnitWas(unit);
         ColonyWas colonyWas = (unit.getColony() == null) ? null
@@ -4408,7 +4400,7 @@ public final class InGameController extends FreeColClientHolder {
         
             if (fcgo instanceof Settlement) {
                 Settlement settlement = (Settlement)fcgo;
-                if (settlement != null && settlement.getOwner() != null) {
+                if (settlement.getOwner() != null) {
                     settlement.getOwner().removeSettlement(settlement);
                 }
                 visibilityChange = true;//-vis(player)
@@ -4416,7 +4408,9 @@ public final class InGameController extends FreeColClientHolder {
             } else if (fcgo instanceof Unit) {
                 // Deselect the object if it is the current active unit.
                 Unit u = (Unit)fcgo;
-                if (u == getGUI().getActiveUnit()) getGUI().setActiveUnit(null);
+                if (u == getGUI().getActiveUnit()) {
+                    getGUI().setActiveUnit(null);
+                }
 
                 // Temporary hack until we have real containers.
                 if (u != null && u.getOwner() != null) {

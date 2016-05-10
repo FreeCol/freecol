@@ -111,12 +111,8 @@ public class FontLibrary {
         mainFont = null;
         if (fontName != null) {
             Font font = Font.decode(fontName);
-            if (font != null) {
-                font = font.deriveFont(defaultSize);
-                mainFont = font;
-                return font;
-            }
-            logger.warning("Font not found: " + fontName);
+            mainFont = font = font.deriveFont(defaultSize);
+            return font;
         }
         return ResourceManager.getFont("font.normal").deriveFont(defaultSize);
     }

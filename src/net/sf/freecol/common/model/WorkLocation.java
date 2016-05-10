@@ -276,7 +276,7 @@ public abstract class WorkLocation extends UnitLocation
         logFreeColObjects(types, lb);
         int bestAmount = best.improve(unitType, this, 0, types, lb);
         if (best.workType != null) {
-            lb.add("\n  => ", best);
+            lb.add("\n  => ", best, "/", bestAmount);
         } else {
             lb.add("\n  FAILED");
         }

@@ -710,7 +710,7 @@ public class DOMMessage {
      */
     public static String readId(Element element) {
         String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-        if (id == null) id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        if (id.isEmpty()) id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
         return id;
     }
     // end @compat

@@ -485,7 +485,6 @@ public class LabourData {
 
     private void incrementOutsideWorker(UnitData unitData, Unit unit,
                                         LocationData.Getter getter) {
-        String roleId = unit.getRole().getId();
         UnitData workingAs = null;
         if (unit.isArmed()) {
             workingAs = soldier;

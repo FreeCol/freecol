@@ -1335,7 +1335,8 @@ public class CollectionUtils {
                           Function<? super T, ? extends R> mapper,
                           Collector<R,?,C> collector) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return fmcd(collection.stream(), predicate, mapper, collector);
+        return fmcd(collection.stream(), predicate, mapper, comparator,
+                    collector);
     }
 
     /**
@@ -1347,15 +1348,17 @@ public class CollectionUtils {
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort with.
      * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the mapped predicate matches and
      *     removing duplicates.
      */
     private static <T,R,C> C fmcd(Stream<T> stream, Predicate<T> predicate,
                                   Function<? super T, ? extends R> mapper,
+                                  Comparator<? super R> comparator,
                                   Collector<R,?,C> collector) {
-        return stream.filter(predicate).map(mapper).distinct()
-            .collect(collector);
+        return stream.filter(predicate).map(mapper).sorted(comparator)
+            .distinct().collect(collector);
     }
     
     /**

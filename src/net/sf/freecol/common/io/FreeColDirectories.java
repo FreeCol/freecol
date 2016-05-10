@@ -510,14 +510,6 @@ public class FreeColDirectories {
         if (!dir.isDirectory()) return "Not a directory: " + path;
         if (!dir.canRead()) return "Can not read directory: " + path;
         dataDirectory = dir;
-        if (getBaseDirectory() == null) {
-            return "Can not find base resources directory: " + path
-                + SEPARATOR + BASE_DIRECTORY;
-        }
-        if (getI18nDirectory() == null) {
-            return "Can not find I18n resources directory: " + path
-                + SEPARATOR + I18N_DIRECTORY;
-        }
         return null;
     }
 

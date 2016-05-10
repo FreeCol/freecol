@@ -648,8 +648,6 @@ public class TerrainGenerator {
      * @return A list of created <code>ServerRegion</code>s.
      */
     private List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
-        final TileType lakeType = spec.getTileType("model.tile.lake");
-
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.

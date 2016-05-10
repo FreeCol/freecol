@@ -1070,10 +1070,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         final Game game = getGame();
         final Stance stance = Enum.valueOf(Stance.class,
                                            element.getAttribute("stance"));
-        if (stance == null) {
-            logger.warning("Invalid stance for setStance");
-            return null;
-        }
         final Player p1 = game
             .getFreeColGameObject(element.getAttribute("first"), Player.class);
         if (p1 == null) {
