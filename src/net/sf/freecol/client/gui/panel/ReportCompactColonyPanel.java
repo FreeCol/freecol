@@ -1119,11 +1119,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
         reportPanel.removeAll();
 
         // Define the layout, with a column for each goods type.
-        String cols = "[l][c][c][c]";
-        for (int i = 0; i < this.goodsTypes.size(); i++) cols += "[c]";
-        cols += "[c][c][l][l][l]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[l][c][c][c]");
+        for (int i = 0; i < this.goodsTypes.size(); i++) sb.append("[c]");
+        sb.append("[c][c][l][l][l]");
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
-                                            cols, ""));
+                                            sb.toString(), ""));
 
         conciseHeaders(this.market);
         List<ColonySummary> summaries = new ArrayList<>();

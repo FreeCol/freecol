@@ -307,11 +307,13 @@ public class ModelMessage extends StringTemplate {
             String key = getSourceId();
             switch (getTemplateType()) {
             case TEMPLATE:
+                StringBuilder sb = new StringBuilder(64);
                 for (String k : getKeys()) {
                     if ("%goods%".equals(k)) {
-                        key += "-" + getReplacement(k).getId();
+                        sb.append('-').append(getReplacement(k).getId());
                     }
                 }
+                key = sb.toString();
                 break;
             }
             return key;

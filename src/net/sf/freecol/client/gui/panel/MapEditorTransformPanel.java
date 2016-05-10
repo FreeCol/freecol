@@ -273,16 +273,18 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
             if (riverType.isTileTypeAllowed(tile.getType())
                 && !tile.hasRiver()) {
-                String conns = "";
+                StringBuilder sb = new StringBuilder(64);
                 for (Direction direction : Direction.longSides) {
                     Tile t = tile.getNeighbourOrNull(direction);
                     TileImprovement otherRiver = (t == null) ? null
                         : t.getRiver();
-                    conns += (t == null
-                        || (t.isLand() && otherRiver == null)) ? "0"
-                        : Integer.toString(magnitude);
+                    if (t == null || (t.isLand() && otherRiver == null)) {
+                        sb.append('0');
+                    } else {
+                        sb.append(magnitude);
+                    }
                 }
-                tile.addRiver(magnitude, conns);
+                tile.addRiver(magnitude, sb.toString());
             }
         }
     }

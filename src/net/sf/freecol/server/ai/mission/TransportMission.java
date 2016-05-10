@@ -456,13 +456,14 @@ public class TransportMission extends Mission {
      * @return A message about the cargoes being cleared.
      */
     private String clearCargoes() {
-        String log = "cargoes cleared: ";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("cargoes cleared: ");
         for (Cargo cargo : tClear()) {
             dropTransportable(cargo.getTransportable());
-            log += " " + cargo;
+            sb.append(' ').append(cargo);
         }
         tRetarget();
-        return log;
+        return sb.toString();
     }
 
     /**

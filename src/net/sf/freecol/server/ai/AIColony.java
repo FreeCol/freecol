@@ -357,10 +357,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getUnitCount() <= 0) {
             lb.add(", autodestruct detected");
-            String destruct = "Autodestruct at " + colony.getName()
-                + " in " + turn + ":";
-            for (UnitWas uw : was) destruct += "\n" + uw;
-            logger.warning(destruct);
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("Autodestruct at ").append(colony.getName())
+                .append(" in ").append(turn).append(':');
+            for (UnitWas uw : was) sb.append('\n').append(uw);
+            logger.warning(sb.toString());
             if (!avertAutoDestruction()) return result;
         }
 

@@ -1403,11 +1403,14 @@ public class ChangeSet {
          */
         @Override
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + see
-                + " #" + getPriority()
-                + " " + name;
-            for (String a : attributes) ret += " " + a;
-            return ret + "]";
+            StringBuilder sb = new StringBuilder(64);
+            sb.append('[').append(getClass().getName())
+                .append(' ').append(see)
+                .append(" #").append(getPriority())
+                .append(' ').append(name);
+            for (String a : attributes) sb.append(' ').append(a);
+            sb.append(']');
+            return sb.toString();
         }
     }
 

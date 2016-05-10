@@ -75,10 +75,10 @@ public class BuildingToolTip extends JToolTip {
                 FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
         }
 
-        String columns = "[align center]";
-        for (int index = 0; index < workplaces; index++) {
-            columns += "20[]5[]";
-        }
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[align center]");
+        for (int index = 0; index < workplaces; index++) sb.append("20[]5[]");
+        String columns = sb.toString();
 
         MigLayout layout = new MigLayout("fill, insets 20, wrap "
             + (2 * workplaces + 1), columns, "[][][align bottom]");

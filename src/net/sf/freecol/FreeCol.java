@@ -1092,11 +1092,11 @@ public final class FreeCol {
      * @return A string containing these.
      */
     public static String getValidGUIScales() {
-        String result = "";
-        for(int i=GUI_SCALE_MIN_PCT; i<GUI_SCALE_MAX_PCT; i+=GUI_SCALE_STEP_PCT)
-            result += i + ",";
-        result += GUI_SCALE_MAX_PCT;
-        return result;
+        StringBuilder sb = new StringBuilder(64);
+        for (int i = GUI_SCALE_MIN_PCT; i <= GUI_SCALE_MAX_PCT;
+             i += GUI_SCALE_STEP_PCT) sb.append(i).append(',');
+        sb.setLength(sb.length()-1);
+        return sb.toString();
     }
 
     /**
