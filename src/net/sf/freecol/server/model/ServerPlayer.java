@@ -1115,14 +1115,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // Drop the isREF() branch when the compatibility code
             // goes away.
             if (isREF()) {
-                if (!role.isAvailableTo(this, type)) {
-                    if (null != role.getId()) switch (role.getId()) {
-                        case "model.role.soldier":
-                            role = spec.getRole("model.role.infantry");
-                            break;
-                        case "model.role.dragoon":
-                            role = spec.getRole("model.role.cavalry");
-                            break;
+                if (!role.isAvailableTo(this, type) && null != role.getId()) {
+                    switch (role.getId()) {
+                    case "model.role.soldier":
+                        role = spec.getRole("model.role.infantry");
+                        break;
+                    case "model.role.dragoon":
+                        role = spec.getRole("model.role.cavalry");
+                        break;
+                    default:
+                        break;
                     }
                 }
             } else {

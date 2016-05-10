@@ -155,21 +155,25 @@ public class NumberRules {
                 }
             }
             Number number = null;
-            switch(numberRule.countRules()) {
+            switch (numberRule.countRules()) {
             case 0:
                 number = OTHER_NUMBER_RULE;
                 break;
             case 1:
                 Rule rule = numberRule.getRule(Category.one);
                 if (rule != null) {
-                    if (null != rule.toString()) switch (rule.toString()) {
-                    case "n is 1":
-                        number = PLURAL_NUMBER_RULE;
-                        break;
-                    case "n in 0..1":
-                        number = ZERO_ONE_NUMBER_RULE;
-                        break;
-                }
+                    if (null != rule.toString()) {
+                        switch (rule.toString()) {
+                        case "n is 1":
+                            number = PLURAL_NUMBER_RULE;
+                            break;
+                        case "n in 0..1":
+                            number = ZERO_ONE_NUMBER_RULE;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
                 }
                 break;
             case 2:
@@ -184,6 +188,7 @@ public class NumberRules {
                 break;
             default:
                 number = numberRule;
+                break;
             }
             for (String locale : locales) {
                 numberMap.put(locale, number);

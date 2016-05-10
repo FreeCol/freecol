@@ -254,40 +254,44 @@ public class FontLibrary {
 
     private static float calcScaledSize(FontSize fontSize, float scaleFactor) {
         float pixelSize;
-        switch(fontSize) {
-            default:
-                logger.warning("Unknown FontSize");
-            case TINY:
-                pixelSize = 12f;
-                break;
-            case SMALLER:
-                pixelSize = 16f;
-                break;
-            case SMALL:
-                pixelSize = 24f;
-                break;
-            case MEDIUM:
-                pixelSize = 36f;
-                break;
-            case BIG:
-                pixelSize = 48f;
+        switch (fontSize) {
+        case TINY:
+            pixelSize = 12f;
+            break;
+        case SMALLER:
+            pixelSize = 16f;
+            break;
+        case SMALL:
+            pixelSize = 24f;
+            break;
+        case MEDIUM:
+            pixelSize = 36f;
+            break;
+        case BIG:
+            pixelSize = 48f;
+            break;
+        default:
+            logger.warning("Unknown FontSize: " + fontSize.toString());
+            return -1.0f;
         }
         return pixelSize * scaleFactor;
     }
 
     private static String getFontKey(FontType fontType) {
         String fontName;
-        switch(fontType) {
-            default:
-                logger.warning("Unknown FontType");
-            case NORMAL:
-                fontName = (mainFont != null) ? null : "font.normal";
-                break;
-            case SIMPLE:
-                fontName = "font.simple";
-                break;
-            case HEADER:
-                fontName = "font.header";
+        switch (fontType) {
+        case NORMAL:
+            fontName = (mainFont != null) ? null : "font.normal";
+            break;
+        case SIMPLE:
+            fontName = "font.simple";
+            break;
+        case HEADER:
+            fontName = "font.header";
+            break;
+        default:
+            logger.warning("Unknown FontType: " + fontType.toString());
+            return null;
         }
         return fontName;
     }
