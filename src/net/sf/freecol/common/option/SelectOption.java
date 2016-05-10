@@ -126,7 +126,7 @@ public class SelectOption extends IntegerOption {
 
         Integer fallback = null;
         for (Integer i : keys) {
-            if (i == value) { // Found a valid selection
+            if (i.compareTo(value) == 0) { // Found a valid selection
                 super.setValue(value);
                 return;
             }

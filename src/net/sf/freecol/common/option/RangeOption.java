@@ -63,7 +63,7 @@ public class RangeOption extends SelectOption {
     public int getValueRank() {
         int rank = 0;
         for (Integer i : getItemValues().keySet()) {
-            if (i == getValue()) return rank;
+            if (i.compareTo(getValue()) == 0) return rank;
             rank++;
         }
         return 0; // Actually invalid
