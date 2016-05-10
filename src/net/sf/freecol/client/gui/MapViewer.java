@@ -1793,7 +1793,7 @@ public final class MapViewer extends FreeColClientHolder {
         float y = vPadding / 2.0f;
         for (i = 0; i < labels.length; i++) {
             Rectangle textRectangle = labels[i].getPixelBounds(null, 0, 0);
-            float x = (width - textRectangle.width) / 2;
+            float x = (width - textRectangle.width) / 2.0f;
             y += labels[i].getAscent();
             labels[i].draw(g2, x, y);
             y += labels[i].getDescent() + linePadding;

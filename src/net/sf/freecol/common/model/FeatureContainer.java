@@ -288,7 +288,9 @@ public final class FeatureContainer {
         float result = number;
         for (Modifier m : modifiers) {
             float value = m.getValue(turn);
-            if (value == Modifier.UNKNOWN) return value;
+            if (Float.compare(value, Modifier.UNKNOWN) == 0) {
+                return value;
+            }
             result = m.apply(result, value);
         }
         return result;

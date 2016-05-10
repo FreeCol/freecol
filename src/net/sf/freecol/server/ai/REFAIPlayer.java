@@ -105,7 +105,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         @Override
         public int compareTo(TargetTuple other) {
-            return (score < other.score) ? -1 : (score > other.score) ? 1 : 0;
+            return Double.compare(score, other.score);
         }
 
         // Override Object

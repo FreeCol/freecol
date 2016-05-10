@@ -507,8 +507,8 @@ public class TerrainGenerator {
         int maximumLength
             = Math.max(mapOptions.getInteger(MapGeneratorOptions.MAP_WIDTH),
                 mapOptions.getInteger(MapGeneratorOptions.MAP_HEIGHT)) / 10;
-        int number = (int)((1.0f - randomHillsRatio)
-            * (getApproximateLandCount()
+        int number = Math.round((1.0f - randomHillsRatio)
+            * ((float)getApproximateLandCount()
                 / mapOptions.getInteger(MapGeneratorOptions.MOUNTAIN_NUMBER)));
         lb.add("Number of mountain tiles is ", number, "\n",
             "Maximum length of mountain ranges is ", maximumLength, "\n");

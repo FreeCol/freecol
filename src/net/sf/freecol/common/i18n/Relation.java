@@ -76,7 +76,7 @@ public class Relation {
      */
     public boolean matches(double number) {
         double value = (mod == 1) ? number : number % mod;
-        if (integer && value != (int) value) {
+        if (integer && Double.compare(value, Math.rint(value)) != 0) {
             return false;
         }
         return (low <= value && value <= high) != negated;

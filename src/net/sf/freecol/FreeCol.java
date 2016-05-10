@@ -1077,7 +1077,7 @@ public final class FreeCol {
                 } else if(n % GUI_SCALE_STEP_PCT != 0) {
                     valid = false;
                 }
-                guiScale = ((float)(n / GUI_SCALE_STEP_PCT)) * GUI_SCALE_STEP;
+                guiScale = ((float)n / GUI_SCALE_STEP_PCT) * GUI_SCALE_STEP;
             } catch (NumberFormatException nfe) {
                 valid = false;
                 guiScale = GUI_SCALE_MAX;
