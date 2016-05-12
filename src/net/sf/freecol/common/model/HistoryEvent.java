@@ -220,6 +220,19 @@ public class HistoryEvent extends StringTemplate {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + this.turn.hashCode();
+        hash = 31 * hash + this.eventType.ordinal();
+        if (this.playerId != null) hash = 31 * hash + this.playerId.hashCode();
+        hash = 31 * hash + this.score;
+        return hash;
+    }
+    
 
     // Serialization
 
@@ -236,13 +249,13 @@ public class HistoryEvent extends StringTemplate {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(TURN_TAG, turn.getNumber());
+        xw.writeAttribute(TURN_TAG, this.turn.getNumber());
 
-        xw.writeAttribute(EVENT_TYPE_TAG, eventType);
+        xw.writeAttribute(EVENT_TYPE_TAG, this.eventType);
 
-        if (playerId != null) xw.writeAttribute(PLAYER_ID_TAG, playerId);
+        if (playerId != null) xw.writeAttribute(PLAYER_ID_TAG, this.playerId);
 
-        xw.writeAttribute(SCORE_TAG, score);
+        xw.writeAttribute(SCORE_TAG, this.score);
     }
 
     /**
