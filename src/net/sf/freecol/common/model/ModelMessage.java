@@ -315,6 +315,8 @@ public class ModelMessage extends StringTemplate {
                 }
                 key = sb.toString();
                 break;
+            default:
+                break;
             }
             return key;
         default:
