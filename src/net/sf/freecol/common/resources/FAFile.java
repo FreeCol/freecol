@@ -184,22 +184,23 @@ public class FAFile {
             int numberOfPoints = Integer.parseInt(st.nextToken());
             int[] xs = new int[numberOfPoints];
             int[] ys = new int[numberOfPoints];
-            line = in.readLine();
+
+            if ((line = in.readLine()) == null) break;
             st = new StringTokenizer(line);
-            for (int i=0; i<numberOfPoints; i++) {
+            for (int i = 0; i < numberOfPoints; i++) {
                 xs[i] = Integer.parseInt(st.nextToken());               
             }
 
             if ((line = in.readLine()) == null) break;
             st = new StringTokenizer(line);         
-            for (int i=0; i<numberOfPoints; i++) {
+            for (int i = 0; i < numberOfPoints; i++) {
                 ys[i] = Integer.parseInt(st.nextToken());               
             }   
 
             FALetter newLetter = new FALetter();
             newLetter.advance = advance;
             newLetter.points = new Point[numberOfPoints];
-            for (int i=0; i<numberOfPoints; i++) {
+            for (int i = 0; i < numberOfPoints; i++) {
                 newLetter.points[i] = new Point(xs[i], ys[i]);                
             }           
             letters.put(letter, newLetter);

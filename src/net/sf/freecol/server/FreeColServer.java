@@ -1248,8 +1248,11 @@ public final class FreeColServer {
      * @param prefix The prefix for the files to delete.
      */
     public static void removeAutosaves(final String prefix) {
-        for (File autosaveFile : FreeColDirectories.getAutosaveDirectory()
-                 .listFiles()) {
+        File asd = FreeColDirectories.getAutosaveDirectory();
+        File[] files;
+        if (asd == null
+            || (files = asd.listFiles()) == null) return;
+        for (File autosaveFile : files) {
             if (autosaveFile.getName().startsWith(prefix)) {
                 try {
                     if (!autosaveFile.delete()) {

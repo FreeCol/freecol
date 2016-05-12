@@ -760,7 +760,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         } else { // does not have a customs house
             for (AIGoods aig : getExportGoods()) {
                 if (aig == null) {
-                    removeExportGoods(aig);
+                    ; // removeExportGoods(aig);
                 } else if (aig.checkIntegrity(false) < 0) {
                     goodsLog(aig, "reaps", lb);
                     dropExportGoods(aig);

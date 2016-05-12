@@ -19,6 +19,7 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -801,15 +802,19 @@ public class FreeColDirectories {
      * may be either from a recent arbitrary user operation or an
      * autosave function.)
      *
-     *  @return The recent save game file
+     * @return The recent save game <code>File</code>, or null if not found.
      */
     public static File getLastSaveGameFile() {
+        final FileFilter filter = FreeColSavegameFile.getFileFilter();
+        if (filter == null) return null;
         File lastSave = null;
+        File[] files;
         for (File directory : new File[] {
                 FreeColDirectories.getSaveDirectory(),
                 FreeColDirectories.getAutosaveDirectory() }) {
-            if (directory == null) continue;
-            for (File savegame : directory.listFiles(FreeColSavegameFile.getFileFilter())) {
+            if (directory == null
+                || (files = directory.listFiles(filter)) == null) continue;
+            for (File savegame : files) {
                 if (lastSave == null
                     || savegame.lastModified() > lastSave.lastModified()) {
                     lastSave = savegame;

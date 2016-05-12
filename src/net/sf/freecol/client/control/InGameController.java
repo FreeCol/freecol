@@ -2221,7 +2221,7 @@ public final class InGameController extends FreeColClientHolder {
         for (Goods g : unit.getCompactGoods()) {
             AbstractGoods ag = AbstractGoods.findByType(g.getType(), toLoad);
             if (ag == null) { // Excess goods on board, failed unload?
-                unexpected.addStringTemplate("%goods%", ag.getLabel());
+                unexpected.addStringTemplate("%goods%", g.getLabel());
             } else {
                 int goodsAmount = g.getAmount();
                 if (ag.getAmount() <= goodsAmount) { // At capacity
@@ -4424,9 +4424,7 @@ public final class InGameController extends FreeColClientHolder {
                 }
 
                 // Temporary hack until we have real containers.
-                if (u != null && u.getOwner() != null) {
-                    u.getOwner().removeUnit(u);
-                }
+                if (u.getOwner() != null) u.getOwner().removeUnit(u);
                 visibilityChange = true;//-vis(player)
             }
 

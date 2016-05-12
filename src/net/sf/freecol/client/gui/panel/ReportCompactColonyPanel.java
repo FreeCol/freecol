@@ -1096,7 +1096,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             reportPanel.add(l);
         }
 
-        final UnitType type = spec.getDefaultUnitType(market.getOwner());
+        final UnitType type = spec.getDefaultUnitType(getMyPlayer());
         ImageIcon colonistIcon
             = new ImageIcon(this.lib.getTinyUnitImage(type, false));
         reportPanel.add(newLabel(null, colonistIcon, null,
