@@ -373,11 +373,13 @@ public class FreeColDebugger {
      * @param msg The message to log.
      */
     public static void debugLog(String msg) {
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream("/tmp/freecol.debug", true);
+            fos = new FileOutputStream("/tmp/freecol.debug", true);
             PrintStream prs = new PrintStream(fos, true, "UTF-8");
             prs.println(msg);
-        } catch (FileNotFoundException|UnsupportedEncodingException ex) {
+            fos.close();
+        } catch (IOException ex) {
             ; // Ignore failure
         }
     }
