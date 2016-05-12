@@ -1812,24 +1812,14 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A goods object, or null if nothing suitable found.
      */
     public Goods getMostValuableGoods() {
-        if (!isEuropean()) return null;
-
-        Goods goods = null;
-        int highValue = 0;
-        for (Colony colony : getColonies()) {
-            for (Goods g : colony.getCompactGoods()) {
-                if (getArrears(g.getType()) <= 0 && hasTraded(g.getType())) {
-                    int amount = Math.min(g.getAmount(),
-                                          GoodsContainer.CARGO_SIZE);
-                    int value = market.getSalePrice(g.getType(), amount);
-                    if (value > highValue) {
-                        highValue = value;
-                        goods = g;
-                    }
-                }
-            }
-        }
-        return goods;
+        final Predicate<Goods> pred = g ->
+            getArrears(g.getType()) <= 0 && hasTraded(g.getType());
+        final Comparator<Goods> comp = Comparator.comparingInt(g ->
+            market.getSalePrice(g.getType(),
+                Math.min(g.getAmount(), GoodsContainer.CARGO_SIZE)));
+        return (!isEuropean()) ? null
+            : maximize(flatten(getColonies(), c -> c.getCompactGoods()),
+                       pred, comp);
     }
 
     /**

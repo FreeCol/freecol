@@ -26,9 +26,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.filechooser.FileSystemView;
 
 import net.sf.freecol.FreeCol;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -38,6 +45,9 @@ public class FreeColDirectories {
 
     // No logger!  Many of these routines are called before logging is
     // initialized.
+
+    private static final Comparator<File> fileModificationComparator
+        = Comparator.comparingLong(File::lastModified);
 
     private static final String AUTOSAVE_DIRECTORY = "autosave";
 
@@ -798,6 +808,21 @@ public class FreeColDirectories {
     }
 
     /**
+     * Find all the saved game files in a given directory.
+     *
+     * @param directory The directory to look in.
+     * @return A list of saved game files found.
+     */
+    public static List<File> getSavedFiles(File directory) {
+        final FileFilter filter = FreeColSavegameFile.getFileFilter();
+        if (directory != null && filter != null) {
+            File[] files = directory.listFiles(filter);
+            if (files != null) return Arrays.asList(files);
+        }
+        return Collections.<File>emptyList();
+    }
+    
+    /**
      * Gets the most recently saved game file, or <b>null</b>.  (This
      * may be either from a recent arbitrary user operation or an
      * autosave function.)
@@ -805,23 +830,10 @@ public class FreeColDirectories {
      * @return The recent save game <code>File</code>, or null if not found.
      */
     public static File getLastSaveGameFile() {
-        final FileFilter filter = FreeColSavegameFile.getFileFilter();
-        if (filter == null) return null;
-        File lastSave = null;
-        File[] files;
-        for (File directory : new File[] {
-                FreeColDirectories.getSaveDirectory(),
-                FreeColDirectories.getAutosaveDirectory() }) {
-            if (directory == null
-                || (files = directory.listFiles(filter)) == null) continue;
-            for (File savegame : files) {
-                if (lastSave == null
-                    || savegame.lastModified() > lastSave.lastModified()) {
-                    lastSave = savegame;
-                }
-            }
-        }
-        return lastSave;
+        return maximize(flatten(Stream.of(FreeColDirectories.getSaveDirectory(),
+                                          FreeColDirectories.getAutosaveDirectory()),
+                                FreeColDirectories::getSavedFiles),
+                        fileModificationComparator);
     }
 
     /**
