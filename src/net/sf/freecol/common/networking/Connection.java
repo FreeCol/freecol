@@ -109,7 +109,7 @@ public class Connection implements Closeable {
         this.messageHandler = null;
         this.name = name;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            this.logWriter = new BufferedWriter(new OutputStreamWriter(System.err));
+            this.logWriter = Utils.getUTF8Writer(System.err);
             this.logResult = new StreamResult(this.logWriter);
         } else {
             this.logWriter = null;

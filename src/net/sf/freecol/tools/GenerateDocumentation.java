@@ -21,9 +21,9 @@ package net.sf.freecol.tools;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +38,7 @@ import javax.xml.transform.TransformerFactory;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -81,8 +82,8 @@ public class GenerateDocumentation {
         System.out.println("Processing source file: resources.properties");
         File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
         try (
-            FileReader fileReader = new FileReader(sourceFile);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            Reader reader = Utils.getFileUTF8Reader(sourceFile);
+            BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {
@@ -121,8 +122,8 @@ public class GenerateDocumentation {
             File sourceFile = new File(STRING_DIRECTORY, name);
 
             try (
-                FileReader fileReader = new FileReader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                Reader reader = Utils.getFileUTF8Reader(sourceFile);
+                BufferedReader bufferedReader = new BufferedReader(reader);
             ) {
                 String line = bufferedReader.readLine();
                 while (line != null) {
@@ -146,7 +147,7 @@ public class GenerateDocumentation {
         }
         File destinationFile = new File(DESTINATION_DIRECTORY, "freecol.tmx");
         try (
-            FileWriter out = new FileWriter(destinationFile);
+             Writer out = Utils.getFileUTF8Writer(destinationFile);
         ) {
             out.write("<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n");
             out.write("<tmx version=\"1.4b\">\n");

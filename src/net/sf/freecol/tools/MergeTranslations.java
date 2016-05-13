@@ -22,8 +22,8 @@ package net.sf.freecol.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -77,7 +78,9 @@ public class MergeTranslations {
                                 e -> !targetProperties.containsKey(e.getKey()),
                                 Collectors.toList());
                 if (!missingProperties.isEmpty()) {
-                    try (FileWriter out = new FileWriter(targetFile, true)) {
+                    try (
+                        Writer out = Utils.getFileUTF8AppendWriter(targetFile)
+                    ) {
                         out.write("### Merged from trunk on "
                                 + DateFormat.getDateTimeInstance().format(new Date())
                                 + " ###\n");
@@ -91,16 +94,15 @@ public class MergeTranslations {
                 }
             } else {
                 System.out.println("Copying " + name + " from trunk.");
-                FileWriter out;
-                try (FileReader in = new FileReader(sourceFile)) {
-                    out = new FileWriter(targetFile);
+                try (
+                    Reader in = Utils.getFileUTF8Reader(sourceFile);
+                    Writer out = Utils.getFileUTF8Writer(targetFile);
+                ) {
                     int c;
                     while ((c = in.read()) != -1) {
                         out.write(c);
                     }
                 }
-                out.close();
-
             }
         }
     }
@@ -108,8 +110,8 @@ public class MergeTranslations {
     private static Map<String, String> readFile(File file) {
         Map<String, String> result = new HashMap<>();
         try (
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+            Reader reader = Utils.getFileUTF8Reader(file);
+            BufferedReader bufferedReader = new BufferedReader(reader); 
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {

@@ -21,11 +21,13 @@ package net.sf.freecol.tools;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -179,7 +181,7 @@ public class InstallerTranslations {
             }
             output.append("</langpack>\n");
             File destinationFile = new File(DESTINATION_DIRECTORY, "lang.xml_" + languageCode);
-            try (FileWriter out = new FileWriter(destinationFile)) {
+            try (Writer out = Utils.getFileUTF8Writer(destinationFile)) {
                 out.write(output.toString());
             }
         }
@@ -189,8 +191,8 @@ public class InstallerTranslations {
     private static Map<String, String> readFile(File file) {
         Map<String, String> result = new HashMap<>();
         try (
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            Reader reader = Utils.getFileUTF8Reader(file);
+            BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line = bufferedReader.readLine();
             while (line != null) {

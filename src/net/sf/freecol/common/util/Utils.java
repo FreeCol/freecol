@@ -22,12 +22,16 @@ package net.sf.freecol.common.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
@@ -127,34 +131,96 @@ public class Utils {
     }
 
     /**
+     * Create a new file reader that uses UTF-8.
+     *
+     * @param file A <code>File</code> to read from.
+     * @return A <code>Reader</code> for this file.
+     */
+    public static Reader getFileUTF8Reader(File file) {
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "No FileInputStream for "
+                + file.getPath(), fnfe);
+            return null;
+        }
+        InputStreamReader isr;
+        try {
+            isr = new InputStreamReader(fis, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            logger.log(Level.WARNING, "No InputStreamWriter for "
+                + file.getPath(), uee);
+            try {
+                fis.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to close", ioe);
+            }
+            return null;
+        }
+        return isr;
+    }
+
+    /**
      * Create a new file writer that uses UTF-8.
      *
      * @param file A <code>File</code> to write to.
      * @return A <code>Writer</code> for this file.
      */
     public static Writer getFileUTF8Writer(File file) {
+        return getF8W(file, false);
+    }
+
+    /**
+     * Create a new appending file writer that uses UTF-8.
+     *
+     * @param file A <code>File</code> to append to.
+     * @return A <code>Writer</code> for this file.
+     */
+    public static Writer getFileUTF8AppendWriter(File file) {
+        return getF8W(file, true);
+    }
+    
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
+     * @param file A <code>File</code> to write to.
+     * @param append If true, append to the file.
+     * @return A <code>Writer</code> for this file.
+     */
+    private static Writer getF8W(File file, boolean append) {
         FileOutputStream fos;
         try {
-            fos = new FileOutputStream(file);
+            fos = new FileOutputStream(file, append);
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "No FileOutputStream for "
                 + file.getName(), e);
             return null;
         }
-        OutputStreamWriter osw;
-        try {
-            osw = new OutputStreamWriter(fos, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            logger.log(Level.WARNING, "No OutputStreamWriter for "
-                + file.getName(), e);
+        Writer wr = getUTF8Writer(fos);
+        if (wr == null) {
             try {
                 fos.close();
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "Failed to close", ioe);
             }
-            return null;
         }
-        return osw;
+        return wr;            
+    }
+
+    /**
+     * Create a new file writer that uses UTF-8.
+     *
+     * @param os An <code>OutputStream</code> to write to.
+     * @return A <code>Writer</code> for this file.
+     */
+    public static Writer getUTF8Writer(OutputStream os) {
+        try {
+            return new OutputStreamWriter(os, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            logger.log(Level.WARNING, "No OutputStreamWriter", uee);
+        }
+        return null;
     }
 
     /**

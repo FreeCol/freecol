@@ -21,11 +21,13 @@ package net.sf.freecol.tools;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -51,7 +53,7 @@ public class DesktopEntry {
     public static void main(String[] args)
         throws FileNotFoundException, IOException {
 
-        try (FileWriter result = new FileWriter(new File(args[0]))) {
+        try (Writer result = Utils.getFileUTF8Writer(new File(args[0]))) {
             result.append("[Desktop Entry]\n");
             result.append("Version=1.0\n");
             result.append("Type=Application\n");
@@ -82,8 +84,8 @@ public class DesktopEntry {
                 boolean foundGenericName = false;
                 boolean foundComment = false;
                 File sourceFile = new File(SOURCE_DIRECTORY, name);
-                FileReader fileReader = new FileReader(sourceFile);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                Reader reader = Utils.getFileUTF8Reader(sourceFile);
+                BufferedReader bufferedReader = new BufferedReader(reader);
                 String line = bufferedReader.readLine();
                 while (line != null) {
                     int index = line.indexOf('=');
