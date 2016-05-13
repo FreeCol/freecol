@@ -481,7 +481,7 @@ public class SimpleMapGenerator implements MapGenerator {
             Tile tile = settlementTiles.remove(0);
             if (tile.getOwner() != null) continue; // No close overlap
 
-            Territory territory = getClosestTerritory(map, tile, territories);
+            Territory territory = getClosestTerritory(tile, territories);
             int radius = territory.player.getNationType().getSettlementType(false)
                 .getClaimableRadius();
             // Insist that the settlement can not be linear
@@ -643,18 +643,19 @@ public class SimpleMapGenerator implements MapGenerator {
         return null;
     }
 
-    private Territory getClosestTerritory(Map map, Tile tile,
+    /**
+     * Find the closest territory to a given tile from a list of choices.
+     *
+     * @param tile The <code>Tile</code> to search from.
+     * @param territories The list of <code>Territory</code>s to choose from.
+     * @return The closest <code>Territory</code> found, or null if none.
+     */
+    private Territory getClosestTerritory(final Tile tile,
                                           List<Territory> territories) {
-        Territory result = null;
-        int minimumDistance = Integer.MAX_VALUE;
-        for (Territory territory : territories) {
-            int distance = map.getDistance(tile, territory.getCenterTile(map));
-            if (distance < minimumDistance) {
-                minimumDistance = distance;
-                result = territory;
-            }
-        }
-        return result;
+        final Map map = tile.getMap();
+        final Comparator<Territory> comp = Comparator.comparingInt(t ->
+            map.getDistance(tile, t.getCenterTile(map)));
+        return minimize(territories, comp);
     }
 
     /**
