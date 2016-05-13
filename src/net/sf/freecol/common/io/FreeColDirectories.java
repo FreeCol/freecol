@@ -495,9 +495,11 @@ public class FreeColDirectories {
      * Derive the directory for the autosave files from the save directory.
      */
     private static void deriveAutosaveDirectory() {
-        if (autosaveDirectory == null && saveDirectory != null) {
-            autosaveDirectory = new File(saveDirectory, AUTOSAVE_DIRECTORY);
-            if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
+        File dir;
+        if (autosaveDirectory == null && saveDirectory != null
+            && (dir = new File(saveDirectory, AUTOSAVE_DIRECTORY)) != null
+            && insistDirectory(dir)) {
+            autosaveDirectory = dir;
         }
     }
         
