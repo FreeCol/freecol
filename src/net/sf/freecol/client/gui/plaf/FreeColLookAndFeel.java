@@ -45,6 +45,11 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
     private static final Logger logger = Logger.getLogger(FreeColLookAndFeel.class.getName());
 
+    private static final String brightPanelUI
+        = "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI";
+    private static final String transparentPanelUI
+        = "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI";
+
     private static final Class uiClasses[] = {
         FreeColButtonUI.class,
         FreeColCheckBoxUI.class,
@@ -123,21 +128,20 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     public UIDefaults getDefaults() {
         UIDefaults u = super.getDefaults();
 
-        try {
-            int offset = "FreeCol".length();
-            for (Class<?> uiClass : uiClasses) {
-                String name = uiClass.getName();
-                int index = name.lastIndexOf("FreeCol");
-                if (index >= 0) {
-                    index += offset;
-                    String shortName = name.substring(index);
-                    u.put(shortName, name);
-                    u.put(name, uiClass);
-                }
+        int offset = "FreeCol".length();
+        for (Class<?> uiClass : uiClasses) {
+            String name = uiClass.getName();
+            int index = name.lastIndexOf("FreeCol");
+            if (index >= 0) {
+                index += offset;
+                String shortName = name.substring(index);
+                u.put(shortName, name);
+                u.put(name, uiClass);
             }
+        }
 
-            // Sharing FreeColBrightPanelUI:
-            String brightPanelUI = "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI";
+        // Sharing FreeColBrightPanelUI:
+        try {
             u.put(brightPanelUI, Class.forName(brightPanelUI));
             u.put("InPortPanelUI", brightPanelUI);
             u.put("CargoPanelUI", brightPanelUI);
@@ -151,9 +155,12 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ColopediaPanelUI", brightPanelUI);
             u.put("TilePanelUI", brightPanelUI);
             u.put("OptionGroupUI", brightPanelUI);
+        } catch (ClassNotFoundException cnfe) {
+            logger.log(Level.WARNING, "Could not load " + brightPanelUI, cnfe);
+        }
 
-            // Sharing FreeColTransparentPanelUI:
-            String transparentPanelUI = "net.sf.freecol.client.gui.plaf.FreeColTransparentPanelUI";
+        // Sharing FreeColTransparentPanelUI:
+        try {
             u.put(transparentPanelUI, Class.forName(transparentPanelUI));
             u.put("MarketPanelUI", transparentPanelUI);
             u.put("EuropeCargoPanelUI", transparentPanelUI);
@@ -161,26 +168,25 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("ToEuropePanelUI", transparentPanelUI);
             u.put("EuropeInPortPanelUI", transparentPanelUI);
             u.put("DocksPanelUI", transparentPanelUI);
+        } catch (ClassNotFoundException cnfe) {
+            logger.log(Level.WARNING, "Could not load " + transparentPanelUI, cnfe);
+        }
 
-            // ColorButton
-            u.put("javax.swing.plaf.metal.MetalButtonUI", javax.swing.plaf.metal.MetalButtonUI.class);
-            u.put("ColorButtonUI", "javax.swing.plaf.metal.MetalButtonUI");
+        // ColorButton
+        u.put("javax.swing.plaf.metal.MetalButtonUI",
+            javax.swing.plaf.metal.MetalButtonUI.class);
+        u.put("ColorButtonUI", "javax.swing.plaf.metal.MetalButtonUI");
 
-            // Add cursors:
-            String key = "image.icon.cursor.go";
-            if (ResourceManager.hasImageResource(key)) {
-                Image im = ResourceManager.getImage(key);
-                u.put("cursor.go",
-                    Toolkit.getDefaultToolkit().createCustomCursor(im,
-                        new Point(im.getWidth(null)/2, im.getHeight(null)/2),
-                        "go"));
-            } else {
-                u.put("cursor.go", Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            }
-
-        } catch (ClassNotFoundException e) {
-            logger.log(Level.SEVERE, "Failed to load look and feel!", e);
-            System.exit(1);
+        // Add cursors:
+        String key = "image.icon.cursor.go";
+        if (ResourceManager.hasImageResource(key)) {
+            Image im = ResourceManager.getImage(key);
+            u.put("cursor.go",
+                Toolkit.getDefaultToolkit().createCustomCursor(im,
+                    new Point(im.getWidth(null)/2, im.getHeight(null)/2),
+                    "go"));
+        } else {
+            u.put("cursor.go", Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
         return u;
