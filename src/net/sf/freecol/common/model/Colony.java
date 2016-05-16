@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1996,17 +1997,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
      */
-    public int getAdjustedNetProductionOf(GoodsType goodsType) {
-        int result = productionCache.getNetProductionOf(goodsType);
-        for (BuildQueue<?> queue : new BuildQueue<?>[] { buildQueue,
-                                                         populationQueue }) {
-            ProductionInfo info = productionCache.getProductionInfo(queue);
-            if (info != null) {
-                result += AbstractGoods.getCount(goodsType,
-                    info.getConsumption());
-            }
-        }
-        return result;
+    public int getAdjustedNetProductionOf(final GoodsType goodsType) {
+        final ToIntFunction<BuildQueue> consumes = q -> {
+            ProductionInfo pi = productionCache.getProductionInfo(q);
+            if (pi == null) return 0;
+            AbstractGoods ag = AbstractGoods.findByType(goodsType, pi.getConsumption());
+            return (ag == null) ? 0 : ag.getAmount();
+        };
+        return productionCache.getNetProductionOf(goodsType)
+            + sum(Stream.of(buildQueue, populationQueue), consumes);
     }
 
     /**
