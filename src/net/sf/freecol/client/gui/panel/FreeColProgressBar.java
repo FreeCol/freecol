@@ -43,30 +43,23 @@ import net.sf.freecol.common.model.StringTemplate;
  */
 public class FreeColProgressBar extends JPanel {
 
-    // The minimum value of the progress bar
+    /** The minimum value of the progress bar. */
     private int min = 0;
 
-    // The maximum value of the progress bar
+    /** The maximum value of the progress bar. */
     private int max = 100;
 
-    // The current value of the progress bar
+    /** The current value of the progress bar. */
     private int value = 0;
 
-    // The expected increase next turn
+    /** The expected increase next turn. */
     private int step = 0;
 
-    private int iconWidth;
-
-    private final int iconHeight = ImageLibrary.ICON_SIZE.height / 2;
-
     /**
-     * The type of goods this progress bar is for. The default value of null
-     * indicates no goods type.
+     * The type of goods this progress bar is for.  The default value
+     * of null indicates no goods type.
      */
     private GoodsType goodsType = null;
-
-
-    private Image image;
 
 
     /**
@@ -98,19 +91,15 @@ public class FreeColProgressBar extends JPanel {
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public FreeColProgressBar(GoodsType goodsType, int min, int max, int value, int step) {
-        this.goodsType = goodsType;
+    public FreeColProgressBar(GoodsType goodsType, int min, int max,
+                              int value, int step) {
         this.min = min;
         this.max = max;
         this.value = value;
         this.step = step;
+        this.goodsType = goodsType;
 
         setBorder(Utility.PROGRESS_BORDER);
-        if (goodsType != null) {
-            image = ImageLibrary.getMiscImage("image.icon." + goodsType.getId(),
-                new Dimension(-1, iconHeight));
-            iconWidth = image.getWidth(this);
-        }
         setPreferredSize(new Dimension(200, 20));
     }
 
@@ -141,21 +130,32 @@ public class FreeColProgressBar extends JPanel {
         repaint();
     }
 
+    /**
+     * Get an image to use for the goods type, if any.
+     *
+     * @return A suitable <code>Image</code>, or null if there is no
+     *      goods type.
+     */
+    private Image getImage() {
+        return (this.goodsType == null) ? null
+            : ImageLibrary.getMiscImage("image.icon." + this.goodsType.getId(),
+                new Dimension(-1, ImageLibrary.ICON_SIZE.height / 2));
+    }
+
+
+    // Override JComponent
+
     @Override
     protected void paintComponent(Graphics g) {
-
-        Graphics2D g2d = (Graphics2D) g.create();
+        Graphics2D g2d = (Graphics2D)g.create();
         g2d.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY));
+                                           FontLibrary.FontSize.TINY));
         int width = getWidth() - getInsets().left - getInsets().right;
         int height = getHeight() - getInsets().top - getInsets().bottom;
 
-        if (image != null && iconWidth < 0) {
-            iconWidth = image.getWidth(this);
-        }
-
         if (isOpaque()) {
-            ImageLibrary.drawTiledImage("image.background.FreeColProgressBar", g, this, getInsets());
+            ImageLibrary.drawTiledImage("image.background.FreeColProgressBar",
+                                        g, this, getInsets());
         }
 
         int dvalue = 0;
@@ -171,7 +171,6 @@ public class FreeColProgressBar extends JPanel {
             g2d.setColor(new Color(0, 0, 0, 70));
             g2d.fillRect(getInsets().left, getInsets().top, dvalue, height);
         }
-
         int dstep = 0;
         if (max > 0) {
             dstep = width * step / max;
@@ -180,40 +179,50 @@ public class FreeColProgressBar extends JPanel {
                     dstep = width - dvalue;
                 }
                 g2d.setColor(new Color(0, 0, 0, 40));
-                g2d.fillRect(getInsets().left + dvalue, getInsets().top, dstep, height);
+                g2d.fillRect(getInsets().left + dvalue, getInsets().top,
+                             dstep, height);
             }
         }
 
         String stepSignal = (step < 0) ? "-" : "+";
-        String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
-        String turnsString = Messages.message("notApplicable");
-        if (max <= value) {
+        String progress = String.valueOf(value) + stepSignal
+            + Math.abs(step) + "/" + max;
+        String turnsString;
+        if (max <= value) { // Already complete
             turnsString = "0";
-        } else if (step > 0) {
-            // There is progress, find how many turns necessary with current production
+        } else if (step > 0) { // There is progress, how many turns to go?
             int turns = (max - value) / step;
             if ((max - value) % step > 0) {
                 turns++;
             }
             turnsString = Integer.toString(turns);
+        } else { // No progress
+            turnsString = Messages.message("notApplicable");
         }
-        progressString += " " + Messages.message(StringTemplate
+        progress += " " + Messages.message(StringTemplate
             .template("freeColProgressBar.turnsToComplete")
             .addName("%number%", turnsString));
 
-        int stringWidth = g2d.getFontMetrics().stringWidth(progressString);
-        int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();
+        int stringWidth = g2d.getFontMetrics().stringWidth(progress);
+        int stringHeight = g2d.getFontMetrics().getAscent()
+            + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;
 
-        if (goodsType != null) {
-            restWidth -= iconWidth;
-            g2d.drawImage(image, restWidth / 2, (getHeight() - iconHeight) / 2, null);
+        Image image = null;
+        int iconWidth = 0;
+        if (goodsType != null && (image = getImage()) != null) {
+            iconWidth = image.getWidth(this);
+            g2d.drawImage(image, restWidth / 2,
+                (getHeight() - ImageLibrary.ICON_SIZE.height / 2) / 2,
+                null);
         }
 
         g2d.setColor(Color.BLACK);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.drawString(progressString, restWidth / 2 + iconWidth, getHeight() / 2 + stringHeight / 4);
-
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.drawString(progress,
+                       (restWidth - iconWidth) / 2 + iconWidth,
+                       getHeight() / 2 + stringHeight / 4);
         g2d.dispose();
     }
 }
