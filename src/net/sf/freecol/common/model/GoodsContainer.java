@@ -292,10 +292,11 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 this.storedGoods.clear();
                 return;
             }
-            for (GoodsType goodsType : this.storedGoods.keySet()) {
-                if (goodsType.isStorable() && !goodsType.limitIgnored()
-                    && this.storedGoods.get(goodsType) > newAmount) {
-                    this.storedGoods.put(goodsType, newAmount);
+            for (Entry<GoodsType, Integer> e : this.storedGoods.entrySet()) {
+                final GoodsType gt = e.getKey();
+                if (gt.isStorable() && !gt.limitIgnored()
+                    && e.getValue() > newAmount) {
+                    this.storedGoods.put(gt, newAmount);
                 }
             }
         }
@@ -310,8 +311,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public boolean hasReachedCapacity(int amount) {
         synchronized (this.storedGoods) {
-            return any(this.storedGoods.keySet(), gt -> gt.isStorable()
-                && !gt.limitIgnored() && this.storedGoods.get(gt) > amount);
+            return any(this.storedGoods.entrySet(), e ->
+                       e.getKey().isStorable()
+                           && !e.getKey().limitIgnored()
+                           && e.getValue() > amount);
         }
     }
 
@@ -349,18 +352,19 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @see #getGoodsIterator
      */
     public List<Goods> getGoods() {
-        List<Goods> totalGoods = new ArrayList<>();
+        final Game game = getGame();
+        List<Goods> result = new ArrayList<>();
         synchronized (this.storedGoods) {
-            for (GoodsType goodsType : this.storedGoods.keySet()) {
-                int amount = this.storedGoods.get(goodsType);
+            for (Entry<GoodsType, Integer> e : this.storedGoods.entrySet()) {
+                int amount = e.getValue();
                 while (amount > 0) {
-                    totalGoods.add(new Goods(getGame(), parent, goodsType,
+                    result.add(new Goods(game, parent, e.getKey(),
                             ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
                     amount -= CARGO_SIZE;
                 }
             }
         }
-        return totalGoods;
+        return result;
     }
 
     /**

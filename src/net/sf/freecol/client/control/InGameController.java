@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -644,12 +645,13 @@ public final class InGameController extends FreeColClientHolder {
      * @param turn The <code>Turn</code> value to test against.
      */
     private synchronized void reapIgnoredMessages(Turn turn) {
-        Iterator<String> keys = messagesToIgnore.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            if (messagesToIgnore.get(key) < turn.getNumber()) {
-                keys.remove();
-                logger.finer("Ignore message reap: " + key);
+        Iterator<Entry<String, Integer>> entries
+            = messagesToIgnore.entrySet().iterator();
+        while (entries.hasNext()) {
+            Entry<String, Integer> e = entries.next();
+            if (e.getValue() < turn.getNumber()) {
+                logger.finer("Ignored message reaped: " + e.getKey());
+                entries.remove();
             }
         }
     }
