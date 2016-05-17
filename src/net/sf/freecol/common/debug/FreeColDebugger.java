@@ -378,9 +378,14 @@ public class FreeColDebugger {
             fos = new FileOutputStream("/tmp/freecol.debug", true);
             PrintStream prs = new PrintStream(fos, true, "UTF-8");
             prs.println(msg);
-            fos.close();
         } catch (IOException ex) {
             ; // Ignore failure
+        } finally {
+            try {
+                if (fos != null) fos.close();
+            } catch (IOException ioe) {
+                ; // Ignore failure
+            }
         }
     }
 
