@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.CharBuffer;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -161,6 +162,33 @@ public class Utils {
         return isr;
     }
 
+    /**
+     * Get the UTF-8 encoded contents of a file.
+     *
+     * @param file The <code>File</code> to query.
+     * @return The contents string, or null on error.
+     */
+    public static String getUTF8Contents(File file) {
+        String ret = null;
+        Reader reader = getFileUTF8Reader(file);
+        if (reader != null) {
+            CharBuffer cb = CharBuffer.allocate((int)file.length());
+            try {
+                reader.read(cb);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Read failed for " + file.getPath(),
+                           ioe);
+            }
+            ret = cb.toString();
+            try {
+                reader.close();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Failed to close", ioe);
+            }
+        }
+        return ret;
+    }
+        
     /**
      * Create a new file writer that uses UTF-8.
      *

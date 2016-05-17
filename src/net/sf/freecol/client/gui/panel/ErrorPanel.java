@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -76,17 +77,8 @@ public final class ErrorPanel extends FreeColPanel {
         super(freeColClient, new MigLayout());
 
         File logFile = new File(FreeColDirectories.getLogFilePath());
-        byte[] buffer = new byte[(int) logFile.length()];
-        String message;
-        try {
-            FileInputStream fis = new FileInputStream(logFile);
-            BufferedInputStream logFileStream = new BufferedInputStream(fis);
-            logFileStream.read(buffer);
-            message = new String(buffer, "UTF-8");
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Could not read error log", ioe);
-            message = Messages.message("errorPanel.loadError");
-        }
+        String message = Utils.getUTF8Contents(logFile);
+        if (message == null) message = Messages.message("errorPanel.loadError");
 
         JTextArea textArea = Utility.getDefaultTextArea(message, 40);
         textArea.setFocusable(true);
