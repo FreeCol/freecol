@@ -76,6 +76,10 @@ public class NameCache {
     private static List<String> riverNames = null;
     private static final Object riverNameLock = new Object();
 
+    /** Extra rumour names. */
+    private static final Object rumourNothingLock = new Object();
+    private static List<String> rumourNothingKeys = null;
+    
     /** Season names. */
     private static List<String> seasonNames = null;
     private static final Object seasonNamesLock = new Object();
@@ -177,6 +181,19 @@ public class NameCache {
             }
             Integer index = regionIndex.get(prefix);
             if (index == null) regionIndex.put(prefix, names.size()+1);
+        }
+    }
+
+    /**
+     * Initialize the rumourNothing collection.
+     */
+    private static void requireRumourNothingKeys() {
+        synchronized (rumourNothingLock) {
+            if (rumourNothingKeys == null) {
+                rumourNothingKeys = new ArrayList<>();
+                collectNames("model.lostCityRumour.nothing.",
+                             rumourNothingKeys);
+            }
         }
     }
 
@@ -435,6 +452,20 @@ public class NameCache {
             regionIndex.put(prefix, index);
         }
         return name;
+    }
+
+    /**
+     * Get a random "nothing" rumour key.
+     *
+     * @param random A pseudo-random number source.
+     * @return A suitable message key.
+     */
+    public static String getRumourNothingKey(Random random) {
+        requireRumourNothingKeys();
+        synchronized (rumourNothingLock) {
+            return getRandomMember(logger, "nothingKey", rumourNothingKeys,
+                                   random);
+        }
     }
 
     /**

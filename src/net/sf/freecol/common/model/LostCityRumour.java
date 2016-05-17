@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Layer;
@@ -264,40 +265,28 @@ public class LostCityRumour extends TileItem {
      * @param player The <code>Player</code> to generate the message for.
      * @param mounds Is this rumour a result of exploring "strange mounds"?
      * @param random A pseudo-random number source.
-     * @return A suitable message.
+     * @return A suitable <code>ModelMessage</code>.
      */
     public ModelMessage getNothingMessage(Player player, boolean mounds,
                                           Random random) {
         final Game game = getGame();
-        String key;
-        if (mounds) {
-            key = RumourType.NOTHING.getAlternateDescriptionKey("mounds");
-            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                    key, player);
-        } else if (game.getTurn().getYear() % 100 == 12
-            && randomInt(logger, "Mayans?", random, 4) == 0) {
-            int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
-            return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                    "model.lostCityRumour.nothing.mayans",
-                                    player)
-                .addAmount("%years%", years);
-        }
-        int i;
-        if (rumourNothing < 0) {
-            i = 0;
-            for (;;) {
-                key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
-                if (!Messages.containsKey(key)) break;
-                i++;
-            }
-            rumourNothing = i;
-        }
-        i = randomInt(logger, "Nothing rumour", random, rumourNothing);
-        key = Messages.descriptionKey("model.lostCityRumour.nothing." + i);
-        return new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                key, player);
+        return (mounds)
+            ? new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                               RumourType.NOTHING.getAlternateDescriptionKey("mounds"),
+                               player)
+            : (game.getTurn().getYear() % 100 == 12
+                && randomInt(logger, "Mayans?", random, 4) == 0)
+            ? new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                               "model.lostCityRumour.nothing.mayans",
+                               player)
+                .addAmount("%years%",
+                    MAYAN_PROPHESY_YEAR - game.getTurn().getYear())
+            : new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                               NameCache.getRumourNothingKey(random),
+                               player);
     }
-    
+
+
     // Interface Named
 
     /**
