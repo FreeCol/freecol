@@ -548,7 +548,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                                 : score / (stockade.getLevel() + 1.5);
                         });
                 target = maximize(flatten(enemies, Player::isEuropean,
-                                          p -> p.getColonies()),
+                                          p -> p.getColonies().stream()),
                                   Colony::isConnectedPort, targetScore);
             }
             // Otherwise attack something near a weak colony
@@ -1065,11 +1065,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A collection of <code>AIUnit</code>s that need work.
      */
     private Collection<AIUnit> rearrangeColonies(LogBuilder lb) {
-        Set<AIUnit> workers = new HashSet<>();
-        for (AIColony aic : getAIColonies()) {
-            workers.addAll(aic.rearrangeWorkers(lb));
-        }
-        return workers;
+        return toSet(flatten(getAIColonies(),
+                             aic -> aic.rearrangeWorkers(lb).stream()));
     }
 
 
@@ -1464,12 +1461,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A list of wishes.
      */
     public List<Wish> getWishes() {
-        List<Wish> wishes = new ArrayList<>();
-        for (AIColony aic : getAIColonies()) {
-            wishes.addAll(aic.getWishes());
-        }
-        Collections.sort(wishes);
-        return wishes;
+        return toSortedList(flatten(getAIColonies(),
+                                    aic -> aic.getWishes().stream()),
+                            ValuedAIObject.descendingValueComparator);
     }
 
 

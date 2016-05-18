@@ -813,15 +813,15 @@ public class FreeColDirectories {
      * Find all the saved game files in a given directory.
      *
      * @param directory The directory to look in.
-     * @return A list of saved game files found.
+     * @return A stream of saved game files found.
      */
-    public static List<File> getSavedFiles(File directory) {
+    public static Stream<File> getSavedFiles(File directory) {
         final FileFilter filter = FreeColSavegameFile.getFileFilter();
         if (directory != null && filter != null) {
             File[] files = directory.listFiles(filter);
-            if (files != null) return Arrays.asList(files);
+            if (files != null) return Arrays.stream(files);
         }
-        return Collections.<File>emptyList();
+        return Stream.<File>empty();
     }
     
     /**

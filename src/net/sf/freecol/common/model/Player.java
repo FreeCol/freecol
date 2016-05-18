@@ -1812,14 +1812,15 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A goods object, or null if nothing suitable found.
      */
     public Goods getMostValuableGoods() {
+        if (!isEuropean()) return null;
         final Predicate<Goods> pred = g ->
             getArrears(g.getType()) <= 0 && hasTraded(g.getType());
         final Comparator<Goods> comp = Comparator.comparingInt(g ->
             market.getSalePrice(g.getType(),
                 Math.min(g.getAmount(), GoodsContainer.CARGO_SIZE)));
-        return (!isEuropean()) ? null
-            : maximize(flatten(getColonies(), c -> c.getCompactGoods()),
-                       pred, comp);
+        return maximize(flatten(getColonies(),
+                                c -> c.getCompactGoods().stream()),
+                        pred, comp);
     }
 
     /**
@@ -3342,14 +3343,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 List<Tile> lastLayer = new ArrayList<>(layer);
                 tiles.addAll(layer);
                 layer.clear();
-                for (Tile have : lastLayer) {
-                    for (Tile next : have.getSurroundingTiles(1)) {
-                        if (!tiles.contains(next)
-                            && canClaimForSettlement(next)) {
-                            layer.add(next);
-                        }
-                    }
-                }
+                layer.addAll(transform(flatten(lastLayer,
+                            ll -> ll.getSurroundingTiles(1, 1).stream()),
+                        t -> !tiles.contains(t) && canClaimForSettlement(t),
+                        Collectors.toList()));
             }
             tiles.addAll(layer);
         }

@@ -1783,13 +1783,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of teacher <code>Unit</code>s.
      */
     public List<Unit> getTeachers() {
-        List<Unit> teachers = new ArrayList<>();
-        for (Building building : getBuildings()) {
-            if (building.canTeach()) {
-                teachers.addAll(building.getUnitList());
-            }
-        }
-        return teachers;
+        return toList(flatten(getBuildings(), b -> b.canTeach(),
+                              b -> b.getUnitList().stream()));
     }
 
     /**
@@ -2444,12 +2439,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public List<FreeColGameObject> getDisposeList() {
-        List<FreeColGameObject> objects = new ArrayList<>();
-        for (WorkLocation workLocation : getAllWorkLocations()) {
-            objects.addAll(workLocation.getDisposeList());
-        }
-        objects.addAll(super.getDisposeList());
-        return objects;
+        return toList(Stream.concat(super.getDisposeList().stream(),
+                                    flatten(getAllWorkLocations(),
+                                            wl -> wl.getDisposeList().stream())));
     }
 
 
@@ -2529,11 +2521,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public List<Unit> getUnitList() {
-        List<Unit> units = new ArrayList<>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            units.addAll(wl.getUnitList());
-        }
-        return units;
+        return toList(flatten(getCurrentWorkLocations(),
+                              wl -> wl.getUnitList().stream()));
     }
 
     /**

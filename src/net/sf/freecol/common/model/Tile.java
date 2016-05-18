@@ -1794,7 +1794,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final Comparator<AbstractGoods> comp = Comparator.comparingInt(ag ->
             getPotentialProduction(ag.getType(), null));
         return maximize(flatten(getType().getAvailableProductionTypes(true),
-                                pt -> pt.getOutputs()),
+                                pt -> pt.getOutputs().stream()),
                         AbstractGoods.isFoodType, comp);
     }
 
@@ -1808,7 +1808,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private void updateColonyTiles() {
         for (ColonyTile ct : transform(flatten(getGame().getAllColonies(null),
-                                               c -> c.getColonyTiles()),
+                                               c -> c.getColonyTiles().stream()),
                                        ct -> ct.getWorkTile() == this,
                                        Collectors.toList())) {
             ct.updateProductionType();

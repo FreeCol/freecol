@@ -185,11 +185,16 @@ public class IndianDemandMission extends Mission {
 
         // Otherwise try military, building, trade, refined goods in order,
         if (goods == null) {
-            goods = selectPredicates.stream()
-                .flatMap(pred -> spec.getGoodsTypeList().stream()
-                    .filter(gt -> pred.test(gt) && target.getGoodsCount(gt) > 0))
-                .findFirst().map(gt -> new Goods(getGame(), target, gt,
-                        capAmount(target.getGoodsCount(gt), dx))).orElse(null);
+            List<GoodsType> goodsTypes
+                = toList(flatten(selectPredicates,
+                            pred -> transform(spec.getGoodsTypeList(),
+                                gt -> pred.test(gt) && target.getGoodsCount(gt) > 0,
+                                Collectors.toList()).stream()));
+            if (!goodsTypes.isEmpty()) {
+                GoodsType gt = goodsTypes.get(0);
+                goods = new Goods(getGame(), target, gt,
+                                  capAmount(target.getGoodsCount(gt), dx));
+            }
         }
 
         // Finally just go for expense

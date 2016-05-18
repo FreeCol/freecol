@@ -2270,16 +2270,10 @@ outer:  for (Effect effect : effects) {
      */
     public List<BuildingType> getFreeBuildingTypes() {
         final Specification spec = getGame().getSpecification();
-        List<BuildingType> result = new ArrayList<>();
-        for (FoundingFather ff : getFathers()) {
-            for (Event event : ff.getEvents()) {
-                String eventId = event.getId();
-                if ("model.event.freeBuilding".equals(eventId)) {
-                    result.add(spec.getBuildingType(event.getValue()));
-                }
-            }
-        }
-        return result;
+        return transform(flatten(getFathers(), ff -> ff.getEvents().stream()),
+                         ev -> "model.event.freeBuilding".equals(ev.getId()),
+                         ev -> spec.getBuildingType(ev.getValue()),
+                         Collectors.toList());
     }
 
     /**

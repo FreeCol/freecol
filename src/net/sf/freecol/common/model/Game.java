@@ -993,7 +993,7 @@ public class Game extends FreeColGameObject {
      */
     public List<Colony> getAllColonies(Player player) {
         return toList(flatten(getLivePlayers(player), p -> p.isEuropean(),
-                              p -> p.getColonies()));
+                              p -> p.getColonies().stream()));
     }
             
     /**
@@ -1005,12 +1005,9 @@ public class Game extends FreeColGameObject {
      *     specified name (the settlement might not be visible to a client).
      */
     public Settlement getSettlementByName(String name) {
-        for (Player p : getLivePlayers(null)) {
-            for (Settlement s : p.getSettlements()) {
-                if (name.equals(s.getName())) return s;
-            }
-        }
-        return null;
+        return find(flatten(getLivePlayers(null),
+                            p -> p.getSettlements().stream()),
+                    s -> name.equals(s.getName()));
     }
 
     /**

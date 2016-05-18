@@ -334,7 +334,7 @@ public class ProductionType extends FreeColSpecObject {
      */
     public static AbstractGoods getBestOutputFor(GoodsType goodsType,
         Collection<ProductionType> types) {
-        return maximize(flatten(types, pt -> pt.getOutputs()),
+        return maximize(flatten(types, pt -> pt.getOutputs().stream()),
                         o -> o.getType() == goodsType,
                         AbstractGoods.amountComparator);
     }

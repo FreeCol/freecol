@@ -380,12 +380,8 @@ public final class TileType extends FreeColSpecObjectType {
      * @return A list of produced <code>AbstractGoods</code>.
      */
     public List<AbstractGoods> getPossibleProduction(boolean unattended) {
-        List<AbstractGoods> production = new ArrayList<>();
-        for (ProductionType pt : getAvailableProductionTypes(unattended)) {
-            List<AbstractGoods> outputs = pt.getOutputs();
-            if (!outputs.isEmpty()) production.addAll(outputs);
-        }
-        return production;
+        return toList(flatten(getAvailableProductionTypes(unattended),
+                              pt -> pt.getOutputs().stream()));
     }
 
     /**

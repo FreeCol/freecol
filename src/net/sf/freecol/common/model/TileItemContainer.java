@@ -422,12 +422,11 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of the applicable modifiers.
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
-        UnitType unitType) {
-        List<Modifier> result = new ArrayList<>();
-        for (TileItem item : getTileItems()) {
-            result.addAll(item.getProductionModifiers(goodsType, unitType));
+                                                 UnitType unitType) {
+        synchronized (tileItems) {
+            return toList(flatten(tileItems,
+                    ti -> ti.getProductionModifiers(goodsType, unitType).stream()));
         }
-        return result;
     }
 
     /**

@@ -545,7 +545,7 @@ public class CollectionUtils {
     }
 
     /**
-     * Flatten an array into a stream derived from component collections.
+     * Flatten an array into a stream derived from its component streams.
      *
      * @param <T> The array member type.
      * @param <R> The resulting stream member type.
@@ -554,13 +554,13 @@ public class CollectionUtils {
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(T[] array,
-        Function<? super T, Collection<? extends R>> mapper) {
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return flatten(Arrays.stream(array), alwaysTrue, mapper);
+        return fla(Arrays.stream(array), alwaysTrue, mapper);
     }
 
     /**
-     * Flatten an array into a stream derived from component collections.
+     * Flatten an array into a stream derived from its component streams.
      *
      * @param <T> The array member type.
      * @param <R> The resulting stream member type.
@@ -571,12 +571,12 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(T[] array,
         Predicate<T> predicate,
-        Function<? super T, Collection<? extends R>> mapper) {
-        return flatten(Arrays.stream(array), predicate, mapper);
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return fla(Arrays.stream(array), predicate, mapper);
     }
 
     /**
-     * Flatten a collection into a stream derived from component collections.
+     * Flatten a collection into a stream derived from its component streams.
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
@@ -585,13 +585,13 @@ public class CollectionUtils {
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(Collection<T> collection,
-        Function<? super T, Collection<? extends R>> mapper) {
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return flatten(collection.stream(), alwaysTrue, mapper);
+        return fla(collection.stream(), alwaysTrue, mapper);
     }
 
     /**
-     * Flatten a collection into a stream derived from component collections.
+     * Flatten a collection into a stream derived from its component streams.
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
@@ -602,8 +602,8 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(Collection<T> collection,
         Predicate<T> predicate,
-        Function<? super T, Collection<? extends R>> mapper) {
-        return flatten(collection.stream(), predicate, mapper);
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return fla(collection.stream(), predicate, mapper);
     }
 
     /**
@@ -616,9 +616,9 @@ public class CollectionUtils {
      * @return A stream of the mapped stream.
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
-        Function<? super T, Collection<? extends R>> mapper) {
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return flatten(stream, alwaysTrue, mapper);
+        return fla(stream, alwaysTrue, mapper);
     }
 
     /**
@@ -633,8 +633,24 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
         Predicate<T> predicate,
-        Function<? super T, Collection<? extends R>> mapper) {
-        return stream.filter(predicate).map(mapper).flatMap(r -> r.stream());
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return fla(stream, predicate, mapper);
+    }
+
+    /**
+     * Flatten the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param <R> The resulting stream member type.
+     * @param stream The <code>Stream</code> to flatten.
+     * @param predicate A <code>Predicate</code> to filter the collection with.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return A stream of the mapped stream.
+     */
+    private static <T, R> Stream<R> fla(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return stream.filter(predicate).flatMap(mapper);
     }
     
     /**

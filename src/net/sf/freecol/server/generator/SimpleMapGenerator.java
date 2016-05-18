@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -629,16 +630,24 @@ public class SimpleMapGenerator implements MapGenerator {
         return good >= n / 2;
     }
 
+    /**
+     * Find a free neighbouring tile to a settlement from a list of choices.
+     *
+     * @param is The <code>IndianSettlement</code> that might claim the tile.
+     * @param tiles A list of <code>Tile</code>s to start searching from.
+     * @return The first suitable tile found, or null if none present.
+     */
     private Tile findFreeNeighbouringTile(IndianSettlement is,
                                           List<Tile> tiles) {
-        for (Tile tile : tiles) {
-            for (Direction d : Direction.getRandomDirections("freeTile",
-                    logger, random)) {
-                Tile t = tile.getNeighbourOrNull(d);
-                if ((t != null)
-                    && (t.getOwningSettlement() == null)
-                    && (is.getOwner().canClaimForSettlement(t))) return t;
-            }
+        final Player owner = is.getOwner();
+        final Predicate<Tile> pred = t -> t != null
+            && t.getOwningSettlement() == null
+            && owner.canClaimForSettlement(t);
+        final Direction[] dirns = Direction.getRandomDirections("freeTile",
+                                                                logger, random);
+        for (Tile t : tiles) {
+            Tile ret = find(map(dirns, d -> t.getNeighbourOrNull(d)), pred);
+            if (ret != null) return ret;
         }
         return null;
     }

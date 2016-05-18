@@ -24,12 +24,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -68,6 +72,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -486,13 +491,15 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         // of accessible settlement locations and do a bulk path search
         // to determine the travel times, and create Destinations from
         // the results.
-        List<Location> locs = game.getLivePlayers(player).stream()
-            .filter(p -> p.hasContacted(player)
-                && (canTrade || !p.isEuropean()))
-            .flatMap(p -> p.getSettlements().stream()
-                .filter(s -> canReach(unit, s) && s.hasContacted(p)))
-            .map(s -> s.getTile()).collect(Collectors.toList());
-        MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
+        final Predicate<Player> pred = p ->
+            p.hasContacted(player) && (canTrade || !p.isEuropean());
+        final Function<Player, Stream<Location>> mapper = p ->
+            transform(p.getSettlements(),
+                s -> canReach(unit, s) && s.hasContacted(p),
+                s -> (Location)s.getTile(),
+                Collectors.toList()).stream();
+        MultipleAdjacentDecider md
+            = new MultipleAdjacentDecider(toList(flatten(game.getLivePlayers(player), pred, mapper)));
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
                     FreeColObject.INFINITY, null);
         this.destinations.addAll(md.getResults().entrySet().stream()
