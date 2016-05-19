@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -222,7 +223,7 @@ public class ProductionTypeTest extends FreeColTestCase {
                     i.intValue(), ag.getAmount());
                 inputs.remove(ag.getType());
             }
-            for (AbstractGoods ag : productionType.getOutputs()) {
+            for (AbstractGoods ag : toList(productionType.getOutputs())) {
                 Integer i = outputs.get(ag.getType());
                 assertNotNull("Output expected for " + ag.getType(), i);
                 assertEquals("Output amount mismatch for " + ag.getType(),

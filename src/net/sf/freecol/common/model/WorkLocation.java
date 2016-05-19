@@ -207,18 +207,8 @@ public abstract class WorkLocation extends UnitLocation
      */
     public ProductionType getBestProductionType(boolean unattended,
                                                 GoodsType workType) {
-        ProductionType best = null;
-        int amount = -1;
-        for (ProductionType pt : getAvailableProductionTypes(unattended)) {
-            for (AbstractGoods output : pt.getOutputs()) {
-                if (workType != null && workType != output.getType()) continue;
-                if (amount < output.getAmount()) {
-                    amount = output.getAmount();
-                    best = pt;
-                }
-            }
-        }
-        return best;
+        return ProductionType.getBestProductionType(workType,
+            getAvailableProductionTypes(unattended));
     }
 
     /**
@@ -432,7 +422,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public List<AbstractGoods> getOutputs() {
         return (productionType == null) ? EMPTY_LIST
-            : productionType.getOutputs();
+            : toList(productionType.getOutputs());
     }
 
     /**
@@ -463,7 +453,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public boolean hasOutputs() {
         return productionType != null
-            && !productionType.getOutputs().isEmpty();
+            && first(productionType.getOutputs()) != null;
     }
 
     /**

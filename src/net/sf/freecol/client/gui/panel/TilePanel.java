@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -132,7 +133,7 @@ public final class TilePanel extends FreeColPanel {
             boolean first = true;
             for (ProductionType productionType
                      : tileType.getAvailableProductionTypes(false)) {
-                for (AbstractGoods output : productionType.getOutputs()) {
+                for (AbstractGoods output : toList(productionType.getOutputs())) {
                     GoodsType goodsType = output.getType();
                     int potential = output.getAmount();
                     if (tile.getTileItemContainer() != null) {

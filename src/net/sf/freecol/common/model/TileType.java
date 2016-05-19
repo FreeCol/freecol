@@ -382,7 +382,7 @@ public final class TileType extends FreeColSpecObjectType {
      */
     public List<AbstractGoods> getPossibleProduction(boolean unattended) {
         return toList(flatten(getAvailableProductionTypes(unattended),
-                              pt -> pt.getOutputs().stream()));
+                              pt -> pt.getOutputs()));
     }
 
     /**
@@ -620,7 +620,7 @@ public final class TileType extends FreeColSpecObjectType {
                 for (ProductionType productionType : unattendedTypes) {
                     if (tileProduction == null
                         || tileProduction.equals(productionType.getProductionLevel())) {
-                        productionType.getOutputs().add(goods);
+                        productionType.addOutput(goods);
                     }
                 }
             } else {

@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -176,11 +178,11 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the output goods.
      *
-     * @return A list of the output <code>AbstractGoods</code>.
+     * @return A stream of the output <code>AbstractGoods</code>.
      */
-    public final List<AbstractGoods> getOutputs() {
-        return (outputs == null) ? Collections.<AbstractGoods>emptyList()
-            : outputs;
+    public final Stream<AbstractGoods> getOutputs() {
+        return (outputs == null) ? Stream.<AbstractGoods>empty()
+            : outputs.stream();
     }
 
     /**
@@ -198,9 +200,19 @@ public class ProductionType extends FreeColSpecObject {
      * @param type The <code>GoodsType</code> to add.
      * @param amount The amount of goods.
      */
-    private void addOutput(GoodsType type, int amount) {
+    public void addOutput(GoodsType type, int amount) {
         if (outputs == null) outputs = new ArrayList<>(1);
         outputs.add(new AbstractGoods(type, amount));
+    }
+
+    /**
+     * Add a new output.
+     *
+     * @param ag The <code>AbstractGoods</code> to add.
+     */
+    public void addOutput(AbstractGoods ag) {
+        if (outputs == null) outputs = new ArrayList<>(1);
+        outputs.add(ag);
     }
 
     /**
@@ -310,33 +322,23 @@ public class ProductionType extends FreeColSpecObject {
      */
     public static ProductionType getBestProductionType(GoodsType goodsType,
         Collection<ProductionType> types) {
-        ProductionType best = null;
-        int bestSum = 0;
-        for (ProductionType pt : types) {
-            int sum = pt.getOutputs().stream()
-                .filter(o -> goodsType == null || goodsType == o.getType())
-                .mapToInt(AbstractGoods::getAmount).sum();
-            if (bestSum < sum) {
-                bestSum = sum;
-                best = pt;
-            }
-        }
-        return best;
+        final Comparator<ProductionType> comp = cachingIntComparator(pt -> {
+                AbstractGoods best = pt.getBestOutputFor(goodsType);
+                return (best == null) ? Integer.MIN_VALUE : best.getAmount();
+            });
+        return maximize(types, comp);
     }
 
     /**
-     * Convenience function to get the best output for a given goods
-     * type from a collection of production types.
+     * Get the output the maximizes production for an optional goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to use.
-     * @param types A collection of <code>ProductionType</code>s to consider.
-     * @return The most productive output that produces the goods type,
-     *     or null if none found.
+     * @param goodsType The optional <code>GoodsType</code> to check.
+     * @return The best production.
      */
-    public static AbstractGoods getBestOutputFor(GoodsType goodsType,
-        Collection<ProductionType> types) {
-        return maximize(flatten(types, pt -> pt.getOutputs().stream()),
-                        o -> o.getType() == goodsType,
+    public AbstractGoods getBestOutputFor(GoodsType goodsType) {
+        final Predicate<AbstractGoods> pred = ag ->
+            goodsType == null || ag.getType() == goodsType;
+        return maximize(getOutputs(), pred,
                         AbstractGoods.ascendingAmountComparator);
     }
 
