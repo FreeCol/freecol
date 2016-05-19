@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -34,6 +35,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.RandomChoice;
 
 
 /**
@@ -415,6 +417,17 @@ public class TileImprovement extends TileItem implements Named {
             }
         }
         return (style == null) ? null : style.getString();
+    }
+
+    /**
+     * Get the disaster choices available for this tile improvement.
+     *
+     * @return A stream of <code>Disaster</code> choices.
+     */
+    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
+        return (this.type == null)
+            ? Stream.<RandomChoice<Disaster>>empty()
+            : this.type.getDisasterChoices();
     }
 
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -200,12 +201,12 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Get a weighted list of natural disasters than can strike this
      * tile improvement type.
      *
-     * @return A random choice list of <code>Disaster</code>s.
+     * @return A stream of <code>Disaster</code> choices.
      */
-    public List<RandomChoice<Disaster>> getDisasters() {
+    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return (disasters == null)
-            ? Collections.<RandomChoice<Disaster>>emptyList()
-            : disasters;
+            ? Stream.<RandomChoice<Disaster>>empty()
+            : disasters.stream();
     }
 
     /**
@@ -504,7 +505,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             }
         }
 
-        for (RandomChoice<Disaster> choice : getDisasters()) {
+        for (RandomChoice<Disaster> choice : toList(getDisasterChoices())) {
             xw.writeStartElement(DISASTER_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());

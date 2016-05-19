@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -256,12 +257,12 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Gets the natural disasters than can strike this tile type.
      *
-     * @return A list of <code>RandomChoice</code>s for the disasters.
+     * @return A stream of <code>Disaster</code> choices.
      */
-    public List<RandomChoice<Disaster>> getDisasters() {
-        return (disasters == null)
-            ? Collections.<RandomChoice<Disaster>>emptyList()
-            : disasters;
+    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
+        return (this.disasters == null)
+            ? Stream.<RandomChoice<Disaster>>empty()
+            : disasters.stream();
     }
 
     /**
@@ -491,7 +492,7 @@ public final class TileType extends FreeColSpecObjectType {
             xw.writeEndElement();
         }
 
-        for (RandomChoice<Disaster> choice : getDisasters()) {
+        for (RandomChoice<Disaster> choice : toList(getDisasterChoices())) {
             xw.writeStartElement(DISASTER_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject());

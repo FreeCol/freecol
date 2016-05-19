@@ -33,6 +33,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -1005,15 +1006,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * strike a tile of this type or a completed tile improvement
      * present.
      *
-     * @return A weighted list of <code>Disaster</code>s.
+     * @return A stream of <code>Disaster</code> choices.
      */
-    public List<RandomChoice<Disaster>> getDisasters() {
-        List<RandomChoice<Disaster>> disasters = new ArrayList<>();
-        disasters.addAll(type.getDisasters());
-        for (TileImprovement ti : getCompleteTileImprovements()) {
-            disasters.addAll(ti.getType().getDisasters());
-        }
-        return disasters;
+    public Stream<RandomChoice<Disaster>> getDisasterChoices() {
+        return Stream.concat(type.getDisasterChoices(),
+                             flatten(getCompleteTileImprovements(),
+                                     ti -> ti.getDisasterChoices()));
     }
 
 

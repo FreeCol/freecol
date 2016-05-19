@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -417,7 +418,13 @@ public class DebugUtils {
     public static void applyDisaster(final FreeColClient freeColClient,
                                      final Colony colony) {
         final GUI gui = freeColClient.getGUI();
-        List<RandomChoice<Disaster>> disasters = colony.getDisasters();
+        final Function<RandomChoice<Disaster>,
+                       ChoiceItem<Disaster>> mapper = rc ->
+            new ChoiceItem<Disaster>(Messages.getName(rc.getObject()) + " "
+                                     + Integer.toString(rc.getProbability()),
+                                     rc.getObject());
+        List<ChoiceItem<Disaster>> disasters
+            = toList(map(colony.getDisasterChoices(), mapper));
         if (disasters.isEmpty()) {
             gui.showErrorMessage(StringTemplate
                 .template("error.disasterNotAvailable")
@@ -426,10 +433,7 @@ public class DebugUtils {
         }
         Disaster disaster = gui.getChoice(null,
             StringTemplate.template("prompt.selectDisaster"), "cancel",
-            toSortedList(map(disasters, (RandomChoice<Disaster> rc) ->
-                    new ChoiceItem<Disaster>(Messages.getName(rc.getObject())
-                        + " " + Integer.toString(rc.getProbability()),
-                        rc.getObject()))));
+            disasters);
         if (disaster == null) return;
 
         final FreeColServer server = freeColClient.getFreeColServer();

@@ -1526,10 +1526,11 @@ public final class Canvas extends JDesktopPane {
      * @param choices The <code>List</code> containing the ChoiceItems to
      *            create buttons for.
      * @return The corresponding member of the values array to the selected
-     *     option.
+     *     option, or null if no choices available.
      */
     public <T> T showChoiceDialog(Tile tile, Object obj, ImageIcon icon,
         String cancelKey, List<ChoiceItem<T>> choices) {
+        if (choices.isEmpty()) return null;
         FreeColChoiceDialog<T> fcd
             = new FreeColChoiceDialog<>(freeColClient, frame, true, obj, icon,
                                          cancelKey, choices);

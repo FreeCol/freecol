@@ -1626,25 +1626,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int start = randomInt(logger, "select colony", random, size);
             for (int index = 0; index < size; index++) {
                 Colony colony = getColonies().get((start + index) % size);
-                List<RandomChoice<Disaster>> disasters = colony.getDisasters();
-                if (!disasters.isEmpty()) {
-                    Disaster disaster = RandomChoice
-                        .getWeightedRandom(logger, "select disaster", disasters,
-                                           random);
-                    List<ModelMessage> messages = csApplyDisaster(random,
-                        colony, disaster, cs);
-                    if (!messages.isEmpty()) {
-                        cs.addMessage(See.only(this),
-                            new ModelMessage(MessageType.DEFAULT,
-                                             "model.player.disaster.strikes",
-                                             colony)
-                                .addName("%colony%", colony.getName())
-                                .addName("%disaster%", disaster));
-                        for (ModelMessage message : messages) {
-                            cs.addMessage(See.only(this), message);
-                        }
-                        return;
+                Disaster disaster = RandomChoice.getWeightedRandom(logger,
+                    "select disaster", toList(colony.getDisasterChoices()),
+                    random);
+                List<ModelMessage> messages = csApplyDisaster(random,
+                    colony, disaster, cs);
+                if (!messages.isEmpty()) {
+                    cs.addMessage(See.only(this),
+                        new ModelMessage(MessageType.DEFAULT,
+                                         "model.player.disaster.strikes",
+                                         colony)
+                            .addName("%colony%", colony.getName())
+                            .addName("%disaster%", disaster));
+                    for (ModelMessage message : messages) {
+                        cs.addMessage(See.only(this), message);
                     }
+                    return;
                 }
             }
         }
