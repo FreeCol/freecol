@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -293,13 +294,10 @@ public abstract class GoodsLocation extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> getDisposeList() {
-        List<FreeColGameObject> objects = new ArrayList<>();
-        if (goodsContainer != null) {
-            objects.addAll(goodsContainer.getDisposeList());
-        }
-        objects.addAll(super.getDisposeList());
-        return objects;
+    public Stream<FreeColGameObject> getDisposables() {
+        Stream<FreeColGameObject> up = super.getDisposables();
+        return (this.goodsContainer == null) ? up
+            : Stream.concat(this.goodsContainer.getDisposables(), up);
     }
 
 

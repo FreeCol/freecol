@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -1697,7 +1698,8 @@ public class ChangeSet {
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addRemove(See see, Location loc, FreeColGameObject obj) {
-        changes.add(new RemoveChange(see, loc, obj.getDisposeList()));//-vis
+        changes.add(new RemoveChange(see, loc,
+                                     toList(obj.getDisposables())));//-vis
         return this;
     }
 
@@ -1712,7 +1714,8 @@ public class ChangeSet {
     public ChangeSet addRemoves(See see, Location loc,
                                 List<? extends FreeColGameObject> objects) {
         for (FreeColGameObject fcgo : objects) {
-            changes.add(new RemoveChange(see, loc, fcgo.getDisposeList()));
+            changes.add(new RemoveChange(see, loc,
+                                         toList(fcgo.getDisposables())));
         }
         return this;
     }

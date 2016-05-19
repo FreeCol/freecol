@@ -24,12 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -164,7 +166,7 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (this.disposed) return;
         LogBuilder lb = new LogBuilder(64);
         lb.add("Destroying:");
-        for (FreeColGameObject fcgo : getDisposeList()) {
+        for (FreeColGameObject fcgo : toList(getDisposables())) {
             lb.add(" ", fcgo.getId());
             fcgo.disposeResources();
         }
@@ -196,18 +198,16 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Collect a list of this object and all its subparts that should be
+     * Collect this object and all its subparts that should be
      * disposed of when this object goes away.
      *
-     * Overriding routines should reference this routine, and arrange
-     * that the object itself is last.
+     * Overriding routines should call upwards towards this routine,
+     * arranging that the object itself is last.
      *
-     * @return A list of <code>FreeColGameObject</code>s to dispose of.
+     * @return A stream of <code>FreeColGameObject</code>s to dispose of.
      */
-    public List<FreeColGameObject> getDisposeList() {
-        List<FreeColGameObject> fcgos = new ArrayList<>();
-        fcgos.add(this);
-        return fcgos;
+    public Stream<FreeColGameObject> getDisposables() {
+        return Stream.of(this);
     }
 
     /**

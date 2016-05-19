@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -265,13 +266,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> getDisposeList() {
-        List<FreeColGameObject> objects = new ArrayList<>();
+    public Stream<FreeColGameObject> getDisposables() {
         synchronized (this.units) {
-            for (Unit u : this.units) objects.addAll(u.getDisposeList());
+            return Stream.concat(flatten(this.units, Unit::getDisposables),
+                                 super.getDisposables());
         }
-        objects.addAll(super.getDisposeList());
-        return objects;
     }
 
     /**

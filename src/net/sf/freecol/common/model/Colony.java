@@ -2435,10 +2435,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public List<FreeColGameObject> getDisposeList() {
-        return toList(Stream.concat(super.getDisposeList().stream(),
-                                    flatten(getAllWorkLocations(),
-                                            wl -> wl.getDisposeList().stream())));
+    public Stream<FreeColGameObject> getDisposables() {
+        return Stream.concat(flatten(getAllWorkLocations(), 
+                                     WorkLocation::getDisposables),
+                             super.getDisposables());
     }
 
 
