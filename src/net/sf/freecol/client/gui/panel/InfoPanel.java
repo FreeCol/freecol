@@ -374,7 +374,7 @@ public final class InfoPanel extends FreeColPanel {
 
     private final UnitInfoPanel unitInfoPanel;
 
-    private final Image skin;
+    private final transient Image skin;
 
 
     /**

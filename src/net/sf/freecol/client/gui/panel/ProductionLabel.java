@@ -76,7 +76,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     private int stockNumber = -1;
 
     /** The image to display. */
-    private Image stringImage = null;
+    private transient Image stringImage = null;
 
 
     /**

@@ -150,7 +150,7 @@ public final class ColonyPanel extends PortPanel
     // inherit PortPanel.defaultTransferHandler
     // inherit PortPanel.selectedUnitLabel
 
-    private MouseListener releaseListener = null;
+    private transient MouseListener releaseListener = null;
 
     // Subparts
     private final JComboBox<Colony> nameBox = new JComboBox<>();
@@ -1768,7 +1768,8 @@ public final class ColonyPanel extends PortPanel
         public final class ASingleBuildingPanel extends BuildingPanel
             implements DropTarget  {
 
-            private final MouseAdapter buildQueueListener = new MouseAdapter() {
+            private final transient MouseAdapter buildQueueListener
+                = new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         getGUI().showBuildQueuePanel(getColony());

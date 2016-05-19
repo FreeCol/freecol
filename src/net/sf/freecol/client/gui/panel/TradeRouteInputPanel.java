@@ -483,7 +483,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
     private CargoHandler cargoHandler;
 
     /** Mouse listeners to use throughout. */
-    private MouseListener dragListener, dropListener;
+    private transient MouseListener dragListener, dropListener;
 
     /** Model to contain the current stops. */
     private DefaultListModel<TradeRouteStop> stopListModel;
