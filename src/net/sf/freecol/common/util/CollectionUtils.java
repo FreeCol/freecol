@@ -648,7 +648,7 @@ public class CollectionUtils {
      */
     public static <T,R> Stream<R> map(T[] array,
                                       Function<? super T,? extends R> mapper) {
-        return Arrays.stream(array).map(mapper);
+        return map(Arrays.stream(array), mapper);
     }
 
     /**
@@ -662,7 +662,19 @@ public class CollectionUtils {
      */
     public static <T,R> Stream<R> map(Collection<T> collection,
                                       Function<? super T,? extends R> mapper) {
-        return collection.stream().map(mapper);
+        return map(collection.stream(), mapper);
+    }
+
+    /**
+     * Apply a mapping to a stream.
+     *
+     * @param stream The <code>Stream</code> to map.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T,R> Stream<R> map(Stream<T> stream,
+                                      Function<? super T,? extends R> mapper) {
+        return stream.map(mapper);
     }
 
     /**
@@ -996,7 +1008,7 @@ public class CollectionUtils {
      * @return A list of the stream contents.
      */
     public static <T> List<T> toSortedList(T[] array,
-                                           Comparator<T> comparator) {
+                                           Comparator<? super T> comparator) {
         return toSortedList(Arrays.stream(array), comparator);
     }
 
@@ -1009,7 +1021,7 @@ public class CollectionUtils {
      * @return A map of the stream contents.
      */
     public static <T> List<T> toSortedList(Collection<T> collection,
-                                           Comparator<T> comparator) {
+                                           Comparator<? super T> comparator) {
         return toSortedList(collection.stream(), comparator);
     }
 
@@ -1022,7 +1034,7 @@ public class CollectionUtils {
      * @return A list of the stream contents.
      */
     public static <T> List<T> toSortedList(Stream<T> stream,
-                                           Comparator<T> comparator) {
+                                           Comparator<? super T> comparator) {
         return stream.sorted(comparator).collect(Collectors.toList());
     }
 
@@ -1038,8 +1050,8 @@ public class CollectionUtils {
      * @return A map of the stream contents.
      */
     public static <T,K,V> Map<K,V> toMap(Collection<T> collection,
-        Function<? super T,? extends K> keyMapper,
-        Function<? super T,? extends V> valueMapper) {
+        Function<? super T, ? extends K> keyMapper,
+        Function<? super T, ? extends V> valueMapper) {
         return toMap(collection.stream(), keyMapper, valueMapper);
     }
 
@@ -1055,8 +1067,8 @@ public class CollectionUtils {
      * @return A map of the stream contents.
      */
     public static <T,K,V> Map<K,V> toMap(Stream<T> stream,
-        Function<? super T,? extends K> keyMapper,
-        Function<? super T,? extends V> valueMapper) {
+        Function<? super T, ? extends K> keyMapper,
+        Function<? super T, ? extends V> valueMapper) {
         return stream.collect(Collectors.toMap(keyMapper, valueMapper));
     }
 
