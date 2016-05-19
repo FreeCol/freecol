@@ -25,6 +25,7 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -212,5 +213,36 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     public int compareTo(ChoiceItem<T> other) {
         return (this.text == null) ? -1 : (other.text == null) ? 1
             : this.text.compareTo(other.text);
+    }
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof ChoiceItem) {
+            ChoiceItem ci = (ChoiceItem)o;
+            return Utils.equals(this.text, ci.toString())
+                && Utils.equals(this.getObject(), ci.getObject());
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 31 * hash + Utils.hashCode(this.text);
+        hash = 31 * hash + Utils.hashCode(this.object);
+        hash = 31 * hash + ((this.enabled) ? 1 : 0);
+        hash = 31 * hash + ((this.optionOK) ? 1 : 0);
+        hash = 31 * hash + ((this.optionCancel) ? 1 : 0);
+        hash = 31 * hash + ((this.optionDefault) ? 1 : 0);
+        return hash;
     }
 }
