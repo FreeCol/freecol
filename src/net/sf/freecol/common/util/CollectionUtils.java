@@ -730,7 +730,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
      */
-    public static <T> T maximize(Collection<T> c, Comparator<T> comparator) {
+    public static <T> T maximize(Collection<T> c,
+                                 Comparator<? super T> comparator) {
         return maximize(c.stream(), p -> true, comparator);
     }
 
@@ -745,7 +746,7 @@ public class CollectionUtils {
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Collection<T> c, Predicate<T> predicate,
-                                 Comparator<T> comparator) {
+                                 Comparator<? super T> comparator) {
         return maximize(c.stream(), predicate, comparator);
     }
 
@@ -758,7 +759,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
      */
-    public static <T> T maximize(Stream<T> stream, Comparator<T> comparator) {
+    public static <T> T maximize(Stream<T> stream,
+                                 Comparator<? super T> comparator) {
         return maximize(stream, p -> true, comparator);
     }
 
@@ -773,7 +775,7 @@ public class CollectionUtils {
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Stream<T> stream, Predicate<T> predicate,
-                                 Comparator<T> comparator) {
+                                 Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.maxBy(comparator))
             .orElse(null);
     }
@@ -787,7 +789,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
      */
-    public static <T> T minimize(Collection<T> c, Comparator<T> comparator) {
+    public static <T> T minimize(Collection<T> c,
+                                 Comparator<? super T> comparator) {
         return minimize(c.stream(), t -> true, comparator);
     }
 
@@ -802,7 +805,7 @@ public class CollectionUtils {
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Collection<T> c, Predicate<T> predicate,
-                                 Comparator<T> comparator) {
+                                 Comparator<? super T> comparator) {
         return minimize(c.stream(), predicate, comparator);
     }
 
@@ -815,7 +818,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
      */
-    public static <T> T minimize(Stream<T> stream, Comparator<T> comparator) {
+    public static <T> T minimize(Stream<T> stream,
+                                 Comparator<? super T> comparator) {
         return minimize(stream, t -> true, comparator);
     }
 
@@ -830,7 +834,7 @@ public class CollectionUtils {
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Stream<T> stream, Predicate<T> predicate,
-                                 Comparator<T> comparator) {
+                                 Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.minBy(comparator))
             .orElse(null);
     }
