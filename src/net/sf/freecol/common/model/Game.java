@@ -612,7 +612,7 @@ public class Game extends FreeColGameObject {
      * @return The first player, or null if none present.
      */
     public Player getFirstPlayer() {
-        return (players.isEmpty()) ? null : players.get(0);
+        return first(players);
     }
 
     /**

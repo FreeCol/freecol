@@ -710,8 +710,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *      the given type of goods, or null if not found.
      */
     public WorkLocation getWorkLocationForProducing(GoodsType goodsType) {
-        List<WorkLocation> wls = getWorkLocationsForProducing(goodsType);
-        return (wls.isEmpty()) ? null : wls.get(0);
+        return first(getWorkLocationsForProducing(goodsType));
     }
 
     /**

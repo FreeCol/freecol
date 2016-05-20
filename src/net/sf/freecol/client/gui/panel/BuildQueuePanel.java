@@ -767,7 +767,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         unbuildableTypes.add(unitType);
                         continue loop;
                     } else {
-                        lockReason.add(Messages.getName(sources.get(0)));
+                        lockReason.add(Messages.getName(first(sources)));
                     }
                 }
             }
@@ -838,7 +838,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                         unbuildableTypes.add(buildingType);
                         continue loop;
                     } else {
-                        lockReason.add(Messages.getName(sources.get(0)));
+                        lockReason.add(Messages.getName(first(sources)));
                     }
                 }
             }
@@ -1062,10 +1062,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             String command = ae.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(this
                     .buildQueueList);
-            while (!buildables.isEmpty()
-                && lockReasons.get(buildables.get(0)) != null) {
-                getGUI().showInformationMessage(buildables.get(0),
-                    this.colony.getUnbuildableMessage(buildables.get(0)));
+            BuildableType bt;
+            while ((bt = first(buildables)) != null
+                && lockReasons.get(bt) != null) {
+                getGUI().showInformationMessage(bt,
+                    this.colony.getUnbuildableMessage(bt));
                 command = FAIL;
                 removeBuildable(buildables.remove(0));
             }

@@ -197,9 +197,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The first <code>Unit</code>.
      */
     public final Unit getFirstUnit() {
-        if (isEmpty()) return null;
-        List<Unit> units = getUnitList();
-        return units.get(0);
+        return first(getUnitList());
     }
 
     /**

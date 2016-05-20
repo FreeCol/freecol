@@ -165,13 +165,13 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public boolean setNext(Unit unit) {
             if (predicate.test(unit)) { // Of course, it has to be valid...
-                Unit first = (units.isEmpty()) ? null : units.get(0);
+                Unit sentinel = first(units);
                 while (!units.isEmpty()) {
                     if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
                 update();
-                while (!units.isEmpty() && units.get(0) != first) {
+                while (!units.isEmpty() && units.get(0) != sentinel) {
                     if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
@@ -2640,9 +2640,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A suitable <code>Tile</code>.
      */
     public Tile getFallbackTile() {
-        List<Settlement> settlements = getSettlements();
-        return (!settlements.isEmpty())
-            ? settlements.get(0).getTile()
+        Settlement settlement = first(getSettlements());
+        return (settlement != null) ? settlement.getTile()
             : getEntryLocation().getTile();
     }
 

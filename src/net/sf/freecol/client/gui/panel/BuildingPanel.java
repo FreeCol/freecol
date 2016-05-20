@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -128,22 +129,21 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
         final Colony colony = building.getColony();
         ProductionLabel productionOutput = null;
         ProductionInfo info = building.getProductionInfo();
-        if (info != null && !info.getProduction().isEmpty()) {
-            AbstractGoods output = info.getProduction().get(0);
-            if (output.getAmount() > 0) {
-                if (building.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-                    int stored = colony.getGoodsCount(output.getType());
-                    int capacity = colony.getWarehouseCapacity();
-                    if (output.getAmount() + stored > capacity) {
-                        output = new AbstractGoods(output.getType(),
-                                                   capacity - stored);
-                    }
+        AbstractGoods output = (info == null) ? null
+            : first(info.getProduction());
+        if (output != null && output.getAmount() > 0) {
+            if (building.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
+                int stored = colony.getGoodsCount(output.getType());
+                int capacity = colony.getWarehouseCapacity();
+                if (output.getAmount() + stored > capacity) {
+                    output = new AbstractGoods(output.getType(),
+                                               capacity - stored);
                 }
-                AbstractGoods maximum = info.getMaximumProduction().isEmpty()
-                    ? output : info.getMaximumProduction().get(0);
-                productionOutput = new ProductionLabel(freeColClient, output,
-                                                       maximum.getAmount());
             }
+            AbstractGoods maximum = info.getMaximumProduction().isEmpty()
+                ? output : info.getMaximumProduction().get(0);
+            productionOutput = new ProductionLabel(freeColClient, output,
+                                                   maximum.getAmount());
         }
         JLabel upkeep = null;
         if (building.getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)

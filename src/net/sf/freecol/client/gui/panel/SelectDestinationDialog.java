@@ -379,7 +379,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() != 2) return;
                     Destination d = destinationList.getSelectedValue();
-                    if (d != null) setValue(options.get(0));
+                    if (d != null) setValue(first(options));
                 }
             });
         updateDestinationList();

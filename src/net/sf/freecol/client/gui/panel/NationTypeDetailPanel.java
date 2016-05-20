@@ -46,7 +46,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -130,8 +130,8 @@ public class NationTypeDetailPanel
         panel.add(label, "wrap");
 
         List<AbstractUnit> startingUnits = nationType.getStartingUnits();
-        if (!startingUnits.isEmpty()) {
-            AbstractUnit startingUnit = startingUnits.get(0);
+        AbstractUnit startingUnit = first(startingUnits);
+        if (startingUnit != null) {
             if (startingUnits.size() > 1) {
                 panel.add(getUnitButton(startingUnit),
                           "span, split " + startingUnits.size());

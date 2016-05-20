@@ -311,7 +311,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
         for (Role r : spec.getMilitaryRoles()) {
-            boolean ok = r.isAvailableTo(player, landTypes.get(0));
+            boolean ok = r.isAvailableTo(player, first(landTypes));
             boolean armed = r.hasAbility(Ability.ARMED);
             boolean mounted = r.hasAbility(Ability.MOUNTED);
             boolean ref = r.requiresAbility(Ability.REF_UNIT);
@@ -495,7 +495,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public UnitType getNavalREFUnitType() {
         initializeCaches();
-        return navalREFUnitTypes.get(0);
+        return first(navalREFUnitTypes);
     }
     // end @compat 0.10.5
 

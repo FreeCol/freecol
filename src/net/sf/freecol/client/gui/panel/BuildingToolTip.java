@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -64,10 +65,9 @@ public class BuildingToolTip extends JToolTip {
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
-        List<AbstractGoods> outputs = building.getOutputs();
         // FIXME: consider several outputs
-        final GoodsType output = (outputs.isEmpty()) ? null
-            : outputs.get(0).getType();
+        final AbstractGoods output = first(building.getOutputs());
+        final GoodsType outputType = (output == null) ? null : output.getType();
 
         if (arrow == null) {
             arrow = new JLabel(ResourceManager.getString("arrow.E"));
@@ -90,18 +90,15 @@ public class BuildingToolTip extends JToolTip {
         add(buildingName, "span");
 
         ProductionInfo info = building.getProductionInfo();
-        AbstractGoods production
-            = (info == null || info.getProduction().isEmpty()) ? null
-            : info.getProduction().get(0);
-        AbstractGoods consumption
-            = (info == null || info.getConsumption().isEmpty()) ? null
-            : info.getConsumption().get(0);
+        AbstractGoods production = (info == null) ? null
+            : first(info.getProduction());
+        AbstractGoods consumption = (info == null) ? null
+            : first(info.getConsumption());
         if (production == null || production.getAmount() <= 0) {
             add(new JLabel(), "span");
         } else {
-            AbstractGoods maxProduction = (info == null
-                || info.getMaximumProduction().isEmpty()) ? null
-                : info.getMaximumProduction().get(0);
+            AbstractGoods maxProduction = (info == null) ? null
+                : first(info.getMaximumProduction());
             ProductionLabel productionOutput
                 = new ProductionLabel(freeColClient, production,
                     ((maxProduction == null) ? production
@@ -109,9 +106,8 @@ public class BuildingToolTip extends JToolTip {
             if (consumption == null) {
                 add(productionOutput, "span");
             } else if (consumption.getAmount() > 0) {
-                AbstractGoods maxConsumption = (info == null
-                    || info.getMaximumConsumption().isEmpty()) ? null
-                    : info.getMaximumConsumption().get(0);
+                AbstractGoods maxConsumption = (info == null) ? null
+                    : first(info.getMaximumConsumption());
                 ProductionLabel productionInput
                     = new ProductionLabel(freeColClient, consumption,
                         ((maxConsumption == null) ? consumption
@@ -131,26 +127,28 @@ public class BuildingToolTip extends JToolTip {
 
         add(new JLabel(new ImageIcon(lib.getBuildingImage(building))));
 
-        for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
-            int amount = building.getUnitProduction(unit, output);
-            if (amount > 0) {
-                add(unitLabel);
-                JLabel pLabel = new ProductionLabel(freeColClient,
-                    new AbstractGoods(output, amount));
-                add(pLabel, "split 2");
-                add(new JLabel());
-            } else if (building.canTeach() && unit.getStudent() != null) {
-                JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
-                                           + unit.getNeededTurnsOfTraining());
-                UnitLabel sLabel = new UnitLabel(freeColClient,
-                                                 unit.getStudent(), true);
-                sLabel.setIgnoreLocation(true);
-                add(unitLabel);
-                add(progress, "split 2, flowy");
-                add(sLabel);
-            } else {
-                add(unitLabel, "span 2");
+        if (outputType != null) {
+            for (Unit unit : building.getUnitList()) {
+                UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
+                int amount = building.getUnitProduction(unit, outputType);
+                if (amount > 0) {
+                    add(unitLabel);
+                    JLabel pLabel = new ProductionLabel(freeColClient,
+                        new AbstractGoods(outputType, amount));
+                    add(pLabel, "split 2");
+                    add(new JLabel());
+                } else if (building.canTeach() && unit.getStudent() != null) {
+                    JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
+                        + unit.getNeededTurnsOfTraining());
+                    UnitLabel sLabel = new UnitLabel(freeColClient,
+                        unit.getStudent(), true);
+                    sLabel.setIgnoreLocation(true);
+                    add(unitLabel);
+                    add(progress, "split 2, flowy");
+                    add(sLabel);
+                } else {
+                    add(unitLabel, "span 2");
+                }
             }
         }
 
@@ -160,20 +158,20 @@ public class BuildingToolTip extends JToolTip {
                 lib.getMiscImage("image.unit.placeholder"))), "span 2");
         }
 
-        int breedingNumber = (output == null) ? GoodsType.INFINITY
-            : output.getBreedingNumber();
-        if (breedingNumber < GoodsType.INFINITY
-            && breedingNumber > building.getColony().getGoodsCount(output)) {
+        int breedingNumber = (outputType == null) ? GoodsType.INFINITY
+            : outputType.getBreedingNumber();
+        if (outputType != null
+            && breedingNumber > building.getColony().getGoodsCount(outputType)) {
             add(Utility.localizedLabel(StringTemplate
                     .template("buildingToolTip.breeding")
                     .addAmount("%number%", breedingNumber)
-                    .addNamed("%goods%", output)));
+                    .addNamed("%goods%", outputType)));
         }
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             List<Modifier> modifiers = new ArrayList<>();
-            if (output != null) {
-                modifiers.addAll(building.getProductionModifiers(output, null));
+            if (outputType != null) {
+                modifiers.addAll(building.getProductionModifiers(outputType, null));
             }
             Collections.sort(modifiers);
             for (Modifier m : modifiers) {

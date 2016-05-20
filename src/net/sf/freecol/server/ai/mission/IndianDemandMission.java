@@ -190,8 +190,8 @@ public class IndianDemandMission extends Mission {
                             pred -> transform(spec.getGoodsTypeList(),
                                 gt -> pred.test(gt) && target.getGoodsCount(gt) > 0,
                                 Collectors.toList()).stream()));
-            if (!goodsTypes.isEmpty()) {
-                GoodsType gt = goodsTypes.get(0);
+            GoodsType gt = first(goodsTypes);
+            if (gt != null) {
                 goods = new Goods(getGame(), target, gt,
                                   capAmount(target.getGoodsCount(gt), dx));
             }

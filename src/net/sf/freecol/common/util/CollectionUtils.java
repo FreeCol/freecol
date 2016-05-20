@@ -540,10 +540,43 @@ public class CollectionUtils {
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Stream<T> stream, Predicate<T> predicate, T fail) {
-        return stream.filter(predicate).findFirst().orElse(fail);
+    public static <T> T find(Stream<T> stream, Predicate<T> predicate,
+                             T fail) {
+        return fir(stream.filter(predicate), fail);
     }
 
+    /**
+     * Get the first item of a collection.
+     *
+     * @param collection The <code>Collection</code> to search.
+     * @return The first item, or null on failure.
+     */
+    public static <T> T first(Collection<T> collection) {
+        return (collection == null || collection.isEmpty()) ? null
+            : fir(collection.stream(), null);
+    }
+
+    /**
+     * Get the first item of a stream.
+     *
+     * @param stream The <code>Stream</code> to search.
+     * @return The first item, or null on failure.
+     */
+    public static <T> T first(Stream<T> stream) {
+        return (stream == null) ? null : fir(stream, null);
+    }
+
+    /**
+     * Get the first item of a stream.
+     *
+     * @param stream The <code>Stream</code> to search.
+     * @param fail The value to return on failure.
+     * @return The first item, or fail on failure.
+     */
+    private static <T> T fir(Stream<T> stream, T fail) {
+        return stream.findFirst().orElse(fail);
+    }
+    
     /**
      * Flatten an array into a stream derived from its component streams.
      *

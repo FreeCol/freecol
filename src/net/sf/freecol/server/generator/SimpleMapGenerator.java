@@ -392,7 +392,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
                 if (territory == null) {
                     lb.add("Failed to allocate preferred region ",
-                        regionKeys.get(0), " for ", player.getNation(), "\n");
+                        first(regionKeys), " for ", player.getNation(), "\n");
                     outer: for (String key : regionKeys) {
                         Territory otherTerritory = territoryMap.get(key);
                         for (String otherKey : ((IndianNationType) otherTerritory.player.getNationType())

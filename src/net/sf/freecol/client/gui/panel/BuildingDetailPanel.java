@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -166,7 +167,7 @@ public class BuildingDetailPanel
             panel.add(Utility.localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
             List<AbstractGoods> required = buildingType.getRequiredGoods();
-            AbstractGoods goodsRequired = required.get(0);
+            AbstractGoods goodsRequired = first(required);
             if (required.size() > 1) {
                 panel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),
                                 "span, split " + required.size());
@@ -196,22 +197,21 @@ public class BuildingDetailPanel
             }
 
         } else {
-            for (ProductionType pt
-                     : buildingType.getAvailableProductionTypes(false)) {
-                List<AbstractGoods> inputs = pt.getInputs();
-                List<AbstractGoods> outputs = pt.getOutputs();
+            for (ProductionType pt : buildingType.getAvailableProductionTypes(false)) {
                 panel.add(Utility.localizedLabel("colopedia.buildings.production"), "newline");
                 // for the moment, we assume only a single input
                 // and output type
-                if (!inputs.isEmpty()) {
-                    panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
+                AbstractGoods input = first(pt.getInputs());
+                if (input != null) {
+                    panel.add(getGoodsButton(input), "span, split 3");
                     JLabel arrow = new JLabel("\u2192");
                     arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
                         FontLibrary.FontSize.SMALL, Font.BOLD));
                     panel.add(arrow);
                 }
-                if (!outputs.isEmpty()) {
-                    panel.add(getGoodsButton(outputs.get(0)));
+                AbstractGoods output = first(pt.getOutputs());
+                if (output != null) {
+                    panel.add(getGoodsButton(output));
                 }
             }
         }

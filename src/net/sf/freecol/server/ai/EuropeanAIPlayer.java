@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -478,16 +479,17 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
 
         if (randoms[cheatIndex++] < landUnitCheatPercent) {
-            final Comparator<WorkerWish> comp
-                = Comparator.comparingInt(ValuedAIObject::getValue);
-            Stream<WorkerWish> values = workerWishes.keySet().stream()
-                .filter(ut -> ut != null && ut.isAvailableTo(player)
-                    && europe.getUnitPrice(ut) != UNDEFINED)
-                .map(ut -> workerWishes.get(ut))
-                .filter(wl -> wl != null && !wl.isEmpty())
-                .map(wl -> wl.get(0));
-            WorkerWish bestWish = maximize(values, comp);
-
+            final Predicate<Entry<UnitType, List<WorkerWish>>> pred = e -> {
+                UnitType ut = e.getKey();
+                return ut != null && ut.isAvailableTo(player)
+                    && europe.getUnitPrice(ut) != UNDEFINED
+                    && first(e.getValue()) != null;
+            };
+            WorkerWish bestWish = maximize(transform(workerWishes.entrySet(),
+                                                     pred,
+                                                     e -> first(e.getValue()),
+                                                     Collectors.toSet()),
+                ValuedAIObject.ascendingValueComparator);
             int cost = (bestWish != null)
                 ? europe.getUnitPrice(bestWish.getUnitType())
                 : (player.getImmigration() < player.getImmigrationRequired() / 2)

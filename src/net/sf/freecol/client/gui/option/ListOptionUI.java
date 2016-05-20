@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -92,9 +93,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             }
         }
         list = new JList<>(this.model);
-        AbstractOption<T> o = option.getValue().isEmpty()
-            ? option.getTemplate()
-            : option.getValue().get(0);
+        AbstractOption<T> o = first(option.getValue());
+        if (o == null) o = option.getTemplate();
         if (o != null) {
             setCellRenderer(gui, o, editable);
             list.setSelectedIndex(0);

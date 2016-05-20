@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A <code>Resource</code> wrapping an <code>Image</code>.
@@ -96,8 +98,7 @@ public class ImageResource extends Resource
                     img0.getWidth()*img0.getHeight() -
                         img1.getWidth()*img1.getHeight());
 
-                image = baseImage != null ? baseImage :
-                    loadedImages.isEmpty() ? null : loadedImages.get(0);
+                image = baseImage != null ? baseImage : first(loadedImages);
             }
         }
     }

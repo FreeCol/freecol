@@ -1784,7 +1784,7 @@ public final class InGameController extends Controller {
                 .filter(p -> p.hasContacted(serverPlayer)),
                 comp);
         if (!natives.isEmpty()) {
-            ServerPlayer good = (ServerPlayer)natives.get(0);
+            ServerPlayer good = (ServerPlayer)first(natives);
             logger.info("Native ally following independence: " + good);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
@@ -3296,12 +3296,11 @@ public final class InGameController extends Controller {
      */
     public ChangeSet nativeGift(ServerPlayer serverPlayer,
                                 Unit unit, Colony colony) {
-        List<Goods> gl = unit.getGoods();
-        if (gl.isEmpty()) {
+        final Goods goods = first(unit.getGoods());
+        if (goods == null) {
             return serverPlayer.clientError("No gift to deliver: "
                 + unit.getId());
         }
-        final Goods goods = gl.get(0);
         final ServerPlayer otherPlayer = (ServerPlayer)colony.getOwner();
 
         ChangeSet cs = new ChangeSet();
@@ -3672,8 +3671,7 @@ public final class InGameController extends Controller {
             // Otherwise player gets to visit, and learn about the settlement.
             List<UnitType> scoutTypes = getGame().getSpecification()
                 .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
-            UnitType scoutSkill = (scoutTypes.isEmpty()) ? null
-                : scoutTypes.get(0);
+            UnitType scoutSkill = first(scoutTypes);
             int radius = unit.getLineOfSight();
             UnitType skill = is.getLearnableSkill();
             int rnd = randomInt(logger, "scouting", random, 10);

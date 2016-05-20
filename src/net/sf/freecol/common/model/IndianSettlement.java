@@ -807,7 +807,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             return sum(getOwnedUnits(),
                        u -> !militaryRoles.contains(u.getRole()),
                        u -> AbstractGoods.getCount(type, 
-                           u.getGoodsDifference(militaryRoles.get(0), 1)));
+                           u.getGoodsDifference(first(militaryRoles), 1)));
         }
 
         int consumption = getConsumptionOf(type);

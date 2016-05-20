@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -260,9 +261,10 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 typeButton.addActionListener(this);
                 requiredTypes.add(typeButton);
             }
-            if (!requiredTypes.isEmpty()) {
+            JButton rt = first(requiredTypes);
+            if (rt != null) {
                 doc.insertString(doc.getLength(), " (", doc.getStyle("regular"));
-                StyleConstants.setComponent(doc.getStyle("button"), requiredTypes.get(0));
+                StyleConstants.setComponent(doc.getStyle("button"), rt);
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 for (int index = 1; index < requiredTypes.size(); index++) {
                     JButton button = requiredTypes.get(index);

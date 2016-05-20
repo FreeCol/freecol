@@ -261,7 +261,7 @@ public class TerrainGenerator {
             throw new RuntimeException("No TileType for"
                 + " temperature==" + localeTemperature);
         case 1:
-            return candidateTileTypes.get(0);
+            return first(candidateTileTypes);
         default:
             break;
         }
@@ -284,7 +284,7 @@ public class TerrainGenerator {
             throw new RuntimeException("No TileType for"
                 + " humidity==" + localeHumidity);
         case 1:
-            return candidateTileTypes.get(0);
+            return first(candidateTileTypes);
         default:
             break;
         }
@@ -307,7 +307,7 @@ public class TerrainGenerator {
             throw new RuntimeException("No TileType for"
                 + " forested==" + forested);
         case 1:
-            return candidateTileTypes.get(0);
+            return first(candidateTileTypes);
         default:
             return candidateTileTypes.get(randomInt(logger, "Forest tile",
                                                     random, i));
@@ -688,7 +688,7 @@ public class TerrainGenerator {
         List<ServerRegion> result = new ArrayList<>();
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
-            Tile tile = lakes.get(0);
+            Tile tile = first(lakes);
             if (tile.getRegion() != null) continue;
 
             ServerRegion lakeRegion = new ServerRegion(game, RegionType.LAKE);

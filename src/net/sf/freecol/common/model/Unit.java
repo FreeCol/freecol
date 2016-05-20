@@ -872,9 +872,7 @@ public class Unit extends GoodsLocation
      * @return A military <code>Role</code>, or null if none found.
      */
     public Role getMilitaryRole() {
-        List<Role> roles
-            = getAvailableRoles(getSpecification().getMilitaryRoles());
-        return (roles.isEmpty()) ? null : roles.get(0);
+        return first(getAvailableRoles(getSpecification().getMilitaryRoles()));
     }
 
     /**

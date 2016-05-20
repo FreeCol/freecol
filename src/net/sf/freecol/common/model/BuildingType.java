@@ -238,8 +238,8 @@ public final class BuildingType extends BuildableType {
      */
     private GoodsType getConsumedGoodsType() {
         if (productionTypes.isEmpty()) return null;
-        List<AbstractGoods> inputs = productionTypes.get(0).getInputs();
-        return (inputs.isEmpty()) ? null : inputs.get(0).getType();
+        AbstractGoods ag = first(first(productionTypes).getInputs());
+        return (ag == null) ? null : ag.getType();
     }
     // end @compat
 
@@ -250,8 +250,8 @@ public final class BuildingType extends BuildableType {
      */
     public GoodsType getProducedGoodsType() {
         if (productionTypes.isEmpty()) return null;
-        List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
-        return (outputs.isEmpty()) ? null : outputs.get(0).getType();
+        AbstractGoods ag = first(first(productionTypes).getOutputs());
+        return (ag == null) ? null : ag.getType();
     }
 
     /**

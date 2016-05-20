@@ -97,7 +97,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout());
 
-        nativeNation = getSpecification().getIndianNations().get(0);
+        nativeNation = first(getSpecification().getIndianNations());
 
         listPanel = new JPanel(new GridLayout(2, 0));
 
@@ -134,7 +134,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   Messages.message("mapEditorTransformPanel.majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(ImageLibrary.getMiscImage("image.tileitem."
-                + getSpecification().getResourceTypeList().get(0).getId(), 0.75f),
+                    + first(getSpecification().getResourceTypeList()).getId(), 0.75f),
             Messages.message("mapEditorTransformPanel.resource"),
             new ResourceTransform()));
         listPanel.add(buildButton(ImageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.5f),
@@ -310,7 +310,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 case 0:
                     return;
                 case 1:
-                    ResourceType resourceType = resList.get(0);
+                    ResourceType resourceType = first(resList);
                     // FIXME: create GUI for setting the quantity
                     t.addResource(new Resource(t.getGame(), t, resourceType,
                                   resourceType.getMaxValue()));
@@ -350,8 +350,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (!t.isLand()
                 || t.hasSettlement()
                 || nativeNation == null) return;
-            UnitType skill = ((IndianNationType)nativeNation.getType())
-                .getSkills().get(0).getObject();
+            UnitType skill = first(((IndianNationType)nativeNation.getType())
+                .getSkills()).getObject();
             Player nativePlayer = getGame().getPlayerByNation(nativeNation);
             if (nativePlayer == null) return;
             String name = nativePlayer.getSettlementName(null);

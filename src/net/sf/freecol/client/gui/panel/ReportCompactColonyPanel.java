@@ -380,9 +380,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
         super(freeColClient, "reportColonyAction");
 
         final Player player = getMyPlayer();
+        final Comparator<Colony> colonyComparator
+            = freeColClient.getClientOptions().getColonyComparator();
         final Comparator<List<Colony>> firstColonyComparator
-            = Comparator.comparing(l -> l.get(0), freeColClient
-                .getClientOptions().getColonyComparator());
+            = Comparator.comparing(l -> first(l), colonyComparator);
 
         this.spec = getSpecification();
         this.lib = getImageLibrary();
@@ -618,7 +619,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             if (n > 0) {
                 c = cAlarm;
                 if (n == 1) {
-                    TileImprovementSuggestion tis = s.tileSuggestions.get(0);
+                    TileImprovementSuggestion tis = first(s.tileSuggestions);
                     for (Unit u : tis.tile.getUnitList()) {
                         if (u.getState() == Unit.UnitState.IMPROVING
                             && u.getWorkImprovement() != null

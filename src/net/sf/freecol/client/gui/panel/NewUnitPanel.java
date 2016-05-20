@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -127,7 +128,7 @@ public class NewUnitPanel extends FreeColPanel {
         setSize(getPreferredSize());
         revalidate();
 
-        shouldEnable = player.checkGold(europe.getUnitPrice(units.get(0)));
+        shouldEnable = player.checkGold(europe.getUnitPrice(first(units)));
     }
 
 

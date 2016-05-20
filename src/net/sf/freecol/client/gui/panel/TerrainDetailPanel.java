@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -114,15 +115,16 @@ public class TerrainDetailPanel
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
         List<ResourceType> resourceList = tileType.getResourceTypes();
-        if (!resourceList.isEmpty()) {
+        ResourceType rt = first(resourceList);
+        if (rt != null) {
             panel.add(Utility.localizedLabel("colopedia.terrain.resource"));
             if (resourceList.size() > 1) {
-                panel.add(getResourceButton(resourceList.get(0)), "split " + resourceList.size());
+                panel.add(getResourceButton(rt), "split " + resourceList.size());
                 for (int index = 1; index < resourceList.size(); index++) {
                     panel.add(getResourceButton(resourceList.get(index)));
                 }
             } else {
-                panel.add(getResourceButton(resourceList.get(0)));
+                panel.add(getResourceButton(rt));
             }
         } else {
             panel.add(new JLabel(), "wrap");
@@ -156,7 +158,7 @@ public class TerrainDetailPanel
                 if (ag.getAmount() <= 0) it.remove();
             }
 
-            AbstractGoods ag = production.get(0);
+            AbstractGoods ag = first(production);
             if (production.size() > 1) {
                 panel.add(getGoodsButton(ag.getType(), ag.getAmount()),
                           "span, split " + production.size());
