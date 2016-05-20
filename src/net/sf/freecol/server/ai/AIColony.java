@@ -122,37 +122,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     private static final Set<GoodsType> fullExport = new HashSet<>();
     private static final Set<GoodsType> partExport = new HashSet<>();
 
-    /**
-     * Comparator to favour expert pioneers, then units in that role,
-     * then least skillful.
-     */
+    /** Comparator to choose the best pioneers. */
     private static final Comparator<Unit> pioneerComparator
-        = new Comparator<Unit>() {
-            private int score(Unit unit) {
-                return (unit == null) ? -1000 : unit.getPioneerScore();
-            }
+        = Comparator.comparingInt(Unit::getPioneerScore).reversed();
 
-            @Override
-            public int compare(Unit u1, Unit u2) {
-                return score(u2) - score(u1);
-            }
-        };
-
-    /**
-     * Comparator to favour expert scouts, then units in that role,
-     * then least skillful.
-     */
+    /** Comparator to choose the best scouts. */
     private static final Comparator<Unit> scoutComparator
-        = new Comparator<Unit>() {
-            private int score(Unit unit) {
-                return (unit == null) ? -1000 : unit.getScoutScore();
-            }
-
-            @Override
-            public int compare(Unit u1, Unit u2) {
-                return score(u2) - score(u1);
-            }
-        };
+        = Comparator.comparingInt(Unit::getScoutScore).reversed();
 
 
     /**
