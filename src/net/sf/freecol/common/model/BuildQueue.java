@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A queue of things for a colony to build.
@@ -59,11 +61,12 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
     /** A list of Buildable items. */
-    private List<T> buildQueue = new ArrayList<>();
+    private final List<T> queue = new ArrayList<>();
 
     /** What to do when an item has been completed. */
     private CompletionAction completionAction = CompletionAction.REMOVE;
 
+    /** The build priority. */
     private int priority = COLONY_PRIORITY;
 
     /** The colony to queue buildables for. */
@@ -84,13 +87,51 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
 
+    public void clear() {
+        this.queue.clear();
+    }
+
+    public void add(T buildable) {
+        this.queue.add(buildable);
+    }
+
+    public List<T> getValues() {
+        return this.queue;
+    }
+
+    public void setValues(List<T> values) {
+        clear();
+        this.queue.addAll(values);
+    }
+
+    public void remove(int index) {
+        this.queue.remove(index);
+    }
+
+    public int size() {
+        return this.queue.size();
+    }
+
+    public boolean isEmpty() {
+        return this.queue.isEmpty();
+    }
+
+    public final CompletionAction getCompletionAction() {
+        return this.completionAction;
+    }
+
+    public final void setCompletionAction(final CompletionAction newCompletionAction) {
+        this.completionAction = newCompletionAction;
+    }
+
+
     /**
      * Get the type of building currently being built.
      *
      * @return The type of building currently being built.
      */
     public T getCurrentlyBuilding() {
-        return (buildQueue.isEmpty()) ? null : buildQueue.get(0);
+        return (this.queue.isEmpty()) ? null : this.queue.get(0);
     }
 
     /**
@@ -100,64 +141,19 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * @param buildable The <code>T</code> to build.
      */
     public void setCurrentlyBuilding(T buildable) {
-        if (buildable instanceof BuildingType && buildQueue.contains(buildable)) {
-            buildQueue.remove(buildable);
+        if (buildable == null) {
+            clear();
+        } else {
+            if (buildable instanceof BuildingType // FIXME: OO
+                && this.queue.contains(buildable)) {
+                this.queue.remove(buildable);
+            }
+            this.queue.add(0, buildable);
         }
-        buildQueue.add(0, buildable);
-    }
-
-
-    public void clear() {
-        buildQueue.clear();
-    }
-
-    public void add(T buildable) {
-        buildQueue.add(buildable);
-    }
-
-    public List<T> getValues() {
-        return buildQueue;
-    }
-
-    public void setValues(List<T> values) {
-        buildQueue = values;
-    }
-
-    public void remove(int index) {
-        buildQueue.remove(index);
-    }
-
-    public int size() {
-        return buildQueue.size();
-    }
-
-    public boolean isEmpty() {
-        return buildQueue.isEmpty();
-    }
-
-    public final CompletionAction getCompletionAction() {
-        return completionAction;
-    }
-
-    public final void setCompletionAction(final CompletionAction newCompletionAction) {
-        this.completionAction = newCompletionAction;
-    }
-
-
-    // Interface Consumer
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<AbstractGoods> getConsumedGoods() {
-        T current = getCurrentlyBuilding();
-        return (current == null) ? new ArrayList<AbstractGoods>()
-            : current.getRequiredGoods();
     }
 
     /**
-     * Return the <code>ProductionInfo</code> for this BuildQueue.
+     * Get the <code>ProductionInfo</code> for this BuildQueue.
      *
      * @param input A list of input <code>AbstractGoods</code>.
      * @return The <code>ProductionInfo</code> for this BuildQueue.
@@ -168,7 +164,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         if (current != null) {
             // ATTENTION: this code presupposes that we will consume
             // all required goods at once
-            final boolean overflow = colony.getSpecification()
+            final boolean overflow = this.colony.getSpecification()
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
             List<AbstractGoods> consumption = new ArrayList<>();
             for (AbstractGoods ag : current.getRequiredGoods()) {
@@ -189,30 +185,29 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
         return result;
     }
 
+
+    // Interface Consumer
+
     /**
-     * The priority of this Consumer. The higher the priority, the
-     * earlier will the Consumer be allowed to consume the goods it
-     * requires.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
     @Override
-    public int getPriority() {
-        return priority;
+    public List<AbstractGoods> getConsumedGoods() {
+        T current = getCurrentlyBuilding();
+        return (current == null) ? Collections.<AbstractGoods>emptyList()
+            : current.getRequiredGoods();
     }
 
     /**
-     * Does the consumer have the ability with the given identifier?
-     *
-     * The two abilities most relevant to consumers are
-     * "consumeAllOrNothing", which implies that the consumer will not
-     * consume any goods if its requirements can not be met (used by
-     * the Colony when building), as well as
-     * "consumeOnlySurplusProduction", which implies that the consumer
-     * does not consume stored goods (used by the country and stables).
-     *
-     * @param id The object identifier.
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
+     */
+    @Override
+    public int getPriority() {
+        return this.priority;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean hasAbility(String id) {
@@ -228,14 +223,16 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
 
+    // Override Object
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append("[BuildQueue (").append(colony.getName()).append(')');
-        for (BuildableType item : buildQueue) {
+        sb.append("[BuildQueue (").append(this.colony.getName()).append(')');
+        for (BuildableType item : this.queue) {
             sb.append(' ').append(item.getId());
         }
         sb.append(']');
