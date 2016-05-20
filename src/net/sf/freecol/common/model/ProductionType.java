@@ -148,11 +148,11 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the input goods.
      *
-     * @return A list of the input <code>AbstractGoods</code>.
+     * @return A stream of the input <code>AbstractGoods</code>.
      */
-    public final List<AbstractGoods> getInputs() {
-        return (inputs == null) ? Collections.<AbstractGoods>emptyList()
-            : inputs;
+    public final Stream<AbstractGoods> getInputs() {
+        return (inputs == null) ? Stream.<AbstractGoods>empty()
+            : inputs.stream();
     }
 
     /**

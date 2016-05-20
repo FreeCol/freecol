@@ -899,7 +899,8 @@ public class CollectionUtils {
      */
     public static <T> int min(Stream<T> stream, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
-        return stream.filter(predicate).mapToInt(tif).min().orElse(0);
+        return stream.filter(predicate).mapToInt(tif).min()
+            .orElse(Integer.MAX_VALUE);
     }
 
     /**

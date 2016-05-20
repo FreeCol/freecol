@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -330,10 +331,9 @@ public abstract class WorkLocation extends UnitLocation
             delta -= getPotentialProduction(goodsType, unit.getType());
         }
         // Do we have a chance of satisfying the inputs?
-        for (AbstractGoods in : productionType.getInputs()) {
-            // TODO: should really consider in.getAmount
-            delta = Math.min(delta, colony.getNetProductionOf(in.getType()));
-        }
+        final ToIntFunction<AbstractGoods> prod = ag ->
+            colony.getNetProductionOf(ag.getType());
+        delta = Math.min(delta, min(productionType.getInputs(), prod));
         if (delta <= 0) return null;
 
         // Is the production actually a good idea?  Not if we are independent
@@ -412,7 +412,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     public List<AbstractGoods> getInputs() {
         return (productionType == null) ? EMPTY_LIST
-            : productionType.getInputs();
+            : toList(productionType.getInputs());
     }
 
     /**
@@ -442,8 +442,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any inputs.
      */
     public boolean hasInputs() {
-        return productionType != null
-            && !productionType.getInputs().isEmpty();
+        return first(getInputs()) != null;
     }
 
     /**

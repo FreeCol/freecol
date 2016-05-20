@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -98,27 +99,24 @@ public class Occupation {
         // Try the available production types for the best production.
         final Colony colony = wl.getColony();
         for (ProductionType pt : productionTypes) {
+            if (pt == null) continue;
             lb.add("\n      try=", pt);
-            if (pt != null) {
-                for (GoodsType gt : workTypes) {
-                    if (pt.getOutput(gt) == null) continue;
-                    int minInput = FreeColObject.INFINITY;
-                    List<AbstractGoods> inputs = pt.getInputs();
-                    for (AbstractGoods ag : inputs) {
-                        int input = Math.max(colony.getGoodsCount(ag.getType()),
-                            colony.getNetProductionOf(ag.getType()));
-                        minInput = Math.min(minInput, input);
-                    }
-                    int potential = wl.getPotentialProduction(gt, unitType);
-                    int amount = Math.min(minInput, potential);
-                    lb.add(" ", gt.getSuffix(), "=", amount, "/", minInput,
-                        "/", potential, ((bestAmount < amount) ? "!" : ""));
-                    if (bestAmount < amount) {
-                        bestAmount = amount;
-                        this.workLocation = wl;
-                        this.productionType = pt;
-                        this.workType = gt;
-                    }
+            
+            for (GoodsType gt : workTypes) {
+                if (pt.getOutput(gt) == null) continue;
+
+                int minInput = min(pt.getInputs(),
+                    ag -> Math.max(colony.getNetProductionOf(ag.getType()),
+                                   colony.getGoodsCount(ag.getType())));
+                int potential = wl.getPotentialProduction(gt, unitType);
+                int amount = Math.min(minInput, potential);
+                lb.add(" ", gt.getSuffix(), "=", amount, "/", minInput,
+                    "/", potential, ((bestAmount < amount) ? "!" : ""));
+                if (bestAmount < amount) {
+                    bestAmount = amount;
+                    this.workLocation = wl;
+                    this.productionType = pt;
+                    this.workType = gt;
                 }
             }
         }
