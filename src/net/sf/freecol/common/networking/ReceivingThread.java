@@ -54,13 +54,11 @@ final class ReceivingThread extends Thread {
      */
     private static class FreeColNetworkInputStream extends InputStream {
 
-        public static final int BUFFER_SIZE = 16384;
-
         private static final int EOS_RESULT = -1;
 
         private final InputStream in;
 
-        private final byte[] buffer = new byte[BUFFER_SIZE];
+        private final byte[] buffer = new byte[Connection.BUFFER_SIZE];
 
         private final byte[] bb = new byte[1];
         
@@ -101,7 +99,7 @@ final class ReceivingThread extends Thread {
         private boolean fill() throws IOException {
             if (this.bSize != 0) throw new IllegalStateException("Not empty.");
 
-            int r = this.in.read(buffer, 0, BUFFER_SIZE);
+            int r = this.in.read(buffer, 0, buffer.length);
             if (r <= 0) return false;
 
             this.bStart = 0;
@@ -145,7 +143,7 @@ final class ReceivingThread extends Thread {
                 byte value = buffer[this.bStart];
                 this.bStart++;
                 this.bSize--;
-                if (value == Connection.END_OF_STREAM) {
+                if (value == (byte)Connection.END_OF_STREAM) {
                     this.wait = true;
                     break;
                 }
@@ -270,9 +268,8 @@ final class ReceivingThread extends Thread {
         in.enable();
 
         // Open a rewindable stream
-        final int LOOK_AHEAD = FreeColNetworkInputStream.BUFFER_SIZE;
-        BufferedInputStream bis
-            = new BufferedInputStream(in, LOOK_AHEAD);
+        final int LOOK_AHEAD = Connection.BUFFER_SIZE;
+        BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
         FreeColXMLReader xr = new FreeColXMLReader(bis);
 

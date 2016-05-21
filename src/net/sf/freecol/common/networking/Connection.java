@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -61,7 +62,8 @@ public class Connection implements Closeable {
 
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
 
-    public static final byte END_OF_STREAM = '\n';
+    public static final char END_OF_STREAM = '\n';
+    public static final int BUFFER_SIZE = 1 << 14;
     
     public static final String DISCONNECT_TAG = "disconnect";
     public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
@@ -90,9 +92,10 @@ public class Connection implements Closeable {
 
     private String name;
 
-    // Logging variables.
-    private final StreamResult logResult;
+    /** The Writer to write logging messages to. */
     private final Writer logWriter;
+    /** A lock to protect the log writer. */
+    private final Object logLock = new Object();
 
 
     /**
@@ -108,13 +111,10 @@ public class Connection implements Closeable {
         this.receivingThread = null;
         this.messageHandler = null;
         this.name = name;
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-            this.logWriter = Utils.getUTF8Writer(System.err);
-            this.logResult = new StreamResult(this.logWriter);
-        } else {
-            this.logWriter = null;
-            this.logResult = null;
-        }
+        this.logWriter
+            = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS))
+            ? Utils.getUTF8Writer(System.err)
+            : null;
     }
 
     /**
@@ -299,28 +299,58 @@ public class Connection implements Closeable {
     }
 
     /**
+     * Write an element into a string writer.
+     *
+     * @param element The <code>Element</code> to write.
+     * @return A new <code>StringWriter</code> containing the element, or
+     *     null if the element could not be transformed.
+     */
+    private StringWriter elementToStringWriter(Element element) {
+        StringWriter sw = new StringWriter(BUFFER_SIZE);
+        DOMSource source = new DOMSource(element);
+        try {
+            xmlTransformer.transform(source, new StreamResult(sw));
+            sw.append(END_OF_STREAM);
+        } catch (TransformerException te) {
+            logger.log(Level.WARNING, "Failed to transform element", te);
+            sw = null;
+        }
+        return sw;
+    }
+
+    /**
      * Log transfer of a DOMSource.
      *
-     * @param element The <code>Element</code> to log.
+     * @param sb A <code>StringBuffer</code> to log.
      * @param send True if sending (else replying).
      */
-    protected void log(Element element, boolean send) {
-        if (this.logResult == null) return;
-        try {
-            this.logWriter.write(name, 0, name.length());
-            if (send) {
-                this.logWriter.write(SEND_SUFFIX, 0, SEND_SUFFIX.length());
-            } else {
-                this.logWriter.write(REPLY_SUFFIX, 0, REPLY_SUFFIX.length());
+    private void logInternal(StringBuffer sb, boolean send) {
+        synchronized (this.logLock) {
+            if (this.logWriter == null) return;
+            try {
+                sb.insert(0, (send) ? SEND_SUFFIX : REPLY_SUFFIX);
+                sb.insert(0, name);
+                this.logWriter.write(sb.toString());
+                this.logWriter.flush();
+            } catch (IOException ioe) {
+                ; // Ignore logging failure
             }
-            this.xmlTransformer.transform(new DOMSource(element), this.logResult);
-            this.logWriter.write('\n');
-            this.logWriter.flush();
-        } catch (IOException|TransformerException e) {
-            ; // Ignore logging failure
         }
     }
 
+    /**
+     * Log transfer of a DOMSource.
+     *
+     * FIXME: Try to stop using this.
+     *
+     * @param element An <code>Element</code> to log.
+     * @param send True if sending (else replying).
+     */
+    protected void log(Element element, boolean send) {
+        StringWriter sw = elementToStringWriter(element);
+        if (sw != null) logInternal(sw.getBuffer(), send);
+    }
+    
     /**
      * Low level routine to send a message over this Connection.
      *
@@ -329,20 +359,13 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {
-        TransformerException te = null;
+        StringWriter sw = elementToStringWriter(element);
         synchronized (this.outLock) {
             if (this.out == null) return;
-            DOMSource source = new DOMSource(element);
-            try {
-                xmlTransformer.transform(source, new StreamResult(this.out));
-            } catch (TransformerException e) {
-                te = e;
-            }
-            this.out.write(END_OF_STREAM);
+            this.out.write(sw.toString().getBytes("UTF-8"));
             this.out.flush();
         }
-        log(element, true);
-        if (te != null) logger.log(Level.WARNING, "Failed to transform", te);
+        logInternal(sw.getBuffer(), true);
     }
 
     /**
