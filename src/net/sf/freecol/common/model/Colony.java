@@ -588,21 +588,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Gets a building for producing a given type of goods.
-     * 
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return A <code>Building</code> which produces
-     *      the given type of goods, or null if not found.
-     */
-    public Building getBuildingForProducing(final GoodsType goodsType) {
-        for (Building b : getBuildings()) {
-            if (AbstractGoods.findByType(goodsType, b.getOutputs()) != null)
-                return b;
-        }
-        return null;
-    }
-
-    /**
      * Add a colony tile.
      *
      * @param ct The <code>ColonyTile</code> to add.

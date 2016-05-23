@@ -32,6 +32,8 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -65,12 +67,12 @@ public final class ReportReligiousPanel extends ReportPanel {
             reportPanel.add(progressBar, "span");
 
             for (Colony colony : freeColClient.getMySortedColonies()) {
-                Building building = colony.getBuildingForProducing(gt);
-                if (building != null) {
+                WorkLocation wl = first(colony.getWorkLocationsForProducing(gt));
+                if (wl instanceof Building) {
                     reportPanel.add(createColonyButton(colony),
                         "split 2, flowy");
                     BuildingPanel bp = new BuildingPanel(getFreeColClient(),
-                                                         building);
+                                                         (Building)wl);
                     bp.initialize();
                     reportPanel.add(bp);
                 }
