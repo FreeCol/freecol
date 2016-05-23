@@ -337,7 +337,7 @@ public class ProductionType extends FreeColSpecObject {
         Collection<ProductionType> types) {
         return maximize(flatten(types, pt -> pt.getOutputs().stream()),
                         o -> o.getType() == goodsType,
-                        AbstractGoods.descendingAmountComparator);
+                        AbstractGoods.ascendingAmountComparator);
     }
 
 
