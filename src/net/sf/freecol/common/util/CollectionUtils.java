@@ -744,6 +744,18 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param c The <code>Collection</code> to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The maximum value found, or zero if the input is empty.
+     */
+    public static <T> int max(Collection<T> c, ToIntFunction<T> tif) {
+        return max(c.stream(), t -> true, tif);
+    }
+
+    /**
+     * Find the maximum int value in a collection.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
      * @param predicate A <code>Predicate</code> to match with.
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
@@ -751,6 +763,18 @@ public class CollectionUtils {
     public static <T> int max(Collection<T> c, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
         return max(c.stream(), predicate, tif);
+    }
+
+    /**
+     * Find the maximum int value in a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The maximum value found, or zero if the input is empty.
+     */
+    public static <T> int max(Stream<T> stream, ToIntFunction<T> tif) {
+        return max(stream, t -> true, tif);
     }
 
     /**
@@ -824,6 +848,58 @@ public class CollectionUtils {
                                  Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.maxBy(comparator))
             .orElse(null);
+    }
+
+    /**
+     * Find the minimum int value in a collection.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(Collection<T> c, ToIntFunction<T> tif) {
+        return min(c.stream(), t -> true, tif);
+    }
+
+    /**
+     * Find the minimum int value in a collection.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(Collection<T> c, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return min(c.stream(), predicate, tif);
+    }
+
+    /**
+     * Find the minimum int value in a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(Stream<T> stream, ToIntFunction<T> tif) {
+        return min(stream, t -> true, tif);
+    }
+
+    /**
+     * Find the minimum int value in a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(Stream<T> stream, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return stream.filter(predicate).mapToInt(tif).min().orElse(0);
     }
 
     /**
