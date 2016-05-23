@@ -185,7 +185,7 @@ public final class InfoPanel extends FreeColPanel {
                         add(new JLabel(), "span " + PRODUCTION);
                     } else {
                         Collections.sort(produce,
-                            AbstractGoods.abstractGoodsComparator);
+                            AbstractGoods.descendingAmountComparator);
                         for (AbstractGoods ag : produce) {
                             GoodsType type = ag.getType();
                             int n = tile.getPotentialProduction(type, null);

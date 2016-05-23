@@ -226,7 +226,8 @@ public class ProductionType extends FreeColSpecObject {
     public GoodsType getBestOutputType() {
         AbstractGoods goods;
         return (outputs == null
-            || (goods = maximize(outputs, AbstractGoods.amountComparator)) == null)
+            || (goods = maximize(outputs,
+                    AbstractGoods.descendingAmountComparator)) == null)
             ? null
             : goods.getType();
     }
@@ -336,7 +337,7 @@ public class ProductionType extends FreeColSpecObject {
         Collection<ProductionType> types) {
         return maximize(flatten(types, pt -> pt.getOutputs().stream()),
                         o -> o.getType() == goodsType,
-                        AbstractGoods.amountComparator);
+                        AbstractGoods.descendingAmountComparator);
     }
 
 
