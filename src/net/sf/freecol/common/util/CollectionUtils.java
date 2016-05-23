@@ -441,7 +441,20 @@ public class CollectionUtils {
      */
     public static <T> boolean contains(Collection<T> c,
                                        Predicate<T> predicate) {
-        return c.stream().filter(predicate).findFirst().isPresent();
+        return contains(c.stream(), predicate);
+    }
+
+    /**
+     * Does a collection contain at least one element that matches a predicate?
+     *
+     * @param <T> The collection member type.
+     * @param stream The <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return True if the predicate ever succeeds.
+     */
+    public static <T> boolean contains(Stream<T> stream,
+                                       Predicate<T> predicate) {
+        return stream.filter(predicate).findFirst().isPresent();
     }
 
     /**
