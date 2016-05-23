@@ -227,7 +227,7 @@ public class ProductionType extends FreeColSpecObject {
         AbstractGoods goods;
         return (outputs == null
             || (goods = maximize(outputs,
-                    AbstractGoods.descendingAmountComparator)) == null)
+                    AbstractGoods.ascendingAmountComparator)) == null)
             ? null
             : goods.getType();
     }
