@@ -3559,7 +3559,7 @@ public final class InGameController extends Controller {
         // Collect roles that cause a change, ordered by simplest change
         for (UnitChange uc : transformAndSort(unitChanges,
                 uc -> uc.role != uc.unit.getRole() && uc.role != defaultRole,
-                Comparator.<UnitChange>reverseOrder(), Collectors.toList())) {
+                u -> u, Comparator.<UnitChange>reverseOrder())) {
             if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + uc.unit.getId() + " for role " + uc.role
@@ -3713,7 +3713,7 @@ public final class InGameController extends Controller {
             // newly visible tiles, possibly with enhanced radius.
             Set<Tile> tiles = transform(tile.getSurroundingTiles(1, radius),
                 t -> !serverPlayer.canSee(t) && (t.isLand() || t.isShore()),
-                Collectors.toSet());
+                t -> t, Collectors.toSet());
             cs.add(See.only(serverPlayer), serverPlayer.exploreTiles(tiles));
 
             // If the unit was promoted, update it completely, otherwise just

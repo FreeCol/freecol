@@ -378,9 +378,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         final Game game = getGame();
         synchronized (this.storedGoods) {
             return transform(this.storedGoods.entrySet(),
-                e -> e.getValue() > 0,
-                e -> new Goods(game, parent, e.getKey(), e.getValue()),
-                Collectors.toList());
+                             e -> e.getValue() > 0,
+                             e -> new Goods(game, parent, e.getKey(), e.getValue()));
         }
     }
 

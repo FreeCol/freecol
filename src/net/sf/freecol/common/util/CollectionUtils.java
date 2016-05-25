@@ -47,6 +47,11 @@ import net.sf.freecol.common.util.CachingFunction;
  */
 public class CollectionUtils {
 
+    private static final int MAX_DEFAULT = Integer.MIN_VALUE;
+    private static final int MIN_DEFAULT = Integer.MAX_VALUE;
+    private static final int SUM_DEFAULT = 0;
+    private static final double SUM_DOUBLE_DEFAULT = 0.0;
+
     /** Trivial integer accumulator. */
     public static final BinaryOperator<Integer> integerAccumulator
         = (i1, i2) -> i1 + i2;
@@ -351,40 +356,104 @@ public class CollectionUtils {
                             Comparator.comparing(Entry::getValue, comparator));
     }
 
+    // Stream-based routines from here on
+    
+    /**
+     * Do all members of an array match a predicate?
+     *
+     * @param <T> The array member type.
+     * @param array The array to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if all members pass the predicate test.
+     */
     public static <T> boolean all(T[] array, Predicate<T> predicate) {
-        return all(Arrays.stream(array), predicate);
+        return all_internal(Arrays.stream(array), predicate);
     }
 
+    /**
+     * Do all members of an collection match a predicate?
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if all members pass the predicate test.
+     */
     public static <T> boolean all(Collection<T> c, Predicate<T> predicate) {
-        return all(c.stream(), predicate);
+        return all_internal(c.stream(), predicate);
     }
 
+    /**
+     * Do all members of an stream match a predicate?
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if all members pass the predicate test.
+     */
     public static <T> boolean all(Stream<T> stream, Predicate<T> predicate) {
+        return (stream == null) ? true : all_internal(stream, predicate);
+    }
+
+    /**
+     * Implementation of all().
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if all members pass the predicate test.
+     */
+    private static <T> boolean all_internal(Stream<T> stream,
+                                            Predicate<T> predicate) {
         return stream.allMatch(predicate);
     }
-
+    
+    /**
+     * Does any member of an array match a predicate?
+     *
+     * @param <T> The array member type.
+     * @param array The array to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if any member passes the predicate test.
+     */
     public static <T> boolean any(T[] array, Predicate<T> predicate) {
-        return any(Arrays.stream(array), predicate);
+        return any_internal(Arrays.stream(array), predicate);
     }
 
+    /**
+     * Does any member of a collection match a predicate?
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if any member passes the predicate test.
+     */
     public static <T> boolean any(Collection<T> c, Predicate<T> predicate) {
-        return any(c.stream(), predicate);
+        return any_internal(c.stream(), predicate);
     }
 
+    /**
+     * Does any member of a stream match a predicate?
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if any member passes the predicate test.
+     */
     public static <T> boolean any(Stream<T> stream, Predicate<T> predicate) {
+        return (stream == null) ? false : any_internal(stream, predicate);
+    }
+
+    /**
+     * Implementation of any().
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if any member passes the predicate test.
+     */
+    private static <T> boolean any_internal(Stream<T> stream,
+                                            Predicate<T> predicate) {
         return stream.anyMatch(predicate);
-    }
-
-    public static <T> boolean none(T[] array, Predicate<T> predicate) {
-        return none(Arrays.stream(array), predicate);
-    }
-
-    public static <T> boolean none(Collection<T> c, Predicate<T> predicate) {
-        return none(c.stream(), predicate);
-    }
-
-    public static <T> boolean none(Stream<T> stream, Predicate<T> predicate) {
-        return stream.noneMatch(predicate);
     }
 
     /**
@@ -432,6 +501,18 @@ public class CollectionUtils {
     }
 
     /**
+     * Does an array contain at least one element that matches a predicate?
+     *
+     * @param <T> The array member type.
+     * @param array The array to search.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return True if the predicate ever succeeds.
+     */
+    public static <T> boolean contains(T[] array, Predicate<T> predicate) {
+        return contains_internal(Arrays.stream(array), predicate);
+    }
+
+    /**
      * Does a collection contain at least one element that matches a predicate?
      *
      * @param <T> The collection member type.
@@ -441,19 +522,32 @@ public class CollectionUtils {
      */
     public static <T> boolean contains(Collection<T> c,
                                        Predicate<T> predicate) {
-        return contains(c.stream(), predicate);
+        return contains_internal(c.stream(), predicate);
     }
 
     /**
      * Does a collection contain at least one element that matches a predicate?
      *
-     * @param <T> The collection member type.
+     * @param <T> The stream member type.
      * @param stream The <code>Stream</code> to search.
      * @param predicate A <code>Predicate</code> to test with.
      * @return True if the predicate ever succeeds.
      */
     public static <T> boolean contains(Stream<T> stream,
                                        Predicate<T> predicate) {
+        return (stream == null) ? false : contains_internal(stream, predicate);
+    }
+
+    /**
+     * Implement contains().
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return True if the predicate ever succeeds.
+     */
+    private static <T> boolean contains_internal(Stream<T> stream,
+                                                 Predicate<T> predicate) {
         return stream.filter(predicate).findFirst().isPresent();
     }
 
@@ -466,7 +560,7 @@ public class CollectionUtils {
      * @return The number of items that matched.
      */
     public static <T> int count(T[] array, Predicate<T> predicate) {
-        return count(Arrays.stream(array), predicate);
+        return count_internal(Arrays.stream(array), predicate);
     }
         
     /**
@@ -478,7 +572,7 @@ public class CollectionUtils {
      * @return The number of items that matched.
      */
     public static <T> int count(Collection<T> c, Predicate<T> predicate) {
-        return count(c.stream(), predicate);
+        return count_internal(c.stream(), predicate);
     }
         
     /**
@@ -490,9 +584,34 @@ public class CollectionUtils {
      * @return The number of items that matched.
      */
     public static <T> int count(Stream<T> stream, Predicate<T> predicate) {
+        return (stream == null) ? 0 : count_internal(stream, predicate);
+    }
+
+    /**
+     * Implement count().
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to test with.
+     * @return The number of items that matched.
+     */
+    private static <T> int count_internal(Stream<T> stream,
+                                          Predicate<T> predicate) {
         return (int)stream.filter(predicate).count();
     }
         
+    /**
+     * Simple stream search for the first item that matches a predicate.
+     *
+     * @param <T> The array member type.
+     * @param array The array to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @return The item found, or null if not found.
+     */
+    public static <T> T find(T[] array, Predicate<T> predicate) {
+        return find_internal(Arrays.stream(array), predicate, null);
+    }
+
     /**
      * Simple stream search for the first item that matches a predicate.
      *
@@ -503,7 +622,7 @@ public class CollectionUtils {
      * @return The item found, or fail if not found.
      */
     public static <T> T find(T[] array, Predicate<T> predicate, T fail) {
-        return find(Arrays.stream(array), predicate, fail);
+        return find_internal(Arrays.stream(array), predicate, fail);
     }
 
     /**
@@ -512,24 +631,24 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param c The <code>Collection</code> to search.
      * @param predicate A <code>Predicate</code> to match with.
-     * @return The item found, or fail if not found.
+     * @return The item found, or null if not found.
      */
     public static <T> T find(Collection<T> c, Predicate<T> predicate) {
-        return find(c, predicate, (T)null);
+        return find_internal(c.stream(), predicate, (T)null);
     }
 
     /**
      * Simple stream search for the first item that matches a predicate.
      *
      * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to search.
+     * @param c The <code>Collection</code> to search.
      * @param predicate A <code>Predicate</code> to match with.
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Collection<T> collection, Predicate<T> predicate,
+    public static <T> T find(Collection<T> c, Predicate<T> predicate,
                              T fail) {
-        return find(collection.stream(), predicate, fail);
+        return find_internal(c.stream(), predicate, fail);
     }
 
     /**
@@ -541,7 +660,7 @@ public class CollectionUtils {
      * @return The item found, or null if not found.
      */
     public static <T> T find(Stream<T> stream, Predicate<T> predicate) {
-        return find(stream, predicate, null);
+        return (stream == null) ? null : find_internal(stream, predicate, null);
     }
 
     /**
@@ -555,7 +674,33 @@ public class CollectionUtils {
      */
     public static <T> T find(Stream<T> stream, Predicate<T> predicate,
                              T fail) {
-        return fir(stream.filter(predicate), fail);
+        return (stream == null) ? fail : find_internal(stream, predicate, fail);
+    }
+
+    /**
+     * Implement find().
+     *
+     * @param <T> The stream member type.
+     * @param stream A <code>Stream</code> to search.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param fail The value to return if nothing is found.
+     * @return The item found, or fail if not found.
+     */
+    private static <T> T find_internal(Stream<T> stream,
+                                       Predicate<T> predicate, T fail) {
+        return first_internal(stream.filter(predicate), fail);
+    }
+   
+    /**
+     * Get the first item of an array.
+     *
+     * @param <T> The array member type.
+     * @param array The <code>Collection</code> to search.
+     * @return The first item, or null on failure.
+     */
+    public static <T> T first(T[] array) {
+        return (array == null || array.length == 0) ? null
+            : first_internal(Arrays.stream(array), null);
     }
 
     /**
@@ -566,7 +711,7 @@ public class CollectionUtils {
      */
     public static <T> T first(Collection<T> collection) {
         return (collection == null || collection.isEmpty()) ? null
-            : fir(collection.stream(), null);
+            : first_internal(collection.stream(), null);
     }
 
     /**
@@ -576,17 +721,17 @@ public class CollectionUtils {
      * @return The first item, or null on failure.
      */
     public static <T> T first(Stream<T> stream) {
-        return (stream == null) ? null : fir(stream, null);
+        return (stream == null) ? null : first_internal(stream, null);
     }
 
     /**
-     * Get the first item of a stream.
+     * Implement first().
      *
      * @param stream The <code>Stream</code> to search.
      * @param fail The value to return on failure.
      * @return The first item, or fail on failure.
      */
-    private static <T> T fir(Stream<T> stream, T fail) {
+    private static <T> T first_internal(Stream<T> stream, T fail) {
         return stream.findFirst().orElse(fail);
     }
     
@@ -602,7 +747,7 @@ public class CollectionUtils {
     public static <T, R> Stream<R> flatten(T[] array,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return fla(Arrays.stream(array), alwaysTrue, mapper);
+        return flatten_internal(Arrays.stream(array), alwaysTrue, mapper);
     }
 
     /**
@@ -618,7 +763,7 @@ public class CollectionUtils {
     public static <T, R> Stream<R> flatten(T[] array,
         Predicate<T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return fla(Arrays.stream(array), predicate, mapper);
+        return flatten_internal(Arrays.stream(array), predicate, mapper);
     }
 
     /**
@@ -626,14 +771,14 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param collection The <code>Collection</code> to flatten.
+     * @param c The <code>Collection</code> to flatten.
      * @param mapper A mapping <code>Function</code> to apply.
      * @return A stream of the mapped collection.
      */
-    public static <T, R> Stream<R> flatten(Collection<T> collection,
+    public static <T, R> Stream<R> flatten(Collection<T> c,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return fla(collection.stream(), alwaysTrue, mapper);
+        return flatten_internal(c.stream(), alwaysTrue, mapper);
     }
 
     /**
@@ -641,15 +786,15 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param collection The <code>Collection</code> to flatten.
+     * @param c The <code>Collection</code> to flatten.
      * @param predicate A <code>Predicate</code> to filter the collection with.
      * @param mapper A mapping <code>Function</code> to apply.
      * @return A stream of the mapped collection.
      */
-    public static <T, R> Stream<R> flatten(Collection<T> collection,
+    public static <T, R> Stream<R> flatten(Collection<T> c,
         Predicate<T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return fla(collection.stream(), predicate, mapper);
+        return flatten_internal(c.stream(), predicate, mapper);
     }
 
     /**
@@ -664,7 +809,8 @@ public class CollectionUtils {
     public static <T, R> Stream<R> flatten(Stream<T> stream,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         final Predicate<T> alwaysTrue = t -> true;
-        return fla(stream, alwaysTrue, mapper);
+        return (stream == null) ? Stream.<R>empty()
+            : flatten_internal(stream, alwaysTrue, mapper);
     }
 
     /**
@@ -680,7 +826,8 @@ public class CollectionUtils {
     public static <T, R> Stream<R> flatten(Stream<T> stream,
         Predicate<T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return fla(stream, predicate, mapper);
+        return (stream == null) ? Stream.<R>empty()
+            : flatten_internal(stream, predicate, mapper);
     }
 
     /**
@@ -693,12 +840,25 @@ public class CollectionUtils {
      * @param mapper A mapping <code>Function</code> to apply.
      * @return A stream of the mapped stream.
      */
-    private static <T, R> Stream<R> fla(Stream<T> stream,
+    private static <T, R> Stream<R> flatten_internal(Stream<T> stream,
         Predicate<T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         return stream.filter(predicate).flatMap(mapper);
     }
-    
+
+    /**
+     * Convenience function to convert a stream to an iterable.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to convert.
+     * @return The suitable <code>Iterable</code>.
+     */
+    public static <T> Iterable<T> iterable(final Stream<T> stream) {
+        return new Iterable<T>() {
+            public Iterator<T> iterator() { return stream.iterator(); }
+        };
+    }
+
     /**
      * Create a stream from an array and an immediate mapping transform.
      *
@@ -709,8 +869,8 @@ public class CollectionUtils {
      * @return The resulting <code>Stream</code>.
      */
     public static <T,R> Stream<R> map(T[] array,
-                                      Function<? super T,? extends R> mapper) {
-        return map(Arrays.stream(array), mapper);
+        Function<? super T,? extends R> mapper) {
+        return map_internal(Arrays.stream(array), mapper);
     }
 
     /**
@@ -718,13 +878,13 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param collection The <code>Collection</code> to search.
+     * @param c The <code>Collection</code> to search.
      * @param mapper A mapping <code>Function</code> to apply.
      * @return The resulting <code>Stream</code>.
      */
-    public static <T,R> Stream<R> map(Collection<T> collection,
-                                      Function<? super T,? extends R> mapper) {
-        return map(collection.stream(), mapper);
+    public static <T,R> Stream<R> map(Collection<T> c,
+        Function<? super T,? extends R> mapper) {
+        return map_internal(c.stream(), mapper);
     }
 
     /**
@@ -735,8 +895,47 @@ public class CollectionUtils {
      * @return The resulting <code>Stream</code>.
      */
     public static <T,R> Stream<R> map(Stream<T> stream,
-                                      Function<? super T,? extends R> mapper) {
+        Function<? super T,? extends R> mapper) {
+        return (stream == null) ? Stream.<R>empty()
+            : map_internal(stream, mapper);
+    }
+
+    /**
+     * Implement map.
+     *
+     * @param stream The <code>Stream</code> to map.
+     * @param mapper A mapping <code>Function</code> to apply.
+     * @return The resulting <code>Stream</code>.
+     */
+    private static <T,R> Stream<R> map_internal(Stream<T> stream,
+        Function<? super T,? extends R> mapper) {
         return stream.map(mapper);
+    }
+
+    /**
+     * Find the maximum int value in an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The maximum value found, or zero if the input is empty.
+     */
+    public static <T> int max(T[] array, ToIntFunction<T> tif) {
+        return max_internal(Arrays.stream(array), t -> true, tif);
+    }
+
+    /**
+     * Find the maximum int value in an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The maximum value found, or zero if the input is empty.
+     */
+    public static <T> int max(T[] array, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return max_internal(Arrays.stream(array), t -> true, tif);
     }
 
     /**
@@ -748,7 +947,7 @@ public class CollectionUtils {
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Collection<T> c, ToIntFunction<T> tif) {
-        return max(c.stream(), t -> true, tif);
+        return max_internal(c.stream(), t -> true, tif);
     }
 
     /**
@@ -774,7 +973,8 @@ public class CollectionUtils {
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Stream<T> stream, ToIntFunction<T> tif) {
-        return max(stream, t -> true, tif);
+        return (stream == null) ? MAX_DEFAULT
+            : max_internal(stream, t -> true, tif);
     }
 
     /**
@@ -788,7 +988,52 @@ public class CollectionUtils {
      */
     public static <T> int max(Stream<T> stream, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
-        return stream.filter(predicate).mapToInt(tif).max().orElse(0);
+        return (stream == null) ? MAX_DEFAULT
+            : max_internal(stream, predicate, tif);
+    }
+
+    /**
+     * Implement max.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The maximum value found, or zero if the input is empty.
+     */
+    private static <T> int max_internal(Stream<T> stream,
+                                        Predicate<T> predicate,
+                                        ToIntFunction<T> tif) {
+        return stream.filter(predicate).mapToInt(tif).max()
+            .orElse(MAX_DEFAULT);
+    }
+
+    /**
+     * Find the selected member of an array that maximizes according
+     * to a given comparison.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to maximize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(T[] array, Comparator<? super T> comparator) {
+        return maximize_internal(Arrays.stream(array), p -> true, comparator);
+    }
+
+    /**
+     * Find the selected member of a collection that maximizes according
+     * to a given comparison.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to maximize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    public static <T> T maximize(T[] array, Predicate<T> predicate,
+                                 Comparator<? super T> comparator) {
+        return maximize_internal(Arrays.stream(array), predicate, comparator);
     }
 
     /**
@@ -802,7 +1047,7 @@ public class CollectionUtils {
      */
     public static <T> T maximize(Collection<T> c,
                                  Comparator<? super T> comparator) {
-        return maximize(c.stream(), p -> true, comparator);
+        return maximize_internal(c.stream(), p -> true, comparator);
     }
 
     /**
@@ -817,7 +1062,7 @@ public class CollectionUtils {
      */
     public static <T> T maximize(Collection<T> c, Predicate<T> predicate,
                                  Comparator<? super T> comparator) {
-        return maximize(c.stream(), predicate, comparator);
+        return maximize_internal(c.stream(), predicate, comparator);
     }
 
     /**
@@ -831,7 +1076,8 @@ public class CollectionUtils {
      */
     public static <T> T maximize(Stream<T> stream,
                                  Comparator<? super T> comparator) {
-        return maximize(stream, p -> true, comparator);
+        return (stream == null) ? null
+            : maximize_internal(stream, p -> true, comparator);
     }
 
     /**
@@ -846,8 +1092,50 @@ public class CollectionUtils {
      */
     public static <T> T maximize(Stream<T> stream, Predicate<T> predicate,
                                  Comparator<? super T> comparator) {
+        return (stream == null) ? null
+            : maximize_internal(stream, predicate, comparator);
+    }
+
+    /**
+     * Implement maximize.
+     *
+     * @param <T> The collection member type.
+     * @param stream The <code>Stream</code> to maximize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The maximal value found, or null if none present.
+     */
+    private static <T> T maximize_internal(Stream<T> stream,
+                                           Predicate<T> predicate,
+                                           Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.maxBy(comparator))
             .orElse(null);
+    }
+
+    /**
+     * Find the minimum int value in an array.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(T[] array, ToIntFunction<T> tif) {
+        return min_internal(Arrays.stream(array), t -> true, tif);
+    }
+
+    /**
+     * Find the minimum int value in an array.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    public static <T> int min(T[] array, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return min_internal(Arrays.stream(array), predicate, tif);
     }
 
     /**
@@ -859,7 +1147,7 @@ public class CollectionUtils {
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Collection<T> c, ToIntFunction<T> tif) {
-        return min(c.stream(), t -> true, tif);
+        return min_internal(c.stream(), t -> true, tif);
     }
 
     /**
@@ -873,7 +1161,7 @@ public class CollectionUtils {
      */
     public static <T> int min(Collection<T> c, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
-        return min(c.stream(), predicate, tif);
+        return min_internal(c.stream(), predicate, tif);
     }
 
     /**
@@ -885,7 +1173,8 @@ public class CollectionUtils {
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Stream<T> stream, ToIntFunction<T> tif) {
-        return min(stream, t -> true, tif);
+        return (stream == null) ? MIN_DEFAULT
+            : min_internal(stream, t -> true, tif);
     }
 
     /**
@@ -899,8 +1188,53 @@ public class CollectionUtils {
      */
     public static <T> int min(Stream<T> stream, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
+        return (stream == null) ? MIN_DEFAULT
+            : min_internal(stream, predicate, tif);
+    }
+
+    /**
+     * Implement min.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @return The minimum value found, or zero if the input is empty.
+     */
+    private static <T> int min_internal(Stream<T> stream,
+                                        Predicate<T> predicate,
+                                        ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).min()
-            .orElse(Integer.MAX_VALUE);
+            .orElse(MIN_DEFAULT);
+    }
+
+    /**
+     * Find the selected member of an array that minimizes according
+     * to a given comparison.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to minimize from.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(T[] array,
+                                 Comparator<? super T> comparator) {
+        return minimize_internal(Arrays.stream(array), t -> true, comparator);
+    }
+
+    /**
+     * Find the selected member of a collection that minimizes according
+     * to a given comparison.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to minimize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    public static <T> T minimize(T[] array, Predicate<T> predicate,
+                                 Comparator<? super T> comparator) {
+        return minimize_internal(Arrays.stream(array), predicate, comparator);
     }
 
     /**
@@ -914,7 +1248,7 @@ public class CollectionUtils {
      */
     public static <T> T minimize(Collection<T> c,
                                  Comparator<? super T> comparator) {
-        return minimize(c.stream(), t -> true, comparator);
+        return minimize_internal(c.stream(), t -> true, comparator);
     }
 
     /**
@@ -929,7 +1263,7 @@ public class CollectionUtils {
      */
     public static <T> T minimize(Collection<T> c, Predicate<T> predicate,
                                  Comparator<? super T> comparator) {
-        return minimize(c.stream(), predicate, comparator);
+        return minimize_internal(c.stream(), predicate, comparator);
     }
 
     /**
@@ -943,7 +1277,8 @@ public class CollectionUtils {
      */
     public static <T> T minimize(Stream<T> stream,
                                  Comparator<? super T> comparator) {
-        return minimize(stream, t -> true, comparator);
+        return (stream == null) ? null
+            : minimize_internal(stream, t -> true, comparator);
     }
 
     /**
@@ -958,8 +1293,99 @@ public class CollectionUtils {
      */
     public static <T> T minimize(Stream<T> stream, Predicate<T> predicate,
                                  Comparator<? super T> comparator) {
+        return (stream == null) ? null
+            : minimize_internal(stream, predicate, comparator);
+    }
+
+    /**
+     * Implement minimize.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to minimize from.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param comparator A <code>Comparator</code> to compare with.
+     * @return The minimal value found, or null if none present.
+     */
+    private static <T> T minimize_internal(Stream<T> stream,
+                                           Predicate<T> predicate,
+                                           Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.minBy(comparator))
             .orElse(null);
+    }
+
+    /**
+     * Do none of the members of an array match a predicate?
+     *
+     * @param <T> The array member type.
+     * @param array The array to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if no member passes the predicate test.
+     */
+    public static <T> boolean none(T[] array, Predicate<T> predicate) {
+        return none_internal(Arrays.stream(array), predicate);
+    }
+
+    /**
+     * Do none of the members of a collection match a predicate?
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if no member passes the predicate test.
+     */
+    public static <T> boolean none(Collection<T> c, Predicate<T> predicate) {
+        return none_internal(c.stream(), predicate);
+    }
+
+    /**
+     * Do none of the members of a stream match a predicate?
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if no member passes the predicate test.
+     */
+    public static <T> boolean none(Stream<T> stream, Predicate<T> predicate) {
+        return (stream == null) ? true : none_internal(stream, predicate);
+    }
+
+    /**
+     * Implementation of none().
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @param predicate The <code>Predicate</code> to test with.
+     * @return True if no member passes the predicate test.
+     */
+    private static <T> boolean none_internal(Stream<T> stream,
+                                             Predicate<T> predicate) {
+        return stream.noneMatch(predicate);
+    }
+
+    /**
+     * Take the sum of the members of an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to sum.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(T[] array, ToIntFunction<T> tif) {
+        return sum_internal(Arrays.stream(array), x -> true, tif);
+    }
+
+    /**
+     * Take the sum of the members of an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(T[] array, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return sum_internal(Arrays.stream(array), predicate, tif);
     }
 
     /**
@@ -971,21 +1397,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     public static <T> int sum(Collection<T> c, ToIntFunction<T> tif) {
-        return sum(c.stream(), x -> true, tif);
-    }
-
-    /**
-     * Take the sum of the members of a collection.
-     *
-     * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to sum.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members
-     *     to a double.
-     * @return The sum of the values found.
-     */
-    public static <T> double sumDouble(Collection<T> c,
-                                       ToDoubleFunction<T> tdf) {
-        return sumDouble(c.stream(), x -> true, tdf);
+        return sum_internal(c.stream(), x -> true, tif);
     }
 
     /**
@@ -999,7 +1411,92 @@ public class CollectionUtils {
      */
     public static <T> int sum(Collection<T> c, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
-        return sum(c.stream(), predicate, tif);
+        return sum_internal(c.stream(), predicate, tif);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to sum.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Stream<T> stream, ToIntFunction<T> tif) {
+        return (stream == null) ? SUM_DEFAULT
+            : sum_internal(stream, x -> true, tif);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    public static <T> int sum(Stream<T> stream, Predicate<T> predicate,
+                              ToIntFunction<T> tif) {
+        return (stream == null) ? SUM_DEFAULT
+            : sum_internal(stream, predicate, tif);
+    }
+
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @return The sum of the values found.
+     */
+    private static <T> int sum_internal(Stream<T> stream,
+                                        Predicate<T> predicate,
+                                        ToIntFunction<T> tif) {
+        return stream.filter(predicate).mapToInt(tif).sum();
+    }
+
+    /**
+     * Take the sum of the members of an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to sum.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     *     to a double.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(T[] array, ToDoubleFunction<T> tdf) {
+        return sumDouble_internal(Arrays.stream(array), x -> true, tdf);
+    }
+
+    /**
+     * Take the sum of the members of an array.
+     *
+     * @param <T> The collection member type.
+     * @param array The array to sum.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tdf A <code>ToDoubleFunction</code> to map the stream to
+     *     double with.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(T[] array, Predicate<T> predicate,
+                                       ToDoubleFunction<T> tdf) {
+        return sumDouble_internal(Arrays.stream(array), predicate, tdf);
+    }
+
+    /**
+     * Take the sum of the members of a collection.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to sum.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     *     to a double.
+     * @return The sum of the values found.
+     */
+    public static <T> double sumDouble(Collection<T> c,
+                                       ToDoubleFunction<T> tdf) {
+        return sumDouble_internal(c.stream(), x -> true, tdf);
     }
 
     /**
@@ -1014,19 +1511,7 @@ public class CollectionUtils {
      */
     public static <T> double sumDouble(Collection<T> c, Predicate<T> predicate,
                                        ToDoubleFunction<T> tdf) {
-        return sumDouble(c.stream(), predicate, tdf);
-    }
-
-    /**
-     * Take the sum of the members of a stream.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
-     * @return The sum of the values found.
-     */
-    public static <T> int sum(Stream<T> stream, ToIntFunction<T> tif) {
-        return sum(stream, x -> true, tif);
+        return sumDouble_internal(c.stream(), predicate, tdf);
     }
 
     /**
@@ -1040,21 +1525,8 @@ public class CollectionUtils {
      */
     public static <T> double sumDouble(Stream<T> stream,
                                        ToDoubleFunction<T> tdf) {
-        return sumDouble(stream, x -> true, tdf);
-    }
-
-    /**
-     * Take the sum of the members of a stream.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param predicate A <code>Predicate</code> to select members.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
-     * @return The sum of the values found.
-     */
-    public static <T> int sum(Stream<T> stream, Predicate<T> predicate,
-                              ToIntFunction<T> tif) {
-        return stream.filter(predicate).mapToInt(tif).sum();
+        return (stream == null) ? SUM_DOUBLE_DEFAULT
+            : sumDouble_internal(stream, x -> true, tdf);
     }
 
     /**
@@ -1069,6 +1541,22 @@ public class CollectionUtils {
     public static <T> double sumDouble(Stream<T> stream,
                                        Predicate<T> predicate,
                                        ToDoubleFunction<T> tdf) {
+        return (stream == null) ? SUM_DOUBLE_DEFAULT
+            : sumDouble_internal(stream, predicate, tdf);
+    }
+  
+    /**
+     * Take the sum of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to sum.
+     * @param predicate A <code>Predicate</code> to select members.
+     * @param tdf A <code>ToIntFunction</code> to convert members to a double.
+     * @return The sum of the values found.
+     */
+    private static <T> double sumDouble_internal(Stream<T> stream,
+                                                 Predicate<T> predicate,
+                                                 ToDoubleFunction<T> tdf) {
         return stream.filter(predicate).mapToDouble(tdf).sum();
     }
 
@@ -1080,7 +1568,7 @@ public class CollectionUtils {
      * @return A map of the stream contents.
      */
     public static <T> List<T> toList(T[] array) {
-        return toList(Arrays.stream(array));
+        return toList_internal(Arrays.stream(array));
     }
 
     /**
@@ -1091,7 +1579,7 @@ public class CollectionUtils {
      * @return A map of the stream contents.
      */
     public static <T> Collection<T> toList(Collection<T> collection) {
-        return toList(collection.stream());
+        return toList_internal(collection.stream());
     }
 
     /**
@@ -1102,6 +1590,18 @@ public class CollectionUtils {
      * @return A list of the stream contents.
      */
     public static <T> List<T> toList(Stream<T> stream) {
+        return (stream == null) ? Collections.<T>emptyList()
+            : toList_internal(stream);
+    }
+    
+    /**
+     * Implement toList.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @return A list of the stream contents.
+     */
+    private static <T> List<T> toList_internal(Stream<T> stream) {
         return stream.collect(Collectors.toList());
     }
 
@@ -1114,32 +1614,8 @@ public class CollectionUtils {
      */
     public static <T extends Comparable<? super T>> List<T>
         toSortedList(T[] array) {
-        return toSortedList(Arrays.stream(array));
-    }
-
-    /**
-     * Convenience function to convert a collection to a sorted list.
-     *
-     * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to convert.
-     * @return A list of the stream contents.
-     */
-    public static <T extends Comparable<? super T>> List<T>
-        toSortedList(Collection<T> collection) {
-        return toSortedList(collection.stream());
-    }
-
-    /**
-     * Convenience function to collect a stream to a list.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @return A list of the stream contents.
-     */
-    public static <T extends Comparable<? super T>> List<T>
-        toSortedList(Stream<T> stream) {
         final Comparator<T> comparator = Comparator.naturalOrder();
-        return toSortedList(stream, comparator);
+        return toSortedList_internal(Arrays.stream(array), comparator);
     }
 
     /**
@@ -1152,20 +1628,47 @@ public class CollectionUtils {
      */
     public static <T> List<T> toSortedList(T[] array,
                                            Comparator<? super T> comparator) {
-        return toSortedList(Arrays.stream(array), comparator);
+        return toSortedList_internal(Arrays.stream(array), comparator);
+    }
+
+    /**
+     * Convenience function to convert a collection to a sorted list.
+     *
+     * @param <T> The collection member type.
+     * @param collection The <code>Collection</code> to convert.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T>
+        toSortedList(Collection<T> collection) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return toSortedList_internal(collection.stream(), comparator);
     }
 
     /**
      * Convenience function to convert a collection to a map.
      *
      * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to convert.
+     * @param c The <code>Collection</code> to convert.
      * @param comparator A <code>Comparator</code> to sort with.
      * @return A map of the stream contents.
      */
-    public static <T> List<T> toSortedList(Collection<T> collection,
+    public static <T> List<T> toSortedList(Collection<T> c,
                                            Comparator<? super T> comparator) {
-        return toSortedList(collection.stream(), comparator);
+        return toSortedList_internal(c.stream(), comparator);
+    }
+
+    /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T>
+        toSortedList(Stream<T> stream) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return (stream == null) ? Collections.<T>emptyList()
+            : toSortedList_internal(stream, comparator);
     }
 
     /**
@@ -1178,7 +1681,38 @@ public class CollectionUtils {
      */
     public static <T> List<T> toSortedList(Stream<T> stream,
                                            Comparator<? super T> comparator) {
+        return (stream == null) ? Collections.<T>emptyList()
+            : toSortedList_internal(stream, comparator);
+    }
+
+    /**
+     * Implement toSortedList.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    private static <T> List<T> toSortedList_internal(Stream<T> stream,
+                                                     Comparator<? super T> comparator) {
         return stream.sorted(comparator).collect(Collectors.toList());
+    }
+
+    /**
+     * Convenience function to convert an array to a map.
+     *
+     * @param <T> The collection member type.
+     * @param <K> The key mapper function.
+     * @param <V> The value mapper function.
+     * @param array The array to convert.
+     * @param keyMapper A mapping function from datum to key.
+     * @param valueMapper A mapping function from datum to value.
+     * @return A map of the stream contents.
+     */
+    public static <T,K,V> Map<K,V> toMap(T[] array,
+        Function<? super T, ? extends K> keyMapper,
+        Function<? super T, ? extends V> valueMapper) {
+        return toMap_internal(Arrays.stream(array), keyMapper, valueMapper);
     }
 
     /**
@@ -1187,15 +1721,15 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param <K> The key mapper function.
      * @param <V> The value mapper function.
-     * @param collection The <code>Collection</code> to convert.
+     * @param c The <code>Collection</code> to convert.
      * @param keyMapper A mapping function from datum to key.
      * @param valueMapper A mapping function from datum to value.
      * @return A map of the stream contents.
      */
-    public static <T,K,V> Map<K,V> toMap(Collection<T> collection,
+    public static <T,K,V> Map<K,V> toMap(Collection<T> c,
         Function<? super T, ? extends K> keyMapper,
         Function<? super T, ? extends V> valueMapper) {
-        return toMap(collection.stream(), keyMapper, valueMapper);
+        return toMap_internal(c.stream(), keyMapper, valueMapper);
     }
 
     /**
@@ -1212,7 +1746,47 @@ public class CollectionUtils {
     public static <T,K,V> Map<K,V> toMap(Stream<T> stream,
         Function<? super T, ? extends K> keyMapper,
         Function<? super T, ? extends V> valueMapper) {
+        return (stream == null) ? Collections.<K,V>emptyMap()
+            : toMap_internal(stream, keyMapper, valueMapper);
+    }
+
+    /**
+     * Implement toMap.
+     *
+     * @param <T> The stream member type.
+     * @param <K> The key mapper function.
+     * @param <V> The value mapper function.
+     * @param stream The <code>Stream</code> to collect.
+     * @param keyMapper A mapping function from datum to key.
+     * @param valueMapper A mapping function from datum to value.
+     * @return A map of the stream contents.
+     */
+    private static <T,K,V> Map<K,V> toMap_internal(Stream<T> stream,
+        Function<? super T, ? extends K> keyMapper,
+        Function<? super T, ? extends V> valueMapper) {
         return stream.collect(Collectors.toMap(keyMapper, valueMapper));
+    }
+
+    /**
+     * Convenience function to collect an array to a set.
+     *
+     * @param <T> The member type.
+     * @param array The array to collect from.
+     * @return A set of the stream contents.
+     */
+    public static <T> Set<T> toSet(T[] array) {
+        return toSet_internal(Arrays.stream(array));
+    }
+
+    /**
+     * Convenience function to collect an collection to a set.
+     *
+     * @param <T> The stream member type.
+     * @param c The <code>Collection</code> to collect.
+     * @return A set of the stream contents.
+     */
+    public static <T> Set<T> toSet(Collection<T> c) {
+        return toSet_internal(c.stream());
     }
 
     /**
@@ -1223,6 +1797,18 @@ public class CollectionUtils {
      * @return A set of the stream contents.
      */
     public static <T> Set<T> toSet(Stream<T> stream) {
+        return (stream == null) ? Collections.<T>emptySet()
+            : toSet_internal(stream);
+    }
+
+    /**
+     * Implement toSet.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @return A set of the stream contents.
+     */
+    private static <T> Set<T> toSet_internal(Stream<T> stream) {
         return stream.collect(Collectors.toSet());
     }
 
@@ -1230,15 +1816,29 @@ public class CollectionUtils {
      * Transform the contents of an array.
      *
      * @param <T> The array member type.
-     * @param <C> The resulting collection type.
      * @param array The array to transform.
      * @param predicate A <code>Predicate</code> to select the items.
-     * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the predicate matches.
      */
-    public static <T,C> C transform(T[] array, Predicate<T> predicate,
-                                    Collector<T,?,C> collector) {
-        return fmc(Arrays.stream(array), predicate, i -> i, collector);
+    public static <T> List<T> transform(T[] array, Predicate<T> predicate) {
+        return transform_internal(Arrays.stream(array), predicate, i -> i,
+                                  Collectors.toList());
+    }
+
+    /**
+     * Transform the contents of an array.
+     *
+     * @param <T> The array member type.
+     * @param <R> The resulting collection member type.
+     * @param array The array to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return The result of collecting the mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(T[] array, Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        return transform_internal(Arrays.stream(array), predicate, mapper,
+                                  Collectors.toList());
     }
 
     /**
@@ -1250,29 +1850,45 @@ public class CollectionUtils {
      * @param array The array to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
+     * @param collector A <code>Collector</code> to collect the items.
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(T[] array, Predicate<T> predicate,
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
-        return fmc(Arrays.stream(array), predicate, mapper, collector);
+        return transform_internal(Arrays.stream(array), predicate, mapper,
+                                  collector);
     }
 
     /**
      * Transform the contents of a collection.
      *
      * @param <T> The collection member type.
-     * @param <C> The resulting collection type.
-     * @param collection The <code>Collection</code> to transform.
+     * @param c The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
-     * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the predicate matches.
      */
-    public static <T,C> C transform(Collection<T> collection,
-                                    Predicate<T> predicate,
-                                    Collector<T,?,C> collector) {
-        return fmc(collection.stream(), predicate, i -> i, collector);
+    public static <T> List<T> transform(Collection<T> c,
+                                        Predicate<T> predicate) {
+        return transform_internal(c.stream(), predicate, i -> i,
+                                  Collectors.toList());
+    }
+
+    /**
+     * Transform the contents of a collection.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
+     * @param c The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return The result of collecting the mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(Collection<T> c,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        return transform_internal(c.stream(), predicate, mapper,
+                                  Collectors.toList());
     }
 
     /**
@@ -1281,32 +1897,31 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
-     * @param collection The <code>Collection</code> to transform.
+     * @param c The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
-    public static <T,R,C> C transform(Collection<T> collection,
+    public static <T,R,C> C transform(Collection<T> c,
                                       Predicate<T> predicate,
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
-        return fmc(collection.stream(), predicate, mapper, collector);
+        return transform_internal(c.stream(), predicate, mapper, collector);
     }
 
     /**
      * Transform the contents of a stream.
      *
      * @param <T> The stream type.
-     * @param <C> The resulting collection type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
-     * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the predicate matches.
      */
-    public static <T,C> C transform(Stream<T> stream, Predicate<T> predicate,
-                                    Collector<T,?,C> collector) {
-        return fmc(stream, predicate, i -> i, collector);
+    public static <T> List<T> transform(Stream<T> stream,
+                                        Predicate<T> predicate) {
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transform_internal(s, predicate, i -> i, Collectors.toList());
     }
 
     /**
@@ -1314,6 +1929,23 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting collection member type.
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return The result of collecting the mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transform_internal(s, predicate, mapper, Collectors.toList());
+    }
+
+    /**
+     * Transform the contents of a stream.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
@@ -1321,10 +1953,12 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
-    public static <T,R,C> C transform(Stream<T> stream, Predicate<T> predicate,
+    public static <T,R,C> C transform(Stream<T> stream,
+                                      Predicate<T> predicate,
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
-        return fmc(stream, predicate, mapper, collector);
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transform_internal(s, predicate, mapper, collector);
     }
 
     /**
@@ -1339,9 +1973,10 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
-    private static <T,R,C> C fmc(Stream<T> stream, Predicate<T> predicate,
-                                 Function<? super T, ? extends R> mapper,
-                                 Collector<R,?,C> collector) {
+    private static <T,R,C> C transform_internal(Stream<T> stream,
+                                                Predicate<T> predicate,
+                                                Function<? super T, ? extends R> mapper,
+                                                Collector<R,?,C> collector) {
         return stream.filter(predicate).map(mapper).collect(collector);
     }
 
@@ -1350,20 +1985,17 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
      * @param array The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
+     * @return The sorted list of the mapped predicate matches.
      */
-    public static <T,R extends Comparable<? super R>,C> C
-        transformAndSort(T[] array, Predicate<T> predicate,
-                         Function<? super T, ? extends R> mapper,
-                         Collector<R,?,C> collector) {
+    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(T[] array,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return fmcs(Arrays.stream(array), predicate, mapper, comparator,
-                    collector);
+        return transformAndSort_internal(Arrays.stream(array), predicate,
+                                         mapper, comparator);
     }
 
     /**
@@ -1371,20 +2003,18 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
      * @param array The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @param comparator A <code>Comparator</code> to sort with.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
+     * @return The sorted list of the mapped predicate matches.
      */
-    public static <T,R,C> C transformAndSort(T[] array, Predicate<T> predicate,
-                                             Function<? super T, ? extends R> mapper,
-                                             Comparator<? super R> comparator,
-                                             Collector<R,?,C> collector) {
-        return fmcs(Arrays.stream(array), predicate, mapper, comparator,
-                    collector);
+    public static <T,R> List<R> transformAndSort(T[] array,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
+        return transformAndSort_internal(Arrays.stream(array), predicate,
+                                         mapper, comparator);
     }
 
     /**
@@ -1392,41 +2022,17 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
      * @param collection The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
+     * @return The sorted list of the mapped predicate matches.
      */
-    public static <T,R extends Comparable<? super R>,C> C
-        transformAndSort(Collection<T> collection,
-                         Predicate<T> predicate,
-                         Function<? super T, ? extends R> mapper,
-                         Collector<R,?,C> collector) {
+    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(Collection<T> c,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
         final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return fmcs(collection.stream(), predicate, mapper, comparator,
-                    collector);
-    }
-
-    /**
-     * Transform and sort the contents of a collection.
-     *
-     * @param <T> The collection member type.
-     * @param <C> The resulting collection type.
-     * @param collection The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
-     */
-    public static <T extends Comparable<? super T>,C> C
-        transformAndSort(Collection<T> collection,
-                         Predicate<T> predicate,
-                         Comparator<? super T> comparator,
-                         Collector<T,?,C> collector) {
-        return fmcs(collection.stream(), predicate, i -> i, comparator,
-                    collector);
+        return transformAndSort_internal(c.stream(), predicate, mapper,
+                                         comparator);
     }
 
     /**
@@ -1434,64 +2040,126 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
-     * @param collection The <code>Collection</code> to transform.
+     * @param c The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @param comparator A <code>Comparator</code> to sort with.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
+     * @return The sorted list of the mapped predicate matches.
      */
-    public static <T,R,C> C transformAndSort(Collection<T> collection,
-                                             Predicate<T> predicate,
-                                             Function<? super T, ? extends R> mapper,
-                                             Comparator<? super R> comparator,
-                                             Collector<R,?,C> collector) {
-        return fmcs(collection.stream(), predicate, mapper, comparator,
-                    collector);
+    public static <T,R> List<R> transformAndSort(Collection<T> c,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
+        return transformAndSort_internal(c.stream(), predicate, mapper,
+                                         comparator);
     }
 
     /**
-     * Underlying implementation for the sorted transform functions.
+     * Transform and sort the contents of a stream.
      *
-     * @param <T> The stream member type.
+     * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return The sorted list of the mapped predicate matches.
+     */
+    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        final Comparator<? super R> comparator = Comparator.naturalOrder();
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transformAndSort_internal(s, predicate, mapper, comparator);
+    }
+
+    /**
+     * Transform and sort the contents of a collection.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @param comparator A <code>Comparator</code> to sort with.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The sorted result of collecting the mapped predicate matches.
+     * @return The sorted list of the mapped predicate matches.
      */
-    private static <T,R,C> C fmcs(Stream<T> stream, Predicate<T> predicate,
-                                  Function<? super T, ? extends R> mapper,
-                                  Comparator<? super R> comparator,
-                                  Collector<R,?,C> collector) {
+    public static <T,R> List<R> transformAndSort(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transformAndSort_internal(s, predicate, mapper, comparator);
+    }
+
+    /**
+     * Implement transformAndSort.
+     *
+     * @param <T> The stream member type.
+     * @param <R> The resulting collection member type.
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return The sorted list of the mapped predicate matches.
+     */
+    private static <T,R> List<R> transformAndSort_internal(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
         return stream.filter(predicate).map(mapper).sorted(comparator)
-            .collect(collector);
+            .collect(Collectors.toList());
     }
     
+    /**
+     * Transform and return distinct items from an array.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
+     * @param array The array to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return The sorted list of the mapped predicate matches.
+     */
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(T[] array,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(Arrays.stream(array), predicate,
+                                          mapper, comp);
+    }
+
     /**
      * Transform and return distinct items from a collection.
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
      * @param collection The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The result of collecting the mapped predicate matches and
-     *     removing duplicates.
+     * @return A list of mapped predicate matches without duplicates.
      */
-    public static <T,R extends Comparable<? super R>,C> C
-        transformDistinct(Collection<T> collection, Predicate<T> predicate,
-                          Function<? super T, ? extends R> mapper,
-                          Collector<R,?,C> collector) {
-        final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return fmcd(collection.stream(), predicate, mapper, comparator,
-                    collector);
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Collection<T> c,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(c.stream(), predicate, mapper, comp);
+    }
+
+    /**
+     * Transform and return distinct items from a stream.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @return A list of mapped predicate matches without duplicates.
+     */
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper) {
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(stream, predicate, mapper, comp);
     }
 
     /**
@@ -1499,33 +2167,17 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting collection member type.
-     * @param <C> The resulting collection type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @param collector A <code>Collector</code> to aggregate the results.
-     * @return The result of collecting the mapped predicate matches and
-     *     removing duplicates.
+     * @param comaprator A <code>Comparator</code> to sort with.
+     * @return A list of mapped predicate matches without duplicates.
      */
-    private static <T,R,C> C fmcd(Stream<T> stream, Predicate<T> predicate,
-                                  Function<? super T, ? extends R> mapper,
-                                  Comparator<? super R> comparator,
-                                  Collector<R,?,C> collector) {
+    private static <T,R> List<R> transformDistinct_internal(Stream<T> stream,
+        Predicate<T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
         return stream.filter(predicate).map(mapper).sorted(comparator)
-            .distinct().collect(collector);
-    }
-    
-    /**
-     * Convenience function to convert a stream to an iterable.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to convert.
-     * @return The suitable <code>Iterable</code>.
-     */
-    public static <T> Iterable<T> iterable(final Stream<T> stream) {
-        return new Iterable<T>() {
-            public Iterator<T> iterator() { return stream.iterator(); }
-        };
+            .distinct().collect(Collectors.toList());
     }
 }

@@ -263,9 +263,8 @@ public class ColonyPlan {
      * @return A list of food producing plans.
      */
     public List<WorkLocationPlan> getFoodPlans() {
-        return transform(workPlans,
-            wp -> wp.isFoodPlan() && !wp.getWorkLocation().canAutoProduce(),
-            Collectors.toList());
+        return transform(workPlans, wp -> wp.isFoodPlan()
+            && !wp.getWorkLocation().canAutoProduce());
     }
 
     /**
@@ -275,9 +274,8 @@ public class ColonyPlan {
      * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
-        return transform(workPlans,
-            wp -> !wp.isFoodPlan() && !wp.getWorkLocation().canAutoProduce(),
-            Collectors.toList());
+        return transform(workPlans, wp -> !wp.isFoodPlan()
+            && !wp.getWorkLocation().canAutoProduce());
     }
 
     /**
@@ -896,7 +894,7 @@ public class ColonyPlan {
         if (colony.getSoL() < 100) {
             produce.addAll(0, transformAndSort(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
-                    productionComparator, Collectors.toList()));
+                    gt -> gt, productionComparator));
         }
 
         // Always add raw/building materials first.
@@ -909,8 +907,7 @@ public class ColonyPlan {
                     && (colony.getGoodsCount(gt.getInputType())
                         >= GoodsContainer.CARGO_SIZE/2
                         || production.containsKey(gt.getInputType())),
-                Comparator.comparingInt(indexer).reversed(),
-                Collectors.toList()));
+                gt -> gt, Comparator.comparingInt(indexer).reversed()));
 
         for (int i = toAdd.size()-1; i >= 0; i--) {
             GoodsType make = toAdd.get(i);
@@ -930,14 +927,14 @@ public class ColonyPlan {
 
         // Military goods after lucrative production.
         produce.addAll(transformAndSort(militaryGoodsTypes,
-                gt -> production.containsKey(gt), productionComparator,
-                Collectors.toList()));
+                                        gt -> production.containsKey(gt),
+                                        gt -> gt, productionComparator));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
             produce.addAll(transformAndSort(immigrationGoodsTypes,
-                    gt -> production.containsKey(gt),
-                    productionComparator, Collectors.toList()));
+                                            gt -> production.containsKey(gt),
+                                            gt -> gt, productionComparator));
         }
     }
 

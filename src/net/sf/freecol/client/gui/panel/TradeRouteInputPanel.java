@@ -647,8 +647,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
             endIndex = startIndex+1;
         }
         List<GoodsType> cargo = transform(cargoPanel.getComponents(),
-            c -> c instanceof CargoLabel, c -> ((CargoLabel)c).getType(),
-            Collectors.toList());
+                                          c -> c instanceof CargoLabel,
+                                          c -> ((CargoLabel)c).getType());
         int maxIndex = this.stopList.getMaxSelectionIndex();
         for (int i = startIndex; i < endIndex; i++) {
             String id = this.destinationSelector.getItemAt(i);

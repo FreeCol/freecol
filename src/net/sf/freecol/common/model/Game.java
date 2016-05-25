@@ -534,8 +534,7 @@ public class Game extends FreeColGameObject {
      */
     public List<Player> getLivePlayers(Player other) {
         return transform(players,
-            p -> !p.isUnknownEnemy() && !p.isDead() && p != other,
-            Collectors.toList());
+                         p -> !p.isUnknownEnemy() && !p.isDead() && p != other);
     }
 
     /**
@@ -558,8 +557,8 @@ public class Game extends FreeColGameObject {
      */
     public List<Player> getLiveEuropeanPlayers(Player other) {
         return transform(players,
-            p -> !p.isUnknownEnemy() && !p.isDead() && p != other && p.isEuropean(),
-            Collectors.toList());
+                         p -> !p.isUnknownEnemy() && !p.isDead()
+                             && p != other && p.isEuropean());
     }
 
     /**
@@ -570,8 +569,8 @@ public class Game extends FreeColGameObject {
      */
     public List<Player> getLiveNativePlayers(Player other) {
         return transform(players,
-            p -> !p.isUnknownEnemy() && !p.isDead() && p != other && p.isIndian(),
-            Collectors.toList());
+                         p -> !p.isUnknownEnemy() && !p.isDead()
+                             && p != other && p.isIndian());
     }
 
     /**
@@ -812,7 +811,7 @@ public class Game extends FreeColGameObject {
     public final List<Nation> getVacantNations() {
         return transform(nationOptions.getNations().entrySet(),
                          e -> e.getValue() == NationState.AVAILABLE,
-                         Entry::getKey, Collectors.toList());
+                         Entry::getKey);
     }
 
     /**

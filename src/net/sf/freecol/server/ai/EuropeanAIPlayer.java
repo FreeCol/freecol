@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
@@ -417,7 +418,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final List<GoodsType> arrears = new ArrayList<>();
         if (market != null) {
             arrears.addAll(transform(spec.getGoodsTypeList(),
-                    gt -> market.getArrears(gt) > 0, Collectors.toList()));
+                                     gt -> market.getArrears(gt) > 0));
         }
         final int nCheats = arrears.size() + 6; // 6 cheats + arrears
         int[] randoms = randomInts(logger, "cheats", air, 100, nCheats);
@@ -591,26 +592,26 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : (0.0f < naval && naval < 0.5f)
             ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
+        final Function<UnitType, RandomChoice<UnitType>> mapper = ut ->
+            new RandomChoice<>(ut, 100000 / europe.getUnitPrice(ut));
         if (randoms[cheatIndex++] < nNaval) {
             cheatUnit(transform(spec.getUnitTypeList(),
-                    ut -> ut.hasAbility(Ability.NAVAL_UNIT)
-                        && ut.isAvailableTo(player)
-                        && ut.hasPrice()
-                        && ut.isOffensive(),
-                    ut -> new RandomChoice<>(ut, 100000 / europe.getUnitPrice(ut)),
-                    Collectors.toList()), "offensive-naval", lb);
+                                ut -> ut.hasAbility(Ability.NAVAL_UNIT)
+                                    && ut.isAvailableTo(player)
+                                    && ut.hasPrice()
+                                    && ut.isOffensive(),
+                                mapper), "offensive-naval", lb);
         }
         // Only cheat carriers if they have work to do.
         int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
             : -1;
         if (randoms[cheatIndex++] < nCarrier) {
             cheatUnit(transform(spec.getUnitTypeList(),
-                    ut -> ut.hasAbility(Ability.NAVAL_UNIT)
-                        && ut.isAvailableTo(player)
-                        && ut.hasPrice()
-                        && ut.getSpace() > 0,
-                    ut -> new RandomChoice<>(ut, 100000 / europe.getUnitPrice(ut)),
-                    Collectors.toList()), "transport-naval", lb);
+                                ut -> ut.hasAbility(Ability.NAVAL_UNIT)
+                                    && ut.isAvailableTo(player)
+                                    && ut.hasPrice()
+                                    && ut.getSpace() > 0,
+                                mapper), "transport-naval", lb);
         }
 
         if (lb.grew("\n  Cheats: ")) lb.shrink(", ");
@@ -1135,7 +1136,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : transform(demand,
                         w -> w instanceof WorkerWish
                             && ((WorkerWish)w).getUnitType() == type,
-                        w -> (WorkerWish)w, Collectors.toList());
+                        w -> (WorkerWish)w);
     }
 
     /**
@@ -1151,7 +1152,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : transform(demand,
                         w -> w instanceof GoodsWish
                             && ((GoodsWish)w).getGoodsType() == type,
-                        w -> (GoodsWish)w, Collectors.toList());
+                        w -> (GoodsWish)w);
     }
 
     /**

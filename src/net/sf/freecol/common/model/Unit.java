@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -863,7 +864,7 @@ public class Unit extends GoodsLocation
      */
     public List<Role> getAvailableRoles(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRoles();
-        return transform(roles, r -> roleIsAvailable(r), Collectors.toList());
+        return transform(roles, r -> roleIsAvailable(r));
     }
 
     /**
@@ -3502,13 +3503,13 @@ public class Unit extends GoodsLocation
      * @return The missionary trade bonuses.
      */
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
+        final Function<Modifier, Modifier> mapper = m -> {
+            Modifier mod = new Modifier(m);
+            if (!sense) mod.setValue(-m.getValue());
+            return mod;
+        };
         return transform(getModifiers(Modifier.MISSIONARY_TRADE_BONUS),
-                         m -> m.getValue() != 0,
-                         m -> {
-                             Modifier mod = new Modifier(m);
-                             if (!sense) mod.setValue(-m.getValue());
-                             return mod;
-                         }, Collectors.toSet());
+                         m -> m.getValue() != 0, mapper, Collectors.toSet());
     }
 
     /**

@@ -75,8 +75,7 @@ public class MergeTranslations {
 
                 List<Entry<String,String>> missingProperties
                     = transform(sourceProperties.entrySet(),
-                                e -> !targetProperties.containsKey(e.getKey()),
-                                Collectors.toList());
+                                e -> !targetProperties.containsKey(e.getKey()));
                 if (!missingProperties.isEmpty()) {
                     try (
                         Writer out = Utils.getFileUTF8AppendWriter(targetFile)

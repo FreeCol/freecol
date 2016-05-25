@@ -1362,7 +1362,7 @@ public final class Specification {
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
         return transform(getUnitTypesWithAbility(Ability.REF_UNIT),
-            ut -> ut.isNaval() == naval, Collectors.toList());
+                         ut -> ut.isNaval() == naval);
     }
 
     /**
@@ -1496,7 +1496,7 @@ public final class Specification {
         if (militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
                 transformAndSort(roles, Role::isOffensive, r -> r,
-                    Role.militaryComparator, Collectors.toList()));
+                                 Role.militaryComparator));
         }
         return militaryRoles;
     }
@@ -1548,9 +1548,9 @@ public final class Specification {
      * @return A list of <code>Role</code>s suitable for REF units.
      */
     public List<Role> getREFRoles(boolean naval) {
-        return transform(((naval) ? Stream.of(getDefaultRole())
-                : getMilitaryRoles().stream()),
-            r -> r.requiresAbility(Ability.REF_UNIT), Collectors.toList());
+        Stream<Role> stream = (naval) ? Stream.of(getDefaultRole())
+            : getMilitaryRoles().stream();
+        return transform(stream, r -> r.requiresAbility(Ability.REF_UNIT));
     }
 
 
@@ -1576,10 +1576,10 @@ public final class Specification {
      */
     public List<OptionGroup> getDifficultyLevels() {
         OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
-        return transform(((group == null) ? Stream.<Option>empty()
-                : group.getOptions().stream()),
-            (Option o) -> o instanceof OptionGroup, o -> (OptionGroup)o,
-            Collectors.toList());
+        Stream<Option> stream = (group == null) ? Stream.<Option>empty()
+            : group.getOptions().stream();
+        return transform(stream, (Option o) -> o instanceof OptionGroup,
+                         o -> (OptionGroup)o);
     }
 
     /**
@@ -1778,9 +1778,9 @@ public final class Specification {
     public List<FreeColSpecObjectType> getTypesProviding(String id,
                                                          boolean value) {
         return transform(getAbilities(id),
-            a -> a.getValue() == value
-                && a.getSource() instanceof FreeColSpecObjectType,
-            a -> (FreeColSpecObjectType)a.getSource(), Collectors.toList());
+                         a -> a.getValue() == value
+                             && a.getSource() instanceof FreeColSpecObjectType,
+                         a -> (FreeColSpecObjectType)a.getSource());
     }
 
     /**
@@ -1796,9 +1796,9 @@ public final class Specification {
                       getTypesWithAbility(Class<T> resultType,
                                           String... abilities) {
         return transform(allTypes.values(),
-            type -> resultType.isInstance(type)
-                && any(abilities, a -> type.hasAbility(a)),
-            type -> resultType.cast(type), Collectors.toList());
+                         type -> resultType.isInstance(type)
+                             && any(abilities, a -> type.hasAbility(a)),
+                         type -> resultType.cast(type));
     }
 
     /**
@@ -1814,9 +1814,9 @@ public final class Specification {
                       getTypesWithoutAbility(Class<T> resultType,
                                              String... abilities) {
         return transform(allTypes.values(),
-            type -> resultType.isInstance(type)
-                && none(abilities, a -> type.hasAbility(a)),
-            type -> resultType.cast(type), Collectors.toList());
+                         type -> resultType.isInstance(type)
+                             && none(abilities, a -> type.hasAbility(a)),
+                         type -> resultType.cast(type));
     }
 
 

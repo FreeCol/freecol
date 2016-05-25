@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -387,8 +388,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int tipSize = tileImprovementPlans.size();
         if (tipSize > 0) {
             List<Unit> pioneers = transformAndSort(tile.getUnitList(),
-                u -> u.getPioneerScore() >= 0, pioneerComparator,
-                Collectors.toList());
+                u -> u.getPioneerScore() >= 0, u -> u, pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
                 if (aiu.tryPioneeringMission(lb)) {
@@ -490,7 +490,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<Unit> explorers = transformAndSort(tile.getUnitList(),
             u -> u.isPerson() && (u.getType().getSkill() <= 0
                 || u.hasAbility(Ability.EXPERT_SCOUT)),
-            scoutComparator, Collectors.toList());
+            u -> u, scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
@@ -526,8 +526,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (!hasDefender) return;
 
         // What goods are really needed?
-        List<GoodsType> needed = transform(spec.getRawBuildingGoodsTypeList(),
-            gt -> colony.getTotalProductionOf(gt) <= 0, Collectors.toList());
+        List<GoodsType> needed
+            = transform(spec.getRawBuildingGoodsTypeList(),
+                        gt -> colony.getTotalProductionOf(gt) <= 0);
 
         // If a tile can be stolen, do so if already at war with the
         // owner or if it is the best one available.
@@ -929,7 +930,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public List<GoodsWish> getGoodsWishes() {
         return transform(wishes, w -> w instanceof GoodsWish,
-                         w -> (GoodsWish)w, Collectors.toList());
+                         w -> (GoodsWish)w);
     }
 
     /**
@@ -939,7 +940,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public List<WorkerWish> getWorkerWishes() {
         return transform(wishes, w -> w instanceof WorkerWish,
-                         w -> (WorkerWish)w, Collectors.toList());
+                         w -> (WorkerWish)w);
     }
 
     /**
@@ -1381,10 +1382,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        List<AIObject> objects = transform(getExportGoods(),
-            aig -> !aig.isDisposed() && aig.getGoods() != null
-                && aig.getGoods().getLocation() == colony,
-            aig -> (AIObject)aig, Collectors.toList());
+        final Predicate<AIGoods> pred = aig ->
+            !aig.isDisposed() && aig.getGoods() != null
+                && aig.getGoods().getLocation() == colony;
+        List<AIObject> objects = transform(getExportGoods(), pred,
+                                           aig -> (AIObject)aig);
         objects.addAll(wishes);
         wishes.clear();
         objects.addAll(tileImprovementPlans);

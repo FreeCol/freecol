@@ -193,16 +193,13 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
                 choices.addAll(unitTypeList);
                 break;
             case IMMIGRANTS:
-                choices.addAll(transform(unitTypeList, UnitType::isRecruitable,
-                                         Collectors.toList()));
+                choices.addAll(transform(unitTypeList, UnitType::isRecruitable));
                 break;
             case NAVAL_UNITS:
-                choices.addAll(transform(unitTypeList, UnitType::isNaval,
-                                         Collectors.toList()));
+                choices.addAll(transform(unitTypeList, UnitType::isNaval));
                 break;
             case LAND_UNITS:
-                choices.addAll(transform(unitTypeList, ut -> !ut.isNaval(),
-                                         Collectors.toList()));
+                choices.addAll(transform(unitTypeList, ut -> !ut.isNaval()));
                 break;
             }
             if (addNone) {

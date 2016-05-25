@@ -135,8 +135,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(new JLabel(Integer.toString(type.getSkill())), "right");
 
             List<BuildingType> schools = transform(spec.getBuildingTypeList(),
-                bt -> bt.hasAbility(Ability.TEACH) && bt.canAdd(type),
-                Collectors.toList());
+                bt -> bt.hasAbility(Ability.TEACH) && bt.canAdd(type));
             if (!schools.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.school"), "newline");
                 int count = 0;
@@ -152,8 +151,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
 
             List<IndianNationType> nations = transform(spec.getIndianNationTypes(),
-                nt -> any(nt.getSkills(), ut -> ut.getObject() == type),
-                Collectors.toList());
+                nt -> any(nt.getSkills(), ut -> ut.getObject() == type));
             if (!nations.isEmpty()) {
                 panel.add(Utility.localizedLabel("colopedia.unit.natives"), "newline");
                 int count = 0;

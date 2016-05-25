@@ -474,8 +474,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
             available.clear();
             available.addAll(transform(getGame().getLivePlayers(this.source),
-                    p -> p != this.other && this.source.getStance(p).isIncitable(),
-                    Collectors.toList()));
+                    p -> p != this.other && this.source.getStance(p).isIncitable()));
 
             add(this.label);
             add(this.victimBox);

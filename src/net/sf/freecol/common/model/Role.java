@@ -353,9 +353,8 @@ public class Role extends BuildableType {
                 }
             }
             result.addAll(transform(fromGoods,
-                    ag -> !AbstractGoods.containsType(ag.getType(), toGoods),
-                    ag -> new AbstractGoods(ag.getType(), -ag.getAmount()),
-                    Collectors.toList()));
+                                    ag -> !AbstractGoods.containsType(ag.getType(), toGoods),
+                                    ag -> new AbstractGoods(ag.getType(), -ag.getAmount())));
         }
         return result;
     }
@@ -380,8 +379,7 @@ public class Role extends BuildableType {
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {
-        return transform(roles, r -> r.isAvailableTo(player, type),
-                         Collectors.toList());
+        return transform(roles, r -> r.isAvailableTo(player, type));
     }
 
     /**

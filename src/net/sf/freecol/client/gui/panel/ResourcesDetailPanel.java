@@ -92,11 +92,11 @@ public class ResourcesDetailPanel
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
                 final Specification spec = getSpecification();
-                String scopeStrings = transform(modifier.getScopes(),
-                    s -> s.getType() != null,
-                    s -> Messages.getName(spec.findType(s.getType())),
-                    Collectors.joining(", "));
-                if (!scopeStrings.isEmpty()) text += " (" + scopeStrings + ")";
+                String scopes = transform(modifier.getScopes(),
+                                          s -> s.getType() != null,
+                                          s -> Messages.getName(spec.findType(s.getType())),
+                                          Collectors.joining(", "));
+                if (!scopes.isEmpty()) text += " (" + scopes + ")";
             }
 
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());

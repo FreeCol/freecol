@@ -1005,6 +1005,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
                         gt -> !gt.isMilitaryGoods() && gt.isStorable(),
+                        gt -> gt,
                         Collectors.toMap(gt -> gt,
                             gt -> getNormalGoodsPriceToBuy(gt,
                                 GoodsContainer.CARGO_SIZE)));

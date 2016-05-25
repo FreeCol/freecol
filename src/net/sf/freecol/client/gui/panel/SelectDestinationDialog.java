@@ -495,9 +495,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             p.hasContacted(player) && (canTrade || !p.isEuropean());
         final Function<Player, Stream<Location>> mapper = p ->
             transform(p.getSettlements(),
-                s -> canReach(unit, s) && s.hasContacted(p),
-                s -> (Location)s.getTile(),
-                Collectors.toList()).stream();
+                      s -> canReach(unit, s) && s.hasContacted(p),
+                      s -> (Location)s.getTile()).stream();
         MultipleAdjacentDecider md
             = new MultipleAdjacentDecider(toList(flatten(game.getLivePlayers(player), pred, mapper)));
         unit.search(unit.getLocation(), md.getGoalDecider(), null,

@@ -69,7 +69,7 @@ public final class ReportProductionPanel extends ReportPanel {
         super(freeColClient, "reportProductionAction");
 
         this.goodsTypes = transform(getSpecification().getGoodsTypeList(),
-            gt -> !gt.isFarmed(), Collectors.toList());
+                                    gt -> !gt.isFarmed());
         List<String> goodsNames = toList(map(this.goodsTypes,
                                              gt -> Messages.getName(gt)));
         goodsNames.add(0, Messages.message("nothing"));
@@ -114,8 +114,7 @@ public final class ReportProductionPanel extends ReportPanel {
                         gt -> transformDistinct(spec.getBuildingTypeList(),
                             bt -> gt == bt.getProducedGoodsType()
                             || bt.hasModifier(gt.getId()),
-                            (BuildingType bt) -> bt.getFirstLevel(),
-                            Collectors.toList())));
+                            (BuildingType bt) -> bt.getFirstLevel())));
 
             // labels
             JLabel newLabel;

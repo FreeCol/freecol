@@ -241,8 +241,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return A list of complete <code>TileItem</code>s.
      */
     public List<TileItem> getCompleteItems() {
-        return transform(getTileItems(), TileItem::isComplete,
-                         Collectors.toList());
+        return transform(getTileItems(), TileItem::isComplete);
     }
 
     /**
@@ -270,9 +269,9 @@ public class TileItemContainer extends FreeColGameObject {
     private List<TileImprovement> getImprovements(boolean completedOnly) {
         synchronized (tileItems) {
             return transform(tileItems,
-                ti -> ti instanceof TileImprovement
-                    && (!completedOnly || ((TileImprovement)ti).isComplete()),
-                ti -> (TileImprovement)ti, Collectors.toList());
+                             ti -> ti instanceof TileImprovement
+                                && (!completedOnly || ((TileImprovement)ti).isComplete()),
+                             ti -> (TileImprovement)ti);
         }
     }
 

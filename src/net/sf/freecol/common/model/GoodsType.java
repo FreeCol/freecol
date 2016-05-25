@@ -467,6 +467,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     public Set<GoodsType> getEquivalentTypes() {
         return transform(getSpecification().getGoodsTypeList(),
                          gt -> gt == this || gt.getStoredAs() == this,
+                         gt -> gt,
                          Collectors.toSet());
     }
         

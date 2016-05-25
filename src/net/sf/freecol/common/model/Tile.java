@@ -526,7 +526,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isRiverCorner() {
         List<Tile> tiles = transform(getSurroundingTiles(0, 1),
-                                     Tile::isOnRiver, Collectors.toList());
+                                     Tile::isOnRiver);
         switch (tiles.size()) {
         case 0: case 1:
             return false;
@@ -612,7 +612,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
                          t -> t.getContiguity() == contiguity,
-                         Collectors.toSet());
+                         t -> t, Collectors.toSet());
     }
 
     /**
@@ -1298,7 +1298,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<Colony> getAdjacentColonies() {
         return transform(getSurroundingTiles(0, 1), t -> t.getColony() != null,
-                         Tile::getColony, Collectors.toList());
+                         Tile::getColony);
     }
 
     /**
@@ -1438,8 +1438,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
         return transform(getSurroundingTiles(0, 1),
-            t -> !t.isLand() && t.isHighSeasConnected()
-                && !t.isDangerousToShip(unit), Collectors.toList());
+                         t -> !t.isLand() && t.isHighSeasConnected()
+                             && !t.isDangerousToShip(unit));
     }
                 
 
@@ -1807,8 +1807,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private void updateColonyTiles() {
         for (ColonyTile ct : transform(flatten(getGame().getAllColonies(null),
                                                c -> c.getColonyTiles().stream()),
-                                       ct -> ct.getWorkTile() == this,
-                                       Collectors.toList())) {
+                                       ct -> ct.getWorkTile() == this)) {
             ct.updateProductionType();
         }
     }

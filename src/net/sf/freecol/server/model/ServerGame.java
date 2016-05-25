@@ -127,9 +127,9 @@ public class ServerGame extends Game implements ServerModelObject {
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
         return transform(getLivePlayers(null),
-            p -> ((ServerPlayer)p).isConnected()
-                && none(serverPlayers, s -> s == (ServerPlayer)p),
-            p -> (ServerPlayer)p, Collectors.toList());
+                         p -> ((ServerPlayer)p).isConnected()
+                             && none(serverPlayers, s -> s == (ServerPlayer)p),
+                         p -> (ServerPlayer)p);
     }
 
     /**
@@ -290,12 +290,12 @@ public class ServerGame extends Game implements ServerModelObject {
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             List<Player> winners = transform(getLiveEuropeanPlayers(null),
-                p -> !p.isREF(), Collectors.toList());
+                                             p -> !p.isREF());
             if (winners.size() == 1) return winners.get(0);
         }
         if (spec.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             List<Player> winners = transform(getLiveEuropeanPlayers(null),
-                p -> !p.isAI(), Collectors.toList());
+                                             p -> !p.isAI());
             if (winners.size() == 1) return winners.get(0);
         }
         return null;

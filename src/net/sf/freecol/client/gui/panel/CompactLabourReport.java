@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
@@ -350,15 +351,15 @@ public final class CompactLabourReport extends ReportPanel {
             if (allColonists) {
                 addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
             } else {
+                final Predicate<Unit> pred = u -> {
+                    final Unit student = u.getStudent();
+                    return student != null && student.getType() == unitType;
+                };
                 Set<UnitType> resultOfTraining = (colony == null)
                     ? Collections.<UnitType>emptySet()
-                    : transform(colony.getTeachers(),
-                        u -> {
-                            final Unit student = u.getStudent();
-                            return student != null && student.getType() == unitType;
-                        },
-                        u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()),
-                        Collectors.toSet());
+                    : transform(colony.getTeachers(), pred,
+                                u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()),
+                                Collectors.toSet());
                 String student = resultOfTraining.size() == 1 ?
                     Messages.message(StringTemplate
                         .template("report.labour.learning")

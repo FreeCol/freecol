@@ -83,10 +83,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         final Specification spec = game.getSpecification();
         List<String> found = toList(map(fatherKeys,
                                         k -> element.getAttribute(k)));
-        this.fathers = transform(found,
-            id -> id != null && !id.isEmpty(),
-            id -> spec.getFoundingFather(id),
-            Collectors.toList());
+        this.fathers = transform(found, id -> id != null && !id.isEmpty(),
+                                 id -> spec.getFoundingFather(id));
         this.foundingFatherId = getStringAttribute(element, FOUNDING_FATHER_TAG);
     }
 

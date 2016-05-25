@@ -153,8 +153,8 @@ public class Player extends FreeColGameObject implements Nameable {
             units.clear();
             units.addAll(transformAndSort(owner.getUnits(),
                                           u -> predicate.test(u),
-                                          Unit.locComparator,
-                                          Collectors.toList()));
+                                          u -> u,
+                                          Unit.locComparator));
         }
 
         /**
@@ -1051,8 +1051,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Player> getRebels() {
         return transform(getGame().getLiveEuropeanPlayers(this),
-            p -> p.getREFPlayer() == this && (p.isRebel() || p.isUndead()),
-            Collectors.toList());
+                         p -> p.getREFPlayer() == this
+                             && (p.isRebel() || p.isUndead()));
     }
 
     /**
@@ -1545,9 +1545,10 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public java.util.Map<String, Turn> getElectionTurns() {
         return transform(getHistory(),
-            e -> e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER,
-            Collectors.toMap(e -> e.getReplacement("%father%").getId(),
-                             e -> e.getTurn()));
+                         e -> e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER,
+                         e -> e,
+                         Collectors.toMap(e -> e.getReplacement("%father%").getId(),
+                                          e -> e.getTurn()));
     }
 
     /**
@@ -2038,8 +2039,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        return transform(getUnits(), u -> u.couldCarry(unit),
-                         Collectors.toList());
+        return transform(getUnits(), u -> u.couldCarry(unit));
     }
 
     /**
@@ -2319,8 +2319,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<Colony> getPorts() {
         return (!isEuropean())
             ? Collections.<Colony>emptyList()
-            : transform(getColonies(), Colony::isConnectedPort,
-                        Collectors.toList());
+            : transform(getColonies(), Colony::isConnectedPort);
     }
 
     /**
@@ -2406,7 +2405,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Colony> getColonies() {
         return transform(getSettlements(), s -> s instanceof Colony,
-                         s -> (Colony)s, Collectors.toList());
+                         s -> (Colony)s);
     }
 
     /**
@@ -2417,7 +2416,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Colony> getSortedColonies(Comparator<Colony> comp) {
         return transformAndSort(getSettlements(), s -> s instanceof Colony,
-                                s -> (Colony)s, comp, Collectors.toList());
+                                s -> (Colony)s, comp);
     }
 
     /**
@@ -2428,7 +2427,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<IndianSettlement> getIndianSettlements() {
         return transform(getSettlements(), s -> s instanceof IndianSettlement,
-                         s -> (IndianSettlement)s, Collectors.toList());
+                         s -> (IndianSettlement)s);
     }
 
     /**
@@ -2478,8 +2477,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<ModelMessage> getNewModelMessages() {
         synchronized (this.modelMessages) {
-            return transform(this.modelMessages, m -> !m.hasBeenDisplayed(),
-                             Collectors.toList());
+            return transform(this.modelMessages, m -> !m.hasBeenDisplayed());
         }
     }
 
@@ -3343,9 +3341,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 tiles.addAll(layer);
                 layer.clear();
                 layer.addAll(transform(flatten(lastLayer,
-                            ll -> ll.getSurroundingTiles(1, 1).stream()),
-                        t -> !tiles.contains(t) && canClaimForSettlement(t),
-                        Collectors.toList()));
+                                               ll -> ll.getSurroundingTiles(1, 1).stream()),
+                                       t -> !tiles.contains(t) && canClaimForSettlement(t)));
             }
             tiles.addAll(layer);
         }

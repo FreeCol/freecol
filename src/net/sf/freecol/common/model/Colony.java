@@ -532,8 +532,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of available <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getAvailableWorkLocations() {
-        return transform(getAllWorkLocations(),
-            WorkLocation::isAvailable, Collectors.toList());
+        return transform(getAllWorkLocations(), WorkLocation::isAvailable);
     }
 
     /**
@@ -542,8 +541,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The list of current <code>WorkLocation</code>s.
      */
     public List<WorkLocation> getCurrentWorkLocations() {
-        return transform(getAllWorkLocations(),
-            WorkLocation::isCurrent, Collectors.toList());
+        return transform(getAllWorkLocations(), WorkLocation::isCurrent);
     }
 
     /**
@@ -667,9 +665,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        return transform(getCurrentWorkLocations(),
-            wl -> any(wl.getInputs(), ag -> ag.getType() == goodsType),
-            Collectors.toList());
+        return transform(getCurrentWorkLocations(), wl -> any(wl.getInputs(),
+                         ag -> ag.getType() == goodsType));
     }
 
     /**
@@ -680,9 +677,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        return transform(getCurrentWorkLocations(),
-            wl -> any(wl.getOutputs(), ag -> ag.getType() == goodsType),
-            Collectors.toList());
+        return transform(getCurrentWorkLocations(), wl -> any(wl.getOutputs(),
+                         ag -> ag.getType() == goodsType));
     }
 
     /**
@@ -809,8 +805,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<UnitType> getBuildableUnits() {
         return transform(getSpecification().getUnitTypeList().stream(),
-            ut -> ut.needsGoodsToBuild() && canBuild(ut),
-            Collectors.toList());
+                         ut -> ut.needsGoodsToBuild() && canBuild(ut));
     }
 
     /**
@@ -1042,10 +1037,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<AbstractGoods> getRequiredGoods(BuildableType type) {
         return transform(type.getRequiredGoods(),
-            ag -> ag.getAmount() > getGoodsCount(ag.getType()),
-            ag -> new AbstractGoods(ag.getType(),
-                ag.getAmount() - getGoodsCount(ag.getType())),
-            Collectors.toList());
+                         ag -> ag.getAmount() > getGoodsCount(ag.getType()),
+                         ag -> new AbstractGoods(ag.getType(),
+                             ag.getAmount() - getGoodsCount(ag.getType())));
     }
 
     /**
@@ -1640,8 +1634,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of burnable buildings.
      */
     public List<Building> getBurnableBuildings() {
-        return transform(getBuildings(), Building::canBeDamaged,
-                         Collectors.toList());
+        return transform(getBuildings(), Building::canBeDamaged);
     }
 
     /**
@@ -1652,7 +1645,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<Goods> getLootableGoodsList() {
         return transform(getGoodsContainer().getGoods(),
-            g -> g.getType().isStorable(), Collectors.toList());
+                         g -> g.getType().isStorable());
     }
 
     /**

@@ -1829,7 +1829,7 @@ outer:  for (Effect effect : effects) {
         List<Unit> units
             = transform(Stream.concat(colony.getUnitList().stream(),
                                       colony.getTile().getUnitList().stream()),
-                u -> effect.appliesTo(u.getType()), Collectors.toList());
+                        u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
             : getRandomMember(logger, "Select unit for effect", units, random);
     }
@@ -2269,8 +2269,7 @@ outer:  for (Effect effect : effects) {
         final Specification spec = getGame().getSpecification();
         return transform(flatten(getFathers(), ff -> ff.getEvents().stream()),
                          ev -> "model.event.freeBuilding".equals(ev.getId()),
-                         ev -> spec.getBuildingType(ev.getValue()),
-                         Collectors.toList());
+                         ev -> spec.getBuildingType(ev.getValue()));
     }
 
     /**
@@ -3545,7 +3544,7 @@ outer:  for (Effect effect : effects) {
         // Former missionary owner knows that the settlement fell.
         if (missionaryOwner != null) {
             List<Tile> surrounding = transform(centerTile.getSurroundingTiles(1, radius),
-                t -> !owned.contains(t), Collectors.toList());
+                                               t -> !owned.contains(t));
             cs.add(See.only(missionaryOwner), owned);
             cs.add(See.only(missionaryOwner), surrounding);
             cs.addRemove(See.only(missionaryOwner), centerTile, settlement);
@@ -4316,8 +4315,8 @@ outer:  for (Effect effect : effects) {
                                  ChangeSet cs) {
         if (checkGold(price)) {
             final Specification spec = getSpecification();
-            List<AbstractUnit> naval = transform(mercs,
-                au -> au.getType(spec).isNaval(), Collectors.toList());
+            List<AbstractUnit> naval
+                = transform(mercs, au -> au.getType(spec).isNaval());
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
                 dst = getColonies().get(0).getTile();

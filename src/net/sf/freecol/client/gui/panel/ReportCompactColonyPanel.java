@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
@@ -206,10 +207,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
             for (GoodsType gt : goodsTypes) produce(gt);
                 
-            this.notWorking.addAll(colony.getTile().getUnitList().stream()
-                .filter(u -> u.getState() != Unit.UnitState.FORTIFIED
-                    && u.getState() != Unit.UnitState.SENTRY)
-                .collect(Collectors.toList()));
+            this.notWorking.addAll(transform(colony.getTile().getUnitList(),
+                    u -> u.getState() != Unit.UnitState.FORTIFIED
+                         && u.getState() != Unit.UnitState.SENTRY));
 
             // Collect the types of the units at work in the colony
             // (colony tiles and buildings) that are suboptimal (and
@@ -253,14 +253,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
             
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
-            this.couldWork.addAll(transform(this.notWorking,
-                    u -> {
-                        WorkLocation wl = u.getWorkLocation();
-                        return wl != null
-                            && (wl.getWorkFor(u) == null
-                                || wl.getWorkFor(u) != u.getWorkType());
-                    },
-                    Unit::getType, Collectors.toList()));
+            final Predicate<Unit> pred = u -> {
+                WorkLocation wl = u.getWorkLocation();
+                return wl != null && (wl.getWorkFor(u) == null
+                        || wl.getWorkFor(u) != u.getWorkType());
+            };
+            this.couldWork.addAll(transform(this.notWorking, pred,
+                                            Unit::getType));
 
             this.build = colony.getCurrentlyBuilding();
             if (this.build == null) {
@@ -971,8 +970,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // exploring.
         // Colour: cAlarm
         List<Tile> tiles = transformDistinct(rTileSuggestions,
-            (TileImprovementSuggestion ts) -> ts.isExploration(),
-            (TileImprovementSuggestion ts) -> ts.tile, Collectors.toList());
+                                             ts -> ts.isExploration(),
+                                             ts -> ts.tile);
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
@@ -984,9 +983,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             if (ti.isNatural()) continue;
             tiles.clear();
             tiles.addAll(transformDistinct(rTileSuggestions,
-                    (TileImprovementSuggestion ts) -> ts.tileImprovementType == ti,
-                    (TileImprovementSuggestion ts) -> ts.tile,
-                    Collectors.toList()));
+                                           ts -> ts.tileImprovementType == ti,
+                                           ts -> ts.tile));
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()

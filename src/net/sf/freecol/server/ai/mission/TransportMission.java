@@ -214,7 +214,7 @@ public class TransportMission extends Mission {
         List<Cargo> old = tCopy();
         synchronized (cargoes) {
             cargoes.clear();
-            cargoes.addAll(transform(nxt, Cargo::isValid, Collectors.toList()));
+            cargoes.addAll(transform(nxt, Cargo::isValid));
             if (setSpace) tSpace();
         }
         tRetarget();

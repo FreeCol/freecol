@@ -187,9 +187,9 @@ public class IndianDemandMission extends Mission {
         if (goods == null) {
             List<GoodsType> goodsTypes
                 = toList(flatten(selectPredicates,
-                            pred -> transform(spec.getGoodsTypeList(),
-                                gt -> pred.test(gt) && target.getGoodsCount(gt) > 0,
-                                Collectors.toList()).stream()));
+                        pred -> transform(spec.getGoodsTypeList(),
+                            gt -> pred.test(gt) && target.getGoodsCount(gt) > 0)
+                            .stream()));
             GoodsType gt = first(goodsTypes);
             if (gt != null) {
                 goods = new Goods(getGame(), target, gt,

@@ -342,7 +342,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         return (player.hasAbility(Ability.IGNORE_EUROPEAN_WARS))
             ? Collections.<Player>emptyList()
             : transform(getGame().getLiveEuropeanPlayers(player),
-                p -> p.isPotentialEnemy(player), Collectors.toList());
+                        p -> p.isPotentialEnemy(player));
     }
 
     /**
@@ -354,7 +354,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     public List<Player> collectPotentialFriends() {
         return transform(getGame().getLiveEuropeanPlayers(player),
-            p -> p.isPotentialFriend(player), Collectors.toList());
+                         p -> p.isPotentialFriend(player));
     }
 
     /**

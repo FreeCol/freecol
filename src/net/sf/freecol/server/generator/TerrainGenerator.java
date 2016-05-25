@@ -155,7 +155,7 @@ public class TerrainGenerator {
             // Do not generate elevated and water tiles at this time
             // they are created elsewhere.
             landTileTypes = transform(spec.getTileTypeList(),
-                t -> !t.isElevation() && !t.isWater(), Collectors.toList());
+                                      t -> !t.isElevation() && !t.isWater());
         }
         return getRandomTileType(landTileTypes, latitude);
     }
@@ -169,9 +169,8 @@ public class TerrainGenerator {
     private TileType getRandomOceanTileType(int latitude) {
         if (oceanTileTypes == null) {
             oceanTileTypes = transform(spec.getTileTypeList(),
-                t -> t.isWater() && t.isHighSeasConnected()
-                    && !t.isDirectlyHighSeasConnected(),
-                Collectors.toList());
+                                       t -> t.isWater() && t.isHighSeasConnected()
+                                           && !t.isDirectlyHighSeasConnected());
         }
         return getRandomTileType(oceanTileTypes, latitude);
     }

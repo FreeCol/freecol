@@ -292,7 +292,7 @@ public class TileImprovement extends TileItem implements Named {
     public Map<Direction, Integer> getConnections() {
         final List<Direction> dirns = getConnectionDirections();
         return (dirns == null) ? Collections.<Direction, Integer>emptyMap()
-            : transform(dirns, d -> isConnectedTo(d),
+            : transform(dirns, d -> isConnectedTo(d), d -> d,
                         Collectors.toMap(d -> d, d -> magnitude));
     }
 

@@ -729,8 +729,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         final Set<Tile> owned = getOwnedTiles();
         final Set<Tile> unseen
             = transform(tile.getSurroundingTiles(1, getLineOfSight()),
-                t -> !newOwner.hasExplored(t) || !newOwner.canSee(t),
-                Collectors.toSet());
+                        t -> !newOwner.hasExplored(t) || !newOwner.canSee(t),
+                        t -> t, Collectors.toSet());
 
         for (Tile t : owned) t.cacheUnseen(newOwner);//+til
         

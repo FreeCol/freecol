@@ -412,7 +412,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public List<Role> getExpertRoles() {
         return transform(getSpecification().getRoles(),
-                         r -> r.getExpertUnit() == this, Collectors.toList());
+                         r -> r.getExpertUnit() == this);
     }
 
     /**
@@ -519,7 +519,7 @@ public final class UnitType extends BuildableType implements Consumer {
     public List<UnitType> getUnitTypesLearntInLostCity() {
         return transform(getTypeChanges(),
                          c -> c.asResultOf(ChangeType.LOST_CITY),
-                         c -> c.getNewUnitType(), Collectors.toList());
+                         c -> c.getNewUnitType());
     }
 
     /**
@@ -653,8 +653,7 @@ public final class UnitType extends BuildableType implements Consumer {
         return (consumption == null) ? Collections.<AbstractGoods>emptyList()
             : transform(consumption.keySet(),
                         gt -> consumption.getCount(gt) != 0,
-                        gt -> new AbstractGoods(gt, consumption.getCount(gt)),
-                        Collectors.toList());
+                        gt -> new AbstractGoods(gt, consumption.getCount(gt)));
     }
 
     /**

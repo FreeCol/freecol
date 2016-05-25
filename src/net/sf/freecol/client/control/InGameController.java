@@ -795,8 +795,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean doEndTurn(boolean showDialog) {
         final Player player = getMyPlayer();
         if (showDialog) {
-            List<Unit> units = transform(player.getUnits(), Unit::couldMove,
-                Collectors.toList());
+            List<Unit> units = transform(player.getUnits(), Unit::couldMove);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 getGUI().showEndTurnDialog(units,
@@ -1332,8 +1331,9 @@ public final class InGameController extends FreeColClientHolder {
 
         // Disembark selected units able to move.
         unit.setStateToAllChildren(UnitState.ACTIVE);
-        final List<Unit> disembarkable = transform(unit.getUnitList(),
-            u -> u.getMoveType(tile).isProgress(), Collectors.toList());
+        final List<Unit> disembarkable
+            = transform(unit.getUnitList(),
+                        u -> u.getMoveType(tile).isProgress());
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
         if (disembarkable.size() == 1) {
             if (getGUI().confirm(tile,
@@ -1389,10 +1389,10 @@ public final class InGameController extends FreeColClientHolder {
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
-        List<ChoiceItem<Unit>> choices = transform(destinationTile.getUnitList(),
-            u -> u.canAdd(unit),
-            u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u),
-            Collectors.toList());
+        List<ChoiceItem<Unit>> choices
+            = transform(destinationTile.getUnitList(),
+                        u -> u.canAdd(unit),
+                        u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u));
         if (choices.isEmpty()) {
             throw new RuntimeException("Unit " + unit.getId()
                 + " found no carrier to embark upon.");

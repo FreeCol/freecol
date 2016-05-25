@@ -115,8 +115,7 @@ public class Building extends WorkLocation
 
             // Colonists which can't work here must be put outside
             eject.addAll(transform(getUnitList(),
-                                   u -> !canAddType(u.getType()),
-                                   Collectors.toList()));
+                                   u -> !canAddType(u.getType())));
         }
 
         // Colonists exceding units limit must be put outside

@@ -293,20 +293,7 @@ public final class ResourceMapping {
      */
     public List<String> getImageKeys(String prefix) {
         return transform(imageResources.keySet(),
-                         k -> k.startsWith(prefix),
-                         Collectors.toList());
-    }
-
-    /**
-     * Get the image keys in this mapping with a given prefix as a set.
-     *
-     * @param prefix The prefix to check for.
-     * @return The set of keys.
-     */
-    public Set<String> getImageKeySet(String prefix) {
-        return transform(imageResources.keySet(),
-                         k -> k.startsWith(prefix),
-                         Collectors.toSet());
+                         k -> k.startsWith(prefix));
     }
 
     /**
@@ -319,7 +306,17 @@ public final class ResourceMapping {
      */
     public List<String> getImageKeys(String prefix, String suffix) {
         return transform(imageResources.keySet(),
-                         k -> k.startsWith(prefix) && k.endsWith(suffix),
-                         Collectors.toList());
+                         k -> k.startsWith(prefix) && k.endsWith(suffix));
+    }
+
+    /**
+     * Get the image keys in this mapping with a given prefix as a set.
+     *
+     * @param prefix The prefix to check for.
+     * @return The set of keys.
+     */
+    public Set<String> getImageKeySet(String prefix) {
+        return transform(imageResources.keySet(), k -> k.startsWith(prefix),
+                         k -> k, Collectors.toSet());
     }
 }

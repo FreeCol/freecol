@@ -1170,7 +1170,7 @@ public final class FreeColServer {
                 && e.getValue() != NationState.NOT_AVAILABLE
                 && game.getPlayerByNationId(e.getKey().getId()) == null,
             e -> makeAIPlayer(e.getKey()),
-            Player.playerComparator, Collectors.toList());
+            Player.playerComparator);
         game.updatePlayers(newAI);
 
         // We need a fake unknown enemy player

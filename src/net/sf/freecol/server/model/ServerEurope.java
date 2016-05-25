@@ -197,10 +197,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
     public List<RandomChoice<UnitType>> generateRecruitablesList() {
         final Player owner = getOwner();
         return transform(getSpecification().getUnitTypeList(),
-            ut -> ut.isRecruitable()
-                && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, ut),
-            ut -> new RandomChoice<>(ut, ut.getRecruitProbability()),
-            Collectors.toList());
+                         ut -> ut.isRecruitable()
+                             && owner.hasAbility(Ability.CAN_RECRUIT_UNIT, ut),
+                         ut -> new RandomChoice<>(ut, ut.getRecruitProbability()));
     }
 
     /**

@@ -308,8 +308,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        return transform(this.items, ti -> ti.getSource() == player,
-                         Collectors.toList());
+        return transform(this.items, ti -> ti.getSource() == player);
     }
 
     /**
@@ -330,8 +329,9 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public List<Colony> getColoniesGivenBy(final Player player) {
         return transform(this.items,
-            ti -> ti instanceof ColonyTradeItem && ti.getSource() == player,
-            ti -> ti.getColony(player.getGame()), Collectors.toList());
+                         ti -> ti instanceof ColonyTradeItem
+                             && ti.getSource() == player,
+                         ti -> ti.getColony(player.getGame()));
     }
 
     /**
@@ -354,8 +354,9 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public List<Goods> getGoodsGivenBy(Player player) {
         return transform(this.items,
-            ti -> ti instanceof GoodsTradeItem && ti.getSource() == player,
-            TradeItem::getGoods, Collectors.toList());
+                         ti -> ti instanceof GoodsTradeItem
+                             && ti.getSource() == player,
+                         TradeItem::getGoods);
     }
 
     /**
@@ -376,8 +377,9 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public List<Unit> getUnitsGivenBy(Player player) {
         return transform(this.items,
-            ti -> ti instanceof UnitTradeItem && ti.getSource() == player,
-            TradeItem::getUnit, Collectors.toList());
+                         ti -> ti instanceof UnitTradeItem
+                             && ti.getSource() == player,
+                         TradeItem::getUnit);
     }
 
     /**

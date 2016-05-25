@@ -226,8 +226,8 @@ public final class BuildingType extends BuildableType {
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
         return transform(productionTypes,
-            pt -> pt.getUnattended() == unattended && pt.appliesTo(level),
-            Collectors.toList());
+                         pt -> pt.getUnattended() == unattended
+                             && pt.appliesTo(level));
     }
 
     // @compat 0.10.6

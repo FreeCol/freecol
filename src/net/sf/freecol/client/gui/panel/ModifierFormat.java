@@ -130,7 +130,7 @@ public class ModifierFormat {
     }
 
     public static String getModifierAsString(Modifier modifier) {
-        return transform(getModifierStrings(modifier), s -> s != null,
+        return transform(getModifierStrings(modifier), s -> s != null, s -> s,
                          Collectors.joining());
     }
 }
