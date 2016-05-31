@@ -972,9 +972,9 @@ public class Map extends FreeColGameObject implements Location {
             // an explored one on the same contiguity.
             Tile closest = (realStart instanceof Tile)
                 ? getClosestTile((Tile)realStart,
-                    toList(((Tile)realEnd).getSurroundingTiles(1, 1).stream()
-                        .filter(t -> t.isExplored()
-                            && isSameContiguity(t, realStart))))
+                    transform(((Tile)realEnd).getSurroundingTiles(1, 1),
+                              t -> t.isExplored()
+                                  && isSameContiguity(t, realStart)))
                 : null;
             path = (closest == null) ? null
                 : findPath(unit, realStart, closest, carrier, costDecider, lb);

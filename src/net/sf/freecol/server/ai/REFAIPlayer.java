@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -652,8 +653,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             }
 
             // Go defend the nearest colony needing defence
-            Colony best = u.getClosestColony(getBadlyDefended().stream()
-                .map(AIColony::getColony));
+            Colony best = u.getClosestColony(map(getBadlyDefended(),
+                                                 AIColony::getColony));
             if (best != null
                 && (m = getDefendSettlementMission(aiu, best)) != null) {
                 lb.add(" GO-DEFEND-", best.getName(), " " , m);
@@ -902,13 +903,13 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         return Integer.MIN_VALUE;
                     }
                     // Do not chase the same unit!
-                    if (any(getAIUnits().stream()
-                            .filter(aiu -> aiu != aiUnit)
-                            .map(aiu -> aiu.getMission(UnitSeekAndDestroyMission.class)),
-                            m -> m != null
-                                && m.getTarget() instanceof Unit
-                                && (Unit)m.getTarget() == target))
-                        return Integer.MIN_VALUE;
+                    final Predicate<UnitSeekAndDestroyMission> pred = m ->
+                        m != null && m.getTarget() instanceof Unit
+                            && (Unit)m.getTarget() == target;
+                    final Function<AIUnit, UnitSeekAndDestroyMission> mapper = aiu ->
+                        aiu.getMission(UnitSeekAndDestroyMission.class);
+                    if (any(transform(getAIUnits(), aiu -> aiu != aiUnit,
+                                      mapper), pred)) return Integer.MIN_VALUE;
                     // The REF is more interested in colonies.
                     value /= 2;
                 }

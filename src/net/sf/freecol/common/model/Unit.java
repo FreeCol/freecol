@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1864,9 +1865,10 @@ public class Unit extends GoodsLocation
     public Location getRepairLocation() {
         final Player player = getOwner();
         final Colony notHere = getTile().getColony();
-        Location best = getClosestColony(player.getColonies().stream()
-            .filter(c -> c != notHere && c.hasAbility(Ability.REPAIR_UNITS)));
-        return (best != null) ? best : player.getEurope();
+        final Predicate<Colony> pred = c ->
+            c != notHere && c.hasAbility(Ability.REPAIR_UNITS);
+        Location loc = getClosestColony(transform(player.getColonies(), pred));
+        return (loc != null) ? loc : player.getEurope();
     }
 
 

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
@@ -531,10 +532,11 @@ public final class UnitType extends BuildableType implements Consumer {
      *     maximum.
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        return find(getTypeChanges().stream()
-                .filter(UnitTypeChange::canBeTaught)
-                .map(UnitTypeChange::getNewUnitType),
-            ut -> ut.hasSkill() && ut.getSkill() <= maximumSkill, null);
+        final Predicate<UnitType> pred = ut ->
+            ut.hasSkill() && ut.getSkill() <= maximumSkill;
+        return find(transform(getTypeChanges(), UnitTypeChange::canBeTaught,
+                              UnitTypeChange::getNewUnitType),
+                    pred);
     }
 
     /**
