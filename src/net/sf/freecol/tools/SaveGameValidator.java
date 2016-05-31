@@ -20,7 +20,6 @@
 package net.sf.freecol.tools;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -49,15 +49,12 @@ public class SaveGameValidator {
         Validator saveGameValidator = schema.newValidator();
 
         List<File> allFiles = new ArrayList<>();
-        FileFilter ff = FreeColSavegameFile.getFileFilter();
         for (String name : args) {
             File file = new File(name);
             if (file.exists()) {
                 if (file.isDirectory()) {
-                    for (File fsg : file.listFiles(ff)) {
-                        allFiles.add(fsg);
-                    }
-                } else if (ff.accept(file)) {
+                    allFiles.addAll(toList(FreeColSavegameFile.getFiles(file)));
+                } else if (FreeColSavegameFile.fileFilter(file)) {
                     allFiles.add(file);
                 }
             }

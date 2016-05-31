@@ -20,7 +20,6 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,10 +33,6 @@ import net.sf.freecol.common.resources.ResourceMapping;
 public class FreeColTcFile extends FreeColModFile {
 
     private static final Logger logger = Logger.getLogger(FreeColTcFile.class.getName());
-
-    /** A file filter to select TCs. */
-    private static final FileFilter fileFilter
-        = makeFileFilter(MOD_DESCRIPTOR_FILE, "ftc", ZIP_FILE_EXTENSION);
 
 
     /**
@@ -84,13 +79,16 @@ public class FreeColTcFile extends FreeColModFile {
         return result;
     }
 
+
     /**
-     * Get the file filter to select TC files.
+     * Helper to filter suitable file candidates to be made into
+     * FreeColTcFiles with {@see FreeColTcFile::make}
      *
-     * @return The TC file filter.
+     * @param f The <code>File</code> to examine.
+     * @return True if the file is suitable.
      */
-    public static FileFilter getFileFilter() {
-        return fileFilter;
+    public static boolean fileFilter(File f) {
+        return fileFilter(f, MOD_DESCRIPTOR_FILE, "ftc", ZIP_FILE_EXTENSION);
     }
 
     /**

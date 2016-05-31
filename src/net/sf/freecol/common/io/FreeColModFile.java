@@ -20,7 +20,6 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,10 +42,6 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
     protected static final String SPECIFICATION_FILE = "specification.xml";
     protected static final String MOD_DESCRIPTOR_FILE = "mod.xml";
-
-    /** A file filter to select mods. */
-    private static final FileFilter fileFilter
-        = makeFileFilter(MOD_DESCRIPTOR_FILE, "fmd", ZIP_FILE_EXTENSION);
 
     /** The identifier for this mod. */
     private String id;
@@ -144,13 +139,16 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
         return parent;
     }
 
+
     /**
-     * Get the file filter to select mod files.
+     * Helper to filter suitable file candidates to be made into
+     * FreeColModFiles with {@see FreeColModFile::make}
      *
-     * @return The mod file filter.
+     * @param The <code>File</code> to examine.
+     * @return True if the file is suitable.
      */
-    public static FileFilter getFileFilter() {
-        return fileFilter;
+    public static boolean fileFilter(File f) {
+        return fileFilter(f, MOD_DESCRIPTOR_FILE, "fmd", ZIP_FILE_EXTENSION);
     }
 
     /**

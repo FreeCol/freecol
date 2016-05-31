@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -50,14 +49,14 @@ public class Mods {
     /**
      * Loads all valid mods from a specified directory.
      *
-     * @param directory The directory to load from.
+     * @param dir The directory to load from.
      */
-    private static void loadModDirectory(File directory) {
-        if (directory == null || !directory.isDirectory()) return;
-        Arrays.stream(directory.listFiles(FreeColModFile.getFileFilter()))
-            .map(FreeColModFile::make)
-            .filter(fcmf -> fcmf != null)
-            .forEach(fcmf -> allMods.put(fcmf.getId(), fcmf));
+    private static void loadModDirectory(File dir) {
+        for (FreeColModFile fcmf : transform(fileStream(dir),
+                                             FreeColModFile::fileFilter,
+                                             FreeColModFile::make)) {
+            allMods.put(fcmf.getId(), fcmf);
+        }
     }
 
     /**
@@ -109,9 +108,7 @@ public class Mods {
      * @return A list of <code>FreeColModFile</code>s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
-        return toList(map(FreeColDirectories.getRulesDirectory()
-                .listFiles(FreeColTcFile.getFileFilter()),
-                FreeColTcFile::make)
-            .filter(tc -> tc != null));
+        return transform(fileStream(FreeColDirectories.getRulesDirectory()),
+                         FreeColTcFile::fileFilter, FreeColTcFile::make);
     }
 }

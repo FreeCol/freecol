@@ -21,7 +21,6 @@ package net.sf.freecol.common.io;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -294,27 +293,6 @@ public class FreeColDataFile {
     }
 
     /**
-     * Make a <code>FileFilter</code> for a set of file endings.
-     *
-     * @param requiredFile If non-null, the filter will accept a directory
-     *     containing this file.
-     * @param endings Acceptable file suffixes.
-     * @return A suitable <code>FileFilter</code>.
-     */
-    public static FileFilter makeFileFilter(final String requiredFile,
-                                            final String... endings) {
-        return f -> {
-            final String name = f.getName();
-            return (name.startsWith("."))
-                ? false
-                : (requiredFile != null && f.isDirectory())
-                ? new File(f, requiredFile).exists()
-                : any(endings, e -> name.endsWith("." + e)
-                    && name.length() > e.length());
-        };
-    }
-
-    /**
      * Get the path to the underlying file.
      *
      * Useful for error messages.
@@ -323,5 +301,25 @@ public class FreeColDataFile {
      */
     public String getPath() {
         return file.getPath();
+    }
+
+    /**
+     * Check a file is some sort of FreeColDataFile.
+     *
+     * @param f The <code>File</code> to test.
+     * @param requiredFile If non-null, the filter will accept a directory
+     *     containing this file.
+     * @param endings If the file has one of these suffixes it is acceptable.
+     * @return True if the file is suitable.
+     */
+    public static boolean fileFilter(File f, String requiredFile,
+                                     String... endings) {
+        final String name = f.getName();
+        return (name.startsWith("."))
+            ? false
+            : (requiredFile != null && f.isDirectory())
+            ? new File(f, requiredFile).exists()
+            : any(endings, e -> name.endsWith("." + e)
+                && name.length() > e.length());
     }
 }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -599,7 +600,32 @@ public class CollectionUtils {
                                           Predicate<T> predicate) {
         return (int)stream.filter(predicate).count();
     }
-        
+
+    /**
+     * Create a stream of files from a directory.
+     *
+     * @param dir The <code>File</code> that hopefully is a directory.
+     * @return A stream of <code>File</code>s.
+     */
+    public static Stream<File> fileStream(File dir) {
+        File[] files;
+        return (dir == null || !dir.isDirectory()
+            || (files = dir.listFiles()) == null)
+            ? Stream.<File>empty()
+            : Arrays.stream(files);
+    }
+
+    /**
+     * Create a stream of files from a directory, that each match a predicate.
+     *
+     * @param dir The <code>File</code> that hopefully is a directory.
+     * @param predicate The <code>Predicate</code> to match with.
+     * @return A stream of matching <code>File</code>s.
+     */
+    public static Stream<File> fileStream(File dir, Predicate<File> predicate) {
+        return fileStream(dir).filter(predicate);
+    }
+
     /**
      * Simple stream search for the first item that matches a predicate.
      *

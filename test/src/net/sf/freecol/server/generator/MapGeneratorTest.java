@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -200,7 +201,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Game game = new ServerGame(spec());
         MapGenerator gen = new SimpleMapGenerator(game, new Random(1));
         File mapDir = new File("data/maps/");
-        for (File importFile : mapDir.listFiles(FreeColSavegameFile.getFileFilter())) {
+        for (File importFile : toList(FreeColSavegameFile.getFiles(mapDir))) {
             ((FileOption)spec().getOption(MapGeneratorOptions.IMPORT_FILE))
                 .setValue(importFile);
             assertNotNull(gen.createMap(new LogBuilder(-1)));

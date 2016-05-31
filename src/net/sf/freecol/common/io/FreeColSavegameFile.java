@@ -20,12 +20,13 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.BufferedInputStream;
+import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -62,10 +63,6 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * particular.
      */
     public static final String THUMBNAIL_FILE = "thumbnail.png";
-
-    /** A file filter to select the saved game files. */
-    private static final FileFilter fileFilter = makeFileFilter(SAVEGAME_FILE,
-        FreeCol.FREECOL_SAVE_EXTENSION, ZIP_FILE_EXTENSION);
 
 
     /**
@@ -131,12 +128,26 @@ public class FreeColSavegameFile extends FreeColDataFile {
         return new FreeColXMLReader(getInputStream(SAVEGAME_FILE));
     }
 
+
     /**
-     * Get the file filter to select saved game files.
+     * Helper to filter suitable file candidates to be made into
+     * FreeColSaveGameFiles.
      *
-     * @return The saved game file filter.
+     * @param The <code>File</code> to examine.
+     * @return True if the file is suitable.
      */
-    public static FileFilter getFileFilter() {
-        return fileFilter;
+    public static boolean fileFilter(File f) {
+        return fileFilter(f, SAVEGAME_FILE, FreeCol.FREECOL_SAVE_EXTENSION,
+                          ZIP_FILE_EXTENSION);
+    }
+
+    /**
+     * Find all the saved game files in a given directory.
+     *
+     * @param directory The directory to look in.
+     * @return A stream of the saved game files found in the directory.
+     */
+    public static Stream<File> getFiles(File directory) {
+        return fileStream(directory, FreeColSavegameFile::fileFilter);
     }
 }

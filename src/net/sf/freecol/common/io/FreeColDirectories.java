@@ -810,21 +810,6 @@ public class FreeColDirectories {
     }
 
     /**
-     * Find all the saved game files in a given directory.
-     *
-     * @param directory The directory to look in.
-     * @return A stream of saved game files found.
-     */
-    public static Stream<File> getSavedFiles(File directory) {
-        final FileFilter filter = FreeColSavegameFile.getFileFilter();
-        if (directory != null && filter != null) {
-            File[] files = directory.listFiles(filter);
-            if (files != null) return Arrays.stream(files);
-        }
-        return Stream.<File>empty();
-    }
-    
-    /**
      * Gets the most recently saved game file, or <b>null</b>.  (This
      * may be either from a recent arbitrary user operation or an
      * autosave function.)
@@ -834,7 +819,7 @@ public class FreeColDirectories {
     public static File getLastSaveGameFile() {
         return maximize(flatten(Stream.of(FreeColDirectories.getSaveDirectory(),
                                           FreeColDirectories.getAutosaveDirectory()),
-                                FreeColDirectories::getSavedFiles),
+                                FreeColSavegameFile::getFiles),
                         fileModificationComparator);
     }
 
