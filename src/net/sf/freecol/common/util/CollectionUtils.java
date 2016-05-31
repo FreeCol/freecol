@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
@@ -2205,5 +2206,19 @@ public class CollectionUtils {
         Comparator<? super R> comparator) {
         return stream.filter(predicate).map(mapper).sorted(comparator)
             .distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Create a new collector that accumulates to a list but excludes
+     * null members.
+     *
+     * @param <T> The stream member type.
+     * @return A list collectors.
+     */
+    public static <T> Collector<T,?,List<T>> toListNoNulls() {
+        return Collector.<T,List<T>>of((Supplier<List<T>>)ArrayList::new,
+            (left, right) -> { if (right != null) left.add(right); },
+            (left, right) -> { left.addAll(right); return left; },
+            Collector.Characteristics.IDENTITY_FINISH);
     }
 }

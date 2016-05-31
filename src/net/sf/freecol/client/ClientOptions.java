@@ -575,10 +575,10 @@ public class ClientOptions extends OptionGroup {
     public List<FreeColModFile> getActiveMods() {
         ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
         return (option == null) ? Collections.<FreeColModFile>emptyList()
-            : toList(map(option.getOptionValues(),
-                    m -> (m == null || m.getId() == null) ? null
-                        : Mods.getFreeColModFile(m.getId()))
-                .filter(f -> f != null));
+            : transform(option.getOptionValues(), o -> true,
+                        m -> (m == null || m.getId() == null) ? null
+                            : Mods.getFreeColModFile(m.getId()),
+                        toListNoNulls());
     }
 
     /**

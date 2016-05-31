@@ -88,12 +88,10 @@ public class ImageResource extends Resource
             if (image == null) {
                 BufferedImage baseImage = loadImage(getResourceLocator());
 
-                loadedImages = alternativeLocators.stream()
-                    .map(uri -> loadImage(uri))
-                    .filter(img -> img != null)
-                    .collect(Collectors.toList());
-                if(baseImage != null)
-                    loadedImages.add(baseImage);
+                loadedImages = transform(alternativeLocators, uri -> true,
+                                         uri -> loadImage(uri),
+                                         toListNoNulls());
+                if (baseImage != null) loadedImages.add(baseImage);
                 loadedImages.sort((img0, img1) ->
                     img0.getWidth()*img0.getHeight() -
                         img1.getWidth()*img1.getHeight());
