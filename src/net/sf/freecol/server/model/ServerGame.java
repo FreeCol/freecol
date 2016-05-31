@@ -140,11 +140,7 @@ public class ServerGame extends Game implements ServerModelObject {
      *     to include (useful when a player dies).
      */
     public void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
-        List<ServerPlayer> live = getConnectedPlayers();
-        for (ServerPlayer sp : serverPlayers) {
-            if (!live.contains(sp)) live.add(sp);
-        }
-        sendToList(live, cs);
+        sendToList(getConnectedPlayers(), cs);
     }
     
     /**
