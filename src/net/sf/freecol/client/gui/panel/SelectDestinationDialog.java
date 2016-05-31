@@ -198,11 +198,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     IndianSettlement is = (IndianSettlement)loc;
                     UnitType sk = is.getLearnableSkill();
                     if (sk != null) {
+                        final Predicate<Unit> pred = u ->
+                            u.getType().canBeUpgraded(sk, ChangeType.NATIVES);
                         Unit up = (unit.getType().canBeUpgraded(sk,
                                 ChangeType.NATIVES)) ? unit : null;
                         if (unit.isCarrier()) {
-                            up = find(unit.getUnitList(),
-                                u -> u.getType().canBeUpgraded(sk, ChangeType.NATIVES));
+                            up = find(unit.getUnitList(), pred);
                         }
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");
@@ -495,12 +496,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             if (p.getMovesLeft() < unit.getInitialMovesLeft()) turns++;
             return new Destination(s, turns, unit, goodsTypes);
         };
-        td.addAll(transform(md.getResults().entrySet(), e -> true, dmapper));
+        td.addAll(transform(md.getResults().entrySet(), alwaysTrue(), dmapper));
 
         // Drop inaccessible destinations and sort as specified.
         this.destinations.addAll(transformAndSort(td,
                                  d -> d.turns < Unit.MANY_TURNS,
-                                 d -> d,
+                                 Function.identity(),
                                  this.destinationComparator));
     }
 

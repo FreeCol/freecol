@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -573,12 +575,14 @@ public class ClientOptions extends OptionGroup {
      * @return A list of active mods.
      */
     public List<FreeColModFile> getActiveMods() {
-        ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
-        return (option == null) ? Collections.<FreeColModFile>emptyList()
-            : transform(option.getOptionValues(), o -> true,
-                        m -> (m == null || m.getId() == null) ? null
-                            : Mods.getFreeColModFile(m.getId()),
-                        toListNoNulls());
+        ModListOption mlo = (ModListOption)getOption(ClientOptions.USER_MODS);
+        if (mlo == null) return Collections.<FreeColModFile>emptyList();
+
+        final Predicate<FreeColModFile> pred = m ->
+            m != null && m.getId() != null;
+        final Function<FreeColModFile, FreeColModFile> mapper = m ->
+            Mods.getFreeColModFile(m.getId());
+        return transform(mlo.getOptionValues(), pred, mapper, toListNoNulls());
     }
 
     /**

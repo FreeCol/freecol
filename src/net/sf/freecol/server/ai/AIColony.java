@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -388,7 +389,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         int tipSize = tileImprovementPlans.size();
         if (tipSize > 0) {
             List<Unit> pioneers = transformAndSort(tile.getUnitList(),
-                u -> u.getPioneerScore() >= 0, u -> u, pioneerComparator);
+                u -> u.getPioneerScore() >= 0, Function.identity(),
+                pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
                 if (aiu.tryPioneeringMission(lb)) {
@@ -487,10 +489,12 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void exploreLCRs() {
         final Tile tile = colony.getTile();
-        List<Unit> explorers = transformAndSort(tile.getUnitList(),
-            u -> u.isPerson() && (u.getType().getSkill() <= 0
-                || u.hasAbility(Ability.EXPERT_SCOUT)),
-            u -> u, scoutComparator);
+        final Predicate<Unit> pred = u -> u.isPerson()
+            && (u.getType().getSkill() <= 0
+                || u.hasAbility(Ability.EXPERT_SCOUT));
+        List<Unit> explorers
+            = transformAndSort(tile.getUnitList(), pred, Function.identity(),
+                               scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
@@ -1274,13 +1278,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             // Defend against clearing the last forested tile.
             TileType change = plan.getType().getChange(workTile.getType());
+            final Predicate<WorkLocation> pred = cwl ->
+                cwl instanceof ColonyTile
+                    && !((ColonyTile)cwl).isColonyCenterTile()
+                    && cwl.getWorkTile().isForested();
             if (change != null
                 && !change.isForested()
                 && !colonyTile.isColonyCenterTile()
-                && count(colony.getAvailableWorkLocations(),
-                    cwl -> cwl instanceof ColonyTile
-                        && !((ColonyTile)cwl).isColonyCenterTile()
-                        && cwl.getWorkTile().isForested())
+                && count(colony.getAvailableWorkLocations(), pred)
                     <= FOREST_MINIMUM) continue;
 
             newPlans.add(plan); // Otherwise add the plan.

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1781,8 +1782,8 @@ public final class InGameController extends Controller {
             p.getTension(serverPlayer).getValue());
         List<Player> natives
             = transformAndSort(game.getLiveNativePlayers(null),
-                               p -> p.hasContacted(serverPlayer), p -> p,
-                               comp);
+                               p -> p.hasContacted(serverPlayer),
+                               Function.identity(), comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)first(natives);
             logger.info("Native ally following independence: " + good);
@@ -3559,7 +3560,7 @@ public final class InGameController extends Controller {
         // Collect roles that cause a change, ordered by simplest change
         for (UnitChange uc : transformAndSort(unitChanges,
                 uc -> uc.role != uc.unit.getRole() && uc.role != defaultRole,
-                u -> u, Comparator.<UnitChange>reverseOrder())) {
+                Function.identity(), Comparator.<UnitChange>reverseOrder())) {
             if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
                     + uc.unit.getId() + " for role " + uc.role
@@ -3713,7 +3714,7 @@ public final class InGameController extends Controller {
             // newly visible tiles, possibly with enhanced radius.
             Set<Tile> tiles = transform(tile.getSurroundingTiles(1, radius),
                 t -> !serverPlayer.canSee(t) && (t.isLand() || t.isShore()),
-                t -> t, Collectors.toSet());
+                Function.identity(), Collectors.toSet());
             cs.add(See.only(serverPlayer), serverPlayer.exploreTiles(tiles));
 
             // If the unit was promoted, update it completely, otherwise just

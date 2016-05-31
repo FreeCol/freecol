@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -291,9 +292,10 @@ public class TileImprovement extends TileItem implements Named {
      */
     public Map<Direction, Integer> getConnections() {
         final List<Direction> dirns = getConnectionDirections();
+        final Function<Direction, Direction> mapper = Function.identity();
         return (dirns == null) ? Collections.<Direction, Integer>emptyMap()
-            : transform(dirns, d -> isConnectedTo(d), d -> d,
-                        Collectors.toMap(d -> d, d -> magnitude));
+            : transform(dirns, d -> isConnectedTo(d), mapper,
+                        Collectors.toMap(mapper, d -> magnitude));
     }
 
     /**

@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.function.ToIntFunction;
@@ -153,7 +154,7 @@ public class Player extends FreeColGameObject implements Nameable {
             units.clear();
             units.addAll(transformAndSort(owner.getUnits(),
                                           u -> predicate.test(u),
-                                          u -> u,
+                                          Function.identity(),
                                           Unit.locComparator));
         }
 
@@ -1051,8 +1052,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Player> getRebels() {
         return transform(getGame().getLiveEuropeanPlayers(this),
-                         p -> p.getREFPlayer() == this
-                             && (p.isRebel() || p.isUndead()));
+                         p -> (p.getREFPlayer() == this
+                             && (p.isRebel() || p.isUndead())));
     }
 
     /**
@@ -1546,7 +1547,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public java.util.Map<String, Turn> getElectionTurns() {
         return transform(getHistory(),
                          e -> e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER,
-                         e -> e,
+                         Function.identity(),
                          Collectors.toMap(e -> e.getReplacement("%father%").getId(),
                                           e -> e.getTurn()));
     }
@@ -1769,8 +1770,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 && (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                     || (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)
                         && any(getGame().getLiveEuropeanPlayers(this),
-                            p -> getStance(p) == Stance.PEACE
-                                || getStance(p) == Stance.ALLIANCE))));
+                               p -> (getStance(p) == Stance.PEACE
+                                   || getStance(p) == Stance.ALLIANCE)))));
     }
 
     /**
@@ -2198,7 +2199,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final TradeRoute exclude) {
         synchronized (this.tradeRoutes) {
             return find(this.tradeRoutes,
-                t -> t.getName().equals(name) && t != exclude);
+                        t -> t.getName().equals(name) && t != exclude);
         }
     }
 
@@ -2993,7 +2994,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasContactedEuropeans() {
         return any(getGame().getLiveEuropeanPlayers(this),
-            p -> hasContacted(p));
+                   p -> hasContacted(p));
     }
 
     /**
@@ -3003,7 +3004,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean hasContactedIndians() {
         return any(getGame().getLiveNativePlayers(this),
-            p -> hasContacted(p));
+                   p -> hasContacted(p));
     }
 
     /**
@@ -3045,10 +3046,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         } // Else, native ownership
         int price = spec.getInteger(GameOptions.LAND_PRICE_FACTOR)
+            // Only consider specific food types, not the aggregation.
             * sum(spec.getGoodsTypeList(),
-                // Only consider specific food types, not the aggregation.
-                gt -> gt != spec.getPrimaryFoodType(),
-                gt -> tile.getPotentialProduction(gt, null))
+                  gt -> gt != spec.getPrimaryFoodType(),
+                  gt -> tile.getPotentialProduction(gt, null))
             + 100;
         return (int)applyModifiers(price, getGame().getTurn(),
                                    Modifier.LAND_PAYMENT_MODIFIER);
@@ -3173,7 +3174,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
         return (any(tile.getUnitList(),
-                u -> u.getOwner() != this && u.isOffensiveUnit()))
+                    u -> u.getOwner() != this && u.isOffensiveUnit()))
             ? NoClaimReason.OCCUPIED // The tile is held against us
             : (isEuropean())
             ? ((tile.hasLostCityRumour())
@@ -3757,7 +3758,7 @@ public class Player extends FreeColGameObject implements Nameable {
             maximumFoodConsumption = max(spec.getUnitTypeList(),
                 ut -> ut.isAvailableTo(this),
                 ut -> sum(spec.getFoodGoodsTypeList(),
-                    ft -> ut.getConsumptionOf(ft)));
+                          ft -> ut.getConsumptionOf(ft)));
         }
         return maximumFoodConsumption;
     }

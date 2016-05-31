@@ -315,7 +315,7 @@ public abstract class Settlement extends GoodsLocation
      */
     public boolean isConnectedPort() {
         return any(getTile().getSurroundingTiles(1, 1),
-            t -> !t.isLand() && t.isHighSeasConnected());
+                   t -> !t.isLand() && t.isHighSeasConnected());
     }
 
     /**
@@ -423,7 +423,7 @@ public abstract class Settlement extends GoodsLocation
         // To succeed, there must exist an available role for the unit
         // where the extra equipment for the role is present.
         return find(unit.getAvailableRoles(military),
-            r -> canProvideGoods(unit.getGoodsDifference(r, 1)));
+                    r -> canProvideGoods(unit.getGoodsDifference(r, 1)));
     }
 
 
@@ -587,9 +587,8 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public int priceGoods(List<AbstractGoods> goods) {
-        return (any(goods,
-                ag -> getGoodsCount(ag.getType()) < ag.getAmount())) ? -1
-            : 0;
+        return (any(goods, ag -> getGoodsCount(ag.getType()) < ag.getAmount()))
+            ? -1 : 0;
     }
 
     /**

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1495,7 +1496,7 @@ public final class Specification {
     public List<Role> getMilitaryRoles() {
         if (this.militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
-                transformAndSort(roles, Role::isOffensive, r -> r,
+                transformAndSort(roles, Role::isOffensive, Function.identity(),
                                  Role.militaryComparator));
         }
         return this.militaryRoles;
@@ -1862,7 +1863,7 @@ public final class Specification {
 
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
-            + transform(getRoles(), r -> true, Role::getId,
+            + transform(getRoles(), alwaysTrue(), Role::getId,
                         Collectors.joining(" ")));
     }
     // end @compat 0.10.x

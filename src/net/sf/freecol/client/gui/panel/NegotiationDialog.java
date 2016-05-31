@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -473,8 +474,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
+            final Predicate<Player> pred = p ->
+                p != this.other && this.source.getStance(p).isIncitable();
             available.addAll(transform(getGame().getLivePlayers(this.source),
-                    p -> p != this.other && this.source.getStance(p).isIncitable()));
+                                       pred));
 
             add(this.label);
             add(this.victimBox);

@@ -408,7 +408,17 @@ public class CollectionUtils {
                                             Predicate<T> predicate) {
         return stream.allMatch(predicate);
     }
-    
+
+    /**
+     * Helper to create a predicate which is always true.
+     *
+     * @param <T> The stream member type.
+     * @return The always valid predicate for the stream type.
+     */
+    public static <T> Predicate<T> alwaysTrue() {
+        return (T t) -> true;
+    }
+
     /**
      * Does any member of an array match a predicate?
      *
@@ -773,8 +783,7 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(T[] array,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        final Predicate<T> alwaysTrue = t -> true;
-        return flatten_internal(Arrays.stream(array), alwaysTrue, mapper);
+        return flatten_internal(Arrays.stream(array), alwaysTrue(), mapper);
     }
 
     /**
@@ -804,8 +813,7 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(Collection<T> c,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        final Predicate<T> alwaysTrue = t -> true;
-        return flatten_internal(c.stream(), alwaysTrue, mapper);
+        return flatten_internal(c.stream(), alwaysTrue(), mapper);
     }
 
     /**
@@ -835,9 +843,8 @@ public class CollectionUtils {
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
-        final Predicate<T> alwaysTrue = t -> true;
         return (stream == null) ? Stream.<R>empty()
-            : flatten_internal(stream, alwaysTrue, mapper);
+            : flatten_internal(stream, alwaysTrue(), mapper);
     }
 
     /**
@@ -948,7 +955,7 @@ public class CollectionUtils {
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(T[] array, ToIntFunction<T> tif) {
-        return max_internal(Arrays.stream(array), t -> true, tif);
+        return max_internal(Arrays.stream(array), alwaysTrue(), tif);
     }
 
     /**
@@ -962,7 +969,7 @@ public class CollectionUtils {
      */
     public static <T> int max(T[] array, Predicate<T> predicate,
                               ToIntFunction<T> tif) {
-        return max_internal(Arrays.stream(array), t -> true, tif);
+        return max_internal(Arrays.stream(array), predicate, tif);
     }
 
     /**
@@ -974,7 +981,7 @@ public class CollectionUtils {
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Collection<T> c, ToIntFunction<T> tif) {
-        return max_internal(c.stream(), t -> true, tif);
+        return max_internal(c.stream(), alwaysTrue(), tif);
     }
 
     /**
@@ -1001,7 +1008,7 @@ public class CollectionUtils {
      */
     public static <T> int max(Stream<T> stream, ToIntFunction<T> tif) {
         return (stream == null) ? MAX_DEFAULT
-            : max_internal(stream, t -> true, tif);
+            : max_internal(stream, alwaysTrue(), tif);
     }
 
     /**
@@ -1045,7 +1052,8 @@ public class CollectionUtils {
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(T[] array, Comparator<? super T> comparator) {
-        return maximize_internal(Arrays.stream(array), p -> true, comparator);
+        return maximize_internal(Arrays.stream(array), alwaysTrue(),
+                                 comparator);
     }
 
     /**
@@ -1074,7 +1082,7 @@ public class CollectionUtils {
      */
     public static <T> T maximize(Collection<T> c,
                                  Comparator<? super T> comparator) {
-        return maximize_internal(c.stream(), p -> true, comparator);
+        return maximize_internal(c.stream(), alwaysTrue(), comparator);
     }
 
     /**
@@ -1104,7 +1112,7 @@ public class CollectionUtils {
     public static <T> T maximize(Stream<T> stream,
                                  Comparator<? super T> comparator) {
         return (stream == null) ? null
-            : maximize_internal(stream, p -> true, comparator);
+            : maximize_internal(stream, alwaysTrue(), comparator);
     }
 
     /**
@@ -1148,7 +1156,7 @@ public class CollectionUtils {
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(T[] array, ToIntFunction<T> tif) {
-        return min_internal(Arrays.stream(array), t -> true, tif);
+        return min_internal(Arrays.stream(array), alwaysTrue(), tif);
     }
 
     /**
@@ -1174,7 +1182,7 @@ public class CollectionUtils {
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Collection<T> c, ToIntFunction<T> tif) {
-        return min_internal(c.stream(), t -> true, tif);
+        return min_internal(c.stream(), alwaysTrue(), tif);
     }
 
     /**
@@ -1201,7 +1209,7 @@ public class CollectionUtils {
      */
     public static <T> int min(Stream<T> stream, ToIntFunction<T> tif) {
         return (stream == null) ? MIN_DEFAULT
-            : min_internal(stream, t -> true, tif);
+            : min_internal(stream, alwaysTrue(), tif);
     }
 
     /**
@@ -1246,7 +1254,8 @@ public class CollectionUtils {
      */
     public static <T> T minimize(T[] array,
                                  Comparator<? super T> comparator) {
-        return minimize_internal(Arrays.stream(array), t -> true, comparator);
+        return minimize_internal(Arrays.stream(array), alwaysTrue(),
+                                 comparator);
     }
 
     /**
@@ -1275,7 +1284,7 @@ public class CollectionUtils {
      */
     public static <T> T minimize(Collection<T> c,
                                  Comparator<? super T> comparator) {
-        return minimize_internal(c.stream(), t -> true, comparator);
+        return minimize_internal(c.stream(), alwaysTrue(), comparator);
     }
 
     /**
@@ -1305,7 +1314,7 @@ public class CollectionUtils {
     public static <T> T minimize(Stream<T> stream,
                                  Comparator<? super T> comparator) {
         return (stream == null) ? null
-            : minimize_internal(stream, t -> true, comparator);
+            : minimize_internal(stream, alwaysTrue(), comparator);
     }
 
     /**
@@ -1398,7 +1407,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     public static <T> int sum(T[] array, ToIntFunction<T> tif) {
-        return sum_internal(Arrays.stream(array), x -> true, tif);
+        return sum_internal(Arrays.stream(array), alwaysTrue(), tif);
     }
 
     /**
@@ -1424,7 +1433,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     public static <T> int sum(Collection<T> c, ToIntFunction<T> tif) {
-        return sum_internal(c.stream(), x -> true, tif);
+        return sum_internal(c.stream(), alwaysTrue(), tif);
     }
 
     /**
@@ -1451,7 +1460,7 @@ public class CollectionUtils {
      */
     public static <T> int sum(Stream<T> stream, ToIntFunction<T> tif) {
         return (stream == null) ? SUM_DEFAULT
-            : sum_internal(stream, x -> true, tif);
+            : sum_internal(stream, alwaysTrue(), tif);
     }
 
     /**
@@ -1494,7 +1503,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     public static <T> double sumDouble(T[] array, ToDoubleFunction<T> tdf) {
-        return sumDouble_internal(Arrays.stream(array), x -> true, tdf);
+        return sumDouble_internal(Arrays.stream(array), alwaysTrue(), tdf);
     }
 
     /**
@@ -1523,7 +1532,7 @@ public class CollectionUtils {
      */
     public static <T> double sumDouble(Collection<T> c,
                                        ToDoubleFunction<T> tdf) {
-        return sumDouble_internal(c.stream(), x -> true, tdf);
+        return sumDouble_internal(c.stream(), alwaysTrue(), tdf);
     }
 
     /**
@@ -1553,7 +1562,7 @@ public class CollectionUtils {
     public static <T> double sumDouble(Stream<T> stream,
                                        ToDoubleFunction<T> tdf) {
         return (stream == null) ? SUM_DOUBLE_DEFAULT
-            : sumDouble_internal(stream, x -> true, tdf);
+            : sumDouble_internal(stream, alwaysTrue(), tdf);
     }
 
     /**
@@ -1848,8 +1857,8 @@ public class CollectionUtils {
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(T[] array, Predicate<T> predicate) {
-        return transform_internal(Arrays.stream(array), predicate, i -> i,
-                                  Collectors.toList());
+        return transform_internal(Arrays.stream(array), predicate,
+                                  Function.<T>identity(), Collectors.toList());
     }
 
     /**
@@ -1897,8 +1906,8 @@ public class CollectionUtils {
      */
     public static <T> List<T> transform(Collection<T> c,
                                         Predicate<T> predicate) {
-        return transform_internal(c.stream(), predicate, i -> i,
-                                  Collectors.toList());
+        return transform_internal(c.stream(), predicate,
+                                  Function.<T>identity(), Collectors.toList());
     }
 
     /**
@@ -1948,7 +1957,8 @@ public class CollectionUtils {
     public static <T> List<T> transform(Stream<T> stream,
                                         Predicate<T> predicate) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
-        return transform_internal(s, predicate, i -> i, Collectors.toList());
+        return transform_internal(s, predicate, Function.<T>identity(),
+                                  Collectors.toList());
     }
 
     /**

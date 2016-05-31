@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -117,7 +118,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     private List<File> loadMapFiles(File dir) {
         final Comparator<File> comp = Comparator.comparing(File::getName);
         return transformAndSort(fileStream(dir),
-                                FreeColSavegameFile::fileFilter, f -> f, comp);
+                                FreeColSavegameFile::fileFilter,
+                                Function.identity(), comp);
     }
 
     /**

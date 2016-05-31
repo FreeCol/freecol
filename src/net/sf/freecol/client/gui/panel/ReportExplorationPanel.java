@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.JLabel;
 
@@ -81,7 +82,8 @@ public final class ReportExplorationPanel extends ReportPanel {
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
         for (Region region : transformAndSort(getGame().getMap().getRegions(),
-                r -> r.getDiscoveredIn() != null, r -> r, regionComparator)) {
+                r -> r.getDiscoveredIn() != null, Function.identity(),
+                regionComparator)) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(Utility.localizedLabel(region.getType().getNameKey()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()

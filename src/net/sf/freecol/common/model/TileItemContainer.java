@@ -254,8 +254,8 @@ public class TileItemContainer extends FreeColGameObject {
     public TileImprovement getImprovement(TileImprovementType type) {
         synchronized (tileItems) {
             return (TileImprovement)find(tileItems,
-                ti -> ti instanceof TileImprovement
-                && ((TileImprovement)ti).getType() == type);
+                ti -> (ti instanceof TileImprovement
+                    && ((TileImprovement)ti).getType() == type));
         }
     }
 
@@ -334,8 +334,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public TileImprovement getRoad() {
         return (TileImprovement)findTileItem(ti ->
-            ti instanceof TileImprovement
-            && ((TileImprovement)ti).isRoad());
+            ti instanceof TileImprovement && ((TileImprovement)ti).isRoad());
     }
 
     /**
@@ -346,8 +345,7 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public TileImprovement getRiver() {
         return (TileImprovement)findTileItem(ti ->
-            ti instanceof TileImprovement
-            && ((TileImprovement)ti).isRiver());
+            ti instanceof TileImprovement && ((TileImprovement)ti).isRiver());
     }
 
     /**

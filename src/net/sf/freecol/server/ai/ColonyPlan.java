@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -894,7 +895,7 @@ public class ColonyPlan {
         if (colony.getSoL() < 100) {
             produce.addAll(0, transformAndSort(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
-                    gt -> gt, productionComparator));
+                    Function.identity(), productionComparator));
         }
 
         // Always add raw/building materials first.
@@ -907,7 +908,8 @@ public class ColonyPlan {
                     && (colony.getGoodsCount(gt.getInputType())
                         >= GoodsContainer.CARGO_SIZE/2
                         || production.containsKey(gt.getInputType())),
-                gt -> gt, Comparator.comparingInt(indexer).reversed()));
+                Function.identity(),
+                Comparator.comparingInt(indexer).reversed()));
 
         for (int i = toAdd.size()-1; i >= 0; i--) {
             GoodsType make = toAdd.get(i);
@@ -928,13 +930,15 @@ public class ColonyPlan {
         // Military goods after lucrative production.
         produce.addAll(transformAndSort(militaryGoodsTypes,
                                         gt -> production.containsKey(gt),
-                                        gt -> gt, productionComparator));
+                                        Function.identity(),
+                                        productionComparator));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
             produce.addAll(transformAndSort(immigrationGoodsTypes,
                                             gt -> production.containsKey(gt),
-                                            gt -> gt, productionComparator));
+                                            Function.identity(),
+                                            productionComparator));
         }
     }
 

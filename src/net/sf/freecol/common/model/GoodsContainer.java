@@ -327,9 +327,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public int getSpaceTaken() {
         synchronized (this.storedGoods) {
             return sum(this.storedGoods.values(),
-                amount -> (amount % CARGO_SIZE == 0)
-                    ? amount/CARGO_SIZE
-                    : amount/CARGO_SIZE + 1);
+                       amount -> ((amount % CARGO_SIZE == 0)
+                           ? amount/CARGO_SIZE
+                           : amount/CARGO_SIZE + 1));
         }
     }
 
@@ -417,7 +417,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     public boolean hasChanged() {
         return any(getSpecification().getGoodsTypeList(),
-            gt -> getOldGoodsCount(gt) != getGoodsCount(gt));
+                   gt -> getOldGoodsCount(gt) != getGoodsCount(gt));
     }
 
     /**

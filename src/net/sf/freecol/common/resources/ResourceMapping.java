@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -317,6 +318,6 @@ public final class ResourceMapping {
      */
     public Set<String> getImageKeySet(String prefix) {
         return transform(imageResources.keySet(), k -> k.startsWith(prefix),
-                         k -> k, Collectors.toSet());
+                         Function.identity(), Collectors.toSet());
     }
 }

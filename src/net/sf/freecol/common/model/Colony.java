@@ -2477,7 +2477,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return any(getAvailableWorkLocations(),
-                wl -> wl.contains(locatable));
+                       wl -> wl.contains(locatable));
         }
         return super.contains(locatable);
     }

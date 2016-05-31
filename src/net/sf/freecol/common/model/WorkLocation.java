@@ -537,8 +537,8 @@ public abstract class WorkLocation extends UnitLocation
         ProductionType pt = getBestProductionType(false, null);
         return (pt == null) ? null
             : find(map(pt.getOutputs(),
-                    ag -> spec.getExpertForProducing(ag.getType())),
-                ut -> ut != null, null);
+                       ag -> spec.getExpertForProducing(ag.getType())),
+                   ut -> ut != null);
     }
 
     /**
@@ -568,11 +568,12 @@ public abstract class WorkLocation extends UnitLocation
         if (unit == null || unit.getWorkType() != goodsType) return 0;
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
-        return max(getOutputs(),
-            ag -> ag.getType() == goodsType,
-            ag -> (int)applyModifiers(getBaseProduction(getProductionType(),
-                                                        goodsType, unitType),
-                turn, getProductionModifiers(goodsType, unitType)));
+        final ToIntFunction<AbstractGoods> toif = ag ->
+            (int)applyModifiers(getBaseProduction(getProductionType(),
+                                                  goodsType, unitType),
+                                turn,
+                                getProductionModifiers(goodsType, unitType));
+        return max(getOutputs(), ag -> ag.getType() == goodsType, toif);
     }
 
     /**

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
@@ -610,7 +611,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
                          t -> t.getContiguity() == contiguity,
-                         t -> t, Collectors.toSet());
+                         Function.identity(), Collectors.toSet());
     }
 
     /**
@@ -1385,11 +1386,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        final Predicate<Tile> pred = t ->
-            t.isLand() && (!t.hasSettlement() || player.owns(t.getSettlement()));
+        final Predicate<Tile> pred = t -> (t.isLand()
+            && (!t.hasSettlement() || player.owns(t.getSettlement())));
         final Comparator<Tile> comp = cachingDoubleComparator((Tile t) ->
             t.getDefenceValue()).reversed();
-        return transformAndSort(getSurroundingTiles(0, 1), pred, t -> t, comp);
+        return transformAndSort(getSurroundingTiles(0, 1), pred,
+                                Function.identity(), comp);
     }
                     
     /**
@@ -1435,8 +1437,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
         return transform(getSurroundingTiles(0, 1),
-                         t -> !t.isLand() && t.isHighSeasConnected()
-                             && !t.isDangerousToShip(unit));
+                         t -> (!t.isLand() && t.isHighSeasConnected()
+                             && !t.isDangerousToShip(unit)));
     }
                 
 

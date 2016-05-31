@@ -88,7 +88,7 @@ public class ImageResource extends Resource
             if (image == null) {
                 BufferedImage baseImage = loadImage(getResourceLocator());
 
-                loadedImages = transform(alternativeLocators, uri -> true,
+                loadedImages = transform(alternativeLocators, alwaysTrue(),
                                          uri -> loadImage(uri),
                                          toListNoNulls());
                 if (baseImage != null) loadedImages.add(baseImage);

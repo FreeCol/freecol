@@ -509,8 +509,8 @@ public class SimpleCombatModel extends CombatModel {
      */
     private boolean hasStrongDefenceModifier(FreeColObject fco) {
         return any(fco.getDefenceModifiers(),
-            m -> m.getType() == ModifierType.PERCENTAGE
-                && m.getValue() >= STRONG_DEFENCE_THRESHOLD);
+                   m -> m.getType() == ModifierType.PERCENTAGE
+                       && m.getValue() >= STRONG_DEFENCE_THRESHOLD);
     }
 
     /**

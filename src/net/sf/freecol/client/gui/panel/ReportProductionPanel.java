@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
@@ -70,8 +71,8 @@ public final class ReportProductionPanel extends ReportPanel {
 
         this.goodsTypes = transform(getSpecification().getGoodsTypeList(),
                                     gt -> !gt.isFarmed());
-        List<String> goodsNames = toList(map(this.goodsTypes,
-                                             gt -> Messages.getName(gt)));
+        List<String> goodsNames = transform(this.goodsTypes, alwaysTrue(),
+                                            gt -> Messages.getName(gt));
         goodsNames.add(0, Messages.message("nothing"));
         String[] model = goodsNames.toArray(new String[0]);
         for (int index = 0; index < NUMBER_OF_GOODS; index++) {
@@ -109,12 +110,13 @@ public final class ReportProductionPanel extends ReportPanel {
         if (!selectedTypes.isEmpty()) {
             final Specification spec = getSpecification();
             final FreeColClient fcc = getFreeColClient();
+            final Function<GoodsType, List<BuildingType>> mapper = gt ->
+                transformDistinct(spec.getBuildingTypeList(),
+                                  bt -> (gt == bt.getProducedGoodsType()
+                                      || bt.hasModifier(gt.getId())),
+                                  bt -> bt.getFirstLevel());
             List<List<BuildingType>> basicBuildingTypes
-                = toList(map(selectedTypes,
-                        gt -> transformDistinct(spec.getBuildingTypeList(),
-                            bt -> gt == bt.getProducedGoodsType()
-                            || bt.hasModifier(gt.getId()),
-                            (BuildingType bt) -> bt.getFirstLevel())));
+                = transform(selectedTypes, alwaysTrue(), mapper);
 
             // labels
             JLabel newLabel;

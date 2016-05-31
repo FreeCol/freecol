@@ -960,7 +960,7 @@ public final class FreeCol {
      */
     private static Advantages selectAdvantages(String advantages) {
         Advantages adv = find(Advantages.values(),
-            a -> Messages.getName(a).equals(advantages), null);
+                              a -> Messages.getName(a).equals(advantages), null);
         if (adv != null) setAdvantages(adv);
         return adv;
     }
@@ -980,7 +980,7 @@ public final class FreeCol {
      * @return A list of advantage types.
      */
     private static String getValidAdvantages() {
-        return transform(Advantages.values(), a -> true,
+        return transform(Advantages.values(), alwaysTrue(),
                          a -> Messages.getName(a), Collectors.joining(","));
     }
 
@@ -1001,7 +1001,7 @@ public final class FreeCol {
      */
     public static String selectDifficulty(String arg) {
         String difficulty = find(map(DIFFICULTIES, d -> "model.difficulty."+d),
-            k -> Messages.getName(k).equals(arg), null);
+                                     k -> Messages.getName(k).equals(arg));
         if (difficulty != null) setDifficulty(difficulty);
         return difficulty;
     }
@@ -1031,7 +1031,7 @@ public final class FreeCol {
      * @return The valid difficulty levels, comma separated.
      */
     public static String getValidDifficulties() {
-        return transform(DIFFICULTIES, d -> true,
+        return transform(DIFFICULTIES, alwaysTrue(),
                          d -> Messages.getName("model.difficulty." + d),
                          Collectors.joining(","));
     }

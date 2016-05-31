@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
@@ -122,7 +123,7 @@ public class ModifierFormat {
     }
 
     public static String getModifierAsString(Modifier modifier) {
-        return transform(getModifierStrings(modifier), s -> s != null, s -> s,
-                         Collectors.joining());
+        return transform(getModifierStrings(modifier), s -> s != null,
+                         Function.identity(), Collectors.joining());
     }
 }

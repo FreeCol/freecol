@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
@@ -1035,11 +1036,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
+        final Function<GoodsType, GoodsType> mapper = Function.identity();
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
                         gt -> !gt.isMilitaryGoods() && gt.isStorable(),
-                        gt -> gt,
-                        Collectors.toMap(gt -> gt,
+                        mapper,
+                        Collectors.toMap(mapper,
                             gt -> getNormalGoodsPriceToBuy(gt,
                                 GoodsContainer.CARGO_SIZE)));
 

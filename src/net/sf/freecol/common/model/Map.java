@@ -203,7 +203,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public Direction getDirection(Position other) {
             return find(Direction.values(),
-                d -> new Position(this, d).equals(other), null);
+                        d -> new Position(this, d).equals(other), null);
         }
 
         // Override Object

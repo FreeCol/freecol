@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -355,10 +356,11 @@ public final class CompactLabourReport extends ReportPanel {
                     final Unit student = u.getStudent();
                     return student != null && student.getType() == unitType;
                 };
+                final Function<Unit, UnitType> mapper = u ->
+                    Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType());
                 Set<UnitType> resultOfTraining = (colony == null)
                     ? Collections.<UnitType>emptySet()
-                    : transform(colony.getTeachers(), pred,
-                                u -> Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType()),
+                    : transform(colony.getTeachers(), pred, mapper,
                                 Collectors.toSet());
                 String student = resultOfTraining.size() == 1 ?
                     Messages.message(StringTemplate

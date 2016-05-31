@@ -381,7 +381,8 @@ public class DOMMessage {
      */
     public static final Element handleChildren(MessageHandler mh,
         Connection connection, Element element) {
-        return handleList(mh, connection, mapChildren(element, e -> e));
+        return handleList(mh, connection,
+                          mapChildren(element, Function.identity()));
     }
 
     /**

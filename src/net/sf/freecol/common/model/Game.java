@@ -799,7 +799,7 @@ public class Game extends FreeColGameObject {
     public Nation getVacantNation() {
         Entry<Nation,NationState> entry
             = find(nationOptions.getNations().entrySet(),
-                e -> e.getValue() == NationState.AVAILABLE, null);
+                   e -> e.getValue() == NationState.AVAILABLE);
         return (entry == null) ? null : entry.getKey();
     }
 
