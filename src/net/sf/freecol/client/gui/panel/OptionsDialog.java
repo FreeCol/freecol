@@ -223,7 +223,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {
-        if (this.group.save(file)) return true;
+        if (this.group.save(file, null, true)) return true;
         getGUI().showErrorMessage(FreeCol.badSave(file));
         return false;
     }

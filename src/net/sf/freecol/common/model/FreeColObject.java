@@ -842,8 +842,7 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file)
-        throws FileNotFoundException {
+    public boolean save(File file) {
         return save(file, WriteScope.toSave());
     }
 
@@ -853,10 +852,8 @@ public abstract class FreeColObject
      * @param file The <code>File</code> to write to.
      * @param scope The <code>WriteScope</code> to use.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file, WriteScope scope)
-        throws FileNotFoundException {
+    public boolean save(File file, WriteScope scope) {
         return save(file, scope, false);
     }
 
@@ -867,14 +864,14 @@ public abstract class FreeColObject
      * @param scope The <code>WriteScope</code> to use.
      * @param pretty Attempt to indent the output nicely.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException if unable to open the file.
      */
-    public boolean save(File file, WriteScope scope, boolean pretty)
-        throws FileNotFoundException {
+    public boolean save(File file, WriteScope scope, boolean pretty) {
         try (
             FileOutputStream fos = new FileOutputStream(file);
         ) {
             return save(fos, scope, pretty);
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "No file: " + file.getPath(), fnfe);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FileOutputStream", ioe);
         }
@@ -890,6 +887,7 @@ public abstract class FreeColObject
      * @return True if the save proceeded without error.
      */
     public boolean save(OutputStream out, WriteScope scope, boolean pretty) {
+        if (scope == null) scope = FreeColXMLWriter.WriteScope.toSave();
         try (
             FreeColXMLWriter xw = new FreeColXMLWriter(out, scope, pretty);
         ) {

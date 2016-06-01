@@ -96,7 +96,7 @@ public final class StartGamePanel extends FreeColPanel {
                 : null;
             gog = (gog != null) ? spec.mergeGroup(gog)
                 : spec.getOptionGroup(gtag);
-            gog.save(gof);
+            gog.save(gof, null, true);
 
             String mtag = MapGeneratorOptions.getTagName();
             File mof = FreeColDirectories
@@ -105,7 +105,7 @@ public final class StartGamePanel extends FreeColPanel {
                 : null;
             mog = (mog != null) ? spec.mergeGroup(mog)
                 : spec.getOptionGroup(mtag);
-            mog.save(mof);
+            mog.save(mof, null, true);
         }
 
         NationOptions nationOptions = getGame().getNationOptions();
