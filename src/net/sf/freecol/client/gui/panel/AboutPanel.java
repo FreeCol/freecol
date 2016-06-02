@@ -113,8 +113,7 @@ public final class AboutPanel extends FreeColPanel {
         add(apRevision, "newline");
 
         // Official Site Link
-        JLabel apOfficialSite = new JLabel();
-        apOfficialSite = Utility.localizedLabel("aboutPanel.officialSite");
+        JLabel apOfficialSite = Utility.localizedLabel("aboutPanel.officialSite");
         apOfficialSite.setFont(fontBold);
         add(apOfficialSite, "newline 10");
         JButton apSiteURL = Utility.getLinkButton(SITE_URL, null, SITE_URL);
@@ -123,12 +122,10 @@ public final class AboutPanel extends FreeColPanel {
         add(apSiteURL, "newline");
 
         // SourceForge Project Site Link
-        JLabel apSFProject = new JLabel();
-        apSFProject = Utility.localizedLabel("aboutPanel.sfProject");      
+        JLabel apSFProject = Utility.localizedLabel("aboutPanel.sfProject");
         apSFProject.setFont(fontBold);
         add(apSFProject, "newline 10");
-        JButton apProjectURL
-            = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
+        JButton apProjectURL = Utility.getLinkButton(PROJECT_URL, null, PROJECT_URL);
         apProjectURL.addActionListener(this);
         apProjectURL.setFont(fontNormal);
         add(apProjectURL, "newline");
@@ -143,8 +140,7 @@ public final class AboutPanel extends FreeColPanel {
         add(apManualURL, "newline");
         
         // License Disclaimer
-        JTextArea apLegal
-            = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
+        JTextArea apLegal = Utility.localizedTextArea("aboutPanel.legalDisclaimer");
         apLegal.setFont(fontNormal);
         add(apLegal, "newline 20, width 300px");
 
