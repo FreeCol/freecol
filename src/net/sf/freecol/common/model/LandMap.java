@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -304,18 +306,20 @@ public class LandMap {
      * Get the positions surrounding a central position that are potential
      * valid land positions.
      *
-     * @param p The central <code>Position</code> to work from.
+     * @param position The central <code>Position</code> to work from.
      * @param preferredDistanceToEdge The preferred distance to the map edge.
      * @return A list of suitable <code>Position</code>s.
      */
-    private List<Position> newPositions(Position p, int preferredDistanceToEdge) {
-        return Direction.longSides.stream()
-            .map(d -> new Position(p, d))
-            .filter(n -> n.isValid(width, height)
-                && isSingleTile(n.getX(), n.getY())
-                && n.getX() > preferredDistanceToEdge
-                && n.getX() < width - preferredDistanceToEdge)
-            .collect(Collectors.toList());
+    private List<Position> newPositions(Position position,
+                                        int preferredDistanceToEdge) {
+        final Predicate<Position> pred = p ->
+            p.isValid(width, height)
+                && isSingleTile(p.getX(), p.getY())
+                && p.getX() > preferredDistanceToEdge
+                && p.getX() < width - preferredDistanceToEdge;
+        final Function<Direction, Position> mapper = d ->
+            new Position(position, d);
+        return transform(map(Direction.longSides, mapper), pred);
     }
 
     /**
