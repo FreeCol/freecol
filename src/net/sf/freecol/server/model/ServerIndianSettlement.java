@@ -138,7 +138,7 @@ public class ServerIndianSettlement extends IndianSettlement
             GoodsType type = spec.getGoodsType(goods.getType().getId());
             addGoods(type, goods.getAmount());
         }
-        wantedGoods = template.getWantedGoods();
+        setWantedGoods(template.getWantedGoods());
     }
 
 

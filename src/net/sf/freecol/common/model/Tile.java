@@ -77,7 +77,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         public UnitType skill = null;
 
         /** The goods the settlement is interested in. */
-        public GoodsType[] wantedGoods = null;
+        public List<GoodsType> wantedGoods = null;
 
 
         /**
@@ -95,17 +95,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
          * @param skill The skill taught.
          * @param wanted The wanted goods.
          */
-        public void setValues(UnitType skill, GoodsType[] wanted) {
+        public void setValues(UnitType skill, List<GoodsType> wanted) {
             this.skill = skill;
             if (wanted == null) {
                 this.wantedGoods = null;
+            } else if (this.wantedGoods == null) {
+                this.wantedGoods = new ArrayList<GoodsType>(wanted);
             } else {
-                if (this.wantedGoods == null) {
-                    this.wantedGoods
-                        = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
-                }
-                System.arraycopy(wanted, 0, this.wantedGoods, 0,
-                    Math.min(wanted.length, this.wantedGoods.length));
+                this.wantedGoods.clear();
+                this.wantedGoods.addAll(wanted);
             }
         }
     }
@@ -1952,7 +1950,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return (isi == null) ? null : isi.skill;
     }
 
-    public GoodsType[] getWantedGoods(Player player) {
+    public List<GoodsType> getWantedGoods(Player player) {
         IndianSettlementInternals isi = getPlayerIndianSettlement(player);
         return (isi == null) ? null : isi.wantedGoods;
     }
@@ -1966,7 +1964,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param wanted The goods wanted by the settlement.
      */
     public void setIndianSettlementInternals(Player player, UnitType skill,
-                                             GoodsType[] wanted) {
+                                             List<GoodsType> wanted) {
         IndianSettlementInternals isi = getPlayerIndianSettlement(player);
         if (isi == null) {
             isi = new IndianSettlementInternals();
@@ -2708,12 +2706,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 UnitType skill = xr.getType(spec,
                     IndianSettlement.LEARNABLE_SKILL_TAG,
                     UnitType.class, (UnitType)null);
-                GoodsType[] wanted
-                    = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
-                for (int i = 0; i < wanted.length; i++) {
-                    wanted[i] = xr.getType(spec,
-                        IndianSettlement.WANTED_GOODS_TAG + i,
-                        GoodsType.class, (GoodsType)null);
+                List<GoodsType> wanted
+                    = new ArrayList<GoodsType>(IndianSettlement.WANTED_GOODS_COUNT);
+                for (int i = 0; i < IndianSettlement.WANTED_GOODS_COUNT; i++) {
+                    wanted.add(xr.getType(spec,
+                            IndianSettlement.WANTED_GOODS_TAG + i,
+                            GoodsType.class, (GoodsType)null));
                 }
                 setIndianSettlementInternals(player, skill, wanted);
             }

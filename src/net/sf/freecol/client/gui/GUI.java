@@ -909,17 +909,13 @@ public class GUI extends FreeColClientHolder {
                     .addNamed("%skill%", is.getLearnableSkill()))
                 .addName(" ");
         }
-        GoodsType[] wantedGoods = is.getWantedGoods();
-        int present = 0;
-        for (; present < wantedGoods.length; present++) {
-            if (wantedGoods[present] == null) break;
-        }
+        int present = is.getWantedGoodsCount();
         if (present > 0) {
             StringTemplate t = StringTemplate.template("scoutSettlement.trade."
                 + Integer.toString(present));
             for (int i = 0; i < present; i++) {
                 String tradeKey = "%goods" + Integer.toString(i+1) + "%";
-                t.addNamed(tradeKey, wantedGoods[i]);
+                t.addNamed(tradeKey, is.getWantedGoods(i));
             }
             template.addStringTemplate(t).addName("\n\n");
         }
@@ -927,11 +923,11 @@ public class GUI extends FreeColClientHolder {
         List<ChoiceItem<ScoutIndianSettlementAction>> choices
             = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.speak"),
-                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_SPEAK));
+                ScoutIndianSettlementAction.SCOUT_SETTLEMENT_SPEAK));
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.tribute"),
-                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_TRIBUTE));
+                ScoutIndianSettlementAction.SCOUT_SETTLEMENT_TRIBUTE));
         choices.add(new ChoiceItem<>(Messages.message("scoutSettlement.attack"),
-                                     ScoutIndianSettlementAction.SCOUT_SETTLEMENT_ATTACK));
+                ScoutIndianSettlementAction.SCOUT_SETTLEMENT_ATTACK));
 
         return getChoice(is.getTile(), template, is, "cancel", choices);
     }

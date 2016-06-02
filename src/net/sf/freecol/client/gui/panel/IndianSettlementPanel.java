@@ -88,7 +88,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 JLabel.CENTER));
         }
 
-        add(Utility.localizedLabel("indianSettlementPanel.learnableSkill"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.learnableSkill"),
+            "newline");
         final UnitType skillType = is.getLearnableSkill();
         add(Utility.localizedLabel(is.getLearnableSkillLabel(visited),
                 ((visited && skillType != null)
@@ -96,7 +97,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     : null),
                 JLabel.CENTER));
 
-        add(Utility.localizedLabel("indianSettlementPanel.mostHated"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.mostHated"),
+            "newline");
         final Player mostHated = is.getMostHated();
         add(Utility.localizedLabel(is.getMostHatedLabel(contacted),
                 ((contacted && mostHated != null)
@@ -104,24 +106,26 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     : null),
                 JLabel.CENTER));
 
-        GoodsType[] wantedGoods = is.getWantedGoods();
-        final int n = (visited) ? is.getWantedGoodsAmount() : 2;
+        GoodsType gt;
         List<StringTemplate> wants = is.getWantedGoodsLabel(0, player);
-        add(Utility.localizedLabel("indianSettlementPanel.highlyWanted"), "newline");
+        add(Utility.localizedLabel("indianSettlementPanel.highlyWanted"),
+            "newline");
         JLabel label = Utility.localizedLabel(wants.get(0),
-            ((visited && wantedGoods[0] != null)
-                ? new ImageIcon(lib.getIconImage(wantedGoods[0]))
+            ((visited && (gt = is.getWantedGoods(0)) != null)
+                ? new ImageIcon(lib.getIconImage(gt))
                 : null),
             JLabel.CENTER);
         if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));
         add(label);
-        add(Utility.localizedLabel("indianSettlementPanel.otherWanted"), "newline");
-        String x = "split " + Integer.toString(n-1);
+        add(Utility.localizedLabel("indianSettlementPanel.otherWanted"),
+            "newline");
+        final int n = is.getWantedGoodsCount();
+        String x = "split " + ((n <= 1) ? "1" : Integer.toString(n-1));
         for (int i = 1; i < n; i++) {
             wants = is.getWantedGoodsLabel(i, player);
             label = Utility.localizedLabel(wants.get(0),
-                ((visited && wantedGoods[i] != null)
-                    ? new ImageIcon(lib.getIconImage(wantedGoods[i]))
+                ((visited && (gt = is.getWantedGoods(i)) != null)
+                    ? new ImageIcon(lib.getIconImage(gt))
                     : null),
                 JLabel.CENTER);
             if (wants.size() > 1) Utility.localizeToolTip(label, wants.get(1));

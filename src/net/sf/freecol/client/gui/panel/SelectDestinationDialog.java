@@ -215,15 +215,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         String sale = owner.getLastSaleString(loc, g);
                         String more = null;
                         if (loc instanceof IndianSettlement) {
-                            GoodsType[] wanted
-                                = ((IndianSettlement)loc).getWantedGoods();
-                            if (wanted.length > 0 && g == wanted[0]) {
-                                more = "***";
-                            } else if (wanted.length > 1 && g == wanted[1]) {
-                                more = "**";
-                            } else if (wanted.length > 2 && g == wanted[2]) {
-                                more = "*";
-                            }
+                            IndianSettlement is = (IndianSettlement)loc;
+                            more = (g == is.getWantedGoods(0)) ? "***"
+                                : (g == is.getWantedGoods(1)) ? "**"
+                                : (g == is.getWantedGoods(2)) ? "*"
+                                : null;
                         }
                         if (sale != null && more != null) {
                             lb.add(Messages.getName(g), " ", sale, more, sep);

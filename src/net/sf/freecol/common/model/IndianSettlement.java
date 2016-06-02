@@ -107,7 +107,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected UnitType learnableSkill = null;
 
     /** The goods this settlement wants. */
-    protected GoodsType[] wantedGoods = { null, null, null };
+    protected final List<GoodsType> wantedGoods = emptyWantedGoods();
 
     /**
      * A map that tells if a player has spoken to the chief of this settlement.
@@ -171,6 +171,17 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         super(game, id);
     }
 
+
+    /**
+     * Create an empty wanted goods list.
+     *
+     * @return A list of null wanted goods.
+     */
+    private static List<GoodsType> emptyWantedGoods() {
+        List<GoodsType> ret = new ArrayList<>(WANTED_GOODS_COUNT);
+        for (int i = 0; i < WANTED_GOODS_COUNT; i++) ret.add(null);
+        return ret;
+    }
 
     /**
      * Adds the given <code>Unit</code> to the list of units that
@@ -362,21 +373,46 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
+     * Is a given index with the range of normal wanted goods.
+     *
+     * @param index The index to test.
+     * @return True if the index is in range.
+     */
+    private boolean validWantedGoodsIndex(int index) {
+        return 0 <= index && index < WANTED_GOODS_COUNT;
+    }
+    
+    /**
      * Gets the goods wanted by this settlement.
      *
      * @return The wanted goods list.
      */
-    public GoodsType[] getWantedGoods() {
-        return wantedGoods;
+    public List<GoodsType> getWantedGoods() {
+        return this.wantedGoods;
+    }
+
+    /**
+     * Gets one of the goods wanted by this settlement.
+     *
+     * @param index Which of the goods to get.
+     * @return The wanted <code>GoodsType</code> or null if not present or
+     *     the index is out of range.
+     */
+    public GoodsType getWantedGoods(int index) {
+        return (validWantedGoodsIndex(index)) ? this.wantedGoods.get(index)
+            : null;
     }
 
     /**
      * Sets the goods wanted by this Settlement.
      *
-     * @param wantedGoods a <code>GoodsType</code> value
+     * @param wanted The new wanted <code>GoodsType</code> list.
      */
-    public void setWantedGoods(GoodsType[] wantedGoods) {
-        this.wantedGoods = wantedGoods;
+    public void setWantedGoods(List<GoodsType> wanted) {
+        final int n = wanted.size();
+        for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
+            this.wantedGoods.set(i, ((i < n) ? wanted.get(i) : null));
+        }
     }
 
     /**
@@ -386,9 +422,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param type The <code>GoodsType</code> wanted.
      */
     public void setWantedGoods(int index, GoodsType type) {
-        if (0 <= index && index < wantedGoods.length) {
-            wantedGoods[index] = type;
-        }
+        if (validWantedGoodsIndex(index)) this.wantedGoods.set(index, type);
     }
 
     /**
@@ -397,8 +431,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * @return The number of wanted goods.
      */
-    public int getWantedGoodsAmount() {
-        return count(wantedGoods, gt -> gt != null);
+    public int getWantedGoodsCount() {
+        return count(this.wantedGoods, gt -> gt != null);
     }
 
     /**
@@ -411,14 +445,13 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public List<StringTemplate> getWantedGoodsLabel(int index, Player player) {
         StringTemplate lab = null, tip = null;
-        if (hasVisited(player) && 0 <= index && index < wantedGoods.length
-            && wantedGoods[index] != null) {
-            lab = StringTemplate.label("")
-                .add(Messages.nameKey(wantedGoods[index]));
-            String sale = player.getLastSaleString(this, wantedGoods[index]);
+        GoodsType gt;
+        if (hasVisited(player) && (gt = getWantedGoods(index)) != null) {
+            lab = StringTemplate.label("").add(Messages.nameKey(gt));
+            String sale = player.getLastSaleString(this, gt);
             if (sale != null) {
                 lab.addName(" " + sale);
-                tip = player.getLastSaleTip(this, wantedGoods[index]);
+                tip = player.getLastSaleTip(this, gt);
             }
         }
         if (lab == null) {
@@ -729,9 +762,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Apply wanted bonus
         final int wantedBase = 100; // Granularity for wanted bonus
         final int wantedBonus // Premium paid for wanted goods types
-            = (type == wantedGoods[0]) ? 150
-            : (type == wantedGoods[1]) ? 125
-            : (type == wantedGoods[2]) ? 110
+            = (type == getWantedGoods(0)) ? 150
+            : (type == getWantedGoods(1)) ? 125
+            : (type == getWantedGoods(2)) ? 110
             : 100;
         // Do not simplify with *=, we want the integer truncation.
         price = wantedBonus * price / wantedBase;
@@ -1013,14 +1046,14 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         int wantedIndex = 0;
         for (Entry<GoodsType, Integer> e
                  : mapEntriesByValue(prices, descendingIntegerComparator)) {
-            GoodsType goodsType = e.getKey();
-            if (e.getValue() <= GoodsContainer.CARGO_SIZE * TRADE_MINIMUM_PRICE
-                || wantedIndex >= wantedGoods.length) break;
-            wantedGoods[wantedIndex] = goodsType;
+            if (!validWantedGoodsIndex(wantedIndex)) break;
+            if (e.getValue() <= GoodsContainer.CARGO_SIZE
+                * TRADE_MINIMUM_PRICE) break;
+            setWantedGoods(wantedIndex, e.getKey());
             wantedIndex++;
         }
-        for (; wantedIndex < wantedGoods.length; wantedIndex++) {
-            wantedGoods[wantedIndex] = null;
+        for (; wantedIndex < WANTED_GOODS_COUNT; wantedIndex++) {
+            setWantedGoods(wantedIndex, null);
         }
     }
 
@@ -1424,10 +1457,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
         }
 
-        for (int i = 0; i < wantedGoods.length; i++) {
-            if (wantedGoods[i] != null) {
-                xw.writeAttribute(WANTED_GOODS_TAG + i, wantedGoods[i]);
-            }
+        for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
+            GoodsType gt = getWantedGoods(i);
+            if (gt != null) xw.writeAttribute(WANTED_GOODS_TAG + i, gt);
         }
 
         if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
@@ -1524,9 +1556,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         mostHated = xr.findFreeColGameObject(getGame(), MOST_HATED_TAG,
                                              Player.class, (Player)null, false);
 
-        for (int i = 0; i < wantedGoods.length; i++) {
-            wantedGoods[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
-                                        GoodsType.class, (GoodsType)null);
+        for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
+            setWantedGoods(i, xr.getType(spec, WANTED_GOODS_TAG + i,
+                                         GoodsType.class, (GoodsType)null));
         }
     }
 

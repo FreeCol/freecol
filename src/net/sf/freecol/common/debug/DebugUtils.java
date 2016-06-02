@@ -1131,18 +1131,15 @@ public class DebugUtils {
         }
         
         lb.add("\nPrices (buy 1/100 / sell 1/100)\n");
-        GoodsType[] wanted = sis.getWantedGoods();
+        List<GoodsType> wanted = sis.getWantedGoods();
         for (GoodsType type : sSpec.getStorableGoodsTypeList()) {
-            int i;
-            for (i = wanted.length - 1; i >= 0; i--) {
-                if (type == wanted[i]) break;
-            }
+            int idx = wanted.indexOf(type);
             lb.add(Messages.getName(type),
                    ": ", sis.getPriceToBuy(type, 1),
                    "/", sis.getPriceToBuy(type, 100),
                    " / ", sis.getPriceToSell(type, 1),
                    "/", sis.getPriceToSell(type, 100),
-                   ((i < 0) ? "" : " wanted[" + Integer.toString(i) + "]"),
+                   ((idx < 0) ? "" : " wanted[" + Integer.toString(idx) + "]"),
                    "\n");
         }
 

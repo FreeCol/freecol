@@ -284,16 +284,14 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (is != null) {
             UnitType skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
                                         UnitType.class, (UnitType)null);
-
-            boolean natives = skill != null;
-            GoodsType[] wanted = new GoodsType[IndianSettlement.WANTED_GOODS_COUNT];
+            List<GoodsType> wanted
+                = new ArrayList<>(IndianSettlement.WANTED_GOODS_COUNT);
             for (int i = 0; i < IndianSettlement.WANTED_GOODS_COUNT; i++) {
-                wanted[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
-                                       GoodsType.class, (GoodsType)null);
-                natives |= wanted[i] != null;
+                GoodsType gt = xr.getType(spec, WANTED_GOODS_TAG + i,
+                    GoodsType.class, (GoodsType)null);
+                if (gt != null) wanted.add(gt);
             }
-            
-            if (natives) {
+            if (skill != null || !wanted.isEmpty()) {
                 tile.setIndianSettlementInternals(player, skill, wanted);
             }
         }

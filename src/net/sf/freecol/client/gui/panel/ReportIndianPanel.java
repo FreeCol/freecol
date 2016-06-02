@@ -210,18 +210,16 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(Utility.localizedLabel(is
                         .getMostHatedLabel(contacted)));
 
-                GoodsType[] wantedGoods = is.getWantedGoods();
-                final int n = (visited) ? is.getWantedGoodsAmount()
-                    : 1;
+                final int n = (visited) ? is.getWantedGoodsCount() : 1;
                 String x = (n > 1) ? "split " + Integer.toString(n) : null;
                 for (int i = 0; i < n; i++) {
                     JLabel goodsLabel;
-                    List<StringTemplate> gl
-                        = is.getWantedGoodsLabel(i, player);
-                    if (visited && wantedGoods[i] != null) {
+                    GoodsType gt;
+                    List<StringTemplate> gl = is.getWantedGoodsLabel(i, player);
+                    if (visited && (gt = is.getWantedGoods(i)) != null) {
                         goodsLabel = new JLabel("");
                         goodsLabel.setIcon(new ImageIcon(
-                            lib.getSmallIconImage(wantedGoods[i])));
+                            lib.getSmallIconImage(gt)));
                         Utility.localizeToolTip(goodsLabel,
                             Messages.message(gl.get(0)));
                     } else {
