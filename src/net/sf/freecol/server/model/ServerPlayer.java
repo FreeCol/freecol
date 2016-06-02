@@ -650,9 +650,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Still not defeated as long as military strength is greater
         // than the rebels.
-        Stream<Unit> us = getRebels().stream()
-            .flatMap(rebel -> rebel.getUnits().stream());
-        int rebelPower = (int)sumDouble(us, u -> !u.isNaval(),
+        int rebelPower = (int)sumDouble(flatten(getRebels(),
+                                                r -> r.getUnits().stream()),
+                                        u -> !u.isNaval(),
                                         u -> cm.getOffencePower(u, null));
         if (power > rebelPower) return false;
 

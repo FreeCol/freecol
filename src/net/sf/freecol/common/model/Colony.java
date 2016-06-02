@@ -804,7 +804,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A list of buildable <code>UnitType</code>s.
      */
     public List<UnitType> getBuildableUnits() {
-        return transform(getSpecification().getUnitTypeList().stream(),
+        return transform(getSpecification().getUnitTypeList(),
                          ut -> ut.needsGoodsToBuild() && canBuild(ut));
     }
 
@@ -1747,7 +1747,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public boolean canTrain(UnitType unitType) {
         return hasAbility(Ability.TEACH)
             && any(getBuildings(),
-                b -> b.canTeach() && b.canAddType(unitType));
+                   b -> b.canTeach() && b.canAddType(unitType));
     }
 
     /**
