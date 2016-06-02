@@ -117,16 +117,8 @@ public class ModifierFormat {
     public static String getFeatureAsString(Feature feature) {
         return Messages.getName(feature) + ":"
             + ((!feature.hasScope()) ? ""
-                : feature.getScopes().stream().map(scope -> {
-                        String k = scope.getKey();
-                        if (k == null) {
-                            k = "";
-                        } else {
-                            k = Messages.getName(k);
-                            if (scope.isMatchNegated()) k = "!" + k;
-                        }
-                        return k;
-                    }).collect(Collectors.joining()));
+                : transform(feature.getScopes(), s -> s != null,
+                            Scope::getFeatureString, Collectors.joining(",")));
     }
 
     public static String getModifierAsString(Modifier modifier) {

@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
@@ -88,6 +89,22 @@ public class Scope extends FreeColObject {
             : null;
     }
 
+    /**
+     * Get a string describing this scope for display within a feature.
+     *
+     * @return A suitable string.
+     */
+    public String getFeatureString() {
+        String k = getKey();
+        if (k == null) {
+            k = "";
+        } else {
+            k = Messages.getName(k);
+            if (isMatchNegated()) k = "!" + k;
+        }
+        return k;
+    }
+        
     /**
      * Does this scope match null?
      *
