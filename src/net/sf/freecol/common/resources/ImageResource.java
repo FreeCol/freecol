@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -162,41 +162,37 @@ public class ImageResource extends Resource
      */
     public BufferedImage getImage(Dimension d) {
         BufferedImage im = getImage();
-        if (im == null)
-            return null;
+        if (im == null) return null;
+        
         int wNew = d.width;
         int hNew = d.height;
-        if(wNew < 0 && hNew < 0)
-            return im;
+        if (wNew < 0 && hNew < 0) return im;
+
         int w = im.getWidth();
         int h = im.getHeight();
-        if(wNew < 0 || (!(hNew < 0) && wNew*h > w*hNew)) {
+        if (wNew < 0 || (!(hNew < 0) && wNew*h > w*hNew)) {
             wNew = (2*w*hNew + (h+1)) / (2*h);
-        } else if(hNew < 0 || wNew*h < w*hNew) {
+        } else if (hNew < 0 || wNew*h < w*hNew) {
             hNew = (2*h*wNew + (w+1)) / (2*w);
         }
-        if(wNew == w && hNew == h)
-            return im;
+        if (wNew == w && hNew == h) return im;
 
         final BufferedImage cached = scaledImages.get(d);
         if (cached != null) return cached;
 
-        final int wNew2 = wNew;
-        final int hNew2 = hNew;
-        Optional<BufferedImage> oim = loadedImages.stream()
-            .filter(img -> img.getWidth() >= wNew2 && img.getHeight() >= hNew2)
-            .findFirst();
-        im = oim.isPresent() ? oim.get() :
-            loadedImages.get(loadedImages.size() - 1);
+        final int fwNew = wNew, fhNew = hNew;
+        final Predicate<BufferedImage> pred = img ->
+            img.getWidth() >= fwNew && img.getHeight() >= fhNew;
+        BufferedImage oim = find(loadedImages, pred);
+        im = (oim != null) ? oim : loadedImages.get(loadedImages.size() - 1);
         w = im.getWidth();
         h = im.getHeight();
-        if(wNew*h > w*hNew) {
+        if (wNew*h > w*hNew) {
             wNew = (2*w*hNew + (h+1)) / (2*h);
-        } else if(wNew*h < w*hNew) {
+        } else if (wNew*h < w*hNew) {
             hNew = (2*h*wNew + (w+1)) / (2*w);
         }
-        if(wNew == w && hNew == h)
-            return im;
+        if (wNew == w && hNew == h) return im;
 
         // Directly scaling to less than half size would ignore some pixels.
         // Prevent that by halving the base image size as often as needed.
