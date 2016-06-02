@@ -29,7 +29,6 @@ import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
@@ -981,8 +980,8 @@ public final class FreeCol {
      * @return A list of advantage types.
      */
     private static String getValidAdvantages() {
-        return Arrays.stream(Advantages.values())
-            .map(a -> Messages.getName(a)).collect(Collectors.joining(","));
+        return transform(Advantages.values(), a -> true,
+                         a -> Messages.getName(a), Collectors.joining(","));
     }
 
     /**
@@ -1032,9 +1031,9 @@ public final class FreeCol {
      * @return The valid difficulty levels, comma separated.
      */
     public static String getValidDifficulties() {
-        return Arrays.stream(DIFFICULTIES)
-            .map(d -> Messages.getName("model.difficulty." + d))
-            .collect(Collectors.joining(","));
+        return transform(DIFFICULTIES, d -> true,
+                         d -> Messages.getName("model.difficulty." + d),
+                         Collectors.joining(","));
     }
 
     /**
