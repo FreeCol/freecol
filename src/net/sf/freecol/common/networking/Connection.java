@@ -79,12 +79,10 @@ public class Connection implements Closeable {
 
     private Socket socket;
 
+    /** The transformer for output, also used as a lock for out. */
+    private final Transformer outTransformer;
     /** The output stream to write to. */
     private OutputStream out;
-    /** A lock to protect the output stream. */
-    private Object outLock = new Object();
-
-    private final Transformer xmlTransformer;
 
     private ReceivingThread receivingThread;
 
@@ -92,10 +90,10 @@ public class Connection implements Closeable {
 
     private String name;
 
+    /** The transformer for logging, also used as a lock for logWriter. */
+    private final Transformer logTransformer;
     /** The Writer to write logging messages to. */
     private final Writer logWriter;
-    /** A lock to protect the log writer. */
-    private final Object logLock = new Object();
 
 
     /**
@@ -104,13 +102,18 @@ public class Connection implements Closeable {
      * @param name The name of the connection.
      */
     protected Connection(String name) {
+        this.name = name;
+        this.outTransformer = Utils.makeTransformer(false, false);
+
         this.in = null;
         this.socket = null;
         this.out = null;
-        this.xmlTransformer = Utils.makeTransformer(false, false);
         this.receivingThread = null;
         this.messageHandler = null;
-        this.name = name;
+
+        // Always make a (pretty printing) transformer, as we need a lock,
+        // but only make the log writer in COMMS-debug mode.
+        this.logTransformer = Utils.makeTransformer(false, true);
         this.logWriter
             = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS))
             ? Utils.getUTF8Writer(System.err)
@@ -136,7 +139,6 @@ public class Connection implements Closeable {
         this.out = socket.getOutputStream();
         this.receivingThread = new ReceivingThread(this, this.in, name);
         this.messageHandler = messageHandler;
-        this.name = name;
 
         this.receivingThread.start();
     }
@@ -178,14 +180,13 @@ public class Connection implements Closeable {
      * Close and clear the socket.
      */
     private void closeSocket() {
-        if (this.socket != null) {
-            try {
-                this.socket.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing socket", ioe);
-            } finally {
-                this.socket = null;
-            }
+        if (this.socket == null) return;
+        try {
+            this.socket.close();
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error closing socket", ioe);
+        } finally {
+            this.socket = null;
         }
     }
     
@@ -193,19 +194,15 @@ public class Connection implements Closeable {
      * Close and clear the output stream.
      */
     private void closeOutputStream() {
-        IOException ioe = null;
-        synchronized (this.outLock) {
+        synchronized (this.outTransformer) {
             if (this.out == null) return;
             try {
                 this.out.close();
-            } catch (IOException e) {
-                ioe = e;
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Error closing output", ioe);
             } finally {
                 this.out = null;
             }
-        }
-        if (ioe != null) {
-            logger.log(Level.WARNING, "Error closing output", ioe);
         }
     }
 
@@ -213,14 +210,13 @@ public class Connection implements Closeable {
      * Close and clear the input stream.
      */
     private void closeInputStream() {
-        if (this.in != null) {
-            try {
-                this.in.close();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Error closing input", ioe);
-            } finally {
-                this.in = null;
-            }
+        if (this.in == null) return;
+        try {
+            this.in.close();
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error closing input", ioe);
+        } finally {
+            this.in = null;
         }
     }
 
@@ -301,15 +297,18 @@ public class Connection implements Closeable {
     /**
      * Write an element into a string writer.
      *
+     * @param transformer A <code>Transformer</code> to convert the
+     *     element with.
      * @param element The <code>Element</code> to write.
      * @return A new <code>StringWriter</code> containing the element, or
      *     null if the element could not be transformed.
      */
-    private StringWriter elementToStringWriter(Element element) {
+    private StringWriter elementToStringWriter(Transformer transformer,
+                                               Element element) {
         StringWriter sw = new StringWriter(BUFFER_SIZE);
         DOMSource source = new DOMSource(element);
         try {
-            xmlTransformer.transform(source, new StreamResult(sw));
+            transformer.transform(source, new StreamResult(sw));
             sw.append(END_OF_STREAM);
         } catch (TransformerException te) {
             logger.log(Level.WARNING, "Failed to transform element", te);
@@ -321,12 +320,17 @@ public class Connection implements Closeable {
     /**
      * Log transfer of a DOMSource.
      *
-     * @param sb A <code>StringBuffer</code> to log.
+     * FIXME: Convert to not use Element.
+     *
+     * @param element An <code>Element</code> to log.
      * @param send True if sending (else replying).
      */
-    private void logInternal(StringBuffer sb, boolean send) {
-        synchronized (this.logLock) {
+    protected void log(Element element, boolean send) {
+        synchronized (this.logTransformer) {
             if (this.logWriter == null) return;
+            StringWriter sw = elementToStringWriter(this.logTransformer, element);
+            if (sw == null) return;
+            StringBuffer sb = sw.getBuffer();
             try {
                 sb.insert(0, (send) ? SEND_SUFFIX : REPLY_SUFFIX);
                 sb.insert(0, name);
@@ -337,19 +341,6 @@ public class Connection implements Closeable {
             }
         }
     }
-
-    /**
-     * Log transfer of a DOMSource.
-     *
-     * FIXME: Try to stop using this.
-     *
-     * @param element An <code>Element</code> to log.
-     * @param send True if sending (else replying).
-     */
-    protected void log(Element element, boolean send) {
-        StringWriter sw = elementToStringWriter(element);
-        if (sw != null) logInternal(sw.getBuffer(), send);
-    }
     
     /**
      * Low level routine to send a message over this Connection.
@@ -359,13 +350,14 @@ public class Connection implements Closeable {
      * @exception IOException If an error occur while sending the message.
      */
     private void sendInternal(Element element) throws IOException {
-        StringWriter sw = elementToStringWriter(element);
-        synchronized (this.outLock) {
+        synchronized (this.outTransformer) {
             if (this.out == null) return;
+            StringWriter sw = elementToStringWriter(this.outTransformer, element);
+            if (sw == null) return;
             this.out.write(sw.toString().getBytes("UTF-8"));
             this.out.flush();
         }
-        logInternal(sw.getBuffer(), true);
+        log(element, true);
     }
 
     /**
