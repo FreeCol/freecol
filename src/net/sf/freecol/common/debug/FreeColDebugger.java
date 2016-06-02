@@ -147,24 +147,6 @@ public class FreeColDebugger {
     public static boolean setDebugModes(String optionValue) {
         if (optionValue == null) return false;
         if (optionValue.isEmpty()) return true;
-        // @compat 0.10.x
-        try {
-            int i = Integer.parseInt(optionValue);
-            switch (i) {
-            case 3:
-                enableDebugMode(DebugMode.COMMS);
-                // Fall through
-            case 2:
-                enableDebugMode(DebugMode.INIT);
-                // Fall through
-            case 1:
-                enableDebugMode(DebugMode.MENUS);
-                return true;
-            default:
-                return false;
-            }
-        } catch (NumberFormatException nfe) {}
-        // end @compat
 
         for (String s : optionValue.split(",")) {
             try {
