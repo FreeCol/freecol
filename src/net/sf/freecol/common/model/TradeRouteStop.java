@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -202,20 +203,25 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      * @return True if this unit should load or unload cargo at the stop.
      */
     public boolean hasWork(Unit unit, int turns) {
+        final List<AbstractGoods> stopGoods = getCompactCargo();
         // Look for goods to load.
-        List<AbstractGoods> stopGoods = getCompactCargo();
-        // There is space on the unit to load some more of this goods
-        // type, so return true if there is some available at the stop.
-        if (any(stopGoods.stream()
-                .filter(ag -> unit.getGoodsCount(ag.getType()) < ag.getAmount()),
-                ag -> getExportAmount(ag.getType(), turns) > 0)) return true;
+        // If there is space on the unit to load some more of this goods
+        // type and there is some available at the stop, return true.
+        
+        final Predicate<AbstractGoods> loadPred = ag ->
+            unit.getGoodsCount(ag.getType()) < ag.getAmount()
+                && getExportAmount(ag.getType(), turns) > 0;
+        if (any(stopGoods, loadPred)) return true;
 
         // Look for goods to unload.
-        if (any(unit.getCompactGoodsList().stream()
-                .filter(ag -> !AbstractGoods.containsType(ag.getType(), stopGoods)),
-                ag -> getImportAmount(ag.getType(), turns) > 0)) return true;
+        // For all goods the unit has loaded, and if the type of goods
+        // is not to be loaded here, and there is demand here, return true.
+        final Predicate<Goods> unloadPred = g ->
+            !AbstractGoods.containsType(g.getType(), stopGoods)
+                && getImportAmount(g.getType(), turns) > 0;
+        if (any(unit.getCompactGoodsList(), unloadPred)) return true;
 
-        return false;
+        return false; // Otherwise no work here.
     }
 
 
