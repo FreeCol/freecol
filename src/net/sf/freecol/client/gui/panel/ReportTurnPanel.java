@@ -218,12 +218,15 @@ public final class ReportTurnPanel extends ReportPanel {
                 filterButton.addActionListener((ActionEvent ae) -> {
                         boolean flag = filterOption.getValue();
                         filterOption.setValue(!flag);
-                        messages.stream()
-                            .filter(m -> m.getMessageType() == mess.getMessageType())
-                            .forEach(m ->
-                                Stream.concat(textPanesByMessage.get(m.getId()).stream(),
-                                    labelsByMessage.get(m.getId()).stream())
-                                    .forEach(jc -> jc.setEnabled(!flag)));
+                        for (ModelMessage m : messages) {
+                            if (m.getMessageType() != mess.getMessageType()) continue;
+                            for (JComponent jc : textPanesByMessage.get(m.getId())) {
+                                jc.setEnabled(!flag);
+                            }
+                            for (JComponent jc : labelsByMessage.get(m.getId())) {
+                                jc.setEnabled(!flag);
+                            }
+                        }
                     });
                 if (ignore) {
                     reportPanel.add(filterButton);
