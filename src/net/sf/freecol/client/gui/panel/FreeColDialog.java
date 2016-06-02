@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -145,7 +146,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * @return An array of enabled options.
      */
     private Object[] selectOptions() {
-        return this.options.stream().filter(ChoiceItem::isEnabled).toArray();
+        return transform(this.options, ChoiceItem::isEnabled).toArray();
     }
 
     /**
