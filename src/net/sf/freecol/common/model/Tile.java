@@ -1387,12 +1387,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
+        final Predicate<Tile> pred = t ->
+            t.isLand() && (!t.hasSettlement() || player.owns(t.getSettlement()));
         final Comparator<Tile> comp = cachingDoubleComparator((Tile t) ->
             t.getDefenceValue()).reversed();
-        return toSortedList(getSurroundingTiles(0, 1).stream()
-                .filter(t -> t.isLand()
-                    && (!t.hasSettlement() || player.owns(t.getSettlement()))),
-            comp);
+        return transformAndSort(getSurroundingTiles(0, 1), pred, t -> t, comp);
     }
                     
     /**
@@ -1417,15 +1416,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isDangerousToShip(Unit ship) {
         final Player player = ship.getOwner();
-        return any(getSurroundingTiles(0, 1).stream()
-            .filter(Tile::hasSettlement),
-            t -> {
-                Settlement settlement = t.getSettlement();
-                return !player.owns(settlement)
+        final Predicate<Tile> pred = t -> {
+            Settlement settlement = t.getSettlement();
+            return (settlement == null) ? false
+                : !player.owns(settlement)
                     && settlement.canBombardEnemyShip()
                     && (player.atWarWith(settlement.getOwner())
                         || ship.hasAbility(Ability.PIRACY));
-            });
+        };
+        return any(getSurroundingTiles(0, 1), pred);
     }
 
     /**

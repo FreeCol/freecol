@@ -1493,12 +1493,12 @@ public final class Specification {
      * @return An unmodifiable list of military <code>Role</code>s.
      */
     public List<Role> getMilitaryRoles() {
-        if (militaryRoles == null) {
+        if (this.militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
                 transformAndSort(roles, Role::isOffensive, r -> r,
                                  Role.militaryComparator));
         }
-        return militaryRoles;
+        return this.militaryRoles;
     }
 
     /**
@@ -1862,8 +1862,8 @@ public final class Specification {
 
         logger.info("Loading role backward compatibility fragment: "
             + ROLES_COMPAT_FILE_NAME + " with roles: "
-            + getRoles().stream()
-                .map(Role::getId).collect(Collectors.joining(" ")));
+            + transform(getRoles(), r -> true, Role::getId,
+                        Collectors.joining(" ")));
     }
     // end @compat 0.10.x
 

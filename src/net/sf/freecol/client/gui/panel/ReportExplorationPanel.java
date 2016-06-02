@@ -80,9 +80,8 @@ public final class ReportExplorationPanel extends ReportPanel {
         
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
-        for (Region region : toSortedList(getGame().getMap().getRegions()
-                .stream().filter(r -> r.getDiscoveredIn() != null),
-                regionComparator)) {
+        for (Region region : transformAndSort(getGame().getMap().getRegions(),
+                r -> r.getDiscoveredIn() != null, r -> r, regionComparator)) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(Utility.localizedLabel(region.getType().getNameKey()));
             reportPanel.add(Utility.localizedLabel(region.getDiscoveredIn()

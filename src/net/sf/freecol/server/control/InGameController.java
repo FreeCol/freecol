@@ -1780,9 +1780,9 @@ public final class InGameController extends Controller {
         final Comparator<Player> comp = Comparator.comparingInt(p ->
             p.getTension(serverPlayer).getValue());
         List<Player> natives
-            = toSortedList(game.getLiveNativePlayers(null).stream()
-                .filter(p -> p.hasContacted(serverPlayer)),
-                comp);
+            = transformAndSort(game.getLiveNativePlayers(null),
+                               p -> p.hasContacted(serverPlayer), p -> p,
+                               comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)first(natives);
             logger.info("Native ally following independence: " + good);

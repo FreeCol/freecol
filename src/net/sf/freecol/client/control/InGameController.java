@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -742,9 +743,9 @@ public final class InGameController extends FreeColClientHolder {
 
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<>();
-        for (Unit unit : toSortedList(player.getUnits().stream()
-                .filter(u -> u.isReadyToTrade() && player.owns(u)),
-                tradeRouteUnitComparator)) {
+        final Predicate<Unit> pred = u -> u.isReadyToTrade() && player.owns(u);
+        for (Unit unit : transformAndSort(player.getUnits(), pred, u -> u,
+                                          tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
             if (moveToDestination(unit, messages)) stillActive = unit;
         }
