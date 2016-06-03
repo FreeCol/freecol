@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -299,12 +300,14 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the <code>Date</code> the score was achieved.
+     * Get the <code>Date</code> the score was achieved as a string.
      *
-     * @return The score <code>Date</code>.
+     * @return The date string.
      */
-    public final Date getDate() {
-        return date;
+    public final String getDateString() {
+        DateFormat format = DateFormat
+            .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+        return format.format(date);
     }
 
 

@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.text.DateFormat;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -121,10 +120,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
             reportPanel.add(Utility.localizedLabel("report.highScores.retired"),
                             "skip");
-            DateFormat format = DateFormat
-                .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-            reportPanel.add(new JLabel(format.format(highScore.getDate())),
-                            "wrap 20");
+            reportPanel.add(new JLabel(highScore.getDateString()), "wrap 20");
         }
         reportPanel.doLayout();
     }
