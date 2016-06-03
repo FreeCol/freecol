@@ -44,7 +44,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * This panel displays the ContinentalCongress Report.
+ * This panel displays the Production Report.
  */
 public final class ReportProductionPanel extends ReportPanel {
 
@@ -134,7 +134,6 @@ public final class ReportProductionPanel extends ReportPanel {
                 }
             }
 
-            int[] totalProduction = new int[selectedTypes.size()];
             for (Colony colony : getFreeColClient().getMySortedColonies()) {
                 // colonyButton
                 JButton colonyButton = Utility.getLinkButton(colony.getName(),
@@ -147,7 +146,6 @@ public final class ReportProductionPanel extends ReportPanel {
                 for (int index = 0; index < selectedTypes.size(); index++) {
                     GoodsType goodsType = selectedTypes.get(index);
                     int newValue = colony.getNetProductionOf(goodsType);
-                    totalProduction[index] += newValue;
                     Goods goods = new Goods(colony.getGame(), colony,
                                             goodsType, newValue);
                     GoodsLabel goodsLabel = new GoodsLabel(getGUI(), goods);
