@@ -52,9 +52,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class BuildingToolTip extends JToolTip {
 
-    private static JLabel arrow = null;
-
-
     /**
      * Creates this BuildingToolTip.
      *
@@ -68,12 +65,6 @@ public class BuildingToolTip extends JToolTip {
         // FIXME: consider several outputs
         final AbstractGoods output = first(building.getOutputs());
         final GoodsType outputType = (output == null) ? null : output.getType();
-
-        if (arrow == null) {
-            arrow = new JLabel(ResourceManager.getString("arrow.E"));
-            arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
-        }
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("[align center]");
@@ -97,6 +88,9 @@ public class BuildingToolTip extends JToolTip {
         if (production == null || production.getAmount() <= 0) {
             add(new JLabel(), "span");
         } else {
+            JLabel arrow = new JLabel(ResourceManager.getString("arrow.E"));
+            arrow.setFont(FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
+                FontLibrary.FontSize.SMALL, Font.BOLD, lib.getScaleFactor()));
             AbstractGoods maxProduction = (info == null) ? null
                 : first(info.getMaximumProduction());
             ProductionLabel productionOutput
