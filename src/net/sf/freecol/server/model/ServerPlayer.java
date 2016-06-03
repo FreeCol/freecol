@@ -2963,9 +2963,6 @@ outer:  for (Effect effect : effects) {
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationLabel();
         Tile tile = colony.getTile();
-        List<Unit> units = new ArrayList<>();
-        units.addAll(colony.getUnitList());
-        units.addAll(tile.getUnitList());
         int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony handover
