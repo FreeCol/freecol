@@ -1049,6 +1049,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         this.unitList.setCellRenderer(cellRenderer);
     }
 
+    private static void updateCompact(boolean selected) {
+        defaultCompact = selected;
+    }
+
+    private static void updateLists(boolean selected) {
+        defaultShowAll = selected;
+    }
 
     // Interface ActionListener
 
@@ -1099,10 +1106,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == this.compactBox) {
             updateDetailView();
-            defaultCompact = this.compactBox.isSelected();
+            updateCompact(this.compactBox.isSelected());
         } else if (event.getSource() == this.showAllBox) {
             updateAllLists();
-            defaultShowAll = this.showAllBox.isSelected();
+            updateLists(this.showAllBox.isSelected());
         }
     }
 }
