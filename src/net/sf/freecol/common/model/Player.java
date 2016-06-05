@@ -152,10 +152,8 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private final void update() {
             units.clear();
-            units.addAll(transformAndSort(owner.getUnits(),
-                                          u -> predicate.test(u),
-                                          Function.identity(),
-                                          Unit.locComparator));
+            units.addAll(transform(owner.getUnits(), u -> predicate.test(u),
+                                   Function.identity(), Unit.locComparator));
         }
 
         /**
@@ -2416,8 +2414,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A fresh list of the <code>Colony</code>s this player owns.
      */
     public List<Colony> getSortedColonies(Comparator<Colony> comp) {
-        return transformAndSort(getSettlements(), s -> s instanceof Colony,
-                                s -> (Colony)s, comp);
+        return transform(getSettlements(), s -> s instanceof Colony,
+                         s -> (Colony)s, comp);
     }
 
     /**

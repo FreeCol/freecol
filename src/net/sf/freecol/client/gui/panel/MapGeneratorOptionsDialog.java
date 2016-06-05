@@ -117,9 +117,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      */
     private List<File> loadMapFiles(File dir) {
         final Comparator<File> comp = Comparator.comparing(File::getName);
-        return transformAndSort(fileStream(dir),
-                                FreeColSavegameFile::fileFilter,
-                                Function.identity(), comp);
+        return transform(fileStream(dir), FreeColSavegameFile::fileFilter,
+                         Function.identity(), comp);
     }
 
     /**

@@ -1390,8 +1390,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             && (!t.hasSettlement() || player.owns(t.getSettlement())));
         final Comparator<Tile> comp = cachingDoubleComparator((Tile t) ->
             t.getDefenceValue()).reversed();
-        return transformAndSort(getSurroundingTiles(0, 1), pred,
-                                Function.identity(), comp);
+        return transform(getSurroundingTiles(0, 1), pred, Function.identity(),
+                         comp);
     }
                     
     /**

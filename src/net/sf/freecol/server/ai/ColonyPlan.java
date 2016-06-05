@@ -893,7 +893,7 @@ public class ColonyPlan {
 
         // If we need liberty put it before the new world production.
         if (colony.getSoL() < 100) {
-            produce.addAll(0, transformAndSort(libertyGoodsTypes,
+            produce.addAll(0, transform(libertyGoodsTypes,
                     gt -> production.containsKey(gt),
                     Function.identity(), productionComparator));
         }
@@ -903,7 +903,7 @@ public class ColonyPlan {
         final ToIntFunction<GoodsType> indexer = gt ->
             rawBuildingGoodsTypes.indexOf(gt.getInputType());
         List<GoodsType> toAdd = new ArrayList<>();
-        toAdd.addAll(transformAndSort(buildingGoodsTypes,
+        toAdd.addAll(transform(buildingGoodsTypes,
                 gt -> production.containsKey(gt)
                     && (colony.getGoodsCount(gt.getInputType())
                         >= GoodsContainer.CARGO_SIZE/2
@@ -928,17 +928,15 @@ public class ColonyPlan {
         }
 
         // Military goods after lucrative production.
-        produce.addAll(transformAndSort(militaryGoodsTypes,
-                                        gt -> production.containsKey(gt),
-                                        Function.identity(),
-                                        productionComparator));
+        produce.addAll(transform(militaryGoodsTypes,
+                                 gt -> production.containsKey(gt),
+                                 Function.identity(), productionComparator));
 
         // Immigration last.
         if (colony.getOwner().getEurope() != null) {
-            produce.addAll(transformAndSort(immigrationGoodsTypes,
-                                            gt -> production.containsKey(gt),
-                                            Function.identity(),
-                                            productionComparator));
+            produce.addAll(transform(immigrationGoodsTypes,
+                                     gt -> production.containsKey(gt),
+                                     Function.identity(), productionComparator));
         }
     }
 

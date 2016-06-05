@@ -1780,10 +1780,8 @@ public final class InGameController extends Controller {
         // that may already be at war.
         final Comparator<Player> comp = Comparator.comparingInt(p ->
             p.getTension(serverPlayer).getValue());
-        List<Player> natives
-            = transformAndSort(game.getLiveNativePlayers(null),
-                               p -> p.hasContacted(serverPlayer),
-                               Function.identity(), comp);
+        List<Player> natives = transform(game.getLiveNativePlayers(null),
+            p -> p.hasContacted(serverPlayer), Function.identity(), comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)first(natives);
             logger.info("Native ally following independence: " + good);
@@ -3558,7 +3556,7 @@ public final class InGameController extends Controller {
         }
 
         // Collect roles that cause a change, ordered by simplest change
-        for (UnitChange uc : transformAndSort(unitChanges,
+        for (UnitChange uc : transform(unitChanges,
                 uc -> uc.role != uc.unit.getRole() && uc.role != defaultRole,
                 Function.identity(), Comparator.<UnitChange>reverseOrder())) {
             if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {

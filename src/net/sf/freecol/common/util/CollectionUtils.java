@@ -1872,7 +1872,8 @@ public class CollectionUtils {
      */
     public static <T> List<T> transform(T[] array, Predicate<T> predicate) {
         return transform_internal(Arrays.stream(array), predicate,
-                                  Function.<T>identity(), Collectors.toList());
+                                  Function.<T>identity(), null,
+                                  Collectors.toList());
     }
 
     /**
@@ -1888,7 +1889,7 @@ public class CollectionUtils {
     public static <T,R> List<R> transform(T[] array, Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
         return transform_internal(Arrays.stream(array), predicate, mapper,
-                                  Collectors.toList());
+                                  null, Collectors.toList());
     }
 
     /**
@@ -1907,7 +1908,25 @@ public class CollectionUtils {
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
         return transform_internal(Arrays.stream(array), predicate, mapper,
-                                  collector);
+                                  null, collector);
+    }
+
+    /**
+     * Transform the contents of an array and sort the result.
+     *
+     * @param <T> The array member type.
+     * @param <R> The resulting collection member type.
+     * @param array The array to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort the items.
+     * @return A list of sorted mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(T[] array, Predicate<T> predicate,
+                                          Function<? super T, ? extends R> mapper,
+                                          Comparator<? super R> comparator) {
+        return transform_internal(Arrays.stream(array), predicate, mapper,
+                                  comparator, Collectors.toList());
     }
 
     /**
@@ -1920,8 +1939,8 @@ public class CollectionUtils {
      */
     public static <T> List<T> transform(Collection<T> c,
                                         Predicate<T> predicate) {
-        return transform_internal(c.stream(), predicate,
-                                  Function.<T>identity(), Collectors.toList());
+        return transform_internal(c.stream(), predicate, Function.<T>identity(),
+                                  null, Collectors.toList());
     }
 
     /**
@@ -1937,7 +1956,26 @@ public class CollectionUtils {
     public static <T,R> List<R> transform(Collection<T> c,
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
-        return transform_internal(c.stream(), predicate, mapper,
+        return transform_internal(c.stream(), predicate, mapper, null,
+                                  Collectors.toList());
+    }
+
+    /**
+     * Transform the contents of a collection and sort the result.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
+     * @param c The <code>Collection</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort the results.
+     * @return A list of sorted mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(Collection<T> c,
+                                          Predicate<T> predicate,
+                                          Function<? super T, ? extends R> mapper,
+                                          Comparator<? super R> comparator) {
+        return transform_internal(c.stream(), predicate, mapper, comparator,
                                   Collectors.toList());
     }
 
@@ -1957,7 +1995,8 @@ public class CollectionUtils {
                                       Predicate<T> predicate,
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
-        return transform_internal(c.stream(), predicate, mapper, collector);
+        return transform_internal(c.stream(), predicate, mapper, null,
+                                  collector);
     }
 
     /**
@@ -1972,7 +2011,7 @@ public class CollectionUtils {
                                         Predicate<T> predicate) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
         return transform_internal(s, predicate, Function.<T>identity(),
-                                  Collectors.toList());
+                                  null, Collectors.toList());
     }
 
     /**
@@ -1989,7 +2028,28 @@ public class CollectionUtils {
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
-        return transform_internal(s, predicate, mapper, Collectors.toList());
+        return transform_internal(s, predicate, mapper, null,
+                                  Collectors.toList());
+    }
+
+    /**
+     * Transform the contents of a stream.
+     *
+     * @param <T> The collection member type.
+     * @param <R> The resulting collection member type.
+     * @param stream The <code>Stream</code> to transform.
+     * @param predicate A <code>Predicate</code> to select the items.
+     * @param mapper A function to transform the selected items.
+     * @param comparator A <code>Comparator</code> to sort the results.
+     * @return A list of sorted mapped predicate matches.
+     */
+    public static <T,R> List<R> transform(Stream<T> stream,
+                                          Predicate<T> predicate,
+                                          Function<? super T, ? extends R> mapper,
+                                          Comparator<? super R> comparator) {
+        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
+        return transform_internal(s, predicate, mapper, comparator,
+                                  Collectors.toList());
     }
 
     /**
@@ -2009,7 +2069,7 @@ public class CollectionUtils {
                                       Function<? super T, ? extends R> mapper,
                                       Collector<R,?,C> collector) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
-        return transform_internal(s, predicate, mapper, collector);
+        return transform_internal(s, predicate, mapper, null, collector);
     }
 
     /**
@@ -2021,143 +2081,90 @@ public class CollectionUtils {
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
+     * @param comparator An optional <code>Comparator</code> to sort
+     *     the results.
      * @param collector A <code>Collector</code> to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
     private static <T,R,C> C transform_internal(Stream<T> stream,
                                                 Predicate<T> predicate,
                                                 Function<? super T, ? extends R> mapper,
+                                                Comparator<? super R> comparator,
                                                 Collector<R,?,C> collector) {
-        return stream.filter(predicate).map(mapper).collect(collector);
+        return (comparator == null)
+            ? stream.filter(predicate).map(mapper).collect(collector)
+            : stream.filter(predicate).map(mapper)
+                .sorted(comparator).collect(collector);
     }
 
     /**
-     * Transform and sort the contents of an array.
+     * Transform and return distinct items from an array.
      *
-     * @param <T> The array member type.
+     * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param array The <code>Collection</code> to transform.
+     * @param array The array to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
      * @return The sorted list of the mapped predicate matches.
      */
-    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(T[] array,
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(T[] array,
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return transformAndSort_internal(Arrays.stream(array), predicate,
-                                         mapper, comparator);
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(Arrays.stream(array), predicate,
+                                          mapper, comp);
     }
 
     /**
-     * Transform and sort the contents of an array.
-     *
-     * @param <T> The array member type.
-     * @param <R> The resulting collection member type.
-     * @param array The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return The sorted list of the mapped predicate matches.
-     */
-    public static <T,R> List<R> transformAndSort(T[] array,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator) {
-        return transformAndSort_internal(Arrays.stream(array), predicate,
-                                         mapper, comparator);
-    }
-
-    /**
-     * Transform and sort the contents of a collection.
+     * Transform and return distinct items from a collection.
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
      * @param collection The <code>Collection</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @return The sorted list of the mapped predicate matches.
+     * @return A list of mapped predicate matches without duplicates.
      */
-    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(Collection<T> c,
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Collection<T> c,
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comparator = Comparator.naturalOrder();
-        return transformAndSort_internal(c.stream(), predicate, mapper,
-                                         comparator);
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(c.stream(), predicate, mapper, comp);
     }
 
     /**
-     * Transform and sort the contents of a collection.
-     *
-     * @param <T> The collection member type.
-     * @param <R> The resulting collection member type.
-     * @param c The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return The sorted list of the mapped predicate matches.
-     */
-    public static <T,R> List<R> transformAndSort(Collection<T> c,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator) {
-        return transformAndSort_internal(c.stream(), predicate, mapper,
-                                         comparator);
-    }
-
-    /**
-     * Transform and sort the contents of a stream.
+     * Transform and return distinct items from a stream.
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @return The sorted list of the mapped predicate matches.
+     * @return A list of mapped predicate matches without duplicates.
      */
-    public static <T,R extends Comparable<? super R>> List<R> transformAndSort(Stream<T> stream,
+    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Stream<T> stream,
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comparator = Comparator.naturalOrder();
-        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
-        return transformAndSort_internal(s, predicate, mapper, comparator);
+        final Comparator<? super R> comp = Comparator.naturalOrder();
+        return transformDistinct_internal(stream, predicate, mapper, comp);
     }
 
     /**
-     * Transform and sort the contents of a collection.
-     *
-     * @param <T> The collection member type.
-     * @param <R> The resulting collection member type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return The sorted list of the mapped predicate matches.
-     */
-    public static <T,R> List<R> transformAndSort(Stream<T> stream,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator) {
-        final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
-        return transformAndSort_internal(s, predicate, mapper, comparator);
-    }
-
-    /**
-     * Implement transformAndSort.
+     * Underlying implementation for the distinct transform functions.
      *
      * @param <T> The stream member type.
      * @param <R> The resulting collection member type.
      * @param stream The <code>Stream</code> to transform.
      * @param predicate A <code>Predicate</code> to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return The sorted list of the mapped predicate matches.
+     * @param comaprator A <code>Comparator</code> to sort with.
+     * @return A list of mapped predicate matches without duplicates.
      */
-    private static <T,R> List<R> transformAndSort_internal(Stream<T> stream,
+    private static <T,R> List<R> transformDistinct_internal(Stream<T> stream,
         Predicate<T> predicate,
         Function<? super T, ? extends R> mapper,
         Comparator<? super R> comparator) {
         return stream.filter(predicate).map(mapper).sorted(comparator)
-            .collect(Collectors.toList());
+            .distinct().collect(Collectors.toList());
     }
 }

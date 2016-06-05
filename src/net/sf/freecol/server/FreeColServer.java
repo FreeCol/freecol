@@ -35,6 +35,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1161,17 +1162,16 @@ public final class FreeColServer {
         final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
         final AIMain aiMain = new AIMain(this);
-        setAIMain(aiMain);
-
-        game.setFreeColGameObjectListener(aiMain);
-        List<ServerPlayer> newAI = transformAndSort(game.getNationOptions()
-            .getNations().entrySet(),
-            e -> !e.getKey().isUnknownEnemy()
+        final Predicate<Entry<Nation, NationState>> pred = e ->
+            !e.getKey().isUnknownEnemy()
                 && e.getValue() != NationState.NOT_AVAILABLE
-                && game.getPlayerByNationId(e.getKey().getId()) == null,
-            e -> makeAIPlayer(e.getKey()),
-            Player.playerComparator);
-        game.updatePlayers(newAI);
+                && game.getPlayerByNationId(e.getKey().getId()) == null;
+
+        setAIMain(aiMain);
+        game.setFreeColGameObjectListener(aiMain);
+        game.updatePlayers(transform(game.getNationOptions().getNations().entrySet(),
+                                     pred, e -> makeAIPlayer(e.getKey()),
+                                     Player.playerComparator));
 
         // We need a fake unknown enemy player
         establishUnknownEnemy(game);

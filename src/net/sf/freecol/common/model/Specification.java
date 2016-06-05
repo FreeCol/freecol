@@ -1496,8 +1496,8 @@ public final class Specification {
     public List<Role> getMilitaryRoles() {
         if (this.militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
-                transformAndSort(roles, Role::isOffensive, Function.identity(),
-                                 Role.militaryComparator));
+                transform(roles, Role::isOffensive, Function.identity(),
+                          Role.militaryComparator));
         }
         return this.militaryRoles;
     }

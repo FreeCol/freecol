@@ -388,9 +388,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Allocate pioneers if possible.
         int tipSize = tileImprovementPlans.size();
         if (tipSize > 0) {
-            List<Unit> pioneers = transformAndSort(tile.getUnitList(),
-                u -> u.getPioneerScore() >= 0, Function.identity(),
-                pioneerComparator);
+            List<Unit> pioneers
+                = transform(tile.getUnitList(), u -> u.getPioneerScore() >= 0,
+                            Function.identity(), pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
                 if (aiu.tryPioneeringMission(lb)) {
@@ -492,15 +492,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Predicate<Unit> pred = u -> u.isPerson()
             && (u.getType().getSkill() <= 0
                 || u.hasAbility(Ability.EXPERT_SCOUT));
-        List<Unit> explorers
-            = transformAndSort(tile.getUnitList(), pred, Function.identity(),
-                               scoutComparator);
+        List<Unit> scouts = transform(tile.getUnitList(), pred,
+                                      Function.identity(), scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
                 Direction direction = tile.getDirection(t);
                 for (;;) {
-                    if (explorers.isEmpty()) return;
-                    Unit u = explorers.remove(0);
+                    if (scouts.isEmpty()) return;
+                    Unit u = scouts.remove(0);
                     if (!u.getMoveType(t).isProgress()) continue;
                     if (getAIUnit(u).move(direction)
                         && !t.hasLostCityRumour()) {

@@ -499,10 +499,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         td.addAll(transform(md.getResults().entrySet(), alwaysTrue(), dmapper));
 
         // Drop inaccessible destinations and sort as specified.
-        this.destinations.addAll(transformAndSort(td,
-                                 d -> d.turns < Unit.MANY_TURNS,
-                                 Function.identity(),
-                                 this.destinationComparator));
+        this.destinations.addAll(transform(td, d -> d.turns < Unit.MANY_TURNS,
+                                           Function.identity(),
+                                           this.destinationComparator));
     }
 
     /**
