@@ -621,7 +621,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean checkForREFDefeat() {
         if (!isREF()) {
-            throw new IllegalStateException("Checking for REF player defeat when player not REF.");
+            throw new RuntimeException("Not a REF player: " + this.getId());
         }
 
         // No one to fight?  Either the rebels are dead, or the REF
@@ -629,35 +629,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Either way, it does not need to surrender.
         if (getRebels().isEmpty()) return false;
 
-        // Not defeated if there are settlements.
+        // Not defeated if holding settlements.
         if (hasSettlements()) return false;
 
         // Not defeated if there is a non-zero navy and enough land units.
         final int landREFUnitsRequired = 7; // FIXME: magic number
-        final CombatModel cm = getGame().getCombatModel();
         boolean naval = false;
         int land = 0;
-        int power = 0;
         for (Unit u : getUnits()) {
             if (u.isNaval()) naval = true; else {
-                if (u.hasAbility(Ability.REF_UNIT)) {
-                    land++;
-                    power += cm.getOffencePower(u, null);
-                }
+                if (u.hasAbility(Ability.REF_UNIT)) land++;
             }
         }
         if (naval && land >= landREFUnitsRequired) return false;
 
-        // Still not defeated as long as military strength is greater
-        // than the rebels.
-        int rebelPower = (int)sumDouble(flatten(getRebels(),
-                                                r -> r.getUnits().stream()),
-                                        u -> !u.isNaval(),
-                                        u -> cm.getOffencePower(u, null));
-        if (power > rebelPower) return false;
-
-        // REF is defeated
-        return true;
+        // Surrender if a rebel has a stronger land army.
+        final double power = calculateStrength(false);
+        return none(getRebels(), r -> power < r.calculateStrength(false));
     }
 
     /**
