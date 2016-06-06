@@ -1015,6 +1015,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final int multipleBonus = 5;
         final int multipleMax = 5;
 
+        // Build a list of goods types the colony is producing,
+        // in order of amount.
+        final Comparator<GoodsType> comp = cachingIntComparator(gt ->
+            colony.getAdjustedNetProductionOf(gt));
+        List<GoodsType> producing
+            = sort(transform(flatten(colony.getAvailableWorkLocations(),
+                                     wl -> wl.getUnitList().stream()),
+                             u -> u.getWorkType() != null,
+                             u -> u.getWorkType().getStoredAs(),
+                             Collectors.toSet()),
+                   comp);
+        
         // For every non-expert, request expert replacement.
         // Prioritize by lowest net production among the goods that are
         // being produced by units (note that we have to traverse the work
@@ -1022,19 +1034,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // production because it could be in balance).
         // Add some weight when multiple cases of the same expert are
         // needed, rather than generating heaps of wishes.
-        List<GoodsType> producing = new ArrayList<>();
-        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-            for (Unit u : wl.getUnitList()) {
-                GoodsType work = u.getWorkType();
-                if (work != null) {
-                    work = work.getStoredAs();
-                    if (!producing.contains(work)) producing.add(work);
-                }
-            }
-        }
-        final Comparator<GoodsType> comp = cachingIntComparator(gt ->
-            colony.getAdjustedNetProductionOf(gt));
-        Collections.sort(producing, comp);
         TypeCountMap<UnitType> experts = new TypeCountMap<>();
         for (Unit unit : colony.getUnitList()) {
             GoodsType goods = unit.getWorkType();
