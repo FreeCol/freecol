@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -822,22 +823,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Select one from each father type
-        List<FoundingFather> randomFathers = new ArrayList<>();
-        LogBuilder lb = new LogBuilder(64);
-        lb.add("Random fathers for ", getDebugName());
-        for (FoundingFatherType type : FoundingFatherType.values()) {
-            List<RandomChoice<FoundingFather>> rc = choices.get(type);
-            if (rc != null) {
-                FoundingFather f = RandomChoice.getWeightedRandom(logger,
+        final Function<FoundingFatherType, FoundingFather> mapper = ft -> {
+            List<RandomChoice<FoundingFather>> rc = choices.get(ft);
+            return (rc == null) ? null
+                : RandomChoice.getWeightedRandom(logger,
                     "Choose founding father", rc, random);
-                if (f != null) {
-                    randomFathers.add(f);
-                    lb.add(":", f.getSuffix());
-                }
-            }
-        }
+        };
+        List<FoundingFather> fathers = transform(FoundingFatherType.values(),
+            alwaysTrue(), mapper, toListNoNulls());
+        LogBuilder lb = new LogBuilder(64);
+        lb.add("Random fathers for ", getDebugName(), ":");
+        for (FoundingFather f : fathers) lb.add(" ", f.getSuffix());
         lb.log(logger, Level.INFO);
-        return randomFathers;
+        return fathers;
     }
 
     /**
