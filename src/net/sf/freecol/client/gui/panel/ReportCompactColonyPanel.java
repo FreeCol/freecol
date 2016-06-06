@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -969,9 +970,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: cAlarm
-        List<Tile> tiles = transformDistinct(rTileSuggestions,
-                                             ts -> ts.isExploration(),
-                                             ts -> ts.tile);
+        Set<Tile> tiles = transform(rTileSuggestions, ts -> ts.isExploration(),
+                                    ts -> ts.tile, Collectors.toSet());
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                        stpld("report.colony.exploring.summary")));
@@ -982,9 +982,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
             if (ti.isNatural()) continue;
             tiles.clear();
-            tiles.addAll(transformDistinct(rTileSuggestions,
-                                           ts -> ts.tileImprovementType == ti,
-                                           ts -> ts.tile));
+            tiles.addAll(transform(rTileSuggestions,
+                                   ts -> ts.tileImprovementType == ti,
+                                   ts -> ts.tile, Collectors.toSet()));
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,
                            stpld("report.colony.tile." + ti.getSuffix()
