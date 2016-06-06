@@ -640,7 +640,20 @@ public abstract class WorkLocation extends UnitLocation
         return (amount < 0) ? 0 : amount;
     }
 
-
+    /**
+     * Helper to get the production deficit for a type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The production deficit as <code>AbstractGoods</code>, or null
+     *     if not in deficit.
+     */
+    public AbstractGoods getProductionDeficit(GoodsType goodsType) {
+        ProductionInfo pi = getProductionInfo();
+        return (pi == null) ? null
+            : AbstractGoods.findByType(goodsType, pi.getProductionDeficit());
+    }
+ 
+   
     // Interface Location
     // Inherits:
     //   FreeColObject.getId

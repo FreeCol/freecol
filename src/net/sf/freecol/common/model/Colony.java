@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
@@ -2180,14 +2181,13 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A collection of warning messages.
      */
     public Collection<StringTemplate> getProductionWarnings(GoodsType goodsType) {
-        List<StringTemplate> result = new ArrayList<>();
         final int amount = getGoodsCount(goodsType);
         final int production = getNetProductionOf(goodsType);
-        int waste;
-        
+        List<StringTemplate> result = new ArrayList<>();
+
         if (goodsType.isStorable()) {
             if (goodsType.limitIgnored()) {
-                if (goodsType.isFoodType()) {
+                if (goodsType.isFoodType()) { // Check for famine/starvation
                     int starve = getStarvationTurns();
                     if (starve == 0) {
                         result.add(StringTemplate
@@ -2200,52 +2200,57 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                             .addAmount("%number%", starve));
                     }
                 }
-            } else if (!getExportData(goodsType).getExported()
-                && (waste = amount + production - getWarehouseCapacity()) > 0) {
-                result.add(StringTemplate
-                    .template("model.building.warehouseSoonFull")
-                    .addNamed("%goods%", goodsType)
-                    .addName("%colony%", getName())
-                    .addAmount("%amount%", waste));
-            }
-        }
-
-        BuildableType currentlyBuilding = getCurrentlyBuilding();
-        if (currentlyBuilding != null) {
-            for (AbstractGoods goods : currentlyBuilding.getRequiredGoods()) {
-                if (goods.getType().equals(goodsType)
-                    && amount < goods.getAmount()) {
-                    int needsAmount = goods.getAmount() - amount;
+            } else { // Check for overflow                
+                int waste;
+                if (!getExportData(goodsType).getExported()
+                    && (waste = amount + production - getWarehouseCapacity()) > 0) {
                     result.add(StringTemplate
-                        .template("model.colony.buildableNeedsGoods")
+                        .template("model.building.warehouseSoonFull")
+                        .addNamed("%goods%", goodsType)
                         .addName("%colony%", getName())
-                        .addNamed("%buildable%", currentlyBuilding)
-                        .addAmount("%amount%", needsAmount)
-                        .addNamed("%goodsType%", goodsType));
+                        .addAmount("%amount%", waste));
                 }
             }
         }
 
-        for (WorkLocation wl : getWorkLocationsForProducing(goodsType)) {
-            ProductionInfo info = getProductionInfo(wl);
-            if (info == null) continue;
-            StringTemplate t = getInsufficientProductionMessage(info,
-                AbstractGoods.findByType(goodsType,
-                    info.getProductionDeficit()));
-            if (t != null) result.add(t);
+        // Add a message for goods required for the current building if any.
+        BuildableType currentlyBuilding = getCurrentlyBuilding();
+        if (currentlyBuilding != null) {
+            final Function<AbstractGoods, StringTemplate> bMapper = ag ->
+                StringTemplate.template("model.colony.buildableNeedsGoods")
+                    .addName("%colony%", getName())
+                    .addNamed("%buildable%", currentlyBuilding)
+                    .addAmount("%amount%", ag.getAmount() - amount)
+                    .addNamed("%goodsType%", goodsType);
+            result.addAll(transform(currentlyBuilding.getRequiredGoods(),
+                                    ag -> ag.getType().equals(goodsType)
+                                        && amount < ag.getAmount(),
+                                    bMapper));
         }
-        for (WorkLocation wl : getWorkLocationsForConsuming(goodsType)) {
-            ProductionInfo info = getProductionInfo(wl);
-            if (info == null) continue;
-            List<AbstractGoods> deficit = info.getProductionDeficit();
-            if (deficit.isEmpty()) continue;
-            for (AbstractGoods ag : wl.getOutputs()) {
-                if (ag.getType().isStorable()) continue;
-                StringTemplate t = getInsufficientProductionMessage(info,
-                    AbstractGoods.findByType(ag.getType(), deficit));
-                if (t != null) result.add(t);
-            }
-        }
+
+        // Add insufficient production messages for each production location
+        // that has a deficit in producing the goods type.
+        final Function<WorkLocation, StringTemplate> pMapper = wl ->
+            getInsufficientProductionMessage(getProductionInfo(wl),
+                wl.getProductionDeficit(goodsType));
+        result.addAll(transform(getWorkLocationsForProducing(goodsType),
+                                wl -> getProductionInfo(wl) != null,
+                                pMapper, toListNoNulls()));
+
+        // Add insufficient production messages for each consumption
+        // location for the goods type where there is a consequent
+        // deficit in production of a dependent goods.
+        final Function<WorkLocation, List<StringTemplate>> cMapper = wl -> {
+            final ProductionInfo info = getProductionInfo(wl);
+            final Function<AbstractGoods, StringTemplate> gMapper = ag ->
+                getInsufficientProductionMessage(info,
+                    wl.getProductionDeficit(ag.getType()));
+            return transform(wl.getOutputs(), ag -> ag.getType().isStorable(),
+                             gMapper, toListNoNulls());
+        };
+        result.addAll(transform(getWorkLocationsForConsuming(goodsType),
+                                wl -> getProductionInfo(wl) != null,
+                                cMapper, toAppendedList()));
 
         return result;
     }
