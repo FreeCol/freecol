@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -427,11 +428,11 @@ public final class PlayersTable extends JTable {
 
         private final List<Nation> nations;
 
-        private final Map<Nation, Player> players = new HashMap<>();
+        private final Map<Nation, Player> nationMap = new HashMap<>();
 
 
         /**
-         * A standard constructor.
+         * Create a new PlayersTableModel.
          *
          * @param preGameController The <code>PreGameController</code>
          *     to use notify of updates.
@@ -444,21 +445,22 @@ public final class PlayersTable extends JTable {
             this.preGameController = preGameController;
             this.nationOptions = nationOptions;
             this.thisPlayer = thisPlayer;
-            this.players.clear();
-            this.nations = thisPlayer.getSpecification().getNations().stream()
-                .filter(n -> !n.isUnknownEnemy()
-                    && nationOptions.getNations().get(n) != null)
-                .peek(n -> this.players.put(n, null))
-                .collect(Collectors.toList());
-            this.players.put(thisPlayer.getNation(), thisPlayer);
+            final Predicate<Nation> pred = n -> !n.isUnknownEnemy()
+                && nationOptions.getNations().get(n) != null;
+            this.nations = transform(thisPlayer.getSpecification().getNations(),
+                                     pred);
+            for (Nation n : this.nations) this.nationMap.put(n, null);
+            this.nationMap.put(thisPlayer.getNation(), thisPlayer);
         }
 
+
+        /**
+         * Update the nation map following any change.
+         */
         public void update() {
-            for (Nation nation : nations) {
-                players.put(nation, null);
-            }
-            for (Player player : thisPlayer.getGame().getLivePlayers(null)) {
-                players.put(player.getNation(), player);
+            for (Nation n : this.nations) nationMap.put(n, null);
+            for (Player p : thisPlayer.getGame().getLivePlayers(null)) {
+                nationMap.put(p.getNation(), p);
             }
             fireTableDataChanged();
         }
@@ -535,12 +537,12 @@ public final class PlayersTable extends JTable {
                 case AVAILABILITY_COLUMN:
                     return nationOptions.getNationState(nation);
                 case ADVANTAGE_COLUMN:
-                    return (players.get(nation) == null) ? nation.getType()
-                        : players.get(nation).getNationType();
+                    return (nationMap.get(nation) == null) ? nation.getType()
+                        : nationMap.get(nation).getNationType();
                 case COLOR_COLUMN:
                     return nation.getColor();
                 case PLAYER_COLUMN:
-                    return players.get(nation);
+                    return nationMap.get(nation);
                 }
             }
             return null;
@@ -557,7 +559,7 @@ public final class PlayersTable extends JTable {
         public boolean isCellEditable(int row, int column) {
             if (row >= 0 && row < getRowCount()) {
                 Nation nation = nations.get(row);
-                boolean ownRow = thisPlayer == players.get(nation)
+                boolean ownRow = thisPlayer == nationMap.get(nation)
                     && !thisPlayer.isReady();
                 switch (column) {
                 case AVAILABILITY_COLUMN:
@@ -574,7 +576,7 @@ public final class PlayersTable extends JTable {
                     return nation.getType() instanceof EuropeanNationType;
                 case PLAYER_COLUMN:
                     return nation.getType() instanceof EuropeanNationType
-                        && players.get(nation) == null;
+                        && nationMap.get(nation) == null;
                 }
             }
             return false;
