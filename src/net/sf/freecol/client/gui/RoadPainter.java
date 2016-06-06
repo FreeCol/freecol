@@ -31,67 +31,87 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
  * This class is responsible for drawing the Roads on a tile.
  */
 public final class RoadPainter {
-    // Helper variables for displaying the map.
+
+    /** Helper variables for displaying the map. */
     private int tileHeight, tileWidth, halfHeight, halfWidth;
 
-    // roads
-    private final EnumMap<Direction, Point2D.Float> corners =
-        new EnumMap<>(Direction.class);
-    private final EnumMap<Direction, List<Direction>> prohibitedRoads =
-        new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, Point2D.Float> corners
+        = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, List<Direction>> prohibitedRoads
+        = new EnumMap<>(Direction.class);
+
     private Stroke roadStroke = new BasicStroke(2);
 
+
+    /**
+     * Create a new road painter for a given tile size.
+     *
+     * @param tileSize The tile size as a <code>Dimension</code>.
+     */
     public RoadPainter(Dimension tileSize) {
-        tileHeight = tileSize.height;
-        tileWidth = tileSize.width;
-        halfHeight = tileHeight/2;
-        halfWidth = tileWidth/2;
+        this.tileHeight = tileSize.height;
+        this.tileWidth  = tileSize.width;
+        this.halfHeight = this.tileHeight/2;
+        this.halfWidth  = this.tileWidth/2;
+        int dy = this.tileHeight/16;
+        this.roadStroke = new BasicStroke(dy / 2.0f);
 
-        int dy = tileHeight/16;
+        // Corners
+        corners.put(Direction.N,  new Point2D.Float(this.halfWidth, 0));
+        corners.put(Direction.NE, new Point2D.Float(0.75f * this.tileWidth,
+                                                    0.25f * this.tileHeight));
+        corners.put(Direction.E,  new Point2D.Float(this.tileWidth,
+                                                    this.halfHeight));
+        corners.put(Direction.SE, new Point2D.Float(0.75f * this.tileWidth,
+                                                    0.75f * this.tileHeight));
+        corners.put(Direction.S,  new Point2D.Float(this.halfWidth,
+                                                    this.tileHeight));
+        corners.put(Direction.SW, new Point2D.Float(0.25f * this.tileWidth,
+                                                    0.75f * this.tileHeight));
+        corners.put(Direction.W,  new Point2D.Float(0, this.halfHeight));
+        corners.put(Direction.NW, new Point2D.Float(0.25f * this.tileWidth,
+                                                    0.25f * this.tileHeight));
 
-        // corners
-        corners.put(Direction.N,  new Point2D.Float(halfWidth, 0));
-        corners.put(Direction.NE, new Point2D.Float(0.75f * tileWidth, 0.25f * tileHeight));
-        corners.put(Direction.E,  new Point2D.Float(tileWidth, halfHeight));
-        corners.put(Direction.SE, new Point2D.Float(0.75f * tileWidth, 0.75f * tileHeight));
-        corners.put(Direction.S,  new Point2D.Float(halfWidth, tileHeight));
-        corners.put(Direction.SW, new Point2D.Float(0.25f * tileWidth, 0.75f * tileHeight));
-        corners.put(Direction.W,  new Point2D.Float(0, halfHeight));
-        corners.put(Direction.NW, new Point2D.Float(0.25f * tileWidth, 0.25f * tileHeight));
-
-        // road pairs to skip drawing when doing 3 or 4 exit point tiles
-        //  don't put more than two directions in each list,
-        //  otherwise a 3-point tile may not draw any roads at all!
-        prohibitedRoads.put(Direction.N,  Arrays.asList(Direction.NW, Direction.NE));
-        prohibitedRoads.put(Direction.NE, Arrays.asList(Direction.N, Direction.E));
-        prohibitedRoads.put(Direction.E,  Arrays.asList(Direction.NE, Direction.SE));
-        prohibitedRoads.put(Direction.SE, Arrays.asList(Direction.E, Direction.S));
-        prohibitedRoads.put(Direction.S,  Arrays.asList(Direction.SE, Direction.SW));
-        prohibitedRoads.put(Direction.SW, Arrays.asList(Direction.S, Direction.W));
-        prohibitedRoads.put(Direction.W,  Arrays.asList(Direction.SW, Direction.NW));
-        prohibitedRoads.put(Direction.NW, Arrays.asList(Direction.W, Direction.N));
-
-        roadStroke = new BasicStroke(dy / 2.0f);
+        // Road pairs to skip drawing when doing 3 or 4 exit point tiles.
+        // Don't put more than two directions in each list, otherwise
+        // a 3-point tile may not draw any roads at all!
+        prohibitedRoads.put(Direction.N,
+                            Arrays.asList(Direction.NW, Direction.NE));
+        prohibitedRoads.put(Direction.NE,
+                            Arrays.asList(Direction.N,  Direction.E));
+        prohibitedRoads.put(Direction.E,
+                            Arrays.asList(Direction.NE, Direction.SE));
+        prohibitedRoads.put(Direction.SE,
+                            Arrays.asList(Direction.E,  Direction.S));
+        prohibitedRoads.put(Direction.S,
+                            Arrays.asList(Direction.SE, Direction.SW));
+        prohibitedRoads.put(Direction.SW,
+                            Arrays.asList(Direction.S,  Direction.W));
+        prohibitedRoads.put(Direction.W,
+                            Arrays.asList(Direction.SW, Direction.NW));
+        prohibitedRoads.put(Direction.NW,
+                            Arrays.asList(Direction.W,  Direction.N));
     }
 
     /**
      * Draws all roads on the given Tile.
      *
      * @param g The <code>Graphics</code> to draw the road upon.
-     * @param tile a <code>Tile</code>
+     * @param tile The <code>Tile</code> with the road.
      */
     public void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();
@@ -99,23 +119,22 @@ public final class RoadPainter {
         g.setStroke(roadStroke);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
-        GeneralPath path = new GeneralPath();
-        Map map = tile.getMap();
-        int x = tile.getX();
-        int y = tile.getY();
-        List<Point2D.Float> points = new ArrayList<>(8);
-        List<Direction> directions = Direction.allDirections.stream()
-            .filter((Direction direction) -> {
-                    Tile borderingTile = map.getTile(direction.step(x, y));
-                    TileImprovement r;
-                    return (borderingTile != null
-                        && (r = borderingTile.getRoad()) != null
-                        && r.isComplete());
-                })
-            .peek((Direction direction) -> points.add(corners.get(direction)))
-            .collect(Collectors.toList());
 
-        switch(points.size()) {
+        final Map map = tile.getMap();
+        final int x = tile.getX();
+        final int y = tile.getY();
+        final Predicate<Direction> pred = d -> {
+            Tile borderingTile = map.getTile(d.step(x, y));
+            TileImprovement r;
+            return borderingTile != null
+                && (r = borderingTile.getRoad()) != null
+                && r.isComplete();
+        };
+        List<Direction> directions = transform(Direction.allDirections, pred);
+        List<Point2D.Float> points = transform(directions, alwaysTrue(),
+                                               d -> corners.get(d));
+        GeneralPath path = new GeneralPath();
+        switch (points.size()) {
         case 0:
             path.moveTo(0.35f * tileWidth, 0.35f * tileHeight);
             path.lineTo(0.65f * tileWidth, 0.65f * tileHeight);
@@ -128,33 +147,33 @@ public final class RoadPainter {
             break;
         case 2:
             path.moveTo(points.get(0).getX(), points.get(0).getY());
-            path.quadTo(halfWidth, halfHeight, points.get(1).getX(), points.get(1).getY());
+            path.quadTo(halfWidth, halfHeight,
+                        points.get(1).getX(), points.get(1).getY());
             break;
-        case 3:
-        case 4: {
+        case 3: case 4:
             Direction pen = directions.get(directions.size() - 1);
-            Point2D p = corners.get(pen);
-            path.moveTo(p.getX(), p.getY());
+            Point2D pt = corners.get(pen);
+            path.moveTo(pt.getX(), pt.getY());
             for (Direction d : directions) {
-                p = corners.get(d);
-                if(prohibitedRoads.get(pen).contains(d)) {
-                    path.moveTo(p.getX(), p.getY());
+                pt = corners.get(d);
+                if (prohibitedRoads.get(pen).contains(d)) {
+                    path.moveTo(pt.getX(), pt.getY());
                 } else {
-                    path.quadTo(halfWidth, halfHeight, p.getX(), p.getY());
+                    path.quadTo(halfWidth, halfHeight, pt.getX(), pt.getY());
                 }
                 pen = d;
             }
             break;
-        }
         default:
             for (Point2D p : points) {
                 path.moveTo(halfWidth, halfHeight);
                 path.lineTo(p.getX(), p.getY());
             }
+            break;
         }
         g.draw(path);
         g.setColor(oldColor);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_OFF);
     }
-
 }
