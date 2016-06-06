@@ -510,15 +510,9 @@ public class SimpleMapGenerator implements MapGenerator {
         HashMap<UnitType, List<IndianSettlement>> skills = new HashMap<>();
         randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
-            List<Tile> tiles = new ArrayList<>();
-            for (Tile tile : is.getOwnedTiles()) {
-                for (Tile t : tile.getSurroundingTiles(1)) {
-                    if (t.getOwningSettlement() == null) {
-                        tiles.add(tile);
-                        break;
-                    }
-                }
-            }
+            List<Tile> tiles = transform(is.getOwnedTiles(),
+                tile -> any(tile.getSurroundingTiles(1,1),
+                            t -> t.getOwningSettlement() == null));
             randomShuffle(logger, "Settlement tiles", tiles, random);
             int minGrow = is.getType().getMinimumGrowth();
             int maxGrow = is.getType().getMaximumGrowth();
@@ -575,8 +569,7 @@ public class SimpleMapGenerator implements MapGenerator {
                         break;
                     }
                 }
-                choices.add((rc != null) ? rc
-                            : new RandomChoice<>(is, 1));
+                choices.add((rc != null) ? rc : new RandomChoice<>(is, 1));
             }
             if (!choices.isEmpty()) {
                 // ...and pick one that could do the missing job.
