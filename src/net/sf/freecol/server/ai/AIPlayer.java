@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -204,16 +205,9 @@ public abstract class AIPlayer extends AIObject {
      * @return A list of AI colonies.
      */
     public List<AIColony> getAIColonies() {
-        List<AIColony> ac = new ArrayList<>();
-        for (Colony colony : getPlayer().getColonies()) {
-            AIColony a = getAIColony(colony);
-            if (a != null) {
-                ac.add(a);
-            } else {
-                logger.warning("Could not find the AIColony for: " + colony);
-            }
-        }
-        return ac;
+        final AIMain aiMain = getAIMain();
+        return transform(getPlayer().getColonies(), alwaysTrue(),
+                         c -> aiMain.getAIColony(c), toListNoNulls());
     }
 
     /**
