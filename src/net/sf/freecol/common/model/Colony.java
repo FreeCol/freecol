@@ -2084,29 +2084,22 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<TileImprovementSuggestion> getTileImprovementSuggestions() {
         final Specification spec = getSpecification();
-        List<TileImprovementSuggestion> result = new ArrayList<>();
 
         // Encourage exploration of neighbouring rumours.
-        for (Tile tile : getTile().getSurroundingTiles(1)) {
-            if (tile.hasLostCityRumour()) {
-                result.add(new TileImprovementSuggestion(tile, null, INFINITY));
-            }
-        }
+        List<TileImprovementSuggestion> result
+            = transform(getTile().getSurroundingTiles(1, 1),
+                        t -> t.hasLostCityRumour(),
+                        t -> new TileImprovementSuggestion(t, null, INFINITY));
 
-        // Consider improvements for all colony tiles
-        for (ColonyTile ct : getColonyTiles()) {
-            final Tile tile = ct.getWorkTile();
-            if (tile == null
-                || tile.getOwningSettlement() != this) continue;
-            
-            for (TileImprovementType t : spec.getTileImprovementTypeList()) {
-                if (t.isNatural()) continue; 
-                int improvement = ct.improvedBy(t);
-                if (improvement > 0) {
-                    result.add(new TileImprovementSuggestion(tile, t,
-                                                             improvement));
-                }
-            }
+        // Consider improvements for all available colony tiles.
+        for (final ColonyTile ct : transform(getColonyTiles(),
+                                             WorkLocation::isAvailable)) {
+            final ToIntFunction<TileImprovementType> improve = cacheInt(ti ->
+                ct.improvedBy(ti));
+            result.addAll(transform(spec.getTileImprovementTypeList(),
+                    ti -> !ti.isNatural() && improve.applyAsInt(ti) > 0,
+                    ti -> new TileImprovementSuggestion(ct.getWorkTile(),
+                        ti, improve.applyAsInt(ti))));
         }
         Collections.sort(result,
             TileImprovementSuggestion.descendingAmountComparator);
