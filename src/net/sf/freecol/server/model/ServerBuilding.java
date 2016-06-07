@@ -29,11 +29,13 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -237,17 +239,14 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
-        List<AbstractGoods> inputs = getInputs();
-        if (!(inputs.isEmpty()
-              || isEmpty()
-              || canAutoProduce())
-            && pi.getProduction().isEmpty()) {
-            for (AbstractGoods goods : inputs) {
+        if (!canAutoProduce() && pi.getProduction().isEmpty()) {
+            for (GoodsType gt : transform(getInputs(), alwaysTrue(),
+                                          AbstractGoods::getType)) {
                 cs.addMessage(See.only((ServerPlayer)getOwner()),
                     new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                      "model.building.notEnoughInput",
-                                     this, goods.getType())
-                        .addNamed("%inputGoods%", goods.getType())
+                                     this, gt)
+                        .addNamed("%inputGoods%", gt)
                         .addNamed("%building%", this)
                         .addName("%colony%", getColony().getName()));
             }

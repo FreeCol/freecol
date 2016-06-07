@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -159,7 +160,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
 
         for (Building building : colony.getBuildings()) {
-            for (AbstractGoods output : building.getOutputs()) {
+            for (AbstractGoods output : iterable(building.getOutputs())) {
                 GoodsType goodsType = output.getType();
                 UnitType expert = spec.getExpertForProducing(goodsType);
 
@@ -179,7 +180,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     && info != null
                     && !info.hasMaximumProduction()
                     && !productionWarning.contains(goodsType)) {
-                    for (AbstractGoods input : building.getInputs()) {
+                    for (AbstractGoods input : iterable(building.getInputs())) {
                         addProductionWarning(doc, colony, goodsType, input.getType());
                     }
                     productionWarning.add(goodsType);

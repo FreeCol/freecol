@@ -232,7 +232,7 @@ public class Building extends WorkLocation
         // First, calculate the nominal production ratios.
         if (canAutoProduce()) {
             // Autoproducers are special
-            for (AbstractGoods output : getOutputs()) {
+            for (AbstractGoods output : iterable(getOutputs())) {
                 if (output.getAmount() <= 0) continue;
                 final GoodsType goodsType = output.getType();
                 int available = getColony().getGoodsCount(goodsType);
@@ -253,7 +253,7 @@ public class Building extends WorkLocation
                 }
             }
         } else {
-            for (AbstractGoods output : getOutputs()) {
+            for (AbstractGoods output : iterable(getOutputs())) {
                 final GoodsType goodsType = output.getType();
                 float production = sum(getUnitList(),
                                        u -> getUnitProduction(u, goodsType));
@@ -271,7 +271,7 @@ public class Building extends WorkLocation
         }
 
         // Then reduce the minimum ratio if some input is in short supply.
-        for (AbstractGoods input : getInputs()) {
+        for (AbstractGoods input : iterable(getInputs())) {
             long required = (long)Math.floor(input.getAmount() * minimumRatio);
             long available = getAvailable(input.getType(), inputs);
             // Do not allow auto-production to go negative.
@@ -298,7 +298,7 @@ public class Building extends WorkLocation
         // Check whether there is space enough to store the goods
         // produced in order to avoid excess production.
         if (avoidOverflow) {
-            for (AbstractGoods output : getOutputs()) {
+            for (AbstractGoods output : iterable(getOutputs())) {
                 double production = output.getAmount() * minimumRatio;
                 if (production <= 0) continue;
                 double headroom = (double)capacity
@@ -317,7 +317,7 @@ public class Building extends WorkLocation
         }
 
         final double epsilon = 0.0001;
-        for (AbstractGoods input : getInputs()) {
+        for (AbstractGoods input : iterable(getInputs())) {
             GoodsType type = input.getType();
             // maximize consumption
             int consumption = (int)Math.floor(input.getAmount()
@@ -329,7 +329,7 @@ public class Building extends WorkLocation
                 result.addMaximumConsumption(new AbstractGoods(type, maximumConsumption));
             }
         }
-        for (AbstractGoods output : getOutputs()) {
+        for (AbstractGoods output : iterable(getOutputs())) {
             GoodsType type = output.getType();
             // minimize production, but add a magic little something
             // to counter rounding errors
@@ -549,7 +549,7 @@ public class Building extends WorkLocation
      */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
-        return getInputs();
+        return toList(getInputs());
     }
 
     /**

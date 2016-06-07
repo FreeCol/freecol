@@ -157,7 +157,7 @@ public class ColonyTile extends WorkLocation {
         final Colony colony = getColony();
         ProductionInfo pi = new ProductionInfo();
         if (isColonyCenterTile()) {
-            for (AbstractGoods output : getOutputs()) {
+            for (AbstractGoods output : iterable(getOutputs())) {
                 boolean onlyNaturalImprovements = getSpecification()
                     .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
                     && !output.getType().isFoodType();
@@ -173,7 +173,7 @@ public class ColonyTile extends WorkLocation {
                 pi.addProduction(production);
             }
         } else {
-            for (AbstractGoods output : getOutputs()) {
+            for (AbstractGoods output : iterable(getOutputs())) {
                 final GoodsType goodsType = output.getType();
                 int amount = sum(getUnitList(),
                                  u -> getUnitProduction(u, goodsType));

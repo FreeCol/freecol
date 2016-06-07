@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -142,16 +143,18 @@ public class ProductionCache {
             ProductionInfo info = null;
             if (consumer instanceof Building) {
                 Building building = (Building)consumer;
-                List<AbstractGoods> outputs = new ArrayList<>();
-                for (AbstractGoods output : building.getOutputs()) {
-                    GoodsType outputType = output.getType();
-                    goodsUsed.add(outputType);
+                final Function<AbstractGoods, AbstractGoods> mapper = ag -> {
+                    GoodsType outputType = ag.getType();
                     AbstractGoods newOutput
                         = new AbstractGoods(production.get(outputType));
                     newOutput.setAmount(newOutput.getAmount()
                         + getGoodsCount(outputType));
-                    outputs.add(newOutput);
-                }
+                    return newOutput;
+                };
+                List<AbstractGoods> outputs = transform(building.getOutputs(),
+                                                        alwaysTrue(), mapper);
+                goodsUsed.addAll(transform(outputs, alwaysTrue(),
+                                           AbstractGoods::getType));
                 info = building.getAdjustedProductionInfo(goods, outputs);
             } else if (consumer instanceof Unit) {
                 info = ((Unit)consumer).getProductionInfo(goods);

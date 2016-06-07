@@ -409,21 +409,21 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Get the <code>AbstractGoods</code> consumed by this work location.
      *
-     * @return A list of <code>AbstractGoods</code> consumed.
+     * @return A stream of <code>AbstractGoods</code> consumed.
      */
-    public List<AbstractGoods> getInputs() {
-        return (productionType == null) ? EMPTY_LIST
-            : toList(productionType.getInputs());
+    public Stream<AbstractGoods> getInputs() {
+        return (productionType == null) ? Stream.<AbstractGoods>empty()
+            : productionType.getInputs();
     }
 
     /**
      * Get the <code>AbstractGoods</code> produced by this work location.
      *
-     * @return A list of <code>AbstractGoods</code> produced.
+     * @return A stream of <code>AbstractGoods</code> produced.
      */
-    public List<AbstractGoods> getOutputs() {
-        return (productionType == null) ? EMPTY_LIST
-            : toList(productionType.getOutputs());
+    public Stream<AbstractGoods> getOutputs() {
+        return (productionType == null) ? Stream.<AbstractGoods>empty()
+            : productionType.getOutputs();
     }
 
     /**

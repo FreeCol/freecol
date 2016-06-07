@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Tile;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -864,7 +865,7 @@ public class BuildingTest extends FreeColTestCase {
         for (Building building : colony.getBuildings()) {
             clearWorkLocation(building);
             unit.setLocation(building);
-            for (AbstractGoods output : building.getOutputs()) {
+            for (AbstractGoods output : iterable(building.getOutputs())) {
                 GoodsType outputType = output.getType();
                 for (UnitType type : spec().getUnitTypeList()) {
                     if (!building.getType().canAdd(type)

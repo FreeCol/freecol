@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
@@ -247,9 +248,10 @@ public class ColonyProductionTest extends FreeColTestCase {
         Unit unit = colony.getFirstUnit();
         unit.setLocation(colony.getWorkLocationFor(unit, bellsType));
 
-        List<AbstractGoods> outputs = pasture.getOutputs();
+        List<AbstractGoods> outputs = toList(pasture.getOutputs());
         assertEquals(1, outputs.size());
         assertEquals(horsesType, outputs.get(0).getType());
+
         assertEquals("Wrong warehouse capacity in colony",
             GoodsContainer.CARGO_SIZE, colony.getWarehouseCapacity());
 
