@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1762,24 +1763,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<AbstractGoods> getSortedPotential(UnitType unitType,
                                                   Player owner) {
+        // Defend against calls while partially read.
         if (getType() == null) return Collections.<AbstractGoods>emptyList();
-
-        final Specification spec = getSpecification();
-        List<AbstractGoods> goodsTypeList = new ArrayList<>();
+        
         // It is necessary to consider all farmed goods, since the
-        // tile might have a resource that produces goods not
-        // produced by the tile type.
-        for (GoodsType goodsType : spec.getFarmedGoodsTypeList()) {
-            int potential = getPotentialProduction(goodsType, unitType);
-            if (potential > 0) {
-                goodsTypeList.add(new AbstractGoods(goodsType, potential));
-            }
-        }
-        Collections.sort(goodsTypeList,
-            (owner == null || owner.getMarket() == null)
-            ? AbstractGoods.descendingAmountComparator
-            : owner.getMarket().getSalePriceComparator());
-        return goodsTypeList;
+        // tile might have a resource that produces goods not produced
+        // by the tile type.
+        final ToIntFunction<GoodsType> toif = cacheInt(gt ->
+            getPotentialProduction(gt, unitType));
+        return transform(getSpecification().getFarmedGoodsTypeList(),
+                         gt -> toif.applyAsInt(gt) > 0,
+                         gt -> new AbstractGoods(gt, toif.applyAsInt(gt)),
+                         ((owner == null || owner.getMarket() == null)
+                             ? AbstractGoods.descendingAmountComparator
+                             : owner.getMarket().getSalePriceComparator()));
     }
 
     /**
