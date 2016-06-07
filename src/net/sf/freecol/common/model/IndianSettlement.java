@@ -1089,22 +1089,20 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return A random goods gift, or null if none found.
      */
     public Goods getRandomGift(Random random) {
-        List<Goods> goodsList = new ArrayList<>();
-        for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
-            int n = getGoodsCount(type) - KEEP_RAW_MATERIAL;
-            if (n >= GIFT_THRESHOLD) {
-                n -= GIFT_MINIMUM;
-                Goods goods = new Goods(getGame(), this, type,
-                    Math.min(randomInt(logger, "Gift amount", random, n)
-                        + GIFT_MINIMUM, GIFT_MAXIMUM));
-                goodsList.add(goods);
-            }
-
-        }
-        return (goodsList.isEmpty()) ? null
-            : getRandomMember(logger, "Gift type", goodsList, random);
+        final Specification spec = getSpecification();
+        final Predicate<GoodsType> pred = gt ->
+            getGoodsCount(gt) >= GIFT_THRESHOLD + KEEP_RAW_MATERIAL;
+        final Function<GoodsType, Goods> mapper = gt ->
+            new Goods(getGame(), this, gt,
+                Math.min(randomInt(logger, "Gift amount", random,
+                                   getGoodsCount(gt) - KEEP_RAW_MATERIAL
+                                       - GIFT_MINIMUM) + GIFT_MINIMUM,
+                         GIFT_MAXIMUM));
+        return getRandomMember(logger, "Gift type",
+                               transform(spec.getNewWorldGoodsTypeList(),
+                                         pred, mapper),
+                               random);
     }
-
 
     /**
      * Add some initial goods to a newly generated settlement.
