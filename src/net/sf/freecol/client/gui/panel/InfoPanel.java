@@ -56,8 +56,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import static net.sf.freecol.common.util.StringUtils.splitText;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -179,13 +179,12 @@ public final class InfoPanel extends FreeColPanel {
                     //moveLabel.setFont(font);
                     add(moveLabel, "span " + PRODUCTION);
 
-                    List<AbstractGoods> produce = tile.getType()
-                        .getPossibleProduction(true);
+                    List<AbstractGoods> produce
+                        = sort(tile.getType().getPossibleProduction(true),
+                               AbstractGoods.descendingAmountComparator);
                     if (produce.isEmpty()) {
                         add(new JLabel(), "span " + PRODUCTION);
                     } else {
-                        Collections.sort(produce,
-                            AbstractGoods.descendingAmountComparator);
                         for (AbstractGoods ag : produce) {
                             GoodsType type = ag.getType();
                             int n = tile.getPotentialProduction(type, null);

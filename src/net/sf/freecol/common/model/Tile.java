@@ -1762,23 +1762,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public List<AbstractGoods> getSortedPotential(UnitType unitType,
                                                   Player owner) {
+        if (getType() == null) return Collections.<AbstractGoods>emptyList();
+
         final Specification spec = getSpecification();
         List<AbstractGoods> goodsTypeList = new ArrayList<>();
-        if (getType() != null) {
-            // It is necessary to consider all farmed goods, since the
-            // tile might have a resource that produces goods not
-            // produced by the tile type.
-            for (GoodsType goodsType : spec.getFarmedGoodsTypeList()) {
-                int potential = getPotentialProduction(goodsType, unitType);
-                if (potential > 0) {
-                    goodsTypeList.add(new AbstractGoods(goodsType, potential));
-                }
+        // It is necessary to consider all farmed goods, since the
+        // tile might have a resource that produces goods not
+        // produced by the tile type.
+        for (GoodsType goodsType : spec.getFarmedGoodsTypeList()) {
+            int potential = getPotentialProduction(goodsType, unitType);
+            if (potential > 0) {
+                goodsTypeList.add(new AbstractGoods(goodsType, potential));
             }
-            Collections.sort(goodsTypeList,
-                (owner == null || owner.getMarket() == null)
-                ? AbstractGoods.descendingAmountComparator
-                : owner.getMarket().getSalePriceComparator());
         }
+        Collections.sort(goodsTypeList,
+            (owner == null || owner.getMarket() == null)
+            ? AbstractGoods.descendingAmountComparator
+            : owner.getMarket().getSalePriceComparator());
         return goodsTypeList;
     }
 

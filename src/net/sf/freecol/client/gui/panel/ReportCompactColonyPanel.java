@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -379,14 +380,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
     public ReportCompactColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");
 
-        final Player player = getMyPlayer();
-        final Comparator<Colony> colonyComparator
-            = freeColClient.getClientOptions().getColonyComparator();
-        final Comparator<List<Colony>> firstColonyComparator
-            = Comparator.comparing(l -> first(l), colonyComparator);
-
         this.spec = getSpecification();
         this.lib = getImageLibrary();
+        this.market = getMyPlayer().getMarket();
         
         // Sort the colonies by continent.
         final Map<Integer, List<Colony>> continents = new HashMap<>();
@@ -397,25 +393,23 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 appendToMapList(continents, c.getTile().getContiguity(), c);
             }
         }
-        for (Entry<Integer, List<Colony>> e 
-                 : mapEntriesByValue(continents, firstColonyComparator)) {
-            this.colonies.add(e.getValue());
-        }
+        final Comparator<Colony> colonyComparator
+            = freeColClient.getClientOptions().getColonyComparator();
+        final Comparator<List<Colony>> firstColonyComparator
+            = Comparator.comparing(l -> first(l), colonyComparator);
+        this.colonies.addAll(transform(continents.entrySet(), alwaysTrue(),
+                                       Entry::getValue, firstColonyComparator));
 
-        this.market = player.getMarket();
-
-        this.goodsTypes.addAll(spec.getGoodsTypeList());
-        Iterator<GoodsType> gti = goodsTypes.iterator();
-        while (gti.hasNext()) {
-            GoodsType gt = gti.next();
-            if (!gt.isStorable() || gt.isTradeGoods()) gti.remove();
-        }
-        Collections.sort(this.goodsTypes, GoodsType.goodsTypeComparator);
+        final Predicate<GoodsType> pred = gt ->
+            gt.isStorable() && !gt.isTradeGoods();
+        this.goodsTypes.addAll(transform(spec.getGoodsTypeList(), pred,
+                                         Function.identity(),
+                                         GoodsType.goodsTypeComparator));
 
         loadResources();
-
         update();
     }
+
 
     private synchronized void loadResources() {
         if (cAlarm != null) return;
@@ -436,7 +430,6 @@ public final class ReportCompactColonyPanel extends ReportPanel
             ? ResourceManager.getColor(cGoodKey)
             : Color.BLUE;
     }
-
 
     private static StringTemplate stpl(String messageId) {
         return (Messages.containsKey(messageId))
@@ -860,13 +853,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                       List<UnitType> have, Colony colony) {
         final String cac = colony.getId();
         List<JButton> result = new ArrayList<>();
-        List<UnitType> types = new ArrayList<>();
-        types.addAll(suggestions.keySet());
         final Comparator<UnitType> buttonComparator
             = Comparator.comparing(ut -> suggestions.get(ut),
                                    Suggestion.descendingAmountComparator);
-        Collections.sort(types, buttonComparator);
-        for (UnitType type : types) {
+        for (UnitType type : sort(suggestions.keySet(), buttonComparator)) {
             boolean present = have.contains(type);
             Suggestion suggestion = suggestions.get(type);
             String label = Integer.toString(suggestion.amount);

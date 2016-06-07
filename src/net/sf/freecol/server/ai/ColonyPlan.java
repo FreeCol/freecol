@@ -866,8 +866,8 @@ public class ColonyPlan {
         // list, and then by amount.  If the type of goods produced is
         // not on the produce list, then make sure such plans sort to
         // the end, except for food plans.
-        Collections.sort(workPlans,
-            Comparator.comparingInt((WorkLocationPlan wp) -> {
+        final Comparator<WorkLocationPlan> comp
+            = cachingIntComparator((WorkLocationPlan wp) -> {
                     final GoodsType gt = wp.getGoodsType();
                     int i = produce.indexOf(gt);
                     return (i < 0 && !gt.isFoodType()) ? 99999 : i;
@@ -875,7 +875,8 @@ public class ColonyPlan {
             .thenComparingInt((WorkLocationPlan wp) ->
                 wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
             .thenComparing((WorkLocationPlan wp) ->
-                wp.getGoodsType(), GoodsType.goodsTypeComparator));
+                wp.getGoodsType(), GoodsType.goodsTypeComparator);
+        Collections.sort(workPlans, comp);
     }
 
     /**
@@ -887,8 +888,8 @@ public class ColonyPlan {
      */
     private void updateProductionList(final Map<GoodsType, Map<WorkLocation, Integer>> production) {
         final Comparator<GoodsType> productionComparator
-            = Comparator.comparingInt((GoodsType gt) ->
-                    sum(production.get(gt).values(), Integer::intValue))
+            = cachingIntComparator((GoodsType gt) ->
+                sum(production.get(gt).values(), Integer::intValue))
                 .reversed();
 
         // If we need liberty put it before the new world production.
@@ -1212,8 +1213,7 @@ public class ColonyPlan {
                     produce.indexOf(u.getType().getExpertProduction()))
                 .reversed()
                 .thenComparingInt(Unit::getExperience);
-        Collections.sort(workers, soldierComparator);
-        for (Unit u : new ArrayList<>(workers)) {
+        for (Unit u : sort(workers, soldierComparator)) {
             if (workers.size() <= 1) break;
             if (!col.isBadlyDefended()) break;
             Role role = u.getMilitaryRole();
@@ -1468,8 +1468,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         }
 
         // Rearm what remains as far as possible.
-        Collections.sort(workers, soldierComparator);
-        for (Unit u : new ArrayList<>(workers)) {
+        for (Unit u : sort(workers, soldierComparator)) {
             Role role = u.getMilitaryRole();
             if (role == null) continue;
             if (fullEquipUnit(spec(), u, role, col)) {

@@ -105,15 +105,14 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel colonistsPanel
                 = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
             colonistsPanel.setOpaque(false);
-            for (Unit u : toSortedList(colony.getUnitList(),
-                                       Unit.typeRoleComparator)) {
+            for (Unit u : sort(colony.getUnitList(), Unit.typeRoleComparator)) {
                 colonistsPanel.add(new UnitLabel(getFreeColClient(), u,
                                                  true, true));
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
             unitsPanel.setOpaque(false);
-            for (Unit u : toSortedList(colony.getTile().getUnitList(),
-                                       Unit.typeRoleComparator)) {
+            for (Unit u : sort(colony.getTile().getUnitList(),
+                               Unit.typeRoleComparator)) {
                 unitsPanel.add(new UnitLabel(getFreeColClient(), u,
                                              true, true));
             }
@@ -125,11 +124,9 @@ public final class ReportClassicColonyPanel extends ReportPanel
             reportPanel.add(unitsPanel, "newline, growx");
             
             // Production
-            List<GoodsType> goodsTypes
-                = new ArrayList<>(spec.getGoodsTypeList());
-            Collections.sort(goodsTypes, GoodsType.goodsTypeComparator);
             int count = 0;
-            for (GoodsType gt : goodsTypes) {
+            for (GoodsType gt : sort(spec.getGoodsTypeList(),
+                                     GoodsType.goodsTypeComparator)) {
                 int newValue = colony.getNetProductionOf(gt);
                 int stockValue = colony.getGoodsCount(gt);
                 if (newValue != 0 || stockValue > 0) {
@@ -154,9 +151,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel buildingsPanel
                 = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
             buildingsPanel.setOpaque(false);
-            List<Building> buildingList = colony.getBuildings();
-            Collections.sort(buildingList);
-            for (Building building : buildingList) {
+            for (Building building : sort(colony.getBuildings())) {
                 if (building.getType().isAutomaticBuild()) continue;
                 JLabel buildingLabel = new JLabel(new ImageIcon(lib
                         .getSmallBuildingImage(building)));

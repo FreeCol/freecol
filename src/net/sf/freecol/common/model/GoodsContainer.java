@@ -511,7 +511,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         xw.writeStartElement(tag);
 
-        for (GoodsType goodsType : toSortedList(storage.keySet())) {
+        for (GoodsType goodsType : sort(storage.keySet())) {
 
             xw.writeStartElement(Goods.getTagName());
 

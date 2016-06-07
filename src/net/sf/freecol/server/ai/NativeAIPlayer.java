@@ -229,10 +229,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         units.addAll(is.getTile().getUnitList());
 
         // Prioritize promoting partially equipped units to full dragoon
-        Collections.sort(units,
-            getGame().getCombatModel().getMilitaryStrengthComparator());
-
-        for (Unit u : units) {
+        final Comparator<Unit> comp = getGame().getCombatModel()
+            .getMilitaryStrengthComparator();
+        for (Unit u : sort(units, comp)) {
             Role r = is.canImproveUnitMilitaryRole(u);
             if (r != null) {
                 Role old = u.getRole();
@@ -356,8 +355,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
 
         // Sort threat tiles by threat value.
-        List<Tile> threatTiles = new ArrayList<>(threats.keySet());
-        Collections.sort(threatTiles,
+        List<Tile> threatTiles = sort(threats.keySet(),
             Comparator.comparingDouble(t -> threats.get(t)));
 
         if (!defenders.isEmpty()) {

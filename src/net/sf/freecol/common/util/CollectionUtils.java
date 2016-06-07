@@ -310,8 +310,7 @@ public class CollectionUtils {
      */
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map) {
-        return toSortedList(map.entrySet(),
-                            Comparator.comparing(Entry::getKey));
+        return sort(map.entrySet(), Comparator.comparing(Entry::getKey));
     }
 
     /**
@@ -325,8 +324,8 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByKey(Map<K, V> map, final Comparator<K> comparator) {
-        return toSortedList(map.entrySet(),
-                            Comparator.comparing(Entry::getKey, comparator));
+        return sort(map.entrySet(),
+                    Comparator.comparing(Entry::getKey, comparator));
     }
 
     /**
@@ -339,8 +338,7 @@ public class CollectionUtils {
      */
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map) {
-        return toSortedList(map.entrySet(),
-                            Comparator.comparing(Entry::getValue));
+        return sort(map.entrySet(), Comparator.comparing(Entry::getValue));
     }
 
     /**
@@ -354,8 +352,8 @@ public class CollectionUtils {
      */
     public static <K,V> List<Entry<K,V>>
         mapEntriesByValue(Map<K, V> map, final Comparator<V> comparator) {
-        return toSortedList(map.entrySet(),
-                            Comparator.comparing(Entry::getValue, comparator));
+        return sort(map.entrySet(),
+                    Comparator.comparing(Entry::getValue, comparator));
     }
 
     // Stream-based routines from here on
@@ -1399,6 +1397,95 @@ public class CollectionUtils {
     }
 
     /**
+     * Convenience function to convert an array to a sorted list.
+     *
+     * @param <T> The array member type.
+     * @param array The array to convert.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T> sort(T[] array) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return sort_internal(Arrays.stream(array), comparator);
+    }
+
+    /**
+     * Convenience function to convert an array to a sorted list.
+     *
+     * @param <T> The array member type.
+     * @param array The array to convert.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    public static <T> List<T> sort(T[] array, Comparator<? super T> comparator) {
+        return sort_internal(Arrays.stream(array), comparator);
+    }
+
+    /**
+     * Convenience function to convert a collection to a sorted list.
+     *
+     * @param <T> The collection member type.
+     * @param collection The <code>Collection</code> to convert.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T> sort(Collection<T> collection) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return sort_internal(collection.stream(), comparator);
+    }
+
+    /**
+     * Convenience function to convert a collection to a map.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to convert.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A map of the stream contents.
+     */
+    public static <T> List<T> sort(Collection<T> c,
+                                   Comparator<? super T> comparator) {
+        return sort_internal(c.stream(), comparator);
+    }
+
+    /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @return A list of the stream contents.
+     */
+    public static <T extends Comparable<? super T>> List<T> sort(Stream<T> stream) {
+        final Comparator<T> comparator = Comparator.naturalOrder();
+        return (stream == null) ? Collections.<T>emptyList()
+            : sort_internal(stream, comparator);
+    }
+
+    /**
+     * Convenience function to collect a stream to a list.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    public static <T> List<T> sort(Stream<T> stream,
+                                   Comparator<? super T> comparator) {
+        return (stream == null) ? Collections.<T>emptyList()
+            : sort_internal(stream, comparator);
+    }
+
+    /**
+     * Implement sorted.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to collect.
+     * @param comparator A <code>Comparator</code> to sort with.
+     * @return A list of the stream contents.
+     */
+    private static <T> List<T> sort_internal(Stream<T> stream,
+                                             Comparator<? super T> comparator) {
+        return stream.sorted(comparator).collect(Collectors.toList());
+    }
+
+    /**
      * Take the sum of the members of an array.
      *
      * @param <T> The collection member type.
@@ -1639,99 +1726,6 @@ public class CollectionUtils {
      */
     private static <T> List<T> toList_internal(Stream<T> stream) {
         return stream.collect(Collectors.toList());
-    }
-
-    /**
-     * Convenience function to convert an array to a sorted list.
-     *
-     * @param <T> The array member type.
-     * @param array The array to convert.
-     * @return A list of the stream contents.
-     */
-    public static <T extends Comparable<? super T>> List<T>
-        toSortedList(T[] array) {
-        final Comparator<T> comparator = Comparator.naturalOrder();
-        return toSortedList_internal(Arrays.stream(array), comparator);
-    }
-
-    /**
-     * Convenience function to convert an array to a sorted list.
-     *
-     * @param <T> The array member type.
-     * @param array The array to convert.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return A list of the stream contents.
-     */
-    public static <T> List<T> toSortedList(T[] array,
-                                           Comparator<? super T> comparator) {
-        return toSortedList_internal(Arrays.stream(array), comparator);
-    }
-
-    /**
-     * Convenience function to convert a collection to a sorted list.
-     *
-     * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to convert.
-     * @return A list of the stream contents.
-     */
-    public static <T extends Comparable<? super T>> List<T>
-        toSortedList(Collection<T> collection) {
-        final Comparator<T> comparator = Comparator.naturalOrder();
-        return toSortedList_internal(collection.stream(), comparator);
-    }
-
-    /**
-     * Convenience function to convert a collection to a map.
-     *
-     * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to convert.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return A map of the stream contents.
-     */
-    public static <T> List<T> toSortedList(Collection<T> c,
-                                           Comparator<? super T> comparator) {
-        return toSortedList_internal(c.stream(), comparator);
-    }
-
-    /**
-     * Convenience function to collect a stream to a list.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @return A list of the stream contents.
-     */
-    public static <T extends Comparable<? super T>> List<T>
-        toSortedList(Stream<T> stream) {
-        final Comparator<T> comparator = Comparator.naturalOrder();
-        return (stream == null) ? Collections.<T>emptyList()
-            : toSortedList_internal(stream, comparator);
-    }
-
-    /**
-     * Convenience function to collect a stream to a list.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return A list of the stream contents.
-     */
-    public static <T> List<T> toSortedList(Stream<T> stream,
-                                           Comparator<? super T> comparator) {
-        return (stream == null) ? Collections.<T>emptyList()
-            : toSortedList_internal(stream, comparator);
-    }
-
-    /**
-     * Implement toSortedList.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @param comparator A <code>Comparator</code> to sort with.
-     * @return A list of the stream contents.
-     */
-    private static <T> List<T> toSortedList_internal(Stream<T> stream,
-                                                     Comparator<? super T> comparator) {
-        return stream.sorted(comparator).collect(Collectors.toList());
     }
 
     /**
@@ -2095,76 +2089,5 @@ public class CollectionUtils {
             ? stream.filter(predicate).map(mapper).collect(collector)
             : stream.filter(predicate).map(mapper)
                 .sorted(comparator).collect(collector);
-    }
-
-    /**
-     * Transform and return distinct items from an array.
-     *
-     * @param <T> The collection member type.
-     * @param <R> The resulting collection member type.
-     * @param array The array to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @return The sorted list of the mapped predicate matches.
-     */
-    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(T[] array,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comp = Comparator.naturalOrder();
-        return transformDistinct_internal(Arrays.stream(array), predicate,
-                                          mapper, comp);
-    }
-
-    /**
-     * Transform and return distinct items from a collection.
-     *
-     * @param <T> The collection member type.
-     * @param <R> The resulting collection member type.
-     * @param collection The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @return A list of mapped predicate matches without duplicates.
-     */
-    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Collection<T> c,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comp = Comparator.naturalOrder();
-        return transformDistinct_internal(c.stream(), predicate, mapper, comp);
-    }
-
-    /**
-     * Transform and return distinct items from a stream.
-     *
-     * @param <T> The collection member type.
-     * @param <R> The resulting collection member type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @return A list of mapped predicate matches without duplicates.
-     */
-    public static <T,R extends Comparable<? super R>> List<R> transformDistinct(Stream<T> stream,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper) {
-        final Comparator<? super R> comp = Comparator.naturalOrder();
-        return transformDistinct_internal(stream, predicate, mapper, comp);
-    }
-
-    /**
-     * Underlying implementation for the distinct transform functions.
-     *
-     * @param <T> The stream member type.
-     * @param <R> The resulting collection member type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
-     * @param mapper A function to transform the selected items.
-     * @param comaprator A <code>Comparator</code> to sort with.
-     * @return A list of mapped predicate matches without duplicates.
-     */
-    private static <T,R> List<R> transformDistinct_internal(Stream<T> stream,
-        Predicate<T> predicate,
-        Function<? super T, ? extends R> mapper,
-        Comparator<? super R> comparator) {
-        return stream.filter(predicate).map(mapper).sorted(comparator)
-            .distinct().collect(Collectors.toList());
     }
 }

@@ -682,9 +682,9 @@ public class SimpleMapGenerator implements MapGenerator {
                                           int radius, List<Tile> tiles,
                                           LogBuilder lb) {
         final Tile center = territory.getCenterTile(map);
-        Collections.sort(tiles, Comparator.comparingInt(t ->
-                t.getDistanceTo(center)));
-        for (Tile t : tiles) {
+        final Comparator<Tile> comp
+            = Comparator.comparingInt(t -> t.getDistanceTo(center));
+        for (Tile t : sort(tiles, comp)) {
             // Choose this tile if it is free and half the expected tile
             // claim can succeed (preventing capitals on small islands).
             if (territory.player.getClaimableTiles(t, radius).size()

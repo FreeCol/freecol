@@ -112,8 +112,6 @@ public abstract class ReportUnitPanel extends ReportPanel {
         }
 
         // Finally all other locations, sorted alphabetically.
-        List<String> otherNames = new ArrayList<>(inLocations.keySet());
-        Collections.sort(otherNames);
         for (Entry<String, List<Unit>> e : mapEntriesByKey(inLocations)) {
             handleLocation(null, e.getKey(), e.getValue());
         }
@@ -185,7 +183,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         if (unitList == null || unitList.isEmpty()) {
             reportPanel.add(Utility.localizedLabel("none"), "sg");
         } else {
-            for (Unit u : toSortedList(unitList, Unit.typeRoleComparator)) {
+            for (Unit u : sort(unitList, Unit.typeRoleComparator)) {
                 JButton unitButton = getUnitButton(u);
                 if (u.isCarrier()) {
                     reportPanel.add(unitButton, "newline, sg");

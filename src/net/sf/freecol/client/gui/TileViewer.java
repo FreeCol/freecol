@@ -56,7 +56,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -484,8 +484,7 @@ public final class TileViewer extends FreeColClientHolder {
                         }
                     }
                 }
-                Collections.sort(imageBorders);
-                for (SortableImage sorted : imageBorders) {
+                for (SortableImage sorted : sort(imageBorders)) {
                     g.drawImage(sorted.image, 0, 0, null);
                 }
             }

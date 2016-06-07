@@ -98,9 +98,8 @@ public class NewUnitPanel extends FreeColPanel {
         add(question, "span, wrap 20");
 
         // The prices may have changed, recreate the buttons
-        Collections.sort(units, priceComparator);
         buttons.clear();
-        for (UnitType ut : units) {
+        for (UnitType ut : sort(units, priceComparator)) {
             int price = europe.getUnitPrice(ut);
             boolean enable = player.checkGold(price);
             JButton newButton = new JButton();

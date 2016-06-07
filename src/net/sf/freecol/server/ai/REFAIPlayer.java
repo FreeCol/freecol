@@ -505,9 +505,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         Tile tile = aiu.getUnit().getTile();
                         return tile.getDistanceTo(target.getTile());
                     });
-            Collections.sort(naval, Comparator.comparingInt(targetDistance));
-            while (!naval.isEmpty()) {
-                AIUnit aiu = naval.remove(0);
+            for (AIUnit aiu : sort(naval, Comparator.comparingInt(targetDistance))) {
                 int distance = targetDistance.applyAsInt(aiu);
                 if ((m = getTransportMission(aiu)) != null) {
                     lb.add(" REQUIRED ", distance, " ", m);

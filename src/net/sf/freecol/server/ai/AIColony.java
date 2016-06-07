@@ -1290,8 +1290,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             newPlans.add(plan); // Otherwise add the plan.
         }
         tileImprovementPlans.clear();
-        tileImprovementPlans.addAll(newPlans);
-        Collections.sort(tileImprovementPlans);
+        tileImprovementPlans.addAll(sort(newPlans));
         if (!tileImprovementPlans.isEmpty()) {
             lb.add(", improve:");
             for (TileImprovementPlan tip : tileImprovementPlans) {

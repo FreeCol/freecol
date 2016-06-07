@@ -270,7 +270,7 @@ public final class QuickActionMenu extends JPopupMenu {
             = Comparator.comparingInt((JMenuItem k) -> map.get(k))
                 .reversed()
                 .thenComparing(JMenuItem::getText);
-        return toSortedList(map.keySet(), comp);
+        return sort(map.keySet(), comp);
     }
 
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,

@@ -1095,6 +1095,7 @@ public final class FreeColServer {
         game.setFreeColGameObjectListener(aiMain);
 
         Collections.sort(game.getPlayers(), Player.playerComparator);
+
         for (Player player : game.getLivePlayers(null)) {
             if (player.isAI()) {
                 ServerPlayer serverPlayer = (ServerPlayer)player;

@@ -197,7 +197,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : toSortedList(getAbilities())) {
+        for (Ability ability : sort(getAbilities())) {
             ability.toXML(xw);
         }
 

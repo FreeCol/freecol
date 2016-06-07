@@ -21,6 +21,7 @@ package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -117,10 +118,9 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /** The available audio mixers. */
     private static final List<MixerWrapper> audioMixers = new ArrayList<>();
     static {
-        for (Mixer.Info mi : AudioSystem.getMixerInfo()) {
-            audioMixers.add(new MixerWrapper(mi.getName(), mi));
-        }
-        Collections.sort(audioMixers);
+        audioMixers.addAll(transform(AudioSystem.getMixerInfo(),
+                alwaysTrue(), mi -> new MixerWrapper(mi.getName(), mi),
+                Comparator.naturalOrder()));
         audioMixers.add(0, DEFAULT_MIXER_WRAPPER);
     }
 

@@ -225,7 +225,7 @@ public class NationOptions extends FreeColSpecObject {
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Nation nation : toSortedList(nations.keySet())) {
+        for (Nation nation : sort(nations.keySet())) {
             xw.writeStartElement(NATION_OPTION_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, nation);

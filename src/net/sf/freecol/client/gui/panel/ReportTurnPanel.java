@@ -113,11 +113,11 @@ public final class ReportTurnPanel extends ReportPanel {
         // Sort if requested
         final Comparator<ModelMessage> comparator
             = options.getModelMessageComparator(game);
-        if (comparator != null) Collections.sort(messages, comparator);
+        if (comparator != null) Collections.sort(this.messages, comparator);
 
         Object source = this;
         ModelMessage.MessageType type = null;
-        for (ModelMessage message : messages) {
+        for (ModelMessage message : this.messages) {
             // Add headline if the grouping changed
             switch (groupBy) {
             case ClientOptions.MESSAGES_GROUP_BY_SOURCE:

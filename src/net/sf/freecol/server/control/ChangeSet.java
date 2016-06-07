@@ -1889,7 +1889,7 @@ public class ChangeSet {
      *         consider, or null if there is nothing to report.
      */
     public Element build(ServerPlayer serverPlayer) {
-        List<Change> c = new ArrayList<>(changes);
+        List<Change> c = sort(changes, changeComparator);
         List<Element> elements = new ArrayList<>();
         List<Change> diverted = new ArrayList<>();
         Document doc = DOMMessage.createNewDocument();
@@ -1897,7 +1897,6 @@ public class ChangeSet {
         // For all sorted changes, if it is notifiable to the target
         // player then convert it to an Element, or divert for later
         // attachment.  Then add all consequence changes to the list.
-        Collections.sort(c, changeComparator);
         while (!c.isEmpty()) {
             Change change = c.remove(0);
             if (change.isNotifiable(serverPlayer)) {
@@ -1939,8 +1938,9 @@ public class ChangeSet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        Collections.sort(changes, changeComparator);
-        for (Change c : changes) sb.append(c).append('\n');
+        for (Change c : sort(changes, changeComparator)) {
+            sb.append(c).append('\n');
+        }
         return sb.toString();
     }
 }

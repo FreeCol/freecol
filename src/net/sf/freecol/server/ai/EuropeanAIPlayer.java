@@ -1040,9 +1040,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The most urgent 10% of the available transportables.
      */
     public List<TransportableAIObject> getUrgentTransportables() {
-        List<TransportableAIObject> urgent = new ArrayList<>(transportSupply);
+        List<TransportableAIObject> urgent = sort(transportSupply);
         // Do not let the list exceed 10% of all transports
-        Collections.sort(urgent);
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
         while (urgent.size() > urge) urgent.remove(urge);
@@ -1464,9 +1463,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return A list of wishes.
      */
     public List<Wish> getWishes() {
-        return toSortedList(flatten(getAIColonies(),
-                                    aic -> aic.getWishes().stream()),
-                            ValuedAIObject.descendingValueComparator);
+        return sort(flatten(getAIColonies(), aic -> aic.getWishes().stream()),
+                    ValuedAIObject.descendingValueComparator);
     }
 
 
@@ -1725,8 +1723,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         // building mission if there are no colonies.
         if (!player.hasSettlements() && bcm != null) {
             final Location bcmTarget = bcm.getTarget();
-            Collections.sort(aiUnits, builderComparator);
-            for (AIUnit aiUnit : aiUnits) {
+            for (AIUnit aiUnit : sort(aiUnits, builderComparator)) {
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();
                 if ((m = getBuildColonyMission(aiUnit, bcmTarget)) == null)
@@ -1741,8 +1738,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             done.clear();
         }
         if (nBuilders > 0) {
-            Collections.sort(aiUnits, builderComparator);
-            for (AIUnit aiUnit : aiUnits) {
+            for (AIUnit aiUnit : sort(aiUnits, builderComparator)) {
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();
                 if ((m = getBuildColonyMission(aiUnit, null)) == null)
@@ -1758,8 +1754,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             done.clear();
         }
         if (nScouts > 0) {
-            Collections.sort(aiUnits, scoutComparator);
-            for (AIUnit aiUnit : aiUnits) {
+            for (AIUnit aiUnit : sort(aiUnits, scoutComparator)) {
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();
                 final Unit unit = aiUnit.getUnit();
@@ -1775,8 +1770,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             done.clear();
         }
         if (nPioneers > 0) {
-            Collections.sort(aiUnits, pioneerComparator);
-            for (AIUnit aiUnit : aiUnits) {
+            for (AIUnit aiUnit : sort(aiUnits, pioneerComparator)) {
                 final Unit unit = aiUnit.getUnit();
                 final Location oldTarget = ((m = aiUnit.getMission()) == null)
                     ? null : m.getTarget();

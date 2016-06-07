@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -103,8 +104,7 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new JLabel(shortName));
         add(new JLabel(ModifierFormat.format(result)));
 
-        Collections.sort(attendedModifiers);
-        output(attendedModifiers, unitType);
+        output(sort(attendedModifiers), unitType);
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
@@ -129,8 +129,7 @@ public class WorkProductionPanel extends FreeColPanel {
             if (result > 0) {
                 add(Utility.localizedLabel(wl.getLabel()));
                 add(new JLabel(ModifierFormat.format(result)), "wrap 30");
-                Collections.sort(unattendedModifiers);
-                output(unattendedModifiers, unitType);
+                output(sort(unattendedModifiers), unitType);
             }
         }
 

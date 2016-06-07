@@ -55,6 +55,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;
 
@@ -408,10 +409,7 @@ public abstract class FreeColObject
      * @return A list of abilities.
      */
     public final List<Ability> getSortedAbilities() {
-        List<Ability> abilities = new ArrayList<>();
-        abilities.addAll(getAbilities());
-        Collections.sort(abilities);
-        return abilities;
+        return sort(getAbilities());
     }
 
     /**
@@ -551,10 +549,7 @@ public abstract class FreeColObject
      * @return A list of modifiers.
      */
     public final List<Modifier> getSortedModifiers() {
-        List<Modifier> modifiers = new ArrayList<>();
-        modifiers.addAll(getModifiers());
-        Collections.sort(modifiers);
-        return modifiers;
+        return sort(getModifiers());
     }
 
     /**

@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -73,10 +74,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             = combatModel.getOffensiveModifiers(attacker, defender);
         final Set<Modifier> defenceModifiers
             = combatModel.getDefensiveModifiers(attacker, defender);
-        final List<Modifier> offence = new ArrayList<>(attackModifiers);
-        Collections.sort(offence);
-        final List<Modifier> defence = new ArrayList<>(defenceModifiers);
-        Collections.sort(defence);
+        final List<Modifier> offence = sort(attackModifiers);
+        final List<Modifier> defence = sort(defenceModifiers);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"

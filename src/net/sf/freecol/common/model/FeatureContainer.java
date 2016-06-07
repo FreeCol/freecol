@@ -283,8 +283,7 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Collection<Modifier> mods) {
         if (mods == null || mods.isEmpty()) return number;
-        List<Modifier> modifiers = new ArrayList<>(mods);
-        Collections.sort(modifiers);
+        List<Modifier> modifiers = sort(mods);
         float result = number;
         for (Modifier m : modifiers) {
             float value = m.getValue(turn);

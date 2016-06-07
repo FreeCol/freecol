@@ -514,7 +514,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         if (xw.validFor(owner)) {
 
-            for (MarketData data : toSortedList(marketData.values())) {
+            for (MarketData data : sort(marketData.values())) {
                 data.toXML(xw);
             }
         }
@@ -567,7 +567,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId())
             .append(" owner=").append(owner.getId());
-        for (MarketData md : toSortedList(marketData.values())) {
+        for (MarketData md : sort(marketData.values())) {
             sb.append(' ').append(md);
         }
         sb.append(']');

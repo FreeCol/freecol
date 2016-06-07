@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -39,6 +40,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.i18n.Messages;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -96,21 +98,18 @@ public class ConceptDetailPanel extends FreeColPanel
      */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
-        DefaultMutableTreeNode node
-            = new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,
-                    getName(), null));
-        List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-        for (String concept : concepts) {
+        final Function<String, DefaultMutableTreeNode> mapper = concept -> {
             String nodeId = "colopedia.concepts." + concept;
             String nodeName = Messages.getName(nodeId);
-            nodes.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this,
-                        nodeId, nodeName, null)));
+            return new DefaultMutableTreeNode(new ColopediaTreeItem(this,
+                                              nodeId, nodeName, null));
+        };
+        for (DefaultMutableTreeNode n : transform(concepts, alwaysTrue(),
+                                                  mapper, nodeComparator)) {
+            root.add(n);
         }
-        Collections.sort(nodes, nodeComparator);
-        for (DefaultMutableTreeNode n : nodes) {
-            node.add(n);
-        }
-        root.add(node);
+        root.add(new DefaultMutableTreeNode(new ColopediaTreeItem(this, id,
+                    getName(), null)));
     }
 
     /**

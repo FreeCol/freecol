@@ -46,7 +46,7 @@ import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.model.ServerPlayer;
-
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
 
@@ -240,8 +240,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     protected void logMissions(java.util.Map<Unit, String> reasons,
                                LogBuilder lb) {
         List<AIUnit> units = getAIUnits();
-        Collections.sort(units, aiUnitLocationComparator);
-        for (AIUnit aiu : units) {
+        for (AIUnit aiu : sort(units, aiUnitLocationComparator)) {
             Unit u = aiu.getUnit();
             String reason = reasons.get(u);
             if (reason == null) reason = "OMITTED";

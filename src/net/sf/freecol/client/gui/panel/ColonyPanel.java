@@ -935,7 +935,7 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public List<Unit> getUnitList() {
-        return toSortedList(colony.getTile().getUnitList());
+        return sort(colony.getTile().getUnitList());
     }
 
 
@@ -1699,9 +1699,7 @@ public final class ColonyPanel extends PortPanel
             if (colony == null) return;
             cleanup();
 
-            List<Building> buildings = colony.getBuildings();
-            Collections.sort(buildings);
-            for (Building building : buildings) {
+            for (Building building : sort(colony.getBuildings())) {
                 ASingleBuildingPanel aSBP = new ASingleBuildingPanel(building);
                 aSBP.initialize();
                 add(aSBP);
