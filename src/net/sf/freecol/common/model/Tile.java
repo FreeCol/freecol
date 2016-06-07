@@ -1700,22 +1700,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // improvements and get the bonuses of all related ones.  If
         // there are options to change TileType using an improvement,
         // consider that too.
-        final Specification spec = getSpecification();
-        List<TileType> tileTypes = new ArrayList<>();
-        tileTypes.add(type);
+        final List<TileImprovementType> improvements
+            = getSpecification().getTileImprovementTypeList();
 
-        // Add to the list the various possible tile type changes
-        for (TileImprovementType impType : spec.getTileImprovementTypeList()) {
-            if (impType.getChange(type) != null) {
-                // There is an option to change TileType
-                tileTypes.add(impType.getChange(type));
-            }
-        }
+        // Collect all the possible tile type changes.
+        List<TileType> tileTypes = transform(improvements,
+            ti -> !ti.isNatural() && ti.getChange(getType()) != null,
+            ti -> ti.getChange(getType()));
+        tileTypes.add(0, getType()); //...including the noop case.
 
-        int maxProduction = 0;
-        for (TileType tileType : tileTypes) {
-            float potential = tileType.getPotentialProduction(goodsType, unitType);
-            if (tileType == type) {
+        // Find the maximum production under each tile type change.
+        final ToIntFunction<TileType> toif = tt -> {
+            float potential = tt.getPotentialProduction(goodsType, unitType);
+            if (tt == getType()) { // Handle the resource in the noop case
                 Resource resource = (tileItemContainer == null) ? null
                     : tileItemContainer.getResource();
                 if (resource != null) {
@@ -1723,16 +1720,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                                     (int)potential);
                 }
             }
-            for (TileImprovementType ti : spec.getTileImprovementTypeList()) {
-                if (ti.isNatural() || !ti.isTileTypeAllowed(tileType)) continue;
-                if (ti.getBonus(goodsType) > 0) {
+            // Try applying all possible non-natural improvements.
+            for (TileImprovementType ti : improvements) {
+                if (!ti.isNatural() && ti.isTileTypeAllowed(tt)
+                    && ti.getBonus(goodsType) > 0) {
                     potential = ti.getProductionModifier(goodsType)
                         .applyTo(potential);
                 }
             }
-            maxProduction = Math.max((int)potential, maxProduction);
-        }
-        return maxProduction;
+            return (int)potential;
+        };
+        return max(tileTypes, toif);  
     }
 
     /**
