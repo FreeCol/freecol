@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -184,16 +185,20 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Player player = getPlayer();
         final Unit unit = aiu.getUnit();
         final Unit carrier = aiCarrier.getUnit();
-        final List<TargetTuple> targets = new ArrayList<>();
-        for (Player p : player.getRebels()) {
-            for (Colony c : p.getColonies()) {
-                if (port && !c.isConnectedPort()) continue;
-                PathNode path = unit.findPath(carrier, c, carrier, null);
-                if (path == null) continue;
-                int score = UnitSeekAndDestroyMission.scorePath(aiu, path);
-                targets.add(new TargetTuple(c, path, score));
-            }
-        }
+        final CachingFunction<Colony, PathNode> pathMapper
+            = new CachingFunction<Colony, PathNode>(c ->
+                unit.findPath(carrier, c, carrier, null));
+        final Predicate<Colony> pred = c ->
+            (!port || c.isConnectedPort()) && pathMapper.apply(c) != null;
+        final Function<Colony, TargetTuple> mapper = c -> {
+            PathNode path = pathMapper.apply(c);
+            return new TargetTuple(c, path,
+                UnitSeekAndDestroyMission.scorePath(aiu, path));
+        };
+        final List<TargetTuple> targets
+            = transform(flatten(player.getRebels(),
+                                p -> p.getColonies().stream()),
+                        pred, mapper);
 
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
