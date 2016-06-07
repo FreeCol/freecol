@@ -22,6 +22,8 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.FoundingFather;
@@ -165,9 +167,11 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            FOUNDING_FATHER_TAG, this.foundingFatherId)
-            .setAttributes(toMap(getFathers(),
-                                 f -> f.getType().toString(), f -> f.getId()))
+                              FOUNDING_FATHER_TAG, this.foundingFatherId)
+            .setAttributes(transform(getFathers(), alwaysTrue(),
+                                     Function.identity(),
+                                     Collectors.toMap(f -> f.getType().toString(),
+                                                      f -> f.getId())))
             .toXMLElement();
     }
 

@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -184,8 +186,9 @@ public class IndianNationType extends NationType {
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {
         final List<RandomChoice<UnitType>> skills = getSkills();
         final Map<GoodsType, Integer> scale
-            = toMap(getSkills(), rc -> rc.getObject().getExpertProduction(),
-                    rc -> 1);
+            = transform(skills, alwaysTrue(), Function.identity(),
+                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
+                                 rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (Entry<GoodsType, Integer> entry : scale.entrySet()) {

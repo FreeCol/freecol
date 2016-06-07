@@ -27,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
@@ -741,9 +743,9 @@ public class SimpleMapGenerator implements MapGenerator {
         List<RandomChoice<UnitType>> skills
             = ((IndianNationType)nationType).getSkills();
         java.util.Map<GoodsType, Integer> scale
-            = toMap(skills,
-                    rc -> rc.getObject().getExpertProduction(),
-                    rc -> 1);
+            = transform(skills, alwaysTrue(), Function.identity(),
+                Collectors.toMap(rc -> rc.getObject().getExpertProduction(),
+                                 rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
             for (Entry<GoodsType, Integer> entry : scale.entrySet()) {

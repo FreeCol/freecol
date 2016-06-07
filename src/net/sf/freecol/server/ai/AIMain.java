@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -316,8 +317,8 @@ public class AIMain extends FreeColObject
                 stats.put(className, count);
             }
         }
-        return toMap(stats.entrySet(),
-                     Entry::getKey, e -> Long.toString(e.getValue()));
+        return transform(stats.entrySet(), alwaysTrue(), Function.identity(),
+            Collectors.toMap(Entry::getKey, e -> Long.toString(e.getValue())));
     }
 
     /**
