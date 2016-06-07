@@ -55,7 +55,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
-    public static final String REARRANGE_WORKERS = "rearrangeWorkers";
+    public static final String REARRANGE_COLONY = "rearrangeColony";
     public static final int LIBERTY_PER_REBEL = 200;
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
@@ -1479,7 +1479,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         updateSoL();
         updateProductionBonus();
         if (getOwner().isAI()) {
-            firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            firePropertyChange(Colony.REARRANGE_COLONY, true, false);
         }
     }
 

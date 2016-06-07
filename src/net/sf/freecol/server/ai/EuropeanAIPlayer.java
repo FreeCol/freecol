@@ -1060,15 +1060,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Rearrange colonies, collecting workers that now need a
-     * WorkInsideColonyMission.
+     * Rearrange colonies.
      *
      * @param lb A <code>LogBuilder</code> to log to.
-     * @return A collection of <code>AIUnit</code>s that need work.
      */
-    private Collection<AIUnit> rearrangeColonies(LogBuilder lb) {
-        return toSet(flatten(getAIColonies(),
-                             aic -> aic.rearrangeWorkers(lb).stream()));
+    private void rearrangeColonies(LogBuilder lb) {
+        for (AIColony aic : getAIColonies()) aic.rearrangeColony(lb);
     }
 
 

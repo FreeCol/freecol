@@ -156,7 +156,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         this(aiMain, colony.getId());
 
         this.colony = colony;
-        colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
+        colony.addPropertyChangeListener(Colony.REARRANGE_COLONY, this);
 
         uninitialized = false;
     }
@@ -229,16 +229,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * FIXME: Detect military threats and boost defence.
      *
      * @param lb A <code>LogBuilder</code> to log to.
-     * @return A collection of worker <code>AIUnit</code>s that now need
-     *     a <code>WorkInsideColonyMission</code>.
      */
-    public Collection<AIUnit> rearrangeWorkers(LogBuilder lb) {
+    public void rearrangeColony(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
         Set<AIUnit> result = new HashSet<>();
 
         // First check if it is collapsing.
         if (colony.getUnitCount() <= 0) {
-            if (!avertAutoDestruction()) return result;
+            if (!avertAutoDestruction()) return;
         }
 
         // Skip this colony if it does not yet need rearranging.
@@ -251,7 +249,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     + " is asleep until turn: " + rearrangeTurn.getNumber()
                     + "( > " + turn + ")");
             } else {
-                return result;
+                return;
             }
         }
 
@@ -324,10 +322,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (scratch == null) {
             lb.add(", failed to assign workers.");
             rearrangeTurn = new Turn(turn + 1);
-            return result;
-        } else {
-            lb.add(", assigned ", workers.size(), " workers");
+            return;
         }
+        lb.add(", assigned ", workers.size(), " workers");
 
         // Apply the arrangement, and give suitable missions to all units.
         AIMessage.askRearrangeColony(this, workers, scratch);
@@ -340,7 +337,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 .append(" in ").append(turn).append(':');
             for (UnitWas uw : was) sb.append('\n').append(uw);
             logger.warning(sb.toString());
-            if (!avertAutoDestruction()) return result;
+            if (!avertAutoDestruction()) return;
         }
 
         // Argh.  We may have chosen to build something we can no
@@ -418,7 +415,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Set the next rearrangement turn.
         rearrangeTurn = new Turn(turn + nextRearrange);
-        return result;
     }
 
     /**
@@ -1370,7 +1366,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Sets the rearrangeTurn variable such that rearrangeWorkers will
+     * Sets the rearrangeTurn variable such that rearrangeColony will
      * run fully next time it is invoked.
      */
     public void requestRearrange() {

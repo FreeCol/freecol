@@ -3901,7 +3901,7 @@ outer:  for (Effect effect : effects) {
         }
         if (changed) colony.getTile().cacheUnseen(copied);//+til
         if (isAI()) {
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            colony.firePropertyChange(Colony.REARRANGE_COLONY, true, false);
         }
     }
 
@@ -4210,7 +4210,7 @@ outer:  for (Effect effect : effects) {
             logger.info("Goods party at " + colony.getName()
                 + " with: " + goods + " arrears: " + arrears);
             if (isAI()) { // Reset the goods wishes
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS,
+                colony.firePropertyChange(Colony.REARRANGE_COLONY,
                                           goodsType, null);
             }
         }

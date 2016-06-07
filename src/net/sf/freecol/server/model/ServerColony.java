@@ -579,7 +579,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             u.setLocation(getTile());//-vis: safe/colony
         }
         if (getOwner().isAI()) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
+            firePropertyChange(REARRANGE_COLONY, true, false);
         }
         return true;
     }
@@ -618,7 +618,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addName("%colony%", getName())
                     .addNamed("%building%", type));
             if (owner.isAI()) {
-                firePropertyChange(REARRANGE_WORKERS, true, false);
+                firePropertyChange(REARRANGE_COLONY, true, false);
             }
             logger.info("New building in " + getName()
                 + ": " + type.getSuffix());
@@ -803,7 +803,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             checkBuildQueueIntegrity(true);
             cs.add(See.only(owner), this);
             if (owner.isAI()) {
-                firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+                firePropertyChange(Colony.REARRANGE_COLONY, true, false);
             }
         }
     }
