@@ -1812,51 +1812,6 @@ public class CollectionUtils {
     }
 
     /**
-     * Convenience function to collect an array to a set.
-     *
-     * @param <T> The member type.
-     * @param array The array to collect from.
-     * @return A set of the stream contents.
-     */
-    public static <T> Set<T> toSet(T[] array) {
-        return toSet_internal(Arrays.stream(array));
-    }
-
-    /**
-     * Convenience function to collect an collection to a set.
-     *
-     * @param <T> The stream member type.
-     * @param c The <code>Collection</code> to collect.
-     * @return A set of the stream contents.
-     */
-    public static <T> Set<T> toSet(Collection<T> c) {
-        return toSet_internal(c.stream());
-    }
-
-    /**
-     * Convenience function to collect a stream to a set.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @return A set of the stream contents.
-     */
-    public static <T> Set<T> toSet(Stream<T> stream) {
-        return (stream == null) ? Collections.<T>emptySet()
-            : toSet_internal(stream);
-    }
-
-    /**
-     * Implement toSet.
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @return A set of the stream contents.
-     */
-    private static <T> Set<T> toSet_internal(Stream<T> stream) {
-        return stream.collect(Collectors.toSet());
-    }
-
-    /**
      * Transform the contents of an array.
      *
      * @param <T> The array member type.
