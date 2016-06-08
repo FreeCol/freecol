@@ -22,11 +22,13 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -304,13 +306,9 @@ public class EquipmentType extends BuildableType {
 
         super.readChildren(xr);
 
-        for (Modifier modifier : getModifiers()) {
-            if (Modifier.OFFENCE.equals(modifier.getId())
-                || Modifier.DEFENCE.equals(modifier.getId())) {
-                militaryEquipment = true;
-                break;
-            }
-        }
+        final Predicate<Modifier> pred = m ->
+            Modifier.OFFENCE.equals(m.getId()) || Modifier.DEFENCE.equals(m.getId());
+        militaryEquipment = any(getModifiers(), pred);
     }
 
     /**
