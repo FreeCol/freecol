@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -117,9 +118,6 @@ public class NationTypeDetailPanel
         Font boldFont = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.SMALLER, Font.BOLD);
 
-        Set<Ability> abilities = nationType.getAbilities();
-        Set<Modifier> modifiers = nationType.getModifiers();
-
         panel.setLayout(new MigLayout("wrap 2, gapx 20"));
 
         JLabel label = Utility.localizedHeaderLabel(nationType, FontLibrary.FontSize.SMALL);
@@ -144,22 +142,24 @@ public class NationTypeDetailPanel
             }
         }
 
+        List<JLabel> abilities
+            = transform(nationType.getAbilities(), alwaysTrue(),
+                        a -> getAbilityComponent(a), toListNoNulls());
         if (!abilities.isEmpty()) {
             label = Utility.localizedLabel("abilities");
             label.setFont(boldFont);
             panel.add(label, "newline 20, span");
-            for (Ability ability : abilities) {
-                panel.add(getAbilityComponent(ability));
-            }
+            for (JLabel a : abilities) panel.add(a);
         }
 
+        List<JComponent> modifiers
+            = transform(nationType.getModifiers(), alwaysTrue(),
+                        m -> getModifierComponent(m), toListNoNulls());
         if (!modifiers.isEmpty()) {
             label = Utility.localizedLabel("modifiers");
             label.setFont(boldFont);
             panel.add(label, "newline 20, span");
-            for (Modifier modifier : modifiers) {
-                panel.add(getModifierComponent(modifier));
-            }
+            for (JComponent m : modifiers) panel.add(m);
         }
     }
 
