@@ -1017,12 +1017,13 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
         // Field: The required goods rates.
         // Colour: cPlain
-        List<JLabel> labels = toList(map(mapEntriesByValue(rNeeded, descendingDoubleComparator),
-                e -> newLabel(String.format("%4.1f %s", e.getValue(),
-                                            Messages.getName(e.getKey())),
-                    null, cPlain,
-                    stpld("report.colony.making.summary")
-                        .addNamed("%goods%", e.getKey()))));
+        List<JLabel> labels = transform(mapEntriesByValue(rNeeded, descendingDoubleComparator),
+            alwaysTrue(), 
+            e -> newLabel(String.format("%4.1f %s", e.getValue(),
+                                        Messages.getName(e.getKey())),
+                null, cPlain,
+                stpld("report.colony.making.summary")
+                    .addNamed("%goods%", e.getKey())));
 
         // Field: What is being trained (attached to previous)
         // Colour: cPlain.

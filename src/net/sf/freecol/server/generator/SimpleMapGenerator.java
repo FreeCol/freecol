@@ -755,13 +755,14 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
 
+        final Function<RandomChoice<UnitType>, RandomChoice<UnitType>> mapper
+            = rc -> {
+                UnitType unitType = rc.getObject();
+                return new RandomChoice<>(unitType, rc.getProbability()
+                    * scale.get(unitType.getExpertProduction()));
+            };
         UnitType skill = RandomChoice.getWeightedRandom(null, null,
-            toList(map(skills, rc -> {
-                        UnitType unitType = rc.getObject();
-                        return new RandomChoice<>(unitType, rc.getProbability()
-                            * scale.get(unitType.getExpertProduction()));
-                    })),
-            random);
+            transform(skills, alwaysTrue(), mapper), random);
         final Specification spec = map.getSpecification();
         return (skill != null) ? skill
             : getRandomMember(logger, "Scout",

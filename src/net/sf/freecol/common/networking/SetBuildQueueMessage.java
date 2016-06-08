@@ -60,7 +60,7 @@ public class SetBuildQueueMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = colony.getId();
-        this.queue = toList(map(queue, bt -> bt.getId()))
+        this.queue = transform(queue, alwaysTrue(), bt -> bt.getId())
             .toArray(new String[0]);
     }
 

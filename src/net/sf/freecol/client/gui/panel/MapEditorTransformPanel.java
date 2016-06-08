@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -189,6 +190,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
 
     /**
+     * Ask the user for a resource choice from a list.
+     *
+     * Ripped out of ResourceTransform to dodge the name clash with
+     * CollectionUtils.transform which we want to use here.
+     *
+     * @param resource A list of <code>ResourceType</code>s to choose from.
+     * @return The chosen <code>ResourceType</code>.
+     */
+    private ResourceType getResourceChoice(List<ResourceType> resources) {
+        final Function<ResourceType, ChoiceItem<ResourceType>> mapper
+            = rt -> new ChoiceItem<ResourceType>(Messages.getName(rt), rt);
+        return getGUI().getChoice(null, 
+            Messages.message("mapEditorTransformPanel.chooseResource"),
+            "cancel",
+            transform(resources, alwaysTrue(), mapper));
+    }
+
+    /**
      * Set the native nation.
      *
      * @param newNativeNation The new native <code>Nation</code>.
@@ -295,6 +314,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * next valid, or removes if end of list.
      */
     private class ResourceTransform extends MapTransform {
+
         @Override
         public void transform(Tile t) {
             // Check if there is a resource already
@@ -316,11 +336,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                   resourceType.getMaxValue()));
                     return;
                 default:
-                    ResourceType choice = getGUI().getChoice(null, 
-                        Messages.message("mapEditorTransformPanel.chooseResource"),
-                        "cancel",
-                        toList(map(resList, rt ->
-                                new ChoiceItem<>(Messages.getName(rt), rt))));
+                    ResourceType choice = getResourceChoice(resList);
                     if (choice != null) {
                         t.addResource(new Resource(t.getGame(), t, choice,
                                       choice.getMaxValue()));

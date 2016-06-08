@@ -194,7 +194,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     @Override
     public void generateChoices() {
         unitType.generateChoices();
-        role.setChoices(toList(map(getSpecification().getRoles(), Role::getId)));
+        role.setChoices(transform(getSpecification().getRoles(), alwaysTrue(),
+                                  Role::getId));
     }
 
 

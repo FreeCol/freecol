@@ -46,8 +46,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     public static final String TAG = "chooseFoundingFather";
     private static final String FOUNDING_FATHER_TAG = "foundingFather";
     private static final List<String> fatherKeys
-        = Collections.<String>unmodifiableList(toList(map(FoundingFatherType.values(),
-                    ft -> ft.toString())));
+        = Collections.<String>unmodifiableList(transform(FoundingFatherType.values(),
+                alwaysTrue(), ft -> ft.toString()));
 
     /** The fathers to offer. */
     private final List<FoundingFather> fathers;
@@ -83,8 +83,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
         super(getTagName());
 
         final Specification spec = game.getSpecification();
-        List<String> found = toList(map(fatherKeys,
-                                        k -> element.getAttribute(k)));
+        List<String> found = transform(fatherKeys, alwaysTrue(),
+                                       k -> element.getAttribute(k));
         this.fathers = transform(found, id -> id != null && !id.isEmpty(),
                                  id -> spec.getFoundingFather(id));
         this.foundingFatherId = getStringAttribute(element, FOUNDING_FATHER_TAG);

@@ -262,11 +262,12 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
      * @return The scaled animation.
      */
     public SimpleZippedAnimation createScaledVersion(final float scale) {
-        Function<AnimationEvent, AnimationEvent> scaleEvent = ae ->
+        final Function<AnimationEvent, AnimationEvent> scaleEvent = ae ->
             (ae instanceof ImageAnimationEventImpl)
                 ? ((ImageAnimationEventImpl)ae).createScaledVersion(scale)
                 : ae;
-        return new SimpleZippedAnimation(toList(map(this.events, scaleEvent)),
+        return new SimpleZippedAnimation(transform(this.events, alwaysTrue(),
+                                                   scaleEvent),
             (int)(this.width * scale), (int)(this.height * scale));
     }
 

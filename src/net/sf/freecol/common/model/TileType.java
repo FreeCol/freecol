@@ -229,7 +229,7 @@ public final class TileType extends FreeColSpecObjectType {
      */
     public List<ResourceType> getResourceTypes() {
         return (resourceTypes == null) ? Collections.<ResourceType>emptyList()
-            : toList(map(resourceTypes, RandomChoice::getObject));
+            : transform(resourceTypes, alwaysTrue(), RandomChoice::getObject);
     }
 
     /**

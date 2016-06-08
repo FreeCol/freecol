@@ -338,10 +338,10 @@ public final class ConnectController extends FreeColClientHolder {
             String choice = getGUI().getChoice(null,
                 Messages.message("client.choicePlayer"),
                 "cancel",
-                toList(map(names, n ->
-                        new ChoiceItem<>(Messages.message(StringTemplate
-                                .template("countryName")
-                                .add("%nation%", Messages.nameKey(n))), n))));
+                transform(names, alwaysTrue(), n ->
+                    new ChoiceItem<>(Messages.message(StringTemplate
+                            .template("countryName")
+                            .add("%nation%", Messages.nameKey(n))), n)));
             if (choice == null) return false; // User cancelled
 
             if (!login(Messages.getRulerName(choice), host, port)) return false;

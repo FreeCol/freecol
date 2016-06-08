@@ -1343,8 +1343,9 @@ public final class InGameController extends FreeColClientHolder {
                 moveDirection(disembarkable.get(0), direction, false);
             }
         } else {
-            List<ChoiceItem<Unit>> choices = toList(map(disembarkable, u ->
-                    new ChoiceItem<Unit>(u.getDescription(Unit.UnitLabelType.NATIONAL), u)));
+            List<ChoiceItem<Unit>> choices
+                = transform(disembarkable, alwaysTrue(), u ->
+                    new ChoiceItem<Unit>(u.getDescription(Unit.UnitLabelType.NATIONAL), u));
             choices.add(new ChoiceItem<>(Messages.message("all"), unit));
 
             // Use moveDirection() to disembark units as while the
@@ -1855,8 +1856,8 @@ public final class InGameController extends FreeColClientHolder {
             // Choose goods to buy
             goods = getGUI().getChoice(unit.getTile(),
                 Messages.message("buyProposition.text"), is, "nothing",
-                toList(map(forSale,
-                        g -> new ChoiceItem<>(Messages.message(g.getLabel()), g))));
+                transform(forSale, alwaysTrue(),
+                    g -> new ChoiceItem<>(Messages.message(g.getLabel()), g)));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1903,8 +1904,8 @@ public final class InGameController extends FreeColClientHolder {
             // Choose goods to sell
             goods = getGUI().getChoice(unit.getTile(),
                 Messages.message("sellProposition.text"), is, "nothing",
-                toList(map(unit.getGoodsList(), g ->
-                        new ChoiceItem<>(Messages.message(g.getLabel(true)), g))));
+                transform(unit.getGoodsList(), alwaysTrue(), g ->
+                    new ChoiceItem<>(Messages.message(g.getLabel(true)), g)));
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -1952,8 +1953,8 @@ public final class InGameController extends FreeColClientHolder {
                                                    IndianSettlement is) {
         Goods goods = getGUI().getChoice(unit.getTile(),
             Messages.message("gift.text"), is, "cancel",
-            toList(map(unit.getGoodsList(), g ->
-                    new ChoiceItem<>(Messages.message(g.getLabel(true)), g))));
+            transform(unit.getGoodsList(), alwaysTrue(), g ->
+                new ChoiceItem<>(Messages.message(g.getLabel(true)), g)));
         return (goods != null
             && askServer().deliverGiftToSettlement(unit, is, goods))
             ? null
@@ -2026,8 +2027,8 @@ public final class InGameController extends FreeColClientHolder {
             Player enemy = getGUI().getChoice(unit.getTile(),
                 Messages.message("missionarySettlement.inciteQuestion"),
                 unit, "missionarySettlement.cancel",
-                toList(map(getGame().getLiveEuropeanPlayers(player), p ->
-                        new ChoiceItem<>(Messages.message(p.getCountryLabel()), p))));
+                transform(getGame().getLiveEuropeanPlayers(player), alwaysTrue(),
+                    p -> new ChoiceItem<>(Messages.message(p.getCountryLabel()), p)));
             if (enemy == null) return true;
             askServer().incite(unit, is, enemy, -1);
             break;

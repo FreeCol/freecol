@@ -172,8 +172,8 @@ public class ServerListMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName())
-            .addMessages(toList(map(this.servers,
-                                    ServerListMessage::serverInfoToMessage)))
+            .addMessages(transform(this.servers, alwaysTrue(),
+                                   ServerListMessage::serverInfoToMessage))
             .toXMLElement();
     }
 

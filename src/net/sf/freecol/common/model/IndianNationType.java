@@ -198,11 +198,12 @@ public class IndianNationType extends NationType {
             }
         }
 
-        return toList(map(skills, rc -> {
-                    UnitType ut = rc.getObject();
-                    int scaleValue = scale.get(ut.getExpertProduction());
-                    return new RandomChoice<>(ut, rc.getProbability() * scaleValue);
-                }));
+        final Function<RandomChoice<UnitType>, RandomChoice<UnitType>> mapper = rc -> {
+            UnitType ut = rc.getObject();
+            int scaleValue = scale.get(ut.getExpertProduction());
+            return new RandomChoice<>(ut, rc.getProbability() * scaleValue);
+        };
+        return transform(skills, alwaysTrue(), mapper);
     }
 
 

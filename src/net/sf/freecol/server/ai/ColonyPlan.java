@@ -231,7 +231,7 @@ public class ColonyPlan {
      * @return A copy of the of <code>BuildableType</code>s list.
      */
     public List<BuildableType> getBuildableTypes() {
-        return toList(map(buildPlans, bp -> bp.type));
+        return transform(buildPlans, alwaysTrue(), bp -> bp.type);
     }
 
     /**
@@ -286,7 +286,9 @@ public class ColonyPlan {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void refine(BuildableType build, LogBuilder lb) {
-        List<GoodsType> required = toList(map(colony.getFullRequiredGoods(build), AbstractGoods::getType));
+        List<GoodsType> required
+            = transform(colony.getFullRequiredGoods(build), alwaysTrue(),
+                        AbstractGoods::getType);
         Map<GoodsType, List<WorkLocationPlan>> suppressed = new HashMap<>();
 
         // Examine a copy of the work plans, but operate on the

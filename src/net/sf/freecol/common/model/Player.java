@@ -3478,8 +3478,8 @@ public class Player extends FreeColGameObject implements Nameable {
         final int FOOD_VERY_LOW = 1;
 
         // Multiplicative modifiers, to be applied to value later
-        List<Double> values = toList(map(ColonyValueCategory.values(),
-                                         v -> 1.0));
+        List<Double> values = transform(ColonyValueCategory.values(),
+                                        alwaysTrue(), v -> 1.0);
 
         // Penalize certain problems more in the initial colonies.
         double development = Math.min(LOW_SETTLEMENT_NUMBER,

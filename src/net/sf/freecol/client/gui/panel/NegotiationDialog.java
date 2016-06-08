@@ -1029,8 +1029,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     private List<Goods> getAnyGoods(GoodsLocation gl) {
         final Game game = getGame();
         final Specification spec = getSpecification();
-        return toList(map(spec.getStorableGoodsTypeList(), gt ->
-                new Goods(game, gl, gt, GoodsContainer.CARGO_SIZE)));
+        return transform(spec.getStorableGoodsTypeList(), alwaysTrue(), gt ->
+            new Goods(game, gl, gt, GoodsContainer.CARGO_SIZE));
     }
 
     /**

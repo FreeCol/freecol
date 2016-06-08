@@ -150,8 +150,8 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public List<AbstractGoods> getRequiredGoods() {
         return (requiredGoods == null) ? Collections.<AbstractGoods>emptyList()
-            : toList(map(requiredGoods,
-                    ag -> new AbstractGoods(ag.getType(), ag.getAmount())));
+            : transform(requiredGoods, alwaysTrue(),
+                        ag -> new AbstractGoods(ag.getType(), ag.getAmount()));
     }
 
     /**

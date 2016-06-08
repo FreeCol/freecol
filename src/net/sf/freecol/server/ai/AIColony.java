@@ -302,7 +302,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // tile, which happens regularly with the initial AI colony.
         // Remember where the units came from.
         List<Unit> workers = colony.getUnitList();
-        List<UnitWas> was = toList(map(workers, u -> new UnitWas(u)));
+        List<UnitWas> was = transform(workers, alwaysTrue(),
+                                      u -> new UnitWas(u));
         for (Unit u : tile.getUnitList()) {
             if (!u.isPerson() || u.hasAbility(Ability.REF_UNIT)
                 || getAIUnit(u) == null) continue;
