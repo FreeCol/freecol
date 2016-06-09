@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -129,6 +131,23 @@ public class RandomUtils {
             break;
         }
         return list.get(randomInt(logger, logMe, random, list.size()));
+    }
+
+    /**
+     * Gets a random member of a stream.
+     *
+     * @param <T> The list member type.
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param stream The <code>Stream</code> to pick from.
+     * @param random A random number source.
+     * @return A random member from the stream.
+     */
+    public static <T> T getRandomMember(Logger logger, String logMe,
+                                        Stream<T> stream, Random random) {
+        return (stream == null) ? null
+            : getRandomMember(logger, logMe,
+                              stream.collect(Collectors.toList()), random);
     }
 
     /**

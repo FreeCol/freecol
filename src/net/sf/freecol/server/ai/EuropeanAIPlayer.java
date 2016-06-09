@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
+import net.sf.freecol.common.util.CachingFunction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -433,15 +434,19 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 // benefit of `temporary' cheat code).  If we do not
                 // do this, AI colonies accumulate heaps of party
                 // modifiers because of the cheat boycott removal.
-                findOne: for (Colony c : player.getColonies()) {
-                    for (Modifier m : c.getModifiers()) {
-                        if (Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource()) {
-                            c.removeModifier(m);
-                            lb.add("lift-boycott at ", c, ", ");
-                            player.logCheat("lift boycott at " + c.getName());
-                            break findOne;
-                        }
-                    }
+                final Predicate<Modifier> pred = m ->
+                    Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource();
+                final Function<Colony, Modifier> mapper = c ->
+                    first(transform(c.getModifiers(), pred));
+                final CachingFunction<Colony, Modifier> cf
+                    = new CachingFunction<>(mapper);
+                Colony party = getRandomMember(logger, "end boycott",
+                    transform(player.getColonies(), c -> cf.apply(c) != null),
+                    air);
+                if (party != null) {
+                    party.removeModifier(cf.apply(party));
+                    lb.add("lift-boycott at ", party, ", ");
+                    player.logCheat("lift boycott at " + party.getName());
                 }
             }
         }
