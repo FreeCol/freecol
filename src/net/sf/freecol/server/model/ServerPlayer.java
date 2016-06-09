@@ -1613,8 +1613,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             for (int index = 0; index < size; index++) {
                 Colony colony = getColonies().get((start + index) % size);
                 Disaster disaster = RandomChoice.getWeightedRandom(logger,
-                    "select disaster", toList(colony.getDisasterChoices()),
-                    random);
+                    "select disaster", colony.getDisasterChoices(), random);
                 List<ModelMessage> messages = csApplyDisaster(random,
                     colony, disaster, cs);
                 if (!messages.isEmpty()) {

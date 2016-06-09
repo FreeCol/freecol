@@ -505,7 +505,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             }
         }
 
-        for (RandomChoice<Disaster> choice : toList(getDisasterChoices())) {
+        for (RandomChoice<Disaster> choice : iterable(getDisasterChoices())) {
             xw.writeStartElement(DISASTER_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());

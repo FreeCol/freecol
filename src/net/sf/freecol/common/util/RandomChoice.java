@@ -22,6 +22,7 @@ package net.sf.freecol.common.util;
 import java.util.Collection;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -66,6 +67,7 @@ public class RandomChoice<T> {
         return sum(input, RandomChoice::getProbability);
     }
 
+
     public static <T> T getWeightedRandom(Logger logger, String logMe,
                                           Collection<RandomChoice<T>> input,
                                           Random random) {
@@ -74,5 +76,11 @@ public class RandomChoice<T> {
             || (n = getTotalProbability(input)) <= 0) ? null
             : (input.size() == 1) ? input.iterator().next().getObject()
             : select(input, randomInt(logger, logMe, random, n));
+    }
+
+    public static <T> T getWeightedRandom(Logger logger, String logMe,
+                                          Stream<RandomChoice<T>> input,
+                                          Random random) {
+        return getWeightedRandom(logger, logMe, toList(input), random);
     }
 }
