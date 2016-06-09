@@ -21,9 +21,12 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.GridLayout;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -94,7 +97,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         if (getId().equals(id)) return;
 
         final Specification spec = getSpecification();
-        UnitType type = spec.getUnitType(id);
+        final UnitType type = spec.getUnitType(id);
         panel.setLayout(new MigLayout("wrap 4", "[]20[]40[]20[]"));
 
         JLabel name = Utility.localizedHeaderLabel(type, FontLibrary.FontSize.SMALL);
@@ -182,8 +185,10 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             }
         }
 
-        List<Modifier> bonusList = toList(flatten(spec.getGoodsTypeList(),
-                gt -> type.getModifiers(gt.getId())));
+        final Function<GoodsType, Stream<Modifier>> goodsMapper = gt ->
+            type.getModifiers(gt.getId());
+        List<Modifier> bonusList = sort(flatten(spec.getGoodsTypeList(),
+                                                goodsMapper));
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
             StringTemplate template = StringTemplate

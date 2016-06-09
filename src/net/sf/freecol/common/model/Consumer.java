@@ -91,7 +91,7 @@ public interface Consumer {
 
 
     /**
-     * Returns the modifier set with the given id. The modifier most
+     * Get the modifier set with the given id. The modifier most
      * relevant to consumers is "consumeOnlySurplusProduction", which
      * implies that the consumer does not consume stored goods (used
      * by the country and stables).
