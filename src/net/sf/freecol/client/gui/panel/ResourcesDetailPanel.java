@@ -88,7 +88,7 @@ public class ResourcesDetailPanel
         panel.add(Utility.localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (Modifier modifier : type.getModifiers()) {
+        for (Modifier modifier : sort(type.getModifiers())) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
                 final Specification spec = getSpecification();
