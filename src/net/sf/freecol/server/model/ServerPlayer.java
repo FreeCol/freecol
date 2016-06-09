@@ -2987,10 +2987,9 @@ outer:  for (Effect effect : effects) {
         }
 
         // Remove goods party modifiers as they apply to a different monarch.
-        for (Modifier m : colony.getModifiers()) {
-            if (Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource()) {
-                colony.removeModifier(m);
-            }
+        for (Modifier m : transform(colony.getModifiers(), m ->
+                Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource())) {
+            colony.removeModifier(m);
         }
 
         // Hand over the colony.  Inform former owner of loss of owned
@@ -4140,13 +4139,13 @@ outer:  for (Effect effect : effects) {
     public Modifier makeTeaPartyModifier() {
         final Specification spec = getGame().getSpecification();
         final Turn turn = getGame().getTurn();
-        for (Modifier modifier : spec.getModifiers(Modifier.COLONY_GOODS_PARTY)) {
-            Modifier m = Modifier.makeTimedModifier("model.goods.bells",
-                                                    modifier, turn);
-            m.setModifierIndex(Modifier.PARTY_PRODUCTION_INDEX);
-            return m;
+        Modifier modifier = first(spec.getModifiers(Modifier.COLONY_GOODS_PARTY));
+        if (modifier != null) {
+            modifier = Modifier.makeTimedModifier("model.goods.bells",
+                                                  modifier, turn);
+            modifier.setModifierIndex(Modifier.PARTY_PRODUCTION_INDEX);
         }
-        return null;
+        return modifier;
     }
 
     /**
