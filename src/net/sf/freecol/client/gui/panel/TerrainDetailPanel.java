@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -147,28 +148,25 @@ public class TerrainDetailPanel
                   "span, growx");
     }
 
-    private void addProduction(JPanel panel, List<AbstractGoods> production) {
-        if (production.isEmpty()) {
+    private void addProduction(JPanel panel, Stream<AbstractGoods> production) {
+        // Positive production only
+        List<AbstractGoods> pro = transform(production,
+                                            ag -> ag.getAmount() > 0);
+        String tag = null;
+        switch (pro.size()) {
+        case 0:
             panel.add(new JLabel(), "wrap");
-        } else {
-            // Drop the zero amount production (which need resources to work)
-            Iterator<AbstractGoods> it = production.iterator();
-            while (it.hasNext()) {
-                AbstractGoods ag = it.next();
-                if (ag.getAmount() <= 0) it.remove();
-            }
-
-            AbstractGoods ag = first(production);
-            if (production.size() > 1) {
-                panel.add(getGoodsButton(ag.getType(), ag.getAmount()),
-                          "span, split " + production.size());
-                for (int index = 1; index < production.size(); index++) {
-                    ag = production.get(index);
-                    panel.add(getGoodsButton(ag.getType(), ag.getAmount()));
-                }
-            } else {
-                panel.add(getGoodsButton(ag.getType(), ag.getAmount()), "span");
-            }
+            break;
+        case 1:
+            tag = "span";
+            break;
+        default:
+            tag = "span, split " + pro.size();
+            break;
+        }
+        for (AbstractGoods ag : pro) {
+            panel.add(getGoodsButton(ag.getType(), ag.getAmount()), tag);
+            tag = null;
         }
     }
 }

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -119,15 +120,11 @@ public class ServerColonyTest extends FreeColTestCase {
 
         // Set the food production of the center tile of the colony to 2
         // This will be the only food production of the colony
-        List<AbstractGoods> colonyTileProduction
-            = colonyTile.getType().getPossibleProduction(true);
-        for (int i = 0; i < colonyTileProduction.size(); i++) {
-            AbstractGoods production = colonyTileProduction.get(i);
-            if (production.getType() == foodGoodsType) {
-                production.setAmount(2);
-                break;
-            }
-        }
+        AbstractGoods foodGoods
+            = first(transform(colonyTile.getType().getPossibleProduction(true),
+                              ag -> ag.getType() == foodGoodsType));
+        if (foodGoods != null) foodGoods.setAmount(2);
+
         Unit unit = colony.getUnitList().get(0);
         unit.setLocation(colony.getWorkLocationFor(unit, bellsType));
 

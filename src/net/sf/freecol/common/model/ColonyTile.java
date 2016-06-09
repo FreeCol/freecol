@@ -217,7 +217,7 @@ public class ColonyTile extends WorkLocation {
             }
 
             // Tile type change.
-            final List<AbstractGoods> newProd
+            final Stream<AbstractGoods> newProd
                 = newType.getPossibleProduction(true);
             int food = sum(newProd, AbstractGoods.isFoodType,
                            AbstractGoods::getAmount);
@@ -230,7 +230,8 @@ public class ColonyTile extends WorkLocation {
                     food -= ag.getAmount();
                 } else if (colony.isConsuming(goodsType)) {
                     int change = -ag.getAmount()
-                        + AbstractGoods.getCount(goodsType, newProd);
+                        + sum(newProd, g -> g.getType() == goodsType,
+                              AbstractGoods::getAmount);
                     if (change < 0
                         && change + colony.getNetProductionOf(goodsType) < 0) {
                         // The change drives the net production (more?)
