@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Feature;
@@ -665,11 +666,9 @@ public class ChangeSet {
         public List<Change> consequences(ServerPlayer serverPlayer) {
             if (seeOld(serverPlayer) && !seeNew(serverPlayer)
                 && !unit.isDisposed()) {
-                List<Unit> units = new ArrayList<>();
-                units.add(unit);
                 List<Change> changes = new ArrayList<>();
                 changes.add(new RemoveChange(See.only(serverPlayer),
-                                             unit.getLocation(), units));
+                                             unit.getLocation(), Stream.of(unit)));
                 return changes;
             }
             return Collections.<Change>emptyList();
@@ -972,11 +971,11 @@ public class ChangeSet {
          * @param objects The <code>FreeColGameObject</code>s to remove.
          */
         public RemoveChange(See see, Location loc,
-                            List<? extends FreeColGameObject> objects) {
+                            Stream<? extends FreeColGameObject> objects) {
             super(see);
             this.tile = (loc instanceof Tile) ? (Tile)loc : null;
-            this.fcgo = objects.remove(objects.size() - 1);
-            this.contents = objects;
+            this.contents = toList(objects);
+            this.fcgo = this.contents.remove(this.contents.size() - 1);
         }
 
         /**
@@ -1540,9 +1539,8 @@ public class ChangeSet {
      */
     public ChangeSet addDisappear(ServerPlayer owner, Tile tile,
                                   FreeColGameObject fcgo) {
-        List<FreeColGameObject> objects = new ArrayList<>();
-        objects.add(fcgo);
-        changes.add(new RemoveChange(See.perhaps().except(owner), tile, objects));
+        changes.add(new RemoveChange(See.perhaps().except(owner), tile,
+                                     Stream.of(fcgo)));
         changes.add(new ObjectChange(See.perhaps().except(owner), tile));
         return this;
     }
@@ -1698,8 +1696,7 @@ public class ChangeSet {
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addRemove(See see, Location loc, FreeColGameObject obj) {
-        changes.add(new RemoveChange(see, loc,
-                                     toList(obj.getDisposables())));//-vis
+        changes.add(new RemoveChange(see, loc, obj.getDisposables()));//-vis
         return this;
     }
 
@@ -1714,8 +1711,7 @@ public class ChangeSet {
     public ChangeSet addRemoves(See see, Location loc,
                                 List<? extends FreeColGameObject> objects) {
         for (FreeColGameObject fcgo : objects) {
-            changes.add(new RemoveChange(see, loc,
-                                         toList(fcgo.getDisposables())));
+            changes.add(new RemoveChange(see, loc, fcgo.getDisposables()));
         }
         return this;
     }

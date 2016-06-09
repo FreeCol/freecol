@@ -1685,16 +1685,14 @@ public final class InGameController extends Controller {
         boolean lost = false;
         for (Unit u : europe.getUnitList()) {
             seized.addStringTemplate(u.getLabel());
-            cs.addRemoves(See.only(serverPlayer), null,
-                          toList(u.getDisposables()));
+            cs.addRemove(See.only(serverPlayer), null, u);
             u.dispose();
             lost = true;
         }
         for (Unit u : serverPlayer.getHighSeas().getUnitList()) {
             if (u.getDestination() == europe) {
                 seized.addStringTemplate(u.getLabel());
-                cs.addRemoves(See.only(serverPlayer), null,
-                              toList(u.getDisposables()));
+                cs.addRemove(See.only(serverPlayer), null, u);
                 u.dispose();
                 lost = true;
             }
