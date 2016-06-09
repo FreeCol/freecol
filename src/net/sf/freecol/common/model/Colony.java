@@ -1754,11 +1754,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a list of all teachers currently present in the school
      * building.
      *
-     * @return A list of teacher <code>Unit</code>s.
+     * @return A stream of teacher <code>Unit</code>s.
      */
-    public List<Unit> getTeachers() {
-        return toList(flatten(getBuildings(), b -> b.canTeach(),
-                              b -> b.getUnitList().stream()));
+    public Stream<Unit> getTeachers() {
+        return flatten(getBuildings(), b -> b.canTeach(),
+                       b -> b.getUnitList().stream());
     }
 
     /**

@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -387,40 +388,43 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addEducationItems(final UnitLabel unitLabel) {
+        final Unit unit = unitLabel.getUnit();
+        final Specification spec = unit.getSpecification();
+        final ImageLibrary lib = gui.getImageLibrary();
         boolean separatorNeeded = false;
-        Unit unit = unitLabel.getUnit();
 
-        ImageLibrary lib = gui.getImageLibrary();
-        if (unit.getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
-            for (Unit teacher : unit.getColony().getTeachers()) {
-                if (unit.canBeStudent(teacher) && unit.isInColony()) {
-                    JMenuItem menuItem = null;
-                    ImageIcon teacherIcon = new ImageIcon(lib.getSmallerUnitImage(teacher));
-                    if (teacher.getStudent() != unit) {
-                        menuItem = Utility.localizedMenuItem("quickActionMenu.assignToTeacher",
-                                                         teacherIcon);
-                        if (teacher.getStudent() != null) {
-                            menuItem.setText(menuItem.getText()
-                                + " (" + teacher.getTurnsOfTraining()
-                                + "/" + teacher.getNeededTurnsOfTraining()
-                                + ")");
-                        }
-                        menuItem.setActionCommand(UnitAction.ASSIGN + "/" + teacher.getId());
-                        menuItem.addActionListener(unitLabel);
-                    } else {
-                        menuItem = Utility.localizedMenuItem(StringTemplate
-                            .template("quickActionMenu.apprentice")
-                            .addName("%unit%",
-                                Messages.getName(teacher.getType())),
-                            teacherIcon);
+        if (spec.getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
+            final Predicate<Unit> pred = teacher ->
+                unit.canBeStudent(teacher) && unit.isInColony();
+            for (Unit teacher : transform(unit.getColony().getTeachers(), pred)) {
+                JMenuItem menuItem = null;
+                ImageIcon teacherIcon
+                    = new ImageIcon(lib.getSmallerUnitImage(teacher));
+                if (teacher.getStudent() != unit) {
+                    menuItem = Utility.localizedMenuItem("quickActionMenu.assignToTeacher",
+                        teacherIcon);
+                    if (teacher.getStudent() != null) {
                         menuItem.setText(menuItem.getText()
-                            + ": " + teacher.getTurnsOfTraining()
-                            + "/" + teacher.getNeededTurnsOfTraining());
-                        menuItem.setEnabled(false);
+                            + " (" + teacher.getTurnsOfTraining()
+                            + "/" + teacher.getNeededTurnsOfTraining()
+                            + ")");
                     }
-                    this.add(menuItem);
-                    separatorNeeded = true;
+                    menuItem.setActionCommand(UnitAction.ASSIGN + "/"
+                        + teacher.getId());
+                    menuItem.addActionListener(unitLabel);
+                } else {
+                    menuItem = Utility.localizedMenuItem(StringTemplate
+                        .template("quickActionMenu.apprentice")
+                        .addName("%unit%",
+                            Messages.getName(teacher.getType())),
+                        teacherIcon);
+                    menuItem.setText(menuItem.getText()
+                        + ": " + teacher.getTurnsOfTraining()
+                        + "/" + teacher.getNeededTurnsOfTraining());
+                    menuItem.setEnabled(false);
                 }
+                this.add(menuItem);
+                separatorNeeded = true;
             }
         }
         if (unit.getStudent() != null) {
