@@ -1317,10 +1317,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public StringTemplate getReducePopulationMessage() {
         if (canReducePopulation()) return null;
-        Set<Modifier> modifierSet = getModifiers(Modifier.MINIMUM_COLONY_SIZE);
-        if (modifierSet.isEmpty()) return null;
-        Modifier modifier = modifierSet.iterator().next();
-        FreeColObject source = modifier.getSource();
+        Modifier min = first(getModifiers(Modifier.MINIMUM_COLONY_SIZE));
+        if (min == null) return null;
+        FreeColObject source = min.getSource();
         if (source instanceof BuildingType) {
             // If the modifier source is a building type, use the
             // building in the colony, which may be of a different
