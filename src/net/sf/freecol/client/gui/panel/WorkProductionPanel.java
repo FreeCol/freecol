@@ -73,10 +73,6 @@ public class WorkProductionPanel extends FreeColPanel {
         final WorkLocation wl = (WorkLocation)unit.getLocation();
         final GoodsType workType = unit.getWorkType();
 
-        List<Modifier> attendedModifiers
-            = wl.getProductionModifiers(workType, unitType);
-        List<Modifier> unattendedModifiers
-            = wl.getProductionModifiers(workType, null);
         String shortName = "";
         String longName = "";
         Image image = null;
@@ -104,7 +100,7 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new JLabel(shortName));
         add(new JLabel(ModifierFormat.format(result)));
 
-        output(sort(attendedModifiers), unitType);
+        output(sort(wl.getProductionModifiers(workType, unitType)), unitType);
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
@@ -129,7 +125,8 @@ public class WorkProductionPanel extends FreeColPanel {
             if (result > 0) {
                 add(Utility.localizedLabel(wl.getLabel()));
                 add(new JLabel(ModifierFormat.format(result)), "wrap 30");
-                output(sort(unattendedModifiers), unitType);
+                output(sort(wl.getProductionModifiers(workType, null)),
+                       unitType);
             }
         }
 

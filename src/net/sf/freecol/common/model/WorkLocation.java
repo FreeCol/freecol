@@ -29,6 +29,7 @@ import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -860,10 +861,10 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType The optional <code>UnitType</code> to produce them.
-     * @return A list of the applicable modifiers.
+     * @return A stream of the applicable modifiers.
      */
-    public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                          UnitType unitType);
+    public abstract Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                            UnitType unitType);
 
     /**
      * Get the production types available for this work location.

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -442,11 +443,9 @@ public class ColonyTile extends WorkLocation {
      * {@inheritDoc}
      */
     @Override
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        if (!canProduce(goodsType, unitType)) {
-            return Collections.<Modifier>emptyList();
-        }
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
+        if (!canProduce(goodsType, unitType)) return Stream.<Modifier>empty();
 
         final Tile workTile = getWorkTile();
         final TileType type = workTile.getType();
@@ -454,27 +453,25 @@ public class ColonyTile extends WorkLocation {
         final Colony colony = getColony();
         final Player owner = colony.getOwner();
         final Turn turn = getGame().getTurn();
+        Stream<Modifier> ownerMods = (owner == null) ? Stream.<Modifier>empty()
+            : owner.getModifiers(id, type, turn).stream();
 
-        List<Modifier> mods = new ArrayList<>();
-        if (unitType == null) {
-            if (isColonyCenterTile()) { // Unattended only possible in center
-                mods.addAll(workTile.getProductionModifiers(goodsType, null));
-                mods.addAll(colony.getProductionModifiers(goodsType));
-                mods.addAll(colony.getModifiers(id, null, turn));
-                if (owner != null) {
-                    mods.addAll(owner.getModifiers(id, type, turn));
-                }
-            }
-
-        } else {
-            mods.addAll(workTile.getProductionModifiers(goodsType, unitType));
-            mods.addAll(colony.getProductionModifiers(goodsType));
-            mods.addAll(unitType.getModifiers(id, type, turn));
-            if (owner != null) {
-                mods.addAll(owner.getModifiers(id, unitType, turn));
-            }
-        }
-        return mods;
+        return (unitType != null)
+            // Unit modifiers apply
+            ? concat(workTile.getProductionModifiers(goodsType, unitType).stream(),
+                     colony.getProductionModifiers(goodsType).stream(),
+                     unitType.getModifiers(id, type, turn).stream(),
+                     ((owner == null) ? null
+                         : owner.getModifiers(id, unitType, turn).stream()))
+            : (isColonyCenterTile())
+            // Unattended only possible in center, colony modifiers apply
+            ? concat(workTile.getProductionModifiers(goodsType, null).stream(),
+                     colony.getProductionModifiers(goodsType).stream(),
+                     colony.getModifiers(id, null, turn).stream(),
+                     ((owner == null) ? null
+                         : owner.getModifiers(id, type, turn).stream()))
+            // Otherwise impossible
+            : Stream.<Modifier>empty();
     }
 
     /**

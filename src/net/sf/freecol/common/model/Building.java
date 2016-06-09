@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -512,31 +513,23 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
         final BuildingType type = getType();
         final String id = (goodsType == null) ? null : goodsType.getId();
         final Colony colony = getColony();
         final Player owner = getOwner();
         final Turn turn = getGame().getTurn();
 
-        List<Modifier> mods = new ArrayList<>();
-        if (unitType == null) { // Add only the building-specific bonuses
-            mods.addAll(colony.getModifiers(id, type, turn));
-            if (owner != null) {
-                mods.addAll(owner.getModifiers(id, type, turn));
-            }
-
-        } else { // If a unit is present add unit specific bonuses.
-            mods.addAll(this.getModifiers(id, unitType, turn));
-            mods.addAll(colony.getProductionModifiers(goodsType));
-            mods.addAll(unitType.getModifiers(id, goodsType, turn));
-            if (owner != null) {
-                mods.addAll(owner.getModifiers(id, unitType, turn));
-            }
-        }
-        Collections.sort(mods);
-        return mods;
+        return (unitType == null)
+            // With no unit, only the building-specific bonuses 
+            ? concat(colony.getModifiers(id, type, turn).stream(),
+                     owner.getModifiers(id, type, turn).stream())
+            // With a unit, also the unit specific bonuses
+            : concat(this.getModifiers(id, unitType, turn).stream(),
+                     colony.getProductionModifiers(goodsType).stream(),
+                     unitType.getModifiers(id, goodsType, turn).stream(),
+                     owner.getModifiers(id, unitType, turn).stream());
     }
 
     /**
