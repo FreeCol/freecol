@@ -562,6 +562,17 @@ public class CollectionUtils {
     }
 
     /**
+     * Count the number of members of an array.
+     *
+     * @param <T> The array member type.
+     * @param array The array to check.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(T[] array) {
+        return (array == null) ? 0 : array.length;
+    }
+        
+    /**
      * Count the number of members of an array that match a predicate.
      *
      * @param <T> The array member type.
@@ -578,6 +589,17 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param c The <code>Collection</code> to check.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(Collection<T> c) {
+        return (c == null) ? 0 : c.size();
+    }
+        
+    /**
+     * Count the number of members of a collection that match a predicate.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to check.
      * @param predicate A <code>Predicate</code> to test with.
      * @return The number of items that matched.
      */
@@ -585,6 +607,17 @@ public class CollectionUtils {
         return count_internal(c.stream(), predicate);
     }
         
+    /**
+     * Count the number of members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to check.
+     * @return The number of items that matched.
+     */
+    public static <T> int count(Stream<T> stream) {
+        return (stream == null) ? 0 : count_internal(stream, alwaysTrue());
+    }
+
     /**
      * Count the number of members of a stream that match a predicate.
      *

@@ -25,6 +25,7 @@ import java.util.Set;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -264,16 +265,16 @@ public class IndividualFatherTest extends FreeColTestCase {
         Unit unit = colony.getFirstUnit();
         townHall.add(unit);
 
-        assertEquals(0, player.getModifiers("model.goods.bells").size());
-        assertEquals(0, colony.getModifiers("model.goods.bells").size());
+        assertEquals(0, count(player.getModifiers("model.goods.bells")));
+        assertEquals(0, count(colony.getModifiers("model.goods.bells")));
         int expected = 4;
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
 
         player.addFather(thomasJefferson);
         expected += expected * 0.5; // Add Jefferson bonus
-        assertEquals(1, player.getModifiers("model.goods.bells").size());
-        assertEquals(0, colony.getModifiers("model.goods.bells").size());
-        assertEquals(1, townHall.getProductionModifiers(bellsType, null).size());
+        assertEquals(1, count(player.getModifiers("model.goods.bells")));
+        assertEquals(0, count(colony.getModifiers("model.goods.bells")));
+        assertEquals(1, count(townHall.getProductionModifiers(bellsType, null)));
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }
 
