@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -53,6 +54,7 @@ public class CollectionUtils {
     private static final int MIN_DEFAULT = Integer.MAX_VALUE;
     private static final int SUM_DEFAULT = 0;
     private static final double SUM_DOUBLE_DEFAULT = 0.0;
+    private static final double PRODUCT_DEFAULT = 1.0;
 
     /** Trivial integer accumulator. */
     public static final BinaryOperator<Integer> integerAccumulator
@@ -1446,6 +1448,104 @@ public class CollectionUtils {
         return stream.noneMatch(predicate);
     }
 
+    /**
+     * Take the product of an array.
+     *
+     * @param <T> The array member type.
+     * @param array The array to multiply.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(T[] array, ToDoubleFunction<T> tdf) {
+        return product_internal(Arrays.stream(array), alwaysTrue(), tdf);
+    }
+            
+    /**
+     * Take the product of an array.
+     *
+     * @param <T> The array member type.
+     * @param array The array to multiply.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(T[] array, Predicate<T> predicate,
+                                     ToDoubleFunction<T> tdf) {
+        return product_internal(Arrays.stream(array), predicate, tdf);
+    }
+            
+    /**
+     * Take the product of a collection.
+     *
+     * @param <T> The stream member type.
+     * @param c The <code>Collection</code> to multiply.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(Collection<T> c,
+                                     ToDoubleFunction<T> tdf) {
+        return product_internal(c.stream(), alwaysTrue(), tdf);
+    }
+            
+    /**
+     * Take the product of a collection.
+     *
+     * @param <T> The stream member type.
+     * @param c The <code>Collection</code> to multiply.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(Collection<T> c, Predicate<T> predicate,
+                                     ToDoubleFunction<T> tdf) {
+        return product_internal(c.stream(), predicate, tdf);
+    }
+            
+    /**
+     * Take the product of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to multiply.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(Stream<T> stream,
+                                     ToDoubleFunction<T> tdf) {
+        return (stream == null) ? PRODUCT_DEFAULT
+            : product_internal(stream, alwaysTrue(), tdf);
+    }
+            
+    /**
+     * Take the product of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to multiply.
+     * @param predicate A <code>Predicate</code> to match with.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product(Stream<T> stream, Predicate<T> predicate,
+                                     ToDoubleFunction<T> tdf) {
+        return (stream == null) ? PRODUCT_DEFAULT
+            : product_internal(stream, predicate, tdf);
+    }
+            
+    /**
+     * Take the product of the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to multiply.
+     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @return The product of the values found.
+     */
+    public static <T> double product_internal(Stream<T> stream,
+                                              Predicate<T> predicate,
+                                              ToDoubleFunction<T> tdf) {
+        final DoubleBinaryOperator mult = (d1, d2) -> d1 * d2;
+        return stream.filter(predicate).mapToDouble(tdf)
+            .reduce(PRODUCT_DEFAULT, mult);
+    }
+            
     /**
      * Convenience function to convert an array to a sorted list.
      *

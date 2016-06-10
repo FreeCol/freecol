@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -203,24 +204,18 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                                    targets.size());
         int twidx = 0;
         for (TargetTuple t : targets) {
-            t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()));
-            for (Building b : t.colony.getBuildings()) {
-                if (b.getLevel() > 1) {
-                    if (b.hasAbility(Ability.REPAIR_UNITS)) t.score *= 1.5;
-                    for (AbstractGoods ag : b.getOutputs()) {
-                        if (ag.getType().isMilitaryGoods()) {
-                            t.score *= 2.0;
-                        } else if (ag.getType().isBuildingMaterial()
-                            && ag.getType().isRefined()) {
-                            t.score *= 1.5;
-                        }
-                    }
-                }
-            }
-            int stockade = (!t.colony.hasStockade()) ? 0
-                : t.colony.getStockade().getLevel();
-            t.score *= (6 - stockade) / 6.0;
-            t.score *= 1.0 + 0.01 * (twiddle[twidx++] - percentTwiddle);
+            final ToDoubleFunction<Building> bdf = b ->
+                ((b.hasAbility(Ability.REPAIR_UNITS)) ? 1.5 : 1.0)
+                * product(b.getOutputs(), ag ->
+                    (ag.getType().isMilitaryGoods()) ? 2.0
+                    : (ag.getType().isBuildingMaterial()
+                        && ag.getType().isRefined()) ? 1.5
+                    : 1.0);
+            t.score *= 0.01 * (101 - Math.min(100, t.colony.getSoL()))
+                * product(t.colony.getBuildings(), b -> b.getLevel() > 1, bdf)
+                * ((6 - ((!t.colony.hasStockade()) ? 0
+                            : t.colony.getStockade().getLevel())) / 6.0)
+                * (1.0 + 0.01 * (twiddle[twidx++] - percentTwiddle));
         }
         Collections.sort(targets);
 
