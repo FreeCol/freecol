@@ -1763,7 +1763,7 @@ public class CollectionUtils {
      * @param collection The <code>Collection</code> to convert.
      * @return A map of the stream contents.
      */
-    public static <T> Collection<T> toList(Collection<T> collection) {
+    public static <T> List<T> toList(Collection<T> collection) {
         return toList_internal(collection.stream());
     }
 
