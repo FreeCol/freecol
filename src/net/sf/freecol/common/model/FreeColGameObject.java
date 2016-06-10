@@ -166,7 +166,7 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (this.disposed) return;
         LogBuilder lb = new LogBuilder(64);
         lb.add("Destroying:");
-        for (FreeColGameObject fcgo : iterable(getDisposables())) {
+        for (FreeColGameObject fcgo : toList(getDisposables())) {
             lb.add(" ", fcgo.getId());
             fcgo.disposeResources();
         }
