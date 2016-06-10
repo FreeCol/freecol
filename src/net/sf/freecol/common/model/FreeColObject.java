@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -643,6 +644,19 @@ public abstract class FreeColObject
      */
     public static final float applyModifiers(float number, Turn turn,
                                              Collection<Modifier> mods) {
+        return FeatureContainer.applyModifiers(number, turn, mods);
+    }
+
+    /**
+     * Applies a stream of modifiers to the given number.
+     *
+     * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @param mods The <code>Modifier</code>s to apply.
+     * @return The modified number.
+     */
+    public static final float applyModifiers(float number, Turn turn,
+                                             Stream<Modifier> mods) {
         return FeatureContainer.applyModifiers(number, turn, mods);
     }
 

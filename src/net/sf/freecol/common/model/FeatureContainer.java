@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -282,10 +283,36 @@ public final class FeatureContainer {
      */
     public static float applyModifiers(float number, Turn turn,
                                        Collection<Modifier> mods) {
-        if (mods == null || mods.isEmpty()) return number;
-        List<Modifier> modifiers = sort(mods);
+        return (mods == null || mods.isEmpty()) ? number
+            : applyModifiers_internal(number, turn, sort(mods));
+    }
+
+    /**
+     * Applies a stream of modifiers to the given float value.
+     *
+     * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @param mods The <code>Modifier</code>s to apply.
+     * @return The modified number.
+     */
+    public static float applyModifiers(float number, Turn turn,
+                                       Stream<Modifier> mods) {
+        return (mods == null) ? number
+            : applyModifiers_internal(number, turn, sort(mods));
+    }
+
+    /**
+     * Implement applyModifiers.
+     *
+     * @param number The number to modify.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @param mods The <code>Modifier</code>s to apply.
+     * @return The modified number.
+     */
+    private static float applyModifiers_internal(float number, Turn turn,
+                                                 Collection<Modifier> mods) {
         float result = number;
-        for (Modifier m : modifiers) {
+        for (Modifier m : mods) {
             float value = m.getValue(turn);
             if (Float.compare(value, Modifier.UNKNOWN) == 0) {
                 return value;
