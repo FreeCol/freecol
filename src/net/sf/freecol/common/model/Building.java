@@ -527,7 +527,7 @@ public class Building extends WorkLocation
                      owner.getModifiers(id, type, turn).stream())
             // With a unit, also the unit specific bonuses
             : concat(this.getModifiers(id, unitType, turn).stream(),
-                     colony.getProductionModifiers(goodsType).stream(),
+                     colony.getProductionModifiers(goodsType),
                      unitType.getModifiers(id, goodsType, turn).stream(),
                      owner.getModifiers(id, unitType, turn).stream());
     }

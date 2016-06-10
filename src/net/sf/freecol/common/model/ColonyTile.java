@@ -459,14 +459,14 @@ public class ColonyTile extends WorkLocation {
         return (unitType != null)
             // Unit modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, unitType).stream(),
-                     colony.getProductionModifiers(goodsType).stream(),
+                     colony.getProductionModifiers(goodsType),
                      unitType.getModifiers(id, type, turn).stream(),
                      ((owner == null) ? null
                          : owner.getModifiers(id, unitType, turn).stream()))
             : (isColonyCenterTile())
             // Unattended only possible in center, colony modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, null).stream(),
-                     colony.getProductionModifiers(goodsType).stream(),
+                     colony.getProductionModifiers(goodsType),
                      colony.getModifiers(id, null, turn).stream(),
                      ((owner == null) ? null
                          : owner.getModifiers(id, type, turn).stream()))

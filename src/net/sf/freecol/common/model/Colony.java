@@ -1921,17 +1921,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * generated from the current production bonus.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
-     * @return A list of suitable <code>Modifier</code>s.
+     * @return A stream of suitable <code>Modifier</code>s.
      */
-    public List<Modifier> getProductionModifiers(GoodsType goodsType) {
-        if (productionBonus == 0) return Collections.<Modifier>emptyList();
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType) {
+        if (productionBonus == 0) return Stream.<Modifier>empty();
         Modifier mod = new Modifier(goodsType.getId(), productionBonus,
                                     Modifier.ModifierType.ADDITIVE,
                                     Specification.SOL_MODIFIER_SOURCE);
         mod.setModifierIndex(Modifier.COLONY_PRODUCTION_INDEX);
-        List<Modifier> result = new ArrayList<>();
-        result.add(mod);
-        return result;
+        return Stream.of(mod);
     }
 
     /**
