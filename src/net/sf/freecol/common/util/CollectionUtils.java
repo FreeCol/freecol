@@ -511,6 +511,23 @@ public class CollectionUtils {
     }
 
     /**
+     * Concatenate streams.
+     *
+     * @param s0 The first <code>Stream</code>.
+     * @param streams The <code>Stream</code>s to concatenate (nulls ignored).
+     * @return The concatenated stream.
+     */
+    @SafeVarargs
+    public static <T> Stream<T> concat(Stream<T> s0, Stream<T>... streams) {
+        Stream<T>[] sts = streams;
+        Stream<T> ret = s0;
+        for (int i = 0; i < sts.length; i++) {
+            if (sts[i] != null) ret = Stream.concat(ret, sts[i]);
+        }
+        return ret;
+    }
+
+    /**
      * Does an array contain at least one element that matches a predicate?
      *
      * @param <T> The array member type.

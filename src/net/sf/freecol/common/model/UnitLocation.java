@@ -266,8 +266,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     @Override
     public Stream<FreeColGameObject> getDisposables() {
         synchronized (this.units) {
-            return Stream.concat(flatten(this.units, Unit::getDisposables),
-                                 super.getDisposables());
+            return concat(flatten(this.units, Unit::getDisposables),
+                          super.getDisposables());
         }
     }
 

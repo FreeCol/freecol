@@ -1813,8 +1813,8 @@ outer:  for (Effect effect : effects) {
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
         List<Unit> units
-            = transform(Stream.concat(colony.getUnitList().stream(),
-                                      colony.getTile().getUnitList().stream()),
+            = transform(concat(colony.getUnitList().stream(),
+                               colony.getTile().getUnitList().stream()),
                         u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
             : getRandomMember(logger, "Select unit for effect", units, random);

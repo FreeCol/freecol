@@ -297,7 +297,7 @@ public abstract class GoodsLocation extends UnitLocation {
     public Stream<FreeColGameObject> getDisposables() {
         Stream<FreeColGameObject> up = super.getDisposables();
         return (this.goodsContainer == null) ? up
-            : Stream.concat(this.goodsContainer.getDisposables(), up);
+            : concat(this.goodsContainer.getDisposables(), up);
     }
 
 
