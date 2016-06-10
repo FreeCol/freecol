@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -125,10 +126,10 @@ public abstract class TileItem extends FreeColGameObject
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType The optional <code>unitType</code> to produce them.
-     * @return A list of the applicable modifiers.
+     * @return A stream of the applicable modifiers.
      */
-    public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                          UnitType unitType);
+    public abstract Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                            UnitType unitType);
 
     /**
      * Is this a natural TileItem?

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -234,11 +235,10 @@ public class Resource extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        return (goodsType == null) ? Collections.<Modifier>emptyList()
-            : new ArrayList<>(getType()
-                .getModifiers(goodsType.getId(), unitType));
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
+        return (goodsType == null) ? Stream.<Modifier>empty()
+            : getType().getModifiers(goodsType.getId(), unitType).stream();
     }
 
     /**

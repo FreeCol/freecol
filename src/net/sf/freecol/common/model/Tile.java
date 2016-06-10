@@ -1677,12 +1677,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             return Collections.<Modifier>emptyList();
         }
 
-        List<Modifier> result = new ArrayList<>();
-        if (tileItemContainer != null) {
-            result.addAll(tileItemContainer
-                .getProductionModifiers(goodsType, unitType));
-        }
-        return result;
+        return (tileItemContainer == null) ? Collections.<Modifier>emptyList()
+            : toList(tileItemContainer.getProductionModifiers(goodsType, unitType));
     }
 
     /**

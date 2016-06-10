@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -416,13 +417,13 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType The optional <code>unitType</code> to produce them.
-     * @return A list of the applicable modifiers.
+     * @return A stream of the applicable <code>Modifier</code>s.
      */
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
         synchronized (tileItems) {
-            return toList(flatten(tileItems,
-                    ti -> ti.getProductionModifiers(goodsType, unitType).stream()));
+            return flatten(tileItems,
+                ti -> ti.getProductionModifiers(goodsType, unitType));
         }
     }
 

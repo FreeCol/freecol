@@ -498,22 +498,17 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        if (goodsType != null) {
-            boolean disableUnattended = !isNatural()
-                && unitType == null                
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
+        final Specification spec = getSpecification();
+        Modifier m;
+        return (goodsType != null && isComplete()
+            && !(/* unattended */ !isNatural() && unitType == null
                 && !goodsType.isFoodType()
-                && getSpecification().getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS);
-            Modifier modifier = (disableUnattended) ? null
-                : getProductionModifier(goodsType);
-            if (modifier != null && isComplete()) {
-                List<Modifier> result = new ArrayList<>();
-                result.add(modifier);
-                return result;
-            }
-        }
-        return Collections.<Modifier>emptyList();
+                && spec.getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS))
+            && (m = getProductionModifier(goodsType)) != null)
+            ? Stream.of(m)
+            : Stream.<Modifier>empty();
     }
 
     /**
