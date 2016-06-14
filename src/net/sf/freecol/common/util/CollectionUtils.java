@@ -530,57 +530,6 @@ public class CollectionUtils {
     }
 
     /**
-     * Does an array contain at least one element that matches a predicate?
-     *
-     * @param <T> The array member type.
-     * @param array The array to search.
-     * @param predicate A <code>Predicate</code> to test with.
-     * @return True if the predicate ever succeeds.
-     */
-    public static <T> boolean contains(T[] array, Predicate<T> predicate) {
-        return contains_internal(Arrays.stream(array), predicate);
-    }
-
-    /**
-     * Does a collection contain at least one element that matches a predicate?
-     *
-     * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to search.
-     * @param predicate A <code>Predicate</code> to test with.
-     * @return True if the predicate ever succeeds.
-     */
-    public static <T> boolean contains(Collection<T> c,
-                                       Predicate<T> predicate) {
-        return contains_internal(c.stream(), predicate);
-    }
-
-    /**
-     * Does a collection contain at least one element that matches a predicate?
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to search.
-     * @param predicate A <code>Predicate</code> to test with.
-     * @return True if the predicate ever succeeds.
-     */
-    public static <T> boolean contains(Stream<T> stream,
-                                       Predicate<T> predicate) {
-        return (stream == null) ? false : contains_internal(stream, predicate);
-    }
-
-    /**
-     * Implement contains().
-     *
-     * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to search.
-     * @param predicate A <code>Predicate</code> to test with.
-     * @return True if the predicate ever succeeds.
-     */
-    private static <T> boolean contains_internal(Stream<T> stream,
-                                                 Predicate<T> predicate) {
-        return stream.filter(predicate).findFirst().isPresent();
-    }
-
-    /**
      * Count the number of members of an array.
      *
      * @param <T> The array member type.

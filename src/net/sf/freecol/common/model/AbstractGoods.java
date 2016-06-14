@@ -216,7 +216,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public static boolean containsType(GoodsType type,
         Collection<? extends AbstractGoods> goods) {
-        return contains(goods, ag -> ag.getType() == type);
+        return any(goods, ag -> ag.getType() == type);
     }
 
     /**

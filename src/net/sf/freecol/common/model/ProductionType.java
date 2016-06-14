@@ -307,8 +307,8 @@ public class ProductionType extends FreeColSpecObject {
      */
     public static boolean canProduce(GoodsType goodsType,
                                      Collection<ProductionType> types) {
-        return any(types, pt -> contains(pt.getOutputs(),
-                                         ag -> ag.getType() == goodsType));
+        return any(types, pt -> any(pt.getOutputs(),
+                                    ag -> ag.getType() == goodsType));
     }
 
     /**

@@ -726,7 +726,7 @@ public class Game extends FreeColGameObject {
      * @return True if an undead player is present.
      */
     public boolean isInRevengeMode() {
-        return contains(getPlayers(), Player::isUndead);
+        return any(getPlayers(), Player::isUndead);
     }
 
     /**
