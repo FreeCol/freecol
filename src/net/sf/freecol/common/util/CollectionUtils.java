@@ -957,6 +957,21 @@ public class CollectionUtils {
     }
 
     /**
+     * Create a predicate for a type that returns true if a mapper applied
+     * to it causes it to equal a key.
+     *
+     * @param <T> The input type.
+     * @param <K> The key type.
+     * @param key The key to match.
+     * @param mapper The mapper <code>Function</code> to apply.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T, K> Predicate<T> matchKey(final K key,
+                                               Function<T, K> mapper) {
+        return t -> mapper.apply(t) == key;
+    }
+
+    /**
      * Find the maximum int value in an array.
      *
      * @param <T> The collection member type.

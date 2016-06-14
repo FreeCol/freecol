@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A map of goods types and their production.
@@ -81,7 +83,7 @@ public class ProductionMap {
                 throw new IllegalArgumentException(goods.getType().getId() + " is not stored as "
                                                    + root.getType());
             } else {
-                AbstractGoods leaf = AbstractGoods.findByType(goods.getType(), leafs);
+                AbstractGoods leaf = find(leafs, AbstractGoods.matches(goods.getType()));
                 if (leaf != null) {
                     leaf.setAmount(leaf.getAmount() + goods.getAmount());
                     root.setAmount(root.getAmount() + goods.getAmount());
@@ -100,7 +102,7 @@ public class ProductionMap {
                     leaf.setAmount(Math.min(leaf.getAmount(), root.getAmount()));
                 }
             } else {
-                AbstractGoods leaf = AbstractGoods.findByType(goods.getType(), leafs);
+                AbstractGoods leaf = find(leafs, AbstractGoods.matches(goods.getType()));
                 if (leaf != null) {
                     leaf.setAmount(leaf.getAmount() - consumed);
                     root.setAmount(root.getAmount() - consumed);
@@ -113,7 +115,7 @@ public class ProductionMap {
             if (root.getType() == type) {
                 return root;
             } else {
-                AbstractGoods leaf = AbstractGoods.findByType(type, leafs);
+                AbstractGoods leaf = find(leafs, AbstractGoods.matches(type));
                 if (leaf != null) {
                     return new AbstractGoods(type, leaf.getAmount());
                 }

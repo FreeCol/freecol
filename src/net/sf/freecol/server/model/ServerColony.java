@@ -520,7 +520,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         buildables.addAll(spec.getBuildingTypeList());
         buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
         return any(buildables, bt -> canBuild(bt)
-            && AbstractGoods.containsType(goodsType, bt.getRequiredGoods()));
+            && any(bt.getRequiredGoods(), AbstractGoods.matches(goodsType)));
     }
 
     /**

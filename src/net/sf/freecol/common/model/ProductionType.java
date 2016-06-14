@@ -223,11 +223,8 @@ public class ProductionType extends FreeColSpecObject {
      *     null.
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
-        if (outputs != null) {
-            AbstractGoods output = AbstractGoods.findByType(goodsType, outputs);
-            if (output != null) return output;
-        }
-        return null;
+        return (outputs == null) ? null
+            : find(outputs, AbstractGoods.matches(goodsType));
     }
 
     /**
@@ -308,7 +305,7 @@ public class ProductionType extends FreeColSpecObject {
     public static boolean canProduce(GoodsType goodsType,
                                      Collection<ProductionType> types) {
         return any(types, pt -> any(pt.getOutputs(),
-                                    ag -> ag.getType() == goodsType));
+                                    AbstractGoods.matches(goodsType)));
     }
 
     /**

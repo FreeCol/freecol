@@ -180,20 +180,6 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Convenience lookup of the member of a collection of abstract goods that
-     * matches a given goods type.
-     *
-     * @param type The <code>GoodsType</code> to look for.
-     * @param goods The collection of <code>AbstractGoods</code> to look in.
-     * @return The <code>AbstractGoods</code> found, or null if not.
-     */
-    public static AbstractGoods findByType(GoodsType type,
-        Collection<? extends AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) if (ag.getType() == type) return ag;
-        return null;
-    }
-
-    /**
      * Convenience lookup of the goods count in a collection of
      * abstract goods given a goods type.
      * 
@@ -203,20 +189,8 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public static int getCount(GoodsType type,
         Collection<? extends AbstractGoods> goods) {
-        AbstractGoods ag = findByType(type, goods);
+        AbstractGoods ag = find(goods, matches(type));
         return (ag == null) ? 0 : ag.getAmount();
-    }
-
-    /**
-     * Does a goods collection contain an element with a given type?
-     *
-     * @param goods The <code>Goods</code> collection to search.
-     * @param type The <code>GoodsType</code> to search for.
-     * @return True if the goods type was found.
-     */
-    public static boolean containsType(GoodsType type,
-        Collection<? extends AbstractGoods> goods) {
-        return any(goods, ag -> ag.getType() == type);
     }
 
     /**
@@ -231,6 +205,11 @@ public class AbstractGoods extends FreeColObject implements Named {
             : market.getSalePrice(getType(), getAmount());
     }
 
+    /** A predicate maker to match by type. */
+    public static final Predicate<? super AbstractGoods> matches(final GoodsType key) {
+        return matchKey(key, AbstractGoods::getType);
+    }
+    
 
     // Interface Named
 

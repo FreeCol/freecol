@@ -666,8 +666,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
-        return transform(getCurrentWorkLocations(), wl -> any(wl.getInputs(),
-                         ag -> ag.getType() == goodsType));
+        return transform(getCurrentWorkLocations(),
+            wl -> any(wl.getInputs(), AbstractGoods.matches(goodsType)));
     }
 
     /**
@@ -678,8 +678,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
-        return transform(getCurrentWorkLocations(), wl -> any(wl.getOutputs(),
-                         ag -> ag.getType() == goodsType));
+        return transform(getCurrentWorkLocations(),
+            wl -> any(wl.getOutputs(), AbstractGoods.matches(goodsType)));
     }
 
     /**
@@ -850,8 +850,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             }
             int production = productionCache.getNetProductionOf(type);
             if (info != null) {
-                AbstractGoods consumption = AbstractGoods.findByType(type,
-                    info.getConsumption());
+                AbstractGoods consumption = find(info.getConsumption(),
+                    AbstractGoods.matches(type));
                 if (consumption != null) {
                     // add the amount the build queue itself will consume
                     production += consumption.getAmount();
@@ -1967,9 +1967,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int getAdjustedNetProductionOf(final GoodsType goodsType) {
         final ToIntFunction<BuildQueue> consumes = q -> {
             ProductionInfo pi = productionCache.getProductionInfo(q);
-            if (pi == null) return 0;
-            AbstractGoods ag = AbstractGoods.findByType(goodsType, pi.getConsumption());
-            return (ag == null) ? 0 : ag.getAmount();
+            return (pi == null) ? 0
+                : AbstractGoods.getCount(goodsType, pi.getConsumption());
         };
         return productionCache.getNetProductionOf(goodsType)
             + sum(Stream.of(buildQueue, populationQueue), consumes);
@@ -2033,7 +2032,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             // positive generic production potential and all inputs satisfied?
             : any(getWorkLocationsForProducing(goodsType),
                 wl -> wl.getGenericPotential(goodsType) > 0
-                    && all(wl.getInputs(),ag -> canProduce(ag.getType())));
+                    && all(wl.getInputs(), ag -> canProduce(ag.getType())));
     }
 
   

@@ -162,7 +162,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     public List<AbstractGoods> getCompactCargo() {
         List<AbstractGoods> result = new ArrayList<>();
         for (GoodsType type : getCargo()) {
-            AbstractGoods ag = AbstractGoods.findByType(type, result);
+            AbstractGoods ag = find(result, AbstractGoods.matches(type));
             if (ag != null) {
                 ag.setAmount(ag.getAmount() + GoodsContainer.CARGO_SIZE);
             } else {
@@ -217,7 +217,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
         // For all goods the unit has loaded, and if the type of goods
         // is not to be loaded here, and there is demand here, return true.
         final Predicate<Goods> unloadPred = g ->
-            !AbstractGoods.containsType(g.getType(), stopGoods)
+            !any(stopGoods, AbstractGoods.matches(g.getType()))
                 && getImportAmount(g.getType(), turns) > 0;
         if (any(unit.getCompactGoodsList(), unloadPred)) return true;
 

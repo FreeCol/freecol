@@ -2223,7 +2223,7 @@ public final class InGameController extends FreeColClientHolder {
         // failed somewhere).  If it is expected to load, reduce the
         // loading amount by what is already on board.
         for (Goods g : unit.getCompactGoods()) {
-            AbstractGoods ag = AbstractGoods.findByType(g.getType(), toLoad);
+            AbstractGoods ag = find(toLoad, AbstractGoods.matches(g.getType()));
             if (ag == null) { // Excess goods on board, failed unload?
                 unexpected.addStringTemplate("%goods%", g.getLabel());
             } else {
@@ -2271,7 +2271,7 @@ public final class InGameController extends FreeColClientHolder {
                     turns += unit.getTurnsToReach(start, trs.getLocation());
                     int amountIn = trs.getImportAmount(type, turns),
                         amountOut = trs.getExportAmount(type, turns);
-                    if (AbstractGoods.findByType(type, trs.getCompactCargo()) == null
+                    if (none(trs.getCompactCargo(), AbstractGoods.matches(type))
                         || amountIn > amountOut) {
                         importAmount = amountIn;
                         unload = trs;

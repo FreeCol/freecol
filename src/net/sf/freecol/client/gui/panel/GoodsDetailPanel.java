@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -210,14 +211,12 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
     private <T extends BuildableType> boolean filterBuildables(List<T> input,
         List<T> output, GoodsType type) {
-        boolean result = true;
+        boolean result = false;
         for (T bt : input) {
-            if (bt.needsGoodsToBuild()) {
-                if (AbstractGoods.containsType(type, bt.getRequiredGoods())) {
-                    output.add(bt);
-                } else {
-                    result = false;
-                }
+            if (bt.needsGoodsToBuild()
+                && any(bt.getRequiredGoods(), AbstractGoods.matches(type))) {
+                output.add(bt);
+                result = true;
             }
         }
         return result;

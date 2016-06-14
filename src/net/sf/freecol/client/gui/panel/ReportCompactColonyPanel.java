@@ -304,8 +304,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
-                    deficit = AbstractGoods.findByType(goodsType,
-                        pi.getConsumptionDeficit());
+                    deficit = find(pi.getConsumptionDeficit(),
+                                   AbstractGoods.matches(goodsType));
                     if (deficit != null) {
                         status = ProductionStatus.CONSUMPTION;
                         extra = deficit.getAmount();
@@ -330,8 +330,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 for (WorkLocation wl : colony.getWorkLocationsForProducing(goodsType)) {
                     ProductionInfo pi = colony.getProductionInfo(wl);
                     if (pi == null) continue;
-                    deficit = AbstractGoods.findByType(goodsType,
-                        pi.getProductionDeficit());
+                    deficit = find(pi.getProductionDeficit(),
+                                   AbstractGoods.matches(goodsType));
                     if (deficit != null) {
                         status = ProductionStatus.PRODUCTION;
                         extra = deficit.getAmount();

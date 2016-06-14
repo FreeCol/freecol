@@ -364,7 +364,7 @@ public abstract class WorkLocation extends UnitLocation
                     ok = true;
                 } else if (colony.getTotalProductionOf(goodsType) == 0
                     && (bt = colony.getCurrentlyBuilding()) != null
-                    && AbstractGoods.containsType(goodsType, bt.getRequiredGoods())) {
+                    && any(bt.getRequiredGoods(), AbstractGoods.matches(goodsType))) {
                     ok = true;
                 }
             }
@@ -434,7 +434,7 @@ public abstract class WorkLocation extends UnitLocation
      *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
-        return AbstractGoods.containsType(goodsType, getOutputs());
+        return any(getOutputs(), AbstractGoods.matches(goodsType));
     }
 
     /**
@@ -521,7 +521,7 @@ public abstract class WorkLocation extends UnitLocation
         if (info == null) return 0;
         List<AbstractGoods> production = info.getMaximumProduction();
         if (production != null) {
-            AbstractGoods ag = AbstractGoods.findByType(goodsType, production);
+            AbstractGoods ag = find(production, AbstractGoods.matches(goodsType));
             if (ag != null) return ag.getAmount();
         }
         return getTotalProductionOf(goodsType);
@@ -651,7 +651,7 @@ public abstract class WorkLocation extends UnitLocation
     public AbstractGoods getProductionDeficit(GoodsType goodsType) {
         ProductionInfo pi = getProductionInfo();
         return (pi == null) ? null
-            : AbstractGoods.findByType(goodsType, pi.getProductionDeficit());
+            : find(pi.getProductionDeficit(), AbstractGoods.matches(goodsType));
     }
  
    
