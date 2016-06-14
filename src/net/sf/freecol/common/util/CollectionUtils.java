@@ -368,7 +368,7 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if all members pass the predicate test.
      */
-    public static <T> boolean all(T[] array, Predicate<T> predicate) {
+    public static <T> boolean all(T[] array, Predicate<? super T> predicate) {
         return all_internal(Arrays.stream(array), predicate);
     }
 
@@ -380,7 +380,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if all members pass the predicate test.
      */
-    public static <T> boolean all(Collection<T> c, Predicate<T> predicate) {
+    public static <T> boolean all(Collection<T> c,
+                                  Predicate<? super T> predicate) {
         return all_internal(c.stream(), predicate);
     }
 
@@ -392,7 +393,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if all members pass the predicate test.
      */
-    public static <T> boolean all(Stream<T> stream, Predicate<T> predicate) {
+    public static <T> boolean all(Stream<T> stream,
+                                  Predicate<? super T> predicate) {
         return (stream == null) ? true : all_internal(stream, predicate);
     }
 
@@ -405,7 +407,7 @@ public class CollectionUtils {
      * @return True if all members pass the predicate test.
      */
     private static <T> boolean all_internal(Stream<T> stream,
-                                            Predicate<T> predicate) {
+                                            Predicate<? super T> predicate) {
         return stream.allMatch(predicate);
     }
 
@@ -427,7 +429,7 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if any member passes the predicate test.
      */
-    public static <T> boolean any(T[] array, Predicate<T> predicate) {
+    public static <T> boolean any(T[] array, Predicate<? super T> predicate) {
         return any_internal(Arrays.stream(array), predicate);
     }
 
@@ -439,7 +441,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if any member passes the predicate test.
      */
-    public static <T> boolean any(Collection<T> c, Predicate<T> predicate) {
+    public static <T> boolean any(Collection<T> c,
+                                  Predicate<? super T> predicate) {
         return any_internal(c.stream(), predicate);
     }
 
@@ -451,7 +454,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if any member passes the predicate test.
      */
-    public static <T> boolean any(Stream<T> stream, Predicate<T> predicate) {
+    public static <T> boolean any(Stream<T> stream,
+                                  Predicate<? super T> predicate) {
         return (stream == null) ? false : any_internal(stream, predicate);
     }
 
@@ -464,7 +468,7 @@ public class CollectionUtils {
      * @return True if any member passes the predicate test.
      */
     private static <T> boolean any_internal(Stream<T> stream,
-                                            Predicate<T> predicate) {
+                                            Predicate<? super T> predicate) {
         return stream.anyMatch(predicate);
     }
 
@@ -548,7 +552,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to test with.
      * @return The number of items that matched.
      */
-    public static <T> int count(T[] array, Predicate<T> predicate) {
+    public static <T> int count(T[] array,
+                                Predicate<? super T> predicate) {
         return count_internal(Arrays.stream(array), predicate);
     }
         
@@ -571,7 +576,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to test with.
      * @return The number of items that matched.
      */
-    public static <T> int count(Collection<T> c, Predicate<T> predicate) {
+    public static <T> int count(Collection<T> c,
+                                Predicate<? super T> predicate) {
         return count_internal(c.stream(), predicate);
     }
         
@@ -594,7 +600,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to test with.
      * @return The number of items that matched.
      */
-    public static <T> int count(Stream<T> stream, Predicate<T> predicate) {
+    public static <T> int count(Stream<T> stream,
+                                Predicate<? super T> predicate) {
         return (stream == null) ? 0 : count_internal(stream, predicate);
     }
 
@@ -607,7 +614,7 @@ public class CollectionUtils {
      * @return The number of items that matched.
      */
     private static <T> int count_internal(Stream<T> stream,
-                                          Predicate<T> predicate) {
+                                          Predicate<? super T> predicate) {
         return (int)stream.filter(predicate).count();
     }
 
@@ -632,7 +639,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to match with.
      * @return A stream of matching <code>File</code>s.
      */
-    public static Stream<File> fileStream(File dir, Predicate<File> predicate) {
+    public static Stream<File> fileStream(File dir,
+                                          Predicate<? super File> predicate) {
         return fileStream(dir).filter(predicate);
     }
 
@@ -644,7 +652,7 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to match with.
      * @return The item found, or null if not found.
      */
-    public static <T> T find(T[] array, Predicate<T> predicate) {
+    public static <T> T find(T[] array, Predicate<? super T> predicate) {
         return find_internal(Arrays.stream(array), predicate, null);
     }
 
@@ -657,7 +665,8 @@ public class CollectionUtils {
      * @param fail The result to return on failure.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(T[] array, Predicate<T> predicate, T fail) {
+    public static <T> T find(T[] array, Predicate<? super T> predicate,
+                             T fail) {
         return find_internal(Arrays.stream(array), predicate, fail);
     }
 
@@ -669,7 +678,7 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to match with.
      * @return The item found, or null if not found.
      */
-    public static <T> T find(Collection<T> c, Predicate<T> predicate) {
+    public static <T> T find(Collection<T> c, Predicate<? super T> predicate) {
         return find_internal(c.stream(), predicate, (T)null);
     }
 
@@ -682,7 +691,7 @@ public class CollectionUtils {
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Collection<T> c, Predicate<T> predicate,
+    public static <T> T find(Collection<T> c, Predicate<? super T> predicate,
                              T fail) {
         return find_internal(c.stream(), predicate, fail);
     }
@@ -695,7 +704,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to match with.
      * @return The item found, or null if not found.
      */
-    public static <T> T find(Stream<T> stream, Predicate<T> predicate) {
+    public static <T> T find(Stream<T> stream,
+                             Predicate<? super T> predicate) {
         return (stream == null) ? null : find_internal(stream, predicate, null);
     }
 
@@ -708,7 +718,7 @@ public class CollectionUtils {
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
-    public static <T> T find(Stream<T> stream, Predicate<T> predicate,
+    public static <T> T find(Stream<T> stream, Predicate<? super T> predicate,
                              T fail) {
         return (stream == null) ? fail : find_internal(stream, predicate, fail);
     }
@@ -723,7 +733,8 @@ public class CollectionUtils {
      * @return The item found, or fail if not found.
      */
     private static <T> T find_internal(Stream<T> stream,
-                                       Predicate<T> predicate, T fail) {
+                                       Predicate<? super T> predicate,
+                                       T fail) {
         return first_internal(stream.filter(predicate), fail);
     }
    
@@ -796,7 +807,7 @@ public class CollectionUtils {
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(T[] array,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         return flatten_internal(Arrays.stream(array), predicate, mapper);
     }
@@ -826,7 +837,7 @@ public class CollectionUtils {
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(Collection<T> c,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         return flatten_internal(c.stream(), predicate, mapper);
     }
@@ -857,7 +868,7 @@ public class CollectionUtils {
      * @return A stream of the mapped stream.
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         return (stream == null) ? Stream.<R>empty()
             : flatten_internal(stream, predicate, mapper);
@@ -874,7 +885,7 @@ public class CollectionUtils {
      * @return A stream of the mapped stream.
      */
     private static <T, R> Stream<R> flatten_internal(Stream<T> stream,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends Stream<? extends R>> mapper) {
         return stream.filter(predicate).flatMap(mapper);
     }
@@ -966,7 +977,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
-    public static <T> int max(T[] array, Predicate<T> predicate,
+    public static <T> int max(T[] array, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return max_internal(Arrays.stream(array), predicate, tif);
     }
@@ -992,7 +1003,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
-    public static <T> int max(Collection<T> c, Predicate<T> predicate,
+    public static <T> int max(Collection<T> c, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return max(c.stream(), predicate, tif);
     }
@@ -1019,7 +1030,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
-    public static <T> int max(Stream<T> stream, Predicate<T> predicate,
+    public static <T> int max(Stream<T> stream, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return (stream == null) ? MAX_DEFAULT
             : max_internal(stream, predicate, tif);
@@ -1035,7 +1046,7 @@ public class CollectionUtils {
      * @return The maximum value found, or zero if the input is empty.
      */
     private static <T> int max_internal(Stream<T> stream,
-                                        Predicate<T> predicate,
+                                        Predicate<? super T> predicate,
                                         ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).max()
             .orElse(MAX_DEFAULT);
@@ -1065,7 +1076,7 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
      */
-    public static <T> T maximize(T[] array, Predicate<T> predicate,
+    public static <T> T maximize(T[] array, Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return maximize_internal(Arrays.stream(array), predicate, comparator);
     }
@@ -1094,7 +1105,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
      */
-    public static <T> T maximize(Collection<T> c, Predicate<T> predicate,
+    public static <T> T maximize(Collection<T> c,
+                                 Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return maximize_internal(c.stream(), predicate, comparator);
     }
@@ -1124,7 +1136,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The maximal value found, or null if none present.
      */
-    public static <T> T maximize(Stream<T> stream, Predicate<T> predicate,
+    public static <T> T maximize(Stream<T> stream,
+                                 Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return (stream == null) ? null
             : maximize_internal(stream, predicate, comparator);
@@ -1140,7 +1153,7 @@ public class CollectionUtils {
      * @return The maximal value found, or null if none present.
      */
     private static <T> T maximize_internal(Stream<T> stream,
-                                           Predicate<T> predicate,
+                                           Predicate<? super T> predicate,
                                            Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.maxBy(comparator))
             .orElse(null);
@@ -1167,7 +1180,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
-    public static <T> int min(T[] array, Predicate<T> predicate,
+    public static <T> int min(T[] array, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return min_internal(Arrays.stream(array), predicate, tif);
     }
@@ -1193,7 +1206,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
-    public static <T> int min(Collection<T> c, Predicate<T> predicate,
+    public static <T> int min(Collection<T> c, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return min_internal(c.stream(), predicate, tif);
     }
@@ -1220,7 +1233,8 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
-    public static <T> int min(Stream<T> stream, Predicate<T> predicate,
+    public static <T> int min(Stream<T> stream,
+                              Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return (stream == null) ? MIN_DEFAULT
             : min_internal(stream, predicate, tif);
@@ -1236,7 +1250,7 @@ public class CollectionUtils {
      * @return The minimum value found, or zero if the input is empty.
      */
     private static <T> int min_internal(Stream<T> stream,
-                                        Predicate<T> predicate,
+                                        Predicate<? super T> predicate,
                                         ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).min()
             .orElse(MIN_DEFAULT);
@@ -1267,7 +1281,7 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
      */
-    public static <T> T minimize(T[] array, Predicate<T> predicate,
+    public static <T> T minimize(T[] array, Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return minimize_internal(Arrays.stream(array), predicate, comparator);
     }
@@ -1296,7 +1310,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
      */
-    public static <T> T minimize(Collection<T> c, Predicate<T> predicate,
+    public static <T> T minimize(Collection<T> c,
+                                 Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return minimize_internal(c.stream(), predicate, comparator);
     }
@@ -1326,7 +1341,8 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to compare with.
      * @return The minimal value found, or null if none present.
      */
-    public static <T> T minimize(Stream<T> stream, Predicate<T> predicate,
+    public static <T> T minimize(Stream<T> stream,
+                                 Predicate<? super T> predicate,
                                  Comparator<? super T> comparator) {
         return (stream == null) ? null
             : minimize_internal(stream, predicate, comparator);
@@ -1342,7 +1358,7 @@ public class CollectionUtils {
      * @return The minimal value found, or null if none present.
      */
     private static <T> T minimize_internal(Stream<T> stream,
-                                           Predicate<T> predicate,
+                                           Predicate<? super T> predicate,
                                            Comparator<? super T> comparator) {
         return stream.filter(predicate).collect(Collectors.minBy(comparator))
             .orElse(null);
@@ -1356,7 +1372,7 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if no member passes the predicate test.
      */
-    public static <T> boolean none(T[] array, Predicate<T> predicate) {
+    public static <T> boolean none(T[] array, Predicate<? super T> predicate) {
         return none_internal(Arrays.stream(array), predicate);
     }
 
@@ -1368,7 +1384,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if no member passes the predicate test.
      */
-    public static <T> boolean none(Collection<T> c, Predicate<T> predicate) {
+    public static <T> boolean none(Collection<T> c,
+                                   Predicate<? super T> predicate) {
         return none_internal(c.stream(), predicate);
     }
 
@@ -1380,7 +1397,8 @@ public class CollectionUtils {
      * @param predicate The <code>Predicate</code> to test with.
      * @return True if no member passes the predicate test.
      */
-    public static <T> boolean none(Stream<T> stream, Predicate<T> predicate) {
+    public static <T> boolean none(Stream<T> stream,
+                                   Predicate<? super T> predicate) {
         return (stream == null) ? true : none_internal(stream, predicate);
     }
 
@@ -1393,7 +1411,7 @@ public class CollectionUtils {
      * @return True if no member passes the predicate test.
      */
     private static <T> boolean none_internal(Stream<T> stream,
-                                             Predicate<T> predicate) {
+                                             Predicate<? super T> predicate) {
         return stream.noneMatch(predicate);
     }
 
@@ -1418,7 +1436,7 @@ public class CollectionUtils {
      * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
      * @return The product of the values found.
      */
-    public static <T> double product(T[] array, Predicate<T> predicate,
+    public static <T> double product(T[] array, Predicate<? super T> predicate,
                                      ToDoubleFunction<T> tdf) {
         return product_internal(Arrays.stream(array), predicate, tdf);
     }
@@ -1445,7 +1463,8 @@ public class CollectionUtils {
      * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
      * @return The product of the values found.
      */
-    public static <T> double product(Collection<T> c, Predicate<T> predicate,
+    public static <T> double product(Collection<T> c,
+                                     Predicate<? super T> predicate,
                                      ToDoubleFunction<T> tdf) {
         return product_internal(c.stream(), predicate, tdf);
     }
@@ -1473,7 +1492,8 @@ public class CollectionUtils {
      * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
      * @return The product of the values found.
      */
-    public static <T> double product(Stream<T> stream, Predicate<T> predicate,
+    public static <T> double product(Stream<T> stream,
+                                     Predicate<? super T> predicate,
                                      ToDoubleFunction<T> tdf) {
         return (stream == null) ? PRODUCT_DEFAULT
             : product_internal(stream, predicate, tdf);
@@ -1488,7 +1508,7 @@ public class CollectionUtils {
      * @return The product of the values found.
      */
     public static <T> double product_internal(Stream<T> stream,
-                                              Predicate<T> predicate,
+                                              Predicate<? super T> predicate,
                                               ToDoubleFunction<T> tdf) {
         final DoubleBinaryOperator mult = (d1, d2) -> d1 * d2;
         return stream.filter(predicate).mapToDouble(tdf)
@@ -1605,7 +1625,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to convert members to an int.
      * @return The sum of the values found.
      */
-    public static <T> int sum(T[] array, Predicate<T> predicate,
+    public static <T> int sum(T[] array, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return sum_internal(Arrays.stream(array), predicate, tif);
     }
@@ -1631,7 +1651,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to map the stream to int with.
      * @return The sum of the values found.
      */
-    public static <T> int sum(Collection<T> c, Predicate<T> predicate,
+    public static <T> int sum(Collection<T> c, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return sum_internal(c.stream(), predicate, tif);
     }
@@ -1658,7 +1678,7 @@ public class CollectionUtils {
      * @param tif A <code>ToIntFunction</code> to convert members to an int.
      * @return The sum of the values found.
      */
-    public static <T> int sum(Stream<T> stream, Predicate<T> predicate,
+    public static <T> int sum(Stream<T> stream, Predicate<? super T> predicate,
                               ToIntFunction<T> tif) {
         return (stream == null) ? SUM_DEFAULT
             : sum_internal(stream, predicate, tif);
@@ -1674,7 +1694,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     private static <T> int sum_internal(Stream<T> stream,
-                                        Predicate<T> predicate,
+                                        Predicate<? super T> predicate,
                                         ToIntFunction<T> tif) {
         return stream.filter(predicate).mapToInt(tif).sum();
     }
@@ -1702,7 +1722,8 @@ public class CollectionUtils {
      *     double with.
      * @return The sum of the values found.
      */
-    public static <T> double sumDouble(T[] array, Predicate<T> predicate,
+    public static <T> double sumDouble(T[] array,
+                                       Predicate<? super T> predicate,
                                        ToDoubleFunction<T> tdf) {
         return sumDouble_internal(Arrays.stream(array), predicate, tdf);
     }
@@ -1731,7 +1752,8 @@ public class CollectionUtils {
      *     double with.
      * @return The sum of the values found.
      */
-    public static <T> double sumDouble(Collection<T> c, Predicate<T> predicate,
+    public static <T> double sumDouble(Collection<T> c,
+                                       Predicate<? super T> predicate,
                                        ToDoubleFunction<T> tdf) {
         return sumDouble_internal(c.stream(), predicate, tdf);
     }
@@ -1761,7 +1783,7 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     public static <T> double sumDouble(Stream<T> stream,
-                                       Predicate<T> predicate,
+                                       Predicate<? super T> predicate,
                                        ToDoubleFunction<T> tdf) {
         return (stream == null) ? SUM_DOUBLE_DEFAULT
             : sumDouble_internal(stream, predicate, tdf);
@@ -1777,8 +1799,8 @@ public class CollectionUtils {
      * @return The sum of the values found.
      */
     private static <T> double sumDouble_internal(Stream<T> stream,
-                                                 Predicate<T> predicate,
-                                                 ToDoubleFunction<T> tdf) {
+        Predicate<? super T> predicate,
+        ToDoubleFunction<T> tdf) {
         return stream.filter(predicate).mapToDouble(tdf).sum();
     }
 
@@ -1861,7 +1883,8 @@ public class CollectionUtils {
      * @param predicate A <code>Predicate</code> to select the items.
      * @return The result of collecting the predicate matches.
      */
-    public static <T> List<T> transform(T[] array, Predicate<T> predicate) {
+    public static <T> List<T> transform(T[] array,
+                                        Predicate<? super T> predicate) {
         return transform_internal(Arrays.stream(array), predicate,
                                   Function.<T>identity(), null,
                                   Collectors.toList());
@@ -1877,7 +1900,8 @@ public class CollectionUtils {
      * @param mapper A function to transform the selected items.
      * @return The result of collecting the mapped predicate matches.
      */
-    public static <T,R> List<R> transform(T[] array, Predicate<T> predicate,
+    public static <T,R> List<R> transform(T[] array,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends R> mapper) {
         return transform_internal(Arrays.stream(array), predicate, mapper,
                                   null, Collectors.toList());
@@ -1895,9 +1919,10 @@ public class CollectionUtils {
      * @param collector A <code>Collector</code> to collect the items.
      * @return The result of collecting the mapped predicate matches.
      */
-    public static <T,R,C> C transform(T[] array, Predicate<T> predicate,
-                                      Function<? super T, ? extends R> mapper,
-                                      Collector<R,?,C> collector) {
+    public static <T,R,C> C transform(T[] array,
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
         return transform_internal(Arrays.stream(array), predicate, mapper,
                                   null, collector);
     }
@@ -1913,9 +1938,10 @@ public class CollectionUtils {
      * @param comparator A <code>Comparator</code> to sort the items.
      * @return A list of sorted mapped predicate matches.
      */
-    public static <T,R> List<R> transform(T[] array, Predicate<T> predicate,
-                                          Function<? super T, ? extends R> mapper,
-                                          Comparator<? super R> comparator) {
+    public static <T,R> List<R> transform(T[] array,
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
         return transform_internal(Arrays.stream(array), predicate, mapper,
                                   comparator, Collectors.toList());
     }
@@ -1929,7 +1955,7 @@ public class CollectionUtils {
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(Collection<T> c,
-                                        Predicate<T> predicate) {
+                                        Predicate<? super T> predicate) {
         return transform_internal(c.stream(), predicate, Function.<T>identity(),
                                   null, Collectors.toList());
     }
@@ -1945,7 +1971,7 @@ public class CollectionUtils {
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R> List<R> transform(Collection<T> c,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends R> mapper) {
         return transform_internal(c.stream(), predicate, mapper, null,
                                   Collectors.toList());
@@ -1963,9 +1989,9 @@ public class CollectionUtils {
      * @return A list of sorted mapped predicate matches.
      */
     public static <T,R> List<R> transform(Collection<T> c,
-                                          Predicate<T> predicate,
-                                          Function<? super T, ? extends R> mapper,
-                                          Comparator<? super R> comparator) {
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
         return transform_internal(c.stream(), predicate, mapper, comparator,
                                   Collectors.toList());
     }
@@ -1983,9 +2009,9 @@ public class CollectionUtils {
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(Collection<T> c,
-                                      Predicate<T> predicate,
-                                      Function<? super T, ? extends R> mapper,
-                                      Collector<R,?,C> collector) {
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
         return transform_internal(c.stream(), predicate, mapper, null,
                                   collector);
     }
@@ -1999,7 +2025,7 @@ public class CollectionUtils {
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(Stream<T> stream,
-                                        Predicate<T> predicate) {
+                                        Predicate<? super T> predicate) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
         return transform_internal(s, predicate, Function.<T>identity(),
                                   null, Collectors.toList());
@@ -2016,7 +2042,7 @@ public class CollectionUtils {
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R> List<R> transform(Stream<T> stream,
-        Predicate<T> predicate,
+        Predicate<? super T> predicate,
         Function<? super T, ? extends R> mapper) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
         return transform_internal(s, predicate, mapper, null,
@@ -2035,9 +2061,9 @@ public class CollectionUtils {
      * @return A list of sorted mapped predicate matches.
      */
     public static <T,R> List<R> transform(Stream<T> stream,
-                                          Predicate<T> predicate,
-                                          Function<? super T, ? extends R> mapper,
-                                          Comparator<? super R> comparator) {
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
         return transform_internal(s, predicate, mapper, comparator,
                                   Collectors.toList());
@@ -2056,9 +2082,9 @@ public class CollectionUtils {
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(Stream<T> stream,
-                                      Predicate<T> predicate,
-                                      Function<? super T, ? extends R> mapper,
-                                      Collector<R,?,C> collector) {
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Collector<R,?,C> collector) {
         final Stream<T> s = (stream == null) ? Stream.<T>empty() : stream;
         return transform_internal(s, predicate, mapper, null, collector);
     }
@@ -2078,10 +2104,10 @@ public class CollectionUtils {
      * @return The result of collecting the mapped predicate matches.
      */
     private static <T,R,C> C transform_internal(Stream<T> stream,
-                                                Predicate<T> predicate,
-                                                Function<? super T, ? extends R> mapper,
-                                                Comparator<? super R> comparator,
-                                                Collector<R,?,C> collector) {
+        Predicate<? super T> predicate,
+        Function<? super T, ? extends R> mapper,
+        Comparator<? super R> comparator,
+        Collector<R,?,C> collector) {
         return (comparator == null)
             ? stream.filter(predicate).map(mapper).collect(collector)
             : stream.filter(predicate).map(mapper)
