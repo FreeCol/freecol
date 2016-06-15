@@ -56,12 +56,6 @@ public class LandMap {
     /** Number of land tiles on the map. */
     private int numberOfLandTiles;
 
-    /** Target distance from land to the map edge. */
-    private int preferredDistanceToEdge;
-
-    /** Minimum number of land tiles on the map. */
-    private int minimumNumberOfTiles;
-
 
     /**
      * Create a new land map with specified dimensions.
@@ -84,19 +78,15 @@ public class LandMap {
     public LandMap(Game game) {
         this(game.getMap().getWidth(), game.getMap().getHeight());
 
-        final Map map = game.getMap();
-        boolean[][] bmap = new boolean[width][height];
-        int n = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                bmap[x][y] = (map.isValid(x, y))
-                    ? map.getTile(x, y).isLand()
+        final Map gmap = game.getMap();
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                this.map[x][y] = (gmap.isValid(x, y))
+                    ? gmap.getTile(x, y).isLand()
                     : false;
-                if (bmap[x][y]) n++;
+                if (this.map[x][y]) this.numberOfLandTiles++;
             }
         }
-        this.map = bmap;
-        this.numberOfLandTiles = n;
     }
 
     /**
@@ -110,16 +100,15 @@ public class LandMap {
         this(mgo.getInteger(MapGeneratorOptions.MAP_WIDTH),
              mgo.getInteger(MapGeneratorOptions.MAP_HEIGHT));
 
-        int preferredDistanceToEdge
+        int distanceToEdge
             = mgo.getInteger(MapGeneratorOptions.PREFERRED_DISTANCE_TO_EDGE);
-        int minimumNumberOfTiles = mgo.getInteger(MapGeneratorOptions.LAND_MASS)
-            * width * height / 100;
+        int minNumberOfTiles = mgo.getInteger(MapGeneratorOptions.LAND_MASS)
+            * getWidth() * getHeight() / 100;
         int gen = mgo.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
         SelectOption so = (SelectOption)
             mgo.getOption(MapGeneratorOptions.LAND_GENERATOR_TYPE);
         logger.info("Using land generator " + so.getItemValues().get(gen));
-        generate(gen, preferredDistanceToEdge, minimumNumberOfTiles,
-                 random);
+        generate(gen, distanceToEdge, minNumberOfTiles, random);
     }
 
 
@@ -149,7 +138,7 @@ public class LandMap {
      * @return True if there coordinate is valid.
      */
     public boolean isValid(int x, int y) {
-        return x >= 0 && x < this.width && y >= 0 && y < this.height;
+        return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
     }
 
     /**
@@ -163,6 +152,44 @@ public class LandMap {
         return (isValid(x, y)) ? this.map[x][y] : false;
     }
 
+    /**
+     * Set a map position to land, and increase the land tile count.
+     *
+     * @param x The x coordinate of the new land.
+     * @param y The y coordinate of the new land.
+     * @return True if the land tile was set.
+     */
+    private boolean setLand(int x, int y) {
+        if (isLand(x, y)) return false;
+        this.map[x][y] = true;
+        this.numberOfLandTiles++;
+        return true;
+    }
+        
+    /**
+     * Sets a given map position to land and grow outward.
+     *
+     * Calls #growLand(int,int) for all valid adjacent map positions,
+     * which may recursively call setLand for these.
+     *
+     * @param x The x coordinate of the new land.
+     * @param y The y coordinate of the new land.
+     * @param distanceToEdge The preferred distance to the map edge.
+     * @param random A pseudo random number source.
+     */
+    private void setLand(int x, int y, int distanceToEdge,
+                         Random random) {
+        if (!setLand(x, y)) return;
+
+        Position p = new Position(x, y);
+        for (Direction direction : Direction.longSides) {
+            Position n = new Position(p, direction);
+            if (n.isValid(getWidth(), getHeight())) {
+                growLand(n.getX(), n.getY(), distanceToEdge, random);
+            }
+        }
+    }
+
 
     // Internals
 
@@ -170,46 +197,44 @@ public class LandMap {
      * Generate the land map using the given generator type.
      *
      * @param type The generator type.
-     * @param minimumNumberOfTiles The minimum land tiles to generate.
-     * @param preferredDistanceToEdge The preferred distance to the map edge.
+     * @param minNumberOfTiles The minimum land tiles to generate.
+     * @param distanceToEdge The preferred distance to the map edge.
      * @param random A pseudo random number source.
      */
-    private void generate(int type, int preferredDistanceToEdge,
-                          int minimumNumberOfTiles, Random random) {
+    private void generate(int type, int distanceToEdge,
+                          int minNumberOfTiles, Random random) {
         switch (type) {
         case MapGeneratorOptions.LAND_GENERATOR_CLASSIC:
-            createClassicLandMap(preferredDistanceToEdge, minimumNumberOfTiles,
-                                 random);
+            createClassicLandMap(distanceToEdge, minNumberOfTiles, random);
             break;
         case MapGeneratorOptions.LAND_GENERATOR_CONTINENT:
             // Create one landmass of 75%, start it somewhere near the
             // center, then fill up with small islands.
             addPolarRegions();
-            int contsize = (minimumNumberOfTiles * 75) / 100;
-            addLandMass(contsize, contsize, width/2, height/4
-                        + randomInt(logger, "Landmass", random, height/2),
-                        preferredDistanceToEdge, random);
-            while (numberOfLandTiles < minimumNumberOfTiles) {
-                addLandMass(15, 25, -1, -1, preferredDistanceToEdge, random);
+            int contsize = (minNumberOfTiles * 75) / 100;
+            addLandMass(contsize, contsize, getWidth()/2, getHeight()/4
+                        + randomInt(logger, "Landmass", random, getHeight()/2),
+                        distanceToEdge, random);
+            while (this.numberOfLandTiles < minNumberOfTiles) {
+                addLandMass(15, 25, -1, -1, distanceToEdge, random);
             }
             break;
         case MapGeneratorOptions.LAND_GENERATOR_ARCHIPELAGO:
             // Create 5 islands of 10% each, then delegate to the Islands
             // generator.
             addPolarRegions();
-            int archsize = (minimumNumberOfTiles * 10) / 100;
+            int archsize = (minNumberOfTiles * 10) / 100;
             for (int i = 0; i < 5; i++) {
                 addLandMass(archsize - 5, archsize + 5, -1, -1,
-                            preferredDistanceToEdge, random);
+                            distanceToEdge, random);
             }
             // Fall through
         case MapGeneratorOptions.LAND_GENERATOR_ISLANDS:
             // Create islands of 25..75 tiles.
             addPolarRegions();
-            while (numberOfLandTiles < minimumNumberOfTiles) {
+            while (this.numberOfLandTiles < minNumberOfTiles) {
                 int s = randomInt(logger, "Island", random, 50) + 25;
-                addLandMass(25, s, -1, -1,
-                            preferredDistanceToEdge, random);
+                addLandMass(25, s, -1, -1, distanceToEdge, random);
             }
             break;
         }
@@ -219,34 +244,32 @@ public class LandMap {
     /**
      * Create the standard FreeCol land map.
      *
-     * @param preferredDistanceToEdge The nominal edge clearance.
-     * @param minimumNumberOfTiles Lower bound for the tiles to create.
+     * @param distanceToEdge The nominal edge clearance.
+     * @param minNumberOfTiles Lower bound for the tiles to create.
      * @param random A pseudo-random number source.
      */
-    private void createClassicLandMap(int preferredDistanceToEdge,
-                                      int minimumNumberOfTiles,
+    private void createClassicLandMap(int distanceToEdge, int minNumberOfTiles,
                                       Random random) {
+        final int edg = distanceToEdge * 2;
+        final int wid = getWidth() - edg * 2;
+        final int hgt = getHeight() - edg * 2;
         int x, y;
-        while (numberOfLandTiles < minimumNumberOfTiles) {
+        while (this.numberOfLandTiles < minNumberOfTiles) {
             int failCounter = 0;
             do {
-                x = (randomInt(logger, "ClassicW", random,
-                               width - preferredDistanceToEdge * 4))
-                    + preferredDistanceToEdge * 2;
-                y = (randomInt(logger, "ClassicH", random,
-                               height - preferredDistanceToEdge * 4))
-                    + preferredDistanceToEdge * 2;
+                x = edg + randomInt(logger, "ClassicW", random, wid);
+                y = edg + randomInt(logger, "ClassicH", random, hgt);
                 failCounter++;
                 // If landmass% is set too high, this loop may fail to
                 // find a free tile.  Decrease necessary minimum over
                 // time, so that this process will eventually succeed.
                 if (failCounter > 100) {
                     failCounter = 0;
-                    minimumNumberOfTiles--;
+                    minNumberOfTiles--;
                     break;
                 }
-            } while (map[x][y]);
-            setLand(x, y, preferredDistanceToEdge, random);
+            } while (isLand(x, y));
+            setLand(x, y, distanceToEdge, random);
         }
         addPolarRegions();
     }
@@ -258,20 +281,10 @@ public class LandMap {
      * FIXME: Make POLAR_HEIGHT an option.
      */
     private void addPolarRegions() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < Map.POLAR_HEIGHT; y++) {
-                if (!map[x][y]) {
-                    map[x][y] = true;
-                    numberOfLandTiles++;
-                }
-            }
-            int limit = height - 1 - Map.POLAR_HEIGHT;
-            for (int y = limit; y < height; y++) {
-                if (!map[x][y]) {
-                    map[x][y] = true;
-                    numberOfLandTiles++;
-                }
-            }
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < Map.POLAR_HEIGHT; y++) setLand(x, y);
+            int limit = this.height - 1 - Map.POLAR_HEIGHT;
+            for (int y = limit; y < this.height; y++) setLand(x, y);
         }
     }
 
@@ -279,27 +292,30 @@ public class LandMap {
      * Remove any 1x1 islands on the map.
      */
     private void cleanMap() {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (isSingleTile(x, y)) map[x][y] = false;
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                if (!hasAdjacentLand(x, y)) this.map[x][y] = false;
             }
         }
     }
 
     /**
      * Do the given coordinates correspond to a location in the land map
-     * with no adjoining land?
+     * with adjacent land?
+     *
+     * Note: does not check the tile at the coordinates itself.
      *
      * @param x The x coordinate to check.
      * @param y The y coordinate to check.
-     * @return Does this tile have no adjoining land.
+     * @return True if this tile has adjacent land.
      */
-    private boolean isSingleTile(int x, int y) {
+    private boolean hasAdjacentLand(int x, int y) {
         final Position p = new Position(x, y);
-        return none(Direction.values(), d -> {
-                Position n = new Position(p, d);
-                return n.isValid(width, height) && map[n.getX()][n.getY()];
-            });
+        final Predicate<Direction> landPred = d -> {
+            Position n = new Position(p, d);
+            return isLand(n.getX(), n.getY());
+        };
+        return any(Direction.values(), landPred);
     }
 
     /**
@@ -307,50 +323,19 @@ public class LandMap {
      * valid land positions.
      *
      * @param position The central <code>Position</code> to work from.
-     * @param preferredDistanceToEdge The preferred distance to the map edge.
+     * @param distanceToEdge The preferred distance to the map edge.
      * @return A list of suitable <code>Position</code>s.
      */
     private List<Position> newPositions(Position position,
-                                        int preferredDistanceToEdge) {
-        final Predicate<Position> pred = p ->
-            p.isValid(width, height)
-                && isSingleTile(p.getX(), p.getY())
-                && p.getX() > preferredDistanceToEdge
-                && p.getX() < width - preferredDistanceToEdge;
-        final Function<Direction, Position> mapper = d ->
+                                        int distanceToEdge) {
+        final Predicate<Position> landPred = p ->
+            (p.isValid(getWidth(), getHeight())
+                && !hasAdjacentLand(p.getX(), p.getY())
+                && p.getX() > distanceToEdge
+                && p.getX() < getWidth() - distanceToEdge);
+        final Function<Direction, Position> positionMapper = d ->
             new Position(position, d);
-        return transform(map(Direction.longSides, mapper), pred);
-    }
-
-    /**
-     * Sets a given map position to land.
-     *
-     * Calls #growLand(int,int) for all valid adjacent map positions,
-     * which may recursively call setLand for these.
-     *
-     * @param x The x coordinate of the new land.
-     * @param y The y coordinate of the new land.
-     * @param preferredDistanceToEdge The preferred distance to the map edge.
-     * @param random A pseudo random number source.
-     * @return The number of tiles set to land.
-     */
-    private int setLand(int x, int y, int preferredDistanceToEdge,
-                        Random random) {
-        if (map[x][y]) return 0;
-
-        int ret = 1;
-        map[x][y] = true;
-        numberOfLandTiles++;
-
-        Position p = new Position(x, y);
-        for (Direction direction : Direction.longSides) {
-            Position n = new Position(p, direction);
-            if (n.isValid(width, height)) {
-                ret += growLand(n.getX(), n.getY(), preferredDistanceToEdge,
-                                random);
-            }
-        }
-        return ret;
+        return transform(map(Direction.longSides, positionMapper), landPred);
     }
 
     /**
@@ -363,31 +348,31 @@ public class LandMap {
      *
      * @param x The x coordinate to grow land at.
      * @param y The y coordinate to grow land at.
-     * @param preferredDistanceToEdge The preferred distance to the map edge.
+     * @param distanceToEdge The preferred distance to the map edge.
      * @param random A pseudo random number source.
-     * @return The number of tiles set to land.
      */
-    private int growLand(int x, int y, int preferredDistanceToEdge,
-                         Random random) {
-        if (map[x][y]) return 0; // Already land
+    private void growLand(int x, int y, int distanceToEdge, Random random) {
+        if (isLand(x, y)) return; // Already land
 
         // Generate a comparison value:
         // Only if the number of adjacent land tiles is bigger than this value,
         // this tile will be set to land.
         // This value is part random, part based on position, that is:
         // -1 in the center of the map, and growing to
-        // preferredDistanceToEdge (*2 for pole ends) at the maps edges.
+        // distanceToEdge (*2 for pole ends) at the maps edges.
         int r = randomInt(logger, "Grow", random, 8)
             + Math.max(-1,
-                (1 + Math.max(preferredDistanceToEdge - Math.min(x, width-x),
-                    2 * preferredDistanceToEdge - Math.min(y, height-y))));
+                (1 + Math.max(distanceToEdge - Math.min(x, getWidth()-x),
+                    2 * distanceToEdge - Math.min(y, getHeight()-y))));
 
-        Position p = new Position(x, y);
-        int sum = count(Direction.values(), d -> {
-                Position n = new Position(p, d);
-                return n.isValid(width, height) && map[n.getX()][n.getY()];
-            });
-        return (sum > r) ? setLand(x, y, preferredDistanceToEdge, random) : 0;
+        final Position p = new Position(x, y);
+        final Predicate<Direction> landPred = d -> {
+            Position n = new Position(p, d);
+            return isLand(n.getX(), n.getY());
+        };
+        if (count(Direction.values(), landPred) > r) {
+            setLand(x, y, distanceToEdge, random);
+        }
     }
 
     /**
@@ -399,25 +384,23 @@ public class LandMap {
      * @param maxSize Maximum number of tiles in the land mass.
      * @param x Optional starting x coordinate (chosen randomly if negative).
      * @param y Optional starting y coordinate (chosen randomly if negative).
-     * @param preferredDistanceToEdge The preferred distance to the map edge.
+     * @param distanceToEdge The preferred distance to the map edge.
      * @param random A pseudo random number source.
      * @return The number of tiles added.
      */
     private int addLandMass(int minSize, int maxSize, int x, int y,
-                            int preferredDistanceToEdge, Random random) {
+                            int distanceToEdge, Random random) {
         int size = 0;
-        boolean[][] newLand = new boolean[width][height];
+        boolean[][] newLand = new boolean[getWidth()][getHeight()];
 
         // Pick a starting position that is sea without neighbouring land.
         if (x < 0 || y < 0) {
+            final int wid = getWidth() - distanceToEdge * 2;
+            final int hgt = getHeight() - distanceToEdge * 2;
             do {
-                x = randomInt(logger, "LandW", random, 
-                              width - preferredDistanceToEdge * 2)
-                    + preferredDistanceToEdge;
-                y = randomInt(logger, "LandH", random,
-                              height - preferredDistanceToEdge * 2)
-                    + preferredDistanceToEdge;
-            } while (map[x][y] || !isSingleTile(x, y));
+                x = distanceToEdge + randomInt(logger, "LandW", random, wid);
+                y = distanceToEdge + randomInt(logger, "LandH", random, hgt);
+            } while (isLand(x, y) || hasAdjacentLand(x, y));
         }
 
         newLand[x][y] = true;
@@ -425,7 +408,7 @@ public class LandMap {
 
         // Add all valid neighbour positions to list
         Position p = new Position(x, y);
-        List<Position> l = newPositions(p, preferredDistanceToEdge);
+        List<Position> l = newPositions(p, distanceToEdge);
 
         // Get a random position from the list,
         // set it to land,
@@ -439,18 +422,15 @@ public class LandMap {
             if (!newLand[p.getX()][p.getY()]) {
                 newLand[p.getX()][p.getY()] = true;
                 size++;
-                l.addAll(newPositions(p, preferredDistanceToEdge));
+                l.addAll(newPositions(p, distanceToEdge));
             }
         }
 
         // Add generated land to map if sufficiently large
         if (size >= minSize) {
-            for (x = 0; x < width; x++) {
-                for (y = 0; y < height; y++) {
-                    if (newLand[x][y] == true) {
-                        map[x][y] = true;
-                        numberOfLandTiles++;
-                    }
+            for (x = 0; x < this.width; x++) {
+                for (y = 0; y < this.height; y++) {
+                    if (newLand[x][y]) setLand(x, y);
                 }
             }
         }
