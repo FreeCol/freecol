@@ -523,7 +523,7 @@ public class Game extends FreeColGameObject {
      *     not found.
      */
     public Player getPlayerByNationId(String nationId) {
-        return find(players, p -> p.getNationId().equals(nationId));
+        return find(players, matchKeyEquals(nationId, Player::getNationId));
     }
 
     /**
@@ -621,7 +621,7 @@ public class Game extends FreeColGameObject {
      * @return The <code>Player</code> or null if none found.
      */
     public Player getPlayerByName(String name) {
-        return find(players, p -> p.getName().equals(name));
+        return find(players, matchKeyEquals(name, Player::getName));
     }
 
     /**
@@ -799,7 +799,7 @@ public class Game extends FreeColGameObject {
     public Nation getVacantNation() {
         Entry<Nation,NationState> entry
             = find(nationOptions.getNations().entrySet(),
-                   e -> e.getValue() == NationState.AVAILABLE);
+                   matchKey(NationState.AVAILABLE, Entry::getValue));
         return (entry == null) ? null : entry.getKey();
     }
 
@@ -810,7 +810,7 @@ public class Game extends FreeColGameObject {
      */
     public final List<Nation> getVacantNations() {
         return transform(nationOptions.getNations().entrySet(),
-                         e -> e.getValue() == NationState.AVAILABLE,
+                         matchKey(NationState.AVAILABLE, Entry::getValue),
                          Entry::getKey);
     }
 
@@ -1006,7 +1006,7 @@ public class Game extends FreeColGameObject {
     public Settlement getSettlementByName(String name) {
         return find(flatten(getLivePlayers(null),
                             p -> p.getSettlements().stream()),
-                    s -> name.equals(s.getName()));
+                    matchKeyEquals(name, Settlement::getName));
     }
 
     /**

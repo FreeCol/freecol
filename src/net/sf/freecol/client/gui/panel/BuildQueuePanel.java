@@ -165,7 +165,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
              */
             @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
-                return any(supportedFlavors, f -> f.equals(flavor));
+                return any(supportedFlavors, matchKeyEquals(flavor));
             }
         }
 
@@ -337,7 +337,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
             return flavors != null
-                && any(flavors, f -> f.equals(BUILD_LIST_FLAVOR));
+                && any(flavors, matchKeyEquals(BUILD_LIST_FLAVOR));
         }
 
         /**

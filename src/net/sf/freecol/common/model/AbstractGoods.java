@@ -205,7 +205,11 @@ public class AbstractGoods extends FreeColObject implements Named {
             : market.getSalePrice(getType(), getAmount());
     }
 
-    /** A predicate maker to match by type. */
+    /**
+     * A predicate maker to match by type.
+     *
+     * @return A suitable <code>Predicate</code>.
+     */
     public static final Predicate<? super AbstractGoods> matches(final GoodsType key) {
         return matchKey(key, AbstractGoods::getType);
     }

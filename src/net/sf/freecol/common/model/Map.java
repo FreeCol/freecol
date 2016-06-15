@@ -203,7 +203,7 @@ public class Map extends FreeColGameObject implements Location {
          */
         public Direction getDirection(Position other) {
             return find(Direction.values(),
-                        d -> new Position(this, d).equals(other), null);
+                        matchKeyEquals(other, d -> new Position(this, d)));
         }
 
         // Override Object
@@ -495,11 +495,12 @@ public class Map extends FreeColGameObject implements Location {
      * Gets a <code>Region</code> by name key.
      *
      * @param key The name key to lookup the region with.
-     * @return The region with the given name key, or null if not found.
+     * @return The <code>Region</code> with the given name key, or
+     *     null if none found.
      */
     public Region getRegionByKey(final String key) {
         return (key == null) ? null
-            : find(getRegions(), r -> key.equals(r.getKey()));
+            : find(getRegions(), matchKeyEquals(key, Region::getKey));
     }
 
     /**
@@ -511,7 +512,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Region getRegionByName(final String name) {
         return (name == null) ? null
-            : find(getRegions(), r -> name.equals(r.getName()));
+            : find(getRegions(), matchKeyEquals(name, Region::getName));
     }
 
     /**

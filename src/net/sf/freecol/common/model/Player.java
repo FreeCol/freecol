@@ -1543,10 +1543,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public java.util.Map<String, Turn> getElectionTurns() {
         return transform(getHistory(),
-                         e -> e.getEventType() == HistoryEvent.HistoryEventType.FOUNDING_FATHER,
+                         matchKey(HistoryEvent.HistoryEventType.FOUNDING_FATHER,
+                                  HistoryEvent::getEventType),
                          Function.identity(),
-                         Collectors.toMap(e -> e.getReplacement("%father%").getId(),
-                                          e -> e.getTurn()));
+                         Collectors.toMap(he -> he.getReplacement("%father%").getId(),
+                                          HistoryEvent::getTurn));
     }
 
     /**
@@ -1975,7 +1976,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Unit getUnitByName(String name) {
         synchronized (this.units) {
-            return find(this.units, u -> name.equals(u.getName()));
+            return find(this.units, matchKeyEquals(name, Unit::getName));
         }
     }
 
@@ -2055,7 +2056,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player owns at least one of the specified unit type.
      */
     public boolean hasUnitType(String typeId) {
-        return any(getUnitList(), u -> typeId.equals(u.getType().getId()));
+        return any(getUnitList(),
+                   matchKeyEquals(typeId, u -> u.getType().getId()));
     }
 
     /**
@@ -2369,7 +2371,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     not found.
      */
     public Colony getColonyByName(String name) {
-        return find(getColonies(), c -> c.getName().equals(name));
+        return find(getColonies(), matchKeyEquals(name, Colony::getName));
     }
 
     /**
@@ -2380,7 +2382,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *     or null if not found.
      */
     public IndianSettlement getIndianSettlementByName(String name) {
-        return find(getIndianSettlements(), is -> is.getName().equals(name));
+        return find(getIndianSettlements(),
+                    matchKeyEquals(name, IndianSettlement::getName));
     }
 
     /**

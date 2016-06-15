@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -464,6 +465,24 @@ public class Messages {
         return new String[] { name, desc };
     }
 
+    /**
+     * A predicate maker to match by message name.
+     *
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static final Predicate<String> matchesName(String key) {
+        return matchKeyEquals(key, (String k) -> Messages.getName(k));
+    }
+
+    /**
+     * A predicate maker to match named types.
+     *
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static final Predicate<Named> matchesNamed(String key) {
+        return matchKeyEquals(key, (Named k) -> Messages.getName(k));
+    }
+    
 
     // Special purpose unit labelling
 

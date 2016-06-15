@@ -1003,6 +1003,19 @@ public class CollectionUtils {
     }
 
     /**
+     * Create a predicate for a type that returns true if it equals a key
+     * in the sense of "equals".
+     *
+     * @param <T> The input type.
+     * @param <K> The key type.
+     * @param key The key to match.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T, K> Predicate<T> matchKeyEquals(final K key) {
+        return t -> Utils.equals(t, key);
+    }
+
+    /**
      * Create a predicate for a type that returns true if a mapper applied
      * to it causes it to equal a key.
      *
@@ -1015,6 +1028,21 @@ public class CollectionUtils {
     public static <T, K> Predicate<T> matchKey(final K key,
                                                Function<T, K> mapper) {
         return t -> mapper.apply(t) == key;
+    }
+
+    /**
+     * Create a predicate for a type that returns true if a mapper applied
+     * to it causes it to equal a key.
+     *
+     * @param <T> The input type.
+     * @param <K> The key type.
+     * @param key The key to match.
+     * @param mapper The mapper <code>Function</code> to apply.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T, K> Predicate<T> matchKeyEquals(final K key,
+                                                     Function<T, K> mapper) {
+        return t -> Utils.equals(mapper.apply(t), key);
     }
 
     /**

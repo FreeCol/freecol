@@ -955,14 +955,13 @@ public final class FreeCol {
      *
      * Called from NewPanel when a selection is made.
      *
-     * @param advantages The name of the new advantages type.
+     * @param as The name of the new advantages type.
      * @return The type of advantages set, or null if none.
      */
-    private static Advantages selectAdvantages(String advantages) {
-        Advantages adv = find(Advantages.values(),
-                              a -> Messages.getName(a).equals(advantages), null);
-        if (adv != null) setAdvantages(adv);
-        return adv;
+    private static Advantages selectAdvantages(String as) {
+        Advantages a = find(Advantages.values(), Messages.matchesNamed(as));
+        if (a != null) setAdvantages(a);
+        return a;
     }
 
     /**
@@ -1000,8 +999,9 @@ public final class FreeCol {
      * @return The name of the selected difficulty, or null if none.
      */
     public static String selectDifficulty(String arg) {
-        String difficulty = find(map(DIFFICULTIES, d -> "model.difficulty."+d),
-                                     k -> Messages.getName(k).equals(arg));
+        String difficulty
+            = find(map(DIFFICULTIES, d -> "model.difficulty." + d),
+                   Messages.matchesName(arg));
         if (difficulty != null) setDifficulty(difficulty);
         return difficulty;
     }

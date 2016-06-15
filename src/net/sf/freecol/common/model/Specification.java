@@ -1594,7 +1594,8 @@ public final class Specification {
      *     if any.
      */
     public OptionGroup getDifficultyOptionGroup(String id) {
-        return find(getDifficultyLevels(), og -> og.getId().equals(id));
+        return find(getDifficultyLevels(),
+                    matchKeyEquals(id, FreeColObject::getId));
     }
 
     /**

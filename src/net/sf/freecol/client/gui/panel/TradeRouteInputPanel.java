@@ -227,7 +227,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            return any(flavors, f -> f.equals(DefaultTransferHandler.flavor));
+            return any(flavors, matchKeyEquals(DefaultTransferHandler.flavor));
         }
     }
 
@@ -342,7 +342,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            return any(flavors, f -> f.equals(STOP_FLAVOR));
+            return any(flavors, matchKeyEquals(STOP_FLAVOR));
         }
 
         /**

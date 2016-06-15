@@ -280,7 +280,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
         return (comp instanceof JPanel || comp instanceof JLabel)
-            && any(flavor, f -> f.equals(DefaultTransferHandler.flavor));
+            && any(flavor, matchKeyEquals(DefaultTransferHandler.flavor));
     }
 
     /**

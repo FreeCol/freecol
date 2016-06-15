@@ -131,7 +131,8 @@ public abstract class NationType extends FreeColSpecObjectType {
      * @return The settlement type.
      */
     public SettlementType getSettlementType(boolean isCapital) {
-        return find(getSettlementTypes(), s -> s.isCapital() == isCapital);
+        return find(getSettlementTypes(),
+                    matchKey(isCapital, SettlementType::isCapital));
     }
 
     /**
@@ -141,7 +142,8 @@ public abstract class NationType extends FreeColSpecObjectType {
      * @return The settlement type.
      */
     public SettlementType getSettlementType(String id) {
-        return find(getSettlementTypes(), s -> id.equals(s.getId()));
+        return find(getSettlementTypes(),
+                    matchKeyEquals(id, FreeColObject::getId));
     }
 
     /**
