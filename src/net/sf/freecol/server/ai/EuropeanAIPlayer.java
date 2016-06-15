@@ -831,11 +831,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The tile with the best plan for a colony, or null if none found.
      */
     public Tile getBestPlanTile(Colony colony) {
-        final Comparator<TileImprovementPlan> comp
+        final Comparator<TileImprovementPlan> valueComp
             = Comparator.comparingInt(TileImprovementPlan::getValue);
+        final Function<Tile, TileImprovementPlan> tileMapper = t ->
+            tipMap.get(t);
         TileImprovementPlan best
-            = maximize(map(colony.getOwnedTiles(), t -> tipMap.get(t)),
-                       tip -> tip != null, comp);
+            = maximize(map(colony.getOwnedTiles(), tileMapper),
+                       notNull(), valueComp);
         return (best == null) ? null : best.getTarget();
     }
 

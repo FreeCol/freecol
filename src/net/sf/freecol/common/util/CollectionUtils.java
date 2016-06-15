@@ -1431,6 +1431,17 @@ public class CollectionUtils {
     }
 
     /**
+     * Create a predicate for a type that returns true if the argument is
+     * not null.
+     *
+     * @param <T> The input type.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T> Predicate<T> notNull() {
+        return (T t) -> t != null;
+    }
+
+    /**
      * Take the product of an array.
      *
      * @param <T> The array member type.

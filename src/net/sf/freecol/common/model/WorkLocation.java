@@ -531,7 +531,7 @@ public abstract class WorkLocation extends UnitLocation
      * Gets the unit type that is the expert for this work location
      * using its first output for which an expert type can be found.
      *
-     * @return The expert <code>UnitType</code>.
+     * @return The expert <code>UnitType</code> or null if none found.
      */
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
@@ -539,7 +539,7 @@ public abstract class WorkLocation extends UnitLocation
         return (pt == null) ? null
             : find(map(pt.getOutputs(),
                        ag -> spec.getExpertForProducing(ag.getType())),
-                   ut -> ut != null);
+                   notNull());
     }
 
     /**
