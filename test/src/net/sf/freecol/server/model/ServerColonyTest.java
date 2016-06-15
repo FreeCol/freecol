@@ -319,7 +319,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Unit statesman = colony.getUnitList().get(0);
         townHall.setWorkFor(statesman);
         assertEquals(bellsType, statesman.getWorkType());
-
+        
         ServerBuilding church
             = (ServerBuilding)colony.getBuilding(chapelType);
         church.upgrade();
@@ -327,23 +327,31 @@ public class ServerColonyTest extends FreeColTestCase {
         church.setWorkFor(preacher);
         assertEquals(crossesType, preacher.getWorkType());
 
-        assertEquals(0, colony.getGoodsCount(bellsType));
-        ServerTestHelper.newTurn();
-
-        int bells = 3;
         assertEquals(population, colony.getUnitCount());
-        assertEquals(bells, colony.getNetProductionOf(bellsType));
-        assertEquals(bells, colony.getGoodsCount(bellsType));
+        assertEquals(1, townHall.getUnitCount());
+        assertEquals(1, church.getUnitCount());
+
+        int bells0 = 3;
+        assertEquals(0, colony.getGoodsCount(bellsType));
+        assertEquals(bells0, colony.getNetProductionOf(bellsType));
+        assertEquals(0, colony.getLiberty());
+
+        ServerTestHelper.newTurn();
+        assertEquals(bells0, colony.getGoodsCount(bellsType));
+        assertEquals(bells0, colony.getNetProductionOf(bellsType));
+        assertEquals(bells0, colony.getLiberty());
 
         colony.addGoods(bellsType, 7);
-        bells += 7;
-        assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
+        int bells1 = bells0 + 7;
+        assertEquals(bells1, colony.getGoodsCount(bellsType));
+        assertEquals(bells0, colony.getNetProductionOf(bellsType));
+        assertEquals(bells1, colony.getLiberty());
 
         colony.removeGoods(bellsType, 5);
-        bells -= 5;
-        assertEquals(bells, colony.getGoodsCount(bellsType));
-        assertEquals(bells, colony.getLiberty());
+        int bells2 = bells1 - 5;
+        assertEquals(bells2, colony.getGoodsCount(bellsType));
+        assertEquals(bells0, colony.getNetProductionOf(bellsType));
+        assertEquals(bells2, colony.getLiberty());
 
         int crosses = colony.getTotalProductionOf(crossesType)
             - colony.getConsumptionOf(crossesType);

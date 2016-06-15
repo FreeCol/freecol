@@ -233,7 +233,7 @@ public class BuildingDetailPanel
         }
 
         List<JComponent> labels = new ArrayList<>();
-        for (Modifier productionBonus : buildingType.getModifiers()) {
+        for (Modifier productionBonus : iterable(buildingType.getModifiers())) {
             JComponent component = getModifierComponent(productionBonus);
             if (component instanceof JButton) {
                 labels.add(0, component);

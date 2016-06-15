@@ -523,13 +523,13 @@ public class Building extends WorkLocation
 
         return (unitType == null)
             // With no unit, only the building-specific bonuses 
-            ? concat(colony.getModifiers(id, type, turn).stream(),
-                     owner.getModifiers(id, type, turn).stream())
+            ? concat(colony.getModifiers(id, type, turn),
+                     owner.getModifiers(id, type, turn))
             // With a unit, also the unit specific bonuses
-            : concat(this.getModifiers(id, unitType, turn).stream(),
+            : concat(this.getModifiers(id, unitType, turn),
                      colony.getProductionModifiers(goodsType),
-                     unitType.getModifiers(id, goodsType, turn).stream(),
-                     owner.getModifiers(id, unitType, turn).stream());
+                     unitType.getModifiers(id, goodsType, turn),
+                     owner.getModifiers(id, unitType, turn));
     }
 
     /**
@@ -588,8 +588,8 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
-                                      Turn turn) {
+    public Stream<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
+                                         Turn turn) {
         // Buildings have no modifiers independent of type
         return getType().getModifiers(id, fcgot, turn);
     }

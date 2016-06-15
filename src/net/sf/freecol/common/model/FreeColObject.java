@@ -530,7 +530,7 @@ public abstract class FreeColObject
      */
     public boolean hasModifier(String id, FreeColSpecObjectType fcgot,
                                Turn turn) {
-        return !getModifiers(id, fcgot, turn).isEmpty();
+        return first(getModifiers(id, fcgot, turn)) != null;
     }
 
     /**
@@ -540,8 +540,7 @@ public abstract class FreeColObject
      * @return True if the key is present.
      */
     public final boolean containsModifierKey(String key) {
-        Set<Modifier> set = getModifiers(key);
-        return (set == null) ? false : !set.isEmpty();
+        return first(getModifiers(key)) != null;
     }
 
     /**
@@ -558,7 +557,7 @@ public abstract class FreeColObject
      *
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifiers() {
+    public final Stream<Modifier> getModifiers() {
         return getModifiers(null);
     }
 
@@ -568,7 +567,7 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifiers(String id) {
+    public final Stream<Modifier> getModifiers(String id) {
         return getModifiers(id, null);
     }
 
@@ -580,8 +579,8 @@ public abstract class FreeColObject
      *     modifier applies to.
      * @return A set of modifiers.
      */
-    public final Set<Modifier> getModifiers(String id,
-                                            FreeColSpecObjectType fcgot) {
+    public final Stream<Modifier> getModifiers(String id,
+                                               FreeColSpecObjectType fcgot) {
         return getModifiers(id, fcgot, null);
     }
 
@@ -597,11 +596,11 @@ public abstract class FreeColObject
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifiers(String id,
-                                      FreeColSpecObjectType fcgot,
-                                      Turn turn) {
+    public Stream<Modifier> getModifiers(String id,
+                                         FreeColSpecObjectType fcgot,
+                                         Turn turn) {
         FeatureContainer fc = getFeatureContainer();
-        return (fc == null) ? Collections.<Modifier>emptySet()
+        return (fc == null) ? Stream.<Modifier>empty()
             : fc.getModifiers(id, fcgot, turn);
     }
 
@@ -718,10 +717,10 @@ public abstract class FreeColObject
     /**
      * Get the defence modifiers applicable to this object.
      *
-     * @return A set of defence <code>Modifier</code>s.
+     * @return A list of defence <code>Modifier</code>s.
      */
-    public Set<Modifier> getDefenceModifiers() {
-        return getModifiers(Modifier.DEFENCE);
+    public List<Modifier> getDefenceModifiers() {
+        return toList(getModifiers(Modifier.DEFENCE));
     }
 
 

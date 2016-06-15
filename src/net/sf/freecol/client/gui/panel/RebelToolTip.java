@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
@@ -38,6 +39,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -79,8 +81,6 @@ public class RebelToolTip extends JToolTip {
 
         add(new JLabel(colony.getTory() + "%"));
 
-        Set<Modifier> modifiers = colony.getOwner()
-            .getModifiers(Modifier.LIBERTY);
         int libertyProduction = 0;
         for (GoodsType goodsType : spec.getLibertyGoodsTypeList()) {
             add(new JLabel(Messages.getName(goodsType)));
@@ -90,9 +90,11 @@ public class RebelToolTip extends JToolTip {
                                     new AbstractGoods(goodsType, production)),
                 "span 2");
         }
+        Stream<Modifier> modifiers = colony.getOwner()
+            .getModifiers(Modifier.LIBERTY);
         libertyProduction = (int)FeatureContainer
             .applyModifiers((float)libertyProduction, turn, modifiers);
-        for (Modifier m : modifiers) {
+        for (Modifier m : iterable(modifiers)) {
             JLabel[] labels = ModifierFormat.getModifierLabels(m, null, turn);
             for (JLabel j : labels) add(j);
         }

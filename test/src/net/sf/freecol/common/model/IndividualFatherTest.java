@@ -116,9 +116,8 @@ public class IndividualFatherTest extends FreeColTestCase {
                      colony.getSoL());
 
         // Is the modifier present
-        Set<Modifier> modifierSet = player.getModifiers(Modifier.SOL);
-        assertEquals(1, modifierSet.size());
-        Modifier bolivarModifier = modifierSet.iterator().next();
+        Modifier bolivarModifier = first(player.getModifiers(Modifier.SOL));
+        assertNotNull(bolivarModifier);
         assertEquals(simonBolivar, bolivarModifier.getSource());
 
         // Check that SoL stops at 100%
@@ -252,11 +251,9 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        Set<Modifier> jeffersonModifiers
-            = thomasJefferson.getModifiers("model.goods.bells");
-        assertEquals(1, jeffersonModifiers.size());
-        Modifier modifier = jeffersonModifiers.iterator().next();
-        assertTrue(modifier.appliesTo(townHallType));
+        Modifier jeffersonModifier = first(thomasJefferson.getModifiers("model.goods.bells"));
+        assertNotNull(jeffersonModifier);
+        assertTrue(jeffersonModifier.appliesTo(townHallType));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -348,10 +345,10 @@ public class IndividualFatherTest extends FreeColTestCase {
         player.recalculateBellsBonus();
 
         assertTrue(player.hasAbility(Ability.ADD_TAX_TO_BELLS));
-        Set<Modifier> modifierSet = player.getModifiers("model.goods.bells");
-        assertEquals(1, modifierSet.size());
+        List<Modifier> modifiers = toList(player.getModifiers("model.goods.bells"));
+        assertEquals(1, count(modifiers));
 
-        Modifier paineModifier = modifierSet.iterator().next();
+        Modifier paineModifier = first(modifiers);
         assertEquals(thomasPaine, paineModifier.getSource());
         assertEquals(player.getTax(), (int) paineModifier.getValue());
 

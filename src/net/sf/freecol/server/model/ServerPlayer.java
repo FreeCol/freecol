@@ -1576,7 +1576,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
                 for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
-                    for (Modifier modifier : effect.getObject().getModifiers()) {
+                    for (Modifier modifier : iterable(effect.getObject().getModifiers())) {
                         cs.addFeatureChange(this, this, modifier, false);
                     }
                 }
@@ -1685,7 +1685,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 outer:  for (Effect effect : effects) {
             mm = null;
             if (colony == null) {
-                for (Modifier modifier : effect.getModifiers()) {
+                for (Modifier modifier : iterable(effect.getModifiers())) {
                     if (modifier.getDuration() > 0) {
                         Modifier timedModifier = Modifier
                             .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -1782,7 +1782,7 @@ outer:  for (Effect effect : effects) {
                     default:
                         mm = new ModelMessage(MessageType.DEFAULT,
                                               effect.getId(), colony);
-                        for (Modifier modifier : effect.getModifiers()) {
+                        for (Modifier modifier : iterable(effect.getModifiers())) {
                             if (modifier.getDuration() > 0) {
                                 Modifier timedModifier = Modifier
                                     .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
@@ -2128,7 +2128,7 @@ outer:  for (Effect effect : effects) {
         }
 
         // Some modifiers are special
-        for (Modifier m : father.getModifiers()) {
+        for (Modifier m : iterable(father.getModifiers())) {
             if (Modifier.LINE_OF_SIGHT_BONUS.equals(m.getId())) {
                 // Check for tiles that are now visible.  They need to be
                 // explored, and always updated so that units are visible.

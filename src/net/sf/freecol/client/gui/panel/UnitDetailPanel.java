@@ -183,7 +183,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         }
 
         List<Modifier> bonusList = toList(flatten(spec.getGoodsTypeList(),
-                gt -> type.getModifiers(gt.getId()).stream()));
+                gt -> type.getModifiers(gt.getId())));
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
             StringTemplate template = StringTemplate

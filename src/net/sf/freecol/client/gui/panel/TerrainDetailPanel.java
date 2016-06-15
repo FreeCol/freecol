@@ -102,9 +102,9 @@ public class TerrainDetailPanel
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = Messages.message("none");
-        Set<Modifier> defenceModifiers = tileType.getDefenceModifiers();
-        if (!defenceModifiers.isEmpty()) {
-            defenseBonus = ModifierFormat.getModifierAsString(defenceModifiers.iterator().next());
+        Modifier defenceModifier = first(tileType.getDefenceModifiers());
+        if (defenceModifier != null) {
+            defenseBonus = ModifierFormat.getModifierAsString(defenceModifier);
         }
 
         JLabel nameLabel = Utility.localizedHeaderLabel(tileType, FontLibrary.FontSize.SMALL);

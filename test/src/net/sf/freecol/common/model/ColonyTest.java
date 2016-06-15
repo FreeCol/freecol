@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Role;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -183,13 +184,8 @@ public class ColonyTest extends FreeColTestCase {
     }
 
     private int countParties(Colony colony) {
-        int modifierCount = 0;
-        for (Modifier existingModifier
-                 : colony.getModifiers("model.goods.bells")) {
-            if (Specification.COLONY_GOODS_PARTY_SOURCE
-                .equals(existingModifier.getSource())) modifierCount++;
-        }
-        return modifierCount;
+        return count(colony.getModifiers("model.goods.bells"),
+            m -> Specification.COLONY_GOODS_PARTY_SOURCE.equals(m.getSource()));
     }
 
     public void testTeaParty() {

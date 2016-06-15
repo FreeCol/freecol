@@ -232,29 +232,27 @@ public final class FeatureContainer {
      * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
+     * @return A stream of <code>Modifier</code>s.
      */
-    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
-                                      Turn turn) {
-        Set<Modifier> result = new HashSet<>();
-        if (modifiersPresent()) {
-            synchronized (modifiersLock) {
-                if (id == null) {
-                    for (Set<Modifier> mset : modifiers.values()) {
-                        result.addAll(mset);
-                    }
-                } else {
-                    Set<Modifier> mset = modifiers.get(id);
-                    if (mset != null) result.addAll(mset);
-                }
-            }
-            Iterator<Modifier> it = result.iterator();
-            while (it.hasNext()) {
-                Modifier m = it.next();
-                if (!m.appliesTo(fcgot, turn)) it.remove();
+    public Stream<Modifier> getModifiers(String id,
+                                         FreeColSpecObjectType fcgot,
+                                         Turn turn) {
+        if (!modifiersPresent()) return Stream.<Modifier>empty();
+        Set<Modifier> mset = new HashSet<>();
+        synchronized (modifiersLock) {
+            if (id == null) {
+                for (Set<Modifier> ms : modifiers.values()) mset.addAll(ms);
+            } else {
+                Set<Modifier> ms = modifiers.get(id);
+                if (ms != null) mset.addAll(ms);
             }
         }
-        return result;
+        Iterator<Modifier> it = mset.iterator();
+        while (it.hasNext()) {
+            Modifier m = it.next();
+            if (!m.appliesTo(fcgot, turn)) it.remove();
+        }
+        return (mset.isEmpty()) ? Stream.<Modifier>empty() : mset.stream();
     }
 
     /**
@@ -495,7 +493,7 @@ public final class FeatureContainer {
             }
         }
 
-        for (Modifier modifier : getModifiers(null, null, null)) {
+        for (Modifier modifier : iterable(getModifiers(null, null, null))) {
             if (oldSource == null || modifier.getSource() == oldSource) {
                 removeModifier(modifier);
                 Modifier newModifier = new Modifier(modifier);
@@ -520,12 +518,12 @@ public final class FeatureContainer {
             }
             sb.append(']');
         }
-        Set<Modifier> modifiers = getModifiers(null, null, null);
-        if (!modifiers.isEmpty()) {
-            sb.append(" [modifiers");
-            for (Modifier modifier : getModifiers(null, null, null)) {
-                sb.append(' ').append(modifier);
-            }
+        int siz = sb.length();
+        for (Modifier modifier : iterable(getModifiers(null, null, null))) {
+            sb.append(' ').append(modifier);
+        }
+        if (sb.length() > siz) {
+            sb.insert(siz, "[modifiers");
             sb.append(']');
         }
         sb.append(']');

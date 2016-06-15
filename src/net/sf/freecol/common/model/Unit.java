@@ -3142,15 +3142,12 @@ public class Unit extends GoodsLocation
      */
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
-        Set<Modifier> result = new HashSet<>();
-        result.addAll(this.getModifiers(Modifier.LINE_OF_SIGHT_BONUS,
-                                        unitType, turn));
-        if (hasTile() && getTile().isExplored()) {
-            result.addAll(getTile().getType()
-                .getModifiers(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn));
-        }
-        float base = unitType.getLineOfSight();
-        return (int)applyModifiers(base, turn, result);
+        return (int)applyModifiers(unitType.getLineOfSight(), turn,
+            Stream.concat(this.getModifiers(Modifier.LINE_OF_SIGHT_BONUS,
+                                            unitType, turn),
+                ((hasTile() && getTile().isExplored())
+                    ? getTile().getType().getModifiers(Modifier.LINE_OF_SIGHT_BONUS, unitType, turn)
+                    : Stream.<Modifier>empty())));
     }
 
     /**
@@ -3616,7 +3613,7 @@ public class Unit extends GoodsLocation
         Set<Modifier> result = new HashSet<>();
 
         // UnitType modifiers always apply
-        for (Modifier m : unitType.getModifiers(id, fcgot, turn)) {
+        for (Modifier m : iterable(unitType.getModifiers(id, fcgot, turn))) {
             switch (m.getType()) {
             case ADDITIVE:
                 m.setModifierIndex(Modifier.UNIT_ADDITIVE_COMBAT_INDEX);
@@ -3629,13 +3626,13 @@ public class Unit extends GoodsLocation
         }
 
         // The player's modifiers may not all apply
-        for (Modifier m : owner.getModifiers(id, fcgot, turn)) {
+        for (Modifier m : iterable(owner.getModifiers(id, fcgot, turn))) {
             m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
             result.add(m);
         }
         
         // Role modifiers apply
-        for (Modifier m : role.getModifiers(id, fcgot, turn)) {
+        for (Modifier m : iterable(role.getModifiers(id, fcgot, turn))) {
             m.setModifierIndex(Modifier.ROLE_COMBAT_INDEX);
             result.add(m);
         }
@@ -4177,22 +4174,17 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
-                                      Turn turn) {
+    public Stream<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
+                                         Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
-        Set<Modifier> result = new HashSet<>();
 
-        // UnitType modifiers always apply
-        result.addAll(unitType.getModifiers(id, fcgot, turn));
-
-        // The player's modifiers may not all apply
-        result.addAll(owner.getModifiers(id, fcgot, turn));
-        
-        // Role modifiers apply
-        result.addAll(role.getModifiers(id, fcgot, turn));
-
-        return result;
+        return concat(// UnitType modifiers always apply.
+                      unitType.getModifiers(id, fcgot, turn),
+                      // The player's modifiers apply.
+                      owner.getModifiers(id, fcgot, turn),
+                      // Role modifiers apply.
+                      role.getModifiers(id, fcgot, turn));
     }
 
 

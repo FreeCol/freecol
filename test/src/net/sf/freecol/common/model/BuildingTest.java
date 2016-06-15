@@ -561,34 +561,34 @@ public class BuildingTest extends FreeColTestCase {
         final Game game = getGame();
         final Turn turn = game.getTurn();
         game.setMap(getTestMap(true));
-        Set<Modifier> modifierSet;
+        List<Modifier> modifiers;
 
         Colony colony = getStandardColony(2);
-        modifierSet = colony.getModifiers(Modifier.DEFENCE);
-        assertEquals(1, modifierSet.size());
-        Modifier modifier = modifierSet.iterator().next();
+        modifiers = toList(colony.getModifiers(Modifier.DEFENCE));
+        assertEquals(1, modifiers.size());
+        Modifier modifier = first(modifiers);
         assertEquals(50f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
 
-        modifierSet = stockadeType.getModifiers(Modifier.DEFENCE);
-        assertEquals(1, modifierSet.size());
-        modifier = modifierSet.iterator().next();
+        modifiers = toList(stockadeType.getModifiers(Modifier.DEFENCE));
+        assertEquals(1, modifiers.size());
+        modifier = first(modifiers);
         assertEquals(100f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
-        modifierSet = fortType.getModifiers(Modifier.DEFENCE);
-        assertEquals(1, modifierSet.size());
-        modifier = modifierSet.iterator().next();
+        modifiers = toList(fortType.getModifiers(Modifier.DEFENCE));
+        assertEquals(1, modifiers.size());
+        modifier = first(modifiers);
         assertEquals(150f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifiers(0f, turn,
                 Modifier.MINIMUM_COLONY_SIZE));
 
-        modifierSet = fortressType.getModifiers(Modifier.DEFENCE);
-        assertEquals(1, modifierSet.size());
-        modifier = modifierSet.iterator().next();
+        modifiers = toList(fortressType.getModifiers(Modifier.DEFENCE));
+        assertEquals(1, modifiers.size());
+        modifier = first(modifiers);
         assertEquals(200f, modifier.getValue());
         assertEquals(ModifierType.PERCENTAGE, modifier.getType());
         assertEquals(0f, stockadeType.applyModifiers(0f, turn,
@@ -717,8 +717,8 @@ public class BuildingTest extends FreeColTestCase {
         Building building = colony.getBuilding(townHallType);
         for (Unit u : building.getUnitList()) u.setLocation(tile);
 
-        Set<Modifier> modifiers = colony.getModifiers("model.goods.bells");
-        assertTrue("No initial modifiers", modifiers.isEmpty());
+        assertEquals("No initial modifiers", 0,
+                     count(colony.getModifiers("model.goods.bells")));
         assertEquals("Initial bell production", 1,
                      building.getTotalProductionOf(bellsType));
 
@@ -733,29 +733,29 @@ public class BuildingTest extends FreeColTestCase {
         // Add Jefferson.
         FoundingFather jefferson = spec()
             .getFoundingFather("model.foundingFather.thomasJefferson");
-        modifiers = jefferson.getModifiers("model.goods.bells");
+        List<Modifier> modifiers = toList(jefferson.getModifiers("model.goods.bells"));
         assertEquals("Jefferson modifier size", 1, modifiers.size());
-        Modifier bellsModifier = modifiers.iterator().next();
+        Modifier bellsModifier = first(modifiers);
         owner.addFather(jefferson);
 
         // Jefferson is a property of the player...
         assertTrue("Jefferson should be present in player",
-            owner.getModifiers("model.goods.bells")
-                .contains(bellsModifier));
+            any(owner.getModifiers("model.goods.bells"),
+                m -> m == bellsModifier));
         assertTrue("Jefferson should be present in player in building scope",
-            owner.getModifiers("model.goods.bells", townHallType, turn)
-                .contains(bellsModifier));
+            any(owner.getModifiers("model.goods.bells", townHallType, turn),
+                m -> m ==  bellsModifier));
         assertFalse("Jefferson should not be present in player in unit scope",
-            owner.getModifiers("model.goods.bells", freeColonistType, turn)
-                .contains(bellsModifier));
+            any(owner.getModifiers("model.goods.bells", freeColonistType, turn),
+                m -> m == bellsModifier));
         // ...not the colony,
         assertFalse("Jefferson modifier should not be present in colony",
-            colony.getModifiers("model.goods.bells")
-                  .contains(bellsModifier));
+            any(colony.getModifiers("model.goods.bells"),
+                m -> m == bellsModifier));
         // ...and the building modifiers do not have it.
         assertFalse("Jefferson modifier should not be present in building modifiers",
-            building.getModifiers("model.goods.bells")
-                    .contains(bellsModifier));
+            any(building.getModifiers("model.goods.bells"),
+                m -> m == bellsModifier));
 
         // 3(colonist)
         assertEquals("Production(Colonist/Jefferson)", 3,
@@ -884,8 +884,8 @@ public class BuildingTest extends FreeColTestCase {
                             expected = 1;
                         }
                         if (expected != output.getAmount()) {
-                            assertFalse("ModifierSet should not be empty!",
-                                        type.getModifiers(outputType.getId()).isEmpty());
+                            assertTrue("Modifiers expected",
+                                count(type.getModifiers(outputType.getId())) > 0);
                         }
                         assertEquals("Wrong productivity for " + type
                             + " in " + building, expected, productivity);

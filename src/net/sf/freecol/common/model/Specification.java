@@ -902,11 +902,11 @@ public final class Specification {
      * Get all the Modifiers with the given identifier.
      *
      * @param id The object identifier to look for.
-     * @return A list of <code>Modifier</code>s.
+     * @return A stream of <code>Modifier</code>s.
      */
-    public List<Modifier> getModifiers(String id) {
+    public Stream<Modifier> getModifiers(String id) {
         List<Modifier> result = allModifiers.get(id);
-        return (result == null) ? Collections.<Modifier>emptyList() : result;
+        return (result == null) ? Stream.<Modifier>empty() : result.stream();
     }
 
 
@@ -1913,7 +1913,7 @@ public final class Specification {
                               "model.goods.crosses");
         for (Entry<String, String> e : fatherGoodsFixMap.entrySet()) {
             FoundingFather father = getFoundingFather(e.getKey());
-            for (Modifier m : father.getModifiers(e.getValue())) {
+            for (Modifier m : iterable(father.getModifiers(e.getValue()))) {
                 m.requireNegatedPersonScope();
             }
         }
@@ -1997,14 +1997,14 @@ public final class Specification {
 
         // Resource type modifiers had the wrong priority
         for (ResourceType rt : resourceTypeList) {
-            for (Modifier m : rt.getModifiers()) {
+            for (Modifier m : iterable(rt.getModifiers())) {
                 m.setModifierIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
             }
         }
 
         // Unit type indexes moved into the spec
         for (UnitType ut : unitTypeList) {
-            for (Modifier m : ut.getModifiers()) {
+            for (Modifier m : iterable(ut.getModifiers())) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
                 }
@@ -2013,7 +2013,7 @@ public final class Specification {
 
         // Father production modifiers have moved to the spec
         for (FoundingFather ff : foundingFathers) {
-            for (Modifier m : ff.getModifiers()) {
+            for (Modifier m : iterable(ff.getModifiers())) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
                 }
@@ -2022,7 +2022,7 @@ public final class Specification {
 
         // Tile improvement type modifier index has moved to the spec
         for (TileImprovementType ti : tileImprovementTypeList) {
-            for (Modifier m : ti.getModifiers()) {
+            for (Modifier m : iterable(ti.getModifiers())) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
                 }
@@ -2031,7 +2031,7 @@ public final class Specification {
 
         // Building type modifier indexes have moved to the spec
         for (BuildingType bt : buildingTypeList) {
-            for (Modifier m : bt.getModifiers()) {
+            for (Modifier m : iterable(bt.getModifiers())) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
                         ? Modifier.AUTO_PRODUCTION_INDEX
@@ -2042,7 +2042,7 @@ public final class Specification {
 
         // European nation type production modifier indexes moved to the spec
         for (EuropeanNationType et : europeanNationTypes) {
-            for (Modifier m : et.getModifiers()) {
+            for (Modifier m : iterable(et.getModifiers())) {
                 if (allTypes.get(m.getId()) instanceof GoodsType) {
                     m.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
                 }
@@ -2166,7 +2166,7 @@ public final class Specification {
 
         // @compat 0.11.3
         // Added the cargo penalty modifier
-        if (getModifiers(Modifier.CARGO_PENALTY).isEmpty()) {
+        if (count(getModifiers(Modifier.CARGO_PENALTY), alwaysTrue()) == 0) {
             addModifier(new Modifier(Modifier.CARGO_PENALTY, -12.5f,
                     Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
                     Modifier.GENERAL_COMBAT_INDEX));
@@ -2186,8 +2186,7 @@ public final class Specification {
         // @compat 0.11.5
         // Added a modifier to hardy pioneer
         UnitType hardyPioneer = getUnitType("model.unit.hardyPioneer");
-        if (hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)
-            .isEmpty()) {
+        if (count(hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION), alwaysTrue()) == 0) {
             Modifier m = new Modifier(Modifier.TILE_TYPE_CHANGE_PRODUCTION,
                 2.0f, Modifier.ModifierType.MULTIPLICATIVE);
             Scope scope = new Scope();

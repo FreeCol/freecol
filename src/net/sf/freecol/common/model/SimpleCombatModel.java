@@ -253,9 +253,9 @@ public class SimpleCombatModel extends CombatModel {
             // Special bonuses against certain nation types
             if (defender instanceof Ownable) {
                 Player owner = ((Ownable)defender).getOwner();
-                result.addAll(attackerUnit
-                    .getModifiers(Modifier.OFFENCE_AGAINST,
-                                  owner.getNationType()));
+                result.addAll(toList(attackerUnit
+                        .getModifiers(Modifier.OFFENCE_AGAINST,
+                                      owner.getNationType())));
             }
 
             // Land/naval specific
@@ -294,12 +294,12 @@ public class SimpleCombatModel extends CombatModel {
                                             Set<Modifier> result) {
         // Attack bonus
         final Specification spec = attacker.getSpecification();
-        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
+        result.addAll(toList(spec.getModifiers(Modifier.ATTACK_BONUS)));
 
         // Goods penalty always applies
         int goodsCount = attacker.getGoodsSpaceTaken();
         if (goodsCount > 0) {
-            for (Modifier m : spec.getModifiers(Modifier.CARGO_PENALTY)) {
+            for (Modifier m : iterable(spec.getModifiers(Modifier.CARGO_PENALTY))) {
                 Modifier c = new Modifier(m);
                 c.setValue(c.getValue() * goodsCount);
                 result.add(c);
@@ -340,15 +340,15 @@ public class SimpleCombatModel extends CombatModel {
         final Specification spec = attacker.getSpecification();
 
         // Attack bonus
-        result.addAll(spec.getModifiers(Modifier.ATTACK_BONUS));
+        result.addAll(toList(spec.getModifiers(Modifier.ATTACK_BONUS)));
 
         // Movement penalty
         switch (attacker.getMovesLeft()) {
         case 1:
-            result.addAll(spec.getModifiers(Modifier.BIG_MOVEMENT_PENALTY));
+            result.addAll(toList(spec.getModifiers(Modifier.BIG_MOVEMENT_PENALTY)));
             break;
         case 2:
-            result.addAll(spec.getModifiers(Modifier.SMALL_MOVEMENT_PENALTY));
+            result.addAll(toList(spec.getModifiers(Modifier.SMALL_MOVEMENT_PENALTY)));
             break;
         default:
             break;
@@ -356,7 +356,7 @@ public class SimpleCombatModel extends CombatModel {
 
         // Amphibious attack?
         if (combatIsAmphibious(attacker, defender)) {
-            result.addAll(spec.getModifiers(Modifier.AMPHIBIOUS_ATTACK));
+            result.addAll(toList(spec.getModifiers(Modifier.AMPHIBIOUS_ATTACK)));
         }
 
         if (combatIsAttackMeasurement(attacker, defender)) {
@@ -364,7 +364,7 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsSettlementAttack(attacker, defender)) {
             // Settlement present, apply bombardment bonus
-            result.addAll(attacker.getModifiers(Modifier.BOMBARD_BONUS));
+            result.addAll(toList(attacker.getModifiers(Modifier.BOMBARD_BONUS)));
 
             // Popular support bonus
             if (combatIsWarOfIndependence(attacker, defender)) {
@@ -377,8 +377,7 @@ public class SimpleCombatModel extends CombatModel {
             if (tile != null) {
                 if (tile.hasSettlement()) {
                     // Bombard bonus applies to settlement defence
-                    result.addAll(attacker
-                                  .getModifiers(Modifier.BOMBARD_BONUS));
+                    result.addAll(toList(attacker.getModifiers(Modifier.BOMBARD_BONUS)));
 
                     // Popular support bonus
                     if (combatIsWarOfIndependence(attacker, defender)) {
@@ -405,7 +404,7 @@ public class SimpleCombatModel extends CombatModel {
                 && attacker.getSettlement() == null
                 && attacker.getState() != Unit.UnitState.FORTIFIED
                 && defenderUnit.getSettlement() == null) {
-                result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
+                result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN)));
             }
         } else {
             throw new IllegalStateException("Bogus combat");
@@ -493,7 +492,7 @@ public class SimpleCombatModel extends CombatModel {
         // Cargo penalty always applies
         int goodsCount = defender.getVisibleGoodsCount();
         if (goodsCount > 0) {
-            for (Modifier m : spec.getModifiers(Modifier.CARGO_PENALTY)) {
+            for (Modifier m : iterable(spec.getModifiers(Modifier.CARGO_PENALTY))) {
                 Modifier c = new Modifier(m);
                 c.setValue(c.getValue() * goodsCount);
                 result.add(c);
@@ -542,7 +541,7 @@ public class SimpleCombatModel extends CombatModel {
                 // Artillery in the Open penalty
                 if (defender.hasAbility(Ability.BOMBARD)
                     && defender.getState() != Unit.UnitState.FORTIFIED) {
-                    result.addAll(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN));
+                    result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_IN_THE_OPEN)));
                 }
 
             } else { // In settlement
@@ -553,7 +552,7 @@ public class SimpleCombatModel extends CombatModel {
                 if (defender.hasAbility(Ability.BOMBARD)
                     && attacker != null
                     && ((Unit)attacker).getOwner().isIndian()) {
-                    result.addAll(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID));
+                    result.addAll(toList(spec.getModifiers(Modifier.ARTILLERY_AGAINST_RAID)));
                 }
 
                 // Automatic defensive role (e.g. Revere)
@@ -573,7 +572,7 @@ public class SimpleCombatModel extends CombatModel {
             // Fortify bonus
             if (defender.getState() == Unit.UnitState.FORTIFIED
                 && !disableFortified) {
-                result.addAll(spec.getModifiers(Modifier.FORTIFIED));
+                result.addAll(toList(spec.getModifiers(Modifier.FORTIFIED)));
             }
         }
     }

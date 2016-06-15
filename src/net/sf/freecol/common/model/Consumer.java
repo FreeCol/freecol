@@ -21,7 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 
 /**
@@ -97,8 +97,7 @@ public interface Consumer {
      * by the country and stables).
      *
      * @param id The object identifier.
-     * @return The set of <code>Modifier</code>s found.
+     * @return The stream of <code>Modifier</code>s found.
      */
-    public Set<Modifier> getModifiers(String id);
-
+    public Stream<Modifier> getModifiers(String id);
 }

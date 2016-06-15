@@ -212,8 +212,8 @@ public class Resource extends TileItem {
     @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
-        Set<Modifier> bonus = type.getModifiers(goodsType.getId(), unitType);
-        int amount = (int)applyModifiers(potential, null, bonus) - potential;
+        int amount = -potential + (int)applyModifiers(potential, null,
+            type.getModifiers(goodsType.getId(), unitType));
         return potential
             + ((quantity == UNLIMITED || quantity > amount) ? amount
                 : quantity);
@@ -238,7 +238,7 @@ public class Resource extends TileItem {
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
         return (goodsType == null) ? Stream.<Modifier>empty()
-            : getType().getModifiers(goodsType.getId(), unitType).stream();
+            : getType().getModifiers(goodsType.getId(), unitType);
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -143,7 +144,7 @@ public class NationTypeTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         colony.getOwner().changeNationType(spec().getNationType("model.nationType.building"));
 
-        List<Modifier> modifiers = new ArrayList<>(colony.getOwner().getModifiers("model.goods.hammers"));
+        List<Modifier> modifiers = toList(colony.getOwner().getModifiers("model.goods.hammers"));
         assertEquals(1, modifiers.size());
 
         BuildingType carpenterHouse = spec().getBuildingType("model.building.carpenterHouse");
@@ -156,7 +157,7 @@ public class NationTypeTest extends FreeColTestCase {
 
         colony.getOwner().changeNationType(spec().getNationType("model.nationType.furTrapping"));
 
-        modifiers = new ArrayList<>(colony.getOwner().getModifiers("model.goods.coats"));
+        modifiers = toList(colony.getOwner().getModifiers("model.goods.coats"));
         assertEquals(1, modifiers.size());
 
         BuildingType traderHouse = spec().getBuildingType("model.building.furTraderHouse");

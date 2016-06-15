@@ -1376,14 +1376,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if a bells bonus was set.
      */
     protected boolean recalculateBellsBonus() {
-        Set<Modifier> libertyBonus = getModifiers("model.goods.bells");
         boolean ret = false;
         for (Ability ability : getAbilities(Ability.ADD_TAX_TO_BELLS)) {
             FreeColObject source = ability.getSource();
             if (source != null) {
-                for (Modifier modifier : libertyBonus) {
-                    if (source.equals(modifier.getSource())) {
-                        modifier.setValue(tax);
+                for (Modifier m : iterable(getModifiers("model.goods.bells"))) {
+                    if (source.equals(m.getSource())) {
+                        m.setValue(tax);
                         ret = true;
                     }
                 }
@@ -4154,7 +4153,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // @compat 0.10.7
         // Fixup production modifiers deriving from founding fathers
         final Specification spec = getSpecification();
-        for (Modifier m : getModifiers()) {
+        for (Modifier m : iterable(getModifiers())) {
             if (m.getSource() == null) continue;
             String type = spec.fatherGoodsFixMap.get(m.getSource().getId());
             if (type != null && m.getId().equals(type)) {

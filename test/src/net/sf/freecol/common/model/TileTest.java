@@ -712,7 +712,7 @@ public class TileTest extends FreeColTestCase {
                 || "model.tile.mountains".equals(tileType.getId())
                 || "model.tile.swamp".equals(tileType.getId());
             assertEquals("Defence for " + tileType.getId(), present,
-                !tileType.getDefenceModifiers().isEmpty());
+                count(tileType.getDefenceModifiers()) != 0);
         }
     }
 

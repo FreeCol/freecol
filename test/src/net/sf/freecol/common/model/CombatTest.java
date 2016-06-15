@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.option.IntegerOption;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.InGameController;
@@ -115,13 +116,13 @@ public class CombatTest extends FreeColTestCase {
         assertFalse(colonist.hasAbility(Ability.AMBUSH_PENALTY));
 
         final Modifier bigMovementPenalty
-            = spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY).get(0);
+            = first(spec().getModifiers(Modifier.BIG_MOVEMENT_PENALTY));
         final Modifier attackModifier
-            = spec().getModifiers(Modifier.ATTACK_BONUS).get(0);
-        final Set<Modifier> veteranModifierSet
-            = veteranType.getModifiers(Modifier.OFFENCE);
-        assertEquals(1, veteranModifierSet.size());
-        final Modifier veteranModifier = veteranModifierSet.iterator().next();
+            = first(spec().getModifiers(Modifier.ATTACK_BONUS));
+        final List<Modifier> veteranModifiers
+            = toList(veteranType.getModifiers(Modifier.OFFENCE));
+        assertEquals(1, veteranModifiers.size());
+        final Modifier veteranModifier = first(veteranModifiers);
 
         Set<Modifier> offenceModifiers
             = combatModel.getOffensiveModifiers(soldier, colonist);
@@ -137,10 +138,10 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(31, n);
 
         final Modifier fortifiedModifier
-            = spec().getModifiers(Modifier.FORTIFIED).get(0);
-        final Set<Modifier> hillsModifierSet = hills.getDefenceModifiers();
-        assertEquals(1, hillsModifierSet.size());
-        Modifier hillsModifier = hillsModifierSet.iterator().next();
+            = first(spec().getModifiers(Modifier.FORTIFIED));
+        final List<Modifier> hillsModifiers = toList(hills.getDefenceModifiers());
+        assertEquals(1, hillsModifiers.size());
+        Modifier hillsModifier = first(hillsModifiers);
 
         Set<Modifier> defenceModifiers
             = combatModel.getDefensiveModifiers(soldier, colonist);
@@ -229,11 +230,11 @@ public class CombatTest extends FreeColTestCase {
 
         // Francis Drake
         FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
-        Set<Modifier> drakeModifiers = drake.getModifiers(Modifier.OFFENCE, privateerType);
-        assertEquals(1, drakeModifiers.size());
+        Modifier drakeModifier = first(drake.getModifiers(Modifier.OFFENCE, privateerType));
+        assertNotNull(drakeModifier);
         french.addFather(drake);
-        drakeModifiers = french.getModifiers(Modifier.OFFENCE, privateerType);
-        assertEquals(1, drakeModifiers.size());
+        assertEquals(drakeModifier, first(french.getModifiers(Modifier.OFFENCE, privateerType)));
+
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         assertEquals(4, offenceModifiers.size());
         n = 0;
@@ -308,7 +309,7 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, colonist);
-        for (Modifier modifier : soldierRole.getModifiers(Modifier.DEFENCE)) {
+        for (Modifier modifier : iterable(soldierRole.getModifiers(Modifier.DEFENCE))) {
             assertTrue(defenceModifiers.contains(modifier));
         }
     }
@@ -343,7 +344,7 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, defender);
-        for (Modifier modifier : nativeDragoonRole.getModifiers(Modifier.DEFENCE)) {
+        for (Modifier modifier : iterable(nativeDragoonRole.getModifiers(Modifier.DEFENCE))) {
             assertTrue(defenceModifiers.contains(modifier));
         }
     }

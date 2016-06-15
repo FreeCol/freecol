@@ -26,6 +26,7 @@ import java.util.Set;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -67,11 +68,10 @@ public class FoundingFatherTest extends FreeColTestCase {
         spec().addModifier(modifier);
         dutch.addFather(father2);
 
-        Set<Modifier> modifierSet = dutch.getModifiers("some.new.modifier");
-        assertEquals(1, modifierSet.size());
-        assertEquals(2f, modifierSet.iterator().next().getValue());
-        assertEquals(4f, FeatureContainer.applyModifiers(2, null,
-                modifierSet));
+        List<Modifier> modifiers = toList(dutch.getModifiers("some.new.modifier"));
+        assertEquals(1, modifiers.size());
+        assertEquals(2f, first(modifiers).getValue());
+        assertEquals(4f, FeatureContainer.applyModifiers(2, null, modifiers));
 
         FoundingFather father3 = new FoundingFather("father3", spec());
         father3.setType(FoundingFatherType.TRADE);
@@ -79,7 +79,7 @@ public class FoundingFatherTest extends FreeColTestCase {
                                          ModifierType.ADDITIVE, father3));
         dutch.addFather(father3);
 
-        assertFalse(dutch.getModifiers("some.new.modifier").isEmpty());
+        assertFalse(count(dutch.getModifiers("some.new.modifier")) == 0);
         assertEquals(6f, dutch.applyModifiers(2, null, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather("father4", spec());

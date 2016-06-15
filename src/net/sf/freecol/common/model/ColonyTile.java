@@ -455,22 +455,22 @@ public class ColonyTile extends WorkLocation {
         final Player owner = colony.getOwner();
         final Turn turn = getGame().getTurn();
         Stream<Modifier> ownerMods = (owner == null) ? Stream.<Modifier>empty()
-            : owner.getModifiers(id, type, turn).stream();
+            : owner.getModifiers(id, type, turn);
 
         return (unitType != null)
             // Unit modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, unitType),
                      colony.getProductionModifiers(goodsType),
-                     unitType.getModifiers(id, type, turn).stream(),
+                     unitType.getModifiers(id, type, turn),
                      ((owner == null) ? null
-                         : owner.getModifiers(id, unitType, turn).stream()))
+                         : owner.getModifiers(id, unitType, turn)))
             : (isColonyCenterTile())
             // Unattended only possible in center, colony modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, null),
                      colony.getProductionModifiers(goodsType),
-                     colony.getModifiers(id, null, turn).stream(),
+                     colony.getModifiers(id, null, turn),
                      ((owner == null) ? null
-                         : owner.getModifiers(id, type, turn).stream()))
+                         : owner.getModifiers(id, type, turn)))
             // Otherwise impossible
             : Stream.<Modifier>empty();
     }

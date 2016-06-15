@@ -299,16 +299,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = getModifiers(goodsType.getId());
-        if (modifierSet == null || modifierSet.isEmpty()) {
-            return null;
-        } else {
-            if (modifierSet.size() > 1) {
-                logger.warning("Only one Modifier for " + goodsType.getId()
-                    + " expected!");
-            }
-            return modifierSet.iterator().next();
-        }
+        return first(getModifiers(goodsType.getId()));
     }
 
     /**

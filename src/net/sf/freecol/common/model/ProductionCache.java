@@ -124,8 +124,8 @@ public class ProductionCache {
 
         List<AbstractGoods> goods = new ArrayList<>();
         for (Consumer consumer : colony.getConsumers()) {
-            Set<Modifier> modifiers = consumer
-                .getModifiers(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION);
+            List<Modifier> modifiers = toList(consumer
+                .getModifiers(Modifier.CONSUME_ONLY_SURPLUS_PRODUCTION));
             goods.clear();
             for (AbstractGoods g : consumer.getConsumedGoods()) {
                 goodsUsed.add(g.getType());

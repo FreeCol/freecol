@@ -22,7 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -217,8 +217,8 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * {@inheritDoc}
      */
     @Override
-    public Set<Modifier> getModifiers(String id) {
-        return Collections.<Modifier>emptySet();
+    public Stream<Modifier> getModifiers(String id) {
+        return Stream.<Modifier>empty();
     }
 
 

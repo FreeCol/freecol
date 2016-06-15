@@ -2302,15 +2302,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     private void modifySpecialGoods(GoodsType goodsType, int amount) {
         final Turn turn = getGame().getTurn();
-        Set<Modifier> mods;
+        List<Modifier> mods;
 
-        mods = goodsType.getModifiers(Modifier.LIBERTY);
+        mods = toList(goodsType.getModifiers(Modifier.LIBERTY));
         if (!mods.isEmpty()) {
-            int liberty = (int)applyModifiers(amount, turn, mods);
-            modifyLiberty(liberty);
+            modifyLiberty((int)applyModifiers(amount, turn, mods));
         }
 
-        mods = goodsType.getModifiers(Modifier.IMMIGRATION);
+        mods = toList(goodsType.getModifiers(Modifier.IMMIGRATION));
         if (!mods.isEmpty()) {
             int migration = (int)applyModifiers(amount, turn, mods);
             modifyImmigration(migration);

@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -498,10 +499,10 @@ public class ServerUnitTest extends FreeColTestCase {
 
         // Upgrade to lumber mill
         assertEquals(0,
-            colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION).size());
+            count(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
         colony.getBuilding(carpenterHouseType).upgrade();
         assertEquals(1,
-            colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION).size());
+            count(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
 
         // Almost clear another tile
         Tile tile2 = tile.getNeighbourOrNull(Direction.N);
