@@ -177,9 +177,9 @@ public class IndianDemandMission extends Mission {
         // When displeased, ask for expensive non-food or military
         if (goods == null
             && tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
-            final Predicate<Goods> pred = g ->
+            final Predicate<Goods> angryPred = g ->
                 !g.getType().isFoodType() && !g.getType().isMilitaryGoods();
-            goods = maximize(target.getCompactGoods(), pred, marketPrice);
+            goods = maximize(target.getCompactGoods(), angryPred, marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }
 

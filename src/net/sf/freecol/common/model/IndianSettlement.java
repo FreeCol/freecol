@@ -1071,7 +1071,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     private GoodsType goodsToMake() {
         final ToIntFunction<GoodsType> deficit = cacheInt(gt ->
             getWantedGoodsAmount(gt) - getGoodsCount(gt));
-        final Predicate<GoodsType> pred = gt ->
+        final Predicate<GoodsType> goodsPred = gt ->
             gt.isRawMaterial()
                 && gt.getOutputType() != null
                 && !gt.getOutputType().isBreedable()
@@ -1079,7 +1079,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                 && deficit.applyAsInt(gt) < 0
                 && deficit.applyAsInt(gt.getOutputType()) > 0;
         final Comparator<GoodsType> comp = Comparator.comparingInt(deficit);
-        return maximize(getSpecification().getGoodsTypeList(), pred, comp);
+        return maximize(getSpecification().getGoodsTypeList(), goodsPred, comp);
     }
 
     /**
@@ -1090,9 +1090,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public Goods getRandomGift(Random random) {
         final Specification spec = getSpecification();
-        final Predicate<GoodsType> pred = gt ->
+        final Predicate<GoodsType> goodsPred = gt ->
             getGoodsCount(gt) >= GIFT_THRESHOLD + KEEP_RAW_MATERIAL;
-        final Function<GoodsType, Goods> mapper = gt ->
+        final Function<GoodsType, Goods> newGoodsMapper = gt ->
             new Goods(getGame(), this, gt,
                 Math.min(randomInt(logger, "Gift amount", random,
                                    getGoodsCount(gt) - KEEP_RAW_MATERIAL
@@ -1100,7 +1100,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                          GIFT_MAXIMUM));
         return getRandomMember(logger, "Gift type",
                                transform(spec.getNewWorldGoodsTypeList(),
-                                         pred, mapper),
+                                         goodsPred, newGoodsMapper),
                                random);
     }
 

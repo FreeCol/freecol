@@ -370,12 +370,12 @@ public class NativeAIPlayer extends MissionAIPlayer {
             Tile tile = threatTiles.remove(0);
             final ToIntFunction<Unit> score = cacheInt(u ->
                 u.getTile().getDistanceTo(tile));
-            final Predicate<Unit> pred = u ->
+            final Predicate<Unit> validPred = u ->
                 UnitSeekAndDestroyMission.invalidReason(aiMain.getAIUnit(u),
                     tile.getDefendingUnit(u)) == null
                 && score.applyAsInt(u) >= 0;
-            final Comparator<Unit> comp = Comparator.comparingInt(score);
-            Unit unit = minimize(units, pred, comp);
+            final Comparator<Unit> scoreComp = Comparator.comparingInt(score);
+            Unit unit = minimize(units, validPred, scoreComp);
             if (unit == null) continue; // Declined to attack.
             units.remove(unit);
             AIUnit aiUnit = aiMain.getAIUnit(unit);

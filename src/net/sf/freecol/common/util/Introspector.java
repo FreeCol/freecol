@@ -335,7 +335,8 @@ public class Introspector {
         } catch (NoSuchMethodException | SecurityException ex) {
             throw new IntrospectorException("Unable to find constructor "
                 + lastPart(tag, ".") + "("
-                + map(types, t -> t.getName()).collect(Collectors.joining(","))
+                + transform(types, alwaysTrue(), Class::getName,
+                            Collectors.joining(","))
                 + ")", ex);
         }
         T instance;

@@ -474,10 +474,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             setLayout(new MigLayout("wrap 1", "", ""));
 
             available.clear();
-            final Predicate<Player> pred = p ->
+            final Predicate<Player> incitablePred = p ->
                 p != this.other && this.source.getStance(p).isIncitable();
             available.addAll(transform(getGame().getLivePlayers(this.source),
-                                       pred));
+                                       incitablePred));
 
             add(this.label);
             add(this.victimBox);

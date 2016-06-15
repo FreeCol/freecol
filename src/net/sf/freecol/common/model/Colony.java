@@ -1579,11 +1579,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The best available defender type.
      */
     public UnitType getBestDefenderType() {
-        final Predicate<UnitType> pred = ut ->
+        final Predicate<UnitType> defenderPred = ut ->
             ut.getDefence() > 0
             && !ut.isNaval()
             && ut.isAvailableTo(getOwner());
-        return maximize(getSpecification().getUnitTypeList(), pred,
+        return maximize(getSpecification().getUnitTypeList(), defenderPred,
                         UnitType.defenceComparator);
     }
 
@@ -1757,7 +1757,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A stream of teacher <code>Unit</code>s.
      */
     public Stream<Unit> getTeachers() {
-        return flatten(getBuildings(), b -> b.canTeach(),
+        return flatten(getBuildings(), Building::canTeach,
                        b -> b.getUnitList().stream());
     }
 
@@ -1796,7 +1796,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             return null; // No automatic assignment
         final GoodsType expertProduction
             = teacher.getType().getExpertProduction();
-        final Predicate<Unit> pred = u ->
+        final Predicate<Unit> teacherPred = u ->
             u.getTeacher() == null && u.canBeStudent(teacher);
         // Always pick the student with the least skill first.
         // Break ties by favouring the one working in the teacher's trade,
@@ -1808,7 +1808,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 (u.getWorkType() == expertProduction) ? 0 : 1);
         final Comparator<Unit> fullComparator
             = skillComparator.thenComparing(tradeComparator);
-        return minimize(getUnitList(), pred, fullComparator);
+        return minimize(getUnitList(), teacherPred, fullComparator);
     }
 
 
@@ -2057,6 +2057,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         /** The expected improvement.  INFINITY for LCRs. */
         public int amount;
         
+
         public TileImprovementSuggestion(Tile tile, TileImprovementType t,
                                          int amount) {
             this.tile = tile;
@@ -2085,7 +2086,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         // Encourage exploration of neighbouring rumours.
         List<TileImprovementSuggestion> result
             = transform(getTile().getSurroundingTiles(1, 1),
-                        t -> t.hasLostCityRumour(),
+                        Tile::hasLostCityRumour,
                         t -> new TileImprovementSuggestion(t, null, INFINITY));
 
         // Consider improvements for all available colony tiles.

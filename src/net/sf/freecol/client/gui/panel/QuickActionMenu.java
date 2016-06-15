@@ -394,9 +394,10 @@ public final class QuickActionMenu extends JPopupMenu {
         boolean separatorNeeded = false;
 
         if (spec.getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
-            final Predicate<Unit> pred = teacher ->
+            final Predicate<Unit> teacherPred = teacher ->
                 unit.canBeStudent(teacher) && unit.isInColony();
-            for (Unit teacher : transform(unit.getColony().getTeachers(), pred)) {
+            for (Unit teacher : transform(unit.getColony().getTeachers(),
+                                          teacherPred)) {
                 JMenuItem menuItem = null;
                 ImageIcon teacherIcon
                     = new ImageIcon(lib.getSmallerUnitImage(teacher));

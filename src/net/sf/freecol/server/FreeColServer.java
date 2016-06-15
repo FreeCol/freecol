@@ -1163,7 +1163,7 @@ public final class FreeColServer {
         final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
         final AIMain aiMain = new AIMain(this);
-        final Predicate<Entry<Nation, NationState>> pred = e ->
+        final Predicate<Entry<Nation, NationState>> availablePred = e ->
             !e.getKey().isUnknownEnemy()
                 && e.getValue() != NationState.NOT_AVAILABLE
                 && game.getPlayerByNationId(e.getKey().getId()) == null;
@@ -1171,7 +1171,7 @@ public final class FreeColServer {
         setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);
         game.updatePlayers(transform(game.getNationOptions().getNations().entrySet(),
-                                     pred, e -> makeAIPlayer(e.getKey()),
+                                     availablePred, e -> makeAIPlayer(e.getKey()),
                                      Player.playerComparator));
 
         // We need a fake unknown enemy player

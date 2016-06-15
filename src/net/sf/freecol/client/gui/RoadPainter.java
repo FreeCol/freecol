@@ -123,14 +123,14 @@ public final class RoadPainter {
         final Map map = tile.getMap();
         final int x = tile.getX();
         final int y = tile.getY();
-        final Predicate<Direction> pred = d -> {
+        final Predicate<Direction> borderPred = d -> {
             Tile borderingTile = map.getTile(d.step(x, y));
             TileImprovement r;
             return borderingTile != null
                 && (r = borderingTile.getRoad()) != null
                 && r.isComplete();
         };
-        List<Direction> directions = transform(Direction.allDirections, pred);
+        List<Direction> directions = transform(Direction.allDirections, borderPred);
         List<Point2D.Float> points = transform(directions, alwaysTrue(),
                                                d -> corners.get(d));
         GeneralPath path = new GeneralPath();

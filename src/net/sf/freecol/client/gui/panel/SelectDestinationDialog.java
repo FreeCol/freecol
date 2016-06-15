@@ -198,12 +198,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     IndianSettlement is = (IndianSettlement)loc;
                     UnitType sk = is.getLearnableSkill();
                     if (sk != null) {
-                        final Predicate<Unit> pred = u ->
+                        final Predicate<Unit> upgradePred = u ->
                             u.getType().canBeUpgraded(sk, ChangeType.NATIVES);
                         Unit up = (unit.getType().canBeUpgraded(sk,
                                 ChangeType.NATIVES)) ? unit : null;
                         if (unit.isCarrier()) {
-                            up = find(unit.getUnitList(), pred);
+                            up = find(unit.getUnitList(), upgradePred);
                         }
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");
@@ -477,14 +477,14 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         // of accessible settlement locations and do a bulk path search
         // to determine the travel times, and create Destinations from
         // the results.
-        final Predicate<Player> pred = p ->
+        final Predicate<Player> tradePred = p ->
             p.hasContacted(player) && (canTrade || !p.isEuropean());
-        final Function<Player, Stream<Location>> mapper = p ->
+        final Function<Player, Stream<Location>> settlementTileMapper = p ->
             transform(p.getSettlements(),
                       s -> canReach.test(s) && s.hasContacted(p),
                       s -> (Location)s.getTile()).stream();
         List<Location> locs = toList(flatten(game.getLivePlayers(player),
-                                             pred, mapper));
+                                             tradePred, settlementTileMapper));
         MultipleAdjacentDecider md = new MultipleAdjacentDecider(locs);
         unit.search(unit.getLocation(), md.getGoalDecider(), null,
                     FreeColObject.INFINITY, null);

@@ -445,10 +445,10 @@ public final class PlayersTable extends JTable {
             this.preGameController = preGameController;
             this.nationOptions = nationOptions;
             this.thisPlayer = thisPlayer;
-            final Predicate<Nation> pred = n -> !n.isUnknownEnemy()
+            final Predicate<Nation> nationPred = n -> !n.isUnknownEnemy()
                 && nationOptions.getNations().get(n) != null;
             this.nations = transform(thisPlayer.getSpecification().getNations(),
-                                     pred);
+                                     nationPred);
             for (Nation n : this.nations) this.nationMap.put(n, null);
             this.nationMap.put(thisPlayer.getNation(), thisPlayer);
         }

@@ -115,7 +115,7 @@ public final class ReportProductionPanel extends ReportPanel {
                 transform(spec.getBuildingTypeList(),
                           bt -> (gt == bt.getProducedGoodsType()
                               || bt.hasModifier(gt.getId())),
-                          bt -> bt.getFirstLevel(), Collectors.toSet());
+                          BuildingType::getFirstLevel, Collectors.toSet());
             List<Set<BuildingType>> basicBuildingTypes
                 = transform(selectedTypes, alwaysTrue(), mapper);
 

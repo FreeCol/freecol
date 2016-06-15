@@ -991,7 +991,7 @@ public class Game extends FreeColGameObject {
      * @return A list of all the <code>Colony</code>s in the game.
      */
     public List<Colony> getAllColonies(Player player) {
-        return toList(flatten(getLivePlayers(player), p -> p.isEuropean(),
+        return toList(flatten(getLivePlayers(player), Player::isEuropean,
                               p -> p.getColonies().stream()));
     }
             

@@ -635,13 +635,14 @@ public class SimpleMapGenerator implements MapGenerator {
     private Tile findFreeNeighbouringTile(IndianSettlement is,
                                           List<Tile> tiles) {
         final Player owner = is.getOwner();
-        final Predicate<Tile> pred = t -> t != null
+        final Predicate<Tile> freeTilePred = t -> t != null
             && t.getOwningSettlement() == null
             && owner.canClaimForSettlement(t);
         final Direction[] dirns = Direction.getRandomDirections("freeTile",
                                                                 logger, random);
         for (Tile t : tiles) {
-            Tile ret = find(map(dirns, d -> t.getNeighbourOrNull(d)), pred);
+            Tile ret = find(map(dirns, d -> t.getNeighbourOrNull(d)),
+                            freeTilePred);
             if (ret != null) return ret;
         }
         return null;

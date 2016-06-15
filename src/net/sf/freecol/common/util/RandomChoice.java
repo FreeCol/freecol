@@ -74,13 +74,14 @@ public class RandomChoice<T> {
         int n;
         return (input == null || input.isEmpty()
             || (n = getTotalProbability(input)) <= 0) ? null
-            : (input.size() == 1) ? input.iterator().next().getObject()
+            : (input.size() == 1) ? first(input).getObject()
             : select(input, randomInt(logger, logMe, random, n));
     }
 
     public static <T> T getWeightedRandom(Logger logger, String logMe,
                                           Stream<RandomChoice<T>> input,
                                           Random random) {
-        return getWeightedRandom(logger, logMe, toList(input), random);
+        return (input == null) ? null
+            : getWeightedRandom(logger, logMe, toList(input), random);
     }
 }

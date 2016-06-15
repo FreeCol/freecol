@@ -333,9 +333,9 @@ public class ProductionType extends FreeColSpecObject {
      * @return The best production.
      */
     public AbstractGoods getBestOutputFor(GoodsType goodsType) {
-        final Predicate<AbstractGoods> pred = ag ->
+        final Predicate<AbstractGoods> typePred = ag ->
             goodsType == null || ag.getType() == goodsType;
-        return maximize(getOutputs(), pred,
+        return maximize(getOutputs(), typePred,
                         AbstractGoods.ascendingAmountComparator);
     }
 

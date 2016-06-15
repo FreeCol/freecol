@@ -255,12 +255,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
             
             // Make a list of unit types that are not working at their
             // speciality, including the units just standing around.
-            final Predicate<Unit> pred = u -> {
+            final Predicate<Unit> couldWorkPred = u -> {
                 WorkLocation wl = u.getWorkLocation();
                 return wl != null && (wl.getWorkFor(u) == null
                         || wl.getWorkFor(u) != u.getWorkType());
             };
-            this.couldWork.addAll(transform(this.notWorking, pred,
+            this.couldWork.addAll(transform(this.notWorking, couldWorkPred,
                                             Unit::getType));
 
             this.build = colony.getCurrentlyBuilding();
@@ -400,9 +400,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         this.colonies.addAll(transform(continents.entrySet(), alwaysTrue(),
                                        Entry::getValue, firstColonyComparator));
 
-        final Predicate<GoodsType> pred = gt ->
+        final Predicate<GoodsType> goodsPred = gt ->
             gt.isStorable() && !gt.isTradeGoods();
-        this.goodsTypes.addAll(transform(spec.getGoodsTypeList(), pred,
+        this.goodsTypes.addAll(transform(spec.getGoodsTypeList(), goodsPred,
                                          Function.identity(),
                                          GoodsType.goodsTypeComparator));
 
@@ -960,7 +960,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         // Field: The number of potential colony tiles that need
         // exploring.
         // Colour: cAlarm
-        Set<Tile> tiles = transform(rTileSuggestions, ts -> ts.isExploration(),
+        Set<Tile> tiles = transform(rTileSuggestions,
+                                    TileImprovementSuggestion::isExploration,
                                     ts -> ts.tile, Collectors.toSet());
         reportPanel.add((tiles.isEmpty()) ? new JLabel()
             : newLabel(Integer.toString(tiles.size()), null, cAlarm,

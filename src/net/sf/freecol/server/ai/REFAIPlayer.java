@@ -188,9 +188,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final CachingFunction<Colony, PathNode> pathMapper
             = new CachingFunction<Colony, PathNode>(c ->
                 unit.findPath(carrier, c, carrier, null));
-        final Predicate<Colony> pred = c ->
+        final Predicate<Colony> portPred = c ->
             (!port || c.isConnectedPort()) && pathMapper.apply(c) != null;
-        final Function<Colony, TargetTuple> mapper = c -> {
+        final Function<Colony, TargetTuple> newTupleMapper = c -> {
             PathNode path = pathMapper.apply(c);
             return new TargetTuple(c, path,
                 UnitSeekAndDestroyMission.scorePath(aiu, path));
@@ -198,7 +198,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final List<TargetTuple> targets
             = transform(flatten(player.getRebels(),
                                 p -> p.getColonies().stream()),
-                        pred, mapper);
+                        portPred, newTupleMapper);
 
         // Increase score for drydock/s, musket and tools suppliers,
         // but decrease for fortifications.
@@ -901,13 +901,14 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         return Integer.MIN_VALUE;
                     }
                     // Do not chase the same unit!
-                    final Predicate<UnitSeekAndDestroyMission> pred = m ->
+                    final Predicate<UnitSeekAndDestroyMission> unitPred = m ->
                         m != null && m.getTarget() instanceof Unit
                             && (Unit)m.getTarget() == target;
-                    final Function<AIUnit, UnitSeekAndDestroyMission> mapper = aiu ->
+                    final Function<AIUnit, UnitSeekAndDestroyMission> missionMapper = aiu ->
                         aiu.getMission(UnitSeekAndDestroyMission.class);
                     if (any(transform(getAIUnits(), aiu -> aiu != aiUnit,
-                                      mapper), pred)) return Integer.MIN_VALUE;
+                                      missionMapper), unitPred))
+                        return Integer.MIN_VALUE;
                     // The REF is more interested in colonies.
                     value /= 2;
                 }

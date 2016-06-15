@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -743,8 +744,10 @@ public final class InGameController extends FreeColClientHolder {
 
         // Deal with the trade route units first.
         List<ModelMessage> messages = new ArrayList<>();
-        final Predicate<Unit> pred = u -> u.isReadyToTrade() && player.owns(u);
-        for (Unit unit : transform(player.getUnits(), pred, u -> u,
+        final Predicate<Unit> tradePred = u ->
+            u.isReadyToTrade() && player.owns(u);
+        for (Unit unit : transform(player.getUnits(), tradePred,
+                                   Function.identity(),
                                    tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
             if (moveToDestination(unit, messages)) stillActive = unit;
@@ -4134,10 +4137,8 @@ public final class InGameController extends FreeColClientHolder {
     public void newLandName(String defaultName, Unit unit) {
         getGUI().showNamingDialog(
             StringTemplate.key("newLand.text"), defaultName, unit,
-            (String name) -> {
-                if (name == null || name.isEmpty()) name = defaultName;
-                nameNewLand(unit, name);
-            });
+            (String name) -> nameNewLand(unit,
+                (name == null || name.isEmpty()) ? defaultName : name));
     }
 
     /**
@@ -4163,10 +4164,8 @@ public final class InGameController extends FreeColClientHolder {
                 StringTemplate.template("nameRegion.text")
                               .addStringTemplate("%type%", region.getLabel()),
                 defaultName, unit,
-                (String name) -> {
-                    if (name == null || name.isEmpty()) name = defaultName;
-                    nameNewRegion(tile, unit, region, name);
-                });
+                (String name) -> nameNewRegion(tile, unit, region,
+                    (name == null || name.isEmpty()) ? defaultName : name));
         }
     }
 

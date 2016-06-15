@@ -366,14 +366,14 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     public boolean updateMostHated() {
         final Player old = this.mostHated;
-        final Predicate<Player> pred = p -> {
+        final Predicate<Player> hatedPred = p -> {
             Tension alarm = getAlarm(p);
             return alarm != null && alarm.getLevel() != Tension.Level.HAPPY;
         };
-        final Comparator<Player> comp
+        final Comparator<Player> mostHatedComp
             = Comparator.comparingInt(p -> getAlarm(p).getValue());
         this.mostHated = maximize(getGame().getLiveEuropeanPlayers(null),
-                                  pred, comp);
+                                  hatedPred, mostHatedComp);
         return this.mostHated != old;
     }
 

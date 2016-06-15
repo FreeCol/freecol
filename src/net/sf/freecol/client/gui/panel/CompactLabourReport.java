@@ -352,21 +352,21 @@ public final class CompactLabourReport extends ReportPanel {
             if (allColonists) {
                 addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
             } else {
-                final Predicate<Unit> pred = u -> {
+                final Predicate<Unit> teachingPred = u -> {
                     final Unit student = u.getStudent();
                     return student != null && student.getType() == unitType;
                 };
-                final Function<Unit, UnitType> mapper = u ->
-                    Unit.getUnitTypeTeaching(u.getType(), u.getStudent().getType());
+                final Function<Unit, UnitType> studentMapper = u ->
+                    Unit.getUnitTypeTeaching(u.getType(), unitType);
                 Set<UnitType> resultOfTraining = (colony == null)
                     ? Collections.<UnitType>emptySet()
-                    : transform(colony.getTeachers(), pred, mapper,
-                                Collectors.toSet());
-                String student = resultOfTraining.size() == 1 ?
-                    Messages.message(StringTemplate
+                    : transform(colony.getTeachers(), teachingPred,
+                                studentMapper, Collectors.toSet());
+                String student = (resultOfTraining.size() == 1)
+                    ? Messages.message(StringTemplate
                         .template("report.labour.learning")
-                        .addName("%unit%", resultOfTraining.iterator().next())) :
-                    Messages.message("report.labour.learningOther");
+                        .addName("%unit%", first(resultOfTraining)))
+                    : Messages.message("report.labour.learningOther");
                 addRow(data,
                        data.getUnitData().getUnitName(),
                        student,

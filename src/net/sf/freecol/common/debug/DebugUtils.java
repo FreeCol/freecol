@@ -176,12 +176,13 @@ public class DebugUtils {
         final Specification sSpec = sGame.getSpecification();
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);
-        final Predicate<FoundingFather> pred = f -> !sPlayer.hasFather(f);
+        final Predicate<FoundingFather> noFatherPred = f ->
+            !sPlayer.hasFather(f);
         final Function<FoundingFather, ChoiceItem<FoundingFather>> mapper
             = f -> new ChoiceItem<FoundingFather>(Messages.getName(f), f);
 
         FoundingFather father = gui.getChoice(null, fatherTitle, "cancel",
-            transform(sSpec.getFoundingFathers(), pred, mapper,
+            transform(sSpec.getFoundingFathers(), noFatherPred, mapper,
                       Comparator.naturalOrder()));
         if (father != null) {
             server.getInGameController()
@@ -383,14 +384,14 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final Specification sSpec = sGame.getSpecification();
         final GUI gui = freeColClient.getGUI();
-        final Predicate<GoodsType> pred = gt ->
+        final Predicate<GoodsType> goodsPred = gt ->
             !gt.isFoodType() || gt == sSpec.getPrimaryFoodType();            
         final Function<GoodsType, ChoiceItem<GoodsType>> mapper = gt ->
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
             
         GoodsType goodsType = gui.getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"), "cancel",
-            transform(sSpec.getGoodsTypeList(), pred, mapper,
+            transform(sSpec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
@@ -944,14 +945,14 @@ public class DebugUtils {
     public static void setColonyGoods(final FreeColClient freeColClient,
                                       final Colony colony) {
         final Specification spec = colony.getSpecification();
-        final Predicate<GoodsType> pred = gt ->
+        final Predicate<GoodsType> goodsPred = gt ->
             !gt.isFoodType() || gt == spec.getPrimaryFoodType();
         final Function<GoodsType, ChoiceItem<GoodsType>> mapper = gt ->
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
 
         GoodsType goodsType = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectGoodsType"), "cancel",
-            transform(spec.getGoodsTypeList(), pred, mapper,
+            transform(spec.getGoodsTypeList(), goodsPred, mapper,
                       Comparator.naturalOrder()));
         if (goodsType == null) return;
 
@@ -1019,14 +1020,14 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final Tile sTile = sGame.getFreeColGameObject(tile.getId(),
                                                       Tile.class);
-        final Predicate<RumourType> pred = r ->
+        final Predicate<RumourType> realRumourPred = r ->
             r != RumourType.NO_SUCH_RUMOUR;
         final Function<RumourType, ChoiceItem<RumourType>> mapper = r ->
             new ChoiceItem<RumourType>(r.toString(), r);
             
         RumourType rumourChoice = freeColClient.getGUI().getChoice(null,
             StringTemplate.template("prompt.selectLostCityRumour"), "cancel",
-            transform(RumourType.values(), pred, mapper,
+            transform(RumourType.values(), realRumourPred, mapper,
                       Comparator.naturalOrder()));
         if (rumourChoice == null) return;
 

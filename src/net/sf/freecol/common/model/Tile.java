@@ -1278,7 +1278,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     unexplored.
      */
     public boolean hasUnexploredAdjacent() {
-        return any(getSurroundingTiles(1, 1), t -> !t.isExplored());
+        return !all(getSurroundingTiles(1, 1), Tile::isExplored);
     }
 
     /**
@@ -1387,12 +1387,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land <code>Tile</code>s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        final Predicate<Tile> pred = t -> (t.isLand()
-            && (!t.hasSettlement() || player.owns(t.getSettlement())));
-        final Comparator<Tile> comp = cachingDoubleComparator((Tile t) ->
-            t.getDefenceValue()).reversed();
-        return transform(getSurroundingTiles(0, 1), pred, Function.identity(),
-                         comp);
+        final Predicate<Tile> safeTilePred = t ->
+            (t.isLand()
+                && (!t.hasSettlement() || player.owns(t.getSettlement())));
+        final Comparator<Tile> defenceComp
+            = cachingDoubleComparator(Tile::getDefenceValue).reversed();
+        return transform(getSurroundingTiles(0, 1), safeTilePred,
+                         Function.identity(), defenceComp);
     }
                     
     /**
@@ -1417,7 +1418,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isDangerousToShip(Unit ship) {
         final Player player = ship.getOwner();
-        final Predicate<Tile> pred = t -> {
+        final Predicate<Tile> dangerPred = t -> {
             Settlement settlement = t.getSettlement();
             return (settlement == null) ? false
                 : !player.owns(settlement)
@@ -1425,7 +1426,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     && (player.atWarWith(settlement.getOwner())
                         || ship.hasAbility(Ability.PIRACY));
         };
-        return any(getSurroundingTiles(0, 1), pred);
+        return any(getSurroundingTiles(0, 1), dangerPred);
     }
 
     /**
@@ -1680,6 +1681,40 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Gets the maximum potential for producing the given type of
+     * goods with a given unit if this tile is (perhaps changed to)
+     * a given tile type.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @param unitType A <code>UnitType</code> to do the work.
+     * @param tileType A <code>TileType</code> to change to.
+     * @return The maximum potential.
+     */
+    private int getMaximumPotential(GoodsType goodsType, UnitType unitType,
+                                    TileType tileType) {
+        float potential = tileType.getPotentialProduction(goodsType, unitType);
+        if (tileType == getType()) { // Handle the resource in the noop case
+            Resource resource = (tileItemContainer == null) ? null
+                : tileItemContainer.getResource();
+            if (resource != null) {
+                potential = resource.applyBonus(goodsType, unitType,
+                                                (int)potential);
+            }
+        }
+        // Try applying all possible non-natural improvements.
+        final List<TileImprovementType> improvements
+            = getSpecification().getTileImprovementTypeList();
+        for (TileImprovementType ti : improvements) {
+            if (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
+                && ti.getBonus(goodsType) > 0) {
+                potential = ti.getProductionModifier(goodsType)
+                    .applyTo(potential);
+            }
+        }
+        return (int)potential;
+    }
+
+    /**
+     * Gets the maximum potential for producing the given type of
      * goods.  The maximum potential is the potential of a tile after
      * the tile has been plowed/built road on.
      *
@@ -1703,27 +1738,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         tileTypes.add(0, getType()); //...including the noop case.
 
         // Find the maximum production under each tile type change.
-        final ToIntFunction<TileType> toif = tt -> {
-            float potential = tt.getPotentialProduction(goodsType, unitType);
-            if (tt == getType()) { // Handle the resource in the noop case
-                Resource resource = (tileItemContainer == null) ? null
-                    : tileItemContainer.getResource();
-                if (resource != null) {
-                    potential = resource.applyBonus(goodsType, unitType,
-                                                    (int)potential);
-                }
-            }
-            // Try applying all possible non-natural improvements.
-            for (TileImprovementType ti : improvements) {
-                if (!ti.isNatural() && ti.isTileTypeAllowed(tt)
-                    && ti.getBonus(goodsType) > 0) {
-                    potential = ti.getProductionModifier(goodsType)
-                        .applyTo(potential);
-                }
-            }
-            return (int)potential;
-        };
-        return max(tileTypes, toif);  
+        return max(tileTypes, tt ->
+                   getMaximumPotential(goodsType, unitType, tt));
     }
 
     /**
@@ -1757,17 +1773,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Defend against calls while partially read.
         if (getType() == null) return Collections.<AbstractGoods>emptyList();
         
+        final ToIntFunction<GoodsType> productionMapper = cacheInt(gt ->
+            getPotentialProduction(gt, unitType));
+        final Predicate<GoodsType> productionPred = gt ->
+            productionMapper.applyAsInt(gt) > 0;
+        final Function<GoodsType, AbstractGoods> goodsMapper = gt ->
+            new AbstractGoods(gt, productionMapper.applyAsInt(gt));
+        final Comparator<AbstractGoods> goodsComp
+            = ((owner == null || owner.getMarket() == null)
+                ? AbstractGoods.descendingAmountComparator
+                : owner.getMarket().getSalePriceComparator());
         // It is necessary to consider all farmed goods, since the
         // tile might have a resource that produces goods not produced
         // by the tile type.
-        final ToIntFunction<GoodsType> toif = cacheInt(gt ->
-            getPotentialProduction(gt, unitType));
         return transform(getSpecification().getFarmedGoodsTypeList(),
-                         gt -> toif.applyAsInt(gt) > 0,
-                         gt -> new AbstractGoods(gt, toif.applyAsInt(gt)),
-                         ((owner == null || owner.getMarket() == null)
-                             ? AbstractGoods.descendingAmountComparator
-                             : owner.getMarket().getSalePriceComparator()));
+                         productionPred, goodsMapper, goodsComp);
     }
 
     /**
@@ -1776,11 +1796,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The <code>AbstractGoods</code> to produce.
      */
     public AbstractGoods getBestFoodProduction() {
-        final Comparator<AbstractGoods> comp = Comparator.comparingInt(ag ->
-            getPotentialProduction(ag.getType(), null));
+        final Comparator<AbstractGoods> goodsComp
+            = Comparator.comparingInt(ag ->
+                getPotentialProduction(ag.getType(), null));
         return maximize(flatten(getType().getAvailableProductionTypes(true),
                                 pt -> pt.getOutputs()),
-                        AbstractGoods.isFoodType, comp);
+                        AbstractGoods.isFoodType, goodsComp);
     }
 
 

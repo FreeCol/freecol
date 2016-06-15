@@ -520,7 +520,7 @@ public final class UnitType extends BuildableType implements Consumer {
     public List<UnitType> getUnitTypesLearntInLostCity() {
         return transform(getTypeChanges(),
                          c -> c.asResultOf(ChangeType.LOST_CITY),
-                         c -> c.getNewUnitType());
+                         UnitTypeChange::getNewUnitType);
     }
 
     /**
@@ -532,11 +532,11 @@ public final class UnitType extends BuildableType implements Consumer {
      *     maximum.
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        final Predicate<UnitType> pred = ut ->
+        final Predicate<UnitType> educationPred = ut ->
             ut.hasSkill() && ut.getSkill() <= maximumSkill;
         return find(transform(getTypeChanges(), UnitTypeChange::canBeTaught,
                               UnitTypeChange::getNewUnitType),
-                    pred);
+                    educationPred);
     }
 
     /**

@@ -442,11 +442,12 @@ public class BuildColonyMission extends Mission {
                 }
 
                 // Go to the nearest smaller colony?
-                final Predicate<Colony> pred = c ->
+                final Predicate<Colony> smallPred = c ->
                     c != colony && c.getUnitCount() < colony.getUnitCount();
-                final Comparator<Colony> comp = cachingIntComparator(c ->
+                final Comparator<Colony> closeComp = cachingIntComparator(c ->
                     unit.getTurnsToReach(c));
-                Colony best = minimize(player.getColonies(), pred, comp);
+                Colony best = minimize(player.getColonies(), smallPred,
+                                       closeComp);
                 if (best != null) {
                     lb.add(", going to smaller ", best.getUnitCount(), "<",
                         colony.getUnitCount(), " colony");

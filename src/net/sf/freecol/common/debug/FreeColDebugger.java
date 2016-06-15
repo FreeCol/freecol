@@ -135,7 +135,7 @@ public class FreeColDebugger {
      */
     public static String getDebugModes() {
         return transform(DebugMode.values(), m -> isInDebugMode(m),
-                         m -> m.toString(), Collectors.joining(","));
+                         DebugMode::toString, Collectors.joining(","));
     }
 
     /**

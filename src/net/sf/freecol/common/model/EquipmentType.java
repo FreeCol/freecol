@@ -306,9 +306,9 @@ public class EquipmentType extends BuildableType {
 
         super.readChildren(xr);
 
-        final Predicate<Modifier> pred = m ->
+        final Predicate<Modifier> militaryPred = m ->
             Modifier.OFFENCE.equals(m.getId()) || Modifier.DEFENCE.equals(m.getId());
-        militaryEquipment = any(getModifiers(), pred);
+        militaryEquipment = any(getModifiers(), militaryPred);
     }
 
     /**

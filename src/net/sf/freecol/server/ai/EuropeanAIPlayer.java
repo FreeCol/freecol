@@ -434,17 +434,17 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 // benefit of `temporary' cheat code).  If we do not
                 // do this, AI colonies accumulate heaps of party
                 // modifiers because of the cheat boycott removal.
-                final Predicate<Modifier> pred = m ->
+                final Predicate<Modifier> partyPred = m ->
                     Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource();
-                final Function<Colony, Modifier> mapper = c ->
-                    first(transform(c.getModifiers(), pred));
-                final CachingFunction<Colony, Modifier> cf
-                    = new CachingFunction<>(mapper);
+                final CachingFunction<Colony, Modifier> partyModifierMapper
+                    = new CachingFunction<>(c ->
+                        first(transform(c.getModifiers(), partyPred)));
                 Colony party = getRandomMember(logger, "end boycott",
-                    transform(player.getColonies(), c -> cf.apply(c) != null),
+                    transform(player.getColonies(),
+                              c -> partyModifierMapper.apply(c) != null),
                     air);
                 if (party != null) {
-                    party.removeModifier(cf.apply(party));
+                    party.removeModifier(partyModifierMapper.apply(party));
                     lb.add("lift-boycott at ", party, ", ");
                     player.logCheat("lift boycott at " + party.getName());
                 }
@@ -485,14 +485,14 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
 
         if (randoms[cheatIndex++] < landUnitCheatPercent) {
-            final Predicate<Entry<UnitType, List<WorkerWish>>> pred = e -> {
+            final Predicate<Entry<UnitType, List<WorkerWish>>> bestWishPred = e -> {
                 UnitType ut = e.getKey();
                 return ut != null && ut.isAvailableTo(player)
                     && europe.getUnitPrice(ut) != UNDEFINED
                     && first(e.getValue()) != null;
             };
             WorkerWish bestWish = maximize(transform(workerWishes.entrySet(),
-                                                     pred,
+                                                     bestWishPred,
                                                      e -> first(e.getValue()),
                                                      Collectors.toSet()),
                 ValuedAIObject.ascendingValueComparator);

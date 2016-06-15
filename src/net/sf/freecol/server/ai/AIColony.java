@@ -486,10 +486,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void exploreLCRs() {
         final Tile tile = colony.getTile();
-        final Predicate<Unit> pred = u -> u.isPerson()
+        final Predicate<Unit> explorerPred = u -> u.isPerson()
             && (u.getType().getSkill() <= 0
                 || u.hasAbility(Ability.EXPERT_SCOUT));
-        List<Unit> scouts = transform(tile.getUnitList(), pred,
+        List<Unit> scouts = transform(tile.getUnitList(), explorerPred,
                                       Function.identity(), scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
@@ -1267,14 +1267,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
             // Defend against clearing the last forested tile.
             TileType change = plan.getType().getChange(workTile.getType());
-            final Predicate<WorkLocation> pred = cwl ->
+            final Predicate<WorkLocation> forestPred = cwl ->
                 cwl instanceof ColonyTile
                     && !((ColonyTile)cwl).isColonyCenterTile()
                     && cwl.getWorkTile().isForested();
             if (change != null
                 && !change.isForested()
                 && !colonyTile.isColonyCenterTile()
-                && count(colony.getAvailableWorkLocations(), pred)
+                && count(colony.getAvailableWorkLocations(), forestPred)
                     <= FOREST_MINIMUM) continue;
 
             newPlans.add(plan); // Otherwise add the plan.
@@ -1375,10 +1375,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     public void dispose() {
-        final Predicate<AIGoods> pred = aig ->
+        final Predicate<AIGoods> ourGoodsPred = aig ->
             !aig.isDisposed() && aig.getGoods() != null
                 && aig.getGoods().getLocation() == colony;
-        List<AIObject> objects = transform(getExportGoods(), pred,
+        List<AIObject> objects = transform(getExportGoods(), ourGoodsPred,
                                            aig -> (AIObject)aig);
         objects.addAll(wishes);
         wishes.clear();

@@ -182,7 +182,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     public static TileImprovementType getBestTileImprovementType(Tile tile,
         GoodsType goodsType) {
         final Specification spec = tile.getSpecification();
-        final Predicate<TileImprovementType> pred = it ->
+        final Predicate<TileImprovementType> goodTIPred = it ->
             !it.isNatural()
                 && it.isTileTypeAllowed(tile.getType())
                 // FIXME: For now, disable any exotic non-Col1
@@ -191,10 +191,11 @@ public class TileImprovementPlan extends ValuedAIObject {
                 // PioneeringMission assumes this does not happen.
                 && it.getExpendedAmount() <= 1
                 && tile.getTileImprovement(it) == null;
-        final Comparator<TileImprovementType> comp = cachingIntComparator(it ->
-            it.getImprovementValue(tile, goodsType));
+        final Comparator<TileImprovementType> bestTIComp
+            = cachingIntComparator(it ->
+                it.getImprovementValue(tile, goodsType));
         TileImprovementType best = maximize(spec.getTileImprovementTypeList(),
-                                            pred, comp);
+                                            goodTIPred, bestTIComp);
         return (best == null || best.getImprovementValue(tile, goodsType) <= 0)
             ? null
             : best;

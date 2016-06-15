@@ -181,9 +181,9 @@ public class ImageResource extends Resource
         if (cached != null) return cached;
 
         final int fwNew = wNew, fhNew = hNew;
-        final Predicate<BufferedImage> pred = img ->
+        final Predicate<BufferedImage> sizePred = img ->
             img.getWidth() >= fwNew && img.getHeight() >= fhNew;
-        BufferedImage oim = find(loadedImages, pred);
+        BufferedImage oim = find(loadedImages, sizePred);
         im = (oim != null) ? oim : loadedImages.get(loadedImages.size() - 1);
         w = im.getWidth();
         h = im.getHeight();
