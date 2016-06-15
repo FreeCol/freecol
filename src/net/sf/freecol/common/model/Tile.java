@@ -1669,16 +1669,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType An optional <code>UnitType</code> to do the work.
-     * @return A list of production <code>Modifier</code>s.
+     * @return A stream of production <code>Modifier</code>s.
      */
-    public List<Modifier> getProductionModifiers(GoodsType goodsType,
-                                                 UnitType unitType) {
-        if (!canProduce(goodsType, unitType)) {
-            return Collections.<Modifier>emptyList();
-        }
-
-        return (tileItemContainer == null) ? Collections.<Modifier>emptyList()
-            : toList(tileItemContainer.getProductionModifiers(goodsType, unitType));
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                   UnitType unitType) {
+        return (canProduce(goodsType, unitType) && tileItemContainer != null)
+            ? tileItemContainer.getProductionModifiers(goodsType, unitType)
+            : Stream.<Modifier>empty();
     }
 
     /**

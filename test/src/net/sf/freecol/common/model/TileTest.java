@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -521,9 +523,9 @@ public class TileTest extends FreeColTestCase {
                                 mineralsResource));
     }
 
-    private boolean hasBonusFrom(List<Modifier> modifierSet,
+    private boolean hasBonusFrom(Stream<Modifier> modifierSet,
                                  FreeColSpecObjectType source) {
-        for (Modifier modifier : modifierSet) {
+        for (Modifier modifier : iterable(modifierSet)) {
             if (source.equals(modifier.getSource())) {
                 return true;
             }
@@ -695,7 +697,7 @@ public class TileTest extends FreeColTestCase {
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getPotentialProduction(silver, colonistType));
         assertEquals(1, tile.getPotentialProduction(silver, colonistType));
-        assertEquals(1, tile.getProductionModifiers(silver, colonistType).size());
+        assertEquals(1, count(tile.getProductionModifiers(silver, colonistType)));
         assertEquals(1, colonyTile.getPotentialProduction(silver, unit.getType()));
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));
