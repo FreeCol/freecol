@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -988,11 +989,21 @@ public class Game extends FreeColGameObject {
      * Get all the colonies in the game.
      *
      * @param player An optional <code>Player</code> to omit.
+     * @return A stream of all the <code>Colony</code>s in the game.
+     */
+    public Stream<Colony> getAllColonies(Player player) {
+        return flatten(getLivePlayers(player), Player::isEuropean,
+                       Player::getColonies);
+    }
+            
+    /**
+     * Get a list of all the colonies in the game.
+     *
+     * @param player An optional <code>Player</code> to omit.
      * @return A list of all the <code>Colony</code>s in the game.
      */
-    public List<Colony> getAllColonies(Player player) {
-        return toList(flatten(getLivePlayers(player), Player::isEuropean,
-                              p -> p.getColonies().stream()));
+    public List<Colony> getAllColoniesList(Player player) {
+        return toList(getAllColonies(player));
     }
             
     /**
@@ -1344,7 +1355,9 @@ public class Game extends FreeColGameObject {
 
         // Make sure all work locations have rational default production
         // now that all tiles are defined.
-        for (Colony c : getAllColonies(null)) c.updateProductionTypes();
+        for (Colony c : getAllColoniesList(null)) {
+            c.updateProductionTypes();
+        }
     }
 
     /**

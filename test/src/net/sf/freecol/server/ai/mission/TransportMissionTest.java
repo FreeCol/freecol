@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.AIGoods;
@@ -254,7 +255,8 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
 
-        assertTrue("Setup error, player should not have colonies", dutch.getColonies().isEmpty());
+        assertTrue("Setup error, player should not have colonies",
+                   none(dutch.getColonies()));
 
         // Exercise
         Location dest = mission.getTarget();
@@ -267,7 +269,8 @@ public class TransportMissionTest extends FreeColTestCase {
         Tile colonyTile = map.getTile(9, 9);
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.colonyTile(colonyTile).initialColonists(1).player(dutch).build();
-        assertFalse("Player should now have a colony", dutch.getColonies().isEmpty());
+        assertTrue("Player should now have a colony",
+                   any(dutch.getColonies()));
         mission = new TransportMission(aiMain, aiUnit);
 
         // Exercise

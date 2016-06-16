@@ -433,14 +433,12 @@ public class LabourData {
 
             GoodsType expertProduction = unitData.getUnitType().getExpertProduction();
             if (expertProduction != null) {
-                for (Colony colony : player.getColonies()) {
-                    LocationData data = unitData.details.containsKey(colony) ? unitData.getLocationData(colony) : null;
-
-                    int netProduction = colony.getNetProductionOf(expertProduction);
-                    if (data != null) {
-                        data.netProduction = netProduction;
+                for (Colony c : player.getColonyList()) {
+                    int net = c.getNetProductionOf(expertProduction);
+                    if (unitData.details.containsKey(c)) {
+                        unitData.getLocationData(c).netProduction = net;
                     }
-                    total.netProduction += netProduction;
+                    total.netProduction += net;
                 }
             }
         }

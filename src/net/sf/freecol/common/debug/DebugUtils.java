@@ -137,7 +137,7 @@ public class DebugUtils {
                                                           Player.class);
         List<String> results = new ArrayList<>();
         int fails = 0;
-        for (Colony sColony : sPlayer.getColonies()) {
+        for (Colony sColony : sPlayer.getColonyList()) {
             Colony.NoBuildReason reason
                 = sColony.getNoBuildReason(sBuildingType, null);
             results.add(sColony.getName() + ": " + reason);
@@ -291,7 +291,7 @@ public class DebugUtils {
         } catch (NumberFormatException x) {
             return;
         }
-        for (Colony c : player.getColonies()) {
+        for (Colony c : player.getColonyList()) {
             c.addLiberty(liberty);
             sGame.getFreeColGameObject(c.getId(), Colony.class)
                 .addLiberty(liberty);

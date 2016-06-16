@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -490,7 +491,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
          */
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
-            return (getUnitList().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
 
         case COLONIAL: // Handle the hard case below
             break;
@@ -504,7 +505,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         case UNDEAD:
-            return (getUnitList().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (getUnitCount() == 0) ? IS_DEAD : IS_ALIVE;
 
         default:
             throw new IllegalStateException("Bogus player type");
@@ -665,7 +666,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Clean up missions and remove tension/alarm/stance.
         for (Player other : getGame().getLivePlayers(this)) {
             if (isEuropean() && other.isIndian()) {
-                for (IndianSettlement is : other.getIndianSettlements()) {
+                for (IndianSettlement is : other.getIndianSettlementList()) {
                     ServerIndianSettlement sis = (ServerIndianSettlement)is;
                     if (is.hasMissionary(this)) sis.csKillMissionary(null, cs);
                     is.getTile().cacheUnseen();//+til
@@ -869,7 +870,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         int oldScore = this.score;
         this.score = sum(getUnitList(), Unit::getScoreValue)
             + sum(getColonies(), Colony::getLiberty)
-            + SCORE_FOUNDING_FATHER * getFathers().size();
+            + SCORE_FOUNDING_FATHER * count(getFathers());
         int gold = getGold();
         if (gold != GOLD_NOT_ACCOUNTED) {
             this.score += (int)Math.floor(SCORE_GOLD * gold);
@@ -1409,7 +1410,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Propagate tension change as settlement alarm to all
         // settlements except the one that originated it (if any).
         if (isIndian()) {
-            for (IndianSettlement is : getIndianSettlements()) {
+            for (IndianSettlement is : getIndianSettlementList()) {
                 if (is == origin || !is.hasContacted(player)) continue;
                 ((ServerIndianSettlement)is).csModifyAlarm(player, add,
                                                            false, cs);//+til
@@ -1604,14 +1605,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csNaturalDisasters(Random random, ChangeSet cs,
                                    int probability) {
         if (randomInt(logger, "Natural disaster", random, 100) < probability) {
-            int size = getSettlements().size();
-            if (size < 1) return;
-            // randomly select a colony to start with, then generate
+            List<Colony> colonies = getColonyList();
+            int size = colonies.size();
+            if (size <= 0) return;
+            // Randomly select a colony to start with, then generate
             // an appropriate disaster if possible, else continue with
-            // the next colony
+            // the next colony, wrapping around if necessary.
             int start = randomInt(logger, "select colony", random, size);
-            for (int index = 0; index < size; index++) {
-                Colony colony = getColonies().get((start + index) % size);
+            for (int i = 0; i < size; i++) {
+                Colony colony = colonies.get((start + i) % size);
                 Disaster disaster = RandomChoice.getWeightedRandom(logger,
                     "select disaster", colony.getDisasterChoices(), random);
                 List<ModelMessage> messages = csApplyDisaster(random,
@@ -1933,7 +1935,7 @@ outer:  for (Effect effect : effects) {
             // The simple way to do it is just to save all old tension
             // levels and check if they have changed after applying
             // all the changes.
-            List<IndianSettlement> allSettlements = getIndianSettlements();
+            List<IndianSettlement> allSettlements = getIndianSettlementList();
             java.util.Map<IndianSettlement,
                 java.util.Map<Player, Tension.Level>> oldLevels = new HashMap<>();
             for (IndianSettlement is : allSettlements) {
@@ -2062,19 +2064,22 @@ outer:  for (Effect effect : effects) {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csBombardEnemyShips(Random random, ChangeSet cs) {
-        for (Colony colony : getColonies()) {
-            if (colony.canBombardEnemyShip()) {
-                for (Tile tile : colony.getTile().getSurroundingTiles(1)) {
-                    if (!tile.isLand() && tile.getFirstUnit() != null
-                        && tile.getFirstUnit().getOwner() != this) {
-                        for (Unit unit : tile.getUnitList()) {
-                            if (atWarWith(unit.getOwner())
-                                || unit.hasAbility(Ability.PIRACY)) {
-                                csCombat(colony, unit, null, random, cs);
-                            }
-                        }
-                    }
-                }
+        // A unit is a bombard target only if it is:
+        //     - not one of ours
+        //     - a naval unit at sea
+        //     - either we are at war with them or they are pirates
+        final Predicate<Unit> bombardUnit = u -> 
+            (u.getOwner() != this
+                && u.isNaval() && !u.getTile().isLand()
+                && (atWarWith(u.getOwner()) || u.hasAbility(Ability.PIRACY)));
+        // For all colonies that are able to bombard, search neighbouring
+        // tiles for targets, and fire!
+        for (Colony c : transform(getColonies(), Colony::canBombardEnemyShip)) {
+            Tile tile = c.getTile();
+            for (Unit u : transform(flatten(tile.getSurroundingTiles(1, 1),
+                                            t -> t.getUnitList().stream()),
+                                    bombardUnit)) {
+                csCombat(c, u, null, random, cs);
             }
         }
     }
@@ -2133,25 +2138,21 @@ outer:  for (Effect effect : effects) {
                 // Check for tiles that are now visible.  They need to be
                 // explored, and always updated so that units are visible.
                 // *Requires that canSee[] has **not** been updated yet!*
-                Set<Tile> tiles = new HashSet<>();
-                int los;
-                for (Colony c : (hasAbility(Ability.SEE_ALL_COLONIES))
-                         ? getGame().getAllColonies(null)
-                         : getColonies()) {
-                    for (Tile t : c.getVisibleTiles()) {
-                        if (!canSee(t)) tiles.add(t);
-                    }
-                }
-                for (Unit u : getUnitList()) {
-                    for (Tile t : u.getVisibleTiles()) {
-                        if (!canSee(t)) tiles.add(t);
-                    }
-                }
+                Stream<Colony> colonies = (hasAbility(Ability.SEE_ALL_COLONIES))
+                    ? getGame().getAllColonies(null)
+                    : getColonies();
+                Set<Tile> tiles
+                    = transform(concat(flatten(colonies,
+                                               c -> c.getVisibleTiles().stream()),
+                                       flatten(getUnitList(),
+                                               u -> u.getVisibleTiles().stream())),
+                                t -> !canSee(t), Function.identity(),
+                                Collectors.toSet());
                 exploreTiles(tiles); // Explore the new tiles
                 cs.add(See.only(this), tiles);
                 visibilityChange = true;
             } else if (Modifier.SOL.equals(m.getId())) {
-                for (Colony c : getColonies()) {
+                for (Colony c : getColonyList()) {
                     c.addLiberty(0); // Kick the SoL and production bonus
                     c.invalidateCache();
                 }
@@ -2173,13 +2174,11 @@ outer:  for (Effect effect : effects) {
                 for (Player p : game.getLiveNativePlayers(null)) {
                     if (!p.hasContacted(this)) continue;
                     p.setTension(this, new Tension(Tension.TENSION_MIN));
-                    for (IndianSettlement is : p.getIndianSettlements()) {
-                        if (is.hasContacted(this)) {
-                            is.getTile().cacheUnseen();//+til
-                            is.setAlarm(this,
-                                new Tension(Tension.TENSION_MIN));//-til
-                            cs.add(See.only(this), is);
-                        }
+                    for (IndianSettlement is : transform(p.getIndianSettlements(),
+                                                         is -> is.hasContacted(this))) {
+                        is.getTile().cacheUnseen();//+til
+                        is.setAlarm(this, new Tension(Tension.TENSION_MIN));//-til
+                        cs.add(See.only(this), is);
                     }
                     csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                 }
@@ -2195,8 +2194,8 @@ outer:  for (Effect effect : effects) {
 
             } else if ("model.event.freeBuilding".equals(eventId)) {
                 BuildingType type = spec.getBuildingType(event.getValue());
-                for (Colony colony : getColonies()) {
-                    ((ServerColony)colony).csFreeBuilding(type, cs);
+                for (Colony c : getColonyList()) {
+                    ((ServerColony)c).csFreeBuilding(type, cs);
                 }
 
             } else if ("model.event.seeAllColonies".equals(eventId)) {
@@ -2761,16 +2760,15 @@ outer:  for (Effect effect : effects) {
             // FIXME: just the tension
             cs.add(See.perhaps().always(this), defenderPlayer);
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
-            for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
-                if (is.hasContacted(this)) {
-                    is.getAlarm(this).setValue(Tension.SURRENDERED);
-                    // Only update attacker with settlements that have
-                    // been seen, as contact can occur with its members.
-                    if (hasExplored(is.getTile())) {
-                        cs.add(See.perhaps().always(this), is);
-                    } else {
-                        cs.add(See.only(defenderPlayer), is);
-                    }
+            for (IndianSettlement is : transform(defenderPlayer.getIndianSettlements(),
+                                                 is -> is.hasContacted(this))) {
+                is.getAlarm(this).setValue(Tension.SURRENDERED);
+                // Only update attacker with settlements that have
+                // been seen, as contact can occur with its members.
+                if (hasExplored(is.getTile())) {
+                    cs.add(See.perhaps().always(this), is);
+                } else {
+                    cs.add(See.only(defenderPlayer), is);
                 }
             }
         } else if (isEuropean() && defenderPlayer.isEuropean()) {
@@ -2909,10 +2907,8 @@ outer:  for (Effect effect : effects) {
 
         // Burn down the missions
         boolean here = is.hasMissionary(attackerPlayer);
-        for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
-            if (s.hasMissionary(attackerPlayer)) {
-                ((ServerIndianSettlement)s).csKillMissionary(null, cs);
-            }
+        for (IndianSettlement s : nativePlayer.getIndianSettlementsWithMissionary(attackerPlayer)) {
+            ((ServerIndianSettlement)s).csKillMissionary(null, cs);
         }
         // Backtrack on updating this tile, avoiding duplication in csCombat
         if (here) cs.remove(is.getTile());
@@ -4291,7 +4287,7 @@ outer:  for (Effect effect : effects) {
                 = transform(mercs, au -> au.getType(spec).isNaval());
             Tile dst;
             if (naval.isEmpty()) { // Deliver to first settlement
-                dst = getColonies().get(0).getTile();
+                dst = first(getColonies()).getTile();
                 createUnits(mercs, dst);//-vis: safe, in colony
                 cs.add(See.only(this), dst);
             } else { // Let them sail in

@@ -1730,7 +1730,7 @@ public final class InGameController extends Controller {
             if (upgrade != null) upgrades.put(unitType, upgrade);
         }
         java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
-        for (Colony colony : serverPlayer.getColonies()) {
+        for (Colony colony : serverPlayer.getColonyList()) {
             List<Unit> allUnits = new ArrayList<>();
             allUnits.addAll(colony.getTile().getUnitList());
             allUnits.addAll(colony.getUnitList());

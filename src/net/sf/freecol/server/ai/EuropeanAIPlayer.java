@@ -543,7 +543,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 enemies.clear();
                 enemies.addAll(preferred);
             }
-            List<Colony> colonies = player.getColonies();
+            List<Colony> colonies = player.getColonyList();
             // Find a target to attack.
             Location target = null;
             // Few colonies?  Attack the weakest European port
@@ -556,7 +556,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                                 : score / (stockade.getLevel() + 1.5);
                         });
                 target = maximize(flatten(enemies, Player::isEuropean,
-                                          p -> p.getColonies().stream()),
+                                          Player::getColonies),
                                   Colony::isConnectedPort, targetScore);
             }
             // Otherwise attack something near a weak colony

@@ -38,6 +38,7 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -164,7 +165,7 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public boolean setNext(Unit unit) {
             if (predicate.test(unit)) { // Of course, it has to be valid...
-                Unit sentinel = first(units);
+                final Unit sentinel = first(units);
                 while (!units.isEmpty()) {
                     if (units.get(0) == unit) return true;
                     units.remove(0);
@@ -1400,9 +1401,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getLibertyProductionNextTurn() {
         final Specification spec = getSpecification();
-        int nextTurn = sum(getColonies(),
-            c -> sum(spec.getLibertyGoodsTypeList(),
-                     gt -> c.getTotalProductionOf(gt)));
+        final List<GoodsType> goodsTypes = spec.getLibertyGoodsTypeList();
+        int nextTurn = sum(getColonies(), c ->
+                           sum(goodsTypes, gt -> c.getTotalProductionOf(gt)));
         return (int)applyModifiers((float)nextTurn, getGame().getTurn(),
                                    Modifier.LIBERTY);
     }
@@ -1413,7 +1414,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The total percentage of rebels in all this player's colonies.
      */
     public int getSoL() {
-        final List<Colony> colonies = getColonies();
+        final List<Colony> colonies = getColonyList();
         return (colonies.isEmpty()) ? 0
             : sum(colonies, Colony::getSoL) / colonies.size();
     }
@@ -1456,7 +1457,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public void addFather(FoundingFather father) {
         foundingFathers.add(father);
         addFeatures(father);
-        for (Colony colony : getColonies()) colony.invalidateCache();
+        for (Colony c : getColonyList()) c.invalidateCache();
     }
 
     /**
@@ -1662,7 +1663,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public void setTax(int amount) {
         tax = amount;
         if (recalculateBellsBonus()) {
-            for (Colony colony : getColonies()) colony.invalidateCache();
+            for (Colony c : getColonyList()) c.invalidateCache();
         }
     }
 
@@ -1965,6 +1966,17 @@ public class Player extends FreeColGameObject implements Nameable {
     public List<Unit> getUnitList() {
         synchronized (this.units) {
             return new ArrayList<>(this.units);
+        }
+    }
+
+    /**
+     * Get the number of units a player has.
+     *
+     * @return The number of units.
+     */
+    public int getUnitCount() {
+        synchronized (this.units) {
+            return count(this.units);
         }
     }
 
@@ -2387,16 +2399,24 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a fresh list of all colonies this player owns.
-     * It is an error to call this on non-European players.
+     * Get a stream of all colonies this player owns.
      *
-     * @return A fresh list of the <code>Colony</code>s this player owns.
+     * @return A stream of the <code>Colony</code>s this player owns.
      */
-    public List<Colony> getColonies() {
+    public Stream<Colony> getColonies() {
+        return getColonyList().stream();
+    }
+
+    /**
+     * Get a fresh list of all colonies this player owns.
+     *
+     * @return A list of the <code>Colony</code>s this player owns.
+     */
+    public List<Colony> getColonyList() {
         return transform(getSettlements(), s -> s instanceof Colony,
                          s -> (Colony)s);
     }
-
+    
     /**
      * Get a sorted list of all colonies this player owns.
      *
@@ -2409,16 +2429,39 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a list of all the IndianSettlements this player owns.
-     * It is an error to call this on non-native players.
+     * Get a stream of all the indian settlements this player owns.
      *
-     * @return The indian settlements this player owns.
+     * @return A stream of the <code>IndianSettlement</code>s this player owns.
      */
-    public List<IndianSettlement> getIndianSettlements() {
+    public Stream<IndianSettlement> getIndianSettlements() {
+        return getIndianSettlementList().stream();
+    }
+
+    /**
+     * Get a list of all the IndianSettlements this player owns.
+     *
+     * @return A list of the <code>IndianSettlement</code>s this player owns.
+     */
+    public List<IndianSettlement> getIndianSettlementList() {
         return transform(getSettlements(), s -> s instanceof IndianSettlement,
                          s -> (IndianSettlement)s);
     }
 
+    /**
+     * Get a list of all indian settlements owned by this player with
+     * a missionary from a given player.
+     *
+     * @param p The <code>Player</code>.
+     * @return A list of the <code>IndianSettlement<code>s with suitable
+     *     missionaries.
+     */
+    public List<IndianSettlement> getIndianSettlementsWithMissionary(Player p) {
+        final Predicate<Settlement> isPred = s ->
+            s instanceof IndianSettlement
+                && ((IndianSettlement)s).hasMissionary(p);
+        return transform(getSettlements(), isPred, s -> (IndianSettlement)s);
+    }            
+        
     /**
      * Find a <code>Settlement</code> by name.
      *
@@ -2799,24 +2842,19 @@ public class Player extends FreeColGameObject implements Nameable {
         if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
             for (Player other : getGame().getLiveNativePlayers(this)) {
-                for (IndianSettlement is : other.getIndianSettlements()) {
-                    if (!is.hasMissionary(this)) {
-                        continue;
-                    }
-                    for (Tile t : is.getVisibleTiles()) {
-                        cST[t.getX()][t.getY()] = true;
-                        t.seeTile(this);
-                    }
+                for (Tile t : iterable(flatten(getIndianSettlementsWithMissionary(this),
+                                               is -> is.getVisibleTiles().stream()))) {
+                    cST[t.getX()][t.getY()] = true;
+                    t.seeTile(this);
                 }
             }
         }
         // All other European settlements if can see all colonies.
         if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
-            for (Colony c : getGame().getAllColonies(this)) {
-                for (Tile t : c.getVisibleTiles()) {
-                    cST[t.getX()][t.getY()] = true;
-                    t.seeTile(this);
-                }
+            for (Tile t : iterable(flatten(getGame().getAllColonies(this),
+                                           c -> c.getVisibleTiles().stream()))) {
+                cST[t.getX()][t.getY()] = true;
+                t.seeTile(this);
             }
         }
         return cST;

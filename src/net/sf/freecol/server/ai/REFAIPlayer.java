@@ -196,8 +196,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 UnitSeekAndDestroyMission.scorePath(aiu, path));
         };
         final List<TargetTuple> targets
-            = transform(flatten(player.getRebels(),
-                                p -> p.getColonies().stream()),
+            = transform(flatten(player.getRebels(), Player::getColonies),
                         portPred, newTupleMapper);
 
         // Increase score for drydock/s, musket and tools suppliers,

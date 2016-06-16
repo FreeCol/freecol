@@ -420,8 +420,7 @@ public class ServerGame extends Game implements ServerModelObject {
         ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
         ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
         for (Player player : getLiveNativePlayers(null)) {
-            for (IndianSettlement is : player.getIndianSettlements()) {
-                if (!is.hasMissionary(weakest)) continue;
+            for (IndianSettlement is : player.getIndianSettlementsWithMissionary(weakest)) {
                 lb.add(" ", is.getName(), "(mission)");
                 is.getTile().cacheUnseen(strongest);//+til
                 tiles.add(is.getTile());
@@ -434,10 +433,10 @@ public class ServerGame extends Game implements ServerModelObject {
                 }
             }
         }
-        for (Colony colony : weakest.getColonies()) {
-            updated.addAll(colony.getOwnedTiles());
-            ((ServerColony)colony).csChangeOwner(strongest, false, cs);//-vis(both),-til
-            lb.add(" ", colony.getName());
+        for (Colony c : weakest.getColonyList()) {
+            updated.addAll(c.getOwnedTiles());
+            ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
+            lb.add(" ", c.getName());
         }
         for (Unit unit : weakest.getUnitList()) {
             if (weakest.csChangeOwner(unit, strongest, 

@@ -93,7 +93,7 @@ public final class ReportIndianPanel extends ReportPanel {
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
         final NationSummary ns = igc().getNationSummary(opponent);
         List<IndianSettlement> nativeSettlements
-            = opponent.getIndianSettlements();
+            = opponent.getIndianSettlementList();
         String numSettlements = String.valueOf(nativeSettlements.size())
             + " / " + ((ns == null) ? "?"
                 : String.valueOf(ns.getNumberOfSettlements()));

@@ -184,13 +184,11 @@ public class MapGeneratorTest extends FreeColTestCase {
             // has at least one settlement.
             int settlements = 0;
             int capitals = 0;
-            for (IndianSettlement s : p.getIndianSettlements()) {
+            for (IndianSettlement s : p.getIndianSettlementList()) {
                 settlements++;
-                if (s.isCapital())
-                    capitals++;
+                if (s.isCapital()) capitals++;
             }
-            if (settlements > 0)
-                assertEquals(1, capitals);
+            if (settlements > 0) assertEquals(1, capitals);
         }
     }
 

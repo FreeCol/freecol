@@ -1030,7 +1030,7 @@ public final class FreeColServer {
             for (Player p : game.getPlayers()) {
                 // @compat 0.10.5
                 if (p.isIndian()) {
-                    for (IndianSettlement is : p.getIndianSettlements()) {
+                    for (IndianSettlement is : p.getIndianSettlementList()) {
                         ((ServerIndianSettlement)is).updateMostHated();
                     }
                 }
@@ -1194,7 +1194,7 @@ public final class FreeColServer {
                     + Tension.Level.CONTENT.getLimit()) / 2;
                 for (Player other : game.getLiveNativePlayers(player)) {
                     player.setStance(other, Stance.PEACE);
-                    for (IndianSettlement is : player.getIndianSettlements()) {
+                    for (IndianSettlement is : player.getIndianSettlementList()) {
                         is.setAlarm(other, new Tension(alarm));
                     }
                 }
