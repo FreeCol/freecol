@@ -167,6 +167,17 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
+     * Remove any stops matching a given location.
+     *
+     * @param loc The <code>Location</code> to match.
+     * @return True if any stop was removed.
+     */
+    public boolean removeMatchingStops(Location loc) {
+        return removeInPlace(stops,
+                             trs -> Map.isSameLocation(trs.getLocation(), loc));
+    }
+
+    /**
      * Get the index of a stop in this trade route.
      *
      * @param stop The <code>TradeRouteStop</code> to look for.

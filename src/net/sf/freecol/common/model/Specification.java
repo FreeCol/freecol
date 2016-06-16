@@ -473,14 +473,8 @@ public final class Specification {
     public void clean(String why) {
         logger.finest("Cleaning up specification following " + why + ".");
 
-        Iterator<FreeColSpecObjectType> typeIterator
-            = allTypes.values().iterator();
-        while (typeIterator.hasNext()) {
-            FreeColSpecObjectType type = typeIterator.next();
-            if (type.isAbstractType()) {
-                typeIterator.remove();
-            }
-        }
+        // Drop all abstract types
+        removeInPlace(allTypes, e -> e.getValue().isAbstractType());
 
         // Fix up the GoodsType derived attributes.  Several GoodsType
         // predicates are likely to fail until this is done.

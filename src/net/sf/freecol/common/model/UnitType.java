@@ -1005,13 +1005,8 @@ public final class UnitType extends BuildableType implements Consumer {
             if (xr.getAttribute(DELETE_TAG, false)) {
                 if (typeChanges != null) {
                     String unitId = xr.getAttribute(UNIT_TAG, (String)null);
-                    Iterator<UnitTypeChange> it = typeChanges.iterator();
-                    while (it.hasNext()) {
-                        if (unitId.equals(it.next().getNewUnitType().getId())) {
-                            it.remove();
-                            break;
-                        }
-                    }
+                    removeInPlace(typeChanges, tc ->
+                        unitId.equals(tc.getNewUnitType().getId()));
                 }
                 xr.closeTag(tag);
 

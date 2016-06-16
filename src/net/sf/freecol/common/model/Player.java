@@ -2499,12 +2499,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void refilterModelMessages(OptionGroup options) {
         synchronized (this.modelMessages) {
-            Iterator<ModelMessage> mi = this.modelMessages.iterator();
-            while (mi.hasNext()) {
-                ModelMessage message = mi.next();
-                String id = message.getMessageType().getOptionName();
-                if (!options.getBoolean(id)) mi.remove();
-            }
+            removeInPlace(this.modelMessages, m ->
+                !options.getBoolean(m.getMessageType().getOptionName()));
         }
     }
 
@@ -2513,11 +2509,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void removeDisplayedModelMessages() {
         synchronized (this.modelMessages) {
-            Iterator<ModelMessage> mi = this.modelMessages.iterator();
-            while (mi.hasNext()) {
-                ModelMessage message = mi.next();
-                if (message.hasBeenDisplayed()) mi.remove();
-            }
+            removeInPlace(this.modelMessages, ModelMessage::hasBeenDisplayed);
         }
     }
 
@@ -2541,16 +2533,15 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void divertModelMessages(FreeColGameObject source,
                                     FreeColGameObject newSource) {
+        final Predicate<ModelMessage> sourcePred = m ->
+            Utils.equals(m.getSourceId(), source.getId());
         synchronized (this.modelMessages) {
-            Iterator<ModelMessage> mi = this.modelMessages.iterator();
-            while (mi.hasNext()) {
-                ModelMessage message = mi.next();
-                if (Utils.equals(message.getSourceId(), source.getId())) {
-                    if (newSource == null) {
-                        mi.remove();
-                    } else {
-                        message.divert(newSource);
-                    }
+            if (newSource == null) {
+                removeInPlace(this.modelMessages, sourcePred);
+            } else {
+                for (ModelMessage m : transform(this.modelMessages,
+                                                sourcePred)) {
+                    m.divert(newSource);
                 }
             }
         }

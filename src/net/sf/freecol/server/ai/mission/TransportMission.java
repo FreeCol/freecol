@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
@@ -757,14 +758,8 @@ public class TransportMission extends Mission {
             } else if (t instanceof AIGoods) {
                 Goods goods = ((AIGoods)t).getGoods();
                 if (goods != null) {
-                    Iterator<Goods> gi = goodsPresent.iterator();
-                    while (gi.hasNext()) {
-                        Goods g = gi.next();
-                        if (g.getType() == goods.getType()) {
-                            gi.remove();
-                            break;
-                        }
-                    }
+                    removeInPlace(goodsPresent,
+                                  AbstractGoods.matches(goods.getType()));
                 }
             }
         }

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -164,11 +163,7 @@ public final class FeatureContainer {
                     if (aset != null) result.addAll(aset);
                 }
             }
-            Iterator<Ability> it = result.iterator();
-            while (it.hasNext()) {
-                Ability a = it.next();
-                if (!a.appliesTo(fcgot, turn)) it.remove();
-            }
+            removeInPlace(result, a -> !a.appliesTo(fcgot, turn));
         }
         return result;
     }
@@ -247,11 +242,7 @@ public final class FeatureContainer {
                 if (ms != null) mset.addAll(ms);
             }
         }
-        Iterator<Modifier> it = mset.iterator();
-        while (it.hasNext()) {
-            Modifier m = it.next();
-            if (!m.appliesTo(fcgot, turn)) it.remove();
-        }
+        removeInPlace(mset, m -> !m.appliesTo(fcgot, turn));
         return (mset.isEmpty()) ? Stream.<Modifier>empty() : mset.stream();
     }
 

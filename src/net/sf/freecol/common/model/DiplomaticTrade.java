@@ -259,12 +259,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      *     <code>TradeItem</code> to remove.
      */
     public void removeType(Class<? extends TradeItem> itemClass) {
-        Iterator<TradeItem> itemIterator = this.items.iterator();
-        while (itemIterator.hasNext()) {
-            if (itemIterator.next().getClass() == itemClass) {
-                itemIterator.remove();
-            }
-        }
+        removeInPlace(this.items, matchKey(itemClass, TradeItem::getClass));
     }
 
     /**

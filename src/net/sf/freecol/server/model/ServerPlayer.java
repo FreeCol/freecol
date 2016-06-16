@@ -3757,16 +3757,7 @@ outer:  for (Effect effect : effects) {
      */
     public void csLoseLocation(Location loc, ChangeSet cs) {
         for (TradeRoute tr : getTradeRoutes()) {
-            boolean suspend = false;
-            Iterator<TradeRouteStop> trsi = tr.getStops().iterator();
-            while (trsi.hasNext()) {
-                TradeRouteStop trs = trsi.next();
-                if (Map.isSameLocation(trs.getLocation(), loc)) {
-                    suspend = true;
-                    trsi.remove();
-                }
-            }
-            if (suspend) {
+            if (tr.removeMatchingStops(loc)) {
                 for (Unit u : tr.getAssignedUnits()) {
                     u.setTradeRoute(null);
                     cs.add(See.only(this), u);

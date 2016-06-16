@@ -22,7 +22,6 @@ package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -902,11 +901,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Update tiles that are now invisible.
-        Iterator<Tile> it = oldTiles.iterator();
-        while (it.hasNext()) {
-            if (serverPlayer.canSee(it.next())) it.remove();
-        }
+        removeInPlace(oldTiles, t -> serverPlayer.canSee(t));
         if (!oldTiles.isEmpty()) cs.add(See.only(serverPlayer), oldTiles);
+
         // Unless moving in from off-map, update the old location and
         // make sure the move is always visible even if the unit
         // dies (including the animation).  However, dead units
