@@ -1767,21 +1767,6 @@ public class SwingGUI extends GUI {
         canvas.updateEuropeanSubpanels();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateGameOptions() {
-        canvas.updateGameOptions();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateMapGeneratorOptions() {
-        canvas.updateMapGeneratorOptions();
-    }
 
     // Trivial delegations to MapViewer
 

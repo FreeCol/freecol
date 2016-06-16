@@ -1317,10 +1317,6 @@ public class GUI extends FreeColClientHolder {
 
     public void showVictoryDialog(DialogHandler<Boolean> handler) {}
 
-    public void updateGameOptions() {}
-
-    public void updateMapGeneratorOptions() {}
-
     public void centerActiveUnit() {}
 
     public void changeViewMode(int newViewMode) {}

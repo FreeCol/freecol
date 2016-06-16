@@ -184,55 +184,6 @@ public final class StartGamePanel extends FreeColPanel {
         setEnabled(true);
     }
 
-    @Override
-    public void requestFocus() {
-        start.requestFocus();
-    }
-
-    /**
-     * Updates the map generator options displayed on this panel.
-     */
-    public void updateMapGeneratorOptions() {
-        getFreeColClient().getGame().getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.MAP_WIDTH);
-        getFreeColClient().getGame().getMapGeneratorOptions()
-            .getOption(MapGeneratorOptions.MAP_HEIGHT);
-    }
-
-    /**
-     * Updates the game options displayed on this panel.
-     */
-    public void updateGameOptions() {
-        // Nothing yet.
-    }
-
-    /**
-     * Sets whether or not this component is enabled. It also does this for its
-     * children.
-     *
-     * @param enabled 'true' if this component and its children should be
-     *            enabled, 'false' otherwise.
-     */
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-
-        Component[] components = getComponents();
-        for (Component component : components) {
-            component.setEnabled(enabled);
-        }
-
-        if (singlePlayerGame && enabled) {
-            readyBox.setEnabled(false);
-        }
-
-        if (enabled) {
-            start.setEnabled(getFreeColClient().isAdmin());
-        }
-
-        gameOptions.setEnabled(enabled);
-    }
-
     /**
      * Check that the user has not specified degenerate victory conditions
      * that are automatically true.
@@ -259,13 +210,14 @@ public final class StartGamePanel extends FreeColPanel {
     /**
      * Displays a chat message to the user.
      *
-     * @param senderName The name of the player who sent the chat message to the
-     *            server.
+     * @param senderName The name of the player who sent the chat
+     *     message to the server.
      * @param message The chat message.
      * @param privateChat 'true' if the message is a private one, 'false'
-     *            otherwise.
+     *     otherwise.
      */
-    public void displayChat(String senderName, String message, boolean privateChat) {
+    public void displayChat(String senderName, String message,
+                            boolean privateChat) {
         if (privateChat) {
             chatArea.append(senderName + " (" + Messages.message("private")
                 + "): " + message + '\n');
@@ -279,9 +231,7 @@ public final class StartGamePanel extends FreeColPanel {
      * they've made.
      */
     public void refreshPlayersTable() {
-        if (table != null) {
-            table.update();
-        }
+        if (table != null) table.update();
     }
 
 
@@ -370,5 +320,36 @@ public final class StartGamePanel extends FreeColPanel {
         gameOptions.removeActionListener(this);
         mapGeneratorOptions.removeActionListener(this);
         if (chat != null) chat.removeActionListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void requestFocus() {
+        start.requestFocus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+
+        Component[] components = getComponents();
+        for (Component component : components) {
+            component.setEnabled(enabled);
+        }
+
+        if (singlePlayerGame && enabled) {
+            readyBox.setEnabled(false);
+        }
+
+        if (enabled) {
+            start.setEnabled(getFreeColClient().isAdmin());
+        }
+
+        gameOptions.setEnabled(enabled);
     }
 }

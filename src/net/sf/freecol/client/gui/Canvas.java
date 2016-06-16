@@ -1498,20 +1498,6 @@ public final class Canvas extends JDesktopPane {
         startGamePanel.refreshPlayersTable();
     }
 
-    /**
-     * Update the game options in the start panel.
-     */
-    void updateGameOptions() {
-        startGamePanel.updateGameOptions();
-    }
-
-    /**
-     * Update the map generator options in the start panel.
-     */
-    void updateMapGeneratorOptions() {
-        startGamePanel.updateMapGeneratorOptions();
-    }
-
 
     // Dialog display
 
