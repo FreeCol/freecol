@@ -454,9 +454,6 @@ public class ColonyTile extends WorkLocation {
         final Colony colony = getColony();
         final Player owner = colony.getOwner();
         final Turn turn = getGame().getTurn();
-        Stream<Modifier> ownerMods = (owner == null) ? Stream.<Modifier>empty()
-            : owner.getModifiers(id, type, turn);
-
         return (unitType != null)
             // Unit modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, unitType),
