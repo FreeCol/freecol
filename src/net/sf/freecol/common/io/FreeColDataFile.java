@@ -275,19 +275,20 @@ public class FreeColDataFile {
             lb.add(", could not resolve virtual resource/s: ",
                    join(" ", todo));
         }
-        alternatives.forEach(key -> {
+        for (String key : alternatives) {
             final String value = properties.getProperty(key);
             URI uri = getURI(value);
             if (uri != null) {
                 int split = key.lastIndexOf('.');
                 ImageResource ir = rc.getImageResource(key.substring(0, split));
-                if(ir != null)
+                if (ir != null) {
                     ir.addAlternativeResourceLocator(uri);
-                else
+                } else {
                     logger.warning("Missing resource when adding alternative: "
                         + key);
+                }
             }
-        });
+        }
         if (lb.grew()) lb.log(logger, Level.INFO);
         return rc;
     }
