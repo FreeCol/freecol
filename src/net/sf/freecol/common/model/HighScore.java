@@ -124,10 +124,10 @@ public class HighScore extends FreeColObject {
     private String difficulty;
 
     /** The final number of units. */
-    private int units;
+    private int nUnits;
 
     /** The final number of colonies. */
-    private int colonies;
+    private int nColonies;
 
     /** The name for the New World. */
     private String newLandName;
@@ -161,8 +161,8 @@ public class HighScore extends FreeColObject {
         this.playerName = player.getName();
         this.nationId = player.getNationId();
         this.nationTypeId = player.getNationType().getId();
-        this.colonies = player.getColonies().size();
-        this.units = player.getUnits().size();
+        this.nColonies = player.getColonies().size();
+        this.nUnits = player.getUnits().size();
         this.independenceTurn = (player.getPlayerType()
             == Player.PlayerType.INDEPENDENT) ? game.getTurn().getNumber()
             : -1;
@@ -286,8 +286,8 @@ public class HighScore extends FreeColObject {
      *
      * @return The number of units.
      */
-    public final int getUnits() {
-        return units;
+    public final int getUnitCount() {
+        return nUnits;
     }
 
     /**
@@ -295,8 +295,8 @@ public class HighScore extends FreeColObject {
      *
      * @return The number of colonies.
      */
-    public final int getColonies() {
-        return colonies;
+    public final int getColonyCount() {
+        return nColonies;
     }
 
     /**
@@ -517,9 +517,9 @@ public class HighScore extends FreeColObject {
 
         xw.writeAttribute(DIFFICULTY_TAG, difficulty);
 
-        xw.writeAttribute(UNITS_TAG, units);
+        xw.writeAttribute(UNITS_TAG, nUnits);
 
-        xw.writeAttribute(COLONIES_TAG, colonies);
+        xw.writeAttribute(COLONIES_TAG, nColonies);
     }
 
     /**
@@ -590,9 +590,9 @@ public class HighScore extends FreeColObject {
         difficulty = xr.getAttribute(DIFFICULTY_TAG,
                                      FreeCol.getDifficulty());
 
-        units = xr.getAttribute(UNITS_TAG, 0);
+        nUnits = xr.getAttribute(UNITS_TAG, 0);
 
-        colonies = xr.getAttribute(COLONIES_TAG, 0);
+        nColonies = xr.getAttribute(COLONIES_TAG, 0);
     }
 
     /**

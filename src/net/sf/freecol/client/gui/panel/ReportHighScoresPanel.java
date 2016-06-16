@@ -112,11 +112,11 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
             reportPanel.add(Utility.localizedLabel("report.highScores.units"),
                             "skip");
-            reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));
+            reportPanel.add(new JLabel(String.valueOf(highScore.getUnitCount())));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.colonies"),
                             "skip");
-            reportPanel.add(new JLabel(String.valueOf(highScore.getColonies())));
+            reportPanel.add(new JLabel(String.valueOf(highScore.getColonyCount())));
 
             reportPanel.add(Utility.localizedLabel("report.highScores.retired"),
                             "skip");
