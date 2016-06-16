@@ -221,11 +221,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Get the <code>ColonyTile</code> matching the given
      * <code>Tile</code>.
      *
-     * @param t The <code>Tile</code> to check.
+     * @param tile The <code>Tile</code> to check.
      * @return The corresponding <code>ColonyTile</code>, or null if not found.
      */
-    public ColonyTile getColonyTile(Tile t) {
-        return find(getColonyTiles(), ct -> ct.getWorkTile() == t);
+    public ColonyTile getColonyTile(Tile tile) {
+        return find(getColonyTiles(), matchKey(tile, ColonyTile::getWorkTile));
     }
 
     /**
@@ -1712,7 +1712,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             result = getDisplayUnitCount() * 1000
                 + 500 // Some useful goods?
                 + 200 * count(getTile().getSurroundingTiles(0, 1),
-                              t -> t.getOwningSettlement() == this);
+                              matchKey(this, Tile::getOwningSettlement));
             Building stockade = getStockade();
             if (stockade != null) result *= stockade.getLevel();
         }

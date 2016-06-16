@@ -282,8 +282,9 @@ public class Building extends WorkLocation
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                final UnitType expertType = getExpertUnitType();
                 long minimumGoodsInput = 4 // FIXME: magic number
-                    * count(getUnitList(), u -> u.getType() == getExpertUnitType());
+                    * count(getUnitList(), matchKey(expertType, Unit::getType));
                 if (minimumGoodsInput > available) {
                     available = minimumGoodsInput;
                 }

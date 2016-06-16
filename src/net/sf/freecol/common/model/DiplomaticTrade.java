@@ -308,7 +308,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      * @return A list of <code>TradeItem</code>s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
-        return transform(this.items, ti -> ti.getSource() == player);
+        return transform(this.items, matchKey(player, TradeItem::getSource));
     }
 
     /**

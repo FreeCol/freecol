@@ -346,7 +346,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     public boolean changeContainsTarget(TileType tileType) {
         return (tileTypeChanges == null) ? false
             : any(tileTypeChanges.values(),
-                change -> change.getTo() == tileType);
+                  matchKey(tileType, TileTypeChange::getTo));
     }
 
     /**

@@ -974,7 +974,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             if (ti.isNatural()) continue;
             tiles.clear();
             tiles.addAll(transform(rTileSuggestions,
-                                   ts -> ts.tileImprovementType == ti,
+                                   matchKey(ti, ts -> ts.tileImprovementType),
                                    ts -> ts.tile, Collectors.toSet()));
             reportPanel.add((tiles.isEmpty()) ? new JLabel()
                 : newLabel(Integer.toString(tiles.size()), null, cAlarm,

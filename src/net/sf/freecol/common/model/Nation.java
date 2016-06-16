@@ -174,7 +174,7 @@ public class Nation extends FreeColSpecObjectType {
      */
     public final Nation getRebelNation() {
         return find(getSpecification().getEuropeanNations(),
-            n -> n.getREFNation() == this);
+                    matchKey(this, Nation::getREFNation));
     }
 
     /**

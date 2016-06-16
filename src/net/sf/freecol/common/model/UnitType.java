@@ -413,7 +413,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public List<Role> getExpertRoles() {
         return transform(getSpecification().getRoles(),
-                         r -> r.getExpertUnit() == this);
+                         matchKey(this, Role::getExpertUnit));
     }
 
     /**
@@ -490,7 +490,8 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return The type change, or null if impossible.
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
-        return find(getTypeChanges(), c -> c.getNewUnitType() == newType);
+        return find(getTypeChanges(),
+                    matchKey(newType, UnitTypeChange::getNewUnitType));
     }
 
     /**

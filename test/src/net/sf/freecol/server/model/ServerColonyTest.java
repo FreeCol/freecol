@@ -122,7 +122,7 @@ public class ServerColonyTest extends FreeColTestCase {
         // This will be the only food production of the colony
         AbstractGoods foodGoods
             = first(transform(colonyTile.getType().getPossibleProduction(true),
-                              ag -> ag.getType() == foodGoodsType));
+                              AbstractGoods.matches(foodGoodsType)));
         if (foodGoods != null) foodGoods.setAmount(2);
 
         Unit unit = colony.getUnitList().get(0);

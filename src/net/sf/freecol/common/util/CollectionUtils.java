@@ -957,6 +957,18 @@ public class CollectionUtils {
     }
 
     /**
+     * Create a predicate for a type that returns true if it equals a key.
+     *
+     * @param <T> The input type.
+     * @param <K> The key type.
+     * @param key The key to match.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T, K> Predicate<T> matchKey(final K key) {
+        return t -> t == key;
+    }
+
+    /**
      * Create a predicate for a type that returns true if a mapper applied
      * to it causes it to equal a key.
      *

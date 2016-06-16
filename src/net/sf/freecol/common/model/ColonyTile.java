@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -230,7 +231,7 @@ public class ColonyTile extends WorkLocation {
                     food -= ag.getAmount();
                 } else if (colony.isConsuming(goodsType)) {
                     int change = -ag.getAmount()
-                        + sum(newProd, g -> g.getType() == goodsType,
+                        + sum(newProd, AbstractGoods.matches(goodsType),
                               AbstractGoods::getAmount);
                     if (change < 0
                         && change + colony.getNetProductionOf(goodsType) < 0) {

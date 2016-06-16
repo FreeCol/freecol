@@ -1190,7 +1190,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean isAdjacent(Tile tile) {
         return (tile == null) ? false
-            : any(getSurroundingTiles(1, 1), t -> t == tile);
+            : any(getSurroundingTiles(1, 1), matchKey(tile));
     }
 
     /**
@@ -1815,7 +1815,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private void updateColonyTiles() {
         for (ColonyTile ct : transform(flatten(getGame().getAllColonies(null),
                                                c -> c.getColonyTiles().stream()),
-                                       ct -> ct.getWorkTile() == this)) {
+                                       matchKey(this, ColonyTile::getWorkTile))) {
             ct.updateProductionType();
         }
     }
