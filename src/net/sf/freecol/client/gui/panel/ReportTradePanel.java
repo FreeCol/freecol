@@ -117,7 +117,7 @@ public final class ReportTradePanel extends ReportPanel {
         TypeCountMap<GoodsType> deltaUnits = new TypeCountMap<>();
         TypeCountMap<GoodsType> cargoUnits = new TypeCountMap<>();
 
-        for (Unit unit : transform(player.getUnits(), Unit::isCarrier)) {
+        for (Unit unit : transform(player.getUnitList(), Unit::isCarrier)) {
             for (Goods goods : unit.getCompactGoodsList()) {
                 cargoUnits.incrementCount(goods.getType(), goods.getAmount());
                 totalUnits.incrementCount(goods.getType(), goods.getAmount());

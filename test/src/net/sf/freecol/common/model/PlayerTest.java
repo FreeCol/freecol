@@ -25,6 +25,7 @@ import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class PlayerTest extends FreeColTestCase {
@@ -57,7 +58,7 @@ public class PlayerTest extends FreeColTestCase {
         Unit unit4 = new ServerUnit(game, map.getTile(5, 8), dutch,
                                     freeColonist);
 
-        int count = dutch.getUnits().size();
+        int count = count(dutch.getUnitList());
         assertTrue(count == 4);
 
         unit1.dispose();
@@ -269,13 +270,13 @@ public class PlayerTest extends FreeColTestCase {
         Player dutch =  game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
 
-        assertEquals("Wrong number of units for dutch player",0,dutch.getUnits().size());
-        assertEquals("Wrong number of units for french player",0,french.getUnits().size());
+        assertEquals("Wrong number of units for dutch player",0,dutch.getUnitList().size());
+        assertEquals("Wrong number of units for french player",0,french.getUnitList().size());
 
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        freeColonist);
         assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
-        assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
+        assertEquals("Wrong number of units for dutch player",1,dutch.getUnitList().size());
 
         try{
             french.addUnit(colonist);
@@ -283,8 +284,8 @@ public class PlayerTest extends FreeColTestCase {
         }
         catch (IllegalStateException e) {
             assertTrue("Colonist owner should not have been changed", colonist.getOwner() == dutch);
-            assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
-            assertEquals("Wrong number of units for french player",0,french.getUnits().size());
+            assertEquals("Wrong number of units for dutch player",1,dutch.getUnitList().size());
+            assertEquals("Wrong number of units for french player",0,french.getUnitList().size());
 
         }
 

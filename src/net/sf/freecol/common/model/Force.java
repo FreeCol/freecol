@@ -128,7 +128,7 @@ public class Force extends FreeColSpecObject {
      *
      * @return A copy of the list of all units.
      */
-    public final List<AbstractUnit> getUnits() {
+    public final List<AbstractUnit> getUnitList() {
         List<AbstractUnit> result = getLandUnits();
         result.addAll(getNavalUnits());
         return result;

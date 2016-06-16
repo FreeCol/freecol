@@ -81,7 +81,7 @@ public class NationSummary extends FreeColObject {
         numberOfSettlements = player.getSettlements().size();
 
         if (player.isEuropean()) {
-            numberOfUnits = player.getUnits().size();
+            numberOfUnits = player.getUnitList().size();
             militaryStrength = player.calculateStrength(false);
             navalStrength = player.calculateStrength(true);
             gold = player.getGold();

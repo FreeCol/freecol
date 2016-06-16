@@ -670,7 +670,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (p >= 1.0 // Avoid calling randomDouble if unnecessary
             || (p > 0.0 && p > randomDouble(logger, "War support?", random))) {
             Force wsf = getWarSupportForce();
-            result.addAll(wsf.getUnits());
+            result.addAll(wsf.getUnitList());
             double supportStrength, fullRatio, strength, ratio;
             supportStrength = wsf.calculateStrength(false);
             fullRatio = Player.strengthRatio(baseStrength + supportStrength,

@@ -204,7 +204,7 @@ public class Operand extends Scope {
             for (Player player : game.getLivePlayers(null)) {
                 switch (this.operandType) {
                 case UNITS:
-                    result += ourCount(player.getUnits());
+                    result += ourCount(player.getUnitList());
                     break;
                 case BUILDINGS:
                     result += sum(player.getColonies(),
@@ -245,7 +245,7 @@ public class Operand extends Scope {
         final String methodName = getMethodName();
         switch (this.operandType) {
         case UNITS:
-            return ourCount(player.getUnits());
+            return ourCount(player.getUnitList());
         case BUILDINGS:
             return sum(player.getColonies(), c -> ourCount(c.getBuildings()));
         case SETTLEMENTS:

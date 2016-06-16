@@ -815,7 +815,7 @@ public class DebugUtils {
      */
     public static void displayUnits(final FreeColClient freeColClient) {
         final Player player = freeColClient.getMyPlayer();
-        List<Unit> all = player.getUnits();
+        List<Unit> all = player.getUnitList();
         LogBuilder lb = new LogBuilder(256);
         lb.add("\nActive units:\n");
 

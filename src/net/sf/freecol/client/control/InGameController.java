@@ -738,7 +738,7 @@ public final class InGameController extends FreeColClientHolder {
         List<ModelMessage> messages = new ArrayList<>();
         final Predicate<Unit> tradePred = u ->
             u.isReadyToTrade() && player.owns(u);
-        for (Unit unit : transform(player.getUnits(), tradePred,
+        for (Unit unit : transform(player.getUnitList(), tradePred,
                                    Function.identity(),
                                    tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
@@ -791,7 +791,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean doEndTurn(boolean showDialog) {
         final Player player = getMyPlayer();
         if (showDialog) {
-            List<Unit> units = transform(player.getUnits(), Unit::couldMove);
+            List<Unit> units = transform(player.getUnitList(), Unit::couldMove);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 getGUI().showEndTurnDialog(units,
@@ -827,7 +827,7 @@ public final class InGameController extends FreeColClientHolder {
 
         // Unskip all skipped, some may have been faked in-client.
         // Server-side skipped units are set active in csNewTurn.
-        for (Unit unit : player.getUnits()) {
+        for (Unit unit : player.getUnitList()) {
             if (unit.getState() == UnitState.SKIPPED) {
                 unit.setState(UnitState.ACTIVE);
             }

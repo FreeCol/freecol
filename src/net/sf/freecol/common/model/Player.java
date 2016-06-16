@@ -152,7 +152,7 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         private final void update() {
             units.clear();
-            units.addAll(transform(owner.getUnits(), u -> predicate.test(u),
+            units.addAll(transform(owner.getUnitList(), u -> predicate.test(u),
                                    Function.identity(), Unit.locComparator));
         }
 
@@ -1038,7 +1038,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     world or a nation is in rebellion against us.
      */
     public boolean isWorkForREF() {
-        return (any(getUnits(), Unit::hasTile))
+        return (any(getUnitList(), Unit::hasTile))
             ? true // Work to do still if there exists a unit in the new world
             : !getRebels().isEmpty();
     }
@@ -1575,7 +1575,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int calculateStrength(boolean naval) {
         final CombatModel cm = getGame().getCombatModel();
-        return (int)sumDouble(getUnits(), u -> u.isNaval() == naval,
+        return (int)sumDouble(getUnitList(), u -> u.isNaval() == naval,
                               u -> cm.getOffencePower(u, null));
     }
 
@@ -1600,7 +1600,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<AbstractUnit> getREFUnits() {
         return (getPlayerType() == PlayerType.COLONIAL)
-            ? getMonarch().getExpeditionaryForce().getUnits()
+            ? getMonarch().getExpeditionaryForce().getUnitList()
             : null;
     }
 
@@ -1614,7 +1614,7 @@ public class Player extends FreeColGameObject implements Nameable {
         java.util.Map<UnitType, HashMap<String, Integer>> unitHash
             = new HashMap<>();
         List<AbstractUnit> units = new ArrayList<>();
-        for (Unit unit : getUnits()) {
+        for (Unit unit : getUnitList()) {
             if (!unit.isOffensiveUnit()) continue;
             UnitType unitType = defaultType;
             if (unit.getType().getOffence() > 0
@@ -1961,7 +1961,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return A list of the player <code>Unit</code>s.
      */
-    public List<Unit> getUnits() {
+    public List<Unit> getUnitList() {
         synchronized (this.units) {
             return new ArrayList<>(this.units);
         }
@@ -2025,7 +2025,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
-        return transform(getUnits(), u -> u.couldCarry(unit));
+        return transform(getUnitList(), u -> u.couldCarry(unit));
     }
 
     /**
@@ -2035,7 +2035,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units.
      */
     public int getUnitCount(boolean naval) {
-        return count(getUnits(), u -> u.isNaval() == naval);
+        return count(getUnitList(), u -> u.isNaval() == naval);
     }
         
     /**
@@ -2044,7 +2044,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The number of units
      */
     public int getNumberOfKingLandUnits() {
-        return count(getUnits(),
+        return count(getUnitList(),
                      u -> u.hasAbility(Ability.REF_UNIT) && !u.isNaval());
     }
 
@@ -2055,7 +2055,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player owns at least one of the specified unit type.
      */
     public boolean hasUnitType(String typeId) {
-        return any(getUnits(), u -> typeId.equals(u.getType().getId()));
+        return any(getUnitList(), u -> typeId.equals(u.getType().getId()));
     }
 
     /**
@@ -2774,7 +2774,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // Set the PET for visible tiles to the tile itself.
         boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
 
-        for (Unit unit : getUnits()) {
+        for (Unit unit : getUnitList()) {
             // Only consider units directly on the map, not those on a
             // carrier or in Europe.
             if (!(unit.getLocation() instanceof Tile)) continue;
@@ -3786,7 +3786,7 @@ public class Player extends FreeColGameObject implements Nameable {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        for (Unit unit : getUnits()) {
+        for (Unit unit : getUnitList()) {
             if (unit.getOwner() == null) {
                 if (fix) {
                     unit.setOwner(this);

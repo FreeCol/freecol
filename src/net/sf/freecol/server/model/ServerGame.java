@@ -439,7 +439,7 @@ public class ServerGame extends Game implements ServerModelObject {
             ((ServerColony)colony).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", colony.getName());
         }
-        for (Unit unit : weakest.getUnits()) {
+        for (Unit unit : weakest.getUnitList()) {
             if (weakest.csChangeOwner(unit, strongest, 
                     ChangeType.CAPTURE, null, cs)) { //-vis(both)
                 unit.setMovesLeft(0);

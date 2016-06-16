@@ -242,7 +242,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * @return A list of <code>AbstractUnit</code>s.
      */
-    public final List<AbstractUnit> getUnits() {
+    public final List<AbstractUnit> getUnitList() {
         return (units == null) ? Collections.<AbstractUnit>emptyList()
             : units;
     }
@@ -318,7 +318,7 @@ public class FoundingFather extends FreeColSpecObjectType {
 
         for (Scope scope : getScopes()) scope.toXML(xw);
 
-        for (AbstractUnit unit : getUnits()) {
+        for (AbstractUnit unit : getUnitList()) {
             xw.writeStartElement(UNIT_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, unit);

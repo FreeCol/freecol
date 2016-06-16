@@ -452,7 +452,7 @@ public final class InGameController extends Controller {
 
         if (teleport) { // Teleport in the units.
             Set<Tile> seen = new HashSet<>();
-            for (Unit u : serverPlayer.getUnits()) {
+            for (Unit u : serverPlayer.getUnitList()) {
                 if (!u.isNaval()) continue;
                 Tile entry = u.getEntryLocation().getTile();
                 u.setLocation(entry);//-vis(serverPlayer)
@@ -468,7 +468,7 @@ public final class InGameController extends Controller {
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         } else {
             // Put navy on the high seas, with 1-turn sail time
-            for (Unit u : serverPlayer.getUnits()) {
+            for (Unit u : serverPlayer.getUnitList()) {
                 if (!u.isNaval()) continue;
                 u.setWorkLeft(1);
                 u.setDestination(u.getEntryLocation());
@@ -516,7 +516,7 @@ public final class InGameController extends Controller {
 
         // Who surrenders?
         List<Unit> surrenderUnits = new ArrayList<>();
-        for (Unit u : serverPlayer.getUnits()) {
+        for (Unit u : serverPlayer.getUnitList()) {
             if (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
                 && serverPlayer.csChangeOwner(u, independent,
                     ChangeType.CAPTURE, null, cs)) {//-vis(both)
@@ -1837,7 +1837,7 @@ public final class InGameController extends Controller {
         }
 
         // Make the mercenary force offer
-        serverPlayer.csMercenaries(monarch.getMercenaryForce().getUnits(),
+        serverPlayer.csMercenaries(monarch.getMercenaryForce().getUnitList(),
             Monarch.MonarchAction.HESSIAN_MERCENARIES, random, cs);
         
         // Pity to have to update such a heavy object as the player,

@@ -490,7 +490,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
          */
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
-            return (getUnits().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (getUnitList().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         case COLONIAL: // Handle the hard case below
             break;
@@ -504,7 +504,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         case UNDEAD:
-            return (getUnits().isEmpty()) ? IS_DEAD : IS_ALIVE;
+            return (getUnitList().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         default:
             throw new IllegalStateException("Bogus player type");
@@ -523,7 +523,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // carriers with units, carriers with goods.
         boolean hasCarrier = false, hasColonist = false, hasEmbarked = false,
             hasGoods = false;
-        for (Unit unit : getUnits()) {
+        for (Unit unit : getUnitList()) {
             if (unit.isCarrier()) {
                 if (unit.hasGoodsCargo()) hasGoods = true;
                 hasCarrier = true;
@@ -637,7 +637,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         final int landREFUnitsRequired = 7; // FIXME: magic number
         boolean naval = false;
         int land = 0;
-        for (Unit u : getUnits()) {
+        for (Unit u : getUnitList()) {
             if (u.isNaval()) naval = true; else {
                 if (u.hasAbility(Ability.REF_UNIT)) land++;
             }
@@ -692,7 +692,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Remove units
-        List<Unit> units = getUnits();
+        List<Unit> units = getUnitList();
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
             if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
@@ -867,7 +867,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean updateScore() {
         int oldScore = this.score;
-        this.score = sum(getUnits(), u -> u.getType().getScoreValue())
+        this.score = sum(getUnitList(), u -> u.getType().getScoreValue())
             + sum(getColonies(), Colony::getLiberty)
             + SCORE_FOUNDING_FATHER * getFathers().size();
         int gold = getGold();
@@ -990,7 +990,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         invalidateCanSeeTiles();//+vis(this)
         if (!reveal) {
             for (Settlement s : getSettlements()) exploreForSettlement(s);
-            for (Unit u : getUnits()) exploreForUnit(u);
+            for (Unit u : getUnitList()) exploreForUnit(u);
         }
         return result;
     }
@@ -1459,7 +1459,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             modifyImmigration(europe.getImmigration(newImmigration));
         }
         // Units.
-        for (Unit unit : new ArrayList<>(getUnits())) {
+        for (Unit unit : getUnitList()) {
             try {
                 ((ServerModelObject) unit).csNewTurn(random, lb, cs);
             } catch (ClassCastException e) {
@@ -2109,15 +2109,15 @@ outer:  for (Effect effect : effects) {
                       .addNamed("%foundingFather%", father)
                       .add("%description%", father.getDescriptionKey()));
 
-        List<AbstractUnit> units = father.getUnits();
+        List<AbstractUnit> units = father.getUnitList();
         if (units != null && !units.isEmpty() && europe != null) {
-            createUnits(father.getUnits(), europe);//-vis: safe, Europe
+            createUnits(father.getUnitList(), europe);//-vis: safe, Europe
             europeDirty = true;
         }
 
         java.util.Map<UnitType, UnitType> upgrades = father.getUpgrades();
         if (upgrades != null) {
-            for (Unit u : getUnits()) {
+            for (Unit u : getUnitList()) {
                 UnitType newType = upgrades.get(u.getType());
                 if (newType != null) {
                     u.changeType(newType);//-vis(this)
@@ -2142,7 +2142,7 @@ outer:  for (Effect effect : effects) {
                         if (!canSee(t)) tiles.add(t);
                     }
                 }
-                for (Unit u : getUnits()) {
+                for (Unit u : getUnitList()) {
                     for (Tile t : u.getVisibleTiles()) {
                         if (!canSee(t)) tiles.add(t);
                     }
@@ -2230,7 +2230,7 @@ outer:  for (Effect effect : effects) {
                 europeDirty = europe.replaceRecruits(random);
 
             } else if ("model.event.movementChange".equals(eventId)) {
-                for (Unit u : getUnits()) {
+                for (Unit u : getUnitList()) {
                     if (u.getMovesLeft() > 0) {
                         u.setMovesLeft(u.getInitialMovesLeft());
                         cs.addPartial(See.only(this), u, "movesLeft");

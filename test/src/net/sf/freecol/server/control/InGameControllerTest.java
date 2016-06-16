@@ -1820,7 +1820,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
-        assertTrue(dutch.getUnits().isEmpty());
+        assertTrue(dutch.getUnitList().isEmpty());
         List<AbstractUnit> units = new ArrayList<>();
         units.add(new AbstractUnit(colonistType, Specification.DEFAULT_ROLE_ID, 1));
         units.add(new AbstractUnit(statesmanType, Specification.DEFAULT_ROLE_ID, 1));
@@ -1829,9 +1829,9 @@ public class InGameControllerTest extends FreeColTestCase {
         father.setUnits(units);
         igc.addFoundingFather(dutch, father);
 
-        assertEquals(2, dutch.getUnits().size());
-        UnitType[] types = { dutch.getUnits().get(0).getType(),
-                             dutch.getUnits().get(1).getType() };
+        assertEquals(2, dutch.getUnitList().size());
+        UnitType[] types = { dutch.getUnitList().get(0).getType(),
+                             dutch.getUnitList().get(1).getType() };
         assertTrue((colonistType == types[0] && statesmanType == types[1])
             || (colonistType == types[1] && statesmanType == types[0]));
     }

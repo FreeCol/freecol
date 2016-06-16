@@ -54,7 +54,7 @@ public class REFTest extends FreeColTestCase {
         // Create player
         ServerPlayer player1 = (ServerPlayer) game.getPlayerByNationId("model.nation.dutch");
         List<AbstractUnit> refUnitsBeforeIndependence = player1.getMonarch()
-            .getExpeditionaryForce().getUnits();
+            .getExpeditionaryForce().getUnitList();
         int soldiersBeforeIndependence = 0;
         int dragoonsBeforeIndependence = 0;
         int artilleryBeforeIndependence = 0;
@@ -91,7 +91,7 @@ public class REFTest extends FreeColTestCase {
             player1.getREFPlayer());
 
         // Execute
-        List<Unit> refUnitsAfterIndependence = refPlayer.getUnits();
+        List<Unit> refUnitsAfterIndependence = refPlayer.getUnitList();
 
         // Get results
         int soldiersAfterIndependence = 0;

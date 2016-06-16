@@ -235,7 +235,7 @@ public abstract class AIPlayer extends AIObject {
      */
     protected List<AIUnit> getAIUnits() {
         List<AIUnit> aiUnits = new ArrayList<>();
-        for (Unit u : getPlayer().getUnits()) {
+        for (Unit u : getPlayer().getUnitList()) {
             if (u.isDisposed()) {
                 logger.warning("getAIUnits ignoring: " + u.getId());
                 continue;
