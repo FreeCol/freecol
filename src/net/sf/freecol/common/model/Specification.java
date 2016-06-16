@@ -535,14 +535,8 @@ public final class Specification {
         nationTypes.clear();
         nationTypes.addAll(indianNationTypes);
         nationTypes.addAll(europeanNationTypes);
-        Iterator<EuropeanNationType> iterator = europeanNationTypes.iterator();
-        while (iterator.hasNext()) {
-            EuropeanNationType nationType = iterator.next();
-            if (nationType.isREF()) {
-                REFNationTypes.add(nationType);
-                iterator.remove();
-            }
-        }
+        REFNationTypes.addAll(transform(europeanNationTypes, NationType::isREF));
+        europeanNationTypes.removeAll(REFNationTypes);
 
         experts.clear();
         unitTypesTrainedInEurope.clear();
@@ -961,10 +955,7 @@ public final class Specification {
      */
     public void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
-        Iterator<Option> iter = optionGroup.iterator();
-
-        while (iter.hasNext()) {
-            Option option = iter.next();
+        for (Option option : optionGroup.getOptions()) {
             if (option instanceof OptionGroup) {
                 allOptionGroups.put(option.getId(), (OptionGroup)option);
                 if (recursive) {

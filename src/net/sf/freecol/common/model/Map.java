@@ -2404,14 +2404,6 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GoodsContainer getGoodsContainer() {
         return null; // Obviously irrelevant for a Map.
     }

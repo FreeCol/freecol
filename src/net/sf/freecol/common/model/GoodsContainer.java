@@ -334,22 +334,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Gets an iterator over all holds of goods in this goods container.
-     * Each <code>Goods</code> returned has a maximum amount of CARGO_SIZE.
-     *
-     * @return The <code>Iterator</code>.
-     * @see #getCompactGoods
-     */
-    public Iterator<Goods> getGoodsIterator() {
-        return getGoods().iterator();
-    }
-
-    /**
      * Gets a list containing all holds of goods in this goods container.
      * Each <code>Goods</code> returned has a maximum amount of CARGO_SIZE.
      *
      * @return A list of <code>Goods</code>.
-     * @see #getGoodsIterator
      */
     public List<Goods> getGoods() {
         final Game game = getGame();

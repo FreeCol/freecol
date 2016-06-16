@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
@@ -619,7 +620,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
-        Unit colonist = colony.getUnitIterator().next();
+        Unit colonist = first(colony.getUnitList());
         colonist.changeType(colonialType);
         assertEquals("Colonist should be Colonial Regular",
                      colonialType, colonist.getType());
@@ -734,7 +735,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = colony.getUnitIterator().next();
+        Unit colonist = first(colony.getUnitList());
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
                                        veteranType, dragoonRole);
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
@@ -952,7 +953,7 @@ public class InGameControllerTest extends FreeColTestCase {
         inca.setStance(dutch, Stance.WAR);
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = colony.getUnitIterator().next();
+        Unit colonist = first(colony.getUnitList());
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        nativeDragoonRole);
         assertEquals("Colonist should be the colony best defender",

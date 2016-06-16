@@ -1980,18 +1980,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get an iterator containing all the units this player owns.
-     *
-     * @return An <code>Iterator</code> over the player <code>Unit</code>s.
-     * @see Unit
-     */
-    public Iterator<Unit> getUnitIterator() {
-        synchronized (this.units) {
-            return this.units.iterator();
-        }
-    }
-
-    /**
      * Add a unit to this player.
      *
      * @param newUnit The new <code>Unit</code> value.

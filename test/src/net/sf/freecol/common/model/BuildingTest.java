@@ -415,7 +415,7 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(10);
 
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit farmer = units.next();
         farmer.setType(expertFarmerType);

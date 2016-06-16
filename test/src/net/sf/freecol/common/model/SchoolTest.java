@@ -116,7 +116,7 @@ public class SchoolTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(5);
 
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit lumberJack = units.next();
         lumberJack.setType(expertLumberJackType);

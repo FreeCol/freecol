@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
@@ -98,10 +97,8 @@ public class ChangeAction extends UnitAction {
         } else if (unit.isOnCarrier()) {
             getGUI().setActiveUnit(unit.getCarrier());
         } else {
-            Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
-            while (unitIterator.hasNext()) {
-                Unit u = unitIterator.next();
+            for (Unit u : tile.getUnitList()) {
                 if (u == unit) {
                     activeUnitFound = true;
                 } else if (activeUnitFound
@@ -111,12 +108,9 @@ public class ChangeAction extends UnitAction {
                     return;
                 }
             }
-            unitIterator = tile.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit u = unitIterator.next();
-                if (u == unit) {
-                    return;
-                } else if (u.getState() == Unit.UnitState.ACTIVE
+            for (Unit u : tile.getUnitList()) {
+                if (u == unit) return;
+                if (u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
                     getGUI().setActiveUnit(u);
                     return;

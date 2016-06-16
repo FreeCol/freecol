@@ -152,7 +152,7 @@ public class CombatTest extends FreeColTestCase {
         defenceModifiers.remove(hillsModifier);
         // this was also added by the combat model
         assertEquals(Specification.BASE_DEFENCE_SOURCE,
-            defenceModifiers.iterator().next().getSource());
+            first(defenceModifiers).getSource());
     }
 
     public void testGalleonAttackedByPrivateer() throws Exception {
@@ -187,7 +187,8 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE,
+                     first(defenceModifiers).getSource());
 
         /**
          * Fortification should have no effect.
@@ -195,7 +196,8 @@ public class CombatTest extends FreeColTestCase {
         galleon.setStateUnchecked(Unit.UnitState.FORTIFIED);
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(Specification.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(Specification.BASE_DEFENCE_SOURCE,
+                     first(defenceModifiers).getSource());
 
         /**
          * Penalties due to cargo.
@@ -266,7 +268,7 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
 
-        Unit colonist = colony.getUnitIterator().next();
+        Unit colonist = first(colony.getUnitList());
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        armedBraveRole);
 
@@ -291,7 +293,7 @@ public class CombatTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = colony.getUnitIterator().next();
+        Unit colonist = first(colony.getUnitList());
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        armedBraveRole);
 

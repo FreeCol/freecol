@@ -283,7 +283,6 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.canAdd
     //   WorkLocation.remove
     //   UnitLocation.getUnitCount
-    //   final UnitLocation.getUnitIterator
     //   UnitLocation.getUnitList
     //   UnitLocation.getGoodsContainer
     //   final WorkLocation getSettlement

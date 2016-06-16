@@ -288,15 +288,6 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
     /**
-     * Get an iterator for all the TradeItems.
-     *
-     * @return An iterator for all TradeItems.
-     */
-    public Iterator<TradeItem> iterator() {
-        return this.items.iterator();
-    }
-
-    /**
      * Get the items offered by a particular player.
      *
      * @param player The <code>Player</code> to check.

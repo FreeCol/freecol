@@ -785,8 +785,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Detects/fixes bogus expeditionary force roles
         List<AbstractUnit> todo = new ArrayList<>();
         Force ref = getExpeditionaryForce();
-        Iterator<AbstractUnit> it = ref.getLandUnits()
-            .iterator();
+        Iterator<AbstractUnit> it = ref.getLandUnits().iterator();
         while (it.hasNext()) {
             AbstractUnit au = it.next();
             if ("model.role.soldier".equals(au.getRoleId())) {

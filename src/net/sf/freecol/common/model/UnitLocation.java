@@ -403,15 +403,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    public final Iterator<Unit> getUnitIterator() {
-        // Marked final as this will always work if getUnitList() does.
-        return getUnitList().iterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public GoodsContainer getGoodsContainer() {
         return null;
     }

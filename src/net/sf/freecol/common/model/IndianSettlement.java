@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -219,18 +218,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     private void clearOwnedUnits() {
         synchronized (this.ownedUnits) {
             this.ownedUnits.clear();
-        }
-    }
-
-    /**
-     * Gets an iterator over all the units this
-     * <code>IndianSettlement</code> is owning.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getOwnedUnitsIterator() {
-        synchronized (this.ownedUnits) {
-            return this.ownedUnits.iterator();
         }
     }
 

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.freecol.common.ObjectWithId;
@@ -118,14 +117,6 @@ public interface Location extends ObjectWithId {
      * @return A list of all the units at this location.
      */
     public List<Unit> getUnitList();
-
-    /**
-     * Gets a <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Location</code>.
-     *
-     * @return A unit <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator();
 
     /**
      * Gets the <code>GoodsContainer</code> this <code>Location</code> use

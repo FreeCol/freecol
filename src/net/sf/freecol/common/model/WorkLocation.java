@@ -662,7 +662,6 @@ public abstract class WorkLocation extends UnitLocation
     //   UnitLocation.contains
     //   UnitLocation.canAdd
     //   UnitLocation.getUnitCount
-    //   final UnitLocation.getUnitIterator
     //   UnitLocation.getGoodsContainer
 
     /**

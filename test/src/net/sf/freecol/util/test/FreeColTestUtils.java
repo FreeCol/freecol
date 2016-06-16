@@ -20,7 +20,7 @@
 package net.sf.freecol.util.test;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map.Entry;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -166,10 +166,9 @@ public class FreeColTestUtils {
 
             // Add colonists
             int nCol = 0;
-            Iterator<UnitType> iter = colonists.keySet().iterator();
-            while (iter.hasNext()) {
-                UnitType type = iter.next();
-                Integer n = colonists.get(type);
+            for (Entry<UnitType, Integer> e : colonists.entrySet()) {
+                UnitType type = e.getKey();
+                Integer n = e.getValue();
                 for (int i = 0; i < n; i++) {
                     Unit colonist = new ServerUnit(game, colonyTile, player,
                                                    type);

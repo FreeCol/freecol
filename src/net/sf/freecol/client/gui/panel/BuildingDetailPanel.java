@@ -104,7 +104,8 @@ public class BuildingDetailPanel
         }
 
         while (!buildingTypes.isEmpty()) {
-            for (Iterator<BuildingType> iterator = buildingTypes.iterator(); iterator.hasNext();) {
+            Iterator<BuildingType> iterator = buildingTypes.iterator();
+            while (iterator.hasNext()) {
                 BuildingType buildingType = iterator.next();
                 DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
                 if (node != null) {

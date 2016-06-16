@@ -19,8 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.Iterator;
-
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -211,9 +209,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             new ServerUnit(game, adjacentTile, dutch, veteranType);
         }
 
-        Iterator<Unit> campUnitIter = camp.getOwnedUnitsIterator();
-        while(campUnitIter.hasNext()){
-            Unit brave = campUnitIter.next();
+        for (Unit brave : camp.getOwnedUnits()) {
             assertNotNull("Got null while getting the camps units", brave);
             AIUnit aiUnit = aiMain.getAIUnit(brave);
             assertNotNull("Couldnt get the ai object for the brave", aiUnit);

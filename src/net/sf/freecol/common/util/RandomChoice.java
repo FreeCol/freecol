@@ -60,7 +60,7 @@ public class RandomChoice<T> {
             total += choice.getProbability();
             if (probability < total) return choice.getObject();
         }
-        return input.iterator().next().getObject();
+        return first(input).getObject();
     }
 
     public static <T> int getTotalProbability(Collection<RandomChoice<T>> input) {

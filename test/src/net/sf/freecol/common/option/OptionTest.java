@@ -35,7 +35,7 @@ public class OptionTest extends FreeColTestCase {
         assertNotNull(spec().getOption(GameOptions.FOG_OF_WAR));
         assertNotNull(spec().getOption(GameOptions.ALLOW_STUDENT_SELECTION));
         assertNotNull(gameOptions);
-        assertTrue(gameOptions.iterator().hasNext());
+        assertFalse(gameOptions.getOptions().isEmpty());
         assertNotNull(gameOptions.getOption(GameOptions.FOG_OF_WAR));
         assertFalse(((BooleanOption) gameOptions.getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT))
                     .getValue());

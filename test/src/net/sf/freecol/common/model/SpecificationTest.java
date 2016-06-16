@@ -31,6 +31,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -167,13 +168,12 @@ public final class SpecificationTest extends FreeColTestCase {
         */
 
         // Additive Modifier
-        Modifier modifier = depotType
-            .getModifiers(Modifier.WAREHOUSE_STORAGE).iterator().next();
+        Modifier modifier = first(depotType.getModifiers(Modifier.WAREHOUSE_STORAGE));
         assertEquals(ModifierType.ADDITIVE, modifier.getType());
         assertEquals(100f, modifier.getValue());
 
         // Multiplicative Modifier
-        modifier = blackSmithType.getModifiers("model.goods.tools").iterator().next();
+        modifier = first(blackSmithType.getModifiers("model.goods.tools"));
         assertEquals(ModifierType.MULTIPLICATIVE, modifier.getType());
         assertEquals(2f, modifier.getValue());
     }

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -406,12 +405,8 @@ public class LabourData {
     private void gatherData(Player player) {
         List<UnitType> labourTypes = getLabourTypes(player);
 
-        Iterator<Unit> units = player.getUnitIterator();
-        while (units.hasNext()) {
-            Unit unit = units.next();
-            if (!labourTypes.contains(unit.getType())) {
-                continue;
-            }
+        for (Unit unit : player.getUnits()) {
+            if (!labourTypes.contains(unit.getType())) continue;
 
             Location location = unit.getLocation();
 

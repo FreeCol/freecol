@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -47,6 +46,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -117,14 +117,10 @@ public final class ReportTradePanel extends ReportPanel {
         TypeCountMap<GoodsType> deltaUnits = new TypeCountMap<>();
         TypeCountMap<GoodsType> cargoUnits = new TypeCountMap<>();
 
-        Iterator<Unit> iterator = player.getUnitIterator();
-        while (iterator.hasNext()) {
-            Unit unit = iterator.next();
-            if (unit.isCarrier()) {
-                for (Goods goods : unit.getGoodsContainer().getCompactGoods()) {
-                    cargoUnits.incrementCount(goods.getType(), goods.getAmount());
-                    totalUnits.incrementCount(goods.getType(), goods.getAmount());
-                }
+        for (Unit unit : transform(player.getUnits(), Unit::isCarrier)) {
+            for (Goods goods : unit.getCompactGoodsList()) {
+                cargoUnits.incrementCount(goods.getType(), goods.getAmount());
+                totalUnits.incrementCount(goods.getType(), goods.getAmount());
             }
         }
 

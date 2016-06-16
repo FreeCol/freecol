@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -790,19 +789,15 @@ public final class EuropePanel extends PortPanel {
     private void unloadAction() {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
-            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods goods = goodsIterator.next();
-                if (getMyPlayer().canTrade(goods.getType())) {
-                    igc().sellGoods(goods);
+            for (Goods g : unit.getCompactGoodsList()) {
+                if (getMyPlayer().canTrade(g.getType())) {
+                    igc().sellGoods(g);
                 } else {
-                    igc().payArrears(goods.getType());
+                    igc().payArrears(g.getType());
                 }
             }
-            Iterator<Unit> unitIterator = unit.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit newUnit = unitIterator.next();
-                igc().leaveShip(newUnit);
+            for (Unit u : unit.getUnitList()) {
+                igc().leaveShip(u);
             }
             cargoPanel.update();
             docksPanel.update();

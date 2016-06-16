@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -105,10 +104,7 @@ public class CargoPanel extends FreeColPanel
 
         if (carrier != null) {
             DragListener dl = new DragListener(getFreeColClient(), this);
-            Iterator<Unit> unitIterator = carrier.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-
+            for (Unit unit : carrier.getUnitList()) {
                 UnitLabel label = new UnitLabel(getFreeColClient(), unit);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
@@ -117,10 +113,7 @@ public class CargoPanel extends FreeColPanel
                 add(label);
             }
 
-            Iterator<Goods> goodsIterator = carrier.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods g = goodsIterator.next();
-
+            for (Goods g : carrier.getGoods()) {
                 GoodsLabel label = new GoodsLabel(getGUI(), g);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);

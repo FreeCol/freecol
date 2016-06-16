@@ -138,7 +138,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Colony colony = getSchoolColony(4, SchoolLevel.SCHOOLHOUSE);
         Building school = colony.getBuilding(schoolType);
         assertTrue(school.canTeach());
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -171,7 +171,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.COLLEGE);
         Building college = colony.getBuilding(collegeType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -199,7 +199,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(4, colony.getUnitCount());
         Building university = colony.getBuilding(universityType);
         assertNotNull(university);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -257,7 +257,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Building townHall = colony.getBuilding(townHallType);
         Building lumberMill = colony.getBuilding(lumberMillType);
         Building college = colony.getBuilding(collegeType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         clearWorkLocation(townHall);
         Unit colonist1 = units.next();
@@ -356,7 +356,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Building university = colony.getBuilding(universityType);
         Building townHall = colony.getBuilding(townHallType);
         clearWorkLocation(townHall);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist1 = units.next();
         colonist1.setType(freeColonistType);
@@ -410,7 +410,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -455,7 +455,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -495,7 +495,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -553,7 +553,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit criminal = units.next();
         criminal.setType(pettyCriminalType);
@@ -585,7 +585,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit criminal = units.next();
         criminal.setType(pettyCriminalType);
@@ -614,7 +614,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit indenturedServant = units.next();
         indenturedServant.setType(indenturedServantType);
@@ -646,7 +646,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
         Unit outsider = new ServerUnit(game, colony.getTile(),
                                        colony.getOwner(), freeColonistType);
 
@@ -690,7 +690,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -772,7 +772,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -826,7 +826,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -914,7 +914,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
         colonist.setLocation(colony.getBuilding(townHallType));
@@ -946,7 +946,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -995,7 +995,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit colonist = units.next();
         colonist.setType(freeColonistType);
@@ -1066,7 +1066,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         colony.addGoods(foodType, 100);
 
         Building university = colony.getBuilding(universityType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit indenturedServant = units.next();
         indenturedServant.setType(indenturedServantType);
@@ -1123,7 +1123,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Colony colony = getSchoolColony(4, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
         colony.getOwner().addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit regular = units.next();
         regular.setType(colonialRegularType);
@@ -1147,7 +1147,7 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         Colony colony = getSchoolColony(2, SchoolLevel.SCHOOLHOUSE);
         Building school = colony.getBuilding(schoolType);
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit lumber = units.next();
         lumber.setType(expertLumberJackType);
@@ -1186,7 +1186,7 @@ public class ServerBuildingTest extends FreeColTestCase {
         Colony colony = getSchoolColony(6, SchoolLevel.UNIVERSITY);
         Building university = colony.getBuilding(universityType);
 
-        Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitList().iterator();
 
         Unit carpenter = units.next();
         carpenter.setType(masterCarpenterType);

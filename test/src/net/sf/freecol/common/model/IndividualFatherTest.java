@@ -215,7 +215,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
-        java.util.Map.Entry<UnitType, UnitType> entry = upgrades.entrySet().iterator().next();
+        java.util.Map.Entry<UnitType, UnitType> entry = first(upgrades.entrySet());
         unit.setType(entry.getKey());
 
         player.csAddFoundingFather(bartolomeDeLasCasas, null, new ChangeSet());

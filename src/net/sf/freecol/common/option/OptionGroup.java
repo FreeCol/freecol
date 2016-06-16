@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -316,15 +315,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     public void removeAll() {
         options.clear();
         optionMap.clear();
-    }
-
-    /**
-     * Gets an <code>Iterator</code> for the <code>Option</code>s.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Option> iterator() {
-        return options.iterator();
     }
 
     /**

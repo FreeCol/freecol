@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -136,17 +135,6 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public final boolean containsGoods(List<AbstractGoods> goods) {
         return all(goods, ag -> ag.getAmount() <= getGoodsCount(ag.getType()));
-    }
-
-    /**
-     * Gets an iterator for every <code>Goods</code> in this location.
-     * Each <code>Goods</code> have a maximum amount of CARGO_SIZE.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public final Iterator<Goods> getGoodsIterator() {
-        return (goodsContainer == null) ? null
-            : goodsContainer.getGoodsIterator();
     }
 
     /**

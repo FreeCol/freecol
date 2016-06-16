@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,8 +83,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Temporary variable, used to hold all AIUnit objects belonging
      * to this AI.  Any implementation of AIPlayer needs to make sure
-     * this list is invalidated as necessary, using clearAIUnits(), so
-     * that getAIUnitIterator() will create a new list.
+     * this list is invalidated as necessary, using clearAIUnits().
      */
     private List<AIUnit> aiUnits = new ArrayList<>();
 
@@ -153,17 +151,6 @@ public abstract class MissionAIPlayer extends AIPlayer {
     protected List<AIUnit> getAIUnits() {
         if (aiUnits.isEmpty()) aiUnits = super.getAIUnits();
         return new ArrayList<>(aiUnits);
-    }
-
-    /**
-     * Returns an iterator over all the <code>AIUnit</code>s owned by this
-     * player.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    protected Iterator<AIUnit> getAIUnitIterator() {
-        if (aiUnits.isEmpty()) aiUnits = super.getAIUnits();
-        return aiUnits.iterator();
     }
 
     /**
