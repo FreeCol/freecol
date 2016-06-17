@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -81,9 +82,12 @@ public final class TilePanel extends FreeColPanel {
 
         // Use ESCAPE for closing the panel:
         InputMap inputMap = new ComponentInputMap(okButton);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false),
+                     "pressed");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true),
+                     "released");
+        SwingUtilities.replaceUIInputMap(okButton,
+            JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
 
         StringTemplate template = StringTemplate.template("tilePanel.label")
             .addStringTemplate("%label%", tile.getLabel())
@@ -128,56 +132,56 @@ public final class TilePanel extends FreeColPanel {
         add(new JLabel(Integer.toString(movementCost)));
         
         if (tileType != null) {
-            UnitType colonist = getSpecification().getDefaultUnitType();
+            final Specification spec = getSpecification();
+            final UnitType colonist = spec.getDefaultUnitType();
             JLabel label = null;
             boolean first = true;
-            for (ProductionType productionType
-                     : tileType.getAvailableProductionTypes(false)) {
-                for (AbstractGoods output : iterable(productionType.getOutputs())) {
-                    GoodsType goodsType = output.getType();
-                    int potential = output.getAmount();
-                    if (tile.getTileItemContainer() != null) {
-                        potential = tile.getTileItemContainer()
-                            .getTotalBonusPotential(goodsType, colonist, potential, true);
+            for (AbstractGoods output
+                     : iterable(flatten(tileType.getAvailableProductionTypes(false),
+                                        ProductionType::getOutputs))) {
+                GoodsType gt = output.getType();
+                int amount = output.getAmount();
+                if (tile.getTileItemContainer() != null) {
+                    amount = tile.getTileItemContainer()
+                        .getTotalBonusPotential(gt, colonist, amount, true);
+                }
+                int expertPotential = amount;
+                final UnitType expert = spec.getExpertForProducing(gt);
+                if (expert != null) {
+                    expertPotential = (int)expert.applyModifiers(amount,
+                        getGame().getTurn(), gt.getId());
+                }
+                if (amount > 0) {
+                    label = new JLabel(String.valueOf(amount),
+                                       new ImageIcon(lib.getIconImage(gt)),
+                                       JLabel.CENTER);
+                    if (first) {
+                        add(label, "span, split, center");
+                        first = false;
+                    } else {
+                        add(label);
                     }
-                    int expertPotential = potential;
-                    UnitType expert = getSpecification().getExpertForProducing(goodsType);
-                    if (expert != null) {
-                        expertPotential = (int)expert.applyModifiers(potential,
-                            getGame().getTurn(), goodsType.getId());
-                    }
-                    if (potential > 0) {
-                        label = new JLabel(String.valueOf(potential),
-                                           new ImageIcon(lib.getIconImage(goodsType)),
+                }
+                if (expertPotential > amount) {
+                    if (label == null) {
+                        // This could happen if a resource were
+                        // exploitable only by experts, for example
+                        label = new JLabel(String.valueOf(expertPotential),
+                                           new ImageIcon(lib.getIconImage(gt)),
                                            JLabel.CENTER);
+                        label.setToolTipText(Messages.getName(expert));
                         if (first) {
-                            add(label, "span, split, center");
+                            add(label, "span, split");
                             first = false;
                         } else {
+                            add(new JLabel("/"));
                             add(label);
                         }
-                    }
-                    if (expertPotential > potential) {
-                        if (label == null) {
-                            // this could happen if a resource were exploitable
-                            // only by experts, for example
-                            label = new JLabel(String.valueOf(expertPotential),
-                                               new ImageIcon(lib.getIconImage(goodsType)),
-                                               JLabel.CENTER);
-                            label.setToolTipText(Messages.getName(expert));
-                            if (first) {
-                                add(label, "span, split");
-                                first = false;
-                            } else {
-                                add(new JLabel("/"));
-                                add(label);
-                            }
-                        } else {
-                            label.setText(String.valueOf(potential) + "/" +
-                                          String.valueOf(expertPotential));
-                            label.setToolTipText(Messages.getName(colonist)
-                                + "/" + Messages.getName(expert));
-                        }
+                    } else {
+                        label.setText(String.valueOf(amount) + "/"
+                                      + String.valueOf(expertPotential));
+                        label.setToolTipText(Messages.getName(colonist)
+                            + "/" + Messages.getName(expert));
                     }
                 }
             }
