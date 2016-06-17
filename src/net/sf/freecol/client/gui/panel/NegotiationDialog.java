@@ -137,7 +137,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
             this.addButton.addActionListener(this);
             this.addButton.setActionCommand(ADD);
             this.label = Utility.localizedLabel(Messages.getName("model.tradeItem.colony"));
-            this.allColonies = source.getColonies();
+            this.allColonies = getFreeColClient().getClientOptions()
+                .getSortedColonies(source);
 
             setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(Utility.SIMPLE_LINE_BORDER);
