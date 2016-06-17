@@ -489,7 +489,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 UnitType ut = e.getKey();
                 return ut != null && ut.isAvailableTo(player)
                     && europe.getUnitPrice(ut) != UNDEFINED
-                    && first(e.getValue()) != null;
+                    && any(e.getValue());
             };
             WorkerWish bestWish = maximize(transform(workerWishes.entrySet(),
                                                      bestWishPred,

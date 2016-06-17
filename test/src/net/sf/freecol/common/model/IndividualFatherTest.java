@@ -262,15 +262,15 @@ public class IndividualFatherTest extends FreeColTestCase {
         Unit unit = colony.getFirstUnit();
         townHall.add(unit);
 
-        assertEquals(0, count(player.getModifiers("model.goods.bells")));
-        assertEquals(0, count(colony.getModifiers("model.goods.bells")));
+        assertTrue(none(player.getModifiers("model.goods.bells")));
+        assertTrue(none(colony.getModifiers("model.goods.bells")));
         int expected = 4;
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
 
         player.addFather(thomasJefferson);
         expected += expected * 0.5; // Add Jefferson bonus
         assertEquals(1, count(player.getModifiers("model.goods.bells")));
-        assertEquals(0, count(colony.getModifiers("model.goods.bells")));
+        assertTrue(none(colony.getModifiers("model.goods.bells")));
         assertEquals(1, count(townHall.getProductionModifiers(bellsType, null)));
         assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }

@@ -498,8 +498,7 @@ public class ServerUnitTest extends FreeColTestCase {
                      colony.getGoodsCount(lumberType));
 
         // Upgrade to lumber mill
-        assertEquals(0,
-            count(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
+        assertTrue(none(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));
         colony.getBuilding(carpenterHouseType).upgrade();
         assertEquals(1,
             count(colony.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION)));

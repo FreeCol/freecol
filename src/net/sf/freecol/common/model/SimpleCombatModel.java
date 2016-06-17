@@ -797,8 +797,8 @@ public class SimpleCombatModel extends CombatModel {
                             lose++;
                         }
                     } else if (r >= 1.0 - winner.getBurnProbability()) {
-                        if (any(loserPlayer.getIndianSettlements(),
-                                s -> s.hasMissionary(winnerPlayer))) {
+                        if (any(transform(loserPlayer.getIndianSettlements(),
+                                    s -> s.hasMissionary(winnerPlayer)))) {
                             crs.add(CombatResult.BURN_MISSIONS);
                         }
                     }

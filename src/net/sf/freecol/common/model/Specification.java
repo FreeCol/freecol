@@ -2151,7 +2151,7 @@ public final class Specification {
 
         // @compat 0.11.3
         // Added the cargo penalty modifier
-        if (count(getModifiers(Modifier.CARGO_PENALTY), alwaysTrue()) == 0) {
+        if (none(getModifiers(Modifier.CARGO_PENALTY))) {
             addModifier(new Modifier(Modifier.CARGO_PENALTY, -12.5f,
                     Modifier.ModifierType.PERCENTAGE, CARGO_PENALTY_SOURCE,
                     Modifier.GENERAL_COMBAT_INDEX));
@@ -2171,7 +2171,7 @@ public final class Specification {
         // @compat 0.11.5
         // Added a modifier to hardy pioneer
         UnitType hardyPioneer = getUnitType("model.unit.hardyPioneer");
-        if (count(hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION), alwaysTrue()) == 0) {
+        if (none(hardyPioneer.getModifiers(Modifier.TILE_TYPE_CHANGE_PRODUCTION))) {
             Modifier m = new Modifier(Modifier.TILE_TYPE_CHANGE_PRODUCTION,
                 2.0f, Modifier.ModifierType.MULTIPLICATIVE);
             Scope scope = new Scope();

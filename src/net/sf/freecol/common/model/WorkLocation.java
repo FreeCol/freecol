@@ -443,7 +443,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any inputs.
      */
     public boolean hasInputs() {
-        return first(getInputs()) != null;
+        return any(getInputs());
     }
 
     /**
@@ -452,8 +452,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return True if there are any outputs.
      */
     public boolean hasOutputs() {
-        return productionType != null
-            && first(productionType.getOutputs()) != null;
+        return productionType != null && any(productionType.getOutputs());
     }
 
     /**

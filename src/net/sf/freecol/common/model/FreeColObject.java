@@ -530,7 +530,7 @@ public abstract class FreeColObject
      */
     public boolean hasModifier(String id, FreeColSpecObjectType fcgot,
                                Turn turn) {
-        return first(getModifiers(id, fcgot, turn)) != null;
+        return any(getModifiers(id, fcgot, turn));
     }
 
     /**
@@ -540,7 +540,7 @@ public abstract class FreeColObject
      * @return True if the key is present.
      */
     public final boolean containsModifierKey(String key) {
-        return first(getModifiers(key)) != null;
+        return any(getModifiers(key));
     }
 
     /**

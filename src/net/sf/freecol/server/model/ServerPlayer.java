@@ -511,7 +511,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Quick check for a colony.  Do not log, this is the common case.
-        if (!getColonies().isEmpty()) return IS_ALIVE;
+        if (any(getColonies())) return IS_ALIVE;
 
         // Do not kill the observing player during a debug run.
         if (!isAI() && FreeColDebugger.getDebugRunTurns() >= 0) return IS_ALIVE;

@@ -79,7 +79,7 @@ public class FoundingFatherTest extends FreeColTestCase {
                                          ModifierType.ADDITIVE, father3));
         dutch.addFather(father3);
 
-        assertFalse(count(dutch.getModifiers("some.new.modifier")) == 0);
+        assertEquals(2, count(dutch.getModifiers("some.new.modifier")));
         assertEquals(6f, dutch.applyModifiers(2, null, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather("father4", spec());

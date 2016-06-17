@@ -220,13 +220,13 @@ public class CollectionUtils {
      * Are all members of a collection the same (in the sense of ==).
      *
      * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to examine.
+     * @param c The <code>Collection</code> to examine.
      * @return True if all members are the same.
      */
-    public static <T> boolean allSame(final Collection<T> collection) {
+    public static <T> boolean allSame(final Collection<T> c) {
         T datum = null;
         boolean first = true;
-        for (T t : collection) {
+        for (T t : c) {
             if (first) datum = t; else if (t != datum) return false;
             first = false;
         }
@@ -369,7 +369,8 @@ public class CollectionUtils {
      * @return True if all members pass the predicate test.
      */
     public static <T> boolean all(T[] array, Predicate<? super T> predicate) {
-        return all_internal(Arrays.stream(array), predicate);
+        return (array == null) ? true
+            : all_internal(Arrays.stream(array), predicate);
     }
 
     /**
@@ -382,7 +383,7 @@ public class CollectionUtils {
      */
     public static <T> boolean all(Collection<T> c,
                                   Predicate<? super T> predicate) {
-        return all_internal(c.stream(), predicate);
+        return (c == null) ? true : all_internal(c.stream(), predicate);
     }
 
     /**
@@ -422,6 +423,17 @@ public class CollectionUtils {
     }
 
     /**
+     * Is an array non-empty?
+     *
+     * @param <T> The array member type.
+     * @param array The array to test.
+     * @return True if the array is non-empty.
+     */
+    public static <T> boolean any(T[] array) {
+        return array != null && array.length > 0;
+    }
+
+    /**
      * Does any member of an array match a predicate?
      *
      * @param <T> The array member type.
@@ -434,6 +446,17 @@ public class CollectionUtils {
     }
 
     /**
+     * Is a collection non-empty?
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to test.
+     * @return True if the collection is non-empty.
+     */
+    public static <T> boolean any(Collection<T> c) {
+        return c != null && !c.isEmpty();
+    }
+
+    /**
      * Does any member of a collection match a predicate?
      *
      * @param <T> The collection member type.
@@ -443,7 +466,18 @@ public class CollectionUtils {
      */
     public static <T> boolean any(Collection<T> c,
                                   Predicate<? super T> predicate) {
-        return any_internal(c.stream(), predicate);
+        return (c == null) ? false : any_internal(c.stream(), predicate);
+    }
+
+    /**
+     * Is a stream non-empty?
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @return True if the stream is non-empty.
+     */
+    public static <T> boolean any(Stream<T> stream) {
+        return stream != null && stream.findFirst().isPresent();
     }
 
     /**
@@ -753,12 +787,12 @@ public class CollectionUtils {
     /**
      * Get the first item of a collection.
      *
-     * @param collection The <code>Collection</code> to search.
+     * @param c The <code>Collection</code> to search.
      * @return The first item, or null on failure.
      */
-    public static <T> T first(Collection<T> collection) {
-        return (collection == null || collection.isEmpty()) ? null
-            : first_internal(collection.stream(), null);
+    public static <T> T first(Collection<T> c) {
+        return (c == null || c.isEmpty()) ? null
+            : first_internal(c.stream(), null);
     }
 
     /**
@@ -1392,6 +1426,17 @@ public class CollectionUtils {
     }
 
     /**
+     * Is an array null or empty?
+     *
+     * @param <T> The array member type.
+     * @param array The array to test.
+     * @return True if an array is null or empty.
+     */
+    public static <T> boolean none(T[] array) {
+        return array == null || array.length == 0;
+    }
+
+    /**
      * Do none of the members of an array match a predicate?
      *
      * @param <T> The array member type.
@@ -1401,6 +1446,17 @@ public class CollectionUtils {
      */
     public static <T> boolean none(T[] array, Predicate<? super T> predicate) {
         return none_internal(Arrays.stream(array), predicate);
+    }
+
+    /**
+     * Is a collection empty?
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to test.
+     * @return True if the collection is null or empty.
+     */
+    public static <T> boolean none(Collection<T> c) {
+        return c == null || c.isEmpty();
     }
 
     /**
@@ -1414,6 +1470,17 @@ public class CollectionUtils {
     public static <T> boolean none(Collection<T> c,
                                    Predicate<? super T> predicate) {
         return none_internal(c.stream(), predicate);
+    }
+
+    /**
+     * Is a stream null or empty?
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to test.
+     * @return True if the stream is null or empty.
+     */
+    public static <T> boolean none(Stream<T> stream) {
+        return stream == null || !stream.findFirst().isPresent();
     }
 
     /**
@@ -1624,12 +1691,12 @@ public class CollectionUtils {
      * Convenience function to convert a collection to a sorted list.
      *
      * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to convert.
+     * @param c The <code>Collection</code> to convert.
      * @return A list of the stream contents.
      */
-    public static <T extends Comparable<? super T>> List<T> sort(Collection<T> collection) {
+    public static <T extends Comparable<? super T>> List<T> sort(Collection<T> c) {
         final Comparator<T> comparator = Comparator.naturalOrder();
-        return sort_internal(collection.stream(), comparator);
+        return sort_internal(c.stream(), comparator);
     }
 
     /**
@@ -1912,11 +1979,11 @@ public class CollectionUtils {
      * Convenience function to convert a collection to a list.
      *
      * @param <T> The collection member type.
-     * @param collection The <code>Collection</code> to convert.
+     * @param c The <code>Collection</code> to convert.
      * @return A map of the stream contents.
      */
-    public static <T> List<T> toList(Collection<T> collection) {
-        return toList_internal(collection.stream());
+    public static <T> List<T> toList(Collection<T> c) {
+        return toList_internal(c.stream());
     }
 
     /**

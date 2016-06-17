@@ -717,8 +717,8 @@ public class BuildingTest extends FreeColTestCase {
         Building building = colony.getBuilding(townHallType);
         for (Unit u : building.getUnitList()) u.setLocation(tile);
 
-        assertEquals("No initial modifiers", 0,
-                     count(colony.getModifiers("model.goods.bells")));
+        assertTrue("No initial modifiers",
+                   none(colony.getModifiers("model.goods.bells")));
         assertEquals("Initial bell production", 1,
                      building.getTotalProductionOf(bellsType));
 
