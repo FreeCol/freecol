@@ -968,8 +968,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                     (g.getType().isNewWorldGoodsType()) ? 0 : 1)
                 .thenComparing(salePriceComparator)
                 .thenComparing(AbstractGoods.descendingAmountComparator);
-        return result.stream().sorted(exportGoodsComparator).limit(limit)
-            .collect(Collectors.toList());
+        return sort(result, exportGoodsComparator).subList(0, limit);
     }
 
 
