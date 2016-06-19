@@ -455,7 +455,7 @@ public class Unit extends GoodsLocation
      * @return The current <code>UnitType</code>.
      */
     public final UnitType getType() {
-        return unitType;
+        return this.unitType;
     }
 
     /**
@@ -484,7 +484,7 @@ public class Unit extends GoodsLocation
         if (getMovesLeft() > getInitialMovesLeft()) {
             setMovesLeft(getInitialMovesLeft());
         }
-        hitPoints = unitType.getHitPoints();
+        this.hitPoints = unitType.getHitPoints();
         if (getTeacher() != null && !canBeStudent(getTeacher())) {
             getTeacher().setStudent(null);
             setTeacher(null);
@@ -493,12 +493,23 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Score this unit.
+     *
+     * Just delegates to unit type for now.
+     *
+     * @return The score for this unit.
+     */
+    public int getScoreValue() {
+        return (this.unitType == null) ? 0 : this.unitType.getScoreValue();
+    }
+
+    /**
      * Checks if this <code>Unit</code> is naval.
      *
      * @return True if this is a naval <code>Unit</code>.
      */
     public boolean isNaval() {
-        return (unitType == null) ? false : unitType.isNaval();
+        return (this.unitType == null) ? false : this.unitType.isNaval();
     }
 
     /**
@@ -545,7 +556,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit is a colonist.
      */
     public boolean isColonist() {
-        return unitType.hasAbility(Ability.FOUND_COLONY)
+        return this.unitType.hasAbility(Ability.FOUND_COLONY)
             && owner.hasAbility(Ability.FOUNDS_COLONIES);
     }
 
@@ -555,7 +566,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit can carry goods or other units.
      */
     public boolean isCarrier() {
-        return unitType.canCarryGoods() || unitType.canCarryUnits();
+        return this.unitType.canCarryGoods() || this.unitType.canCarryUnits();
     }
 
     /**
@@ -568,9 +579,9 @@ public class Unit extends GoodsLocation
     public boolean isPerson() {
         return hasAbility(Ability.PERSON)
             // @compat 0.10.0
-            || unitType.hasAbility(Ability.BORN_IN_COLONY)
-            || unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-            || unitType.hasAbility(Ability.FOUND_COLONY)
+            || this.unitType.hasAbility(Ability.BORN_IN_COLONY)
+            || this.unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+            || this.unitType.hasAbility(Ability.FOUND_COLONY)
             // Nick also had:
             //     && (!hasAbility("model.ability.carryGoods")
             //         && !hasAbility("model.ability.carryUnits")

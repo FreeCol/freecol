@@ -867,7 +867,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean updateScore() {
         int oldScore = this.score;
-        this.score = sum(getUnitList(), u -> u.getType().getScoreValue())
+        this.score = sum(getUnitList(), Unit::getScoreValue)
             + sum(getColonies(), Colony::getLiberty)
             + SCORE_FOUNDING_FATHER * getFathers().size();
         int gold = getGold();
