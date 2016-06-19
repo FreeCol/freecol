@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -924,6 +925,110 @@ public class CollectionUtils {
         return stream.filter(predicate).flatMap(mapper);
     }
 
+    /**
+     * Apply a consumer to the members of an array.
+     *
+     * @param <T> The array member type.
+     * @param array The array to apply to.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(T[] array,
+                                   Consumer<? super T> consumer) {
+        if (array != null && consumer != null) {
+            forEach_internal(Arrays.stream(array), alwaysTrue(), consumer);
+        }
+    }
+    
+    /**
+     * Apply a consumer to the members of an array that match a predicate.
+     *
+     * @param <T> The array member type.
+     * @param array The array to apply to.
+     * @param predicate A <code>Predicate</code> to gate the application.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(T[] array,
+                                   Predicate<? super T> predicate,
+                                   Consumer<? super T> consumer) {
+        if (array != null && consumer != null) {
+            forEach_internal(Arrays.stream(array), predicate, consumer);
+        }
+    }
+
+    /**
+     * Apply a consumer to the members of a collection.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to apply to.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(Collection<T> c,
+                                   Consumer<? super T> consumer) {
+        if (c != null && !c.isEmpty() && consumer != null) {
+            forEach_internal(c.stream(), alwaysTrue(), consumer);
+        }
+    }
+    
+    /**
+     * Apply a consumer to the members of a collection that match a predicate.
+     *
+     * @param <T> The collection member type.
+     * @param c The <code>Collection</code> to apply to.
+     * @param predicate A <code>Predicate</code> to gate the application.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(Collection<T> c,
+                                   Predicate<? super T> predicate,
+                                   Consumer<? super T> consumer) {
+        if (c != null && !c.isEmpty() && consumer != null) {
+            forEach_internal(c.stream(), predicate, consumer);
+        }
+    }
+
+    /**
+     * Apply a consumer to the members of a stream.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to apply to.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(Stream<T> stream,
+                                   Consumer<? super T> consumer) {
+        if (stream != null && consumer != null) {
+            forEach_internal(stream, alwaysTrue(), consumer);
+        }
+    }
+    
+    /**
+     * Apply a consumer to the members of a stream that match a predicate.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to apply to.
+     * @param predicate A <code>Predicate</code> to gate the application.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <T> void forEach(Stream<T> stream,
+                                   Predicate<? super T> predicate,
+                                   Consumer<? super T> consumer) {
+        if (stream != null && consumer != null) {
+            forEach_internal(stream, predicate, consumer);
+        }
+    }
+
+    /**
+     * Implement forEach.
+     *
+     * @param <T> The stream member type.
+     * @param stream The <code>Stream</code> to apply to.
+     * @param predicate A <code>Predicate</code> to gate the application.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    private static <T> void forEach_internal(Stream<T> stream,
+                                             Predicate<? super T> predicate,
+                                             Consumer<? super T> consumer) {
+        stream.filter(predicate).forEach(consumer);
+    }
+        
     /**
      * Convenience function to convert a stream to an iterable.
      *
