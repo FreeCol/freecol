@@ -128,7 +128,7 @@ public class ServerGame extends Game implements ServerModelObject {
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
         return transform(getLivePlayers(null),
                          p -> ((ServerPlayer)p).isConnected()
-                             && none(serverPlayers, s -> s == (ServerPlayer)p),
+                             && none(serverPlayers, matchKey((ServerPlayer)p)),
                          p -> (ServerPlayer)p);
     }
 
