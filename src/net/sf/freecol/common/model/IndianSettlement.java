@@ -1151,6 +1151,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     //   GoodsLocation.contains
     //   UnitLocation.canAdd
     //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnits
     //   UnitLocation.getUnitList
     //   Settlement.getSettlement
     //   final Settlement.getRank

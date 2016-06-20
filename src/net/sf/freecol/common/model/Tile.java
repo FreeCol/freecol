@@ -2104,7 +2104,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         return (owner != null && unit != null && unit.getOwner() != owner
             && unit.getOwner().atWarWith(owner))
-            ? find(getUnitList(), Unit::isOffensiveUnit)
+            ? find(getUnits(), Unit::isOffensiveUnit)
             : null;
     }
 

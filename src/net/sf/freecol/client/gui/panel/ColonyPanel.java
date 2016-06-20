@@ -935,7 +935,7 @@ public final class ColonyPanel extends PortPanel
      */
     @Override
     public List<Unit> getUnitList() {
-        return sort(colony.getTile().getUnitList());
+        return sort(colony.getTile().getUnits());
     }
 
 

@@ -115,7 +115,7 @@ public class Building extends WorkLocation
             colony.addFeatures(buildingType);
 
             // Colonists which can't work here must be put outside
-            eject.addAll(transform(getUnitList(),
+            eject.addAll(transform(getUnits(),
                                    u -> !canAddType(u.getType())));
         }
 
@@ -255,7 +255,7 @@ public class Building extends WorkLocation
         } else {
             for (AbstractGoods output : iterable(getOutputs())) {
                 final GoodsType goodsType = output.getType();
-                float production = sum(getUnitList(),
+                float production = sum(getUnits(),
                                        u -> getUnitProduction(u, goodsType));
                 // Unattended production always applies for buildings!
                 production += getBaseProduction(null, goodsType, null);
@@ -284,7 +284,7 @@ public class Building extends WorkLocation
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 final UnitType expertType = getExpertUnitType();
                 long minimumGoodsInput = 4 // FIXME: magic number
-                    * count(getUnitList(), matchKey(expertType, Unit::getType));
+                    * count(getUnits(), matchKey(expertType, Unit::getType));
                 if (minimumGoodsInput > available) {
                     available = minimumGoodsInput;
                 }

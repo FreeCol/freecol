@@ -105,13 +105,13 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel colonistsPanel
                 = new JPanel(new GridLayout(0, COLONISTS_PER_ROW));
             colonistsPanel.setOpaque(false);
-            for (Unit u : sort(colony.getUnitList(), Unit.typeRoleComparator)) {
+            for (Unit u : sort(colony.getUnits(), Unit.typeRoleComparator)) {
                 colonistsPanel.add(new UnitLabel(getFreeColClient(), u,
                                                  true, true));
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
             unitsPanel.setOpaque(false);
-            for (Unit u : sort(colony.getTile().getUnitList(),
+            for (Unit u : sort(colony.getTile().getUnits(),
                                Unit.typeRoleComparator)) {
                 unitsPanel.add(new UnitLabel(getFreeColClient(), u,
                                              true, true));

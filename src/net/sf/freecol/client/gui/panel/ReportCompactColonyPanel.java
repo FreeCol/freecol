@@ -208,7 +208,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
             for (GoodsType gt : goodsTypes) produce(gt);
                 
-            this.notWorking.addAll(transform(colony.getTile().getUnitList(),
+            this.notWorking.addAll(transform(colony.getTile().getUnits(),
                     u -> u.getState() != Unit.UnitState.FORTIFIED
                          && u.getState() != Unit.UnitState.SENTRY));
 

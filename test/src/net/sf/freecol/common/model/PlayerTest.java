@@ -270,24 +270,29 @@ public class PlayerTest extends FreeColTestCase {
         Player dutch =  game.getPlayerByNationId("model.nation.dutch");
         Player french = game.getPlayerByNationId("model.nation.french");
 
-        assertEquals("Wrong number of units for dutch player",0,dutch.getUnitList().size());
-        assertEquals("Wrong number of units for french player",0,french.getUnitList().size());
+        assertEquals("Wrong number of units for dutch player", 0,
+                     dutch.getUnitCount());
+        assertEquals("Wrong number of units for french player", 0,
+                     french.getUnitCount());
 
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        freeColonist);
         assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
-        assertEquals("Wrong number of units for dutch player",1,dutch.getUnitList().size());
+        assertEquals("Wrong number of units for dutch player", 1,
+                     dutch.getUnitCount());
 
         try{
             french.addUnit(colonist);
             fail("An IllegalStateException should have been raised");
         }
         catch (IllegalStateException e) {
-            assertTrue("Colonist owner should not have been changed", colonist.getOwner() == dutch);
-            assertEquals("Wrong number of units for dutch player",1,dutch.getUnitList().size());
-            assertEquals("Wrong number of units for french player",0,french.getUnitList().size());
+            assertEquals("Colonist owner should not have been changed",
+                         dutch, colonist.getOwner());
+            assertEquals("Wrong number of units for dutch player", 1,
+                         dutch.getUnitCount());
+            assertEquals("Wrong number of units for french player", 0,
+                         french.getUnitCount());
 
         }
-
     }
 }

@@ -176,7 +176,7 @@ public class ColonyTile extends WorkLocation {
         } else {
             for (AbstractGoods output : iterable(getOutputs())) {
                 final GoodsType goodsType = output.getType();
-                int amount = sum(getUnitList(),
+                int amount = sum(getUnits(),
                                  u -> getUnitProduction(u, goodsType));
                 if (amount > 0) {
                     pi.addProduction(new AbstractGoods(goodsType, amount));

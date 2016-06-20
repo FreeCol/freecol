@@ -1022,7 +1022,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             colony.getAdjustedNetProductionOf(gt));
         List<GoodsType> producing
             = sort(transform(flatten(colony.getAvailableWorkLocations(),
-                                     wl -> wl.getUnitList().stream()),
+                                     WorkLocation::getUnits),
                              u -> u.getWorkType() != null,
                              u -> u.getWorkType().getStoredAs(),
                              Collectors.toSet()),

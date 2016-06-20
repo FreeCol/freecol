@@ -1594,7 +1594,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public double getTotalDefencePower() {
         final CombatModel cm = getGame().getCombatModel();
-        return sumDouble(getTile().getUnitList(), Unit::isDefensiveUnit,
+        return sumDouble(getTile().getUnits(), Unit::isDefensiveUnit,
                          u -> cm.getDefencePower(null, u));
     }
 
@@ -1757,8 +1757,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A stream of teacher <code>Unit</code>s.
      */
     public Stream<Unit> getTeachers() {
-        return flatten(getBuildings(), Building::canTeach,
-                       b -> b.getUnitList().stream());
+        return flatten(getBuildings(), Building::canTeach, Building::getUnits);
     }
 
     /**
@@ -1808,7 +1807,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 (u.getWorkType() == expertProduction) ? 0 : 1);
         final Comparator<Unit> fullComparator
             = skillComparator.thenComparing(tradeComparator);
-        return minimize(getUnitList(), teacherPred, fullComparator);
+        return minimize(getUnits(), teacherPred, fullComparator);
     }
 
 
@@ -2414,9 +2413,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
 
     // Interface Location (from Settlement via GoodsLocation via UnitLocation)
-    //   UnitLocation.units is not used in Colony, but getUnitList is
-    //   faked to return the union of the units in the work locations.
-    //   This is a wart, and was probably a bad idea.
+    //   UnitLocation.units is not used in Colony.  getUnits/List is defined
+    //   to return the union of the units in the work locations, which may
+    //   or not be the best idea.  Another choice would be to return all
+    //   the units in the work locations, plus those present on the tile,
+    //   which is provided by Settlement.getAllUnitsList.
+    //   TODO: look at all the uses, see if this makes sense.
     // Inherits
     //   FreeColObject.getId
     //   Settlement.getTile
@@ -2488,9 +2490,16 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
+    public Stream<Unit> getUnits() {
+        return flatten(getCurrentWorkLocations(), WorkLocation::getUnits);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Unit> getUnitList() {
-        return toList(flatten(getCurrentWorkLocations(),
-                              wl -> wl.getUnitList().stream()));
+        return toList(getUnits());
     }
 
     /**
@@ -2592,7 +2601,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final CombatModel cm = getGame().getCombatModel();
         final Comparator<Unit> comp
             = cachingDoubleComparator(u -> cm.getDefencePower(attacker, u));
-        return maximize(getUnitList(), comp);
+        return maximize(getUnits(), comp);
     }
 
     /**

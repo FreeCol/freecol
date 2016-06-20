@@ -20,7 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -170,7 +170,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     // Some useful utilities, marked final as they will work as long
-    // as working implementations of getUnitList(), getUnitCount(),
+    // as working implementations of getUnits/List(), getUnitCount(),
     // getUnitCapacity() and getSettlement() are provided.
 
     /**
@@ -197,7 +197,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The first <code>Unit</code>.
      */
     public final Unit getFirstUnit() {
-        return first(getUnitList());
+        return first(getUnits());
     }
 
     /**
@@ -219,7 +219,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      *     <code>Location</code>.
      */
     public int getTotalUnitCount() {
-        return sum(getUnitList(), u -> 1 + u.getUnitCount());
+        return sum(getUnits(), u -> 1 + u.getUnitCount());
     }
 
     /**
@@ -231,7 +231,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @see Unit#isCarrier
      */
     public boolean hasCarrierWithSpace(int space) {
-        return any(getUnitList(), u -> u.isCarrier() && !u.isDamaged()
+        return any(getUnits(), u -> u.isCarrier() && !u.isDamaged()
             && u.getSpaceLeft() >= space);
     }
 
@@ -241,7 +241,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return A list of naval <code>Unit</code>s present.
      */
     public List<Unit> getNavalUnits() {
-        return transform(getUnitList(), Unit::isNaval);
+        return transform(getUnits(), Unit::isNaval);
     }
 
     /**
@@ -393,9 +393,20 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
+    public Stream<Unit> getUnits() {
+        synchronized (this.units) {
+            return getUnitList().stream();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<Unit> getUnitList() {
         synchronized (this.units) {
-            return new ArrayList<>(this.units);
+            return (this.units.isEmpty()) ? Collections.<Unit>emptyList()
+                : new ArrayList<>(this.units);
         }
     }
 
@@ -448,7 +459,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The sum of the space taken by the units in this location.
      */
     public int getSpaceTaken() {
-        return sum(getUnitList(), Unit::getSpaceTaken);
+        return sum(getUnits(), Unit::getSpaceTaken);
     }
 
     /**
@@ -543,7 +554,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         super.writeChildren(xw);
 
         synchronized (this.units) {
-            // Do *not* use getUnitList here, because Colony.getUnitList lies!
+            // FIXME: Do *not* use getUnits/List here, because Colony lies!
             for (Unit unit : this.units) {
                 if (unit.getLocation() != this) {
                     logger.warning("UnitLocation contains unit " + unit

@@ -33,6 +33,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -2391,6 +2392,14 @@ public class Map extends FreeColGameObject implements Location {
     @Override
     public int getUnitCount() {
         return -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Stream<Unit> getUnits() {
+        return Stream.<Unit>empty();
     }
 
     /**

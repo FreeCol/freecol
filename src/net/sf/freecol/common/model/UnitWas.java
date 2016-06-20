@@ -61,7 +61,7 @@ public class UnitWas implements Comparable<UnitWas> {
         this.work = unit.getWorkType();
         this.workAmount = getAmount(loc, work);
         this.movesLeft = unit.getMovesLeft();
-        this.units = new ArrayList<>(unit.getUnitList());
+        this.units = unit.getUnitList();
         this.colony = unit.getColony();
         if (unit.getGoodsContainer() != null) {
             unit.getGoodsContainer().saveState();

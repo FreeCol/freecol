@@ -349,7 +349,7 @@ public class DebugUtils {
 
         Unit carrier = null, sCarrier = null;
         if (!sTile.isLand() && !unitChoice.isNaval()) {
-            sCarrier = find(sTile.getUnitList(), u -> u.isNaval()
+            sCarrier = find(sTile.getUnits(), u -> u.isNaval()
                 && u.getSpaceLeft() >= unitChoice.getSpaceTaken());
         }
         Location loc = (sCarrier != null) ? sCarrier : sTile;

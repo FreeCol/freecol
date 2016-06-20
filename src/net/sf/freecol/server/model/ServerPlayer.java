@@ -868,7 +868,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public boolean updateScore() {
         int oldScore = this.score;
-        this.score = sum(getUnitList(), Unit::getScoreValue)
+        this.score = sum(getUnits(), Unit::getScoreValue)
             + sum(getColonies(), Colony::getLiberty)
             + SCORE_FOUNDING_FATHER * count(getFathers());
         int gold = getGold();
@@ -1814,8 +1814,7 @@ outer:  for (Effect effect : effects) {
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
         List<Unit> units
-            = transform(concat(colony.getUnitList().stream(),
-                               colony.getTile().getUnitList().stream()),
+            = transform(concat(colony.getUnits(), colony.getTile().getUnits()),
                         u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
             : getRandomMember(logger, "Select unit for effect", units, random);
@@ -1964,7 +1963,7 @@ outer:  for (Effect effect : effects) {
                         if (enemy.isEuropean()) {
                             Integer alarm = extra.get(enemy);
                             if (alarm == null) continue;
-                            alarm += (int)sumDouble(tile.getUnitList(),
+                            alarm += (int)sumDouble(tile.getUnits(),
                                 u -> u.isOffensiveUnit() && !u.isNaval(),
                                 u -> u.getType().getOffence());
                             extra.put(enemy, alarm);
@@ -2077,7 +2076,7 @@ outer:  for (Effect effect : effects) {
         for (Colony c : transform(getColonies(), Colony::canBombardEnemyShip)) {
             Tile tile = c.getTile();
             for (Unit u : transform(flatten(tile.getSurroundingTiles(1, 1),
-                                            t -> t.getUnitList().stream()),
+                                            Tile::getUnits),
                                     bombardUnit)) {
                 csCombat(c, u, null, random, cs);
             }
@@ -2144,7 +2143,7 @@ outer:  for (Effect effect : effects) {
                 Set<Tile> tiles
                     = transform(concat(flatten(colonies,
                                                c -> c.getVisibleTiles().stream()),
-                                       flatten(getUnitList(),
+                                       flatten(getUnits(),
                                                u -> u.getVisibleTiles().stream())),
                                 t -> !canSee(t), Function.identity(),
                                 Collectors.toSet());
@@ -3014,8 +3013,7 @@ outer:  for (Effect effect : effects) {
         ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
         ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
         StringTemplate convertNation = nativePlayer.getNationLabel();
-        List<Unit> units = is.getTile().getUnitList();
-        if (units.isEmpty()) units.addAll(is.getUnitList());
+        List<Unit> units = is.getAllUnitsList();
         ServerUnit convert = (ServerUnit)getRandomMember(logger,
             "Choose convert", units, random);
         if (nativePlayer.csChangeOwner(convert, attackerPlayer,

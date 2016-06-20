@@ -620,7 +620,7 @@ public class InGameControllerTest extends FreeColTestCase {
         tile2.setExplored(dutch, true);
         tile2.setExplored(french, true);
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
-        Unit colonist = first(colony.getUnitList());
+        Unit colonist = first(colony.getUnits());
         colonist.changeType(colonialType);
         assertEquals("Colonist should be Colonial Regular",
                      colonialType, colonist.getType());
@@ -735,7 +735,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = first(colony.getUnitList());
+        Unit colonist = first(colony.getUnits());
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
                                        veteranType, dragoonRole);
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
@@ -953,7 +953,7 @@ public class InGameControllerTest extends FreeColTestCase {
         inca.setStance(dutch, Stance.WAR);
         Tile tile2 = map.getTile(4, 8);
         tile2.setExplored(dutch, true);
-        Unit colonist = first(colony.getUnitList());
+        Unit colonist = first(colony.getUnits());
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        nativeDragoonRole);
         assertEquals("Colonist should be the colony best defender",
@@ -1820,7 +1820,7 @@ public class InGameControllerTest extends FreeColTestCase {
         final InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayerByNationId("model.nation.dutch");
-        assertTrue(dutch.getUnitList().isEmpty());
+        assertEquals(0, dutch.getUnitCount());
         List<AbstractUnit> units = new ArrayList<>();
         units.add(new AbstractUnit(colonistType, Specification.DEFAULT_ROLE_ID, 1));
         units.add(new AbstractUnit(statesmanType, Specification.DEFAULT_ROLE_ID, 1));
@@ -1829,7 +1829,7 @@ public class InGameControllerTest extends FreeColTestCase {
         father.setUnits(units);
         igc.addFoundingFather(dutch, father);
 
-        assertEquals(2, dutch.getUnitList().size());
+        assertEquals(2, dutch.getUnitCount());
         UnitType[] types = { dutch.getUnitList().get(0).getType(),
                              dutch.getUnitList().get(1).getType() };
         assertTrue((colonistType == types[0] && statesmanType == types[1])

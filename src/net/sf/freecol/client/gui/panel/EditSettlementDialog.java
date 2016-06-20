@@ -191,7 +191,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         }
         this.skill.setModel(getSkillModel());
         this.skill.setSelectedItem(is.getLearnableSkill());
-        this.units.getModel().setValue(is.getUnitList().size());
+        this.units.getModel().setValue(is.getUnitCount());
     }
 
 

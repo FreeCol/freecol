@@ -677,7 +677,7 @@ public class Unit extends GoodsLocation
                 if (!workImprovement.isComplete()
                     && (tile = workImprovement.getTile()) != null
                     && tile.getTileItemContainer() != null
-                    && none(tile.getUnitList(), u ->
+                    && none(tile.getUnits(), u ->
                         u != this && u.getState() == UnitState.IMPROVING
                              && u.getWorkImprovement() == workImprovement)) {
                     workImprovement.getTile().getTileItemContainer()
@@ -2227,7 +2227,7 @@ public class Unit extends GoodsLocation
         } else { // moving to sea, check for embarkation
             return (defender == null || !getOwner().owns(defender))
                 ? MoveType.MOVE_NO_ACCESS_EMBARK
-                : (any(target.getUnitList(), u -> u.canAdd(this)))
+                : (any(target.getUnits(), u -> u.canAdd(this)))
                 ? MoveType.EMBARK
                 : MoveType.MOVE_NO_ACCESS_FULL;
         }
@@ -3283,7 +3283,7 @@ public class Unit extends GoodsLocation
      * @return The number of cargo slots occupied by units.
      */
     public int getUnitSpaceTaken() {
-        return (canCarryUnits()) ? sum(getUnitList(), Unit::getSpaceTaken)
+        return (canCarryUnits()) ? sum(getUnits(), Unit::getSpaceTaken)
             : 0;
     }
 
@@ -3597,7 +3597,7 @@ public class Unit extends GoodsLocation
      */
     public int evaluateFor(Player player) {
         final Europe europe = player.getEurope();
-        if (player.isAI() && player.getUnitList().size() < 10) {
+        if (player.isAI() && player.getUnitCount() < 10) {
             return Integer.MIN_VALUE;
         }
         return (europe == null) ? 500 : europe.getUnitPrice(getType());

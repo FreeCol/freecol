@@ -738,7 +738,7 @@ public final class InGameController extends FreeColClientHolder {
         List<ModelMessage> messages = new ArrayList<>();
         final Predicate<Unit> tradePred = u ->
             u.isReadyToTrade() && player.owns(u);
-        for (Unit unit : transform(player.getUnitList(), tradePred,
+        for (Unit unit : transform(player.getUnits(), tradePred,
                                    Function.identity(),
                                    tradeRouteUnitComparator)) {
             getGUI().setActiveUnit(unit);
@@ -791,7 +791,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean doEndTurn(boolean showDialog) {
         final Player player = getMyPlayer();
         if (showDialog) {
-            List<Unit> units = transform(player.getUnitList(), Unit::couldMove);
+            List<Unit> units = transform(player.getUnits(), Unit::couldMove);
             if (!units.isEmpty()) {
                 // Modal dialog takes over
                 getGUI().showEndTurnDialog(units,
@@ -1328,7 +1328,7 @@ public final class InGameController extends FreeColClientHolder {
         // Disembark selected units able to move.
         unit.setStateToAllChildren(UnitState.ACTIVE);
         final List<Unit> disembarkable
-            = transform(unit.getUnitList(),
+            = transform(unit.getUnits(),
                         u -> u.getMoveType(tile).isProgress());
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
         if (disembarkable.size() == 1) {
@@ -1387,7 +1387,7 @@ public final class InGameController extends FreeColClientHolder {
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
         Unit carrier = null;
         List<ChoiceItem<Unit>> choices
-            = transform(destinationTile.getUnitList(),
+            = transform(destinationTile.getUnits(),
                         u -> u.canAdd(unit),
                         u -> new ChoiceItem<>(u.getDescription(Unit.UnitLabelType.NATIONAL), u));
         if (choices.isEmpty()) {
