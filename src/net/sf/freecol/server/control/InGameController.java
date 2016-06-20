@@ -1731,9 +1731,7 @@ public final class InGameController extends Controller {
         }
         java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
         for (Colony colony : serverPlayer.getColonyList()) {
-            List<Unit> allUnits = new ArrayList<>();
-            allUnits.addAll(colony.getTile().getUnitList());
-            allUnits.addAll(colony.getUnitList());
+            List<Unit> allUnits = colony.getAllUnitsList();
             int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
             if (limit <= 0) continue;
 

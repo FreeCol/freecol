@@ -146,11 +146,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
         // Give defensive missions up to the minimum expected defence,
         // leave the rest with the default wander-hostile mission.
-        List<Unit> units = new ArrayList<>();
         for (IndianSettlement is : player.getIndianSettlementList()) {
-            units.clear();
-            units.addAll(is.getTile().getUnitList());
-            units.addAll(is.getUnitList());
+            List<Unit> units = is.getAllUnitsList();
             while (units.size() > is.getRequiredDefenders()) {
                 Unit u = units.remove(0);
                 AIUnit aiu = getAIUnit(u);
@@ -224,14 +221,10 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * @param lb A <code>LogBuilder</code> to log to.
      */
     public void equipBraves(IndianSettlement is, LogBuilder lb) {
-        // Find all the units
-        List<Unit> units = is.getUnitList();
-        units.addAll(is.getTile().getUnitList());
-
         // Prioritize promoting partially equipped units to full dragoon
         final Comparator<Unit> comp = getGame().getCombatModel()
             .getMilitaryStrengthComparator();
-        for (Unit u : sort(units, comp)) {
+        for (Unit u : sort(is.getAllUnitsList(), comp)) {
             Role r = is.canImproveUnitMilitaryRole(u);
             if (r != null) {
                 Role old = u.getRole();
@@ -258,10 +251,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
         DefendSettlementMission dm;
 
         // Collect native units and defenders
-        List<Unit> units = new ArrayList<>();
+        List<Unit> units = is.getAllUnitsList();
         List<Unit> defenders = new ArrayList<>();
-        units.addAll(is.getUnitList());
-        units.addAll(is.getTile().getUnitList());
         for (Unit u : is.getOwnedUnits()) {
             if (!units.contains(u)) units.add(u);
         }

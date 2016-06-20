@@ -426,6 +426,19 @@ public abstract class Settlement extends GoodsLocation
                     r -> canProvideGoods(unit.getGoodsDifference(r, 1)));
     }
 
+    /**
+     * Get all the units present here.  That is, not just the units in the
+     * settlement but also the units on the tile.
+     *
+     * @return A list of <code>Unit</code>s.
+     */
+    public List<Unit> getAllUnitsList() {
+        List<Unit> units = getUnitList();
+        if (units.isEmpty()) return getTile().getUnitList();
+        units.addAll(getTile().getUnitList());
+        return units;
+    }
+
 
     // Override FreeColGameObject
 

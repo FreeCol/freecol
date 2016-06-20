@@ -755,8 +755,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
             : ChangeType.CAPTURE;
-        List<Unit> units = getUnitList();
-        units.addAll(tile.getUnitList());
+        List<Unit> units = getAllUnitsList();
         for (Unit u : units) {//-vis(both)
             oldOwner.csChangeOwner(u, newOwner, change, null, cs);
         }

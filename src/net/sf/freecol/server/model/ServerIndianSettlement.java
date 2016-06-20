@@ -179,10 +179,8 @@ public class ServerIndianSettlement extends IndianSettlement
             // around (as distinct to those with DefendSettlement
             // missions) into the settlement so we can ignore the
             // tile-residents.
-            List<Unit> ul = tile.getUnitList();
-            if (ul.isEmpty()) ul.addAll(getUnitList());
             ServerUnit brave = (ServerUnit)getRandomMember(logger, "Convert",
-                                                           ul, random);
+                getAllUnitsList(), random);
             colony.csAddConvert(brave, cs);
         }
     }
