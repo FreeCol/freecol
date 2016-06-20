@@ -1107,12 +1107,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         }
         double d = randomInt(logger, "Goods at " + getName(), random, 10)
             * 0.1 + 1.0;
-        for (Entry<GoodsType, Integer> e : goodsMap.entrySet()) {
-            int i = e.getValue();
-            if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());
-            i = Math.min(i, GoodsContainer.CARGO_SIZE);
-            if (i > 0) addGoods(e.getKey(), i);
-        }
+        forEachMapEntry(goodsMap, e -> {
+                int i = e.getValue();
+                if (!e.getKey().isFoodType()) i = (int)Math.round(d * e.getValue());
+                i = Math.min(i, GoodsContainer.CARGO_SIZE);
+                if (i > 0) addGoods(e.getKey(), i);
+            });
     }
 
     /**

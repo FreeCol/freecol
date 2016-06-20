@@ -1553,11 +1553,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         for (Tile t : getSurroundingTiles(1)) {
             if (!t.isLand()) landLocked = false;
-            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-                entry.setValue(entry.getValue()
-                    + t.getPotentialProduction(entry.getKey(),
-                        spec.getDefaultUnitType(owner)));
-            }
+            forEachMapEntry(goodsMap, e -> e.setValue(e.getValue()
+                    + t.getPotentialProduction(e.getKey(),
+                        spec.getDefaultUnitType(owner))));
             Player tileOwner = t.getOwner();
             if (owner == tileOwner) {
                 if (t.getOwningSettlement() != null) {
@@ -1589,25 +1587,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (food < 8) {
             ret.add("warning.noFood");
         }
-        for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
-            if (!entry.getKey().isFoodType()
-                && entry.getValue() < LOW_PRODUCTION_WARNING_VALUE) {
-                ret.addStringTemplate(StringTemplate
-                    .template("warning.noBuildingMaterials")
-                    .addNamed("%goods%", entry.getKey()));
-            }
-        }
-
-        if (ownedBySelf) {
-            ret.add("warning.ownLand");
-        }
-        if (ownedByEuropeans) {
-            ret.add("warning.europeanLand");
-        }
-        if (ownedByIndians) {
-            ret.add("warning.nativeLand");
-        }
-
+        final Predicate<Entry<GoodsType, Integer>> loPred = e ->
+            !e.getKey().isFoodType() && e.getValue() < LOW_PRODUCTION_WARNING_VALUE;
+        forEachMapEntry(goodsMap, loPred, e ->
+            ret.addStringTemplate(StringTemplate
+                .template("warning.noBuildingMaterials")
+                .addNamed("%goods%", e.getKey())));
+        if (ownedBySelf) ret.add("warning.ownLand");
+        if (ownedByEuropeans) ret.add("warning.europeanLand");
+        if (ownedByIndians) ret.add("warning.nativeLand");
         return ret;
     }
 

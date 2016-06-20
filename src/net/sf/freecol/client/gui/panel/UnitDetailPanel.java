@@ -177,14 +177,11 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         Map<String, Boolean> abilities = type.getRequiredAbilities();
         if (!abilities.isEmpty()) {
             panel.add(Utility.localizedLabel("colopedia.unit.requirements"), "newline, top");
-            try {
-                JTextPane textPane = Utility.getDefaultTextPane();
-                StyledDocument doc = textPane.getStyledDocument();
-                appendRequiredAbilities(doc, type);
-                panel.add(textPane, "span, width 60%");
-            } catch (BadLocationException e) {
-                //logger.warning(e.toString());
-            }
+            JTextPane textPane = Utility.getDefaultTextPane();
+            StyledDocument doc = textPane.getStyledDocument();
+            forEachMapEntry(type.getRequiredAbilities(),
+                e -> appendRequiredAbility(doc, e.getKey(), e.getValue()));
+            panel.add(textPane, "span, width 60%");
         }
 
         final Function<GoodsType, Stream<Modifier>> goodsMapper = gt ->

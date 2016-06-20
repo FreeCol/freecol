@@ -165,19 +165,17 @@ public class FreeColTestUtils {
             player.invalidateCanSeeTiles();//+vis(player)
 
             // Add colonists
-            int nCol = 0;
-            for (Entry<UnitType, Integer> e : colonists.entrySet()) {
-                UnitType type = e.getKey();
-                Integer n = e.getValue();
-                for (int i = 0; i < n; i++) {
-                    Unit colonist = new ServerUnit(game, colonyTile, player,
-                                                   type);
-                    colonist.setLocation(colony);
-                    nCol++;
-                }
-            }
+            forEachMapEntry(colonists, e -> {
+                    UnitType type = e.getKey();
+                    Integer n = e.getValue();
+                    for (int i = 0; i < n; i++) {
+                        Unit colonist = new ServerUnit(game, colonyTile,
+                                                       player, type);
+                        colonist.setLocation(colony);
+                    }
+                });
             // add rest of colonists as simple free colonists
-            for (int i = nCol; i < initialColonists; i++) {
+            for (int i = colony.getUnitCount(); i < initialColonists; i++) {
                 Unit colonist = new ServerUnit(game, colonyTile, player,
                                                colonistType);
                 colonist.setLocation(colony);

@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * A map that incorporates a count.
@@ -56,9 +58,8 @@ public class TypeCountMap<T extends FreeColSpecObjectType> {
     }
 
     public void add(TypeCountMap<T> other) {
-        for (Map.Entry<T, Integer> entry : other.values.entrySet()) {
-            incrementCount(entry.getKey(), entry.getValue());
-        }
+        forEachMapEntry(other.values,
+                        e -> incrementCount(e.getKey(), e.getValue()));
     }
 
     public void clear() {
@@ -97,10 +98,9 @@ public class TypeCountMap<T extends FreeColSpecObjectType> {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getClass().getName());
-        for (Map.Entry<T, Integer> entry : values.entrySet()) {
-            sb.append(" [").append(entry.getKey().getIndex())
-                .append(',').append(entry.getValue()).append(']');
-        }
+        forEachMapEntry(values, e ->
+            sb.append(" [").append(e.getKey().getIndex())
+              .append(',').append(e.getValue()).append(']'));
         sb.append(']');
         return sb.toString();
     }

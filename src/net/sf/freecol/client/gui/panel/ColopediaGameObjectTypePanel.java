@@ -25,6 +25,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -48,6 +50,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -59,6 +62,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {
 
+    private static final Logger logger = Logger.getLogger(ColopediaGameObjectTypePanel.class.getName());
 
     /** The enclosing colopedia panel. */
     private ColopediaPanel colopediaPanel; 
@@ -246,38 +250,41 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
         }
     }
 
-    public void appendRequiredAbilities(StyledDocument doc, BuildableType buildableType)
-        throws BadLocationException {
-        List<JButton> requiredTypes = new ArrayList<>();
-        for (Entry<String, Boolean> entry
-                 : buildableType.getRequiredAbilities().entrySet()) {
-            doc.insertString(doc.getLength(),
-                             Messages.getName(entry.getKey()),
+    public void appendRequiredAbility(StyledDocument doc, String key, boolean value) {
+        final Specification spec = getSpecification();
+        try {
+            doc.insertString(doc.getLength(), Messages.getName(key),
                              doc.getStyle("regular"));
-            requiredTypes.clear();
-            for (FreeColSpecObjectType type : getSpecification()
-                     .getTypesProviding(entry.getKey(), entry.getValue())) {
-                JButton typeButton = getButton(type);
-                typeButton.addActionListener(this);
-                requiredTypes.add(typeButton);
-            }
+            List<JButton> requiredTypes
+                 = transform(spec.getTypesProviding(key, value), alwaysTrue(),
+                     t -> {
+                         JButton typeButton = getButton(t);
+                         typeButton.addActionListener(this);
+                         return typeButton;
+                     });
             JButton rt = first(requiredTypes);
             if (rt != null) {
-                doc.insertString(doc.getLength(), " (", doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), " (",
+                                 doc.getStyle("regular"));
                 StyleConstants.setComponent(doc.getStyle("button"), rt);
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 for (int index = 1; index < requiredTypes.size(); index++) {
                     JButton button = requiredTypes.get(index);
-                    doc.insertString(doc.getLength(), " / ", doc.getStyle("regular"));
+                    doc.insertString(doc.getLength(), " / ",
+                                     doc.getStyle("regular"));
                     StyleConstants.setComponent(doc.getStyle("button"), button);
-                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                    doc.insertString(doc.getLength(), " ",
+                                     doc.getStyle("button"));
                 }
-                doc.insertString(doc.getLength(), ")", doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), ")",
+                                 doc.getStyle("regular"));
             }
             doc.insertString(doc.getLength(), "\n", doc.getStyle("regular"));
+        } catch (BadLocationException ble) {
+            logger.log(Level.WARNING, "Insert fail", ble);
         }
     }
-
+        
 
     // Override Component
 

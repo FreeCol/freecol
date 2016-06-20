@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -285,19 +286,19 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param newAmount The threshold.
      */
-    public void removeAbove(int newAmount) {
+    public void removeAbove(final int newAmount) {
         synchronized (this.storedGoods) {
             if (newAmount <= 0) {
                 this.storedGoods.clear();
                 return;
             }
-            for (Entry<GoodsType, Integer> e : this.storedGoods.entrySet()) {
+            final Predicate<Entry<GoodsType, Integer>> hiPred = e -> {
                 final GoodsType gt = e.getKey();
-                if (gt.isStorable() && !gt.limitIgnored()
-                    && e.getValue() > newAmount) {
-                    this.storedGoods.put(gt, newAmount);
-                }
-            }
+                return gt.isStorable() && !gt.limitIgnored()
+                    && e.getValue() > newAmount;
+            };
+            forEachMapEntry(this.storedGoods, hiPred,
+                            e -> this.storedGoods.put(e.getKey(), newAmount));
         }
     }
 
@@ -342,14 +343,14 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         final Game game = getGame();
         List<Goods> result = new ArrayList<>();
         synchronized (this.storedGoods) {
-            for (Entry<GoodsType, Integer> e : this.storedGoods.entrySet()) {
-                int amount = e.getValue();
-                while (amount > 0) {
-                    result.add(new Goods(game, parent, e.getKey(),
-                            ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
-                    amount -= CARGO_SIZE;
-                }
-            }
+            forEachMapEntry(this.storedGoods, e -> {
+                    int amount = e.getValue();
+                    while (amount > 0) {
+                        result.add(new Goods(game, parent, e.getKey(),
+                                ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
+                        amount -= CARGO_SIZE;
+                    }
+                });
         }
         return result;
     }

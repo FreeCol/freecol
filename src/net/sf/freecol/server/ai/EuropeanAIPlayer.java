@@ -787,13 +787,13 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (!tipMap.isEmpty()) {
             lb.add("\n  Improvements:");
-            for (Entry<Tile, TileImprovementPlan> e : tipMap.entrySet()) {
-                Tile t = e.getKey();
-                TileImprovementPlan tip = e.getValue();
-                AIUnit pioneer = tip.getPioneer();
-                lb.add(" ", t, "=", tip.getType().getSuffix());
-                if (pioneer != null) lb.add("/", pioneer.getUnit());
-            }
+            forEachMapEntry(tipMap, e -> {
+                    Tile t = e.getKey();
+                    TileImprovementPlan tip = e.getValue();
+                    AIUnit pioneer = tip.getPioneer();
+                    lb.add(" ", t, "=", tip.getType().getSuffix());
+                    if (pioneer != null) lb.add("/", pioneer.getUnit());
+                });
         }                
     }
 
@@ -1026,12 +1026,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
         if (!transportDemand.isEmpty()) {
             lb.add("\n  Transport Demand:");
-            for (Entry<Location, List<Wish>> e : transportDemand.entrySet()) {
-                Location ld = e.getKey();
-                lb.add("\n    ", ld, "[");
-                for (Wish w : e.getValue()) lb.add(" ", w);
-                lb.add(" ]");
-            }
+            forEachMapEntry(transportDemand, e -> {
+                    Location ld = e.getKey();
+                    lb.add("\n    ", ld, "[");
+                    for (Wish w : e.getValue()) lb.add(" ", w);
+                    lb.add(" ]");
+                });
         }
     }
 
@@ -1247,32 +1247,31 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
         if (!workerWishes.isEmpty()) {
             lb.add("\n  Wishes (workers):");
-            for (Entry<UnitType, List<WorkerWish>> e
-                     : workerWishes.entrySet()) {
-                UnitType ut = e.getKey();
-                List<WorkerWish> wl = e.getValue();
-                if (!wl.isEmpty()) {
-                    lb.add("\n    ", ut.getSuffix(), ":");
-                    for (WorkerWish ww : wl) {
-                        lb.add(" ", ww.getDestination(),
-                               "(", ww.getValue(), ")");
+            forEachMapEntry(workerWishes, e -> {
+                    UnitType ut = e.getKey();
+                    List<WorkerWish> wl = e.getValue();
+                    if (!wl.isEmpty()) {
+                        lb.add("\n    ", ut.getSuffix(), ":");
+                        for (WorkerWish ww : wl) {
+                            lb.add(" ", ww.getDestination(),
+                                "(", ww.getValue(), ")");
+                        }
                     }
-                }
-            }
+                });
         }
         if (!goodsWishes.isEmpty()) {
             lb.add("\n  Wishes (goods):");
-            for (Entry<GoodsType, List<GoodsWish>> e : goodsWishes.entrySet()) {
-                GoodsType gt = e.getKey();
-                List<GoodsWish> gl = e.getValue();
-                if (!gl.isEmpty()) {
-                    lb.add("\n    ", gt.getSuffix(), ":");
-                    for (GoodsWish gw : gl) {
-                        lb.add(" ", gw.getDestination(),
-                               "(", gw.getValue(), ")");
+            forEachMapEntry(goodsWishes, e -> {
+                    GoodsType gt = e.getKey();
+                    List<GoodsWish> gl = e.getValue();
+                    if (!gl.isEmpty()) {
+                        lb.add("\n    ", gt.getSuffix(), ":");
+                        for (GoodsWish gw : gl) {
+                            lb.add(" ", gw.getDestination(),
+                                "(", gw.getValue(), ")");
+                        }
                     }
-                }
-            }
+                });
         }
     }
 

@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -103,19 +104,18 @@ public final class ReportLabourDetailPanel extends ReportPanel
                 detailPanel.add(countLabel);
             }
         }
-        for (Entry<Location, Integer> entry : unitLocations.entrySet()) {
-            if (!(entry.getKey() instanceof Colony)) {
+        forEachMapEntry(unitLocations, e -> !(e.getKey() instanceof Colony),
+            e -> {
                 String locationName
-                    = Messages.message(entry.getKey().getLocationLabel());
+                    = Messages.message(e.getKey().getLocationLabel());
                 JButton linkButton = Utility.getLinkButton(locationName, null,
-                    entry.getKey().getId());
+                                                           e.getKey().getId());
                 linkButton.addActionListener(this);
                 detailPanel.add(linkButton);
-                JLabel countLabel = new JLabel(entry.getValue().toString());
+                JLabel countLabel = new JLabel(e.getValue().toString());
                 countLabel.setForeground(Utility.LINK_COLOR);
                 detailPanel.add(countLabel);
-            }
-        }
+            });
         if (canTrain) {
             detailPanel.add(Utility.localizedLabel("report.labour.canTrain"),
                             "newline 20, span");

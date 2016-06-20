@@ -273,22 +273,21 @@ public final class SpecificationTest extends FreeColTestCase {
         roleAbilities.put("model.role.nativeDragoon", expectAbilities);
 
         // Verify
-        for (Entry<String, Map<String, Boolean>> entry
-                 : roleAbilities.entrySet()) {
-            Role role = spec.getRole(entry.getKey());
-            Map<String, Boolean> required = role.getRequiredAbilities();
-            expectAbilities = entry.getValue();
-            for (String key : required.keySet()) {
-                Boolean req = required.get(key);
-                Boolean val = expectAbilities.get(key);
-                assertNotNull(role.getId() + " missing " + key, val);
-                assertEquals(role.getId() + " " + key + " value != " + req,
-                    req, val);
-                expectAbilities.remove(key);
-            }
-            assertEquals(role.getId() + " excess abilities", 0,
-                expectAbilities.size());
-        }
+        forEachMapEntry(roleAbilities, e -> {
+                Role role = spec.getRole(e.getKey());
+                Map<String, Boolean> required = role.getRequiredAbilities();
+                Map<String, Boolean> expect = e.getValue();
+                for (String key : required.keySet()) {
+                    Boolean req = required.get(key);
+                    Boolean val = expect.get(key);
+                    assertNotNull(role.getId() + " missing " + key, val);
+                    assertEquals(role.getId() + " " + key + " value != " + req,
+                                 req, val);
+                    expect.remove(key);
+                }
+                assertEquals(role.getId() + " excess abilities", 0,
+                             expect.size());
+            });
 
         Role role;
         role = spec.getRole("model.role.default");

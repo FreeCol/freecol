@@ -1930,12 +1930,12 @@ public final class Specification {
                               "model.goods.bells");
         fatherGoodsFixMap.put("model.foundingFather.williamPenn",
                               "model.goods.crosses");
-        for (Entry<String, String> e : fatherGoodsFixMap.entrySet()) {
-            FoundingFather father = getFoundingFather(e.getKey());
-            for (Modifier m : iterable(father.getModifiers(e.getValue()))) {
-                m.requireNegatedPersonScope();
-            }
-        }
+        forEachMapEntry(fatherGoodsFixMap, e -> {
+                FoundingFather father = getFoundingFather(e.getKey());
+                for (Modifier m : iterable(father.getModifiers(e.getValue()))) {
+                    m.requireNegatedPersonScope();
+                }
+            });
 
         // Nation FOUND_COLONY -> FOUNDS_COLONIES
         for (EuropeanNationType ent : transform(europeanNationTypes,

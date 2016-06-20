@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -555,7 +556,39 @@ public class ServerIndianSettlement extends IndianSettlement
         return ret;
     }
 
+    /**
+     * Check if tension has increased with respect to an enemy.
+     *
+     * @param enemy The enemy <code>Player</code>.
+     * @param oldLevel The previous tension <code>Level</code>.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csCheckTension(Player enemy, Tension.Level oldLevel,
+                               ChangeSet cs) {
+        Tension newTension = getAlarm(enemy);
+        Tension.Level newLevel = (newTension == null) ? null
+            : newTension.getLevel();
+        if (oldLevel == null || oldLevel == newLevel
+            || !hasContacted(enemy) || !enemy.hasExplored(getTile())) return;
 
+        // Tension has changed, update the enemy
+        cs.add(See.only(null).perhaps((ServerPlayer)enemy), this);
+
+        // No messages about improving tension
+        if (newLevel == null || (oldLevel != null
+                && oldLevel.getLimit() > newLevel.getLimit())) return;
+
+        // Send a message to the enemy that tension has increased.
+        String key = "model.player.alarmIncrease." + getAlarm(enemy).getKey();
+        if (!Messages.containsKey(key)) return;
+        cs.addMessage(See.only((ServerPlayer)enemy),
+            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                             key, this)
+                .addStringTemplate("%nation%", getOwner().getNationLabel())
+                .addStringTemplate("%enemy%", enemy.getNationLabel())
+                .addName("%settlement%", getName()));
+    }
+        
     /**
      * Gets the tag name of the root element representing this object.
      *

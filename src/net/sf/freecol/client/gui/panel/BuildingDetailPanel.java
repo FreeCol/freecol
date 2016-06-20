@@ -154,7 +154,8 @@ public class BuildingDetailPanel
                                  Messages.message(template) + "\n",
                                  doc.getStyle("regular"));
             }
-            appendRequiredAbilities(doc, buildingType);
+            forEachMapEntry(buildingType.getRequiredAbilities(),
+                e -> appendRequiredAbility(doc, e.getKey(), e.getValue()));
 
             panel.add(Utility.localizedLabel("colopedia.buildings.requires"), "top");
             panel.add(textPane, "span, growx");

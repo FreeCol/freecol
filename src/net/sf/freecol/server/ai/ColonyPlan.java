@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -834,19 +835,18 @@ public class ColonyPlan {
      */
     private void updatePlans(Map<GoodsType, Map<WorkLocation, Integer>> production) {
         workPlans.clear();
-        for (Entry<GoodsType, Map<WorkLocation, Integer>> entry
-                 : production.entrySet()) {
-            GoodsType g = entry.getKey();
-            // Do not make plans to produce into a full warehouse.
-            if (g.isStorable()
-                && colony.getGoodsCount(g) >= colony.getWarehouseCapacity()
-                && !g.limitIgnored()) continue;
-
-            for (WorkLocation wl : transform(entry.getValue().keySet(),
-                    w -> (w.canBeWorked() || w.canAutoProduce()))) {
-                workPlans.add(new WorkLocationPlan(getAIMain(), wl, g));
-            }
-        }
+        // Do not make plans to produce into a full warehouse.
+        final Predicate<Entry<GoodsType, Map<WorkLocation, Integer>>> fullPred = (e) -> {
+            GoodsType g = e.getKey();
+            return !g.isStorable() || g.limitIgnored()
+                || colony.getGoodsCount(g) < colony.getWarehouseCapacity();
+        };            
+        forEachMapEntry(production, fullPred, e -> {
+                for (WorkLocation wl : transform(e.getValue().keySet(),
+                        w -> (w.canBeWorked() || w.canAutoProduce()))) {
+                    workPlans.add(new WorkLocationPlan(getAIMain(), wl, e.getKey()));
+                }
+            });
 
         // Now we have lots of plans, determine what goods to produce.
         updateProductionList(production);

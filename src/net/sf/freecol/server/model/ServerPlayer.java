@@ -979,7 +979,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         invalidateCanSeeTiles();//+vis(this)
         if (!reveal) {
-            forEach(getSettlements(), s -> exploreForSettlement(s));
+            for (Settlement s : getSettlementList()) exploreForSettlement(s);
             for (Unit u : getUnitList()) exploreForUnit(u);
         }
         return result;
@@ -1976,18 +1976,13 @@ outer:  for (Effect effect : effects) {
                               extra.get(enemy) + missionAlarm);
                 }
                 // Apply modifiers, and commit the total change.
-                for (Entry<Player, Integer> entry : extra.entrySet()) {
-                    Player player = entry.getKey();
-                    int change = entry.getValue();
-                    if (change != 0) {
-                        change = (int)player.applyModifiers((float)change,
+                forEachMapEntry(extra, e -> e.getValue() != 0, e -> {
+                        final Player player = e.getKey();
+                        int change = (int)player.applyModifiers((float)e.getValue(),
                             game.getTurn(), Modifier.NATIVE_ALARM_MODIFIER);
-                        ServerIndianSettlement sis
-                            = (ServerIndianSettlement)is;
-                        sis.csModifyAlarm(player, change,
-                                          true, cs);//+til
-                    }
-                }
+                        ((ServerIndianSettlement)is)
+                            .csModifyAlarm(player, change, true, cs);//+til
+                    });
             }
 
             // Calm down a bit at the whole-tribe level.
@@ -2001,36 +1996,12 @@ outer:  for (Effect effect : effects) {
             // Update those that changed, and add messages for selected
             // worsening relation transitions.
             for (IndianSettlement is : allSettlements) {
-                java.util.Map<Player, Tension.Level> oldLevel
-                    = oldLevels.get(is);
-                for (Entry<Player, Tension.Level> entry : oldLevel.entrySet()) {
-                    Player enemy = entry.getKey();
-                    Tension newTension = is.getAlarm(enemy);
-                    Tension.Level newLevel = (newTension == null) ? null
-                        : newTension.getLevel();
-                    if (entry.getValue() == null
-                        || entry.getValue() == newLevel
-                        || !is.hasContacted(enemy)
-                        || !enemy.hasExplored(is.getTile()))
-                        continue;
-                    cs.add(See.only(null).perhaps((ServerPlayer)enemy), is);
-                    // No messages about improving tension
-                    if (newLevel == null
-                        || (entry.getValue() != null 
-                            && entry.getValue().getLimit()
-                            > newLevel.getLimit())) continue;
-                    String key = "model.player.alarmIncrease."
-                        + is.getAlarm(enemy).getKey();
-                    if (!Messages.containsKey(key)) continue;
-                    cs.addMessage(See.only((ServerPlayer)enemy),
-                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                         key, is)
-                            .addStringTemplate("%nation%", getNationLabel())
-                            .addStringTemplate("%enemy%", enemy.getNationLabel())
-                            .addName("%settlement%", is.getName()));
-                }
+                forEachMapEntry(oldLevels.get(is), e ->
+                    ((ServerIndianSettlement)is)
+                        .csCheckTension(e.getKey(), e.getValue(), cs));
             }
 
+            // All updated, start the turn for the settlements.
             for (IndianSettlement is : allSettlements) {
                 ((ServerIndianSettlement)is).csStartTurn(random, cs);
             }

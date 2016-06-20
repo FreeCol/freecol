@@ -756,11 +756,11 @@ public class SimpleMapGenerator implements MapGenerator {
                                  rc -> 1));
 
         for (Tile t: tile.getSurroundingTiles(1)) {
-            for (Entry<GoodsType, Integer> entry : scale.entrySet()) {
-                GoodsType goodsType = entry.getKey();
-                scale.put(goodsType, entry.getValue()
-                          + t.getPotentialProduction(goodsType, null));
-            }
+            forEachMapEntry(scale, e -> {
+                    GoodsType goodsType = e.getKey();
+                    scale.put(goodsType, e.getValue()
+                        + t.getPotentialProduction(goodsType, null));
+                });
         }
 
         final Function<RandomChoice<UnitType>, RandomChoice<UnitType>> mapper
