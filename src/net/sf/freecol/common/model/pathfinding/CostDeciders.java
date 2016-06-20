@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
+import java.util.function.Predicate;
+
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
@@ -27,6 +29,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -186,17 +189,19 @@ public final class CostDeciders {
                 if (tile.isDangerousToShip(unit)) {
                     cost = ILLEGAL_MOVE;
                 } else {
+                    // Move might end if there is a credible naval
+                    // threat in an adjacent tile.
                     final Player owner = unit.getOwner();
-                    tiles: for (Tile t : tile.getSurroundingTiles(1)) {
-                        for (Unit u : t.getUnitList()) {
-                            if (u.getOwner() == owner) break;
-                            if (u.hasAbility(Ability.PIRACY)
+                    final Predicate<Unit> threatPred = u ->
+                        (u.getOwner() != owner
+                            && (u.hasAbility(Ability.PIRACY)
                                 || (u.getOwner().atWarWith(owner)
-                                    && u.isOffensiveUnit())) {
-                                this.movesLeft = 0;
-                                this.newTurns++;
-                                break tiles;
-                            }
+                                    && u.isOffensiveUnit())));
+                    for (Tile t : tile.getSurroundingTiles(1)) {
+                        if (any(t.getUnits(), threatPred)) {
+                            this.movesLeft = 0;
+                            this.newTurns++;
+                            break;
                         }
                     }
                 }

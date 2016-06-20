@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -67,10 +68,8 @@ public final class ReportCargoPanel extends ReportUnitPanel {
 
     @Override
     protected void gatherData() {
-        for (Unit unit : getMyPlayer().getUnitList()) {
-            if (unit.isCarrier()) {
-                addUnit(unit, "carriers");
-            }
+        for (Unit u : transform(getMyPlayer().getUnits(), Unit::isCarrier)) {
+            addUnit(u, "carriers");
         }
     }
 

@@ -137,8 +137,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         Set<GoodsType> productionWarning = new HashSet<>();
 
         // Check if all unit requirements are met.
-        for (Unit expert : colony.getUnitList()) {
-            if (expert.getSkillLevel() <= 0) continue;
+        for (Unit expert : transform(colony.getUnits(),
+                                     u -> u.getSkillLevel() > 0)) {
             Unit better = colony.getBetterExpert(expert);
             if (better != null
                 && !badAssignmentWarning.contains(expert.getType())) {

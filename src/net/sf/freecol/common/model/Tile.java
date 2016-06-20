@@ -2043,17 +2043,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         double defenderPower = -1.0, power;
 
         // Check the units on the tile...
-        for (Unit u : getUnitList()) {
-            if (isLand() != u.isNaval()) {
-                // On land, ships are normally docked in port and
-                // cannot defend.  Except if beached (see below).
-                // On ocean tiles, land units behave as ship cargo and
-                // can not defend.
-                power = cm.getDefencePower(attacker, u);
-                if (Unit.betterDefender(defender, defenderPower, u, power)) {
-                    defender = u;
-                    defenderPower = power;
-                }
+        for (Unit u : transform(getUnits(), u -> isLand() != u.isNaval())) {
+            // On land, ships are normally docked in port and
+            // cannot defend.  Except if beached (see below).
+            // On ocean tiles, land units behave as ship cargo and
+            // can not defend.
+            power = cm.getDefencePower(attacker, u);
+            if (Unit.betterDefender(defender, defenderPower, u, power)) {
+                defender = u;
+                defenderPower = power;
             }
         }
 

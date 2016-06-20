@@ -471,15 +471,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Cancel other co-located improvements of the same type
-        for (Unit unit : tile.getUnitList()) {
-            if (unit.getWorkImprovement() != null
-                && unit.getWorkImprovement().getType() == ti.getType()
-                && unit.getState() == UnitState.IMPROVING) {
-                unit.setWorkLeft(-1);
-                unit.setWorkImprovement(null);
-                unit.setState(UnitState.ACTIVE);
-                unit.setMovesLeft(0);
-            }
+        for (Unit unit : transform(tile.getUnits(),
+                u -> (u.getWorkImprovement() != null
+                    && u.getWorkImprovement().getType() == ti.getType()
+                    && u.getState() == UnitState.IMPROVING))) {
+            unit.setWorkLeft(-1);
+            unit.setWorkImprovement(null);
+            unit.setState(UnitState.ACTIVE);
+            unit.setMovesLeft(0);
         }
     }
 
@@ -545,10 +544,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return Either an enemy unit that causes a slowdown, or null if none.
      */
     private Unit getSlowedBy(Tile newTile, Random random) {
-        Player player = getOwner();
-        Game game = getGame();
-        CombatModel combatModel = game.getCombatModel();
-        boolean pirate = hasAbility(Ability.PIRACY);
+        final Player player = getOwner();
+        final Game game = getGame();
+        final CombatModel combatModel = game.getCombatModel();
+        final boolean pirate = hasAbility(Ability.PIRACY);
         Unit attacker = null;
         double attackPower = 0, totalAttackPower = 0;
 
@@ -561,14 +560,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 || tile.getColony() != null
                 || tile.getFirstUnit() == null
                 || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
-            for (Unit enemyUnit : tile.getUnitList()) {
-                if ((pirate || enemyUnit.hasAbility(Ability.PIRACY)
-                     || (enemyUnit.isOffensiveUnit() && player.atWarWith(enemy)))
-                    && enemyUnit.isNaval()
-                    && combatModel.getOffencePower(enemyUnit, this) > attackPower) {
-                    attackPower = combatModel.getOffencePower(enemyUnit, this);
-                    totalAttackPower += attackPower;
+            for (Unit enemyUnit : transform(tile.getUnits(), u ->
+                    (u.isNaval()
+                        && ((u.isOffensiveUnit() && player.atWarWith(enemy))
+                            || pirate || u.hasAbility(Ability.PIRACY))))) {
+                double power = combatModel.getOffencePower(enemyUnit, this);
+                totalAttackPower += power;
+                if (power > attackPower) {
                     attacker = enemyUnit;
+                    attackPower = power;
                 }
             }
         }
@@ -831,11 +831,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csActivateSentries(Tile tile, ChangeSet cs) {
-        for (Unit u : tile.getUnitList()) {
-            if (u.getState() == UnitState.SENTRY) {
-                u.setState(UnitState.ACTIVE);
-                cs.add(See.perhaps(), u);
-            }
+        for (Unit u : transform(tile.getUnits(),
+                                u -> u.getState() == UnitState.SENTRY)) {
+            u.setState(UnitState.ACTIVE);
+            cs.add(See.perhaps(), u);
         }
     }
 

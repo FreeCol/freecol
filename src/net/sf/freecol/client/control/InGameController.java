@@ -827,10 +827,9 @@ public final class InGameController extends FreeColClientHolder {
 
         // Unskip all skipped, some may have been faked in-client.
         // Server-side skipped units are set active in csNewTurn.
-        for (Unit unit : player.getUnitList()) {
-            if (unit.getState() == UnitState.SKIPPED) {
-                unit.setState(UnitState.ACTIVE);
-            }
+        for (Unit unit : transform(player.getUnits(),
+                                   u -> u.getState() == UnitState.SKIPPED)) {
+            unit.setState(UnitState.ACTIVE);
         }
 
         // Restart the selection cycle.
@@ -3975,12 +3974,11 @@ public final class InGameController extends FreeColClientHolder {
         boolean update = false;
         if (getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
             && unit.isInEurope()) {
-            for (Unit u : unit.getOwner().getEurope().getUnitList()) {
-                if (!u.isNaval()
-                    && u.getState() == UnitState.SENTRY
-                    && unit.canAdd(u)) {
-                    if (askEmbark(u, unit)) update = true;
-                }
+            for (Unit u : transform(unit.getOwner().getEurope().getUnits(),
+                    u -> (!u.isNaval()
+                        && u.getState() == UnitState.SENTRY
+                        && unit.canAdd(u)))) {
+                update |= askEmbark(u, unit);
             }
         }
 

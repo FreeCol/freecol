@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -452,8 +453,7 @@ public final class InGameController extends Controller {
 
         if (teleport) { // Teleport in the units.
             Set<Tile> seen = new HashSet<>();
-            for (Unit u : serverPlayer.getUnitList()) {
-                if (!u.isNaval()) continue;
+            for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
                 Tile entry = u.getEntryLocation().getTile();
                 u.setLocation(entry);//-vis(serverPlayer)
                 u.setWorkLeft(-1);
@@ -468,8 +468,7 @@ public final class InGameController extends Controller {
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         } else {
             // Put navy on the high seas, with 1-turn sail time
-            for (Unit u : serverPlayer.getUnitList()) {
-                if (!u.isNaval()) continue;
+            for (Unit u : transform(serverPlayer.getUnits(), Unit::isNaval)) {
                 u.setWorkLeft(1);
                 u.setDestination(u.getEntryLocation());
                 u.setLocation(u.getOwner().getHighSeas());//-vis: safe!map
@@ -515,16 +514,16 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%ref%", serverPlayer.getNationLabel()));
 
         // Who surrenders?
-        List<Unit> surrenderUnits = new ArrayList<>();
-        for (Unit u : serverPlayer.getUnitList()) {
-            if (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
+        final Predicate<Unit> surrenderPred = u -> //-vis(both)
+            (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
                 && serverPlayer.csChangeOwner(u, independent,
-                    ChangeType.CAPTURE, null, cs)) {//-vis(both)
-                u.setMovesLeft(0);
-                u.setState(Unit.UnitState.ACTIVE);
-                cs.add(See.perhaps().always(serverPlayer), u.getTile());
-                surrenderUnits.add(u);
-            }
+                                              ChangeType.CAPTURE, null, cs));
+        List<Unit> surrenderUnits
+            = transform(serverPlayer.getUnits(), surrenderPred);
+        for (Unit u : surrenderUnits) {
+            u.setMovesLeft(0);
+            u.setState(Unit.UnitState.ACTIVE);
+            cs.add(See.perhaps().always(serverPlayer), u.getTile());
         }
         if (!surrenderUnits.isEmpty()) {
             cs.addMessage(See.only(independent),
@@ -1687,13 +1686,12 @@ public final class InGameController extends Controller {
             u.dispose();
             lost = true;
         }
-        for (Unit u : serverPlayer.getHighSeas().getUnitList()) {
-            if (u.getDestination() == europe) {
-                seized.addStringTemplate(u.getLabel());
-                cs.addRemove(See.only(serverPlayer), null, u);
-                u.dispose();
-                lost = true;
-            }
+        for (Unit u : transform(serverPlayer.getHighSeas().getUnits(),
+                                u -> u.getDestination() == europe)) {
+            seized.addStringTemplate(u.getLabel());
+            cs.addRemove(See.only(serverPlayer), null, u);
+            u.dispose();
+            lost = true;
         }
         if (lost) {
             cs.addMessage(See.only(serverPlayer),

@@ -563,13 +563,11 @@ public final class ColonyPanel extends PortPanel
         // Check for non-producing locations that can now produce.
         for (WorkLocation wl : colony.getCurrentWorkLocations()) {
             boolean change = false, check = wl.getProductionType() == null;
-            for (Unit u : wl.getUnitList()) {
-                if (check || !wl.produces(u.getWorkType())) {
-                    GoodsType workType = wl.getWorkFor(u);
-                    if (workType != null && workType != u.getWorkType()) {
-                        igc().changeWorkType(u, workType);
-                    }
-                    change = true;
+            for (Unit unit : transform(wl.getUnits(), u ->
+                    (check || !wl.produces(u.getWorkType())))) {
+                GoodsType workType = wl.getWorkFor(unit);
+                if (workType != null && workType != unit.getWorkType()) {
+                    change |= igc().changeWorkType(unit, workType);
                 }
             }
             if (change) wl.updateProductionType();
@@ -691,20 +689,18 @@ public final class ColonyPanel extends PortPanel
                     });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
-                if (unit.getUnitList() != null) {
-                    for (final Unit innerUnit : unit.getUnitList()) {
-                        unitIcon = new ImageIcon(lib.getSmallerUnitImage(innerUnit));
-                        menuTitle = innerUnit.getDescription()
-                            + " " + Messages.message("cargoOnCarrier")
-                            + " " + unit.getDescription();
-                        subMenu = new JMenuItem(menuTitle, unitIcon);
-                        subMenu.addActionListener((ActionEvent ae) -> {
-                                unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
-                                unitMenu.show(getGUI().getCanvas(), 0, 0);
-                            });
-                        unitNumber++;
-                        colonyUnitsMenu.add(subMenu);
-                    }
+                for (final Unit innerUnit : unit.getUnitList()) {
+                    unitIcon = new ImageIcon(lib.getSmallerUnitImage(innerUnit));
+                    menuTitle = innerUnit.getDescription()
+                        + " " + Messages.message("cargoOnCarrier")
+                        + " " + unit.getDescription();
+                    subMenu = new JMenuItem(menuTitle, unitIcon);
+                    subMenu.addActionListener((ActionEvent ae) -> {
+                            unitMenu.addMenuItems(new UnitLabel(freeColClient, innerUnit));
+                            unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        });
+                    unitNumber++;
+                    colonyUnitsMenu.add(subMenu);
                 }
             } else if (!unit.isOnCarrier()) {
                 unitIcon = new ImageIcon(lib.getSmallerUnitImage(unit));

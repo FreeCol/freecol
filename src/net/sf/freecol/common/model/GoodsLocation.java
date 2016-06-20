@@ -170,6 +170,7 @@ public abstract class GoodsLocation extends UnitLocation {
     //    UnitLocation.getLocationLabelFor
     //    UnitLocation.canAdd
     //    UnitLocation.getUnitCount
+    //    UnitLocation.getUnits
     //    UnitLocation.getUnitList
     //    UnitLocation.getSettlement
     // Does not implement getRank

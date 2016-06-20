@@ -29,6 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -58,17 +59,17 @@ public final class ReportEducationPanel extends ReportPanel {
                     bp.initialize();
                     reportPanel.add(bp);
                     JPanel teacherPanel = getPanel("report.education.teachers");
-                    for (Unit unit : colony.getUnitList()) {
-                        if (building.canAdd(unit)) {
-                            teacherPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
-                            maxSkill = Math.max(maxSkill, unit.getType().getSkill());
-                        }
+                    for (Unit unit : transform(colony.getUnits(),
+                                               u -> building.canAdd(u))) {
+                        teacherPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
+                        maxSkill = Math.max(maxSkill, unit.getType().getSkill());
                     }
                     reportPanel.add(teacherPanel, "split 2, flowy, grow");
                     JPanel studentPanel = getPanel("report.education.students");
                     for (Unit unit : colony.getUnitList()) {
                         if (unit.getType().getEducationUnit(maxSkill) != null) {
-                            studentPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
+                            studentPanel.add(new UnitLabel(getFreeColClient(),
+                                                           unit, true, true));
                         }
                     }
                     reportPanel.add(studentPanel, "grow");

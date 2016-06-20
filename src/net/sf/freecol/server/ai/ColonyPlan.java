@@ -1479,11 +1479,9 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 workers.remove(u);
             } else break;
         }
-        for (Unit u : col.getUnitList()) {
-            if (!u.hasDefaultRole()) {
-                logger.warning("assignWorkers bogus role for " + u);
-                u.changeRole(spec().getDefaultRole(), 0);
-            }
+        for (Unit u : transform(col.getUnits(), u -> !u.hasDefaultRole())) {
+            logger.warning("assignWorkers bogus role for " + u);
+            u.changeRole(spec().getDefaultRole(), 0);
         }
 
         // Log and return the scratch colony on success.

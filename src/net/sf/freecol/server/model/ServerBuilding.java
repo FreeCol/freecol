@@ -220,12 +220,10 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csRepairUnits(ChangeSet cs) {
-        for (Unit unit : getTile().getUnitList()) {
-            if (unit.isDamaged()
-                && getType().hasAbility(Ability.REPAIR_UNITS,
-                                        unit.getType())) {
-                ((ServerUnit) unit).csRepairUnit(cs);
-            }
+        for (Unit unit : transform(getTile().getUnits(), u ->
+                (u.isDamaged()
+                    && getType().hasAbility(Ability.REPAIR_UNITS, u.getType())))) {
+            ((ServerUnit) unit).csRepairUnit(cs);
         }
     }
 

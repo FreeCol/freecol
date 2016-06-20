@@ -209,8 +209,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             for (GoodsType gt : goodsTypes) produce(gt);
                 
             this.notWorking.addAll(transform(colony.getTile().getUnits(),
-                    u -> u.getState() != Unit.UnitState.FORTIFIED
-                         && u.getState() != Unit.UnitState.SENTRY));
+                    u -> (u.getState() != Unit.UnitState.FORTIFIED
+                        && u.getState() != Unit.UnitState.SENTRY)));
 
             // Collect the types of the units at work in the colony
             // (colony tiles and buildings) that are suboptimal (and
@@ -232,11 +232,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 }
 
                 // Check if the units are working.
-                for (Unit u : wl.getUnitList()) {
-                    if (u.getTeacher() == null && u.getWorkType() == null) {
-                        this.notWorking.add(u);
-                    }
-                }
+                this.notWorking.addAll(transform(wl.getUnits(),
+                                       u -> (u.getTeacher() == null
+                                           && u.getWorkType() == null)));
 
                 // Add work location suggestions.
                 for (Entry<Unit, Suggestion> e
@@ -612,14 +610,12 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 c = cAlarm;
                 if (n == 1) {
                     TileImprovementSuggestion tis = first(s.tileSuggestions);
-                    for (Unit u : tis.tile.getUnitList()) {
-                        if (u.getState() == Unit.UnitState.IMPROVING
-                            && u.getWorkImprovement() != null
-                            && u.getWorkImprovement().getType()
-                                == tis.tileImprovementType) {
-                            c = cWarn; // Work is underway
-                            break;
-                        }
+                    if (any(tis.tile.getUnits(),
+                            u -> (u.getState() == Unit.UnitState.IMPROVING
+                                && u.getWorkImprovement() != null
+                                && u.getWorkImprovement().getType()
+                                    == tis.tileImprovementType))) {
+                        c = cWarn; // Work is underway
                     }
                     t = stpld("report.colony.tile." + ti.getSuffix()
                               + ".specific")

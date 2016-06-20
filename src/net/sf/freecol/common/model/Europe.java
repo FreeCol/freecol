@@ -590,8 +590,8 @@ public class Europe extends UnitLocation
         // @compat 0.10.1
         // Sometimes units in a Europe element have a missing
         // location.  It should always be this Europe instance.
-        for (Unit u : getUnitList()) {
-            if (u.getLocation() == null) u.setLocationNoUpdate(this);
+        for (Unit u : transform(getUnits(), u -> u.getLocation() == null)) {
+            u.setLocationNoUpdate(this);
         }
         // end @compat
     }

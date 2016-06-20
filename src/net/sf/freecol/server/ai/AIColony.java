@@ -304,13 +304,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<Unit> workers = colony.getUnitList();
         List<UnitWas> was = transform(workers, alwaysTrue(),
                                       u -> new UnitWas(u));
-        for (Unit u : tile.getUnitList()) {
-            if (!u.isPerson() || u.hasAbility(Ability.REF_UNIT)
-                || getAIUnit(u) == null) continue;
-            if (getAIUnit(u).isAvailableForWork(colony)) {
-                workers.add(u);
-                was.add(new UnitWas(u));
-            }
+        final Predicate<Unit> workerPred = u -> {
+            AIUnit validAIU;
+            return u.isPerson() && !u.hasAbility(Ability.REF_UNIT)
+                && (validAIU = getAIUnit(u)) != null
+                && validAIU.isAvailableForWork(colony);
+        };                
+        for (Unit u : transform(tile.getUnits(), workerPred)) {
+            workers.add(u);
+            was.add(new UnitWas(u));
         }
         // Assign the workers according to the colony plan.
         // ATM we just accept this assignment unless it failed, in
@@ -379,15 +381,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Return any units with the wrong mission
         for (Unit u : colony.getUnitList()) {
             final AIUnit aiu = getAIUnit(u);
-            if(!aiu.tryWorkInsideColonyMission(this, lb))
-                result.add(aiu); 
+            if (!aiu.tryWorkInsideColonyMission(this, lb)) result.add(aiu); 
         }
 
         // Allocate pioneers if possible.
         int tipSize = tileImprovementPlans.size();
         if (tipSize > 0) {
             List<Unit> pioneers
-                = transform(tile.getUnitList(), u -> u.getPioneerScore() >= 0,
+                = transform(tile.getUnits(), u -> u.getPioneerScore() >= 0,
                             Function.identity(), pioneerComparator);
             for (Unit u : pioneers) {
                 final AIUnit aiu = getAIUnit(u);
@@ -489,7 +490,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Predicate<Unit> explorerPred = u -> u.isPerson()
             && (u.getType().getSkill() <= 0
                 || u.hasAbility(Ability.EXPERT_SCOUT));
-        List<Unit> scouts = transform(tile.getUnitList(), explorerPred,
+        List<Unit> scouts = transform(tile.getUnits(), explorerPred,
                                       Function.identity(), scoutComparator);
         for (Tile t : tile.getSurroundingTiles(1)) {
             if (t.hasLostCityRumour()) {
@@ -520,7 +521,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final Specification spec = getSpecification();
         final Tile tile = colony.getTile();
         final Player player = colony.getOwner();
-        boolean hasDefender = any(tile.getUnitList(),
+        boolean hasDefender = any(tile.getUnits(),
             u -> u.isDefensiveUnit()
                 && getAIUnit(u).hasDefendSettlementMission());
         if (!hasDefender) return;
@@ -587,8 +588,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : colony.getTile().getUnitList()) lb.add(" ", u);
         List<GoodsType> libertyGoods = getSpecification()
             .getLibertyGoodsTypeList();
-        out: for (Unit u : colony.getTile().getUnitList()) {
-            if (!u.isPerson()) continue;
+        out: for (Unit u : transform(colony.getTile().getUnits(),
+                                     Unit::isPerson)) {
             for (WorkLocation wl : colony.getAvailableWorkLocations()) {
                 if (!wl.canAdd(u)) continue;
                 for (GoodsType type : libertyGoods) {
@@ -1144,11 +1145,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (isBadlyDefended()) {
             Role role = first(spec.getMilitaryRoles());
             Player owner = colony.getOwner();
-            for (Unit unit : colony.getTile().getUnitList()) {
-                if (!unit.roleIsAvailable(role)
-                    || (!unit.hasDefaultRole()
-                        && !Role.isCompatibleWith(role, unit.getRole())))
-                    continue;
+            final Predicate<Unit> rolePred = u ->
+                (u.roleIsAvailable(role)
+                    && (u.hasDefaultRole()
+                        || Role.isCompatibleWith(role, u.getRole())));
+            for (Unit unit : transform(colony.getTile().getUnits(), rolePred)) {
                 for (AbstractGoods ag : role.getRequiredGoods()) {
                     required.incrementCount(ag.getType(), ag.getAmount());
                 }

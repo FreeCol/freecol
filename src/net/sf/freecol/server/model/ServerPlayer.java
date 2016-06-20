@@ -1813,9 +1813,8 @@ outer:  for (Effect effect : effects) {
     }
 
     public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
-        List<Unit> units
-            = transform(concat(colony.getUnits(), colony.getTile().getUnits()),
-                        u -> effect.appliesTo(u.getType()));
+        List<Unit> units = transform(colony.getAllUnitsList(),
+                                     u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
             : getRandomMember(logger, "Select unit for effect", units, random);
     }
@@ -2228,11 +2227,9 @@ outer:  for (Effect effect : effects) {
                 europeDirty = europe.replaceRecruits(random);
 
             } else if ("model.event.movementChange".equals(eventId)) {
-                for (Unit u : getUnitList()) {
-                    if (u.getMovesLeft() > 0) {
-                        u.setMovesLeft(u.getInitialMovesLeft());
-                        cs.addPartial(See.only(this), u, "movesLeft");
-                    }
+                for (Unit u : transform(getUnits(), u -> u.getMovesLeft() > 0)) {
+                    u.setMovesLeft(u.getInitialMovesLeft());
+                    cs.addPartial(See.only(this), u, "movesLeft");
                 }
             }
         }
@@ -3162,11 +3159,8 @@ outer:  for (Effect effect : effects) {
                                      ChangeSet cs) {
         boolean captureRepairing = getSpecification()
             .getBoolean(GameOptions.CAPTURE_UNITS_UNDER_REPAIR);
-        List<Unit> units = new ArrayList<>();
-        for (Unit u : colony.getTile().getUnitList()) {
-            if (u.isNaval()
-                && !(captureRepairing && u.isDamaged())) units.add(u);
-        }
+        List<Unit> units = transform(colony.getTile().getUnits(),
+            u -> u.isNaval() && !(captureRepairing && u.isDamaged()));
         if (!units.isEmpty()) {
             final ServerPlayer shipPlayer = (ServerPlayer)colony.getOwner();
             final Unit ship = units.get(0);
@@ -3926,11 +3920,8 @@ outer:  for (Effect effect : effects) {
     private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
         boolean captureRepairing = getSpecification()
             .getBoolean(GameOptions.CAPTURE_UNITS_UNDER_REPAIR);
-        List<Unit> units = new ArrayList<>();
-        for (Unit u : colony.getTile().getUnitList()) {
-            if (u.isNaval() && !(captureRepairing && u.isDamaged()))
-                units.add(u);
-        }
+        List<Unit> units = transform(colony.getTile().getUnits(),
+            u -> u.isNaval() && !(captureRepairing && u.isDamaged()));
         if (!units.isEmpty()) {
             final ServerPlayer shipPlayer = (ServerPlayer)colony.getOwner();
             final ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();

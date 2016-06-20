@@ -197,25 +197,25 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addBoardItems(final UnitLabel unitLabel, Location loc) {
-        final InGameController igc = freeColClient.getInGameController();
         final Unit tempUnit = unitLabel.getUnit();
-
         if (tempUnit.isCarrier()) return false;
+
+        final InGameController igc = freeColClient.getInGameController();
+
         boolean added = false;
-        for (final Unit unit : loc.getUnitList()) {
-            if (unit.isCarrier() && unit.canCarryUnits()
-                && unit.canAdd(tempUnit)
-                && tempUnit.getLocation() != unit) {
-                StringTemplate template = StringTemplate.template("quickActionMenu.board")
+        for (Unit unit : transform(loc.getUnitList(), u ->
+                (u.isCarrier() && u.canCarryUnits() && u.canAdd(tempUnit)
+                    && tempUnit.getLocation() != u))) {
+            StringTemplate template
+                = StringTemplate.template("quickActionMenu.board")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener((ActionEvent ae) -> {
-                        igc.boardShip(tempUnit, unit);
-                    });
-                this.add(menuItem);
-                added = true;
-            }
+            JMenuItem menuItem = Utility.localizedMenuItem(template);
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    igc.boardShip(tempUnit, unit);
+                });
+            this.add(menuItem);
+            added = true;
         }
         return added;
     }
@@ -224,22 +224,21 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
 
         boolean added = false;
-        for (final Unit unit : loc.getUnitList()) {
-            if (unit.isCarrier() && unit.canCarryGoods()
-                && unit.canAdd(goods)) {
-                StringTemplate template = StringTemplate.template("quickActionMenu.loadOnTo")
+        for (Unit unit : transform(loc.getUnits(), u ->
+                (u.isCarrier() && u.canCarryGoods() && u.canAdd(goods)))) {
+            StringTemplate template
+                = StringTemplate.template("quickActionMenu.loadOnTo")
                     .addStringTemplate("%unit%",
                         unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener((ActionEvent ae) -> {
-                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                            promptForGoods(goods);
-                        }
-                        igc.loadCargo(goods, unit);
-                    });
-                this.add(menuItem);
-                added = true;
-            }
+            JMenuItem menuItem = Utility.localizedMenuItem(template);
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                        promptForGoods(goods);
+                    }
+                    igc.loadCargo(goods, unit);
+                });
+            this.add(menuItem);
+            added = true;
         }
         return added;
     }
@@ -394,10 +393,8 @@ public final class QuickActionMenu extends JPopupMenu {
         boolean separatorNeeded = false;
 
         if (spec.getBoolean(GameOptions.ALLOW_STUDENT_SELECTION)) {
-            final Predicate<Unit> teacherPred = teacher ->
-                unit.canBeStudent(teacher) && unit.isInColony();
-            for (Unit teacher : transform(unit.getColony().getTeachers(),
-                                          teacherPred)) {
+            for (Unit teacher : transform(unit.getColony().getTeachers(), u ->
+                    unit.canBeStudent(u) && u.isInColony())) {
                 JMenuItem menuItem = null;
                 ImageIcon teacherIcon
                     = new ImageIcon(lib.getSmallerUnitImage(teacher));
@@ -815,27 +812,25 @@ public final class QuickActionMenu extends JPopupMenu {
         final InGameController igc = freeColClient.getInGameController();
         final Goods goods = new Goods(europe.getGame(), null,
                                       ag.getType(), ag.getAmount());
+
         boolean added = false;
-        for (final Unit unit : europe.getUnitList()) {
-            if (unit.isCarrier() && unit.canCarryGoods()
-                && unit.canAdd(goods)) {
-                StringTemplate template = StringTemplate.template("loadOnTo")
-                    .addStringTemplate("%unit%",
-                        unit.getLabel(Unit.UnitLabelType.NATIONAL));
-                JMenuItem menuItem = Utility.localizedMenuItem(template);
-                menuItem.addActionListener((ActionEvent ae) -> {
-                        if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                            promptForGoods(ag);
-                        }
-                        igc.buyGoods(ag.getType(), ag.getAmount(), unit);
-                    });
-                this.add(menuItem);
-                added = true;
-            }
+        for (Unit unit : transform(europe.getUnits(), u ->
+                (u.isCarrier() && u.canCarryGoods() && u.canAdd(goods)))) {
+            StringTemplate template = StringTemplate.template("loadOnTo")
+                .addStringTemplate("%unit%",
+                    unit.getLabel(Unit.UnitLabelType.NATIONAL));
+            JMenuItem menuItem = Utility.localizedMenuItem(template);
+            menuItem.addActionListener((ActionEvent ae) -> {
+                    if ((ae.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                        promptForGoods(ag);
+                    }
+                    igc.buyGoods(ag.getType(), ag.getAmount(), unit);
+                });
+            this.add(menuItem);
+            added = true;
         }
         return added;
     }
-
 
     /**
      * Creates a menu for a tile.

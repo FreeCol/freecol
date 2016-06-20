@@ -451,18 +451,16 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }
         }
     
+        final Predicate<Unit> equipPred = u ->
+            u.hasDefaultRole() && u.hasAbility(Ability.CAN_BE_EQUIPPED);
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
             && randoms[cheatIndex++] < equipScoutCheatPercent) {
-            for (Unit u : europe.getUnitList()) {
-                if (u.hasDefaultRole()
-                    && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    cheatGold(europe.priceGoods(u.getGoodsDifference(scoutRole, 1)), lb);
-                    if
-            (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null))) {
-                        lb.add(" to equip scout ", u, ", ");
-                        player.logCheat("Equip scout " + u.toShortString());
-                    }
+            for (Unit u : transform(europe.getUnits(), equipPred)) {
+                cheatGold(europe.priceGoods(u.getGoodsDifference(scoutRole, 1)), lb);
+                if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null))) {
+                    lb.add(" to equip scout ", u, ", ");
+                    player.logCheat("Equip scout " + u.toShortString());
                     break;
                 }
             }
@@ -471,14 +469,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         if (!europe.isEmpty()
             && pioneersNeeded() > 0
             && randoms[cheatIndex++] < equipPioneerCheatPercent) {
-            for (Unit u : europe.getUnitList()) {
-                if (u.hasDefaultRole()
-                    && u.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                    cheatGold(europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)), lb);
-                    if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null))) {
-                        lb.add(" to equip pioneer ", u, ", ");
-                        player.logCheat("Equip pioneer " + u.toShortString());
-                    }
+            for (Unit u : transform(europe.getUnits(), equipPred)) {
+                cheatGold(europe.priceGoods(u.getGoodsDifference(pioneerRole, 1)), lb);
+                if (getAIUnit(u).equipForRole(spec.getRoleWithAbility(Ability.IMPROVE_TERRAIN, null))) {
+                    lb.add(" to equip pioneer ", u, ", ");
+                    player.logCheat("Equip pioneer " + u.toShortString());
                     break;
                 }
             }
@@ -1350,16 +1345,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         for (Settlement settlement : player.getSettlementList()) {
             nColonies++;
             if (settlement.isConnectedPort()) nPorts++;
-            for (Unit u : settlement.getUnitList()) {
-                if (u.isPerson()) nWorkers++;
-            }
-            for (Unit u : settlement.getTile().getUnitList()) {
-                if (u.isPerson()) nWorkers++;
-            }
+            nWorkers += count(settlement.getAllUnitsList(), Unit::isPerson);
         }
         Europe europe = player.getEurope();
         nEuropean = (europe == null) ? 0
-            : count(europe.getUnitList(), Unit::isPerson);
+            : count(europe.getUnits(), Unit::isPerson);
             
         // If would be good to have at least two colonies, and at least
         // one port.  After that, determine the ratio of workers to colonies

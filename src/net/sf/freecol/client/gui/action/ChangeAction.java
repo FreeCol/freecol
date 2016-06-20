@@ -25,6 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -108,14 +109,11 @@ public class ChangeAction extends UnitAction {
                     return;
                 }
             }
-            for (Unit u : tile.getUnitList()) {
-                if (u == unit) return;
-                if (u.getState() == Unit.UnitState.ACTIVE
-                    && u.getMovesLeft() > 0) {
-                    getGUI().setActiveUnit(u);
-                    return;
-                }
-            }
+            Unit active = find(tile.getUnits(),
+                               u -> (u != unit
+                                   && u.getState() == Unit.UnitState.ACTIVE
+                                   && u.getMovesLeft() > 0));
+            if (active != null) getGUI().setActiveUnit(active);
         }
     }
 }

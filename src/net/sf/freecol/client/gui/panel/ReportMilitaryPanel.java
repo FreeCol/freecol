@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -79,10 +80,9 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
      */
     @Override
     protected void gatherData() {
-        for (Unit unit : getMyPlayer().getUnitList()) {
-            if (reportable(unit)) {
-                addUnit(unit, unit.getRole().getId());
-            }
+        for (Unit unit : transform(getMyPlayer().getUnits(),
+                                   u -> reportable(u))) {
+            addUnit(unit, unit.getRole().getId());
         }
     }
 

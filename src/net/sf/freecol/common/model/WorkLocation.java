@@ -387,9 +387,8 @@ public abstract class WorkLocation extends UnitLocation
         Occupation occ = getOccupation(null);
         GoodsType work;
         Suggestion sug;
-        // Check if the existing units can be improved.
-        for (Unit u : getUnitList()) {
-            if (u.getTeacher() != null) continue; // Students assumed temporary
+        // Check if the existing non-student units can be improved.
+        for (Unit u : transform(getUnits(), u -> u.getTeacher() == null)) {
             if ((work = u.getWorkType()) == null) {
                 if (occ != null) work = occ.workType;
             }

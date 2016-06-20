@@ -171,12 +171,11 @@ public class ServerColony extends Colony implements ServerModelObject {
                 for (AbstractGoods goods : productionInfo.getProduction()) {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
                     int experience = goods.getAmount() / workLocation.getUnitCount();
-                    for (Unit unit : workLocation.getUnitList()) {
-                        if (goods.getType() == unit.getExperienceType()
-                            && unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)) {
-                            unit.setExperience(unit.getExperience() + experience);
-                            cs.addPartial(See.only(owner), unit, "experience");
-                        }
+                    for (Unit unit : transform(workLocation.getUnits(),
+                            u -> u.getExperienceType() == goods.getType()
+                                && u.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE))) {
+                        unit.setExperience(unit.getExperience() + experience);
+                        cs.addPartial(See.only(owner), unit, "experience");
                     }
                 }
             }
@@ -262,7 +261,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 if (net + stored < 0) {
                     if (getUnitCount() > 1) {
                         Unit victim = getRandomMember(logger, "Starver",
-                                                      getUnitList(), random);
+                                                      getUnits(), random);
                         cs.addRemove(See.only(owner), null,
                                      victim);//-vis: safe, all within colony
                         victim.dispose();

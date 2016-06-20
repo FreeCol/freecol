@@ -3086,15 +3086,16 @@ public class Unit extends GoodsLocation
                         || !getOwner().atWarWith(first.getOwner())) {
                         return false;
                     }
-                    for (Unit u : tile.getUnitList()) {
-                        PathNode reverse;
-                        if (u.canAttack(unit)
+                    final Predicate<Unit> attackerPred = u -> {
+                        PathNode p;
+                        return (u.canAttack(unit) 
                             && cm.calculateCombatOdds(u, unit).win >= threat
-                            && (reverse = u.findPath(start)) != null
-                            && reverse.getTotalTurns() < range) {
-                            found = path;
-                            return true;
-                        }
+                            && (p = u.findPath(start)) != null
+                            && p.getTotalTurns() < range);
+                    };
+                    if (any(transform(tile.getUnits(), attackerPred))) {
+                        found = path;
+                        return true;
                     }
                     return false;
                 }

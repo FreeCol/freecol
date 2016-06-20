@@ -1769,17 +1769,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return A potential teacher, or null of none found.
      */
     public Unit findTeacher(Unit student) {
-        if (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
-            return null; // No automatic assignment
-        for (Building building : getBuildings()) {
-            if (building.canTeach()) {
-                for (Unit unit : building.getUnitList()) {
-                    if (unit.getStudent() == null
-                        && student.canBeStudent(unit)) return unit;
-                }
-            }
-        }
-        return null;
+        return (getSpecification().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION))
+            ? null // No automatic assignment
+            : find(flatten(getBuildings(), Building::canTeach,
+                           Building::getUnits),
+                    u -> u.getStudent() == null);
     }
 
     /**
@@ -2122,9 +2116,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         // We have an expert not doing the job of their expertise.
         // Check if there is a non-expert doing the job instead.
-        for (Unit nonExpert : getUnitList()) {
-            if (nonExpert.getWorkType() != expertise
-                || nonExpert.getType() == expertType) continue;
+        for (Unit nonExpert : transform(getUnits(), u ->
+                u.getWorkType() == expertise && u.getType() != expertType)) {
 
             // We have found a unit of a different type doing the
             // job of this expert's expertise now check if the
@@ -2372,12 +2365,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                 if (ct.getWorkTile().getId().equals(id)) return (T)ct.getWorkTile();
             }
         } else if (fco instanceof Unit) {
-            for (Unit t : getUnitList()) {
-                if (t.getId().equals(id)) return (T)t;
-            }
-            for (Unit t : getTile().getUnitList()) {
-                if (t.getId().equals(id)) return (T)t;
-            }
+            return (T)find(getAllUnitsList(), matchKeyEquals(id, Unit::getId));
         }
         return null;
     }

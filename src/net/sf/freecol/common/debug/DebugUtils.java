@@ -347,14 +347,14 @@ public class DebugUtils {
                       Comparator.naturalOrder()));
         if (unitChoice == null) return;
 
-        Unit carrier = null, sCarrier = null;
-        if (!sTile.isLand() && !unitChoice.isNaval()) {
-            sCarrier = find(sTile.getUnits(), u -> u.isNaval()
-                && u.getSpaceLeft() >= unitChoice.getSpaceTaken());
-        }
-        Location loc = (sCarrier != null) ? sCarrier : sTile;
-        ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,
-                                          unitChoice);//-vis(sPlayer)
+        // Is there a server-unit with space left?
+        Unit sCarrier = (sTile.isLand() || unitChoice.isNaval()) ? null
+            : find(sTile.getUnitList(), u ->
+                u.isNaval() && u.getSpaceLeft() >= unitChoice.getSpaceTaken());
+
+        ServerUnit sUnit
+            = new ServerUnit(sGame, ((sCarrier != null) ? sCarrier : sTile),
+                             sPlayer, unitChoice);//-vis(sPlayer)
         ((ServerPlayer)sPlayer).exploreForUnit(sUnit);
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
         sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
@@ -589,9 +589,8 @@ public class DebugUtils {
         lb.add("Desynchronization detected\n");
         for (Tile t : sMap.getAllTiles()) {
             if (!sPlayer.canSee(t)) continue;
-            for (Unit u : t.getUnitList()) {
-                if (!sPlayer.owns(u)
-                    && (t.hasSettlement() || u.isOnCarrier())) continue;
+            for (Unit u : transform(t.getUnits(), u ->
+                    sPlayer.owns(u) || (!t.hasSettlement() && !u.isOnCarrier()))) {
                 if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
                     lb.add("Unit missing on client-side.\n", "  Server: ",
                            u.getDescription(Unit.UnitLabelType.NATIONAL),

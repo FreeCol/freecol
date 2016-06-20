@@ -1616,8 +1616,7 @@ public class Player extends FreeColGameObject implements Nameable {
         java.util.Map<UnitType, HashMap<String, Integer>> unitHash
             = new HashMap<>();
         List<AbstractUnit> units = new ArrayList<>();
-        for (Unit unit : getUnitList()) {
-            if (!unit.isOffensiveUnit()) continue;
+        for (Unit unit : transform(getUnits(), Unit::isOffensiveUnit)) {
             UnitType unitType = defaultType;
             if (unit.getType().getOffence() > 0
                 || unit.hasAbility(Ability.EXPERT_SOLDIER)) {
@@ -3671,13 +3670,12 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            for (Unit u : t.getUnitList()) {
-                if (!owns(u) && u.isOffensiveUnit()
-                    && atWarWith(u.getOwner())) {
-                    values.set(ColonyValueCategory.A_ADJACENT.ordinal(),
-                        values.get(ColonyValueCategory.A_ADJACENT.ordinal())
-                        * MOD_ENEMY_UNIT[1]);
-                }
+            for (Unit u : transform(t.getUnits(),
+                                    u -> !owns(u) && u.isOffensiveUnit()
+                                        && atWarWith(u.getOwner()))) {
+                values.set(ColonyValueCategory.A_ADJACENT.ordinal(),
+                    values.get(ColonyValueCategory.A_ADJACENT.ordinal())
+                    * MOD_ENEMY_UNIT[1]);
             }
         }
 
@@ -3718,13 +3716,12 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
 
-                for (Unit u : t.getUnitList()) {
-                    if (!owns(u) && u.isOffensiveUnit()
-                        && atWarWith(u.getOwner())) {
-                        values.set(ColonyValueCategory.A_NEARBY.ordinal(),
-                            values.get(ColonyValueCategory.A_NEARBY.ordinal())
-                            * MOD_ENEMY_UNIT[radius]);
-                    }
+                for (Unit u : transform(t.getUnits(),
+                                        u -> (!owns(u) && u.isOffensiveUnit()
+                                            && atWarWith(u.getOwner())))) {
+                    values.set(ColonyValueCategory.A_NEARBY.ordinal(),
+                        values.get(ColonyValueCategory.A_NEARBY.ordinal())
+                        * MOD_ENEMY_UNIT[radius]);
                 }
             }
         }

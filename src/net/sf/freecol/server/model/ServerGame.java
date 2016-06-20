@@ -438,22 +438,21 @@ public class ServerGame extends Game implements ServerModelObject {
             ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", c.getName());
         }
-        for (Unit unit : weakest.getUnitList()) {
-            if (weakest.csChangeOwner(unit, strongest, 
-                    ChangeType.CAPTURE, null, cs)) { //-vis(both)
-                unit.setMovesLeft(0);
-                unit.setState(Unit.UnitState.ACTIVE);
-                lb.add(" ", unit.getId());
-                if (unit.getLocation() instanceof Europe) {
-                    unit.setLocation(strongestAIPlayer.getEurope());//-vis
-                    cs.add(See.only(strongest), unit);
-                } else if (unit.getLocation() instanceof HighSeas) {
-                    unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
-                    cs.add(See.only(strongest), unit);
-                } else if (unit.getLocation() instanceof Tile) {
-                    Tile tile = unit.getTile();
-                    if (!tiles.contains(tile)) tiles.add(tile);
-                }
+        for (Unit unit : transform(weakest.getUnits(),
+                u -> weakest.csChangeOwner(u, strongest, //-vis(both)
+                                           ChangeType.CAPTURE, null, cs))) {
+            unit.setMovesLeft(0);
+            unit.setState(Unit.UnitState.ACTIVE);
+            lb.add(" ", unit.getId());
+            if (unit.getLocation() instanceof Europe) {
+                unit.setLocation(strongestAIPlayer.getEurope());//-vis
+                cs.add(See.only(strongest), unit);
+            } else if (unit.getLocation() instanceof HighSeas) {
+                unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
+                cs.add(See.only(strongest), unit);
+            } else if (unit.getLocation() instanceof Tile) {
+                Tile tile = unit.getTile();
+                if (!tiles.contains(tile)) tiles.add(tile);
             }
         }
 

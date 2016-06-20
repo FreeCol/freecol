@@ -203,7 +203,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         Unit up = (unit.getType().canBeUpgraded(sk,
                                 ChangeType.NATIVES)) ? unit : null;
                         if (unit.isCarrier()) {
-                            up = find(unit.getUnitList(), upgradePred);
+                            up = find(unit.getUnits(), upgradePred);
                         }
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");

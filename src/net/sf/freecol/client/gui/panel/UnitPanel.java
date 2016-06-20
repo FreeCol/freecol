@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -98,9 +99,8 @@ public abstract class UnitPanel extends MigPanel
         removeAll();
 
         if (portPanel != null) {
-            for (Unit unit : portPanel.getUnitList()) {
-                if (!accepts(unit)) continue;
-                    
+            for (Unit unit : transform(portPanel.getUnitList(),
+                                       u -> accepts(u))) {
                 UnitLabel unitLabel
                     = new UnitLabel(portPanel.getFreeColClient(), unit);
                 TradeRoute tradeRoute = unit.getTradeRoute();
