@@ -370,7 +370,7 @@ public class ServerIndianSettlement extends IndianSettlement
         };
         final Comparator<Player> mostHatedComp
             = Comparator.comparingInt(p -> getAlarm(p).getValue());
-        this.mostHated = maximize(getGame().getLiveEuropeanPlayers(null),
+        this.mostHated = maximize(getGame().getLiveEuropeanPlayers(),
                                   hatedPred, mostHatedComp);
         return this.mostHated != old;
     }

@@ -2854,7 +2854,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // All missions if using enhanced missionaries.
         if (isEuropean()
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-            for (Player other : getGame().getLiveNativePlayers(this)) {
+            for (Player other : getGame().getLiveNativePlayerList(this)) {
                 for (Tile t : iterable(flatten(getIndianSettlementsWithMissionary(this),
                                                is -> is.getVisibleTiles().stream()))) {
                     cST[t.getX()][t.getY()] = true;
@@ -3004,7 +3004,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is at war with any other.
      */
     public boolean isAtWar() {
-        return any(getGame().getLivePlayers(null), p -> atWarWith(p));
+        return any(getGame().getLivePlayers(), p -> atWarWith(p));
     }
 
     /**

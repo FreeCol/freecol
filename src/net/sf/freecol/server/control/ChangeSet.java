@@ -1605,7 +1605,7 @@ public class ChangeSet {
      */
     public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
         changes.add(new OwnedChange(See.all(), history));
-        for (Player p : game.getLiveEuropeanPlayers(null)) {
+        for (Player p : game.getLiveEuropeanPlayerList()) {
             p.addHistory(history);
         }
         return this;

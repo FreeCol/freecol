@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -461,7 +462,7 @@ public class FreeColTestCase extends TestCase {
             map.resetHighSeasCount();
             if (exploredByAll) {
                 for (Tile tile : map.getAllTiles()) {
-                    for (Player player : game.getLiveEuropeanPlayers(null)) {
+                    for (Player player : game.getLiveEuropeanPlayerList()) {
                         tile.setExplored(player, true);
                     }
                 }
@@ -510,12 +511,11 @@ public class FreeColTestCase extends TestCase {
         }
 
         public IndianSettlementBuilder player(Player player){
-            this.indianPlayer = player;
-
-            if(indianPlayer == null || !game.getPlayers().contains(player)){
+            if (player == null
+                || none(game.getPlayers(), matchKey(player))) {
                 throw new IllegalArgumentException("Indian player not in game");
             }
-
+            this.indianPlayer = player;
             return this;
         }
 

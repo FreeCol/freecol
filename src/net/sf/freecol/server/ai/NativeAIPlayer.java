@@ -172,7 +172,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayers(serverPlayer)) {
+        for (Player p : getGame().getLivePlayerList(serverPlayer)) {
             Stance newStance = determineStance(p);
             if (newStance != serverPlayer.getStance(p)) {
                 getAIMain().getFreeColServer().getInGameController()

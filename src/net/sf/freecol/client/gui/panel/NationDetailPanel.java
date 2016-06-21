@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -77,13 +78,10 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         if (getId().equals(id)) return;
 
         Nation nation = getSpecification().getNation(id);
-        NationType currentNationType = nation.getType();
-        for (Player player : getGame().getLivePlayers(null)) {
-            if (player.getNation() == nation) {
-                currentNationType = player.getNationType();
-                break;
-            }
-        }
+        Player player = find(getGame().getLivePlayers(),
+                             p -> p.getNation() == nation);
+        NationType currentNationType = (player == null) ? nation.getType()
+            : player.getNationType();
 
         panel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 

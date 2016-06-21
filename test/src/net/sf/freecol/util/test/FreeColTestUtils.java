@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class FreeColTestUtils {
@@ -88,12 +89,11 @@ public class FreeColTestUtils {
         }
 
         public ColonyBuilder player(Player player) {
-            this.player = player;
-
-            if(player == null || !game.getPlayers().contains(player)) {
+            if (player == null
+                || none(game.getPlayers(), matchKey(player))) {
                 throw new IllegalArgumentException("Player not in game");
             }
-
+            this.player = player;
             return this;
         }
 

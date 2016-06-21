@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -75,15 +76,14 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0",
                                             "[]20px[center]", "[top]"));
         boolean needsSeperator = false;
-        for (Player opponent : getGame().getLiveNativePlayers(null)) {
-            if (player.hasContacted(opponent)) {
-                if (needsSeperator) {
-                    reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
-                        "newline 20, span, growx, wrap 20");
-                }
-                buildIndianAdvisorPanel(player, opponent);
-                needsSeperator = true;
+        for (Player opponent : transform(getGame().getLiveNativePlayers(),
+                                         p -> player.hasContacted(p))) {
+            if (needsSeperator) {
+                reportPanel.add(new JSeparator(JSeparator.HORIZONTAL),
+                    "newline 20, span, growx, wrap 20");
             }
+            buildIndianAdvisorPanel(player, opponent);
+            needsSeperator = true;
         }
         scrollPane.getViewport().setOpaque(false);
         reportPanel.setOpaque(true);

@@ -204,7 +204,7 @@ public class LoginMessage extends DOMMessage {
             }
 
             // Create and add the new player:
-            boolean admin = game.getLivePlayers(null).isEmpty();
+            boolean admin = game.getLivePlayerList().isEmpty();
             player = new ServerPlayer(game, admin, game.getVacantNation(),
                                       connection.getSocket(), connection);
             player.setName(userName);
@@ -224,7 +224,7 @@ public class LoginMessage extends DOMMessage {
                 StringBuilder sb = new StringBuilder("Player \"");
                 sb.append(userName).append("\" is not present in the game.")
                     .append("\n  Known players = ( ");
-                for (Player p : game.getLiveEuropeanPlayers(null)) {
+                for (Player p : game.getLiveEuropeanPlayerList()) {
                     sb.append(p.getName()).append(' ');
                 }
                 sb.append(')');

@@ -1207,8 +1207,7 @@ public final class InGameController extends Controller {
             }
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);//-vis(serverPlayer),-til
-            for (Player p : getGame().getLivePlayers(serverPlayer)) {
-                if (p == serverPlayer) continue;
+            for (Player p : getGame().getLivePlayerList(serverPlayer)) {
                 ((IndianSettlement)settlement).setAlarm(p, (p.isIndian())
                     ? new Tension(Tension.Level.CONTENT.getLimit())
                     : serverPlayer.getTension(p));//-til
@@ -1775,7 +1774,7 @@ public final class InGameController extends Controller {
         // that may already be at war.
         final Comparator<Player> comp = Comparator.comparingInt(p ->
             p.getTension(serverPlayer).getValue());
-        List<Player> natives = transform(game.getLiveNativePlayers(null),
+        List<Player> natives = transform(game.getLiveNativePlayers(),
             p -> p.hasContacted(serverPlayer), Function.identity(), comp);
         if (!natives.isEmpty()) {
             ServerPlayer good = (ServerPlayer)first(natives);
@@ -2491,7 +2490,7 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.
-        for (Player p : game.getLivePlayers(serverPlayer)) {
+        for (Player p : game.getLivePlayerList(serverPlayer)) {
             if (serverPlayer.hasContacted(p)) {
                 serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p,
                                             true, cs);

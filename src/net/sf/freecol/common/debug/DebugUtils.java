@@ -516,7 +516,7 @@ public class DebugUtils {
             
         Player player = gui.getChoice(null,
             StringTemplate.template("prompt.selectOwner"), "cancel",
-            transform(game.getLivePlayers(null),
+            transform(game.getLivePlayers(),
                       p -> unit.getType().isAvailableTo(p), mapper,
                       Comparator.naturalOrder()));
         if (player == null || unit.getOwner() == player) return;
@@ -729,7 +729,7 @@ public class DebugUtils {
         List<Unit> toEurope = new ArrayList<>();
         List<Unit> toAmerica = new ArrayList<>();
         HashMap<String,List<Unit>> units = new HashMap<>();
-        for (Player tp : sGame.getLiveEuropeanPlayers(null)) {
+        for (Player tp : sGame.getLiveEuropeanPlayerList()) {
             Player p = sGame.getFreeColGameObject(tp.getId(), Player.class);
             if (p.getEurope() == null) continue;
             inEurope.clear();
@@ -1123,7 +1123,7 @@ public class DebugUtils {
         LogBuilder lb = new LogBuilder(256);
         lb.add(sis.getName(), "\n\nAlarm\n");
         Player mostHated = sis.getMostHated();
-        for (Player p : sGame.getLiveEuropeanPlayers(null)) {
+        for (Player p : sGame.getLiveEuropeanPlayerList()) {
             Tension tension = sis.getAlarm(p);
             lb.add(Messages.message(p.getNationLabel()),
                    " ", ((tension == null) ? "(none)"

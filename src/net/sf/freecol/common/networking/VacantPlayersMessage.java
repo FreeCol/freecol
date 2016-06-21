@@ -91,7 +91,7 @@ public class VacantPlayersMessage extends DOMMessage {
         final Game game = server.getGame();
 
         this.vacantPlayers.clear();
-        for (Player p : game.getLiveEuropeanPlayers(null)) {
+        for (Player p : game.getLiveEuropeanPlayerList()) {
             if (!p.isREF()
                 && (p.isAI() || !((ServerPlayer)p).isConnected())) {
                 this.vacantPlayers.add(p.getNationId());

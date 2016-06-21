@@ -201,7 +201,7 @@ public class Operand extends Scope {
             result = game.getSpecification().getInteger(getType());
             break;
         default:
-            for (Player player : game.getLivePlayers(null)) {
+            for (Player player : game.getLivePlayerList()) {
                 switch (this.operandType) {
                 case UNITS:
                     result += ourCount(player.getUnitList());

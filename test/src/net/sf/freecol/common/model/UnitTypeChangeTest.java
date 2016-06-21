@@ -40,7 +40,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
                    change.getScopes().isEmpty());
 
         // empty scope applies to all players
-        for (Player player : getStandardGame().getPlayers()) {
+        for (Player player : getStandardGame().getPlayerList()) {
             assertTrue("Empty scopes apply to all players",
                        change.appliesTo(player));
         }

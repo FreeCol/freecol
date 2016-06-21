@@ -664,7 +664,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addDead(this);
 
         // Clean up missions and remove tension/alarm/stance.
-        for (Player other : getGame().getLivePlayers(this)) {
+        for (Player other : getGame().getLivePlayerList(this)) {
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement is : other.getIndianSettlementList()) {
                     ServerIndianSettlement sis = (ServerIndianSettlement)is;
@@ -1546,7 +1546,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Stance sta = getStance(s);
             boolean war = sta == Stance.WAR;
             if (sta == Stance.UNCONTACTED) continue;
-            for (Player p : game.getLiveEuropeanPlayers(this)) {
+            for (Player p : game.getLiveEuropeanPlayerList(this)) {
                 ServerPlayer sp = (ServerPlayer) p;
                 if (p == s || !p.hasContacted(this)
                     || !p.hasContacted(s)) continue;
@@ -1841,7 +1841,7 @@ outer:  for (Effect effect : effects) {
 
         // Do not need to update the clients here, these changes happen
         // while it is not their turn.
-        for (Player p : getGame().getLiveEuropeanPlayers(this)) {
+        for (Player p : getGame().getLiveEuropeanPlayerList(this)) {
             Market market = p.getMarket();
             if (market != null) market.addGoodsToMarket(type, amount);
         }
@@ -1940,7 +1940,7 @@ outer:  for (Effect effect : effects) {
             for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel = new HashMap<>();
                 oldLevels.put(is, oldLevel);
-                for (Player enemy : game.getLiveEuropeanPlayers(this)) {
+                for (Player enemy : game.getLiveEuropeanPlayerList(this)) {
                     Tension alarm = is.getAlarm(enemy);
                     oldLevel.put(enemy,
                         (alarm == null) ? null : alarm.getLevel());
@@ -1950,7 +1950,7 @@ outer:  for (Effect effect : effects) {
             // Do the settlement alarms first.
             for (IndianSettlement is : allSettlements) {
                 java.util.Map<Player, Integer> extra = new HashMap<>();
-                for (Player enemy : game.getLiveEuropeanPlayers(this)) {
+                for (Player enemy : game.getLiveEuropeanPlayerList(this)) {
                     extra.put(enemy, 0);
                 }
 
@@ -2009,7 +2009,7 @@ outer:  for (Effect effect : effects) {
             }
 
             // Calm down a bit at the whole-tribe level.
-            for (Player enemy : game.getLiveEuropeanPlayers(this)) {
+            for (Player enemy : game.getLiveEuropeanPlayerList(this)) {
                 if (getTension(enemy).getValue() > 0) {
                     int change = -getTension(enemy).getValue()/100 - 4;
                     csModifyTension(enemy, change, cs);//+til
@@ -2162,7 +2162,7 @@ outer:  for (Effect effect : effects) {
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
             if ("model.event.resetBannedMissions".equals(eventId)) {
-                for (Player p : game.getLiveNativePlayers(null)) {
+                for (Player p : game.getLiveNativePlayerList()) {
                     if (p.missionsBanned(this)) {
                         p.removeMissionBan(this);
                         cs.add(See.only(this), p);
@@ -2170,8 +2170,8 @@ outer:  for (Effect effect : effects) {
                 }
 
             } else if ("model.event.resetNativeAlarm".equals(eventId)) {
-                for (Player p : game.getLiveNativePlayers(null)) {
-                    if (!p.hasContacted(this)) continue;
+                for (Player p : transform(game.getLiveNativePlayers(),
+                                          p -> p.hasContacted(this))) {
                     p.setTension(this, new Tension(Tension.TENSION_MIN));
                     for (IndianSettlement is : transform(p.getIndianSettlements(),
                                                          is -> is.hasContacted(this))) {

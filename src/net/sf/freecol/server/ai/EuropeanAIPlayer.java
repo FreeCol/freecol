@@ -530,13 +530,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             //   crush the weak
             List<Player> enemies = new ArrayList<>();
             List<Player> preferred = new ArrayList<>();
-            for (Player p : game.getLivePlayers(player)) {
-                if (player.atWarWith(p)) {
-                    enemies.add(p);
-                    double strength = getStrengthRatio(p);
-                    if (strength < 3.0/2.0 && strength > 2.0/3.0) {
-                        preferred.add(p);
-                    }
+            for (Player p : transform(game.getLivePlayers(player),
+                                      x -> player.atWarWith(x))) {
+                enemies.add(p);
+                double strength = getStrengthRatio(p);
+                if (strength < 3.0/2.0 && strength > 2.0/3.0) {
+                    preferred.add(p);
                 }
             }
             if (!preferred.isEmpty()) {
@@ -1483,7 +1482,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
         lb.mark();
 
-        for (Player p : getGame().getLivePlayers(serverPlayer)) {
+        for (Player p : getGame().getLivePlayerList(serverPlayer)) {
             Stance newStance = determineStance(p);
             if (newStance != serverPlayer.getStance(p)) {
                 if (newStance == Stance.WAR && peaceHolds(p)) {
@@ -1577,8 +1576,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         double navalAverage = 0.0;
         double navalStrength = 0.0;
         int nPlayers = 0;
-        for (Player p : getGame().getLiveEuropeanPlayers(player)) {
-            if (p.isREF()) continue;
+        for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
+                                  x -> !x.isREF())) {
             NationSummary ns = getNationSummary(p);
             if (p == player) {
                 navalStrength = ns.getNavalStrength();

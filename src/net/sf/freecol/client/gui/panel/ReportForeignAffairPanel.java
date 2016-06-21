@@ -78,7 +78,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
                                             "[align top]"));
 
         int n;
-        for (Player enemy : getGame().getLiveEuropeanPlayers(null)) {
+        for (Player enemy : getGame().getLiveEuropeanPlayerList()) {
             NationSummary ns = igc().getNationSummary(enemy);
             if (ns == null) continue;
 

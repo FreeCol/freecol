@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.FreeColException;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -63,10 +64,10 @@ public class GameTest extends FreeColTestCase {
         }
 
         Collections.sort(players, Player.playerComparator);
-        Collections.sort(game.getPlayers(), Player.playerComparator);
+        game.sortPlayers(Player.playerComparator);
         assertEquals(spec().getNations().size() - counter,
-                     game.getPlayers().size());
-        assertEquals(players, game.getPlayers());
+                     count(game.getPlayers()));
+        assertEquals(players, game.getPlayerList());
     }
 
     public void testTurn() {

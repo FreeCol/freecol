@@ -255,7 +255,7 @@ public class SimpleMapGenerator implements MapGenerator {
     private boolean importIndianSettlements(Map map, LogBuilder lb) {
         int nSettlements = 0;
         
-        for (Player player : importGame.getLiveNativePlayers(null)) {
+        for (Player player : importGame.getLiveNativePlayerList()) {
             Player indian = game.getPlayerByNationId(player.getNationId());
             if (indian == null) {
                 Nation nation = spec.getNation(player.getNationId());
@@ -358,7 +358,7 @@ public class SimpleMapGenerator implements MapGenerator {
         List<Player> indians = new ArrayList<>();
         HashMap<String, Territory> territoryMap = new HashMap<>();
 
-        for (Player player : game.getLiveNativePlayers(null)) {
+        for (Player player : game.getLiveNativePlayerList()) {
             switch (player.getNationType().getNumberOfSettlements()) {
             case HIGH:
                 shares += 4;
@@ -1107,7 +1107,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // Decorate the map.
         makeNativeSettlements(map, lb);
         makeLostCityRumours(map, lb);
-        createEuropeanUnits(map, game.getLiveEuropeanPlayers(null), lb);
+        createEuropeanUnits(map, game.getLiveEuropeanPlayerList(), lb);
         return map;
     }
 }

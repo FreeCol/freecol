@@ -587,8 +587,7 @@ public final class FreeColServer {
         final Game game = buildGame();
 
         // Inform the clients.
-        for (Player player : game.getLivePlayers(null)) {
-            if (player.isAI()) continue;
+        for (Player player : transform(game.getLivePlayers(), p -> !p.isAI())) {
             ServerPlayer serverPlayer = (ServerPlayer)player;
 
             serverPlayer.invalidateCanSeeTiles(); // Send clean copy of the game
@@ -727,7 +726,7 @@ public final class FreeColServer {
      *     by the AI.
      */
     public int getSlotsAvailable() {
-        return count(game.getLiveEuropeanPlayers(null),
+        return count(game.getLiveEuropeanPlayers(),
                      p -> !p.isREF() && ((ServerPlayer)p).isAI()
                          && !((ServerPlayer)p).isConnected());
     }
@@ -738,7 +737,7 @@ public final class FreeColServer {
      * @return The number of living human players.
      */
     public int getNumberOfLivingHumanPlayers() {
-        return count(game.getLivePlayers(null),
+        return count(game.getLivePlayers(),
                      p -> !((ServerPlayer)p).isAI()
                          && ((ServerPlayer)p).isConnected());
     }
@@ -1027,7 +1026,7 @@ public final class FreeColServer {
         int savegameVersion = fis.getSavegameVersion();
         // @compat 0.10.x
         if (savegameVersion < 12) {
-            for (Player p : game.getPlayers()) {
+            for (Player p : game.getPlayerList()) {
                 // @compat 0.10.5
                 if (p.isIndian()) {
                     for (IndianSettlement is : p.getIndianSettlementList()) {
@@ -1094,9 +1093,9 @@ public final class FreeColServer {
         }
         game.setFreeColGameObjectListener(aiMain);
 
-        Collections.sort(game.getPlayers(), Player.playerComparator);
+        game.sortPlayers(Player.playerComparator);
 
-        for (Player player : game.getLivePlayers(null)) {
+        for (Player player : game.getLivePlayerList()) {
             if (player.isAI()) {
                 ServerPlayer serverPlayer = (ServerPlayer)player;
                 DummyConnection theConnection
@@ -1185,14 +1184,14 @@ public final class FreeColServer {
         // Initial stances and randomizations for all players.
         spec.generateDynamicOptions();
         Random random = getServerRandom();
-        for (Player player : game.getLivePlayers(null)) {
+        for (Player player : game.getLivePlayerList()) {
             ((ServerPlayer)player).randomizeGame(random);
             if (player.isIndian()) {
                 // Indian players know about each other, but European colonial
                 // players do not.
                 final int alarm = (Tension.Level.HAPPY.getLimit()
                     + Tension.Level.CONTENT.getLimit()) / 2;
-                for (Player other : game.getLiveNativePlayers(player)) {
+                for (Player other : game.getLiveNativePlayerList(player)) {
                     player.setStance(other, Stance.PEACE);
                     for (IndianSettlement is : player.getIndianSettlementList()) {
                         is.setAlarm(other, new Tension(alarm));
@@ -1274,7 +1273,7 @@ public final class FreeColServer {
      * @param reveal If true, reveal, if false, hide.
      */
     public void exploreMapForAllPlayers(boolean reveal) {
-        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
+        for (Player player : getGame().getLiveEuropeanPlayerList()) {
             ((ServerPlayer)player).exploreMap(reveal);
         }
      
@@ -1289,7 +1288,7 @@ public final class FreeColServer {
             fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
         }
 
-        for (Player player : getGame().getLiveEuropeanPlayers(null)) {
+        for (Player player : getGame().getLiveEuropeanPlayerList()) {
             ((ServerPlayer)player).getConnection().reconnect();
         }
     }
