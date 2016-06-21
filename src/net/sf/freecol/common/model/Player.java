@@ -2286,12 +2286,21 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The list of <code>Settlements</code> this player owns.
      */
-    public List<Settlement> getSettlements() {
+    public List<Settlement> getSettlementList() {
         synchronized (this.settlements) {
-            return this.settlements;
+            return new ArrayList<>(this.settlements);
         }
     }
 
+    /**
+     * Get a stream of the settlements this player owns.
+     *
+     * @return The strean of <code>Settlements</code> this player owns.
+     */
+    public Stream<Settlement> getSettlements() {
+        return getSettlementList().stream();
+    }
+        
     /**
      * Does this player have any settlements at present.
      *
@@ -2308,7 +2317,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The number of settlements this player has.
      */
-    private int getSettlementCount() {
+    public int getSettlementCount() {
         synchronized (this.settlements) {
             return this.settlements.size();
         }
@@ -2845,7 +2854,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         // All the settlements.
-        for (Settlement settlement : getSettlements()) {
+        for (Settlement settlement : getSettlementList()) {
             for (Tile t : settlement.getVisibleTiles()) {
                 cST[t.getX()][t.getY()] = true;
                 t.seeTile(this);
@@ -3316,7 +3325,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the player has no settlements (on the map) yet.
      */
     private boolean hasZeroSettlements() {
-        List<Settlement> settlements = getSettlements();
+        List<Settlement> settlements = getSettlementList();
         return settlements.isEmpty()
             || (settlements.size() == 1
                 && settlements.get(0).getTile().getSettlement() == null);

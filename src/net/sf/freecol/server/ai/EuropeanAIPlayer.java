@@ -1347,7 +1347,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         if (!player.canBuildColonies()) return 0;
 
         int nColonies = 0, nPorts = 0, nWorkers = 0, nEuropean = 0;
-        for (Settlement settlement : player.getSettlements()) {
+        for (Settlement settlement : player.getSettlementList()) {
             nColonies++;
             if (settlement.isConnectedPort()) nPorts++;
             for (Unit u : settlement.getUnitList()) {
@@ -1891,7 +1891,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 lb.add(" ", aiu.getUnit());
             }
         }
-        lb.add("\n  Missions(colonies=", player.getSettlements().size(),
+        lb.add("\n  Missions(colonies=", player.getSettlementCount(),
             " builders=", nBuilders,
             " pioneers=", nPioneers,
             " scouts=", nScouts,
@@ -2675,7 +2675,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             // Refuse if we already have this type under production in
             // multiple places.
             int n = count(getPlayer().getSettlements(),
-                s -> s.getGoodsCount(goodsType) > 0);
+                          s -> s.getGoodsCount(goodsType) > 0);
             ret = n < 2;
             if (ret) {
                 lb.add("accepted: breedable-type-", goodsType.getSuffix(), 

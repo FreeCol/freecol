@@ -597,7 +597,7 @@ public class GUI extends FreeColClientHolder {
         Player player = attacker.getOwner();
         Player other = is.getOwner();
         int strength = player.calculateStrength(false);
-        String messageId = (other.getSettlements().size() >= strength)
+        String messageId = (other.getSettlementCount() >= strength)
             ? "confirmTribute.unwise"
             : (other.getStance(player) == Stance.CEASE_FIRE)
             ? "confirmTribute.warLikely"

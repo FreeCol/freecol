@@ -515,7 +515,7 @@ public class NameCache {
 
         // Use the fallback name
         final String base = getFallbackSettlementName(player);
-        int i = player.getSettlements().size() + 1;
+        int i = player.getSettlementCount() + 1;
         String name = null;
         while (game.getSettlementByName(name = base + i++) != null);
         return name;

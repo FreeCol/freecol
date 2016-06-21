@@ -78,7 +78,7 @@ public class NationSummary extends FreeColObject {
         stance = player.getStance(requester);
         if (stance == Stance.UNCONTACTED) stance = Stance.PEACE;
 
-        numberOfSettlements = player.getSettlements().size();
+        numberOfSettlements = player.getSettlementCount();
 
         if (player.isEuropean()) {
             numberOfUnits = player.getUnitCount();

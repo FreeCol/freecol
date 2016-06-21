@@ -177,7 +177,7 @@ public final class FindSettlementPanel extends FreeColPanel
                 break;
             }
             if (ok) {
-                for (Settlement s : player.getSettlements()) {
+                for (Settlement s : player.getSettlementList()) {
                     model.addElement(s);
                 }
             }

@@ -494,7 +494,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(colony.getName(), copied.getName());
         // Note: we can not check that player.hasSettlement(copied) is false
         // because it too will use FCGO.equals().
-        for (Settlement s : player.getSettlements()) {
+        for (Settlement s : player.getSettlementList()) {
             assertFalse(s == copied);
         }
 

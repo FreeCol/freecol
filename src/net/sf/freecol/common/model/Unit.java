@@ -2604,34 +2604,19 @@ public class Unit extends GoodsLocation
         // Must be a land unit not on the map.  May have a carrier.
         // Get our nearest settlement to Europe, fallback to any other.
         final Player owner = getOwner();
-        int bestValue = INFINITY;
-        for (Settlement s : owner.getSettlements()) {
-            if (s.getTile().isHighSeasConnected()) {
-                int value = s.getTile().getHighSeasCount();
-                if (bestValue > value) {
-                    bestValue = value;
-                    ret = s;
-                }
-            } else if (bestValue == INFINITY) ret = s;
-        }
-        if (ret != null) return ret;
+        final Comparator<Settlement> settlementComp = cachingIntComparator(s ->
+            ((s.getTile().isHighSeasConnected())
+                ? s.getTile().getHighSeasCount()
+                : INFINITY));
+        Settlement sett = minimize(owner.getSettlements(), settlementComp);
+        if (sett == null) sett = first(owner.getSettlements());
+        if (sett != null) return sett;
 
         // Owner has no settlements.  If it is the REF, start from a
         // rebel colony.  Prefer the closest port.
         if (owner.isREF()) {
-            bestValue = INFINITY;
-            for (Player p : owner.getRebels()) {
-                for (Settlement s : p.getSettlements()) {
-                    if (s.getTile().isHighSeasConnected()) {
-                        int value = s.getTile().getHighSeasCount();
-                        if (bestValue > value) {
-                            bestValue = value;
-                            ret = s;
-                        }
-                    } else if (bestValue == INFINITY) ret = s;
-                }
-            }
-            if (ret != null) return ret;
+            return minimize(flatten(owner.getRebels(), Player::getSettlements),
+                            settlementComp);
         }
 
         // Desperately find the nearest land to the entry location.
@@ -2988,7 +2973,7 @@ public class Unit extends GoodsLocation
         case 2:
             // Ocean travel required, destination blocked.
             // Find the closest available connected port.
-            for (Settlement s : getOwner().getSettlements()) {
+            for (Settlement s : getOwner().getSettlementList()) {
                 if (s != ignoreSrc && s != ignoreDst && s.isConnectedPort()
                     && (path = findPath(s)) != null) {
                     value = path.getTotalTurns()
@@ -3002,7 +2987,7 @@ public class Unit extends GoodsLocation
             break;
         case 3:
             // Land travel.  Find nearby settlement with correct contiguity.
-            for (Settlement s : getOwner().getSettlements()) {
+            for (Settlement s : getOwner().getSettlementList()) {
                 if (s != ignoreSrc && s != ignoreDst
                     && s.getTile().getContiguity() == dstCont
                     && (path = findPath(s)) != null) {
