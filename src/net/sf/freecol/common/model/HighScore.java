@@ -96,7 +96,7 @@ public class HighScore extends FreeColObject {
     }
 
     /** The format to use for dates.  Almost ISO8601. */
-    private static final SimpleDateFormat dateFormat
+    private final SimpleDateFormat dateFormat
         = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
     /** The turn in which independence was granted. */
@@ -148,11 +148,10 @@ public class HighScore extends FreeColObject {
      * Create a new high score record.
      *
      * @param player The <code>Player</code> the score is for.
-     * @param theDate The <code>Data</code> the score is created.
      */
-    public HighScore(Player player, Date theDate) {
+    private HighScore(Player player) {
         Game game = player.getGame();
-        this.date = theDate;
+        this.date = new Date();
         this.retirementTurn = game.getTurn().getNumber();
         this.score = player.getScore();
         this.level = find(ScoreLevel.values(),
@@ -337,8 +336,7 @@ public class HighScore extends FreeColObject {
      * @return True if the given score can be added to the list.
      */
     public static boolean checkHighScore(int score, List<HighScore> scores) {
-        return /*!FreeColDebugger.isInDebugMode()
-                 && */score >= 0
+        return /*!FreeColDebugger.isInDebugMode() && */score >= 0
             && (scores.size() < NUMBER_OF_HIGH_SCORES
                 || score > scores.get(scores.size()-1).getScore());
     }
@@ -353,7 +351,7 @@ public class HighScore extends FreeColObject {
     public static boolean newHighScore(Player player) {
         List<HighScore> scores = loadHighScores();
         if (!checkHighScore(player.getScore(), scores)) return false;
-        HighScore hs = new HighScore(player, new Date());
+        HighScore hs = new HighScore(player);
         scores.add(hs);
         tidyScores(scores);
         return saveHighScores(scores);
@@ -364,7 +362,6 @@ public class HighScore extends FreeColObject {
      *
      * @return A list of <code>HighScore</code>s from the high score file.
      */
-
     public static List<HighScore> loadHighScores() {
         List<HighScore> scores = new ArrayList<>();
         File hsf = FreeColDirectories.getHighScoreFile();
@@ -541,7 +538,7 @@ public class HighScore extends FreeColObject {
             try {
                 float f = xr.getAttribute(DATE_TAG, -1.0f);
                 if (f >= 0.0 && f < Long.MAX_VALUE) {
-                    date = new Date(new Float(f).longValue());
+                    date = new Date((long)f);
                 }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Bad float date", e);
