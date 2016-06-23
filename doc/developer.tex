@@ -283,25 +283,19 @@ and launch the game right away. Enjoy.
 We have a NetBeans project with updated settings, but it is not at the
 standard location the IDE expects it at, as the IDE gets slower while a
 large project, like FreeCol, is open.
-NetBeans (currently on version 8.0.2) also, for a long time, contains a bug
-in that it wont read or write the editor setting for the Java version, if it
-was correctly set to 1.8.
-It is therefore set to 1.5 in the project file and causes the Editor to show a
-huge amount of wrong compatibility warnings, though compilation is not affected.
 
 You have the option of just clicking on ``build.xml'' in ``Files'' pane and
 starting the build commands easily through the ``Navigator'' pane inside
 the IDE that way.
 
-If you opt for using the provided project, copy the ``FreeCol/config/nbproject''
-folder to ``FreeCol/nbproject'' once. Without this step it will not work!
-Open the project inside NetBeans once, it will remember this, as long as
+If you opt for using the provided project, it is recommended to use NetBeans 8.1
+(or newer), because previous versions contained a bug in that it wont read or
+write the editor setting for the Java version, if it was correctly set to 1.8
+(though it seems version 8.0.2 can read the project file after updating it with 8.1).
+Just copy the ``FreeCol/config/nbproject'' folder to ``FreeCol/nbproject'' once.
+Without this step it will not work!
+Open the project inside NetBeans once; it will remember this, as long as
 you do not close the project manually.
-Each time you open the IDE right click on the ``FreeCol'' project name inside
-the ``Projects'' panel, choose ``Properties'', then from the opened dialog choose
-``Java Sources'' on the tree part, then change the ``Source Level'' setting to
-``JDK 1.8'' and click the ``OK'' button. This is necessary every time, until
-the NetBeans bug got fixed!
 
 \hypertarget{Creating a new NetBeans project}{\subsection{Creating a new NetBeans project (thanks to ``xsainnz'')}}
 
