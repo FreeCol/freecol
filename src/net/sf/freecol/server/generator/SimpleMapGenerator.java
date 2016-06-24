@@ -513,8 +513,8 @@ public class SimpleMapGenerator implements MapGenerator {
         randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
             List<Tile> tiles = transform(is.getOwnedTiles(),
-                tile -> any(tile.getSurroundingTiles(1,1),
-                            t -> t.getOwningSettlement() == null));
+                t -> any(t.getSurroundingTiles(1,1),
+                         matchKeyEquals(null, Tile::getOwningSettlement)));
             randomShuffle(logger, "Settlement tiles", tiles, random);
             int minGrow = is.getType().getMinimumGrowth();
             int maxGrow = is.getType().getMaximumGrowth();
@@ -564,14 +564,11 @@ public class SimpleMapGenerator implements MapGenerator {
                 IndianNationType nation
                     = (IndianNationType) is.getOwner().getNationType();
                 int cm = (is.isCapital()) ? 2 : 1;
-                RandomChoice<IndianSettlement> rc = null;
-                for (RandomChoice<UnitType> c : nation.generateSkillsForTile(is.getTile())) {
-                    if (c.getObject() == neededSkill) {
-                        rc = new RandomChoice<>(is, c.getProbability() * cm);
-                        break;
-                    }
-                }
-                choices.add((rc != null) ? rc : new RandomChoice<>(is, 1));
+                RandomChoice<UnitType> rc
+                    = find(nation.generateSkillsForTile(is.getTile()),
+                        matchKeyEquals(neededSkill, RandomChoice::getObject));
+                choices.add(new RandomChoice<>(is,
+                        (rc == null) ? 1 : rc.getProbability() * cm));
             }
             if (!choices.isEmpty()) {
                 // ...and pick one that could do the missing job.
@@ -678,25 +675,25 @@ public class SimpleMapGenerator implements MapGenerator {
                                           int radius, List<Tile> tiles,
                                           LogBuilder lb) {
         final Tile center = territory.getCenterTile(map);
+        final Predicate<Tile> terrPred = t ->
+            territory.player.getClaimableTiles(t, radius).size()
+                >= (2 * radius + 1) * (2 * radius + 1) / 2;
         final Comparator<Tile> comp
             = Comparator.comparingInt(t -> t.getDistanceTo(center));
-        for (Tile t : sort(tiles, comp)) {
-            // Choose this tile if it is free and half the expected tile
-            // claim can succeed (preventing capitals on small islands).
-            if (territory.player.getClaimableTiles(t, radius).size()
-                >= (2 * radius + 1) * (2 * radius + 1) / 2) {
-                String name = (territory.region == null) ? "default region"
-                    : territory.region.toString();
-                lb.add("Placing the ", territory.player,
-                    " capital in region: ", name, " at tile: ", t, "\n");
-                IndianSettlement is = placeIndianSettlement(territory.player,
-                    true, t, map, lb);
-                territory.numberOfSettlements--;
-                territory.tile = t;
-                return is;
-            }
-        }
-        return null;
+        // Choose a tile that is free and half the expected tile claims
+        // can succeed, preventing capitals on small islands.
+        Tile t = first(transform(tiles, terrPred, Function.identity(), comp));
+        if (t == null) return null;
+
+        String name = (territory.region == null) ? "default region"
+            : territory.region.toString();
+        lb.add("Placing the ", territory.player,
+            " capital in region: ", name, " at tile: ", t, "\n");
+        IndianSettlement is = placeIndianSettlement(territory.player,
+                                                    true, t, map, lb);
+        territory.numberOfSettlements--;
+        territory.tile = t;
+        return is;
     }
 
     /**
@@ -828,7 +825,6 @@ public class SimpleMapGenerator implements MapGenerator {
                     newUnit.setState(Unit.UnitState.SENTRY);
                     passengers.add(newUnit);
                 }
-
             }
 
             boolean startAtSea = true;
@@ -955,21 +951,17 @@ public class SimpleMapGenerator implements MapGenerator {
         Colony colony = new ServerColony(game, player, colonyName, colonyTile);
         player.addSettlement(colony);
         colony.placeSettlement(true);
-        for (Tile tile : colonyTile.getSurroundingTiles(1)) {
-            if (!tile.hasSettlement()
-                && (tile.getOwner() == null
-                    || !tile.getOwner().isEuropean())) {
-                tile.changeOwnership(player, colony);
-                if (tile.hasLostCityRumour()) {
-                    tile.removeLostCityRumour();
-                }
-            }
+        for (Tile tile : transform(colonyTile.getSurroundingTiles(1,1), t ->
+                (!t.hasSettlement()
+                    && (t.getOwner() == null || !t.getOwner().isEuropean())))) {
+            tile.changeOwnership(player, colony);
+            if (tile.hasLostCityRumour()) tile.removeLostCityRumour();
         }
         buildColonyUnit.setLocation(colony);
         Tile ct = buildColonyUnit.getWorkTile();
         if (ct != null) {
-            for (TileType t : spec.getTileTypeList()) {
-                if (t.isWater()) continue;
+            for (TileType t : transform(spec.getTileTypeList(),
+                                        tt -> !tt.isWater())) {
                 ct.setType(t);
                 TileImprovementType plowType = map.getSpecification()
                     .getTileImprovementType("model.improvement.plow");
@@ -993,12 +985,8 @@ public class SimpleMapGenerator implements MapGenerator {
         Unit lumberjack = new ServerUnit(game, colony, player, unitType);
         Tile lt = lumberjack.getWorkTile();
         if (lt != null) {
-            for (TileType t : spec.getTileTypeList()) {
-                if (t.isForested()) {
-                    lt.setType(t);
-                    break;
-                }
-            }
+            TileType tt = find(spec.getTileTypeList(), TileType::isForested);
+            if (tt != null) lt.setType(tt);
             lumberjack.changeWorkType(lumberjack.getType()
                 .getExpertProduction());
         }
