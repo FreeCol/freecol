@@ -237,17 +237,11 @@ public final class ReportCompactColonyPanel extends ReportPanel
                                            && u.getWorkType() == null)));
 
                 // Add work location suggestions.
-                for (Entry<Unit, Suggestion> e
-                         : wl.getSuggestions().entrySet()) {
-                    Unit u = e.getKey();
-                    Suggestion s = e.getValue();
-                    UnitType expert = spec.getExpertForProducing(s.goodsType);
-                    if (u == null) {
-                        addSuggestion(this.want, expert, s);
-                    } else {
-                        addSuggestion(this.improve, expert, s);
-                    }
-                }
+                forEachMapEntry(wl.getSuggestions(),
+                    e -> addSuggestion(((e.getKey() == null) ? this.want
+                            : this.improve),
+                        spec.getExpertForProducing(e.getValue().goodsType),
+                        e.getValue()));
             }
             
             // Make a list of unit types that are not working at their

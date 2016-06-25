@@ -140,9 +140,8 @@ public class CollectionUtils {
 
     public static <K,V> void accumulateMap(Map<K,V> map1, Map<K,V> map2,
                                            BinaryOperator<V> accumulator) {
-        for (Entry<K,V> e : map2.entrySet()) {
-            accumulateToMap(map1, e.getKey(), e.getValue(), accumulator);
-        }
+        forEachMapEntry(map2,
+            e -> accumulateToMap(map1, e.getKey(), e.getValue(), accumulator));
     }
 
     /**
@@ -925,6 +924,38 @@ public class CollectionUtils {
         return stream.filter(predicate).flatMap(mapper);
     }
 
+    /**
+     * Apply a consumer to the entries of a map.
+     *
+     * @param <K> The map key type.
+     * @param <V> The map value type.
+     * @param map The <code>Map</code> to apply to.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <K,V> void forEachMapEntry(Map<K,V> map,
+                                             Consumer<Entry<K,V>> consumer) {
+        if (map != null && !map.isEmpty() && consumer != null) {
+            forEach_internal(map.entrySet().stream(), alwaysTrue(), consumer);
+        }
+    }
+    
+    /**
+     * Apply a consumer to the entries of a map that match a predicate.
+     *
+     * @param <K> The map key type.
+     * @param <V> The map value type.
+     * @param map The <code>Map</code> to apply to.
+     * @param predicate The <code>Predicate</code> to match.
+     * @param consumer A <code>Consumer</code> to apply.
+     */
+    public static <K,V> void forEachMapEntry(Map<K,V> map,
+                                             Predicate<Entry<K,V>> predicate,
+                                             Consumer<Entry<K,V>> consumer) {
+        if (map != null && !map.isEmpty() && consumer != null) {
+            forEach_internal(map.entrySet().stream(), predicate, consumer);
+        }
+    }
+    
     /**
      * Apply a consumer to the members of an array.
      *
@@ -1778,15 +1809,15 @@ public class CollectionUtils {
      * Special case to remove objects from a map.
      *
      * @param <K> The map key type.
-     * @param <T> The map value type.
+     * @param <V> The map value type.
      * @param c The <code>Map</code> to remove from.
      * @param predicate A <code>Predicate</code> to match map entries with.
      * @return True if anything was removed.
      */
-    public static <K,T> boolean removeInPlace(Map<K,T> map,
-                                              Predicate<Entry<K,T>> predicate) {
+    public static <K,V> boolean removeInPlace(Map<K,V> map,
+                                              Predicate<Entry<K,V>> predicate) {
         boolean ret = false;
-        Iterator<Entry<K,T>> iterator = map.entrySet().iterator();
+        Iterator<Entry<K,V>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             if (predicate.test(iterator.next())) {
                 iterator.remove();

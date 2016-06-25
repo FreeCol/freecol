@@ -368,59 +368,58 @@ public class ServerGame extends Game implements ServerModelObject {
      */
     private ServerPlayer csSpanishSuccession(ChangeSet cs, LogBuilder lb,
                                              Event event) {
-        Limit yearLimit
+        final Limit yearLimit
             = event.getLimit("model.limit.spanishSuccession.year");
         if (!yearLimit.evaluate(this)) return null;
 
-        Limit weakLimit
+        final Limit weakLimit
             = event.getLimit("model.limit.spanishSuccession.weakestPlayer");
-        Limit strongLimit
+        final Limit strongLimit
             = event.getLimit("model.limit.spanishSuccession.strongestPlayer");
-        Map<Player, Integer> scores = new HashMap<>();
+        Player weakAI = null, strongAI = null;
+        int weakScore = Integer.MAX_VALUE, strongScore = Integer.MIN_VALUE;
         boolean ready = false;
+        lb.add("Spanish succession scores[");
+        final String sep = ", ";
         for (Player player : transform(getLiveEuropeanPlayers(),
                                        p -> !p.isREF())) {
-            ready |= strongLimit.evaluate(player);
-            // Human players can trigger the event, but only transfer assets
-            // between AI players.
-            if (player.isAI()) { 
-                scores.put(player, player.getSpanishSuccessionScore());
-            }
-        }
-        if (!ready) return null; // No player meets the support limit.
+            // Has anyone met the triggering limit?
+            boolean ok = strongLimit.evaluate(player);
+            ready |= ok;
+            lb.add(player.getName(), "(", ok, ")");
 
-        int bestScore = Integer.MIN_VALUE;
-        int worstScore = Integer.MAX_VALUE;
-        Player weakestAIPlayer = null;
-        Player strongestAIPlayer = null;
-        for (Entry<Player, Integer> entry : scores.entrySet()) {
-            Player player = entry.getKey();
-            int score = entry.getValue();
-            if (worstScore > score && weakLimit.evaluate(player)) {
-                worstScore = score;
-                weakestAIPlayer = player;
+            // Human players can trigger the event, but we only
+            // transfer assets between AI players.
+            if (!player.isAI()) continue;
+            
+            final int score = player.getSpanishSuccessionScore();
+            lb.add("=", score, sep);
+            if (strongAI == null || strongScore < score) {
+                strongScore = score;
+                strongAI = player;
             }
-            if (bestScore < score) {
-                bestScore = score;
-                strongestAIPlayer = player;
+            if (weakLimit.evaluate(player)
+                && (weakAI == null || weakScore > score)) {
+                weakScore = score;
+                weakAI = player;
             }
         }
-        if (weakestAIPlayer == null
-            || strongestAIPlayer == null
-            || weakestAIPlayer == strongestAIPlayer) return null;
+        lb.truncate(lb.size() - sep.length());
+        lb.add("]");
+        // Do not proceed if no player meets the support limit or if there
+        // are not clearly identifiable strong and weak AIs.
+        if (!ready
+            || weakAI == null || strongAI == null
+            || weakAI == strongAI) return null;
 
-        lb.add("Spanish succession scores[");
-        for (Entry<Player, Integer> entry : scores.entrySet()) {
-            lb.add(" ", entry.getKey().getName(), "=", entry.getValue());
-        }
-        lb.add(" ]=> ", weakestAIPlayer.getName(),
-               " cedes to ", strongestAIPlayer.getName(), ":");
+        lb.add(" => ", weakAI.getName(), " cedes ", strongAI.getName(), ":");
         List<Tile> tiles = new ArrayList<>();
         Set<Tile> updated = new HashSet<>();
-        ServerPlayer strongest = (ServerPlayer)strongestAIPlayer;
-        ServerPlayer weakest = (ServerPlayer)weakestAIPlayer;
+        ServerPlayer strongest = (ServerPlayer)strongAI;
+        ServerPlayer weakest = (ServerPlayer)weakAI;
         for (Player player : getLiveNativePlayerList()) {
-            for (IndianSettlement is : player.getIndianSettlementsWithMissionary(weakest)) {
+            for (IndianSettlement is
+                     : player.getIndianSettlementsWithMissionary(weakest)) {
                 lb.add(" ", is.getName(), "(mission)");
                 is.getTile().cacheUnseen(strongest);//+til
                 tiles.add(is.getTile());
@@ -445,10 +444,10 @@ public class ServerGame extends Game implements ServerModelObject {
             unit.setState(Unit.UnitState.ACTIVE);
             lb.add(" ", unit.getId());
             if (unit.getLocation() instanceof Europe) {
-                unit.setLocation(strongestAIPlayer.getEurope());//-vis
+                unit.setLocation(strongAI.getEurope());//-vis
                 cs.add(See.only(strongest), unit);
             } else if (unit.getLocation() instanceof HighSeas) {
-                unit.setLocation(strongestAIPlayer.getHighSeas());//-vis
+                unit.setLocation(strongAI.getHighSeas());//-vis
                 cs.add(See.only(strongest), unit);
             } else if (unit.getLocation() instanceof Tile) {
                 Tile tile = unit.getTile();
@@ -456,11 +455,11 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
 
-        StringTemplate loser = weakestAIPlayer.getNationLabel();
-        StringTemplate winner = strongestAIPlayer.getNationLabel();
+        StringTemplate loser = weakAI.getNationLabel();
+        StringTemplate winner = strongAI.getNationLabel();
         cs.addMessage(See.all(),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                             "model.game.spanishSuccession", strongestAIPlayer)
+                             "model.game.spanishSuccession", strongAI)
                 .addStringTemplate("%loserNation%", loser)
                 .addStringTemplate("%nation%", winner));
         cs.addGlobalHistory(this,

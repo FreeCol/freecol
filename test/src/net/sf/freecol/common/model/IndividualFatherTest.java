@@ -202,20 +202,23 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
-        java.util.Map<UnitType, UnitType> upgrades = bartolomeDeLasCasas.getUpgrades();
+        java.util.Map<UnitType, UnitType> upgrades
+            = bartolomeDeLasCasas.getUpgrades();
 
         assertFalse(upgrades.isEmpty());
-
-        for (java.util.Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
-            assertEquals(entry.getKey(), spec().getUnitType(entry.getKey().getId()));
-            assertEquals(entry.getValue(), spec().getUnitType(entry.getValue().getId()));
-        }
+        forEachMapEntry(upgrades, e -> {
+                assertEquals(e.getKey(),
+                             spec().getUnitType(e.getKey().getId()));
+                assertEquals(e.getValue(),
+                             spec().getUnitType(e.getValue().getId()));
+            });
 
         Colony colony = getStandardColony(4);
         ServerPlayer player = (ServerPlayer)colony.getOwner();
         Unit unit = colony.getUnitList().get(0);
 
-        java.util.Map.Entry<UnitType, UnitType> entry = first(upgrades.entrySet());
+        java.util.Map.Entry<UnitType, UnitType> entry
+            = first(upgrades.entrySet());
         unit.setType(entry.getKey());
 
         player.csAddFoundingFather(bartolomeDeLasCasas, null, new ChangeSet());

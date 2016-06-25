@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.DOMMessage;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ServerInputHandler;
@@ -265,11 +266,8 @@ public class DOMMessage {
      * @return This message.
      */
     public DOMMessage setAttributes(Map<String, String> attributes) {
-        if (!attributes.isEmpty()) {
-            for (Entry<String, String> e : attributes.entrySet()) {
-                setAttribute(e.getKey(), e.getValue());
-            }
-        }
+        forEachMapEntry(attributes,
+                        e -> setAttribute(e.getKey(), e.getValue()));
         return this;
     }
 

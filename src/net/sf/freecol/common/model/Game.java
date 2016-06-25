@@ -865,7 +865,7 @@ public class Game extends FreeColGameObject {
      * @return A vacant <code>Nation</code> or null if none found.
      */
     public Nation getVacantNation() {
-        Entry<Nation,NationState> entry
+        Entry<Nation, NationState> entry
             = find(nationOptions.getNations().entrySet(),
                    matchKey(NationState.AVAILABLE, Entry::getValue));
         return (entry == null) ? null : entry.getKey();
@@ -1149,9 +1149,8 @@ public class Game extends FreeColGameObject {
             if (fcgo.isDisposed()) disposed++;
         }
         stats.put("disposed", Long.toString(disposed));
-        for (Entry<String, Long> entry : objStats.entrySet()) {
-            stats.put(entry.getKey(), Long.toString(entry.getValue()));
-        }
+        forEachMapEntry(objStats,
+                e -> stats.put(e.getKey(), Long.toString(e.getValue())));
 
         return stats;
     }

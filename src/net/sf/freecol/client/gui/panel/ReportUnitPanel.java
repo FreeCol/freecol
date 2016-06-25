@@ -112,9 +112,8 @@ public abstract class ReportUnitPanel extends ReportPanel {
         }
 
         // Finally all other locations, sorted alphabetically.
-        for (Entry<String, List<Unit>> e : mapEntriesByKey(inLocations)) {
-            handleLocation(null, e.getKey(), e.getValue());
-        }
+        forEach(mapEntriesByKey(inLocations),
+                e -> handleLocation(null, e.getKey(), e.getValue()));
 
         revalidate();
         repaint();

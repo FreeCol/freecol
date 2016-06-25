@@ -743,38 +743,14 @@ public class DebugUtils {
             for (Unit u : p.getEurope().getUnitList()) {
                 if (u.getDestination() instanceof Map) {
                     toAmerica.add(u);
-                    continue;
-                }
-                if (u.getDestination() instanceof Europe) {
+                } else if (u.getDestination() instanceof Europe) {
                     toEurope.add(u);
-                    continue;
+                } else {
+                    inEurope.add(u);
                 }
-                inEurope.add(u);
             }
-
-            for (Entry<String, List<Unit>> entry : units.entrySet()) {
-                final String label = entry.getKey();
-                final List<Unit> list = entry.getValue();
-                if (list.isEmpty()) continue;
-                lb.add("\n->", label, "\n");
-                for (Unit u : list) {
-                    lb.add("\n", u.getDescription(Unit.UnitLabelType.NATIONAL));
-                    if (u.isDamaged()) {
-                        lb.add(" (", Messages.message(u.getRepairLabel()),
-                            ")");
-                    } else {
-                        lb.add("    ");
-                        AIUnit aiu = aiMain.getAIUnit(u);
-                        if (!aiu.hasMission()) {
-                            lb.add(" (", Messages.message("none"), ")");
-                        } else {
-                            lb.add(aiu.getMission().toString()
-                                .replaceAll("\n", "    \n"));
-                        }
-                    }
-                }
-                lb.add("\n");
-            }
+            forEachMapEntry(units,
+                e -> logEurope(aiMain, lb, e.getKey(), e.getValue()));
             lb.add("\n->", Messages.message("immigrants"), "\n\n");
             for (UnitType unitType : p.getEurope().getRecruitables()) {
                 lb.add(Messages.getName(unitType), "\n");
@@ -784,6 +760,35 @@ public class DebugUtils {
         freeColClient.getGUI().showInformationMessage(lb.toString());
     }
 
+    /**
+     * Log European unit lists.
+     *
+     * @param aiMain The main AI object.
+     * @param lb The <code>LogBuilder</code> to log to.
+     * @param label A label for the group of units.
+     * @param units The <code>Unit</code>s to log.
+     */
+    private static void logEurope(AIMain aiMain, LogBuilder lb, String label,
+                                  List<Unit> units) {
+        if (units.isEmpty()) return;
+        lb.add("\n->", label, "\n");
+        for (Unit u : units) {
+            lb.add("\n", u.getDescription(Unit.UnitLabelType.NATIONAL));
+            if (u.isDamaged()) {
+                lb.add(" (", Messages.message(u.getRepairLabel()), ")");
+            } else {
+                lb.add("    ");
+                AIUnit aiu = aiMain.getAIUnit(u);
+                if (!aiu.hasMission()) {
+                    lb.add(" (", Messages.message("none"), ")");
+                } else {
+                    lb.add(aiu.getMission().toString()
+                        .replaceAll("\n", "    \n"));
+                }
+            }
+        }
+        lb.add("\n");
+    }
     /**
      * Debug action to display a mission.
      *

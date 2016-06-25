@@ -349,14 +349,9 @@ public class DebugMenu extends JMenu {
                 StringBuilder builder = new StringBuilder();
                 Map<String, ImageResource> resources
                     = ResourceManager.getImageResources();
-                for (Entry<String, ImageResource> en
-                         : mapEntriesByKey(resources)) {
-                    builder.append(en.getKey());
-                    builder.append(" (");
-                    builder.append(en.getValue().getCount());
-                    builder.append(')');
-                    builder.append('\n');
-                }
+                forEach(mapEntriesByKey(resources),
+                    e -> builder.append(e.getKey()).append(" (")
+                            .append(e.getValue().getCount()).append(")\n"));
                 gui.showInformationMessage(builder.toString());
             });
         showResourceKeys.setEnabled(true);

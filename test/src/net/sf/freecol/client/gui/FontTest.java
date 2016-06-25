@@ -25,6 +25,7 @@ import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -51,30 +52,11 @@ public class FontTest extends FreeColTestCase {
         try {
             Font font = new Font("Serif", Font.PLAIN, 1);
             assertNotNull(font);
-            for (Map.Entry<Character, String> entry : specialCharacters.entrySet()) {
-                assertTrue(font.getName() + " can not display " + entry.getValue(),
-                           font.canDisplay(entry.getKey()));
-            }
+            forEachMapEntry(specialCharacters, e ->
+                assertTrue(font.getName() + " can not display " + e.getValue(),
+                           font.canDisplay(e.getKey())));
         } catch (Exception e) {
             fail(e.toString());
         }
     }
-
-    /*
-    public void testLiberationSerif() {
-
-        File liberationSerif = new File("data/base/resources/fonts/LiberationSerif-Regular.ttf");
-        try {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, liberationSerif);
-            assertNotNull(font);
-            for (Map.Entry<Character, String> entry : specialCharacters.entrySet()) {
-                assertTrue(font.getName() + " can not display " + entry.getValue(),
-                           font.canDisplay(entry.getKey()));
-            }
-        } catch (Exception e) {
-            fail(e.toString());
-        }
-    }
-    */
-
 }

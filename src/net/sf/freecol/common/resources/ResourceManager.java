@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
@@ -126,33 +127,21 @@ public class ResourceManager {
      * Clean up easily replaced modified copies in caches.
      */
     public static synchronized void clean() {
-        if(baseMapping != null) {
-            for (Map.Entry<String,ImageResource> entry
-                : baseMapping.getImageResources().entrySet()) {
-                ImageResource resource = entry.getValue();
-                resource.clean();
-            }
+        if (baseMapping != null) {
+            forEachMapEntry(baseMapping.getImageResources(),
+                            e -> e.getValue().clean());
         }
-        if(tcMapping != null) {
-            for (Map.Entry<String,ImageResource> entry
-                : tcMapping.getImageResources().entrySet()) {
-                ImageResource resource = entry.getValue();
-                resource.clean();
-            }
+        if (tcMapping != null) {
+            forEachMapEntry(tcMapping.getImageResources(),
+                            e -> e.getValue().clean());
         }
-        if(scenarioMapping != null) {
-            for (Map.Entry<String,ImageResource> entry
-                : scenarioMapping.getImageResources().entrySet()) {
-                ImageResource resource = entry.getValue();
-                resource.clean();
-            }
+        if (scenarioMapping != null) {
+            forEachMapEntry(scenarioMapping.getImageResources(),
+                            e -> e.getValue().clean());
         }
-        if(modMapping != null) {
-            for (Map.Entry<String,ImageResource> entry
-                : modMapping.getImageResources().entrySet()) {
-                ImageResource resource = entry.getValue();
-                resource.clean();
-            }
+        if (modMapping != null) {
+            forEachMapEntry(modMapping.getImageResources(),
+                            e -> e.getValue().clean());
         }
         System.gc();
     }

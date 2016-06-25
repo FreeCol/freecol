@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -225,10 +226,8 @@ public class EuropeanNationType extends NationType {
         EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);
         if (parent != this) {
-            for (Map.Entry<String, Map<String, AbstractUnit>> entry
-                     : parent.startingUnitMap.entrySet()) {
-                startingUnitMap.put(entry.getKey(), new HashMap<>(entry.getValue()));
-            }
+            forEachMapEntry(parent.startingUnitMap, e ->
+                startingUnitMap.put(e.getKey(), new HashMap<>(e.getValue())));
         }
 
         super.readChildren(xr);

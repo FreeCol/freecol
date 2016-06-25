@@ -582,20 +582,17 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     @Override
     public String toString() {
+        final String sep = ", ";
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getId()).append(" [");
         // Do not bother to synchronize containers for display
-        for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(entry.getValue())
-                .append(", ");
-        }
-        sb.setLength(sb.length() - ", ".length());
+        forEachMapEntry(storedGoods, e ->
+            sb.append(e.getKey()).append('=').append(e.getValue()).append(sep));
+        sb.setLength(sb.length() - sep.length());
         sb.append("][");
-        for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(entry.getValue())
-                .append(", ");
-        }
-        sb.setLength(sb.length() - ", ".length());
+        forEachMapEntry(oldStoredGoods, e ->
+            sb.append(e.getKey()).append('=').append(e.getValue()).append(sep));
+        sb.setLength(sb.length() - sep.length());
         sb.append("]]");
         return sb.toString();
     }
