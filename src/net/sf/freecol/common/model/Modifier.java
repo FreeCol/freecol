@@ -662,7 +662,7 @@ public class Modifier extends Feature {
         if (modifierIndex >= DEFAULT_MODIFIER_INDEX) {
             sb.append(" index=").append(modifierIndex);
         }
-        List<Scope> scopes = getScopes();
+        List<Scope> scopes = getScopeList();
         if (!scopes.isEmpty()) {
             sb.append(" [");
             for (Scope s : scopes) sb.append(' ').append(s);

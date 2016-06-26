@@ -1712,16 +1712,10 @@ public class Unit extends GoodsLocation
         if (settlement == null) return null;
 
         final Specification spec = getSpecification();
-        for (Ability ability : autoDefence) {
-            for (Scope scope : ability.getScopes()) {
-                Role role = spec.getRole(scope.getType());
-                if (role != null
-                    && settlement.containsGoods(getGoodsDifference(role, 1))) {
-                    return role;
-                }
-            }
-        }
-        return null;
+        return find(transform(flatten(autoDefence, Ability::getScopes),
+                              alwaysTrue(), s -> spec.getRole(s.getType())),
+                    r -> r != null
+                        && settlement.containsGoods(getGoodsDifference(r, 1)));
     }
 
     /**

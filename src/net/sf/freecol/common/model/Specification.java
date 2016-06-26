@@ -1872,12 +1872,11 @@ public final class Specification {
         // scope was left hanging.
         FoundingFather brebeuf
             = getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-        for (Ability ability : brebeuf.getAbilities()) {
-            for (Scope scope : ability.getScopes()) {
-                if ("model.ability.missionary".equals(scope.getAbilityId())) {
-                    scope.setAbilityId(Ability.ESTABLISH_MISSION);
-                }
-            }
+        for (Scope scope : transform(flatten(brebeuf.getAbilities(),
+                                             Ability::getScopes),
+                                     matchKeyEquals("model.ability.missionary",
+                                                    Scope::getAbilityId))) {
+            scope.setAbilityId(Ability.ESTABLISH_MISSION);
         }
 
         // Coronado gained an ability in freecol
@@ -2100,27 +2099,24 @@ public final class Specification {
 
         // automaticEquipment scope types are now roles
         for (NationType nt : indianNationTypes) {
-            for (Ability ability : nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT)) {
-                for (Scope scope : ability.getScopes()) {
-                    String type = scope.getType();
-                    if ("model.equipment.indian.muskets".equals(type)) {
-                        scope.setType("model.role.nativeDragoon");
-                    } else if ("model.equipment.indian.horses".equals(type)) {
-                        scope.setType("model.role.armedBrave");
-                    }
+            for (Scope scope : iterable(flatten(nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT),
+                                                Ability::getScopes))) {
+                String type = scope.getType();
+                if ("model.equipment.indian.muskets".equals(type)) {
+                    scope.setType("model.role.nativeDragoon");
+                } else if ("model.equipment.indian.horses".equals(type)) {
+                    scope.setType("model.role.armedBrave");
                 }
             }
         }
         {
             FoundingFather revere
                 = getFoundingFather("model.foundingFather.paulRevere");
-            for (Ability ability : revere.getAbilities(Ability.AUTOMATIC_EQUIPMENT)) {
-                for (Scope scope : ability.getScopes()) {
-                    String type = scope.getType();
-                    if ("model.equipment.muskets".equals(type)) {
-                        scope.setType("model.role.soldier");
-                    }
-                }
+            for (Scope scope : transform(flatten(revere.getAbilities(Ability.AUTOMATIC_EQUIPMENT),
+                                                 Ability::getScopes),
+                                         matchKeyEquals("model.equipment.muskets",
+                                                        Scope::getType))) {
+                scope.setType("model.role.soldier");
             }
         }
         // end @compat 0.10.7

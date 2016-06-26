@@ -723,13 +723,9 @@ public class ColonyPlan {
             }
 
             if (type.hasAbility(Ability.BUILD)) {
-                double factor = 1.0;
-                if ("building".equals(advantage)) factor = 1.1;
-                double support = 1.0;
-                for (Ability a : type.getAbilities(Ability.BUILD)) {
-                    List<Scope> scopes = a.getScopes();
-                    if (scopes != null && !scopes.isEmpty()) support = 0.1;
-                }
+                double factor = ("building".equals(advantage)) ? 1.1 : 1.0;
+                double support = (any(type.getAbilities(Ability.BUILD),
+                                      Ability::hasScope)) ? 0.1 : 1.0;
                 prioritize(type, BUILDING_WEIGHT * factor,
                     support/*FIXME: need for the thing now buildable*/);
             }

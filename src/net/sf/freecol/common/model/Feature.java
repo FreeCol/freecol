@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -88,7 +89,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
         this.lastTurn = other.lastTurn;
         this.duration = other.duration;
         this.temporary = other.temporary;
-        setScopes(other.getScopes());
+        setScopes(other.getScopeList());
     }
 
     /**
@@ -142,7 +143,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
      * @return True if there are any scopes attached to this feature.
      */
     public final boolean hasScope() {
-        return scopes != null && !scopes.isEmpty();
+        return this.scopes != null && !this.scopes.isEmpty();
     }
 
     /**
@@ -150,9 +151,19 @@ public abstract class Feature extends FreeColSpecObject implements Named {
      *
      * @return A list of <code>Scope</code>s.
      */
-    public final List<Scope> getScopes() {
-        return (scopes == null) ? Collections.<Scope>emptyList()
-            : scopes;
+    public final List<Scope> getScopeList() {
+        return (this.scopes == null) ? Collections.<Scope>emptyList()
+            : new ArrayList<>(this.scopes);
+    }
+
+    /**
+     * Get the scopes for this feature.
+     *
+     * @return A stream of <code>Scope</code>s.
+     */
+    public final Stream<Scope> getScopes() {
+        return (this.scopes == null) ? Stream.<Scope>empty()
+            : getScopeList().stream();
     }
 
     /**
@@ -170,8 +181,8 @@ public abstract class Feature extends FreeColSpecObject implements Named {
      * @param scope The <code>Scope</code> to add.
      */
     public void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<>();
-        scopes.add(scope);
+        if (this.scopes == null) this.scopes = new ArrayList<>();
+        this.scopes.add(scope);
     }
 
     /**
@@ -237,7 +248,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
      */
     public boolean appliesTo(final FreeColSpecObjectType objectType) {
         return (!hasScope()) ? true
-            : any(scopes, s -> s.appliesTo(objectType));
+            : any(this.scopes, s -> s.appliesTo(objectType));
     }
 
     /**
@@ -334,7 +345,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
             } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
                 return false;
             }
-            if (scopes == null) {
+            if (this.scopes == null) {
                 if (feature.scopes != null) {
                     return false;
                 }
@@ -342,8 +353,8 @@ public abstract class Feature extends FreeColSpecObject implements Named {
                 return false;
             } else {
                 // Not very efficient, but we do not expect many scopes
-                if (!all(scopes, s -> feature.scopes.contains(s))
-                    || !all(feature.scopes, s -> scopes.contains(s)))
+                if (any(this.scopes, s -> !feature.scopes.contains(s))
+                    || any(feature.scopes, s -> !this.scopes.contains(s)))
                     return false;
             }
             return true;
@@ -362,12 +373,10 @@ public abstract class Feature extends FreeColSpecObject implements Named {
         hash += 31 * hash + ((lastTurn == null) ? 0 : lastTurn.getNumber());
         hash += 31 * hash + duration;
         hash += 31 * ((temporary) ? 1 : 0);
-        if (scopes != null) {
-            for (Scope scope : scopes) {
-                // FIXME: is this safe?  It is an easy way to ignore
-                // the order of scope elements.
-                hash += Utils.hashCode(scope);
-            }
+        if (this.scopes != null) {
+            // FIXME: is this safe?  It is an easy way to ignore
+            // the order of scope elements.
+            hash += sum(this.scopes, s -> Utils.hashCode(s));
         }
         return hash;
     }
@@ -417,7 +426,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(xw);
+        for (Scope scope : getScopeList()) scope.toXML(xw);
     }
 
     /**
@@ -453,7 +462,7 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        scopes = null;
+        setScopes(null);
 
         super.readChildren(xr);
     }
@@ -466,7 +475,8 @@ public abstract class Feature extends FreeColSpecObject implements Named {
         final String tag = xr.getLocalName();
 
         if (Scope.getTagName().equals(tag)) {
-            addScope(new Scope(xr));
+            Scope scope = new Scope(xr);
+            if (scope != null) addScope(scope);
 
         } else {
             super.readChild(xr);

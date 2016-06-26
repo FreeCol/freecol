@@ -607,8 +607,8 @@ public class TerrainGenerator {
                 if (!riverType.isTileTypeAllowed(tile.getType())) continue;
 
                 // check the river source/spring is not too close to the ocean
-                if (!all(tile.getSurroundingTiles(1, 2),
-                        Tile::isLand)) continue;
+                if (!all(tile.getSurroundingTiles(1, 2), Tile::isLand))
+                    continue;
 
                 if (riverMap.get(tile) == null) {
                     // no river here yet
