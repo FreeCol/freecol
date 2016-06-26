@@ -520,8 +520,6 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private final JCheckBox showAllBox;
 
     private final Map<BuildableType, String> lockReasons = new HashMap<>();
-    private final Set<BuildableType> unbuildableTypes
-        = new HashSet<>();
 
 
     /**
@@ -702,174 +700,145 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         model.removeElement(type);
     }
 
-    private void updateUnitList() {
+    private boolean checkAbilities(BuildableType bt, List<String> lockReason) {
         final Specification spec = getSpecification();
-        final Turn turn = getGame().getTurn();
-        StringTemplate tmpl;
-        DefaultListModel<UnitType> units
-            = (DefaultListModel<UnitType>)this.unitList.getModel();
-        units.clear();
-        loop: for (UnitType unitType : spec.getBuildableUnitTypes()) {
-            // compare colony.getNoBuildReason()
-            List<String> lockReason = new ArrayList<>();
-            if (unbuildableTypes.contains(unitType)) {
+        final int oldSize = lockReason.size();
+        forEachMapEntry(bt.getRequiredAbilities(), e -> {
+                final String id = e.getKey();
+                final boolean value = e.getValue();
+                if (this.featureContainer.hasAbility(id, null, null) != value
+                    && this.colony.hasAbility(id) != value) {
+                    FreeColSpecObjectType source
+                        = first(spec.getTypesProviding(id, value));
+                    lockReason.add((source != null)
+                        ? Messages.getName(source)
+                        : Messages.getName(bt));
+                }
+            });
+        return lockReason.size() == oldSize;
+    }
+        
+    private void updateBuildingList() {
+        final Specification spec = getSpecification();
+        final DefaultListModel<BuildableType> current
+            = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
+        final DefaultListModel<BuildingType> buildings
+            = (DefaultListModel<BuildingType>)this.buildingList.getModel();
+        buildings.clear();
+        Set<BuildableType> unbuildableTypes = new HashSet<>();
+
+        // For each building type, find out if it is buildable, and
+        // reasons to not build it (and perhaps display a lock icon).
+        for (BuildingType bt : spec.getBuildingTypeList()) {
+            if (unbuildableTypes.contains(bt)) continue;
+
+            // Impossible upgrade path
+            if (bt.getUpgradesFrom() != null
+                && unbuildableTypes.contains(bt.getUpgradesFrom())) {
+                unbuildableTypes.add(bt);
                 continue;
             }
 
-            if (unitType.getRequiredPopulation() > this.colony.getUnitCount()) {
-                tmpl = StringTemplate.template("buildQueuePanel.populationTooSmall")
-                    .addAmount("%number%", unitType.getRequiredPopulation());
-                lockReason.add(Messages.message(tmpl));
+            // Ignore pre-built buildings
+            if (!bt.needsGoodsToBuild()) continue;
+            
+            // Only one building of any kind
+            if (current.contains(bt) || hasBuildingType(bt)) continue;
+            
+            List<String> reasons = new ArrayList<>();
+
+            // Coastal limit
+            if (bt.hasAbility(Ability.COASTAL_ONLY)
+                && !this.colony.getTile().isCoastland()) {
+                reasons.add(Messages.message(StringTemplate
+                        .template("buildQueuePanel.coastalOnly")));
             }
 
-            if (unitType.getLimits() != null) {
-                for (Limit limit : unitType.getLimits()) {
-                    if (!limit.evaluate(this.colony)) {
-                        lockReason.add(Messages.getDescription(limit));
-                    }
-                }
+            // Population limit
+            if (bt.getRequiredPopulation() > this.colony.getUnitCount()) {
+                reasons.add(Messages.message(StringTemplate
+                        .template("buildQueuePanel.populationTooSmall")
+                        .addAmount("%number%", bt.getRequiredPopulation())));
             }
 
-            if (!(this.colony.hasAbility(Ability.BUILD, unitType, turn)
-                    || this.featureContainer.hasAbility(Ability.BUILD,
-                        unitType, null))) {
-                boolean builderFound = false;
-                for (Ability ability : spec.getAbilities(Ability.BUILD)) {
-                    FreeColObject source = ability.getSource();
-                    if (ability.appliesTo(unitType)
-                        && ability.getValue()
-                        && source != null
-                        && !unbuildableTypes.contains(source)) {
-                        builderFound = true;
-                        if (source instanceof Named) {
-                            lockReason.add(Messages.getName((Named)source));
-                        }
-                        break;
-                    }
-                }
-                if (!builderFound) {
-                    unbuildableTypes.add(unitType);
-                    continue;
-                }
+            // Spec limits
+            for (Limit limit : transform(bt.getLimits(),
+                                         l -> !l.evaluate(this.colony))) {
+                reasons.add(Messages.getDescription(limit));
             }
 
-            for (Entry<String, Boolean> entry
-                     : unitType.getRequiredAbilities().entrySet()) {
-                if (this.colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && this.featureContainer.hasAbility(entry.getKey(),
-                            null, null)
-                    != entry.getValue()) {
-                    List<FreeColSpecObjectType> sources
-                        = spec.getTypesProviding(entry.getKey(),
-                                                 entry.getValue());
-                    if (sources.isEmpty()) {
-                        // no type provides the required ability
-                        unbuildableTypes.add(unitType);
-                        continue loop;
-                    } else {
-                        lockReason.add(Messages.getName(first(sources)));
-                    }
-                }
+            // Missing ability
+            if (!checkAbilities(bt, reasons)) unbuildableTypes.add(bt);
+
+            // Upgrade path is blocked
+            Building colonyBuilding = this.colony.getBuilding(bt);
+            BuildingType up = bt.getUpgradesFrom();
+            if (up != null && !current.contains(up)
+                && (colonyBuilding == null || colonyBuilding.getType() != up)) {
+                reasons.add(Messages.getName(up));
             }
-            if (lockReason.isEmpty()) {
-                lockReasons.put(unitType, null);
-            } else {
-                tmpl = StringTemplate.template("buildQueuePanel.requires")
-                    .addName("%string%", join("/", lockReason));
-                lockReasons.put(unitType, Messages.message(tmpl));
-            }
-            if (lockReason.isEmpty() || showAllBox.isSelected()) {
-                units.addElement(unitType);
-            }
+
+            lockReasons.put(bt, (reasons.isEmpty()) ? null
+                : Messages.message(StringTemplate
+                    .template("buildQueuePanel.requires")
+                    .addName("%string%", join("/", reasons))));
+            if (reasons.isEmpty()
+                || showAllBox.isSelected()) buildings.addElement(bt);
         }
     }
 
-    private void updateBuildingList() {
+    private void updateUnitList() {
         final Specification spec = getSpecification();
-        final DefaultListModel<BuildingType> buildings
-            = (DefaultListModel<BuildingType>)this.buildingList.getModel();
-        final DefaultListModel<BuildableType> current
-            = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
-        StringTemplate tmpl;
+        final Turn turn = getGame().getTurn();
+        DefaultListModel<UnitType> units
+            = (DefaultListModel<UnitType>)this.unitList.getModel();
+        units.clear();
+        Set<BuildableType> unbuildableTypes = new HashSet<>();
+        
+        // For each unit type, find out if it is buildable, and
+        // reasons to not build it (and perhaps display a lock icon).
+        for (UnitType ut : spec.getBuildableUnitTypes()) {
+            if (unbuildableTypes.contains(ut)) continue;
 
-        buildings.clear();
-        loop: for (BuildingType buildingType : spec.getBuildingTypeList()) {
-            // compare colony.getNoBuildReason()
-            List<String> lockReason = new ArrayList<>();
-            Building colonyBuilding = this.colony.getBuilding(buildingType);
-            if (current.contains(buildingType)
-                || hasBuildingType(buildingType)) {
-                // only one building of any kind
-                continue;
-            } else if (unbuildableTypes.contains(buildingType)) {
-                continue;
-            } else if (!buildingType.needsGoodsToBuild()) {
-                // pre-built
-                continue;
-            } else if (unbuildableTypes.contains(buildingType
-                    .getUpgradesFrom())) {
-                unbuildableTypes.add(buildingType); // impossible upgrade path
-                continue;
+            List<String> reasons = new ArrayList<>();
+
+            // Population limit
+            if (ut.getRequiredPopulation() > this.colony.getUnitCount()) {
+                reasons.add(Messages.message(StringTemplate
+                        .template("buildQueuePanel.populationTooSmall")
+                        .addAmount("%number%", ut.getRequiredPopulation())));
             }
 
-            if (buildingType.hasAbility(Ability.COASTAL_ONLY)
-                && !this.colony.getTile().isCoastland()) {
-                tmpl = StringTemplate.template("buildQueuePanel.coastalOnly");
-                lockReason.add(Messages.message(tmpl));
-            }
-                                                
-            if (buildingType.getRequiredPopulation() > this.colony
-                    .getUnitCount()) {
-                tmpl = StringTemplate.template("buildQueuePanel.populationTooSmall")
-                    .addAmount("%number%", buildingType.getRequiredPopulation());
-                lockReason.add(Messages.message(tmpl));
+            // Spec limits
+            for (Limit limit : transform(ut.getLimits(),
+                                         l -> !l.evaluate(this.colony))) {
+                reasons.add(Messages.getDescription(limit));
             }
 
-            for (Entry<String, Boolean> entry
-                     : buildingType.getRequiredAbilities().entrySet()) {
-                if (this.colony.hasAbility(entry.getKey()) != entry.getValue()
-                    && this.featureContainer.hasAbility(entry.getKey(),
-                            null, null)
-                    != entry.getValue()) {
-                    List<FreeColSpecObjectType> sources = getSpecification()
-                        .getTypesProviding(entry.getKey(), entry.getValue());
-                    if (sources.isEmpty()) {
-                        // no type provides the required ability
-                        unbuildableTypes.add(buildingType);
-                        continue loop;
-                    } else {
-                        lockReason.add(Messages.getName(first(sources)));
-                    }
-                }
+            // Missing ability
+            if (!checkAbilities(ut, reasons)) unbuildableTypes.add(ut);
+
+            // Missing unit build ability?
+            if (!this.featureContainer.hasAbility(Ability.BUILD, ut, null)
+                && !this.colony.hasAbility(Ability.BUILD, ut, turn)) {
+                Ability buildAbility = find(spec.getAbilities(Ability.BUILD),
+                    a -> (a.appliesTo(ut)
+                        && a.getValue()
+                        && a.getSource() != null
+                        && !unbuildableTypes.contains(a.getSource())));
+                reasons.add((buildAbility != null)
+                    ? ((buildAbility.getSource() instanceof Named)
+                        ? Messages.getName((Named)buildAbility.getSource())
+                        : Messages.getName(buildAbility))
+                    : Messages.getName(ut));
             }
 
-            if (buildingType.getLimits() != null) {
-                for (Limit limit : buildingType.getLimits()) {
-                    if (!limit.evaluate(this.colony)) {
-                        lockReason.add(Messages.getDescription(limit));
-                    }
-                }
-            }
-
-            if (buildingType.getUpgradesFrom() != null
-                && !current.contains(buildingType.getUpgradesFrom())) {
-                if (colonyBuilding == null
-                    || colonyBuilding.getType() != buildingType
-                            .getUpgradesFrom()) {
-                    lockReason.add(Messages.getName(buildingType
-                            .getUpgradesFrom()));
-                }
-            }
-            if (lockReason.isEmpty()) {
-                lockReasons.put(buildingType, null);
-            } else {
-                tmpl = StringTemplate.template("buildQueuePanel.requires")
-                    .addName("%string%", join("/", lockReason));
-                lockReasons.put(buildingType, Messages.message(tmpl));
-            }
-            if (lockReason.isEmpty() || showAllBox.isSelected()) {
-                buildings.addElement(buildingType);
-            }
+            lockReasons.put(ut, (reasons.isEmpty()) ? null
+                : Messages.message(StringTemplate
+                    .template("buildQueuePanel.requires")
+                    .addName("%string%", join("/", reasons))));
+            if (reasons.isEmpty()
+                || showAllBox.isSelected()) units.addElement(ut);
         }
     }
 
