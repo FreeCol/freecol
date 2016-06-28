@@ -32,6 +32,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.MessageHandler;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -181,17 +182,17 @@ public final class Server extends Thread {
      */
     public void sendToAll(DOMMessage message, Connection exceptConnection) {
         Element element = message.toXMLElement();
-        for (Connection c : new ArrayList<>(connections.values())) {
-            if (c == exceptConnection) continue;
-            if (c.isAlive()) {
+        for (Connection conn : transform(connections.values(),
+                                         c -> c != exceptConnection)) {
+            if (conn.isAlive()) {
                 try {
-                    c.sendAndWait(element);
+                    conn.sendAndWait(element);
                 } catch (IOException e) {
-                    logger.log(Level.WARNING, "Unable to send to: " + c, e);
+                    logger.log(Level.WARNING, "Unable to send to: " + conn, e);
                 }
             } else {
-                logger.log(Level.INFO, "Reap dead connection: " + c);
-                removeConnection(c);
+                logger.log(Level.INFO, "Reap dead connection: " + conn);
+                removeConnection(conn);
             }
         }
     }
@@ -267,8 +268,9 @@ public final class Server extends Thread {
             logger.fine("Wait for Server.run to complete.");
         }
 
-        for (Connection c : this.connections.values()) {
-            if (c.isAlive()) c.close();
+        for (Connection c : transform(this.connections.values(),
+                                      Connection::isAlive)) {
+            c.close();
         }
         this.connections.clear();
 

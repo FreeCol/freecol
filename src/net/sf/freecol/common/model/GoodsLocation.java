@@ -90,8 +90,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return True if the goods were all added.
      */
     public final boolean addGoods(List<AbstractGoods> goods) {
-        for (AbstractGoods ag : goods) if (!addGoods(ag)) return false;
-        return true;
+        return all(goods, ag -> addGoods(ag));
     }
 
     /**

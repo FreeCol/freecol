@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.control.ChangeSet;
 
 
@@ -104,8 +105,8 @@ public abstract class Session {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public static void completeAll(ChangeSet cs) {
-        for (Session ts : allSessions.values()) {
-            if (!ts.completed) ts.complete(cs);
+        for (Session ts : transform(allSessions.values(), s -> !s.completed)) {
+            ts.complete(cs);
         }
         clearAll();
     }

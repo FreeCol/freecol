@@ -422,8 +422,8 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return A suitable role identifier for display purposes.
      */
     public String getDisplayRoleId() {
-        for (Role r : getExpertRoles()) return r.getId();
-        return Specification.DEFAULT_ROLE_ID;
+        Role r = first(getExpertRoles());
+        return (r != null) ? r.getId() : Specification.DEFAULT_ROLE_ID;
     }
 
     /**

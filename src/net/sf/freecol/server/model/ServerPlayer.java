@@ -936,11 +936,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @see #hasExplored
      */
     public Set<Tile> exploreTiles(Collection<? extends Tile> tiles) {
-        Set<Tile> result = new HashSet<>();
-        for (Tile t : tiles) {
-            if (exploreTile(t)) result.add(t);
-        }
-        return result;
+        return transform(tiles, t -> exploreTile(t), Function.identity(),
+                         Collectors.toSet());
     }
 
     /**
@@ -1012,8 +1009,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         HashMap<Tile, Settlement> claims = new HashMap<>();
         Settlement claimant;
         for (Tile t : tiles) t.changeOwnership(null, null);//-til
-        for (Tile tile : tiles) {
-            if (tile.isOccupied()) continue;
+        for (Tile tile : transform(tiles, t -> !t.isOccupied())) {
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
                 claimant = t.getOwningSettlement();
@@ -1410,8 +1406,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Propagate tension change as settlement alarm to all
         // settlements except the one that originated it (if any).
         if (isIndian()) {
-            for (IndianSettlement is : getIndianSettlementList()) {
-                if (is == origin || !is.hasContacted(player)) continue;
+            for (IndianSettlement is : transform(getIndianSettlements(),
+                    i -> i != origin && i.hasContacted(player))) {
                 ((ServerIndianSettlement)is).csModifyAlarm(player, add,
                                                            false, cs);//+til
             }

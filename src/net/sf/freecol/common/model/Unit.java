@@ -1730,13 +1730,9 @@ public class Unit extends GoodsLocation
         if (!hasAbility(Ability.CAPTURE_EQUIPMENT)) return null;
         final Specification spec = getSpecification();
         final Role oldRole = getRole();
-        for (Role r : getAvailableRoles(spec.getMilitaryRoles())) {
-            for (Role.RoleChange rc : r.getRoleChanges()) {
-                if (rc.getFrom(spec) == oldRole
-                    && rc.getCapture(spec) == role) return r;
-            }
-        }
-        return null;
+        return find(getAvailableRoles(spec.getMilitaryRoles()),
+            r -> any(r.getRoleChanges(), rc ->
+                rc.getFrom(spec) == oldRole && rc.getCapture(spec) == role));
     }
 
     /**
@@ -2614,14 +2610,10 @@ public class Unit extends GoodsLocation
         }
 
         // Desperately find the nearest land to the entry location.
-        Location entry = getFullEntryLocation();
-        if (entry != null && entry.getTile() != null) {
-            for (Tile t : entry.getTile().getSurroundingTiles(INFINITY)) {
-                if (t.isLand()) return t;
-            }
-        }
-
-        return null; // Fail
+        Location loc = getFullEntryLocation();
+        return (loc == null || loc.getTile() == null) ? null
+            : find(loc.getTile().getSurroundingTiles(1, INFINITY),
+                   Tile::isLand);
     }
 
     /**

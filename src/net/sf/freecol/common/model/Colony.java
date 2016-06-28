@@ -606,10 +606,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     <code>Ability</code>, or null if not found.
      */
     public WorkLocation getWorkLocationWithAbility(String ability) {
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            if (wl.hasAbility(ability)) return wl;
-        }
-        return null;
+        return find(getCurrentWorkLocations(), wl -> wl.hasAbility(ability));
     }
 
     /**
@@ -624,7 +621,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public <T extends WorkLocation> T getWorkLocationWithAbility(String ability,
         Class<T> returnClass) {
         WorkLocation wl = getWorkLocationWithAbility(ability);
-        if (wl != null) try { return returnClass.cast(wl); } catch (ClassCastException cce) {};
+        try {
+            if (wl != null) return returnClass.cast(wl);
+        } catch (ClassCastException cce) {};
         return null;
     }
 
@@ -636,10 +635,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     <code>Modifier</code>, or null if not found.
      */
     public WorkLocation getWorkLocationWithModifier(String modifier) {
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            if (wl.hasModifier(modifier)) return wl;
-        }
-        return null;
+        return find(getCurrentWorkLocations(), wl -> wl.hasModifier(modifier));
     }
 
     /**

@@ -426,8 +426,7 @@ public class Region extends FreeColGameObject implements Nameable {
         this.discoveredIn = turn;
         this.discoverable = false;
         result.add(this);
-        for (Region r : getChildren()) {
-            if (!r.getDiscoverable()) continue;
+        for (Region r : transform(getChildren(), Region::getDiscoverable)) {
             r.discoveredBy = player;
             r.discoveredIn = turn;
             r.discoverable = false;

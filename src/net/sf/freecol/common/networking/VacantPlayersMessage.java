@@ -21,9 +21,11 @@ package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -90,13 +92,11 @@ public class VacantPlayersMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final Game game = server.getGame();
 
+        final Predicate<Player> vacantPred = p ->
+            !p.isREF() && (p.isAI() || !((ServerPlayer)p).isConnected());
         this.vacantPlayers.clear();
-        for (Player p : game.getLiveEuropeanPlayerList()) {
-            if (!p.isREF()
-                && (p.isAI() || !((ServerPlayer)p).isConnected())) {
-                this.vacantPlayers.add(p.getNationId());
-            }
-        }
+        this.vacantPlayers.addAll(transform(game.getLiveEuropeanPlayers(),
+                                            vacantPred, Player::getNationId));
         return this.toXMLElement();
     }
 

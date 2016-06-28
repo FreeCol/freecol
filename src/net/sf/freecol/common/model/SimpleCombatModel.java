@@ -226,7 +226,6 @@ public class SimpleCombatModel extends CombatModel {
     public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                FreeColGameObject defender) {
         Set<Modifier> result = new HashSet<>();
-        Modifier m;
         if (attacker == null) {
             throw new IllegalStateException("Null attacker");
         } else if (combatIsAttackMeasurement(attacker, defender)
@@ -274,10 +273,10 @@ public class SimpleCombatModel extends CombatModel {
 
         // @compat 0.11.0
         // Any modifier with the default modifier index needs to be fixed
-        for (Modifier r : result) {
-            if (r.getModifierIndex() == Modifier.DEFAULT_MODIFIER_INDEX) {
-                r.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
-            }
+        for (Modifier m : transform(result,
+                matchKeyEquals(Modifier.DEFAULT_MODIFIER_INDEX,
+                               Modifier::getModifierIndex))) {
+            m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
         }
         // end @compat 0.11.0
 
@@ -469,10 +468,10 @@ public class SimpleCombatModel extends CombatModel {
 
         // @compat 0.11.0
         // Any modifier with the default modifier index needs to be fixed
-        for (Modifier r : result) {
-            if (r.getModifierIndex() == Modifier.DEFAULT_MODIFIER_INDEX) {
-                r.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
-            }
+        for (Modifier m : transform(result,
+                matchKeyEquals(Modifier.DEFAULT_MODIFIER_INDEX,
+                               Modifier::getModifierIndex))) {
+            m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
         }
         // end @compat 0.11.0
 

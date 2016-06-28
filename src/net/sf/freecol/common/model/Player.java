@@ -2836,11 +2836,10 @@ public class Player extends FreeColGameObject implements Nameable {
         // Set the PET for visible tiles to the tile itself.
         boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
 
-        for (Unit unit : getUnitList()) {
-            // Only consider units directly on the map, not those on a
-            // carrier or in Europe.
-            if (!(unit.getLocation() instanceof Tile)) continue;
-
+        // Only consider units directly on the map, not those on a
+        // carrier or in Europe.
+        for (Unit unit : transform(getUnits(),
+                                   u -> u.getLocation() instanceof Tile)) {
             // All the units.
             for (Tile t : unit.getVisibleTiles()) {
                 cST[t.getX()][t.getY()] = true;
@@ -3620,8 +3619,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         Set<GoodsType> highProduction = new HashSet<>();
         Set<GoodsType> goodProduction = new HashSet<>();
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.getType() == null) continue; // Unexplored!?!
+        for (Tile t : transform(tile.getSurroundingTiles(1,1),
+                                t2 -> t2.getType() != null)) {
             if (t.getSettlement() != null) { // Should not happen, tested above
                 values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                            NoValueType.SETTLED.getDouble());
@@ -4187,8 +4186,8 @@ public class Player extends FreeColGameObject implements Nameable {
         // @compat 0.10.7
         // Fixup production modifiers deriving from founding fathers
         final Specification spec = getSpecification();
-        for (Modifier m : iterable(getModifiers())) {
-            if (m.getSource() == null) continue;
+        for (Modifier m : transform(getModifiers(),
+                                    m -> m.getSource() != null)) {
             String type = spec.fatherGoodsFixMap.get(m.getSource().getId());
             if (type != null && m.getId().equals(type)) {
                 m.requireNegatedPersonScope();

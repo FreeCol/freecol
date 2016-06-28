@@ -831,11 +831,10 @@ public class Game extends FreeColGameObject {
      */
     public void setMap(Map newMap) {
         if (this.map != newMap) {
-            for (Player player : getLivePlayerList()) {
-                if (player.getHighSeas() != null) {
-                    player.getHighSeas().removeDestination(this.map);
-                    player.getHighSeas().addDestination(newMap);
-                }
+            for (Player player : transform(getLivePlayers(),
+                                           p -> p.getHighSeas() != null)) {
+                player.getHighSeas().removeDestination(this.map);
+                player.getHighSeas().addDestination(newMap);
             }
         }
         this.map = newMap;

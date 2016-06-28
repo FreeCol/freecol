@@ -1850,8 +1850,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * forcibly such as when a native settlement is removed.
      */
     public void seeTile() {
-        for (Player p : getGame().getLiveEuropeanPlayerList()) {
-            if (p.canSee(this)) seeTile(p);
+        for (Player p : transform(getGame().getLiveEuropeanPlayers(),
+                                  p -> p.canSee(this))) {
+            seeTile(p);
         }
     }
 

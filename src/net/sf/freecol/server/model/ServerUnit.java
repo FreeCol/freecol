@@ -307,8 +307,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     setWorkLeft(turns);
                     if (ti.isRoad() && ti.isComplete()) {
                         ti.updateRoadConnections(true);
-                        for (Tile t : loc.getTile().getSurroundingTiles(1)) {
-                            if (t.hasRoad()) cs.add(See.perhaps(), t);
+                        for (Tile t : transform(loc.getTile().getSurroundingTiles(1,1),
+                                                Tile::hasRoad)) {
+                            cs.add(See.perhaps(), t);
                         }
                         locDirty = true;
                     }
@@ -953,11 +954,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
             // Check for new contacts.
             List<ServerPlayer> pending = new ArrayList<>();
-            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
-                if (t == null || !t.isLand()) {
-                    continue; // Invalid tile for contact
-                }
-
+            for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
+                                    nt -> nt != null && nt.isLand())) {
                 settlement = t.getSettlement();
                 ServerPlayer other = (settlement != null)
                     ? (ServerPlayer)settlement.getOwner()
@@ -1027,12 +1025,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 csActivateSentries(t, cs);
             }
         } else { // water
-            for (Tile t : newTile.getSurroundingTiles(1, 1)) {
-                if (t == null || t.isLand() || t.getFirstUnit() == null) {
-                    continue;
-                }
-                if (t.getFirstUnit().getOwner()
-                    != serverPlayer) csActivateSentries(t, cs);
+            for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
+                    nt -> (nt != null && !nt.isLand()
+                        && nt.getFirstUnit() != null
+                        && nt.getFirstUnit().getOwner() != serverPlayer))) {
+                csActivateSentries(t, cs);
             }
         }
 

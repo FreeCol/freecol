@@ -123,10 +123,9 @@ public class ServerColony extends Colony implements ServerModelObject {
             buildQueue.add(spec.getBuildingType("model.building.docks"));
             addPortAbility();
         }
-        for (UnitType unitType : spec.getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
-            if (unitType.needsGoodsToBuild()) {
-                populationQueue.add(unitType);
-            }
+        for (UnitType unitType : transform(spec.getUnitTypesWithAbility(Ability.BORN_IN_COLONY),
+                                           UnitType::needsGoodsToBuild)) {
+            populationQueue.add(unitType);
         }
     }
 
@@ -365,9 +364,9 @@ public class ServerColony extends Colony implements ServerModelObject {
         // levels that will be exceeded next turn
         int limit = getWarehouseCapacity();
         int adjustment = limit / GoodsContainer.CARGO_SIZE;
-        for (Goods goods : getCompactGoods()) {
+        for (Goods goods : transform(getCompactGoods(),
+                                     g -> g.getType().isStorable())) {
             GoodsType type = goods.getType();
-            if (!type.isStorable()) continue;
             ExportData exportData = getExportData(type);
             int low = exportData.getLowLevel() * adjustment;
             int high = exportData.getHighLevel() * adjustment;
@@ -430,11 +429,10 @@ public class ServerColony extends Colony implements ServerModelObject {
         }
 
         // Check for free buildings
-        for (BuildingType buildingType : spec.getBuildingTypeList()) {
-            if (isAutomaticBuild(buildingType)) {
-                buildBuilding(new ServerBuilding(getGame(), this,
-                                                 buildingType));//-til
-            }
+        for (BuildingType buildingType : transform(spec.getBuildingTypeList(),
+                bt -> isAutomaticBuild(bt))) {
+            buildBuilding(new ServerBuilding(getGame(), this,
+                                             buildingType));//-til
         }
         checkBuildQueueIntegrity(true);
 
@@ -488,12 +486,11 @@ public class ServerColony extends Colony implements ServerModelObject {
         // before checking for completion of training.  This is a rare
         // case so it is not worth reordering the work location calls
         // to csNewTurn.
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            if (workLocation.canTeach()) {
-                ServerBuilding building = (ServerBuilding)workLocation;
-                for (Unit teacher : building.getUnitList()) {
-                    building.csCheckTeach(teacher, cs);
-                }
+        for (WorkLocation workLocation : transform(getCurrentWorkLocations(),
+                                                   WorkLocation::canTeach)) {
+            ServerBuilding building = (ServerBuilding)workLocation;
+            for (Unit teacher : building.getUnitList()) {
+                building.csCheckTeach(teacher, cs);
             }
         }
 
@@ -570,8 +567,8 @@ public class ServerColony extends Colony implements ServerModelObject {
     public boolean ejectUnits(WorkLocation workLocation, List<Unit> units) {
         if (units == null || units.isEmpty()) return false;
         unit: for (Unit u : units) {
-            for (WorkLocation wl : getAvailableWorkLocations()) {
-                if (wl == workLocation || !wl.canAdd(u)) continue;
+            for (WorkLocation wl : transform(getAvailableWorkLocations(),
+                                             w -> w != workLocation && w.canAdd(u))) {
                 u.setLocation(wl);//-vis: safe/colony
                 continue unit;
             }
@@ -741,11 +738,10 @@ public class ServerColony extends Colony implements ServerModelObject {
             oldOwner.reassignTiles(owned, this);//-til
 
             // Make sure units are ejected when a tile is claimed.
-            for (Tile t : owned) {
-                if (t != tile && t.getOwningSettlement() != this) {
-                    ColonyTile ct = getColonyTile(t);
-                    ejectUnits(ct, ct.getUnitList());
-                }
+            for (Tile t : transform(owned,
+                    t2 -> t2 != tile && t2.getOwningSettlement() != this)) {
+                ColonyTile ct = getColonyTile(t);
+                ejectUnits(ct, ct.getUnitList());
             }
             owned.add(tile);
         }

@@ -1252,16 +1252,15 @@ public final class FreeColServer {
         File[] files;
         if (asd == null
             || (files = asd.listFiles()) == null) return;
-        for (File autosaveFile : files) {
-            if (autosaveFile.getName().startsWith(prefix)) {
-                try {
-                    if (!autosaveFile.delete()) {
-                        logger.warning("Failed to delete: " + autosaveFile.getPath());
-                    }
-                } catch (SecurityException se) {
-                    logger.log(Level.WARNING, "Failed to delete: "
-                        + autosaveFile.getPath());
+        for (File autosaveFile : transform(files,
+                                           f -> f.getName().startsWith(prefix))) {
+            try {
+                if (!autosaveFile.delete()) {
+                    logger.warning("Failed to delete: " + autosaveFile.getPath());
                 }
+            } catch (SecurityException se) {
+                logger.log(Level.WARNING, "Failed to delete: "
+                    + autosaveFile.getPath());
             }
         }
     }

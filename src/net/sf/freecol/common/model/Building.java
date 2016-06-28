@@ -232,8 +232,8 @@ public class Building extends WorkLocation
         // First, calculate the nominal production ratios.
         if (canAutoProduce()) {
             // Autoproducers are special
-            for (AbstractGoods output : iterable(getOutputs())) {
-                if (output.getAmount() <= 0) continue;
+            for (AbstractGoods output : transform(getOutputs(),
+                                                  o -> o.getAmount() > 0)) {
                 final GoodsType goodsType = output.getType();
                 int available = getColony().getGoodsCount(goodsType);
                 if (available >= capacity) {

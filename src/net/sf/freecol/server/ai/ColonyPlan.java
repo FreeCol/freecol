@@ -675,9 +675,9 @@ public class ColonyPlan {
         }
 
         Player player = colony.getOwner();
-        for (BuildingType type : spec().getBuildingTypeList()) {
+        for (BuildingType type : transform(spec().getBuildingTypeList(),
+                                           bt -> colony.canBuild(bt))) {
             boolean expectFail = false;
-            if (!colony.canBuild(type)) continue;
 
             // Exempt defence and export from the level check.
             if (type.hasModifier(Modifier.DEFENCE)) {
@@ -780,8 +780,8 @@ public class ColonyPlan {
             wagonNeed = (wagons <= 0) ? 0.0 : (wagons > 3) ? 1.0
                 : wagons / 3.0;
         }
-        for (UnitType unitType : spec().getUnitTypeList()) {
-            if (!colony.canBuild(unitType)) continue;
+        for (UnitType unitType : transform(spec().getUnitTypeList(),
+                                           ut -> colony.canBuild(ut))) {
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 ; // FIXME: decide to build a ship
             } else if (unitType.isDefensive()) {
@@ -843,10 +843,9 @@ public class ColonyPlan {
                 && colony.getGoodsCount(g) >= colony.getWarehouseCapacity()
                 && !g.limitIgnored()) continue;
 
-            for (WorkLocation wl : entry.getValue().keySet()) {
-                if (wl.canBeWorked() || wl.canAutoProduce()) {
-                    workPlans.add(new WorkLocationPlan(getAIMain(), wl, g));
-                }
+            for (WorkLocation wl : transform(entry.getValue().keySet(),
+                    w -> (w.canBeWorked() || w.canAutoProduce()))) {
+                workPlans.add(new WorkLocationPlan(getAIMain(), wl, g));
             }
         }
 
@@ -856,9 +855,8 @@ public class ColonyPlan {
         // Filter out plans that can not use a unit.
         List<WorkLocationPlan> oldPlans = new ArrayList<>(workPlans);
         workPlans.clear();
-        for (WorkLocationPlan wlp : oldPlans) {
-            if (wlp.getWorkLocation().canBeWorked()) workPlans.add(wlp);
-        }
+        workPlans.addAll(transform(oldPlans,
+                                   w -> w.getWorkLocation().canBeWorked()));
 
         // Sort the work plans by earliest presence in the produce
         // list, and then by amount.  If the type of goods produced is
@@ -1033,8 +1031,7 @@ public class ColonyPlan {
         int bestValue = colony.getAdjustedNetProductionOf(outputType);
         Unit special = null;
         best.clear();
-        for (Unit u : todo) {
-            if (!wl.canAdd(u)) continue;
+        for (Unit u : transform(todo, u2 -> wl.canAdd(u2))) {
             Location oldLoc = u.getLocation();
             GoodsType oldWork = u.getWorkType();
             u.setLocation(wl);

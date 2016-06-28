@@ -952,7 +952,7 @@ public class Messages {
         char last = 0;
         int level = 0;
         for (int index = start; index < input.length(); index++) {
-            switch(input.charAt(index)) {
+            switch (input.charAt(index)) {
             case '{':
                 if (last == '{') {
                     last = 0;
