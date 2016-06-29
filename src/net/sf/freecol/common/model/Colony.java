@@ -380,17 +380,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         List<Collection<GoodsType>> result = new ArrayList<>();
         Set<GoodsType> tried = new HashSet<>();
 
-        // Find the food and non-food goods types required by the unit.
+        // Find the food and non-food goods types required by this unit
+        // and which are underproduced at present.
         Set<GoodsType> food = new HashSet<>();
         Set<GoodsType> nonFood = new HashSet<>();
-        for (AbstractGoods ag : unit.getType().getConsumedGoods()) {
-            if (productionCache.getNetProductionOf(ag.getType())
-                < ag.getAmount()) {
-                if (ag.getType().isFoodType()) {
-                    food.addAll(ag.getType().getEquivalentTypes());
-                } else {
-                    nonFood.addAll(ag.getType().getEquivalentTypes());
-                }
+        for (AbstractGoods ag : transform(unit.getType().getConsumedGoods(),
+                g -> productionCache.getNetProductionOf(g.getType())
+                    < g.getAmount())) {
+            if (ag.getType().isFoodType()) {
+                food.addAll(ag.getType().getEquivalentTypes());
+            } else {
+                nonFood.addAll(ag.getType().getEquivalentTypes());
             }
         }
 
@@ -1645,31 +1645,26 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Returns <code>true</code> if the number of enemy combat units
-     * on all tiles that belong to the colony exceeds the number of
-     * friendly combat units. At the moment, only the colony owner's
-     * own units are considered friendly, but that could be extended
-     * to include the units of allied players.
+     * Decide if the number of enemy combat units on all tiles that
+     * belong to the colony exceeds the number of friendly combat
+     * units. At the moment, only the colony owner's own units are
+     * considered friendly, but that could be extended to include the
+     * units of allied players.
      *
      * FIXME: if a colony is under siege, it should not be possible to
      * put units outside the colony, unless those units are armed.
      *
-     * @return a <code>boolean</code> value
+     * @return Whether the colony is under siege.
      */
     public boolean isUnderSiege() {
         int friendlyUnits = 0;
         int enemyUnits = 0;
-        for (ColonyTile colonyTile : getColonyTiles()) {
-            for (Unit unit : colonyTile.getWorkTile().getUnitList()) {
-                if (unit.getOwner() == getOwner()) {
-                    if (unit.isDefensiveUnit()) {
-                        friendlyUnits++;
-                    }
-                } else if (getOwner().atWarWith(unit.getOwner())) {
-                    if (unit.isOffensiveUnit()) {
-                        enemyUnits++;
-                    }
-                }
+        for (Unit u : iterable(flatten(getColonyTiles(),
+                                       ct -> ct.getWorkTile().getUnits()))) {
+            if (u.getOwner() == getOwner()) {
+                if (u.isDefensiveUnit()) friendlyUnits++;
+            } else if (getOwner().atWarWith(u.getOwner())) {
+                if (u.isOffensiveUnit()) enemyUnits++;
             }
         }
         return enemyUnits > friendlyUnits;
@@ -2351,19 +2346,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     @SuppressWarnings("unchecked")
     public <T extends FreeColObject> T getCorresponding(T fco) {
         final String id = fco.getId();
-        if (fco instanceof WorkLocation) {
-            for (WorkLocation t : getAllWorkLocations()) {
-                if (t.getId().equals(id)) return (T)t;
-            }
-        } else if (fco instanceof Tile) {
-            if (getTile().getId().equals(id)) return (T)getTile();
-            for (ColonyTile ct : getColonyTiles()) {
-                if (ct.getWorkTile().getId().equals(id)) return (T)ct.getWorkTile();
-            }
-        } else if (fco instanceof Unit) {
-            return (T)find(getAllUnitsList(), matchKeyEquals(id, Unit::getId));
-        }
-        return null;
+        return (fco instanceof WorkLocation)
+            ? (T)find(getAllWorkLocations(),
+                      matchKeyEquals(id, WorkLocation::getId))
+            : (fco instanceof Tile)
+            ? (T)((getTile().getId().equals(id)) ? getTile()
+                : find(map(getColonyTiles(), ColonyTile::getWorkTile),
+                       matchKeyEquals(id, Tile::getId)))
+            : (fco instanceof Unit)
+            ? (T)find(getAllUnitsList(),
+                      matchKeyEquals(id, Unit::getId))
+            : null;
     }
 
 
