@@ -167,7 +167,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             final boolean overflow = this.colony.getSpecification()
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
             List<AbstractGoods> consumption = new ArrayList<>();
-            for (AbstractGoods ag : current.getRequiredGoods()) {
+            for (AbstractGoods ag : current.getRequiredGoodsList()) {
                 AbstractGoods available = find(input, AbstractGoods.matches(ag.getType()));
                 if (available != null
                     && ag.getAmount() <= available.getAmount()) {
@@ -194,7 +194,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
         return (current == null) ? Collections.<AbstractGoods>emptyList()
-            : current.getRequiredGoods();
+            : current.getRequiredGoodsList();
     }
 
     /**

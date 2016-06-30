@@ -260,7 +260,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, colony.getTile(), colony.getOwner(),
                                    colonistType);
         unit.setLocation(colony);
-        for (AbstractGoods ag : lumberMillType.getRequiredGoods()) {
+        for (AbstractGoods ag : lumberMillType.getRequiredGoodsList()) {
             GoodsType type = ag.getType();
             int amount = ag.getAmount() + 1;
             colony.addGoods(type, amount);

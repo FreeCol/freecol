@@ -961,7 +961,7 @@ public class InGameControllerTest extends FreeColTestCase {
         dutch.addFather(spec()
                         .getFoundingFather("model.foundingFather.paulRevere"));
         java.util.Map<GoodsType,Integer> goodsAdded = new HashMap<>();
-        for (AbstractGoods goods : soldierRole.getRequiredGoods()) {
+        for (AbstractGoods goods : soldierRole.getRequiredGoodsList()) {
             colony.addGoods(goods);
             goodsAdded.put(goods.getType(), goods.getAmount());
         }
@@ -978,7 +978,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     colonist.isDisposed());
         assertFalse("Colonist should not be captured",
                     colonist.getOwner() == attacker.getOwner());
-        for (AbstractGoods goods : soldierRole.getRequiredGoods()) {
+        for (AbstractGoods goods : soldierRole.getRequiredGoodsList()) {
             boolean goodsLost = colony.getGoodsCount(goods.getType())
                 < goodsAdded.get(goods.getType());
             assertTrue("Colony should have lost " + goods.getType().toString(),
@@ -1728,7 +1728,7 @@ public class InGameControllerTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
         ServerPlayer indian = (ServerPlayer)camp.getOwner();
-        List<AbstractGoods> required = nativeDragoonRole.getRequiredGoods();
+        List<AbstractGoods> required = nativeDragoonRole.getRequiredGoodsList();
         int horsesReqPerUnit = AbstractGoods.getCount(horsesType, required);
         int musketsReqPerUnit = AbstractGoods.getCount(musketsType, required);
 
@@ -1779,7 +1779,7 @@ public class InGameControllerTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
 
-        List<AbstractGoods> required = mountedBraveRole.getRequiredGoods();
+        List<AbstractGoods> required = mountedBraveRole.getRequiredGoodsList();
         int horsesReq = AbstractGoods.getCount(horsesType, required);
         int musketsReq = AbstractGoods.getCount(musketsType, required);
 

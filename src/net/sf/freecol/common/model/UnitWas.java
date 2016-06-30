@@ -202,7 +202,7 @@ public class UnitWas implements Comparable<UnitWas> {
         // we can still try our best by using the amount of equipment
         // the unit needs as a secondary criterion (favouring the
         // least equipped).
-        List<Role> roles = this.unit.getAvailableRoles(null);
+        List<Role> roles = this.unit.getAvailableRolesList(null);
         int cmp = ((UnitLocation)uw.loc).getUnitCapacity()
             - ((UnitLocation)this.loc).getUnitCapacity();
         if (cmp == 0) {

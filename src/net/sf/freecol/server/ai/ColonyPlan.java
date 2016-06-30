@@ -1112,7 +1112,8 @@ public class ColonyPlan {
     }
 
     /**
-     * Equips a unit for a role, trying extra possibilities.
+     * Equips a unit for a role, trying all possibilities if a military role
+     * was called for.
      *
      * @param spec The <code>Specification</code> defining the roles.
      * @param unit The <code>Unit</code> to equip if possible.
@@ -1122,14 +1123,11 @@ public class ColonyPlan {
      */
     private static boolean fullEquipUnit(Specification spec, Unit unit,
                                          Role role, Colony colony) {
-        if (role.isOffensive()) {
-            for (Role r : unit.getAvailableRoles(spec.getMilitaryRoles())) {
-                if (colony.equipForRole(unit, 
-                        r, r.getMaximumCount())) return true;
-            }
-            return false;
-        }
-        return colony.equipForRole(unit, role, role.getMaximumCount());
+        return (role.isOffensive())
+            ? any(transform(spec.getMilitaryRoles(),
+                            r -> unit.roleIsAvailable(r)
+                                && colony.equipForRole(unit, r, r.getMaximumCount())))
+            : colony.equipForRole(unit, role, role.getMaximumCount());
     }
 
     /**
@@ -1222,7 +1220,7 @@ public class ColonyPlan {
         // Greedy assignment of other workers to plans.
         List<AbstractGoods> buildGoods = new ArrayList<>();
         BuildableType build = col.getCurrentlyBuilding();
-        if (build != null) buildGoods.addAll(build.getRequiredGoods());
+        if (build != null) buildGoods.addAll(build.getRequiredGoodsList());
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
         boolean done = false;

@@ -354,7 +354,7 @@ public class Unit extends GoodsLocation
                 } else {
                     // Other roles can be characterized by their goods.
                     List<AbstractGoods> requiredGoods
-                        = role.getRequiredGoods(getRoleCount());
+                        = role.getRequiredGoodsList(getRoleCount());
                     boolean first = true;
                     extra = StringTemplate.label("");
                     for (AbstractGoods ag : requiredGoods) {
@@ -874,9 +874,21 @@ public class Unit extends GoodsLocation
      *     available roles are used.
      * @return A list of available <code>Role</code>s.
      */
-    public List<Role> getAvailableRoles(List<Role> roles) {
-        if (roles == null) roles = getSpecification().getRoles();
+    public List<Role> getAvailableRolesList(List<Role> roles) {
+        if (roles == null) roles = getSpecification().getRolesList();
         return transform(roles, r -> roleIsAvailable(r));
+    }
+
+    /**
+     * Filter a list of roles to return only those available to this unit,
+     * returning a stream.
+     *
+     * @param roles The list of <code>Role</code>s to filter, if null all
+     *     available roles are used.
+     * @return A stream of available <code>Role</code>s.
+     */
+    public Stream<Role> getAvailableRoles(List<Role> roles) {
+        return getAvailableRolesList(roles).stream();
     }
 
     /**
@@ -885,7 +897,8 @@ public class Unit extends GoodsLocation
      * @return A military <code>Role</code>, or null if none found.
      */
     public Role getMilitaryRole() {
-        return first(getAvailableRoles(getSpecification().getMilitaryRoles()));
+        return first(transform(getSpecification().getMilitaryRoles(),
+                               r -> roleIsAvailable(r)));
     }
 
     /**
@@ -1730,7 +1743,7 @@ public class Unit extends GoodsLocation
         if (!hasAbility(Ability.CAPTURE_EQUIPMENT)) return null;
         final Specification spec = getSpecification();
         final Role oldRole = getRole();
-        return find(getAvailableRoles(spec.getMilitaryRoles()),
+        return find(getAvailableRoles(spec.getMilitaryRolesList()),
             r -> any(r.getRoleChanges(), rc ->
                 rc.getFrom(spec) == oldRole && rc.getCapture(spec) == role));
     }

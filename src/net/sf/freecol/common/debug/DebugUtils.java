@@ -552,13 +552,13 @@ public class DebugUtils {
         final Game sGame = server.getGame();
         final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
         final GUI gui = freeColClient.getGUI();
-        final Function<Role, ChoiceItem<Role>> mapper = r ->
+        final Function<Role, ChoiceItem<Role>> roleMapper = r ->
             new ChoiceItem<Role>(r.getId(), r);
 
         Role roleChoice = gui.getChoice(null,
             StringTemplate.template("prompt.selectRole"), "cancel",
             transform(sGame.getSpecification().getRoles(), alwaysTrue(),
-                      mapper, Comparator.naturalOrder()));
+                      roleMapper, Comparator.naturalOrder()));
         if (roleChoice == null) return;
 
         sUnit.changeRole(roleChoice, roleChoice.getMaximumCount());

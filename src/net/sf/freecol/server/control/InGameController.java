@@ -3880,10 +3880,11 @@ public final class InGameController extends Controller {
         if (getGame().getSpecification()
             .getBoolean(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH)
             && current != colony.getCurrentlyBuilding()) {
-            for (AbstractGoods ag : current.getRequiredGoods()) {
-                if (!ag.getType().isStorable()) {
-                    colony.removeGoods(ag.getType());
-                }
+            final Predicate<AbstractGoods> notStorablePred = ag ->
+                !ag.getType().isStorable();
+            for (AbstractGoods ag : transform(current.getRequiredGoods(),
+                                              notStorablePred)) {
+                colony.removeGoods(ag.getType());
             }
         }
         colony.invalidateCache();

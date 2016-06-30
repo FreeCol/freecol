@@ -310,7 +310,7 @@ public final class Monarch extends FreeColGameObject implements Named {
                 mercenaryTypes.add(unitType);
             }
         }
-        for (Role r : spec.getMilitaryRoles()) {
+        for (Role r : spec.getMilitaryRolesList()) {
             boolean ok = r.isAvailableTo(player, first(landTypes));
             boolean armed = r.hasAbility(Ability.ARMED);
             boolean mounted = r.hasAbility(Ability.MOUNTED);

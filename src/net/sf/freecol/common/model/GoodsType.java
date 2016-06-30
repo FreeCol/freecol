@@ -500,11 +500,10 @@ public final class GoodsType extends FreeColSpecObjectType {
         List<BuildableType> buildableTypes = new ArrayList<>();
         buildableTypes.addAll(spec.getBuildingTypeList());
         buildableTypes.addAll(spec.getUnitTypeList());
-        buildableTypes.addAll(spec.getRoles());
-        for (BuildableType b : buildableTypes) {
-            for (AbstractGoods ag : b.getRequiredGoods()) {
-                ag.getType().buildingMaterial = true;
-            }
+        buildableTypes.addAll(spec.getRolesList());
+        for (AbstractGoods ag : iterable(flatten(buildableTypes,
+                    BuildableType::getRequiredGoods))) {
+            ag.getType().buildingMaterial = true;
         }
 
         // Set makes attribute

@@ -1449,8 +1449,22 @@ public final class Specification {
 
     // -- Roles --
 
-    public List<Role> getRoles() {
-        return roles;
+    /**
+     * Get all the available roles.
+     *
+     * @return A list of available <code>Role</code>s.
+     */
+    public List<Role> getRolesList() {
+        return this.roles;
+    }
+
+    /**
+     * Get all the available roles as a stream.
+     *
+     * @return A stream of available <code>Role</code>s.
+     */
+    public Stream<Role> getRoles() {
+        return getRolesList().stream();
     }
 
     /**
@@ -1478,13 +1492,44 @@ public final class Specification {
      *
      * @return An unmodifiable list of military <code>Role</code>s.
      */
-    public List<Role> getMilitaryRoles() {
+    public List<Role> getMilitaryRolesList() {
         if (this.militaryRoles == null) {
             this.militaryRoles = Collections.<Role>unmodifiableList(
-                transform(roles, Role::isOffensive, Function.identity(),
+                transform(this.roles, Role::isOffensive, Function.identity(),
                           Role.militaryComparator));
         }
         return this.militaryRoles;
+    }
+
+    /**
+     * Get the available military roles as a stream.
+     *
+     * @return A stream of military <code>Role</code>s.
+     */
+    public Stream<Role> getMilitaryRoles() {
+        return getMilitaryRolesList().stream();
+    }
+
+    /**
+     * Gets the roles suitable for a REF unit.
+     *
+     * @param naval If true, choose roles for naval units, if not, land units.
+     * @return A list of <code>Role</code>s suitable for REF units.
+     */
+    public List<Role> getREFRolesList(boolean naval) {
+        return transform(((naval) ? Stream.of(getDefaultRole())
+                             : getMilitaryRoles()),
+                         r -> r.requiresAbility(Ability.REF_UNIT));
+    }
+
+    /**
+     * Gets the roles suitable for a REF unit as a stream.
+     *
+     * @param naval If true, choose roles for naval units, if not, land units.
+     * @return A stream of <code>Role</code>s suitable for REF units.
+     */
+    public Stream<Role> getREFRoles(boolean naval) {
+        return getREFRolesList(naval).stream();
     }
 
     /**
@@ -1525,18 +1570,6 @@ public final class Specification {
      */
     public Role getScoutRole() {
         return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
-    }
-
-    /**
-     * Gets the roles suitable for a REF unit.
-     *
-     * @param naval If true, choose roles for naval units, if not, land units.
-     * @return A list of <code>Role</code>s suitable for REF units.
-     */
-    public List<Role> getREFRoles(boolean naval) {
-        Stream<Role> stream = (naval) ? Stream.of(getDefaultRole())
-            : getMilitaryRoles().stream();
-        return transform(stream, r -> r.requiresAbility(Ability.REF_UNIT));
     }
 
 

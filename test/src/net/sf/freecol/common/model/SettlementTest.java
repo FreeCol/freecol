@@ -164,7 +164,7 @@ public class SettlementTest extends FreeColTestCase {
 
         // Colony now has enough equipment
         colony.addGoods(musketsType, 10);
-        assertTrue(colony.canProvideGoods(soldierRole.getRequiredGoods()));
+        assertTrue(colony.canProvideGoods(soldierRole.getRequiredGoodsList()));
         assertEquals(soldierRole,
                      colony.canImproveUnitMilitaryRole(colonist));
 

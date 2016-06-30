@@ -101,7 +101,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
         assertTrue("Colony can provide tools",
-                   colony.canProvideGoods(pioneerRole.getRequiredGoods()));
+                   colony.canProvideGoods(pioneerRole.getRequiredGoodsList()));
         assertEquals("Colony found", colony,
                      PioneeringMission.findTarget(aiUnit, 10, false));
         assertNull("Pioneer has no mission",

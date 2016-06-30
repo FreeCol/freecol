@@ -139,7 +139,7 @@ public class RoleTest extends FreeColTestCase {
 
     public void testMilitaryRoles() {
         final Game game = getStandardGame();
-        final List<Role> military = spec().getMilitaryRoles();
+        final List<Role> military = spec().getMilitaryRolesList();
 
         List<Role> expectedRoles = new ArrayList<>();
         expectedRoles.add(dragoon);

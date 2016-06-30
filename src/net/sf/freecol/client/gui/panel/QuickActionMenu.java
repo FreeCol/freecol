@@ -636,8 +636,8 @@ public final class QuickActionMenu extends JPopupMenu {
         UnitLocation uloc = (unit.isInEurope()) ? unit.getOwner().getEurope()
             : unit.getSettlement();
         if (uloc == null) return false;
-        for (Role r : unit.getAvailableRoles(null)) {
-            if (r == role) continue;
+        for (Role r : transform(unit.getAvailableRoles(null),
+                                r2 -> r2 != role)) {
             JMenuItem newItem;
             if (r.isDefaultRole()) { // Always valid
                 newItem = createRoleItem(unitLabel, role, roleCount, r, 0, 0);

@@ -167,7 +167,7 @@ public class BuildingDetailPanel
         if (!buildingType.needsGoodsToBuild()) {
             panel.add(Utility.localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
-            List<AbstractGoods> required = buildingType.getRequiredGoods();
+            List<AbstractGoods> required = buildingType.getRequiredGoodsList();
             AbstractGoods goodsRequired = first(required);
             if (required.size() > 1) {
                 panel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),

@@ -416,7 +416,7 @@ public abstract class Settlement extends GoodsLocation
         final Role role = unit.getRole();
 
         // Get the military roles that are superior to the current role
-        List<Role> military = spec.getMilitaryRoles();
+        List<Role> military = spec.getMilitaryRolesList();
         int index = military.indexOf(role);
         if (index >= 0) military = military.subList(0, index);
 

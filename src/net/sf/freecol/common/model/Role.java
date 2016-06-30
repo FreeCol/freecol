@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -215,14 +216,25 @@ public class Role extends BuildableType {
      * @param roleCount The role count.
      * @return A list of required goods.
      */
-    public List<AbstractGoods> getRequiredGoods(int roleCount) {
-        List<AbstractGoods> result = getRequiredGoods();
+    public List<AbstractGoods> getRequiredGoodsList(int roleCount) {
+        List<AbstractGoods> result = getRequiredGoodsList();
         if (roleCount > 1 && !result.isEmpty()) {
             for (AbstractGoods ag : result) {
                 ag.setAmount(roleCount * ag.getAmount());
             }
         }
         return result;
+    }
+
+    /**
+     * Get the required goods for this role, considering also the role count,
+     * as a stream.
+     *
+     * @param roleCount The role count.
+     * @return A stream of required goods.
+     */
+    public Stream<AbstractGoods> getRequiredGoods(int roleCount) {
+        return getRequiredGoodsList(roleCount).stream();
     }
 
     /**
@@ -343,8 +355,8 @@ public class Role extends BuildableType {
         if (from != to && !(from == null && to.isDefaultRole())) {
             List<AbstractGoods> fromGoods = (from == null)
                 ? new ArrayList<AbstractGoods>()
-                : from.getRequiredGoods(fromCount);
-            List<AbstractGoods> toGoods = to.getRequiredGoods(toCount);
+                : from.getRequiredGoodsList(fromCount);
+            List<AbstractGoods> toGoods = to.getRequiredGoodsList(toCount);
             for (AbstractGoods ag : toGoods) {
                 int amount = ag.getAmount()
                     - AbstractGoods.getCount(ag.getType(), fromGoods);
@@ -409,8 +421,8 @@ public class Role extends BuildableType {
             Role role = (Role)other;
             cmp = role.getAbilityIndex() - this.getAbilityIndex();
             if (cmp == 0) {
-                cmp = role.getRequiredGoods().size()
-                    - this.getRequiredGoods().size();
+                cmp = role.getRequiredGoodsList().size()
+                    - this.getRequiredGoodsList().size();
             }
         }
         if (cmp == 0) cmp = super.compareTo(other);

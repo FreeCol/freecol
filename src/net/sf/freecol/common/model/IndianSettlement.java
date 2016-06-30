@@ -822,7 +822,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final Specification spec = getSpecification();
         final UnitType unitType = getFirstUnit().getType();
         final List<Role> militaryRoles = Role.getAvailableRoles(getOwner(),
-            unitType, spec.getMilitaryRoles());
+            unitType, spec.getMilitaryRolesList());
 
         if (type.isMilitaryGoods()) { // Retain enough goods to fully arm
             return sum(getOwnedUnits(),

@@ -302,7 +302,7 @@ public class CombatTest extends FreeColTestCase {
 
         // Set up for auto-equip
         dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
-        for (AbstractGoods ag : soldierRole.getRequiredGoods()) {
+        for (AbstractGoods ag : soldierRole.getRequiredGoodsList()) {
             colony.addGoods(ag);
         }
 
@@ -340,7 +340,7 @@ public class CombatTest extends FreeColTestCase {
                                        nativeDragoonRole);
         Unit attacker = new ServerUnit(game, tile2, dutch, colonistType,
                                        dragoonRole);
-        for (AbstractGoods ag : nativeDragoonRole.getRequiredGoods()) {
+        for (AbstractGoods ag : nativeDragoonRole.getRequiredGoodsList()) {
             is.addGoods(ag);
         }
 

@@ -122,7 +122,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
 
         // Report unit types that are inherently reportable, and units
         // with military roles.
-        List<Role> militaryRoles = spec.getMilitaryRoles();
+        final List<Role> militaryRoles = spec.getMilitaryRolesList();
         for (UnitType ut : spec.getUnitTypeList()) {
             if (reportable(ut)) {
                 tryUnitRole(ut, Specification.DEFAULT_ROLE_ID);
