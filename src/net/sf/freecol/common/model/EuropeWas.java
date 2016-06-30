@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.util.logging.Logger;
 
+import static net.sf.freecol.common.util.CollectionUtils.*;
+
 
 /**
  * Helper container to remember the Europe state prior to some
@@ -30,40 +32,36 @@ public class EuropeWas {
 
     private static final Logger logger = Logger.getLogger(EuropeWas.class.getName());
 
+    /** The Europe to remember. */
     private final Europe europe;
+
+    /** The initial number of units in the Europe. */
     private final int unitCount;
 
 
+    /**
+     * Create a new wrapper to remember the state of Europe.
+     *
+     * @param europe The <code>Europe</code> to remember.
+     */
     public EuropeWas(Europe europe) {
         this.europe = europe;
         this.unitCount = europe.getUnitCount();
     }
 
+
     /**
      * Gets a unit added to Europe since this EuropeWas was sampled.
      *
-     * Simply makes sure there is at least one new unit, then picks the one
-     * with the highest numeric id.
+     * As long there is at least one new unit, pick the one with the
+     * highest numeric id.
      *
-     * @return A new unit.
+     * @return The newest <code>Unit</code> or null if none has been added.
      */
     public Unit getNewUnit() {
-        if (europe.getUnitCount() < unitCount+1) return null;
-        Unit newUnit = null;
-        int idMax = 0;
-        final String unitPrefix = Unit.getTagName() + ":";
-        for (Unit u : europe.getUnitList()) {
-            String uid = u.getId();
-            if (!uid.startsWith(unitPrefix)) continue;
-            try {
-                int id = Integer.parseInt(uid.substring(unitPrefix.length()));
-                if (idMax < id) {
-                    idMax = id;
-                    newUnit = u;
-                }
-            } catch (NumberFormatException nfe) {}
-        }
-        return newUnit;        
+        return (europe.getUnitCount() <= this.unitCount) ? null
+            : maximize(europe.getUnits(),
+                       cachingIntComparator(Unit::getIdNumber));
     }
 
     /**
@@ -72,11 +70,9 @@ public class EuropeWas {
      * @return True if something changed.
      */
     public boolean fireChanges() {
-        int newUnitCount = europe.getUnitCount();
-
-        if (newUnitCount != unitCount) {
-            europe.firePropertyChange(Europe.UNIT_CHANGE,
-                                      unitCount, newUnitCount);
+        final int newCount = europe.getUnitCount();
+        if (newCount != this.unitCount) {
+            europe.firePropertyChange(Europe.UNIT_CHANGE, unitCount, newCount);
             return true;
         }
         return false;
