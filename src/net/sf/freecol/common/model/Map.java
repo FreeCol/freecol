@@ -645,16 +645,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return The closest tile found (may be null if the list is empty).
      */
     public Tile getClosestTile(Tile tile, Collection<Tile> tiles) {
-        Tile result = null;
-        int minimumDistance = Integer.MAX_VALUE;
-        for (Tile t : tiles) {
-            int distance = getDistance(t, tile);
-            if (distance < minimumDistance) {
-                minimumDistance = distance;
-                result = t;
-            }
-        }
-        return result;
+        return minimize(tiles, cachingIntComparator(t -> getDistance(t, tile)));
     }
 
     /**
