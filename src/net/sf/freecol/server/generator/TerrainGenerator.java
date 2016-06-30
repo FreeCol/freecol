@@ -964,18 +964,14 @@ public class TerrainGenerator {
 
         // Connect all new regions to their geographic parent and add to
         // the map.
-        List<ServerRegion> geographic = new ArrayList<>();
-        for (ServerRegion sr : fixed) {
-            if (sr.isGeographic()) geographic.add(sr);
-        }
+        List<ServerRegion> geographic
+            = transform(fixed, ServerRegion::isGeographic);
         for (ServerRegion sr : newRegions) {
-            for (ServerRegion gr : geographic) {
-                if (gr.containsCenter(sr)) {
-                    sr.setParent(gr);
-                    gr.addChild(sr);
-                    gr.setSize(gr.getSize() + sr.getSize());
-                    break;
-                }
+            ServerRegion gr = find(geographic, g -> g.containsCenter(sr));
+            if (gr != null) {
+                sr.setParent(gr);
+                gr.addChild(sr);
+                gr.setSize(gr.getSize() + sr.getSize());
             }
             map.addRegion(sr);
         }
