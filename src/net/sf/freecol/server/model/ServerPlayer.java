@@ -1507,19 +1507,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (getMonarch() != null
                 // end @compat 0.10.5
                     && (ivf = getMonarch().getInterventionForce()) != null) {
-                    List<Unit> landUnits = createUnits(ivf.getLandUnits(),
-                                                       entry);//-vis(this)
-                    List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
-                                                        entry);//-vis(this)
-                    List<Unit> leftOver = loadShips(landUnits, navalUnits,
-                                                    random);//-vis(this)
+                    List<Unit> land = createUnits(ivf.getLandUnitsList(),
+                                                  entry);//-vis(this)
+                    List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
+                                                   entry);//-vis(this)
+                    List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
                     for (Unit unit : leftOver) {
                         // no use for left over units
                         logger.warning("Disposing of left over unit " + unit);
                         unit.setLocationNoUpdate(null);//-vis: safe, off map
                         unit.dispose();//-vis: safe, never sighted
                     }
-                    Set<Tile> tiles = exploreForUnit(navalUnits.get(0));
+                    Set<Tile> tiles = exploreForUnit(naval.get(0));
                     if (!tiles.contains(entry)) tiles.add(entry);
                     invalidateCanSeeTiles();//+vis(this)
                     cs.add(See.perhaps(), tiles);
@@ -1528,8 +1527,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                          "model.player.interventionForceArrives",
                                          this));
                     logger.info("Intervention force ("
-                        + navalUnits.size() + " naval, "
-                        + landUnits.size() + " land, "
+                        + naval.size() + " naval, "
+                        + land.size() + " land, "
                         + leftOver.size() + " left over) arrives at " + entry
                         + "(for " + port.getName() + ")");
                 }

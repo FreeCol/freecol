@@ -547,7 +547,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (interventionTurns > 0) {
             Force ivf = getInterventionForce();
             int updates = getGame().getTurn().getNumber() / interventionTurns;
-            for (AbstractUnit unit : ivf.getLandUnits()) {
+            for (AbstractUnit unit : ivf.getLandUnitsList()) {
                 // add units depending on current turn
                 int value = unit.getNumber() + updates;
                 unit.setNumber(value);
@@ -555,7 +555,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             ivf.updateSpaceAndCapacity();
             while (ivf.getCapacity() < ivf.getSpaceRequired()) {
                 boolean progress = false;
-                for (AbstractUnit ship : ivf.getNavalUnits()) {
+                for (AbstractUnit ship : ivf.getNavalUnitsList()) {
                     // add ships until all units can be transported at once
                     if (ship.getType(spec).canCarryUnits()
                         && ship.getType(spec).getSpace() > 0) {
@@ -785,7 +785,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Detects/fixes bogus expeditionary force roles
         List<AbstractUnit> todo = new ArrayList<>();
         Force ref = getExpeditionaryForce();
-        Iterator<AbstractUnit> it = ref.getLandUnits().iterator();
+        Iterator<AbstractUnit> it = ref.getLandUnitsList().iterator();
         while (it.hasNext()) {
             AbstractUnit au = it.next();
             if ("model.role.soldier".equals(au.getRoleId())) {
@@ -908,10 +908,10 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         // @compat 0.10.5
         } else if (Force.LAND_UNITS_TAG.equals(tag)) {
-            expeditionaryForce.getLandUnits().clear();
+            expeditionaryForce.clearLandUnits();
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 AbstractUnit newUnit = new AbstractUnit(xr);
-                expeditionaryForce.getLandUnits().add(newUnit);
+                expeditionaryForce.add(newUnit);
             }
         // end @compat
 
@@ -924,10 +924,10 @@ public final class Monarch extends FreeColGameObject implements Named {
             
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
-            expeditionaryForce.getNavalUnits().clear();
+            expeditionaryForce.clearNavalUnits();
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 AbstractUnit newUnit = new AbstractUnit(xr);
-                expeditionaryForce.getNavalUnits().add(newUnit);
+                expeditionaryForce.add(newUnit);
             }
         // end @compat
 

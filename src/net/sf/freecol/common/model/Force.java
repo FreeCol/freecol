@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -73,23 +74,18 @@ public class Force extends FreeColSpecObject {
      * @param ability An optional ability name required of the units
      *     in the force.
      */
-    public Force(Specification specification, List<AbstractUnit> units,
-                 String ability) {
-        this(specification);
-        for (AbstractUnit unit : units) {
-            UnitType unitType = unit.getType(specification);
-            if (ability == null || unitType.hasAbility(ability)) {
-                if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-                    navalUnits.add(unit);
-                } else {
-                    landUnits.add(unit);
-                }
+    public Force(Specification spec, List<AbstractUnit> units, String ability) {
+        this(spec);
+
+        this.capacity = this.spaceRequired = 0;
+        for (AbstractUnit au : units) {
+            if (ability == null || au.getType(spec).hasAbility(ability)) {
+                add(au);
             } else {
                 logger.warning("Found unit lacking required ability \""
-                    + ability + "\": " + unit);
+                    + ability + "\": " + au);
             }
         }
-        updateSpaceAndCapacity();
     }
 
 
@@ -129,18 +125,26 @@ public class Force extends FreeColSpecObject {
      * @return A copy of the list of all units.
      */
     public final List<AbstractUnit> getUnitList() {
-        List<AbstractUnit> result = getLandUnits();
-        result.addAll(getNavalUnits());
+        List<AbstractUnit> result = new ArrayList<>();
+        result.addAll(this.landUnits);
+        result.addAll(this.navalUnits);
         return result;
     }
 
     /**
-     * Gets the naval units.
-     *
-     * @return A copy of the list of the naval units.
+     * Clear the land unit list.
      */
-    public final List<AbstractUnit> getNavalUnits() {
-        return AbstractUnit.deepCopy(this.navalUnits);
+    public final void clearLandUnits() {
+        this.landUnits.clear();
+        this.spaceRequired = 0;
+    }
+
+    /**
+     * Clear the naval unit list.
+     */
+    public final void clearNavalUnits() {
+        this.navalUnits.clear();
+        this.capacity = 0;
     }
 
     /**
@@ -148,8 +152,17 @@ public class Force extends FreeColSpecObject {
      *
      * @return A list of the  land units.
      */
-    public final List<AbstractUnit> getLandUnits() {
+    public final List<AbstractUnit> getLandUnitsList() {
         return AbstractUnit.deepCopy(this.landUnits);
+    }
+
+    /**
+     * Gets the naval units.
+     *
+     * @return A copy of the list of the naval units.
+     */
+    public final List<AbstractUnit> getNavalUnitsList() {
+        return AbstractUnit.deepCopy(this.navalUnits);
     }
 
     /**
@@ -162,40 +175,37 @@ public class Force extends FreeColSpecObject {
     }
 
     /**
-     * Adds units to this Force.
+     * Add abstract units to this Force.
      *
-     * @param au The addition to this Force.
+     * @param au The addition to this <code>Force</code>.
      */
     public void add(AbstractUnit au) {
         final Specification spec = getSpecification();
         final UnitType unitType = au.getType(spec);
         final int n = au.getNumber();
-        boolean added = false;
+        final Predicate<AbstractUnit> matchPred = a ->
+            spec.getUnitType(a.getId()) == unitType
+                && a.getRoleId().equals(au.getRoleId());
+
         if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
-            for (AbstractUnit refUnit : navalUnits) {
-                if (spec.getUnitType(refUnit.getId()) == unitType) {
-                    refUnit.setNumber(refUnit.getNumber() + n);
-                    if (unitType.canCarryUnits()) {
-                        this.capacity += unitType.getSpace() * n;
-                    }
-                    added = true;
-                    break;
+            AbstractUnit refUnit = find(this.navalUnits, matchPred);
+            if (refUnit != null) {
+                refUnit.setNumber(refUnit.getNumber() + n);
+                if (unitType.canCarryUnits()) {
+                    this.capacity += unitType.getSpace() * n;
                 }
+            } else {
+                this.navalUnits.add(au);
             }
-            if (!added) navalUnits.add(au);
         } else {
-            for (AbstractUnit refUnit : landUnits) {
-                if (spec.getUnitType(refUnit.getId()) == unitType
-                    && refUnit.getRoleId().equals(au.getRoleId())) {
-                    refUnit.setNumber(refUnit.getNumber() + n);
-                    spaceRequired += unitType.getSpaceTaken() * n;
-                    added = true;
-                    break;
-                }
+            AbstractUnit refUnit = find(this.landUnits, matchPred);
+            if (refUnit != null) {
+                refUnit.setNumber(refUnit.getNumber() + n);
+                this.spaceRequired += unitType.getSpaceTaken() * n;
+            } else {
+                this.landUnits.add(au);
             }
-            if (!added) this.landUnits.add(au);
         }
-        updateSpaceAndCapacity();
     }
 
     /**
@@ -229,16 +239,18 @@ public class Force extends FreeColSpecObject {
             }
         }
         while (!todo.isEmpty()) add(todo.remove(0));
+        updateSpaceAndCapacity();
     }
     // end @compat 0.10.x
 
                     
     // Serialization
 
+    // @compat 0.10.5
+    // do not delete! just revert to private, public for now because of
+    // back compatibility code in Monarch
     public static final String LAND_UNITS_TAG = "landUnits";
     public static final String NAVAL_UNITS_TAG = "navalUnits";
-    // @compat 0.10.5
-    // public for now, revert to private
     // end @compat
 
 
@@ -251,13 +263,13 @@ public class Force extends FreeColSpecObject {
 
         xw.writeStartElement(NAVAL_UNITS_TAG);
 
-        for (AbstractUnit unit : navalUnits) unit.toXML(xw);
+        for (AbstractUnit unit : this.navalUnits) unit.toXML(xw);
 
         xw.writeEndElement();
 
         xw.writeStartElement(LAND_UNITS_TAG);
 
-        for (AbstractUnit unit : landUnits) unit.toXML(xw);
+        for (AbstractUnit unit : this.landUnits) unit.toXML(xw);
 
         xw.writeEndElement();
 
@@ -270,19 +282,21 @@ public class Force extends FreeColSpecObject {
     @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        navalUnits.clear();
-        landUnits.clear();
+        clearLandUnits();
+        clearNavalUnits();
 
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tag = xr.getLocalName();
 
             if (LAND_UNITS_TAG.equals(tag)) {
                 while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    add(new AbstractUnit(xr));
+                    AbstractUnit au = new AbstractUnit(xr);
+                    if (au != null) add(au);
                 }
             } else if (NAVAL_UNITS_TAG.equals(tag)) {
                 while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    add(new AbstractUnit(xr));
+                    AbstractUnit au = new AbstractUnit(xr);
+                    if (au != null) add(au);
                 }
             } else {
                 logger.warning("Bogus Force tag: " + tag);

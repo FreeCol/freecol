@@ -378,9 +378,9 @@ public final class InGameController extends Controller {
             exf.add(au);
         }
         // end @compat 0.10.5
-        List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnits(),
+        List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnitsList(),
                                                      europe);//-vis: safe!map
-        List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnits(),
+        List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnitsList(),
                                                       europe);//-vis: safe!map
         refPlayer.loadShips(landUnits, navalUnits, random);//-vis: safe!map
         return refPlayer;
