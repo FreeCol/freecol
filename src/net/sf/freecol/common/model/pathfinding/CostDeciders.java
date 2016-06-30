@@ -197,12 +197,11 @@ public final class CostDeciders {
                             && (u.hasAbility(Ability.PIRACY)
                                 || (u.getOwner().atWarWith(owner)
                                     && u.isOffensiveUnit())));
-                    for (Tile t : tile.getSurroundingTiles(1)) {
-                        if (any(t.getUnits(), threatPred)) {
-                            this.movesLeft = 0;
-                            this.newTurns++;
-                            break;
-                        }
+                    if (any(flatten(tile.getSurroundingTiles(1,1),
+                                    Tile::getUnits),
+                            threatPred)) {
+                        this.movesLeft = 0;
+                        this.newTurns++;
                     }
                 }
             }
