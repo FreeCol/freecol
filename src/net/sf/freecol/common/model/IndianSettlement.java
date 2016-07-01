@@ -986,9 +986,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         goodsToTrade.add(armsType);
         goodsToTrade.add(horsesType);
 
-        for(GoodsType goods : goodsToTrade){
+        for (GoodsType goods : goodsToTrade) {
             int goodsInStock = getGoodsCount(goods);
-            if(goodsInStock <= 50){
+            if (goodsInStock <= 50) {
                 continue;
             }
             int goodsTraded = goodsInStock / 2;
@@ -1022,12 +1022,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void updateWantedGoods() {
         final Specification spec = getSpecification();
-        final Function<GoodsType, GoodsType> mapper = Function.identity();
+        final Function<GoodsType, GoodsType> identity = Function.identity();
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
                         gt -> !gt.isMilitaryGoods() && gt.isStorable(),
-                        mapper,
-                        Collectors.toMap(mapper,
+                        identity,
+                        Collectors.toMap(identity,
                             gt -> getNormalGoodsPriceToBuy(gt,
                                 GoodsContainer.CARGO_SIZE)));
 
@@ -1098,13 +1098,12 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      */
     public void addRandomGoods(Random random) {
         HashMap<GoodsType, Integer> goodsMap = new HashMap<>();
-        for (Tile t : getOwnedTiles()) {
-            for (AbstractGoods ag : t.getSortedPotential()) {
-                GoodsType type = ag.getType().getStoredAs();
-                Integer i = goodsMap.get(type);
-                int value = (i == null) ? 0 : i;
-                goodsMap.put(type, value + ag.getAmount());
-            }
+        for (AbstractGoods ag : iterable(flatten(getOwnedTiles(),
+                    t -> t.getSortedPotential().stream()))) {
+            GoodsType type = ag.getType().getStoredAs();
+            Integer i = goodsMap.get(type);
+            int value = (i == null) ? 0 : i;
+            goodsMap.put(type, value + ag.getAmount());
         }
         double d = randomInt(logger, "Goods at " + getName(), random, 10)
             * 0.1 + 1.0;
@@ -1244,7 +1243,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             double unitPower = attacker.getGame().getCombatModel()
                 .getDefencePower(attacker, nextUnit);
             if (Unit.betterDefender(defender, defencePower,
-                    nextUnit, unitPower)) {
+                                    nextUnit, unitPower)) {
                 defender = nextUnit;
                 defencePower = unitPower;
             }
@@ -1309,12 +1308,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         int tiles = 0;
         int potential = 0;
-        for (Tile workTile : getOwnedTiles()) {
-            if (workTile != getTile() && !workTile.isOccupied()) {
-                // FIXME: make unitType brave
-                potential += workTile.getPotentialProduction(type, null);
-                tiles++;
-            }
+        for (Tile wt : transform(getOwnedTiles(),
+                                 t -> t != getTile() && !t.isOccupied())) {
+            // FIXME: make unitType brave
+            potential += wt.getPotentialProduction(type, null);
+            tiles++;
         }
 
         // When a native settlement has more tiles than units, pretend
