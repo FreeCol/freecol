@@ -3858,13 +3858,12 @@ outer:  for (Effect effect : effects) {
             building.dispose();
             // Have any abilities been removed that gate other production,
             // e.g. removing docks should shut down fishing.
-            for (WorkLocation wl : colony.getAllWorkLocations()) {
-                if (!wl.isEmpty() && !wl.canBeWorked()) {
-                    changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
-                    logger.info("Units ejected from workLocation "
-                        + wl.getId() + " on loss of "
-                        + building.getType().getSuffix());
-                }
+            for (WorkLocation wl : transform(colony.getAllWorkLocations(),
+                    w -> !w.isEmpty() && !w.canBeWorked())) {
+                changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
+                logger.info("Units ejected from workLocation "
+                    + wl.getId() + " on loss of "
+                    + building.getType().getSuffix());
             }
         } else if (building.canBeDamaged()) {
             changed = colony.ejectUnits(building, building.downgrade());//-til

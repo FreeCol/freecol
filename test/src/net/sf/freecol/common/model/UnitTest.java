@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import net.sf.freecol.common.model.Role;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -393,12 +394,9 @@ public class UnitTest extends FreeColTestCase {
             if (u == soldier) fail("Unit building colony still in tile");
         }
 
-        found = false;
-        for (WorkLocation loc : colony.getCurrentWorkLocations()) {
-            found |= loc.getUnitList().contains(soldier);
-        }
         assertTrue("Soldier should be in a work location in the colony",
-                   found);
+                   any(colony.getCurrentWorkLocations(),
+                       wl -> wl.contains(soldier)));
         WorkLocation wl = soldier.getWorkLocation();
         assertNotNull("Soldier should be in a work location in the colony", wl);
         assertFalse("Soldier should not be working in central tile",

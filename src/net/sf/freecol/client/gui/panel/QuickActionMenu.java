@@ -315,7 +315,7 @@ public final class QuickActionMenu extends JPopupMenu {
             int bestOwnedProd = bonus + bonusChange,
                 bestUnownedProd = bonus + bonusChange;
             WorkLocation bestOwned = null, bestUnowned = null;
-            for (WorkLocation wl : colony.getAllWorkLocations()) {
+            for (WorkLocation wl : colony.getAllWorkLocationsList()) {
                 int prod = 0;
                 switch (wl.getNoAddReason(unit)) {
                 case NONE:

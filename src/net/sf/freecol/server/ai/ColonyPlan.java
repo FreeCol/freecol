@@ -394,7 +394,7 @@ public class ColonyPlan {
      */
     private Map<GoodsType, Map<WorkLocation, Integer>> createProductionMap() {
         Map<GoodsType, Map<WorkLocation, Integer>> production = new HashMap<>();
-        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+        for (WorkLocation wl : colony.getAvailableWorkLocationsList()) {
             for (GoodsType g : spec().getGoodsTypeList()) {
                 int p = wl.getGenericPotential(g);
                 if (p > 0) {
@@ -1381,7 +1381,7 @@ public class ColonyPlan {
         //     starvation and add one worker.
         if (col.getUnitCount() == 0) {
             if (getFoodPlans().isEmpty()) {
-locations:      for (WorkLocation wl : col.getAvailableWorkLocations()) {
+locations:      for (WorkLocation wl : col.getAvailableWorkLocationsList()) {
                     for (Unit u : new ArrayList<>(workers)) {
                         for (GoodsType type : libertyGoodsTypes) {
                             if (wl.canAdd(u)

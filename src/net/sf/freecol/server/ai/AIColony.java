@@ -591,8 +591,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             .getLibertyGoodsTypeList();
         out: for (Unit u : transform(colony.getTile().getUnits(),
                                      Unit::isPerson)) {
-            for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-                if (!wl.canAdd(u)) continue;
+            for (WorkLocation wl : transform(colony.getAvailableWorkLocations(),
+                                             w -> w.canAdd(u))) {
                 for (GoodsType type : libertyGoods) {
                     if (wl.getPotentialProduction(type, u.getType()) > 0
                         && AIMessage.askWork(getAIUnit(u), wl)
@@ -1124,14 +1124,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Add raw materials for buildings.
-        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
-            if (!wl.getProductionInfo().hasMaximumProduction()) {
-                for (GoodsType gt : transform(wl.getInputs(), alwaysTrue(),
-                                              AbstractGoods::getType)) {
-                    // FIXME: find better heuristic
-                    required.incrementCount(gt, 100);
-                }
-            }
+        for (GoodsType gt : iterable(map(flatten(colony.getCurrentWorkLocations(),
+                         wl -> !wl.getProductionInfo().hasMaximumProduction(),
+                        WorkLocation::getInputs),
+                    AbstractGoods::getType))) {
+            required.incrementCount(gt, 100); // FIXME: find better heuristic
         }
 
         // Add breedable goods
@@ -1234,9 +1231,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public void updateTileImprovementPlans(LogBuilder lb) {
         List<TileImprovementPlan> newPlans = new ArrayList<>();
-        for (WorkLocation wl : colony.getAvailableWorkLocations()) {
+        for (WorkLocation wl : transform(colony.getAvailableWorkLocations(),
+                                         w -> w instanceof ColonyTile)) {
             Tile workTile = wl.getWorkTile();
-            if (workTile == null) continue;
             ColonyTile colonyTile = (ColonyTile)wl;
             if (workTile.getOwningSettlement() != colony
                 || getPlanFor(workTile, newPlans) != null) continue;

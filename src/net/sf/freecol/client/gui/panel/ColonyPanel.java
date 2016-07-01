@@ -561,7 +561,7 @@ public final class ColonyPanel extends PortPanel
         if (colony == null) return;
 
         // Check for non-producing locations that can now produce.
-        for (WorkLocation wl : colony.getCurrentWorkLocations()) {
+        for (WorkLocation wl : colony.getCurrentWorkLocationsList()) {
             boolean change = false, check = wl.getProductionType() == null;
             for (Unit unit : transform(wl.getUnits(), u ->
                     (check || !wl.produces(u.getWorkType())))) {

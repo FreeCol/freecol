@@ -432,7 +432,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
         Occupation best = new Occupation(null, null, null);
         int bestAmount = 0;
-        for (WorkLocation wl : getCurrentWorkLocations()) {
+        for (WorkLocation wl : getCurrentWorkLocationsList()) {
             bestAmount = best.improve(unit, wl, bestAmount, workTypes, lb);
         }
 
@@ -515,13 +515,29 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The list of work locations.
      */
-    public List<WorkLocation> getAllWorkLocations() {
+    public List<WorkLocation> getAllWorkLocationsList() {
         List<WorkLocation> ret = new ArrayList<>();
-        synchronized (colonyTiles) {
-            ret.addAll(colonyTiles);
+        synchronized (this.colonyTiles) {
+            ret.addAll(this.colonyTiles);
         }
-        synchronized (buildingMap) {
-            ret.addAll(buildingMap.values());
+        synchronized (this.buildingMap) {
+            ret.addAll(this.buildingMap.values());
+        }
+        return ret;
+    }
+
+    /**
+     * Gets a stream of every work location in this colony.
+     *
+     * @return The stream of work locations.
+     */
+    public Stream<WorkLocation> getAllWorkLocations() {
+        Stream<WorkLocation> ret = Stream.<WorkLocation>empty();
+        synchronized (this.colonyTiles) {
+            ret = concat(ret, map(this.colonyTiles, ct -> (WorkLocation)ct));
+        }
+        synchronized (this.buildingMap) {
+            ret = concat(ret, map(this.buildingMap.values(), b -> (WorkLocation)b));
         }
         return ret;
     }
@@ -532,8 +548,18 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The list of available <code>WorkLocation</code>s.
      */
-    public List<WorkLocation> getAvailableWorkLocations() {
+    public List<WorkLocation> getAvailableWorkLocationsList() {
         return transform(getAllWorkLocations(), WorkLocation::isAvailable);
+    }
+
+    /**
+     * Get a stream of all freely available work locations in this
+     * colony.
+     *
+     * @return The stream of available <code>WorkLocation</code>s.
+     */
+    public Stream<WorkLocation> getAvailableWorkLocations() {
+        return getAvailableWorkLocationsList().stream();
     }
 
     /**
@@ -541,8 +567,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return The list of current <code>WorkLocation</code>s.
      */
-    public List<WorkLocation> getCurrentWorkLocations() {
+    public List<WorkLocation> getCurrentWorkLocationsList() {
         return transform(getAllWorkLocations(), WorkLocation::isCurrent);
+    }
+
+    /**
+     * Get a stream of all current work locations in this colony.
+     *
+     * @return The stream of current <code>WorkLocation</code>s.
+     */
+    public Stream<WorkLocation> getCurrentWorkLocations() {
+        return getCurrentWorkLocationsList().stream();
     }
 
     /**
@@ -1684,7 +1719,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int result, v;
         if (player.owns(this)) {
             result = 0;
-            for (WorkLocation wl : getAvailableWorkLocations()) {
+            for (WorkLocation wl : getAvailableWorkLocationsList()) {
                 v = wl.evaluateFor(player);
                 if (v == Integer.MIN_VALUE) return Integer.MIN_VALUE;
                 result += v;
@@ -1993,7 +2028,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * present.
      */
     public void updateProductionTypes() {
-        for (WorkLocation wl : getAvailableWorkLocations()) {
+        for (WorkLocation wl : getAvailableWorkLocationsList()) {
             wl.updateProductionType();
         }
     }

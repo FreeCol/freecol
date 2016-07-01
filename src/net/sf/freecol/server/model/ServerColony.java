@@ -162,7 +162,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         container.saveState();
 
         // Check for learning by experience
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
+        for (WorkLocation workLocation : getCurrentWorkLocationsList()) {
             ((ServerModelObject)workLocation).csNewTurn(random, lb, cs);
             ProductionInfo productionInfo = getProductionInfo(workLocation);
             if (productionInfo == null) continue;
