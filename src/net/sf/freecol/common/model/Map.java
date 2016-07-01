@@ -2018,25 +2018,23 @@ public class Map extends FreeColGameObject implements Location {
      */
     public static boolean[][] floodFill(boolean[][] boolmap, int x, int y,
                                         int limit) {
-        Position p = new Position(x, y);
+        final int xmax = boolmap.length, ymax = boolmap[0].length;
+        boolean[][] visited = new boolean[xmax][ymax];
         Queue<Position> q = new LinkedList<>();
-        boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
-        visited[p.getX()][p.getY()] = true;
-        limit--;
-        do {
-            for (Direction direction : Direction.values()) {
-                Position n = new Position(p, direction);
-                if (n.isValid(boolmap.length, boolmap[0].length)
-                    && boolmap[n.getX()][n.getY()]
-                    && !visited[n.getX()][n.getY()] && limit > 0) {
-                    visited[n.getX()][n.getY()] = true;
-                    limit--;
-                    q.add(n);
+
+        visited[x][y] = true;
+        for (Position p = new Position(x, y); p != null && --limit > 0;
+             p = q.poll()) {
+            for (Direction d : Direction.values()) {
+                final Position np = new Position(p, d);
+                if (np.isValid(xmax, ymax)
+                    && boolmap[np.getX()][np.getY()]
+                    && !visited[np.getX()][np.getY()]) {
+                    visited[np.getX()][np.getY()] = true;
+                    q.add(np);
                 }
             }
-
-            p = q.poll();
-        } while (p != null && limit > 0);
+        }
         return visited;
     }
 
@@ -2046,9 +2044,10 @@ public class Map extends FreeColGameObject implements Location {
     public void resetContiguity() {
         // Create the water map.  It is an error for any tile not to
         // have a region at this point.
-        boolean[][] waterMap = new boolean[getWidth()][getHeight()];
-        for (int y = 0; y < getHeight(); y++) {
-            for (int x = 0; x < getWidth(); x++) {
+        final int xmax = getWidth(), ymax = getHeight();
+        boolean[][] waterMap = new boolean[xmax][ymax];
+        for (int y = 0; y < ymax; y++) {
+            for (int x = 0; x < xmax; x++) {
                 if (isValid(x, y)) {
                     waterMap[x][y] = !getTile(x,y).isLand();
                     Tile tile = getTile(x, y);
@@ -2246,8 +2245,8 @@ public class Map extends FreeColGameObject implements Location {
                 // relies on the map being attached to the game, which
                 // is not necessarily true in the test suite.
                 Position position = new Position(tile.getX(), tile.getY());
-                for (Direction d : Direction.values()) {
-                    Position p = new Position(position, d);
+                for (Position p : transform(Direction.values(), alwaysTrue(),
+                                            d -> new Position(position, d))) {
                     if (isValid(p)) {
                         Tile t = getTile(p);
                         if (t.getHighSeasCount() < 0) {
