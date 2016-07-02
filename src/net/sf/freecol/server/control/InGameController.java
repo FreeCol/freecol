@@ -1474,7 +1474,7 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         TileImprovement improvement = tile.getTileImprovement(type);
         if (improvement == null) { // Create the new improvement.
-            improvement = new TileImprovement(getGame(), tile, type);
+            improvement = new TileImprovement(getGame(), tile, type, null);
             tile.add(improvement);
         }
 

@@ -82,7 +82,8 @@ public class MovementTest extends FreeColTestCase {
 
         // Plowing should not change result
         assertTrue("No improvements", tile2.getTileImprovements().isEmpty());
-        TileImprovement ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.plow"));
+        TileImprovement ti = new TileImprovement(game, tile2,
+            spec().getTileImprovementType("model.improvement.plow"), null);
         ti.setTurnsToComplete(0);
         tile2.add(ti);
         assertTrue("Plowed", tile2.getCompleteTileImprovements().size() == 1);

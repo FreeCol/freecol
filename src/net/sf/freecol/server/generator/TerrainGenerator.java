@@ -753,7 +753,7 @@ public class TerrainGenerator {
             // In Col1, ocean tiles with less than 3 land neighbours
             // produce 2 fish, all others produce 4 fish
             if (adjacentLand > 2) {
-                t.add(new TileImprovement(game, t, fishBonusLandType));
+                t.add(new TileImprovement(game, t, fishBonusLandType, null));
             }
 
             // In Col1, the ocean tile in front of a river mouth would
@@ -761,7 +761,7 @@ public class TerrainGenerator {
             // FIXME: This probably has some false positives, means
             // river tiles that are NOT a river mouth next to this tile!
             if (!t.hasRiver() && adjacentRiver) {
-                t.add(new TileImprovement(game, t, fishBonusRiverType));
+                t.add(new TileImprovement(game, t, fishBonusRiverType, null));
             }
 
             if (t.getType().isHighSeasConnected()) {
@@ -914,7 +914,7 @@ public class TerrainGenerator {
                             = new TileItemContainer(game, t);
                         // TileItemContainer copies every natural item
                         // including Resource if importBonuses is true.
-                        // Rumors and roads are not copied.
+                        // Rumors are not copied here.
                         container.copyFrom(importTile.getTileItemContainer(),
                             (importBonuses) ? Map.Layer.RESOURCES
                             : Map.Layer.RIVERS);

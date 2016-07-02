@@ -870,7 +870,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (magnitude == TileImprovement.NO_RIVER) return null;
         TileImprovementType riverType = getSpecification()
             .getTileImprovementType("model.improvement.river");
-        TileImprovement river = new TileImprovement(getGame(), this, riverType);
+        TileImprovement river = new TileImprovement(getGame(), this, riverType,
+                                                    null);
         river.setTurnsToComplete(0);
         river.setMagnitude(magnitude);
         if (!addTileItem(river)) return null;
@@ -903,7 +904,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public TileImprovement addRoad() {
         TileImprovementType roadType = getSpecification()
             .getTileImprovementType("model.improvement.road");
-        TileImprovement road = new TileImprovement(getGame(), this, roadType);
+        TileImprovement road = new TileImprovement(getGame(), this, roadType,
+                                                   null);
         road.setMagnitude(1);
         return (addTileItem(road)) ? road : null;
     }

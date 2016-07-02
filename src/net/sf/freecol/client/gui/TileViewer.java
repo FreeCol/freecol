@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -691,7 +692,6 @@ public final class TileViewer extends FreeColClientHolder {
     void displayTileItems(Graphics2D g, Tile tile, BufferedImage overlayImage) {
         // ATTENTION: we assume that only overlays and forests
         // might be taller than a tile.
-
         // layer additions and improvements according to zIndex
         List<TileItem> tileItems = tile.getCompleteItems();
         int startIndex = 0;
@@ -765,13 +765,15 @@ public final class TileViewer extends FreeColClientHolder {
         if (ti.isComplete()) {
             if (ti.isRoad()) {
                 rp.displayRoad(g, tile);
-            } else if (ti.isRiver()
-                    && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                // @compat 0.10.5
-                // America_large had some bogus rivers in 0.10.5
-                if (ti.getStyle() != null)
-                // end @compat 0.10.5
-                    g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
+            } else if (ti.isRiver()) {
+                if (ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                    TileImprovementStyle style = ti.getStyle();
+                    // @compat 0.10.5
+                    // America_large had some bogus rivers in 0.10.5
+                    if (style != null)
+                    // end @compat 0.10.5
+                    g.drawImage(lib.getRiverImage(style), 0, 0, null);
+                }
             } else {
                 String key = "image.tile." + ti.getType().getId();
                 if (ResourceManager.hasImageResource(key)) {

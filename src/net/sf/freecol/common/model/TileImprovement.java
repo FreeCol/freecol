@@ -86,9 +86,12 @@ public class TileImprovement extends TileItem implements Named {
      *
      * @param game The enclosing <code>Game</code>.
      * @param tile The <code>Tile</code> on which this object sits.
-     * @param type The <code>TileImprovementType</code> of this TileImprovement.
+     * @param type The <code>TileImprovementType</code> of this
+     *     improvement.
+     * @param style The <code>TileImprovementStyle</code> of this improvement.
      */
-    public TileImprovement(Game game, Tile tile, TileImprovementType type) {
+    public TileImprovement(Game game, Tile tile, TileImprovementType type,
+                           TileImprovementStyle style) {
         super(game, tile);
         if (type == null) {
             throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
@@ -99,8 +102,8 @@ public class TileImprovement extends TileItem implements Named {
                 + type.getAddWorkTurns();
         }
         this.magnitude = type.getMagnitude();
-        this.style = null;
-        this.connected = 0L;
+        this.style = style;
+        this.connected = getConnectionsFromStyle();
     }
 
     /**

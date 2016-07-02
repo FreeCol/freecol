@@ -156,7 +156,8 @@ public class ColonizationMapLoader implements MapLoader {
                         && (overlay == 2 || overlay == 3 || overlay == 6 || overlay == 7)) {
                         TileItemContainer container = new TileItemContainer(game, tiles[x][y]);
                         TileImprovement river =
-                            new TileImprovement(game, tiles[x][y], riverType);
+                            new TileImprovement(game, tiles[x][y], riverType,
+                                                null);//TODO: connections!
                         river.setMagnitude (overlay <= 3 ? 1 : 2);
                         container.tryAddTileItem(river);
                         tiles[x][y].setTileItemContainer(container);

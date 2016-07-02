@@ -257,7 +257,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(cotton, secondaryProduction.getType());
         assertEquals(2, secondaryProduction.getAmount());
 
-        TileImprovement ti = new TileImprovement(game, tile, plow);
+        TileImprovement ti = new TileImprovement(game, tile, plow, null);
         ti.setTurnsToComplete(0);
         tile.add(ti);
         colony.invalidateCache();
