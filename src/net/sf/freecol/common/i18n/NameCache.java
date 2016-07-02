@@ -118,6 +118,20 @@ public class NameCache {
     }
 
     /**
+     * Collects all the keys with a given prefix.
+     *
+     * @param prefix The prefix to check.
+     * @param keys A list to fill with the keys found.
+     * @param suffix A suffix to add.
+     */
+    private static void collectKeys(String prefix, List<String> keys,
+                                    String suffix) {
+        String key;
+        for (int i = 0; Messages.containsKey(key = prefix
+                + Integer.toString(i) + suffix); i++) keys.add(key);
+    }
+
+    /**
      * Initialize the cities of Cibola collection.
      *
      * Public for FreeColServer to initialize with a new game.
@@ -191,8 +205,8 @@ public class NameCache {
         synchronized (rumourNothingLock) {
             if (rumourNothingKeys == null) {
                 rumourNothingKeys = new ArrayList<>();
-                collectNames("model.lostCityRumour.nothing.",
-                             rumourNothingKeys);
+                collectKeys("model.lostCityRumour.nothing.",
+                            rumourNothingKeys, Messages.DESCRIPTION_SUFFIX);
             }
         }
     }
