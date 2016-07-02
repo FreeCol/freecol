@@ -1125,7 +1125,7 @@ public final class InGameController extends FreeColClientHolder {
             // this turn, but might not be next turn, so do not cancel the
             // destination but set the state to skipped instead.
             clearDestination = false;
-            unit.setState(UnitState.SKIPPED);
+            changeState(unit, UnitState.SKIPPED);
             break;
         case MOVE_NO_TILE:
             if (interactive || clearDestination) {
@@ -1406,7 +1406,7 @@ public final class InGameController extends FreeColClientHolder {
         askClearGotoOrders(unit);
         if (!askServer().embark(unit, carrier, direction)
             || unit.getLocation() != carrier) {
-            unit.setState(UnitState.SKIPPED);
+            changeState(unit, UnitState.SKIPPED);
             return false;
         }
         unit.getOwner().invalidateCanSeeTiles();
@@ -1551,7 +1551,7 @@ public final class InGameController extends FreeColClientHolder {
                     askEmbark(u, unit);
                 } finally {
                     if (u.getLocation() != unit) {
-                        u.setState(UnitState.SKIPPED);
+                        changeState(u, UnitState.SKIPPED);
                     }
                     continue;
                 }
@@ -1564,7 +1564,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!askServer().move(unit, direction)) {
             // Can fail due to desynchronization.  Skip this unit so
             // we do not end up retrying indefinitely.
-            unit.setState(UnitState.SKIPPED);
+            changeState(unit, UnitState.SKIPPED);
             return false;
         }
 
@@ -2097,7 +2097,7 @@ public final class InGameController extends FreeColClientHolder {
                 if (path == null) {
                     lb.add("\n", Messages.message(stop
                             .getLabelFor("tradeRoute.pathStop", player)));
-                    unit.setState(UnitState.SKIPPED);
+                    changeState(unit, UnitState.SKIPPED);
                     break;
                 }
                 
@@ -2105,7 +2105,7 @@ public final class InGameController extends FreeColClientHolder {
                 // the stop it is finished for now.
                 movePath(unit, path);
                 if (!unit.atStop(stop)) {
-                    unit.setState(UnitState.SKIPPED);
+                    changeState(unit, UnitState.SKIPPED);
                     break;
                 }
             }
@@ -2137,7 +2137,7 @@ public final class InGameController extends FreeColClientHolder {
                 // No work was found anywhere on the trade route,
                 // so we should skip this unit.
                 lb.add(" ", Messages.message("tradeRoute.wait"));
-                unit.setState(UnitState.SKIPPED);
+                changeState(unit, UnitState.SKIPPED);
                 unit.setMovesLeft(0);
                 break;
             }
@@ -2164,7 +2164,7 @@ public final class InGameController extends FreeColClientHolder {
             }
             // Set the new stop, skip on error.
             if (!askServer().setCurrentStop(unit, tr.getIndex(next))) {
-                unit.setState(UnitState.SKIPPED);
+                changeState(unit, UnitState.SKIPPED);
                 break;
             }
         }
