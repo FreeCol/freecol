@@ -3984,15 +3984,15 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (xw.validFor(this)) {
 
-            for (Ability ability : getSortedAbilities()) {
-                if (ability.isIndependent()) ability.toXML(xw);
+            for (Ability ability : transform(getSortedAbilities(),
+                                             Ability::isIndependent)) {
+                ability.toXML(xw);
             }
 
             Turn turn = getGame().getTurn();
-            for (Modifier modifier : getSortedModifiers()) {
-                if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
-                    modifier.toXML(xw);
-                }
+            for (Modifier modifier : transform(getSortedModifiers(), m ->
+                    m.isTemporary() && !m.isOutOfDate(turn))) {
+                modifier.toXML(xw);
             }
 
             for (Player p : sort(tension.keySet())) {
