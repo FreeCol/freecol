@@ -269,11 +269,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // included in any new colony plan.
         exploreLCRs();
         stealTiles(lb);
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (!player.owns(t) && player.canClaimForSettlement(t)) {
-                AIMessage.askClaimLand(t, this, 0);
-                if (player.owns(t)) lb.add(", claimed tile ", t);
-            }
+        for (Tile t : transform(tile.getSurroundingTiles(1,1),
+                t2 -> !player.owns(t2) && player.canClaimForSettlement(t2))) {
+            AIMessage.askClaimLand(t, this, 0);
+            if (player.owns(t)) lb.add(", claimed tile ", t);
         }
 
         // Update the colony plan.
@@ -367,8 +366,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             nextRearrange = Math.max(0, Math.min(nextRearrange, when-1));
         }
         int warehouse = colony.getWarehouseCapacity();
-        for (GoodsType g : spec.getStorableGoodsTypeList()) {
-            if (g.isFoodType()) continue;
+        for (GoodsType g : transform(spec.getStorableGoodsTypeList(),
+                                     gt -> !gt.isFoodType())) {
             int have = colony.getGoodsCount(g);
             int net = colony.getAdjustedNetProductionOf(g);
             if (net >= 0 && (have >= warehouse || g.limitIgnored())) continue;
@@ -452,9 +451,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Goods required to equip for any available role should only be
         // partially exported.
-        final UnitType defaultUnit = spec.getDefaultUnitType(player);
+        final UnitType dUT = spec.getDefaultUnitType(player);
         for (AbstractGoods ag : transform(flatten(spec.getRoles(),
-                                                  r -> r.isAvailableTo(player, defaultUnit),
+                                                  r -> r.isAvailableTo(player, dUT),
                                                   Role::getRequiredGoods),
                                           g -> fullExport.contains(g.getType()))) {
             fullExport.remove(ag.getType());
@@ -1105,12 +1104,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Add building materials.
         if (colony.getCurrentlyBuilding() != null) {
-            final Predicate<AbstractGoods> notProducing = ag ->
-                colony.getAdjustedNetProductionOf(ag.getType()) <= 0;
-            for (AbstractGoods ag : transform(colony.getCurrentlyBuilding()
-                                                    .getRequiredGoods(),
-                                              notProducing)) {
-                required.incrementCount(ag.getType(), ag.getAmount());
+            for (AbstractGoods ag : colony.getCurrentlyBuilding()
+                     .getRequiredGoodsList()) {
+                if (colony.getAdjustedNetProductionOf(ag.getType()) <= 0) {
+                    required.incrementCount(ag.getType(), ag.getAmount());
+                }
             }
         }
 
