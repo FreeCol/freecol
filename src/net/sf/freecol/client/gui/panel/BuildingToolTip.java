@@ -152,13 +152,12 @@ public class BuildingToolTip extends JToolTip {
                 lib.getMiscImage("image.unit.placeholder"))), "span 2");
         }
 
-        int breedingNumber = (outputType == null) ? GoodsType.INFINITY
+        int breed = (outputType == null || !outputType.isBreedable()) ? -1
             : outputType.getBreedingNumber();
-        if (outputType != null
-            && breedingNumber > building.getColony().getGoodsCount(outputType)) {
+        if (breed > building.getColony().getGoodsCount(outputType)) {
             add(Utility.localizedLabel(StringTemplate
                     .template("buildingToolTip.breeding")
-                    .addAmount("%number%", breedingNumber)
+                    .addAmount("%number%", breed)
                     .addNamed("%goods%", outputType)));
         }
 
