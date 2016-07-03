@@ -449,14 +449,13 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public int getMoveCost(Tile fromTile, Tile targetTile, int basicMoveCost) {
         int moveCost = basicMoveCost;
-        for (TileItem item : getTileItems()) {
-            if (item instanceof TileImprovement
-                && ((TileImprovement)item).isComplete()) {
-                Direction direction = targetTile.getDirection(fromTile);
-                if (direction == null) return INFINITY;
-                moveCost = Math.min(moveCost, 
-                    ((TileImprovement)item).getMoveCost(direction, moveCost));
-            }
+        for (TileItem item : transform(getTileItems(), ti ->
+                (ti instanceof TileImprovement
+                    && ((TileImprovement)ti).isComplete()))) {
+            Direction direction = targetTile.getDirection(fromTile);
+            if (direction == null) return INFINITY;
+            moveCost = Math.min(moveCost, 
+                ((TileImprovement)item).getMoveCost(direction, moveCost));
         }
         return moveCost;
     }
@@ -476,8 +475,8 @@ public class TileItemContainer extends FreeColGameObject {
         final Game game = getGame();
         List<TileItem> otherItems = tic.getTileItems();
         List<TileItem> result = new ArrayList<TileItem>();
-        for (TileItem item : otherItems) {
-            if (layer.compareTo(item.getLayer()) < 0) continue;
+        for (TileItem item : transform(otherItems, ti ->
+                                       layer.compareTo(ti.getLayer()) >= 0)) {
             if (item instanceof Resource) {
                 Resource resource = (Resource)item;
                 ResourceType type
