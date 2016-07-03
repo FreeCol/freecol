@@ -446,9 +446,9 @@ public final class InGameController extends Controller {
         // that the REF units will have their own unit-specific entry
         // locations set by their missions.  This just flags that the
         // REF is initialized.
-        for (Player p : serverPlayer.getRebels()) {
-            serverPlayer.setEntryLocation(p.getEntryLocation().getTile());
-            break;
+        Player rebel = first(serverPlayer.getRebels());
+        if (rebel != null) {
+            serverPlayer.setEntryLocation(rebel.getEntryLocation().getTile());
         }
 
         if (teleport) { // Teleport in the units.
@@ -1174,8 +1174,8 @@ public final class InGameController extends Controller {
             settlement.equipForRole(unit, spec.getDefaultRole(), 0);
 
             // Coronado
-            for (ServerPlayer sp : game.getConnectedPlayers(serverPlayer)) {
-                if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
+            for (ServerPlayer sp : transform(game.getConnectedPlayers(serverPlayer),
+                    p -> p.hasAbility(Ability.SEE_ALL_COLONIES))) {
                 cs.add(See.only(sp), sp.exploreForSettlement(settlement));//-vis(sp)
                 sp.invalidateCanSeeTiles();//+vis(sp)
                 cs.addMessage(See.only(sp),
@@ -2488,11 +2488,9 @@ public final class InGameController extends Controller {
         serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.
-        for (Player p : game.getLivePlayerList(serverPlayer)) {
-            if (serverPlayer.hasContacted(p)) {
-                serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p,
-                                            true, cs);
-            }
+        for (Player p : transform(game.getLivePlayers(serverPlayer),
+                                  p2 -> serverPlayer.hasContacted(p2))) {
+            serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)p, true, cs);
         }
 
         // Revenge begins
@@ -3880,10 +3878,8 @@ public final class InGameController extends Controller {
         if (getGame().getSpecification()
             .getBoolean(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH)
             && current != colony.getCurrentlyBuilding()) {
-            final Predicate<AbstractGoods> notStorablePred = ag ->
-                !ag.getType().isStorable();
             for (AbstractGoods ag : transform(current.getRequiredGoods(),
-                                              notStorablePred)) {
+                    g -> !g.getType().isStorable())) {
                 colony.removeGoods(ag.getType());
             }
         }
