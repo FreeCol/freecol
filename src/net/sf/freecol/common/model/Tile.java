@@ -42,6 +42,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Direction;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1705,12 +1706,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Try applying all possible non-natural improvements.
         final List<TileImprovementType> improvements
             = getSpecification().getTileImprovementTypeList();
-        for (TileImprovementType ti : improvements) {
-            if (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
-                && ti.getBonus(goodsType) > 0) {
-                potential = ti.getProductionModifier(goodsType)
-                    .applyTo(potential);
-            }
+        for (TileImprovementType ti : transform(improvements, ti ->
+                (!ti.isNatural() && ti.isTileTypeAllowed(tileType)
+                    && ti.getBonus(goodsType) > 0))) {
+            potential = ti.getProductionModifier(goodsType).applyTo(potential);
         }
         return (int)potential;
     }
@@ -1812,14 +1811,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Update player explored tiles after a change to this tile.
+     * Update production after a change to this tile.
      */
     private void updateColonyTiles() {
-        for (ColonyTile ct : transform(flatten(getGame().getAllColonies(null),
-                                               c -> c.getColonyTiles().stream()),
-                                       matchKey(this, ColonyTile::getWorkTile))) {
-            ct.updateProductionType();
-        }
+        WorkLocation wl = find(flatten(getGame().getAllColonies(null),
+                                       Colony::getAvailableWorkLocations),
+                               matchKey(this, WorkLocation::getWorkTile));
+        if (wl != null) wl.updateProductionType();
     }
 
     /**
