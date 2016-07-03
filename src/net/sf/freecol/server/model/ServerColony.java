@@ -106,12 +106,9 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         Building building;
         List<BuildingType> buildingTypes = spec.getBuildingTypeList();
-        for (BuildingType buildingType : buildingTypes) {
-            if (buildingType.isAutomaticBuild()
-                || isAutomaticBuild(buildingType)) {
-                building = new ServerBuilding(getGame(), this, buildingType);
-                addBuilding(building);
-            }
+        for (BuildingType buildingType : transform(buildingTypes, bt ->
+                bt.isAutomaticBuild() || isAutomaticBuild(bt))) {
+            addBuilding(new ServerBuilding(getGame(), this, buildingType));
         }
         // Set up default production queues.  Do this after calling
         // addBuilding because that will check build queue integrity,
