@@ -343,21 +343,17 @@ public final class InGameController extends Controller {
      * @return The REF player.
      */
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
-        Nation refNation = serverPlayer.getNation().getREFNation();
-        Monarch monarch = serverPlayer.getMonarch();
-        ServerPlayer refPlayer = getFreeColServer().makeAIPlayer(refNation);
-        Europe europe = refPlayer.getEurope();
+        final Nation refNation = serverPlayer.getNation().getREFNation();
+        final Monarch monarch = serverPlayer.getMonarch();
+        final ServerPlayer refPlayer = getFreeColServer().makeAIPlayer(refNation);
+        final Europe europe = refPlayer.getEurope();
+        final Predicate<Tile> exploredPred = t ->
+            ((!t.isLand() || t.isCoastland() || t.getOwner() == serverPlayer)
+                && t.isExploredBy(serverPlayer));
         // Inherit rebel player knowledge of the seas, coasts, claimed
         // land but not full detailed scouting knowledge.
         Set<Tile> explore = new HashSet<>();
-        for (Tile t : getGame().getMap().getAllTiles()) {
-            if (!t.isExploredBy(serverPlayer)) continue;
-            if (!t.isLand()
-                || t.isCoastland()
-                || t.getOwner() == serverPlayer) {
-                explore.add(t);
-            }
-        }
+        getGame().getMap().forEachTile(exploredPred, t -> explore.add(t));
         refPlayer.exploreTiles(explore);
 
         // Trigger initial placement routine

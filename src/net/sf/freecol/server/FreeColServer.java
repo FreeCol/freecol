@@ -1057,9 +1057,7 @@ public final class FreeColServer {
                 }
             }
 
-            for (Tile tile : game.getMap().getAllTiles()) {
-                TerrainGenerator.encodeStyle(tile);
-            }
+            game.getMap().forEachTile(t -> TerrainGenerator.encodeStyle(t));
         }
         // end @compat 0.10.x
 

@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -199,25 +201,20 @@ public class SimpleMapGenerator implements MapGenerator {
         final boolean importRumours
             = mapOptions.getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
         if (importGame != null && importRumours) {
-            int nLCRs = 0;
-            for (Tile importTile : importGame.getMap().getAllTiles()) {
-                LostCityRumour rumour = importTile.getLostCityRumour();
-                // no rumor
-                if (rumour == null) continue;
-                int x = importTile.getX();
-                int y = importTile.getY();
-                if (map.isValid(x, y)) {
-                    final Tile t = map.getTile(x, y);
-                    rumour.setLocation(t);
-                    t.addLostCityRumour(rumour);
-                    nLCRs++;
-                }
-            }
-            if (nLCRs > 0) {
-                lb.add("Imported ", nLCRs, " lost city rumours.\n");
+            Set<LostCityRumour> lcrs = new HashSet<>();
+            importGame.getMap().forEachTile(Tile::hasLostCityRumour, iTile -> {
+                    final LostCityRumour lcr = iTile.getLostCityRumour();
+                    final Tile tile = map.getTile(iTile.getX(), iTile.getY());
+                    lcr.setLocation(tile);
+                    tile.addLostCityRumour(lcr);
+                    lcrs.add(lcr);
+                });
+            // If LCRs were imported then log and return, otherwise
+            // fall through and create them.
+            if (!lcrs.isEmpty()) {
+                lb.add("Imported ", lcrs.size(), " lost city rumours.\n");
                 return;
             }
-            // Otherwise fall through and create them
         }
 
         final int rumourNumber
@@ -253,88 +250,102 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     private boolean importIndianSettlements(Map map, LogBuilder lb) {
-        int nSettlements = 0;
-        
-        for (Player player : importGame.getLiveNativePlayerList()) {
-            Player indian = game.getPlayerByNationId(player.getNationId());
+        // First make sure all the players are present.
+        for (Player iPlayer : importGame.getLiveNativePlayerList()) {
+            Player indian = game.getPlayerByNationId(iPlayer.getNationId());
             if (indian == null) {
-                Nation nation = spec.getNation(player.getNationId());
+                Nation nation = spec.getNation(iPlayer.getNationId());
                 if (nation == null) {
-                    lb.add("Native nation ", player.getNationId(),
+                    lb.add("Native nation ", iPlayer.getNationId(),
                         " not found in spec.\n");
-                    continue;
+                } else {
+                    indian = new ServerPlayer(game, false, nation, null, null);
+                    lb.add("Imported new native nation ",
+                        iPlayer.getNationId(), ": ", indian.getId(), "\n");
+                    game.addPlayer(indian);
                 }
-                indian = new ServerPlayer(game, false, nation, null, null);
-                lb.add("Imported new native nation ", player.getNationId(),
-                    ": ", indian.getId(), "\n");
-                game.addPlayer(indian);
             } else {
-                lb.add("Found native nation ", player.getNationId(),
+                lb.add("Found native nation ", iPlayer.getNationId(),
                     " for import: ", indian.getId(), "\n");
             }
         }
-        for (Tile tile : importGame.getMap().getAllTiles()) {
-            IndianSettlement is = tile.getIndianSettlement();
-            if (is == null) continue;
-            Player indian = game.getPlayerByNationId(is.getOwner().getNationId());
-            ServerIndianSettlement sis
-                = new ServerIndianSettlement(game, indian, is.getName(),
-                    map.getTile(tile.getX(), tile.getY()), is.isCapital(),
-                    is.getLearnableSkill(), null);
+
+        // Make new settlements.
+        Set<IndianSettlement> newSettlements = new HashSet<>();
+        for (Tile iTile : transform(importGame.getMap().getAllTiles(),
+                                    t -> t.getIndianSettlement() != null)) {
+            final IndianSettlement is = iTile.getIndianSettlement();
+            if (is.getOwner() == null) continue;
+            final Player owner = game
+                .getPlayerByNationId(is.getOwner().getNationId());
+            if (owner == null) continue;
+            
+            final UnitType iSkill = is.getLearnableSkill();
+            ServerIndianSettlement sis = new ServerIndianSettlement(game,
+                owner, is.getName(),
+                map.getTile(iTile.getX(), iTile.getY()),
+                is.isCapital(),
+                ((iSkill == null) ? null : spec.getUnitType(iSkill.getId())),
+                null);
             sis.placeSettlement(false);
-            for (Tile t : is.getOwnedTiles()) {
-                map.getTile(t.getX(), t.getY())
-                    .changeOwnership(indian, sis);
+            for (Tile it : is.getOwnedTiles()) {
+                map.getTile(it.getX(), it.getY()).changeOwnership(owner, sis);
             }
-                
-            List<Unit> units = is.getUnitList();
-            if (units.isEmpty()) {
+
+            List<Unit> iUnits = is.getUnitList();
+            if (iUnits.isEmpty()) {
                 sis.addUnits(random);
             } else {
-                for (Unit unit : units) {
-                    UnitType t = spec.getUnitType(unit.getType().getId());
-                    if (t != null) {
-                        Unit u = new ServerUnit(game, sis, indian, t);
-                        sis.add(u);
-                        sis.addOwnedUnit(u);
+                for (Unit iu : iUnits) {
+                    UnitType it = spec.getUnitType(iu.getType().getId());
+                    if (it != null) {
+                        Unit su = new ServerUnit(game, sis, owner, it);
+                        sis.add(su);
+                        sis.addOwnedUnit(su);
                     }
                 }
             }
             
-            List<Goods> goods = is.getCompactGoods();
-            if (goods.isEmpty()) {
+            List<Goods> iGoods = is.getCompactGoods();
+            if (iGoods.isEmpty()) {
                 sis.addRandomGoods(random);
             } else {
-                for (Goods g : goods) {
-                    GoodsType t = spec.getGoodsType(g.getType().getId());
-                    if (t != null) {
-                        sis.addGoods(t, g.getAmount());
+                for (Goods ig : iGoods) {
+                    GoodsType it = spec.getGoodsType(ig.getType().getId());
+                    if (it != null) {
+                        sis.addGoods(it, ig.getAmount());
                     }
                 }
             }
-            sis.setWantedGoods(is.getWantedGoods());
-            indian.addSettlement(sis);
-            nSettlements++;
+            
+            sis.setWantedGoods(transform(is.getWantedGoods(), alwaysTrue(),
+                                         ig -> spec.getGoodsType(ig.getId()),
+                                         toListNoNulls()));
+
+            owner.addSettlement(sis);
+            newSettlements.add(sis);
         }
 
-        if (nSettlements > 0) {
-            for (Tile t : importGame.getMap().getAllTiles()) {
-                if (t.getOwner() == null) continue;
-                Player owner = game.getPlayerByNationId(t.getOwner()
-                    .getNationId());
-                if (owner == null) continue;
-                Tile tile = map.getTile(t.getX(), t.getY());
-                if (tile == null) continue;
-                tile.setOwner(owner);
-                if (tile.getOwningSettlement() != null) {
-                    String name = tile.getOwningSettlement().getName();
-                    Settlement is = game.getSettlementByName(name);
-                    tile.setOwningSettlement(is);
-                }
-            }
-        }
-        lb.add("Imported ", nSettlements, " native settlements.\n");
-        return nSettlements > 0;
+        /* This should no longer be needed.
+        if (!newSettlements.isEmpty()) {
+            importGame.getMap().forEachTile(iTile -> {
+                    final Tile tile = map.getTile(iTile.getX(), iTile.getY());
+                    if (tile == null) return;
+
+                    final Player iOwner = iTile.getOwner();
+                    final Player owner = (iOwner == null) ? null
+                        : game.getPlayerByNationId(iOwner.getNationId());
+                    tile.setOwner(owner);
+                    
+                    final Settlement iSettlement = iTile.getOwningSettlement();
+                    final Settlement settlement = (iSettlement == null) ? null
+                        : game.getSettlementByName(iSettlement.getName());
+                    tile.setOwningSettlement(settlement);
+                });
+        }*/
+        
+        lb.add("Imported ", newSettlements.size(), " native settlements.\n");
+        return !newSettlements.isEmpty();
     }
 
     /**
@@ -424,8 +435,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // order picking out as many as possible suitable tiles for
         // native settlements such that can be guaranteed at least one
         // layer of surrounding tiles to own.
-        List<Tile> allTiles = new ArrayList<>();
-        for (Tile t : map.getAllTiles()) allTiles.add(t);
+        List<Tile> allTiles = toList(map.getAllTiles());
         randomShuffle(logger, "All tile shuffle", allTiles, random);
         final int minDistance
             = spec.getRangeOption(GameOptions.SETTLEMENT_NUMBER).getValue();

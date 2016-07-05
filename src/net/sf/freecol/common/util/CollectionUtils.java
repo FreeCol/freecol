@@ -42,6 +42,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import net.sf.freecol.common.util.CachingFunction;
 
@@ -2187,6 +2188,26 @@ public class CollectionUtils {
             Collector.Characteristics.IDENTITY_FINISH);
     }
 
+    /**
+     * Convert an iterator to a stream.
+     *
+     * @param iterator The <code>Iterator</code> to convert.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T> Stream<T> toStream(Iterator<T> iterator) {
+        return toStream(() -> iterator);
+    }
+
+    /**
+     * Convert an iterable to a stream.
+     *
+     * @param iterable The <code>Iterable</code> to convert.
+     * @return The resulting <code>Stream</code>.
+     */
+    public static <T> Stream<T> toStream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
+    }
+    
     /**
      * Transform the contents of an array.
      *

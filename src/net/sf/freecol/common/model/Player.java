@@ -2832,11 +2832,9 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
             boolean[][] cST = (canSeeTiles != null) ? canSeeTiles
                 : new boolean[map.getWidth()][map.getHeight()];
-            for (Tile t : getGame().getMap().getAllTiles()) {
-                if (t != null) {
+            getGame().getMap().forEachTile(t -> {
                     cST[t.getX()][t.getY()] = hasExplored(t);
-                }
-            }
+                });
             return cST;
         }
 

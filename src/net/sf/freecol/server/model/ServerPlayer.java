@@ -682,12 +682,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Clean up remaining tile ownerships
-        for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (tile.getOwner() == this) {
-                tile.cacheUnseen();//+til
-                tile.changeOwnership(null, null);//-til
-                cs.add(See.perhaps().always(this), tile);
-            }
+        for (Tile t : transform(getGame().getMap().getAllTiles(),
+                                matchKeyEquals(this, Tile::getOwner))) {
+            t.cacheUnseen();//+til
+            t.changeOwnership(null, null);//-til
+            cs.add(See.perhaps().always(this), t);
         }
 
         // Remove units
@@ -974,11 +973,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public Set<Tile> exploreMap(boolean reveal) {
         Set<Tile> result = new HashSet<>();
-        for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (hasExplored(tile) != reveal) {
-                tile.setExplored(this, reveal);//-vis(this)
-                result.add(tile);
-            }
+        for (Tile t : transform(getGame().getMap().getAllTiles(),
+                                t -> hasExplored(t) != reveal)) {
+            t.setExplored(this, reveal);//-vis(this)
+            result.add(t);
         }
         invalidateCanSeeTiles();//+vis(this)
         if (!reveal) {
@@ -2188,9 +2186,8 @@ outer:  for (Effect effect : effects) {
 
             case "model.event.seeAllColonies":
                 visibilityChange = true;//-vis(this), can now see other colonies
-                for (Tile t : game.getMap().getAllTiles()) {
-                    Colony colony = t.getColony();
-                    if (colony == null) continue;
+                for (Colony colony : game.getAllColoniesList(null)) {
+                    final Tile t = colony.getTile();
                     Set<Tile> tiles = new HashSet<>();
                     if (exploreTile(t)) {
                         if (!hasAbility(Ability.SEE_ALL_COLONIES)) {

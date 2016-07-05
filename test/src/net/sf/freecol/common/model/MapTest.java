@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -188,7 +189,7 @@ public class MapTest extends FreeColTestCase {
         }
         
         int i = 0;
-        for (Tile t : map.getAllTiles()) {
+        for (Tile t : toList(map.getAllTiles())) {
             i++;
             assertTrue(allTiles.remove(t));
         }

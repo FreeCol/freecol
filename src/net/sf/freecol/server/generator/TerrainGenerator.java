@@ -982,12 +982,10 @@ public class TerrainGenerator {
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they
         // do not belong (like sugar in large rivers or tobacco on hills).
-        for (Tile tile : map.getAllTiles()) {
-            perhapsAddBonus(tile, !importBonuses);
-            if (!tile.isLand()) {
-                encodeStyle(tile);
-            }
-        }
+        map.forEachTile(t -> {
+                perhapsAddBonus(t, !importBonuses);
+                if (!t.isLand()) encodeStyle(t);
+            });
 
         // Final cleanups
         map.resetContiguity();

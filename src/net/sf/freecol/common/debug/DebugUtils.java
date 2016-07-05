@@ -587,7 +587,7 @@ public class DebugUtils {
         boolean problemDetected = false;
         LogBuilder lb = new LogBuilder(256);
         lb.add("Desynchronization detected\n");
-        for (Tile t : sMap.getAllTiles()) {
+        for (Tile t : toList(sMap.getAllTiles())) {
             if (!sPlayer.canSee(t)) continue;
             for (Unit u : transform(t.getUnits(), u ->
                     sPlayer.owns(u) || (!t.hasSettlement() && !u.isOnCarrier()))) {
