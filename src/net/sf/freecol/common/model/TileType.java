@@ -301,8 +301,8 @@ public final class TileType extends FreeColSpecObjectType {
                                                             String level) {
         List<ProductionType> good = new ArrayList<>(),
             better = new ArrayList<>();
-        for (ProductionType productionType : productionTypes) {
-            if (productionType.getUnattended() != unattended) continue;
+        for (ProductionType productionType : transform(productionTypes,
+                matchKey(unattended, ProductionType::getUnattended))) {
             if (productionType.appliesExactly(level)) {
                 better.add(productionType);
             } else if (productionType.appliesTo(level)) {
@@ -617,11 +617,10 @@ public final class TileType extends FreeColSpecObjectType {
                 String level = spec.getDifficultyLevel();
                 List<ProductionType> unattendedTypes
                     = getAvailableProductionTypes(true, level);
-                for (ProductionType productionType : unattendedTypes) {
-                    if (tileProduction == null
-                        || tileProduction.equals(productionType.getProductionLevel())) {
-                        productionType.addOutput(goods);
-                    }
+                for (ProductionType productionType : transform(unattendedTypes,
+                        pt -> (tileProduction == null
+                            || tileProduction.equals(pt.getProductionLevel())))) {
+                    productionType.addOutput(goods);
                 }
             } else {
                 productionTypes.add(new ProductionType(goods, false,
