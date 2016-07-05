@@ -83,7 +83,15 @@ public class Unit extends GoodsLocation
     public static final Comparator<Unit> typeRoleComparator
         = Comparator.comparing(Unit::getType)
             .thenComparing(Comparator.comparing(Unit::getRole));
-    
+
+    /**
+     * Comparator to rank settlements by accessibility by sea to Europe.
+     */
+    private static final Comparator<Settlement> settlementStartComparator
+        = cachingIntComparator(s ->
+            (s == null || !s.getTile().isHighSeasConnected()) ? INFINITY
+                : s.getTile().getHighSeasCount());
+
     /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
@@ -2607,11 +2615,8 @@ public class Unit extends GoodsLocation
         // Must be a land unit not on the map.  May have a carrier.
         // Get our nearest settlement to Europe, fallback to any other.
         final Player owner = getOwner();
-        final Comparator<Settlement> settlementComp = cachingIntComparator(s ->
-            ((s.getTile().isHighSeasConnected())
-                ? s.getTile().getHighSeasCount()
-                : INFINITY));
-        Settlement sett = minimize(owner.getSettlements(), settlementComp);
+        Settlement sett = minimize(owner.getSettlements(),
+                                   settlementStartComparator);
         if (sett == null) sett = first(owner.getSettlements());
         if (sett != null) return sett;
 
@@ -2619,7 +2624,7 @@ public class Unit extends GoodsLocation
         // rebel colony.  Prefer the closest port.
         if (owner.isREF()) {
             return minimize(flatten(owner.getRebels(), Player::getSettlements),
-                            settlementComp);
+                            settlementStartComparator);
         }
 
         // Desperately find the nearest land to the entry location.
@@ -2685,6 +2690,24 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a comparator to rank locations by proximity to a start location,
+     * using this unit+optional carrier and cost decider.
+     *
+     * @param start The starting <code>Location</code>.
+     * @param carrier An optional carrier <code>Unit</code>.
+     * @param costDecider An option <code>CostDecider</code>.
+     * @return A suitable <code>Comparator</code>.
+     */
+    public Comparator<Tile> getPathComparator(final Location start,
+                                              final Unit carrier,
+                                              final CostDecider costDecider) {
+        return cachingIntComparator((Tile t) -> {
+                PathNode p = this.findPath(start, t, carrier, costDecider);
+                return (p == null) ? INFINITY : p.getTotalTurns();
+            });
+    }
+
+    /**
      * Finds the fastest path from the current location to the
      * specified one.  No carrier is provided, and the default cost
      * decider for this unit is used.
@@ -2730,19 +2753,14 @@ public class Unit extends GoodsLocation
     public PathNode findPathToNeighbour(Location start, Tile end, Unit carrier,
                                         CostDecider costDecider) {
         final Player owner = getOwner();
-        int bestValue = INFINITY;
-        PathNode best = null;
-        for (Tile t : end.getSurroundingTiles(1)) {
-            if (isTileAccessible(t)
-                && (t.getFirstUnit() == null || owner.owns(t.getFirstUnit()))) {
-                PathNode p = findPath(start, t, carrier, costDecider);
-                if (p != null && bestValue > p.getTotalTurns()) {
-                    bestValue = p.getTotalTurns();
-                    best = p;
-                }
-            }
-        }
-        return best;
+        final Predicate<Tile> endPred = t ->
+            (isTileAccessible(t)
+                && (t.getFirstUnit() == null || owner.owns(t.getFirstUnit())));
+
+        Tile best = minimize(end.getSurroundingTiles(1, 1), endPred,
+            getPathComparator(start, carrier, costDecider));
+        return (best == null) ? null
+            : this.findPath(start, best, carrier, costDecider);
     }
 
     /**
@@ -2928,10 +2946,14 @@ public class Unit extends GoodsLocation
         final Tile srcTile = getTile();
         final Tile dstTile = dst.getTile();
         final int dstCont = (dstTile == null) ? -1 : dstTile.getContiguity();
-        PathNode path, best = null;
-        int value, bestValue = INFINITY;
-        int type;
+        final Comparator<Settlement> settlementComparator
+            = cachingIntComparator(s -> {
+                    PathNode p = findPath(s);
+                    return (p == null) ? INFINITY
+                    : p.getTotalTurns() + dstTile.getDistanceTo(s.getTile());
+                });
 
+        int type;
         if (isNaval()) {
             if (!srcTile.isHighSeasConnected()) {
                 // On a lake!  FIXME: do better
@@ -2958,6 +2980,8 @@ public class Unit extends GoodsLocation
             }
         }
 
+        PathNode path = null;
+        Settlement sett;
         switch (type) {
         case 0:
             // No progress possible.
@@ -2965,41 +2989,30 @@ public class Unit extends GoodsLocation
         case 1:
             // Starting on a river, probably blocked in there.
             // Find the settlement that most reduces the high seas count.
-            best = search(getLocation(),
+            path = search(getLocation(),
                           GoalDeciders.getReduceHighSeasCountGoalDecider(this),
                           null, INFINITY, null);
             break;
         case 2:
             // Ocean travel required, destination blocked.
             // Find the closest available connected port.
-            for (Settlement s : getOwner().getSettlementList()) {
-                if (s != ignoreSrc && s != ignoreDst && s.isConnectedPort()
-                    && (path = findPath(s)) != null) {
-                    value = path.getTotalTurns()
-                        + dstTile.getDistanceTo(s.getTile());
-                    if (bestValue > value) {
-                        bestValue = value;
-                        best = path;
-                    }
-                }
-            }
+            final Predicate<Settlement> portPredicate = s ->
+                s != ignoreSrc && s != ignoreDst && s.isConnectedPort();
+            sett = minimize(getOwner().getSettlements(), portPredicate,
+                            settlementComparator);
+            path = (sett == null) ? null : this.findPath(sett);
             break;
         case 3:
             // Land travel.  Find nearby settlement with correct contiguity.
-            for (Settlement s : getOwner().getSettlementList()) {
-                if (s != ignoreSrc && s != ignoreDst
-                    && s.getTile().getContiguity() == dstCont
-                    && (path = findPath(s)) != null) {
-                    value = path.getTotalTurns()
-                        + dstTile.getDistanceTo(s.getTile());
-                    if (bestValue > value) {
-                        bestValue = value;
-                        best = path;
-                    }
-                }
-            }
+            final Predicate<Settlement> contiguityPred = s ->
+                s != ignoreSrc && s != ignoreDst
+                    && s.getTile().getContiguity() == dstCont;
+            sett = minimize(getOwner().getSettlements(), contiguityPred,
+                            settlementComparator);
+            path = (sett == null) ? null : this.findPath(sett);
+            break;
         }
-        return (best != null) ? best
+        return (path != null) ? path
             : findOurNearestSettlement(false, INFINITY, false);
     }
 
