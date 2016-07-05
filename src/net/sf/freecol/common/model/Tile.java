@@ -1923,11 +1923,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
-        for (Player p : getGame().getLiveEuropeanPlayerList(player)) {
-            if (!p.canSee(this) && getCachedTile(p) == this) {
-                if (copied == null) copied = getTileToCache();
-                setCachedTile(p, copied);
-            }
+        for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
+                p -> !p.canSee(this) && getCachedTile(p) == this)) {
+            if (copied == null) copied = getTileToCache();
+            setCachedTile(p, copied);
         }
     }
 
