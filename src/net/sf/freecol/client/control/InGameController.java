@@ -2219,7 +2219,7 @@ public final class InGameController extends FreeColClientHolder {
         for (Goods g : unit.getCompactGoods()) {
             AbstractGoods ag = find(toLoad, AbstractGoods.matches(g.getType()));
             if (ag == null) { // Excess goods on board, failed unload?
-                unexpected.addStringTemplate("%goods%", g.getLabel());
+                unexpected.addStringTemplate(g.getLabel());
             } else {
                 int goodsAmount = g.getAmount();
                 if (ag.getAmount() <= goodsAmount) { // At capacity
