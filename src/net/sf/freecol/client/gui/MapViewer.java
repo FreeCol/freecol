@@ -1965,6 +1965,7 @@ public final class MapViewer extends FreeColClientHolder {
             && !player.owns(unit)
             && unit.getOwner().isAI()
             && getFreeColServer() != null
+            && getFreeColServer().getAIMain() != null
             && (au = getFreeColServer().getAIMain().getAIUnit(unit)) != null) {
             if (FreeColDebugger.debugShowMission()) {
                 g.setColor(Color.WHITE);
