@@ -20,8 +20,11 @@
 package net.sf.freecol.common.model.pathfinding;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColObject;
@@ -32,6 +35,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -298,9 +302,10 @@ public final class GoalDeciders {
      * @return A suitable <code>GoalDecider</code>.
      */
     public static GoalDecider getDisembarkGoalDecider(final Tile target) {
+        final double NO_DANGER_BONUS = 1000.0;
+        
         return new GoalDecider() {
             private double bestScore = -1.0;
-            private boolean goalDangerous = true;
             private PathNode goal = null;
 
             @Override
@@ -309,44 +314,34 @@ public final class GoalDeciders {
             public boolean hasSubGoals() { return true; }
             @Override
             public boolean check(Unit u, PathNode pathNode) {
-                Tile tile = pathNode.getTile();
+                final Tile tile = pathNode.getTile();
                 if (tile == null || !tile.isLand() || !tile.isEmpty()
                     || tile.hasSettlement()) return false;
+
                 final Player owner = u.getOwner();
-                boolean found = false, danger = false;
-                for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
-                    if (!t.isHighSeasConnected() || t.isLand()) continue;
-                    for (Tile t2 : t.getSurroundingTiles(1)) {
-                        Settlement settlement = t2.getSettlement();
-                        if (settlement != null
-                            && !owner.owns(settlement)
-                            && settlement.hasAbility(Ability.BOMBARD_SHIPS)
-                            && (owner.atWarWith(settlement.getOwner())
-                                || u.hasAbility(Ability.PIRACY))) {
-                            danger = true;
-                            break;
-                        }
-                    }
-                    if (goalDangerous) {
-                        found = true;
-                        if (!danger) {
-                            // Found first non-dangerous tile, reset scores
-                            goalDangerous = false;
-                            bestScore = -1.0f;
-                        }
-                    } else {
-                        found = !danger; // Only accept non-dangerous tiles
-                    }
-                }
-                if (found) {
-                    double distance = 1.0 + u.getGame().getMap()
-                        .getDistance(target, tile);
-                    double score = tile.getDefenceValue() / distance;
-                    if (bestScore < score) {
-                        bestScore = score;
-                        goal = pathNode;
-                        return true;
-                    }
+                final Map map = u.getGame().getMap();
+                final Predicate<Tile> dockPred = t ->
+                    t.isHighSeasConnected() && !t.isLand();
+                final Predicate<Tile> dangerPred = t -> {
+                    Settlement settlement = t.getSettlement();
+                    return (settlement != null
+                        && !owner.owns(settlement)
+                        && settlement.hasAbility(Ability.BOMBARD_SHIPS)
+                        && (owner.atWarWith(settlement.getOwner())
+                            || u.hasAbility(Ability.PIRACY)));
+                };
+                final ToDoubleFunction<Tile> tileScorer = cacheDouble(t ->
+                    (t.getDefenceValue() / (1.0 + map.getDistance(target, t))
+                        + ((none(t.getSurroundingTiles(1, 1), dangerPred))
+                            ? NO_DANGER_BONUS : 0.0)));
+                Tile best = maximize(tile.getSurroundingTiles(1, 1), dockPred,
+                                     Comparator.comparingDouble(tileScorer));
+                double score;
+                if (best != null
+                    && (score = tileScorer.applyAsDouble(best)) > bestScore) {
+                    bestScore = score;
+                    goal = pathNode;
+                    return true;
                 }
                 return false;
             }
@@ -469,13 +464,12 @@ public final class GoalDeciders {
                     public boolean check(Unit u, PathNode path) {
                         Tile tile = path.getTile();
                         if (tile == null) return false;
-                        for (Location loc : locs) {
-                            if (tile.isAdjacent(loc.getTile())) {
-                                PathNode p = results.get(loc);
-                                if (p == null
-                                    || p.getCost() > path.getCost()) {
-                                    results.put(loc, path);
-                                }
+                        for (Location loc : transform(locs,
+                                l -> tile.isAdjacent(l.getTile()))) {
+                            PathNode p = results.get(loc);
+                            if (p == null
+                                || p.getCost() > path.getCost()) {
+                                results.put(loc, path);
                             }
                         }
                         return false;
