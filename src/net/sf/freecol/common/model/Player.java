@@ -2468,14 +2468,26 @@ public class Player extends FreeColGameObject implements Nameable {
      * a missionary from a given player.
      *
      * @param p The <code>Player</code>.
-     * @return A list of the <code>IndianSettlement<code>s with suitable
-     *     missionaries.
+     * @return A list of the <code>IndianSettlement<code>s with a matching
+     *     missionary.
      */
-    public List<IndianSettlement> getIndianSettlementsWithMissionary(Player p) {
+    public List<IndianSettlement> getIndianSettlementsWithMissionaryList(Player p) {
         final Predicate<Settlement> isPred = s ->
             s instanceof IndianSettlement
                 && ((IndianSettlement)s).hasMissionary(p);
         return transform(getSettlements(), isPred, s -> (IndianSettlement)s);
+    }            
+        
+    /**
+     * Get a stream of all indian settlements owned by this player with
+     * a missionary from a given player.
+     *
+     * @param p The <code>Player</code>.
+     * @return A stream of the <code>IndianSettlement<code>s with a matching
+     *     missionary.
+     */
+    public Stream<IndianSettlement> getIndianSettlementsWithMissionary(Player p) {
+        return getIndianSettlementsWithMissionaryList(p).stream();
     }            
         
     /**

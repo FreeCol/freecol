@@ -2898,7 +2898,7 @@ outer:  for (Effect effect : effects) {
 
         // Burn down the missions
         boolean here = is.hasMissionary(attackerPlayer);
-        for (IndianSettlement s : nativePlayer.getIndianSettlementsWithMissionary(attackerPlayer)) {
+        for (IndianSettlement s : nativePlayer.getIndianSettlementsWithMissionaryList(attackerPlayer)) {
             ((ServerIndianSettlement)s).csKillMissionary(null, cs);
         }
         // Backtrack on updating this tile, avoiding duplication in csCombat

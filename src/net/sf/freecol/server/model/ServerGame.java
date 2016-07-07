@@ -417,21 +417,20 @@ public class ServerGame extends Game implements ServerModelObject {
         Set<Tile> updated = new HashSet<>();
         ServerPlayer strongest = (ServerPlayer)strongAI;
         ServerPlayer weakest = (ServerPlayer)weakAI;
-        for (Player player : getLiveNativePlayerList()) {
-            for (IndianSettlement is
-                     : player.getIndianSettlementsWithMissionary(weakest)) {
+        forEach(flatten(getLiveNativePlayers(),
+                        p -> p.getIndianSettlementsWithMissionary(weakest)),
+            is -> {
                 lb.add(" ", is.getName(), "(mission)");
                 is.getTile().cacheUnseen(strongest);//+til
                 tiles.add(is.getTile());
                 is.setContacted(strongest);//-til
                 ServerUnit missionary = (ServerUnit)is.getMissionary();
-                if (weakest.csChangeOwner(missionary, strongest,
-                        ChangeType.CAPTURE, null, cs)) {//-vis(both),-til
+                if (weakest.csChangeOwner(missionary, strongest,//-vis(both),-til
+                                          ChangeType.CAPTURE, null, cs)) {
                     is.getTile().updateIndianSettlement(strongest);
                     cs.add(See.perhaps().always(strongest), is);
                 }
-            }
-        }
+            });
         for (Colony c : weakest.getColonyList()) {
             updated.addAll(c.getOwnedTiles());
             ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
