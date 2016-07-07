@@ -441,22 +441,17 @@ public class ServerColony extends Colony implements ServerModelObject {
         // production probably means we forgot to reset the build
         // queue.  Thus, if hammers are being produced it is worth
         // warning about, but not if producing tools.
-        for (BuildQueue<?> queue : queues) {
-            if (queue.isEmpty()) {
-                for (GoodsType g : spec.getGoodsTypeList()) {
-                    if (g.isBuildingMaterial()
+        for (BuildQueue<?> queue : transform(queues, BuildQueue::isEmpty)) {
+            if (none(spec.getGoodsTypeList(), g ->
+                    (g.isBuildingMaterial()
                         && !g.isRawMaterial()
                         && !g.isBreedable()
                         && getAdjustedNetProductionOf(g) > 0
-                        && neededForBuildableType(g)) {
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(MessageType.BUILDING_COMPLETED,
-                                             "model.colony.notBuildingAnything",
-                                             this)
-                                .addName("%colony%", getName()));
-                        break;
-                    }
-                }
+                        && neededForBuildableType(g)))) {
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(MessageType.BUILDING_COMPLETED,
+                        "model.colony.notBuildingAnything", this)
+                        .addName("%colony%", getName()));
             }
         }
 
@@ -643,17 +638,15 @@ public class ServerColony extends Colony implements ServerModelObject {
             case NONE:
                 return buildable;
             case NOT_BUILDING:
-                for (GoodsType goodsType : spec.getGoodsTypeList()) {
-                    if (goodsType.isBuildingMaterial()
-                        && !goodsType.isStorable()
-                        && getTotalProductionOf(goodsType) > 0) {
-                        // Production is idle
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(MessageType.WARNING,
-                                             "model.colony.cannotBuild",
-                                             this)
-                                .addName("%colony%", getName()));
-                    }
+                for (GoodsType goodsType : transform(spec.getGoodsTypeList(),
+                        gt -> (gt.isBuildingMaterial()
+                            && !gt.isStorable()
+                            && getTotalProductionOf(gt) > 0))) {
+                    // Production is idle
+                    cs.addMessage(See.only(owner),
+                        new ModelMessage(MessageType.WARNING,
+                                         "model.colony.cannotBuild", this)
+                            .addName("%colony%", getName()));
                 }
                 return null;
                 
