@@ -32,8 +32,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -573,16 +574,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // It is necessary to still have a carrier.
         final Europe europe = getEurope();
+        final ToIntFunction<UnitType> unitPricer = ut -> {
+            int p = europe.getUnitPrice(ut);
+            return (p == UNDEFINED) ? Integer.MAX_VALUE : p;
+        };
         int goldNeeded = 0;
         if (!hasCarrier) {
-            int price = Integer.MAX_VALUE;
-            if (europe != null) {
-                for (UnitType type
-                         : spec.getUnitTypesWithAbility(Ability.NAVAL_UNIT)) {
-                    int p = europe.getUnitPrice(type);
-                    if (p != UNDEFINED && p < price) price = p;
-                }
-            }
+            int price = (europe == null) ? Integer.MAX_VALUE
+                : min(spec.getUnitTypesWithAbility(Ability.NAVAL_UNIT),
+                      unitPricer);
             if (price == Integer.MAX_VALUE || !checkGold(price)) {
                 logger.info(getName() + " dead, can not buy carrier.");
                 return IS_DEAD;
@@ -599,11 +599,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return IS_DEAD;
         }
         UnitType unitType = null;
-        int price = europe.getRecruitPrice();
-        for (UnitType type : spec.getUnitTypesWithAbility(Ability.FOUND_COLONY)) {
-            int p = europe.getUnitPrice(type);
-            if (p != UNDEFINED && p < price) price = p;
-        }
+        int price = Math.min(europe.getRecruitPrice(),
+                             min(spec.getUnitTypesWithAbility(Ability.FOUND_COLONY),
+                                 unitPricer));
         goldNeeded += price;
         if (checkGold(goldNeeded)) {
             logger.info(getName() + " alive, can buy colonist.");
@@ -812,15 +810,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         final int age = game.getAge();
         EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
             = new EnumMap<>(FoundingFatherType.class);
-        for (FoundingFather father : spec.getFoundingFathers()) {
-            if (!hasFather(father) && father.isAvailableTo(this)) {
-                FoundingFatherType type = father.getType();
-                List<RandomChoice<FoundingFather>> rc = choices.get(type);
-                if (rc == null) rc = new ArrayList<>();
-                int weight = father.getWeight(age);
-                rc.add(new RandomChoice<>(father, weight));
-                choices.put(father.getType(), rc);
-            }
+        for (FoundingFather father : transform(spec.getFoundingFathers(),
+                ff -> !hasFather(ff) && ff.isAvailableTo(this))) {
+            FoundingFatherType type = father.getType();
+            List<RandomChoice<FoundingFather>> rc = choices.get(type);
+            if (rc == null) rc = new ArrayList<>();
+            int weight = father.getWeight(age);
+            rc.add(new RandomChoice<>(father, weight));
+            choices.put(father.getType(), rc);
         }
 
         // Select one from each father type
@@ -877,21 +874,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         
         int bonus = 0;
-        for (HistoryEvent h : getHistory()) {
-            if (getId().equals(h.getPlayerId())) {
-                switch (h.getEventType()) {
-                case INDEPENDENCE:
-                    switch (h.getScore()) {
-                    case 0: bonus = SCORE_INDEPENDENCE_BONUS_FIRST; break;
-                    case 1: bonus = SCORE_INDEPENDENCE_BONUS_SECOND; break;
-                    case 2: bonus = SCORE_INDEPENDENCE_BONUS_THIRD; break;
-                    default: bonus = 0; break;
-                    }
-                    break;
-                default:
-                    this.score += h.getScore();
-                    break;
+        for (HistoryEvent h : transform(getHistory(), matchKeyEquals(getId(), HistoryEvent::getPlayerId))) {
+            switch (h.getEventType()) {
+            case INDEPENDENCE:
+                switch (h.getScore()) {
+                case 0: bonus = SCORE_INDEPENDENCE_BONUS_FIRST; break;
+                case 1: bonus = SCORE_INDEPENDENCE_BONUS_SECOND; break;
+                case 2: bonus = SCORE_INDEPENDENCE_BONUS_THIRD; break;
+                default: bonus = 0; break;
                 }
+                    break;
+            default:
+                this.score += h.getScore();
+                break;
             }
         }
         this.score += (this.score * bonus) / 100;
@@ -1159,15 +1154,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
         randomShuffle(logger, "Land load", landUnits, random);
         LogBuilder lb = new LogBuilder(256);
         lb.mark();
-        landUnit: for (Unit unit : landUnits) {
-            for (Unit carrier : navalUnits) {
-                if (carrier.canAdd(unit)) {
-                    unit.setLocation(carrier);//-vis(owner)
-                    lb.add(unit, " -> ", carrier, ", ");
-                    continue landUnit;
-                }
+        for (Unit unit : landUnits) {
+            Unit carrier = find(navalUnits, u -> u.canAdd(unit));
+            if (carrier != null) {
+                unit.setLocation(carrier);//-vis(owner)
+                lb.add(unit, " -> ", carrier, ", ");
+            } else {
+                leftOver.add(unit);
             }
-            leftOver.add(unit);
         }
         if (lb.grew("Load ships: ")) {
             lb.shrink(", ");
@@ -1212,14 +1206,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public boolean csFlushMarket(ChangeSet cs) {
         Market market = getMarket();
         if (market == null) return false;
+        final Specification spec = getSpecification();
         boolean ret = false;
         StringBuilder sb = new StringBuilder(32);
         sb.append("Flush market for ").append(getId()).append(':');
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (csFlushMarket(type, cs)) {
-                sb.append(' ').append(type.getId());
-                ret = true;
-            }
+        for (GoodsType goodsType : transform(spec.getGoodsTypeList(),
+                                             gt -> csFlushMarket(gt, cs))) {
+            sb.append(' ').append(goodsType.getId());
+            ret = true;
         }
         if (ret) logger.finest(sb.toString());
         return ret;
@@ -1571,11 +1565,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 changed = true;
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
-                for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
-                    for (Modifier modifier : iterable(effect.getObject().getModifiers())) {
-                        cs.addFeatureChange(this, this, modifier, false);
-                    }
-                }
+                forEach(flatten(bankruptcy.getEffects(),
+                                e -> e.getObject().getModifiers()), m -> {
+                        cs.addFeatureChange(this, this, m, false);
+                    });
                 cs.addMessage(See.only(this),
                     new ModelMessage(MessageType.GOVERNMENT_EFFICIENCY,
                                      "model.player.disaster.bankruptcy.stop",
@@ -1862,23 +1855,21 @@ outer:  for (Effect effect : effects) {
                                              goodsTypes, random)).isStorable());
 
         // Remove standard amount, and the extra amount.
-        for (GoodsType type : goodsTypes) {
-            if (market.hasBeenTraded(type)) {
-                boolean add = market.getAmountInMarket(type)
-                    < type.getInitialAmount();
-                int amount = game.getTurn().getNumber() / 10;
-                if (type == extraType) amount = 2 * amount + 1;
-                if (amount <= 0) continue;
-                amount = randomInt(logger, "Market adjust " + type,
-                                   random, amount);
-                if (!add) amount = -amount;
-                market.addGoodsToMarket(type, amount);
-                logger.finest(getName() + " adjust of " + amount
-                              + " " + type
-                              + ", total: " + market.getAmountInMarket(type)
-                              + ", initial: " + type.getInitialAmount());
-                addExtraTrade(new AbstractGoods(type, amount));
-            }
+        for (GoodsType type : transform(goodsTypes,
+                                        gt -> market.hasBeenTraded(gt))) {
+            boolean add = market.getAmountInMarket(type)
+                < type.getInitialAmount();
+            int amount = game.getTurn().getNumber() / 10;
+            if (type == extraType) amount = 2 * amount + 1;
+            if (amount <= 0) continue;
+            amount = randomInt(logger, "Market adjust " + type, random, amount);
+            if (!add) amount = -amount;
+            market.addGoodsToMarket(type, amount);
+            logger.finest(getName() + " adjust of " + amount
+                + " " + type
+                + ", total: " + market.getAmountInMarket(type)
+                + ", initial: " + type.getInitialAmount());
+            addExtraTrade(new AbstractGoods(type, amount));
         }
 
         flushExtraTrades(random);
@@ -2003,11 +1994,10 @@ outer:  for (Effect effect : effects) {
             }
 
             // Calm down a bit at the whole-tribe level.
-            for (Player enemy : game.getLiveEuropeanPlayerList(this)) {
-                if (getTension(enemy).getValue() > 0) {
-                    int change = -getTension(enemy).getValue()/100 - 4;
-                    csModifyTension(enemy, change, cs);//+til
-                }
+            for (Player enemy : transform(game.getLiveEuropeanPlayers(this),
+                                          p -> getTension(p).getValue() > 0)) {
+                int change = -getTension(enemy).getValue()/100 - 4;
+                csModifyTension(enemy, change, cs);//+til
             }
 
             // Now collect the settlements that changed.
@@ -2155,15 +2145,17 @@ outer:  for (Effect effect : effects) {
         // Some events are special
         for (Event event : father.getEvents()) {
             String eventId = event.getId();
-            if ("model.event.resetBannedMissions".equals(eventId)) {
+            switch (eventId) {
+            case "model.event.resetBannedMissions":
                 for (Player p : game.getLiveNativePlayerList()) {
                     if (p.missionsBanned(this)) {
                         p.removeMissionBan(this);
                         cs.add(See.only(this), p);
                     }
                 }
+                break;
 
-            } else if ("model.event.resetNativeAlarm".equals(eventId)) {
+            case "model.event.resetNativeAlarm":
                 for (Player p : transform(game.getLiveNativePlayers(),
                                           p -> p.hasContacted(this))) {
                     p.setTension(this, new Tension(Tension.TENSION_MIN));
@@ -2175,8 +2167,9 @@ outer:  for (Effect effect : effects) {
                     }
                     csChangeStance(Stance.PEACE, (ServerPlayer)p, true, cs);
                 }
+                break;
 
-            } else if ("model.event.boycottsLifted".equals(eventId)) {
+            case "model.event.boycottsLifted":
                 Market market = getMarket();
                 for (GoodsType goodsType : spec.getGoodsTypeList()) {
                     if (market.getArrears(goodsType) > 0) {
@@ -2184,14 +2177,16 @@ outer:  for (Effect effect : effects) {
                         cs.add(See.only(this), market.getMarketData(goodsType));
                     }
                 }
+                break;
 
-            } else if ("model.event.freeBuilding".equals(eventId)) {
+            case "model.event.freeBuilding":
                 BuildingType type = spec.getBuildingType(event.getValue());
                 for (Colony c : getColonyList()) {
                     ((ServerColony)c).csFreeBuilding(type, cs);
                 }
+                break;
 
-            } else if ("model.event.seeAllColonies".equals(eventId)) {
+            case "model.event.seeAllColonies":
                 visibilityChange = true;//-vis(this), can now see other colonies
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
@@ -2217,15 +2212,21 @@ outer:  for (Effect effect : effects) {
                     cs.add(See.only(this), tiles);
                 }
 
-            } else if ("model.event.newRecruits".equals(eventId)
-                       && europe != null) {
-                europeDirty = europe.replaceRecruits(random);
+            case "model.event.newRecruits":
+                if (europe != null) {
+                    europeDirty = europe.replaceRecruits(random);
+                }
+                break;
 
-            } else if ("model.event.movementChange".equals(eventId)) {
+            case "model.event.movementChange":
                 for (Unit u : transform(getUnits(), u -> u.getMovesLeft() > 0)) {
                     u.setMovesLeft(u.getInitialMovesLeft());
                     cs.addPartial(See.only(this), u, "movesLeft");
                 }
+                break;
+
+            default:
+                break;
             }
         }
 
@@ -3739,19 +3740,18 @@ outer:  for (Effect effect : effects) {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csLoseLocation(Location loc, ChangeSet cs) {
-        for (TradeRoute tr : getTradeRoutes()) {
-            if (tr.removeMatchingStops(loc)) {
-                for (Unit u : tr.getAssignedUnits()) {
-                    u.setTradeRoute(null);
-                    cs.add(See.only(this), u);
-                }
-                cs.addMessage(See.only(this),
-                    new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                     "combat.tradeRouteSuspended", this)
-                        .addName("%route%", tr.getName())
-                        .addStringTemplate("%stop%", loc.getLocationLabel()));
-                cs.add(See.only(this), tr);
+        for (TradeRoute tr : transform(getTradeRoutes(),
+                                       r -> r.removeMatchingStops(loc))) {
+            for (Unit u : tr.getAssignedUnits()) {
+                u.setTradeRoute(null);
+                cs.add(See.only(this), u);
             }
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                    "combat.tradeRouteSuspended", this)
+                    .addName("%route%", tr.getName())
+                    .addStringTemplate("%stop%", loc.getLocationLabel()));
+            cs.add(See.only(this), tr);
         }
     }
 
@@ -3858,7 +3858,7 @@ outer:  for (Effect effect : effects) {
             // Have any abilities been removed that gate other production,
             // e.g. removing docks should shut down fishing.
             for (WorkLocation wl : transform(colony.getAllWorkLocations(),
-                    w -> !w.isEmpty() && !w.canBeWorked())) {
+                                             w -> !w.isEmpty() && !w.canBeWorked())) {
                 changed |= colony.ejectUnits(wl, wl.getUnitList());//-til
                 logger.info("Units ejected from workLocation "
                     + wl.getId() + " on loss of "
