@@ -48,6 +48,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -1938,11 +1939,10 @@ public final class Specification {
         }
 
         // Nation FOUND_COLONY -> FOUNDS_COLONIES
-        for (EuropeanNationType ent : europeanNationTypes) {
-            if (ent.hasAbility(Ability.FOUND_COLONY)) {
-                ent.removeAbilities(Ability.FOUND_COLONY);
-                ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
-            }
+        for (EuropeanNationType ent : transform(europeanNationTypes,
+                nt -> nt.hasAbility(Ability.FOUND_COLONY))) {
+            ent.removeAbilities(Ability.FOUND_COLONY);
+            ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
         }
 
         // Fix REF roles, soldier -> infantry, dragoon -> cavalry
@@ -2007,65 +2007,49 @@ public final class Specification {
         // ability to have man-o-war.  Older specs used
         // INDEPENDENCE_DECLARED but we can not directly use that or
         // the REF gets access to colonialRegulars.
-        for (NationType nt : europeanNationTypes) {
-            if (!nt.isREF()) continue;
-            if (!nt.hasAbility(Ability.INDEPENDENT_NATION)) {
-                nt.addAbility(new Ability(Ability.INDEPENDENT_NATION));
-            }
+        for (NationType ent : transform(europeanNationTypes,
+                nt -> nt.isREF() && !nt.hasAbility(Ability.INDEPENDENT_NATION))) {
+            ent.addAbility(new Ability(Ability.INDEPENDENT_NATION));
         }
 
         // Resource type modifiers had the wrong priority
-        for (ResourceType rt : resourceTypeList) {
-            for (Modifier m : iterable(rt.getModifiers())) {
+        forEach(flatten(resourceTypeList, ResourceType::getModifiers), m -> {
                 m.setModifierIndex(Modifier.RESOURCE_PRODUCTION_INDEX);
-            }
-        }
+            });
 
         // Unit type indexes moved into the spec
-        for (UnitType ut : unitTypeList) {
-            for (Modifier m : iterable(ut.getModifiers())) {
-                if (allTypes.get(m.getId()) instanceof GoodsType) {
-                    m.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
-                }
-            }
+        for (Modifier mod : transform(flatten(unitTypeList, UnitType::getModifiers),
+                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+            mod.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
         }
 
         // Father production modifiers have moved to the spec
-        for (FoundingFather ff : foundingFathers) {
-            for (Modifier m : iterable(ff.getModifiers())) {
-                if (allTypes.get(m.getId()) instanceof GoodsType) {
-                    m.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
-                }
-            }
+        for (Modifier mod : transform(flatten(foundingFathers,
+                                              FoundingFather::getModifiers),
+                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+            mod.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
         }
 
         // Tile improvement type modifier index has moved to the spec
-        for (TileImprovementType ti : tileImprovementTypeList) {
-            for (Modifier m : iterable(ti.getModifiers())) {
-                if (allTypes.get(m.getId()) instanceof GoodsType) {
-                    m.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
-                }
-            }
+        for (Modifier mod : transform(flatten(tileImprovementTypeList, TileImprovementType::getModifiers),
+                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+            mod.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
         }
 
         // Building type modifier indexes have moved to the spec
         for (BuildingType bt : buildingTypeList) {
-            for (Modifier m : iterable(bt.getModifiers())) {
-                if (allTypes.get(m.getId()) instanceof GoodsType) {
-                    m.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
-                        ? Modifier.AUTO_PRODUCTION_INDEX
-                        : Modifier.BUILDING_PRODUCTION_INDEX);
-                }
+            for (Modifier mod : transform(bt.getModifiers(),
+                    m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+                mod.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
+                    ? Modifier.AUTO_PRODUCTION_INDEX
+                    : Modifier.BUILDING_PRODUCTION_INDEX);
             }
         }
 
         // European nation type production modifier indexes moved to the spec
-        for (EuropeanNationType et : europeanNationTypes) {
-            for (Modifier m : iterable(et.getModifiers())) {
-                if (allTypes.get(m.getId()) instanceof GoodsType) {
-                    m.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
-                }
-            }
+        for (Modifier mod : transform(flatten(europeanNationTypes, EuropeanNationType::getModifiers),
+                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+            mod.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
         }
 
         // TownHall, Chapel et al now have unattended production types
@@ -2082,19 +2066,18 @@ public final class Specification {
         }
         GoodsType crossesType = getGoodsType("model.goods.crosses");
         int a = 1;
-        for (BuildingType bt : new BuildingType[] {
-                getBuildingType("model.building.chapel"),
-                getBuildingType("model.building.church"),
-                getBuildingType("model.building.cathedral") }) {
-            if (bt.hasModifier("model.goods.crosses")) {
-                AbstractGoods ag = new AbstractGoods(crossesType, a);
-                a++;
-                ProductionType pt = new ProductionType(ag, true, null);
-                bt.addProductionType(pt);
-                bt.removeModifiers("model.goods.crosses");
-                logger.info("Added backward compatibility production " + pt
-                    + " to " + bt);
-            }
+        for (BuildingType bt : transform(new BuildingType[] {
+                    getBuildingType("model.building.chapel"),
+                    getBuildingType("model.building.church"),
+                    getBuildingType("model.building.cathedral") },
+                bt -> bt.hasModifier("model.goods.crosses"))) {
+            AbstractGoods ag = new AbstractGoods(crossesType, a);
+            a++;
+            ProductionType pt = new ProductionType(ag, true, null);
+            bt.addProductionType(pt);
+            bt.removeModifiers("model.goods.crosses");
+            logger.info("Added backward compatibility production " + pt
+                + " to " + bt);
         }
         // Country and stables production is now defined as unattended.
         for (BuildingType bt : new BuildingType[] {
@@ -2117,11 +2100,10 @@ public final class Specification {
         if (first(getAbilities(Ability.AMBUSH_TERRAIN)) == null){
             Ability ambush = new Ability(Ability.AMBUSH_TERRAIN, null, true);
             addAbility(ambush);
-            for (TileType tt : getTileTypeList()) {
-                if ((tt.isElevation() || tt.isForested())
-                    && !tt.hasAbility(Ability.AMBUSH_TERRAIN)) {
-                    tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
-                }
+            for (TileType tt : transform(getTileTypeList(), tt ->
+                    ((tt.isElevation() || tt.isForested())
+                        && !tt.hasAbility(Ability.AMBUSH_TERRAIN)))) {
+                tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
             }
         }
 
@@ -2132,17 +2114,19 @@ public final class Specification {
         goodsType.setMilitary();
 
         // automaticEquipment scope types are now roles
-        for (NationType nt : indianNationTypes) {
-            for (Scope scope : iterable(flatten(nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT),
-                                                Ability::getScopes))) {
+        forEach(flatten(flatten(indianNationTypes,
+                                nt -> nt.getAbilities(Ability.AUTOMATIC_EQUIPMENT)),
+                        Ability::getScopes),
+            scope -> {
                 String type = scope.getType();
                 if ("model.equipment.indian.muskets".equals(type)) {
                     scope.setType("model.role.nativeDragoon");
                 } else if ("model.equipment.indian.horses".equals(type)) {
                     scope.setType("model.role.armedBrave");
                 }
-            }
-        }
+            });
+
+        // Limit Revere auto-equip of muskets to the soldier role
         {
             FoundingFather revere
                 = getFoundingFather("model.foundingFather.paulRevere");
