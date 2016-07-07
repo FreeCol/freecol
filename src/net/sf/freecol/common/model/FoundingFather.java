@@ -66,12 +66,6 @@ public class FoundingFather extends FreeColSpecObjectType {
      */
     private final int[] weight = new int[Specification.NUMBER_OF_AGES];
 
-    /**
-     * Players that want to elect this Founding Father must match one
-     * of these scopes.
-     */
-    private List<Scope> scopes = null;
-
     /** The events triggered by this Founding Father. */
     private List<Event> events = null;
 
@@ -175,37 +169,6 @@ public class FoundingFather extends FreeColSpecObjectType {
     }
 
     /**
-     * Get any scopes on the election of this father.
-     *
-     * @return A list of <code>Scope</code>s.
-     */
-    public final List<Scope> getScopes() {
-        return (scopes == null) ? Collections.<Scope>emptyList()
-            : scopes;
-    }
-
-    /**
-     * Set the scopes on this Founding Father.
-     *
-     * Public for the test suite.
-     *
-     * @param newScopes The new scopes.
-     */
-    public final void setScopes(final List<Scope> newScopes) {
-        this.scopes = newScopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    private void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<>();
-        scopes.add(scope);
-    }
-
-    /**
      * Get the upgrades triggered by this Founding Father.
      *
      * @return A map of old to new <code>UnitType</code>s.
@@ -278,8 +241,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      */
     public boolean isAvailableTo(Player player) {
         return (!player.isEuropean()) ? false
-            : (scopes == null) ? true
-            : any(scopes, s -> s.appliesTo(player));
+            : appliesTo((FreeColObject)player);
     }
 
 
@@ -315,8 +277,6 @@ public class FoundingFather extends FreeColSpecObjectType {
         super.writeChildren(xw);
 
         for (Event event : getEvents()) event.toXML(xw);
-
-        for (Scope scope : getScopes()) scope.toXML(xw);
 
         for (AbstractUnit unit : getUnitList()) {
             xw.writeStartElement(UNIT_TAG);
@@ -362,7 +322,6 @@ public class FoundingFather extends FreeColSpecObjectType {
         // Clear containers.
         if (xr.shouldClearContainers()) {
             events = null;
-            scopes = null;
             units = null;
             upgrades = null;
         }
@@ -391,9 +350,6 @@ public class FoundingFather extends FreeColSpecObjectType {
 
         } else if (Event.getTagName().equals(tag)) {
             addEvent(new Event(xr, spec));
-
-        } else if (Scope.getTagName().equals(tag)) {
-            addScope(new Scope(xr));
 
         } else {
             super.readChild(xr);

@@ -61,9 +61,6 @@ public class Effect extends FreeColSpecObjectType {
     /** The probability of this effect. */
     private int probability;
 
-    /** Scopes that might limit this Effect to certain types of objects. */
-    private List<Scope> scopes = null;
-
 
     /**
      * Deliberately empty constructor.
@@ -91,7 +88,7 @@ public class Effect extends FreeColSpecObjectType {
         setId(template.getId());
         setSpecification(template.getSpecification());
         this.probability = template.probability;
-        this.scopes = template.scopes;
+        setScopes(template.getScopeList());
         addFeatures(template);
     }
 
@@ -103,37 +100,6 @@ public class Effect extends FreeColSpecObjectType {
      */
     public final int getProbability() {
         return probability;
-    }
-
-    /**
-     * Get the scopes applicable to this effect.
-     *
-     * @return A list of <code>Scope</code>s.
-     */
-    public final List<Scope> getScopes() {
-        return (scopes == null) ? Collections.<Scope>emptyList()
-            : scopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    private void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<>();
-        scopes.add(scope);
-    }
-
-    /**
-     * Does at least one of this effect's scopes apply to an object.
-     *
-     * @param objectType The <code>FreeColSpecObjectType</code> to check.
-     * @return True if this effect applies.
-     */
-    public boolean appliesTo(final FreeColSpecObjectType objectType) {
-        return (scopes == null || scopes.isEmpty()) ? true
-            : any(scopes, s -> s.appliesTo(objectType));
     }
 
 
@@ -156,16 +122,6 @@ public class Effect extends FreeColSpecObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeChildren(xw);
-
-        for (Scope scope : getScopes()) scope.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
@@ -176,39 +132,11 @@ public class Effect extends FreeColSpecObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        if (xr.shouldClearContainers()) {
-            scopes = null;
-        }
-
-        super.readChildren(xr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final String tag = xr.getLocalName();
-
-        if (Scope.getTagName().equals(tag)) {
-            addScope(new Scope(xr));
-
-        } else {
-            super.readChild(xr);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append('[').append(getId())
             .append(" probability=").append(probability).append('%');
-        for (Scope scope : getScopes()) sb.append(' ').append(scope);
+        for (Scope scope : getScopeList()) sb.append(' ').append(scope);
         sb.append(']');
         return sb.toString();
     }

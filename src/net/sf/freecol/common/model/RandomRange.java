@@ -129,11 +129,11 @@ public class RandomRange {
     }
 
     /**
-     * Get the scopes of this random range.
+     * Get a list of the scopes of this random range.
      *
      * @return The scopes of this <code>RandomRange</code>.
      */
-    public List<Scope> getScopes() {
+    public List<Scope> getScopeList() {
         return (scopes == null) ? Collections.<Scope>emptyList()
             : scopes;
     }
@@ -155,7 +155,7 @@ public class RandomRange {
      * @return True if the scopes are satisfied.
      */
     public boolean appliesTo(FreeColObject fco) {
-        List<Scope> scs = getScopes();
+        List<Scope> scs = getScopeList();
         return scs.isEmpty() || any(scs, s -> s.appliesTo(fco));
     }
     
@@ -217,7 +217,7 @@ public class RandomRange {
 
         xw.writeAttribute(FACTOR_TAG, factor);
 
-        for (Scope scope : getScopes()) scope.toXML(xw);
+        for (Scope scope : getScopeList()) scope.toXML(xw);
 
         xw.writeEndElement();
     }

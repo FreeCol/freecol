@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,12 +92,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
 
     /** The disasters that may strike this type of tile improvement. */
     private List<RandomChoice<Disaster>> disasters = null;
-
-    /**
-     * The scopes define which TileTypes support this improvement.
-     * An eligible TileType must match all scopes.
-     */
-    private List<Scope> scopes = null;
 
 
     /**
@@ -175,26 +168,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      */
     public int getExposeResourcePercent() {
         return exposeResourcePercent;
-    }
-
-    /**
-     * Get the scopes applicable to this improvement.
-     *
-     * @return A list of <code>Scope</code>s.
-     */
-    public List<Scope> getScopes() {
-        return (scopes == null) ? Collections.<Scope>emptyList()
-            : scopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    private void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<>();
-        scopes.add(scope);
     }
 
     /**
@@ -477,8 +450,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(xw);
-
         if (allowedWorkers != null) {
             for (String id : allowedWorkers) {
                 xw.writeStartElement(WORKER_TAG);
@@ -561,7 +532,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (xr.shouldClearContainers()) {
-            scopes = null;
             allowedWorkers = null;
             tileTypeChanges = null;
             disasters = null;
@@ -607,9 +577,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         } else if (WORKER_TAG.equals(tag)) {
             addAllowedWorker(xr.readId());
             xr.closeTag(WORKER_TAG);
-
-        } else if (Scope.getTagName().equals(tag)) {
-            addScope(new Scope(xr));
 
         } else {
             super.readChild(xr);

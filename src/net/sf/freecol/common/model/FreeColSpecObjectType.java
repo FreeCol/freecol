@@ -19,9 +19,15 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -54,6 +60,12 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      * created on demand.
      */
     private FeatureContainer featureContainer = null;
+
+    /**
+     * Scopes that might limit the action of this object to certain
+     * types of objects.
+     */
+    private List<Scope> scopes = null;
 
     // Do not serialize below.
 
@@ -106,6 +118,66 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         setId(id);
     }
 
+
+    /**
+     * Get the scopes applicable to this effect.
+     *
+     * @return A list of <code>Scope</code>s.
+     */
+    public final List<Scope> getScopeList() {
+        return (this.scopes == null) ? Collections.<Scope>emptyList()
+            : this.scopes;
+    }
+
+    /**
+     * Get the scopes applicable to this effect as a stream.
+     *
+     * @return A stream of <code>Scope</code>s.
+     */
+    public final Stream<Scope> getScopes() {
+        return (this.scopes == null) ? Stream.<Scope>empty()
+            : getScopeList().stream();
+    }
+
+    /**
+     * Set the scopes for this object.
+     *
+     * @param scopes A list of new <code>Scope</code>s.
+     */
+    public final void setScopes(List<Scope> scopes) {
+        this.scopes = scopes;
+    }
+
+    /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (this.scopes == null) this.scopes = new ArrayList<>();
+        this.scopes.add(scope);
+    }
+
+    /**
+     * Does at least one of this effect's scopes apply to an object type.
+     *
+     * @param objectType The <code>FreeColSpecObjectType</code> to check.
+     * @return True if this effect applies.
+     */
+    public boolean appliesTo(final FreeColSpecObjectType objectType) {
+        return appliesTo((FreeColObject)objectType);
+    }
+
+    /**
+     * Does at least one of this effect's scopes apply to an object.
+     *
+     * @param object The <code>FreeColObject</code> to check.
+     * @return True if this effect applies.
+     */
+    protected boolean appliesTo(FreeColObject object) {
+        return (this.scopes == null || this.scopes.isEmpty()) ? true
+            : any(this.scopes, s -> s.appliesTo(object));
+    }
 
     /**
      * Gets the index of this FreeColSpecObjectType.
@@ -197,13 +269,11 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Ability ability : sort(getAbilities())) {
-            ability.toXML(xw);
-        }
+        for (Ability ability : sort(getAbilities())) ability.toXML(xw);
 
-        for (Modifier modifier : getSortedModifiers()) {
-            modifier.toXML(xw);
-        }
+        for (Modifier modifier : getSortedModifiers()) modifier.toXML(xw);
+
+        for (Scope scope : getScopeList()) scope.toXML(xw);
     }
 
     /**
@@ -225,6 +295,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         // Clear containers.
         if (xr.shouldClearContainers()) {
             if (this.featureContainer != null) this.featureContainer.clear();
+            setScopes(null);
         }
 
         super.readChildren(xr);
@@ -261,6 +332,10 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
                 addModifier(modifier);
                 spec.addModifier(modifier);
             }
+
+        } else if (Scope.getTagName().equals(tag)) {
+            Scope scope = new Scope(xr);
+            if (scope != null) addScope(scope);
 
         } else {
             super.readChild(xr);
