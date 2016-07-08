@@ -1538,13 +1538,12 @@ public final class InGameController extends Controller {
 
         if (settlement != null && serverPlayer.isEuropean()) {
             // Define Coronado to make all colony-owned tiles visible
-            for (ServerPlayer sp : getGame().getConnectedPlayers(serverPlayer)) {
-                if (sp.isEuropean()
-                    && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    sp.exploreTile(tile);
-                    cs.add(See.only(sp), tile);
-                    sp.invalidateCanSeeTiles();//+vis(sp)
-                }
+            for (ServerPlayer sp
+                     : transform(getGame().getConnectedPlayers(serverPlayer),
+                         p -> p.hasAbility(Ability.SEE_ALL_COLONIES))) {
+                sp.exploreTile(tile);
+                cs.add(See.only(sp), tile);
+                sp.invalidateCanSeeTiles();//+vis(sp)
             }
         }
 
@@ -1727,21 +1726,15 @@ public final class InGameController extends Controller {
             if (upgrade != null) upgrades.put(unitType, upgrade);
         }
         java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
-        for (Colony colony : serverPlayer.getColonyList()) {
+        for (Colony colony : transform(serverPlayer.getColonies(),
+                                       c -> c.getSoL() > 50)) {
             List<Unit> allUnits = colony.getAllUnitsList();
             int limit = (allUnits.size() + 2) * (colony.getSoL() - 50) / 100;
-            if (limit <= 0) continue;
 
             unitMap.clear();
-            for (Unit unit : allUnits) {
-                if (upgrades.containsKey(unit.getType())) {
-                    List<Unit> unitList = unitMap.get(unit.getType());
-                    if (unitList == null) {
-                        unitList = new ArrayList<>();
-                        unitMap.put(unit.getType(), unitList);
-                    }
-                    unitList.add(unit);
-                }
+            for (Unit unit : transform(allUnits,
+                    u -> upgrades.containsKey(u.getType()))) {
+                appendToMapList(unitMap, unit.getType(), unit);
             }
             for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
                 int n = 0;
@@ -2910,10 +2903,10 @@ public final class InGameController extends Controller {
 
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
-        for (Tile t : tile.getSurroundingTiles(colony.getRadius())) {
-            if (t.getOwningSettlement() == colony && !ownedTiles.contains(t)) {
-                cs.add(See.perhaps(), t);
-            }
+        for (Tile t : transform(tile.getSurroundingTiles(1, colony.getRadius()),
+                t2 -> (t2.getOwningSettlement() == colony
+                    && !ownedTiles.contains(t2)))) {
+            cs.add(See.perhaps(), t);
         }
 
         // Others might see a tile ownership change.
