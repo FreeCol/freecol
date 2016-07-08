@@ -1100,10 +1100,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         HashMap<GoodsType, Integer> goodsMap = new HashMap<>();
         for (AbstractGoods ag : iterable(flatten(getOwnedTiles(),
                     t -> t.getSortedPotential().stream()))) {
-            GoodsType type = ag.getType().getStoredAs();
-            Integer i = goodsMap.get(type);
-            int value = (i == null) ? 0 : i;
-            goodsMap.put(type, value + ag.getAmount());
+            accumulateToMap(goodsMap, ag.getType().getStoredAs(),
+                            ag.getAmount(), (a, b) -> a + b);
         }
         double d = randomInt(logger, "Goods at " + getName(), random, 10)
             * 0.1 + 1.0;

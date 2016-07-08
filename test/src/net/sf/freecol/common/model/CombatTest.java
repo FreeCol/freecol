@@ -311,9 +311,8 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, colonist);
-        for (Modifier modifier : iterable(soldierRole.getModifiers(Modifier.DEFENCE))) {
-            assertTrue(defenceModifiers.contains(modifier));
-        }
+        forEach(soldierRole.getModifiers(Modifier.DEFENCE),
+                m -> assertTrue(defenceModifiers.contains(m)));
     }
 
     public void testDefendSettlement() {
@@ -346,9 +345,8 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> defenceModifiers = combatModel
             .getDefensiveModifiers(attacker, defender);
-        for (Modifier modifier : iterable(nativeDragoonRole.getModifiers(Modifier.DEFENCE))) {
-            assertTrue(defenceModifiers.contains(modifier));
-        }
+        forEach(nativeDragoonRole.getModifiers(Modifier.DEFENCE),
+                m -> assertTrue(defenceModifiers.contains(m)));
     }
 
     public void testAttackIgnoresMovementPoints() throws Exception {

@@ -1932,9 +1932,8 @@ public final class Specification {
                               "model.goods.crosses");
         forEachMapEntry(fatherGoodsFixMap, e -> {
                 FoundingFather father = getFoundingFather(e.getKey());
-                for (Modifier m : iterable(father.getModifiers(e.getValue()))) {
-                    m.requireNegatedPersonScope();
-                }
+                forEach(father.getModifiers(e.getValue()),
+                        Modifier::requireNegatedPersonScope);
             });
 
         // Nation FOUND_COLONY -> FOUNDS_COLONIES

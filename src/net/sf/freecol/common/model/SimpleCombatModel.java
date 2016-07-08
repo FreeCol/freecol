@@ -298,11 +298,9 @@ public class SimpleCombatModel extends CombatModel {
         // Goods penalty always applies
         int goodsCount = attacker.getGoodsSpaceTaken();
         if (goodsCount > 0) {
-            for (Modifier m : iterable(spec.getModifiers(Modifier.CARGO_PENALTY))) {
-                Modifier c = new Modifier(m);
-                c.setValue(c.getValue() * goodsCount);
-                result.add(c);
-            }
+            result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
+                    alwaysTrue(),
+                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 
@@ -491,11 +489,9 @@ public class SimpleCombatModel extends CombatModel {
         // Cargo penalty always applies
         int goodsCount = defender.getVisibleGoodsCount();
         if (goodsCount > 0) {
-            for (Modifier m : iterable(spec.getModifiers(Modifier.CARGO_PENALTY))) {
-                Modifier c = new Modifier(m);
-                c.setValue(c.getValue() * goodsCount);
-                result.add(c);
-            }
+            result.addAll(transform(spec.getModifiers(Modifier.CARGO_PENALTY),
+                    alwaysTrue(),
+                    m -> new Modifier(m).setValue(m.getValue() * goodsCount)));
         }
     }
 

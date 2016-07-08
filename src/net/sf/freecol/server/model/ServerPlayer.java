@@ -881,7 +881,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 case 2: bonus = SCORE_INDEPENDENCE_BONUS_THIRD; break;
                 default: bonus = 0; break;
                 }
-                    break;
+                break;
             default:
                 this.score += h.getScore();
                 break;
@@ -1579,9 +1579,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // the only effects of a disaster that can be reversed
                 // are the modifiers
                 forEach(flatten(bankruptcy.getEffects(),
-                                e -> e.getObject().getModifiers()), m -> {
-                        cs.addFeatureChange(this, this, m, false);
-                    });
+                                e -> e.getObject().getModifiers()),
+                    m -> cs.addFeatureChange(this, this, m, false));
                 cs.addMessage(See.only(this),
                     new ModelMessage(MessageType.GOVERNMENT_EFFICIENCY,
                                      "model.player.disaster.bankruptcy.stop",
@@ -1688,16 +1687,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
 outer:  for (Effect effect : effects) {
             mm = null;
             if (colony == null) {
-                for (Modifier modifier : iterable(effect.getModifiers())) {
-                    if (modifier.getDuration() > 0) {
-                        Modifier timedModifier = Modifier
-                            .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
-                        modifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
-                        cs.addFeatureChange(this, this, timedModifier, true);
-                    } else {
-                        cs.addFeatureChange(this, this, modifier, true);
-                    }
-                }
+                forEach(effect.getModifiers(), modifier -> {
+                        if (modifier.getDuration() > 0) {
+                            Modifier timedModifier = Modifier
+                                .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
+                            modifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
+                            cs.addFeatureChange(this, this, timedModifier, true);
+                        } else {
+                            cs.addFeatureChange(this, this, modifier, true);
+                        }
+                    });
             } else {
                 if (null != effect.getId()) {
                     switch (effect.getId()) {
@@ -1785,17 +1784,17 @@ outer:  for (Effect effect : effects) {
                     default:
                         mm = new ModelMessage(MessageType.DEFAULT,
                                               effect.getId(), colony);
-                        for (Modifier modifier : iterable(effect.getModifiers())) {
-                            if (modifier.getDuration() > 0) {
-                                Modifier timedModifier = Modifier
-                                    .makeTimedModifier(modifier.getId(), modifier, getGame().getTurn());
-                                timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
-                                cs.addFeatureChange(this, colony, timedModifier, true);
-                            } else {
-                                cs.addFeatureChange(this, colony, modifier, true);
-                            }
-                            colonyDirty = true;
-                        }
+                        forEach(effect.getModifiers(), m -> {
+                                if (m.getDuration() > 0) {
+                                    Modifier timedModifier = Modifier
+                                        .makeTimedModifier(m.getId(), m, getGame().getTurn());
+                                    timedModifier.setModifierIndex(Modifier.DISASTER_PRODUCTION_INDEX);
+                                    cs.addFeatureChange(this, colony, timedModifier, true);
+                                } else {
+                                    cs.addFeatureChange(this, colony, m, true);
+                                }
+                            });
+                        colonyDirty |= first(effect.getModifiers()) != null;
                         break;
                     }
                 }

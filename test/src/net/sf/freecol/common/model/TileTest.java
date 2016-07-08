@@ -525,12 +525,7 @@ public class TileTest extends FreeColTestCase {
 
     private boolean hasBonusFrom(Stream<Modifier> modifierSet,
                                  FreeColSpecObjectType source) {
-        for (Modifier modifier : iterable(modifierSet)) {
-            if (source.equals(modifier.getSource())) {
-                return true;
-            }
-        }
-        return false;
+        return any(modifierSet, matchKeyEquals(source, Modifier::getSource));
     }
 
 

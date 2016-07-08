@@ -323,9 +323,11 @@ public class Modifier extends Feature {
      * Set the modifier type.
      *
      * @param modifierType The new <code>ModifierType</code> value.
+     * @return This modifier.
      */
-    public final void setType(final ModifierType modifierType) {
+    public final Modifier setType(final ModifierType modifierType) {
         this.modifierType = modifierType;
+        return this;
     }
 
     /**
@@ -361,9 +363,11 @@ public class Modifier extends Feature {
      * Set the modifier value.
      *
      * @param value The new value.
+     * @return This modifier.
      */
-    public final void setValue(final float value) {
+    public final Modifier setValue(final float value) {
         this.value = value;
+        return this;
     }
 
     /**
@@ -388,9 +392,11 @@ public class Modifier extends Feature {
      * Set the increment type.
      *
      * @param incrementType The new increment <code>ModifierType</code>.
+     * @return This modifier.
      */
-    public final void setIncrementType(final ModifierType incrementType) {
+    public final Modifier setIncrementType(final ModifierType incrementType) {
         this.incrementType = incrementType;
+        return this;
     }
 
     /**
@@ -406,9 +412,11 @@ public class Modifier extends Feature {
      * Set the increment value.
      *
      * @param increment The new value.
+     * @return This modifier.
      */
-    public final void setIncrement(final float increment) {
+    public final Modifier setIncrement(final float increment) {
         this.increment = increment;
+        return this;
     }
 
     /**
@@ -420,10 +428,11 @@ public class Modifier extends Feature {
      *     active.
      * @param lastTurn The last <code>Turn</code> the increment is
      *     active.
+     * @return This modifier.
      */
-    public final void setIncrement(final ModifierType incrementType,
-                                   final float increment,
-                                   Turn firstTurn, Turn lastTurn) {
+    public final Modifier setIncrement(final ModifierType incrementType,
+                                       final float increment,
+                                       Turn firstTurn, Turn lastTurn) {
         if (firstTurn == null) {
             throw new IllegalArgumentException("Null firstTurn");
         }
@@ -431,6 +440,7 @@ public class Modifier extends Feature {
         this.increment = increment;
         setFirstTurn(firstTurn);
         setLastTurn(lastTurn);
+        return this;
     }
 
     /**
@@ -446,9 +456,11 @@ public class Modifier extends Feature {
      * Set the modifier index.
      *
      * @param modifierIndex The new modifier index value.
+     * @return This modifier.
      */
-    public final void setModifierIndex(final int modifierIndex) {
+    public final Modifier setModifierIndex(final int modifierIndex) {
         this.modifierIndex = modifierIndex;
+        return this;
     }
 
     /**

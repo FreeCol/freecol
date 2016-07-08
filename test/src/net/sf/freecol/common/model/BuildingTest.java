@@ -867,28 +867,23 @@ public class BuildingTest extends FreeColTestCase {
             unit.setLocation(building);
             for (AbstractGoods output : iterable(building.getOutputs())) {
                 GoodsType outputType = output.getType();
-                for (UnitType type : spec().getUnitTypeList()) {
-                    if (!building.getType().canAdd(type)
-                        || !type.isAvailableTo(colony.getOwner())) continue;
+                for (UnitType type : transform(spec().getUnitTypeList(),
+                        ut -> (building.getType().canAdd(ut)
+                            && ut.isAvailableTo(colony.getOwner())))) {
                     unit.changeType(type);
                     if (output != null) {
                         int productivity = building.getUnitProduction(unit, outputType);
-                        int expected = output.getAmount();
-                        if (type == building.getExpertUnitType()) {
-                            expected = 6;
-                        } else if (type == indenturedServantType) {
-                            expected = 2;
-                        } else if (type == indianConvertType) {
-                            expected = 1;
-                        } else if (type == pettyCriminalType) {
-                            expected = 1;
-                        }
-                        if (expected != output.getAmount()) {
+                        int expect = (type == building.getExpertUnitType()) ? 6
+                            : (type == indenturedServantType) ? 2
+                            : (type == indianConvertType) ? 1
+                            : (type == pettyCriminalType) ? 1
+                            : output.getAmount();
+                        if (expect != output.getAmount()) {
                             assertTrue("Modifiers expected",
                                 count(type.getModifiers(outputType.getId())) > 0);
                         }
                         assertEquals("Wrong productivity for " + type
-                            + " in " + building, expected, productivity);
+                            + " in " + building, expect, productivity);
                     }
                 }
             }

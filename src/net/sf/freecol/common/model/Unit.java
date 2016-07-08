@@ -3621,29 +3621,21 @@ public class Unit extends GoodsLocation
         Set<Modifier> result = new HashSet<>();
 
         // UnitType modifiers always apply
-        for (Modifier m : iterable(unitType.getModifiers(id, fcgot, turn))) {
-            switch (m.getType()) {
-            case ADDITIVE:
-                m.setModifierIndex(Modifier.UNIT_ADDITIVE_COMBAT_INDEX);
-                break;
-            default:
-                m.setModifierIndex(Modifier.UNIT_NORMAL_COMBAT_INDEX);
-                break;
-            }
-            result.add(m);
-        }
+        result.addAll(transform(unitType.getModifiers(id, fcgot, turn),
+                alwaysTrue(),
+                m -> m.setModifierIndex((m.getType() == Modifier.ModifierType.ADDITIVE)
+                    ? Modifier.UNIT_ADDITIVE_COMBAT_INDEX
+                    : Modifier.UNIT_NORMAL_COMBAT_INDEX)));
 
         // The player's modifiers may not all apply
-        for (Modifier m : iterable(owner.getModifiers(id, fcgot, turn))) {
-            m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX);
-            result.add(m);
-        }
+        result.addAll(transform(owner.getModifiers(id, fcgot, turn),
+                alwaysTrue(),
+                m -> m.setModifierIndex(Modifier.GENERAL_COMBAT_INDEX)));
         
         // Role modifiers apply
-        for (Modifier m : iterable(role.getModifiers(id, fcgot, turn))) {
-            m.setModifierIndex(Modifier.ROLE_COMBAT_INDEX);
-            result.add(m);
-        }
+        result.addAll(transform(role.getModifiers(id, fcgot, turn),
+                alwaysTrue(),
+                m -> m.setModifierIndex(Modifier.ROLE_COMBAT_INDEX)));
 
         return result;
     }

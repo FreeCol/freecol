@@ -158,30 +158,27 @@ public class ColonyTile extends WorkLocation {
         final Colony colony = getColony();
         ProductionInfo pi = new ProductionInfo();
         if (isColonyCenterTile()) {
-            for (AbstractGoods output : iterable(getOutputs())) {
-                boolean onlyNaturalImprovements = getSpecification()
-                    .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
-                    && !output.getType().isFoodType();
-                int potential = output.getAmount();
-                if (workTile.getTileItemContainer() != null) {
-                    potential = workTile.getTileItemContainer()
-                        .getTotalBonusPotential(output.getType(), null, potential,
-                                                onlyNaturalImprovements);
-                }
-                potential += Math.max(0, colony.getProductionBonus());
-                AbstractGoods production
-                    = new AbstractGoods(output.getType(), potential);
-                pi.addProduction(production);
-            }
+            forEach(getOutputs(), output -> {
+                    boolean onlyNaturalImprovements = getSpecification()
+                        .getBoolean(GameOptions.ONLY_NATURAL_IMPROVEMENTS)
+                        && !output.getType().isFoodType();
+                    int potential = output.getAmount();
+                    if (workTile.getTileItemContainer() != null) {
+                        potential = workTile.getTileItemContainer()
+                            .getTotalBonusPotential(output.getType(), null,
+                                potential, onlyNaturalImprovements);
+                    }
+                    potential += Math.max(0, colony.getProductionBonus());
+                    AbstractGoods production
+                        = new AbstractGoods(output.getType(), potential);
+                    pi.addProduction(production);
+                });
         } else {
-            for (AbstractGoods output : iterable(getOutputs())) {
-                final GoodsType goodsType = output.getType();
-                int amount = sum(getUnits(),
-                                 u -> getUnitProduction(u, goodsType));
-                if (amount > 0) {
-                    pi.addProduction(new AbstractGoods(goodsType, amount));
-                }
-            }
+            forEach(map(getOutputs(), AbstractGoods::getType),
+                gt -> {
+                    int n = sum(getUnits(), u -> getUnitProduction(u, gt));
+                    if (n > 0) pi.addProduction(new AbstractGoods(gt, n));
+                });
         }
         return pi;
     }

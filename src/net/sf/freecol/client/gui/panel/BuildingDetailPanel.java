@@ -235,14 +235,14 @@ public class BuildingDetailPanel
         }
 
         List<JComponent> labels = new ArrayList<>();
-        for (Modifier productionBonus : iterable(buildingType.getModifiers())) {
-            JComponent component = getModifierComponent(productionBonus);
-            if (component instanceof JButton) {
-                labels.add(0, component);
-            } else {
-                labels.add(component);
-            }
-        }
+        forEach(buildingType.getModifiers(), m -> {
+                JComponent component = getModifierComponent(m);
+                if (component instanceof JButton) {
+                    labels.add(0, component);
+                } else {
+                    labels.add(component);
+                }
+            });
 
         for (Ability ability : iterable(buildingType.getAbilities())) {
             JComponent component = getAbilityComponent(ability);
