@@ -702,16 +702,15 @@ public class ColonyPlan {
                 if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)
                     && colony.getTile().isShore()) {
                     int landFood = 0, seaFood = 0;
-                    for (Tile t : colony.getTile().getSurroundingTiles(1)) {
-                        if (t.getOwningSettlement() == colony
-                            || player.canClaimForSettlement(t)) {
-                            for (AbstractGoods ag : t.getSortedPotential()) {
-                                if (ag.getType().isFoodType()) {
-                                    if (t.isLand()) {
-                                        landFood += ag.getAmount();
-                                    } else {
-                                        seaFood += ag.getAmount();
-                                    }
+                    for (Tile t : transform(colony.getTile().getSurroundingTiles(1,1),
+                            t2 -> (t2.getOwningSettlement() == colony
+                                || player.canClaimForSettlement(t2)))) {
+                        for (AbstractGoods ag : t.getSortedPotential()) {
+                            if (ag.getType().isFoodType()) {
+                                if (t.isLand()) {
+                                    landFood += ag.getAmount();
+                                } else {
+                                    seaFood += ag.getAmount();
                                 }
                             }
                         }
@@ -946,29 +945,27 @@ public class ColonyPlan {
      * @return The unit that was replaced by the expert, or null if none.
      */
     private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
-        Role oldRole = expert.getRole();
-        int oldRoleCount = expert.getRoleCount();
-        GoodsType work = expert.getType().getExpertProduction();
-        GoodsType oldWork = expert.getWorkType();
-        for (Unit other : others) {
-            if (!other.isPerson()) continue;
-            if (other.getWorkType() == work
-                && other.getType().getExpertProduction() != work) {
-                Location l1 = expert.getLocation();
-                Location l2 = other.getLocation();
-                other.setLocation(colony.getTile());
-                expert.setLocation(l2);
-                expert.changeWorkType(work);
-                other.setLocation(l1);
-                if (oldWork != null) other.changeWorkType(oldWork);
-                Role tmpRole = other.getRole();
-                int tmpRoleCount = other.getRoleCount();
-                other.changeRole(oldRole, oldRoleCount);
-                expert.changeRole(tmpRole, tmpRoleCount);
-                return other;
-            }
+        final Role oldRole = expert.getRole();
+        final int oldRoleCount = expert.getRoleCount();
+        final GoodsType work = expert.getType().getExpertProduction();
+        final GoodsType oldWork = expert.getWorkType();
+        final Unit other = find(others, u ->
+            (u.isPerson() && u.getWorkType() == work
+                && u.getType().getExpertProduction() != work));
+        if (other != null) {
+            Location l1 = expert.getLocation();
+            Location l2 = other.getLocation();
+            other.setLocation(colony.getTile());
+            expert.setLocation(l2);
+            expert.changeWorkType(work);
+            other.setLocation(l1);
+            if (oldWork != null) other.changeWorkType(oldWork);
+            Role tmpRole = other.getRole();
+            int tmpRoleCount = other.getRoleCount();
+            other.changeRole(oldRole, oldRoleCount);
+            expert.changeRole(tmpRole, tmpRoleCount);
         }
-        return null;
+        return other;
     }
 
     /**
