@@ -492,18 +492,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 || u.hasAbility(Ability.EXPERT_SCOUT));
         List<Unit> scouts = transform(tile.getUnits(), explorerPred,
                                       Function.identity(), scoutComparator);
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.hasLostCityRumour()) {
-                Direction direction = tile.getDirection(t);
-                for (;;) {
-                    if (scouts.isEmpty()) return;
-                    Unit u = scouts.remove(0);
-                    if (!u.getMoveType(t).isProgress()) continue;
-                    if (getAIUnit(u).move(direction)
-                        && !t.hasLostCityRumour()) {
-                        u.setDestination(tile);
-                        break;
-                    }
+        for (Tile t : transform(tile.getSurroundingTiles(1,1),
+                                Tile::hasLostCityRumour)) {
+            Direction direction = tile.getDirection(t);
+            for (;;) {
+                if (scouts.isEmpty()) return;
+                Unit u = scouts.remove(0);
+                if (!u.getMoveType(t).isProgress()) continue;
+                if (getAIUnit(u).move(direction)
+                    && !t.hasLostCityRumour()) {
+                    u.setDestination(tile);
+                    break;
                 }
             }
         }
@@ -1130,11 +1129,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Add breedable goods
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (g.isBreedable()
-                && colony.getGoodsCount(g) < g.getBreedingNumber()) {
-                required.incrementCount(g, g.getBreedingNumber());
-            }
+        for (GoodsType gt : transform(spec.getGoodsTypeList(),
+                g -> (g.isBreedable()
+                    && colony.getGoodsCount(g) < g.getBreedingNumber()))) {
+            required.incrementCount(gt, gt.getBreedingNumber());
         }
 
         // Add materials required to build military equipment,
@@ -1146,11 +1144,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 (u.roleIsAvailable(role)
                     && (u.hasDefaultRole()
                         || Role.isCompatibleWith(role, u.getRole())));
-            for (Unit unit : transform(colony.getTile().getUnits(), rolePred)) {
+            if (any(colony.getTile().getUnits(), rolePred)) {
                 for (AbstractGoods ag : role.getRequiredGoodsList()) {
                     required.incrementCount(ag.getType(), ag.getAmount());
                 }
-                break;
             }
         }
 
