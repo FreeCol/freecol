@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -368,15 +367,8 @@ public class TileItemContainer extends FreeColGameObject {
         TileType tileType = tile.getType();
         boolean removed = false;
         synchronized (tileItems) {
-            Iterator<TileItem> iterator = tileItems.iterator();
-            while (iterator.hasNext()) {
-                TileItem item = iterator.next();
-                if (!item.isTileTypeAllowed(tileType)) {
-                    iterator.remove();
-                    item.dispose();
-                    removed = true;
-                }
-            }
+            removed = removeInPlace(tileItems,
+                                    ti -> !ti.isTileTypeAllowed(tileType));
         }
         if (removed) invalidateCache();
     }

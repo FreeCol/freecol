@@ -21,7 +21,6 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import java.util.stream.Collectors;
