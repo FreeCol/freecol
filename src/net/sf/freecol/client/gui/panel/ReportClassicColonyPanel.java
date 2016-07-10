@@ -59,7 +59,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
     private static final int GOODS_PER_ROW = 10;
     private static final int BUILDINGS_PER_ROW = 8;
 
-    private static final List<Colony> colonies = new ArrayList<>();
+    private final List<Colony> colonies = new ArrayList<>();
 
 
     /**
