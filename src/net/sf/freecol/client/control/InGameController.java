@@ -825,13 +825,6 @@ public final class InGameController extends FreeColClientHolder {
         // Clear active unit if any.
         getGUI().setActiveUnit(null);
 
-        // Unskip all skipped, some may have been faked in-client.
-        // Server-side skipped units are set active in csNewTurn.
-        for (Unit unit : transform(player.getUnits(),
-                                   u -> u.getState() == UnitState.SKIPPED)) {
-            unit.setState(UnitState.ACTIVE);
-        }
-
         // Restart the selection cycle.
         moveMode = MoveMode.NEXT_ACTIVE_UNIT;
 
@@ -1325,11 +1318,11 @@ public final class InGameController extends FreeColClientHolder {
         }
 
         // Disembark selected units able to move.
-        unit.setStateToAllChildren(UnitState.ACTIVE);
         final List<Unit> disembarkable
             = transform(unit.getUnits(),
                         u -> u.getMoveType(tile).isProgress());
         if (disembarkable.isEmpty()) return false; // Fail, did not find one
+        for (Unit u : disembarkable) changeState(u, UnitState.ACTIVE);
         if (disembarkable.size() == 1) {
             if (getGUI().confirm(tile,
                             StringTemplate.key("disembark.text"),
@@ -3099,8 +3092,7 @@ public final class InGameController extends FreeColClientHolder {
 
         UnitWas unitWas = new UnitWas(unit);
         boolean ret = askClearGotoOrders(unit)
-            && (unit.getState() == UnitState.ACTIVE
-                || askServer().changeState(unit, UnitState.ACTIVE));
+            && changeState(unit, UnitState.ACTIVE);
         if (ret) {
             unitWas.fireChanges();
             updateGUI(null);
@@ -4013,7 +4005,7 @@ public final class InGameController extends FreeColClientHolder {
         UnitWas unitWas = new UnitWas(unit);
         ColonyWas colonyWas = (unit.getColony() == null) ? null
             : new ColonyWas(unit.getColony());
-        unit.setState(UnitState.ACTIVE);
+        changeState(unit, UnitState.ACTIVE);
         moveDirection(unit, direction, true);
         boolean ret = unit.getTile() != oldTile
             || unitWas.fireChanges();
