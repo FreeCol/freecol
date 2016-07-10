@@ -120,14 +120,18 @@ public class WorkProductionPanel extends FreeColPanel {
         finalResult.setBorder(Utility.PRODUCTION_BORDER);
         add(finalResult, "wrap 30");
 
-        if (wl instanceof Building) { // Unattended production also applies.
-            result = wl.getBaseProduction(null, workType, null);
-            if (result > 0) {
-                add(Utility.localizedLabel(wl.getLabel()));
-                add(new JLabel(ModifierFormat.format(result)), "wrap 30");
-                output(sort(wl.getProductionModifiers(workType, null)),
-                       unitType);
-            }
+        // Is there unattended production?
+        result = wl.getBaseProduction(null, workType, null);
+        if (wl instanceof Building && result > 0) {
+            Font boldFont = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
+                FontLibrary.FontSize.TINY, Font.BOLD, lib.getScaleFactor());
+            JLabel unattendedLabel = Utility
+                .localizedLabel("workProductionPanel.unattendedProduction");
+            unattendedLabel.setFont(boldFont);
+            add(unattendedLabel, "span");
+            add(Utility.localizedLabel(wl.getLabel()));
+            add(new JLabel(ModifierFormat.format(result)));
+            output(sort(wl.getProductionModifiers(workType, null)), unitType);
         }
 
         add(okButton, "newline, span, tag ok");
