@@ -93,7 +93,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
         // Sell any excess
         final ServerPlayer owner = (ServerPlayer)getOwner();
         for (AbstractGoods ag : transform(required,
-                g -> (g.getAmount() > 0
+                g -> (g.getAmount() < 0
                     && owner.canTrade(g.getType(), Market.Access.EUROPE)))) {
             int rm = owner.sell(null, ag.getType(), -ag.getAmount());
             if (rm > 0) {
