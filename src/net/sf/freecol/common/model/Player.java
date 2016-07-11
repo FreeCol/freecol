@@ -1378,15 +1378,13 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected boolean recalculateBellsBonus() {
         boolean ret = false;
-        for (Ability ability : getAbilities(Ability.ADD_TAX_TO_BELLS)) {
+        for (Ability ability : transform(getAbilities(Ability.ADD_TAX_TO_BELLS),
+                                         a -> a.getSource() != null)) {
             FreeColObject source = ability.getSource();
-            if (source != null) {
-                for (Modifier m : iterable(getModifiers("model.goods.bells"))) {
-                    if (source.equals(m.getSource())) {
-                        m.setValue(tax);
-                        ret = true;
-                    }
-                }
+            for (Modifier modifier : transform(getModifiers("model.goods.bells"),
+                                               matchKeyEquals(source, Modifier::getSource))) {
+                modifier.setValue(tax);
+                ret = true;
             }
         }
         return ret;

@@ -2401,13 +2401,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColSpecObjectType type,
-                                     Turn turn) {
+    public Stream<Ability> getAbilities(String id, FreeColSpecObjectType type,
+                                        Turn turn) {
         if (turn == null) turn = getGame().getTurn();
-        Set<Ability> result = super.getAbilities(id, type, turn);
-        // Owner abilities also apply to colonies
-        if (owner != null) result.addAll(owner.getAbilities(id, type, turn));
-        return result;
+        return concat(super.getAbilities(id, type, turn),
+                      ((owner == null) ? Stream.<Ability>empty()
+                          : owner.getAbilities(id, type, turn)));
     }
 
 

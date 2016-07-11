@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -458,14 +459,13 @@ public class Europe extends UnitLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
-                                     Turn turn) {
-        Set<Ability> result = super.getAbilities(id, fcgot, turn);
-        // Always able to dress a missionary.
-        if (id == null || Ability.DRESS_MISSIONARY.equals(id)) {
-            result.add(ABILITY_DRESS_MISSIONARY);
-        }
-        return result;
+    public Stream<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
+                                        Turn turn) {
+        return concat(super.getAbilities(id, fcgot, turn),
+            // Always able to dress a missionary.
+            ((id == null || Ability.DRESS_MISSIONARY.equals(id))
+                ? Stream.of(ABILITY_DRESS_MISSIONARY)
+                : Stream.<Ability>empty()));
     }
 
 

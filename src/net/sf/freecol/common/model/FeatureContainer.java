@@ -105,13 +105,16 @@ public final class FeatureContainer {
      * Is the given set of abilities non-empty and contains no
      * false-valued members?
      *
-     * @param abilitySet A set of abilities to check.
-     * @return True if the ability set is `satisfied'.
+     * @param abilities A stream of <code>Ability</code>s to check.
+     * @return True if the abilities are `satisfied'.
      */
-    public static boolean hasAbility(Set<Ability> abilitySet) {
-        return (abilitySet == null || abilitySet.isEmpty())
-            ? false
-            : all(abilitySet, Ability::getValue);
+    public static boolean hasAbility(Stream<Ability> abilities) {
+        boolean ret = false;
+        for (Ability ability : iterable(abilities)) {
+            if (!ability.getValue()) return false;
+            ret = true;
+        }
+        return ret;
     }
 
     /**
@@ -136,7 +139,7 @@ public final class FeatureContainer {
      * @return True if the key is present.
      */
     public boolean containsAbilityKey(String key) {
-        return !getAbilities(key, null, null).isEmpty();
+        return first(getAbilities(key, null, null)) != null;
     }
 
     /**
@@ -147,10 +150,10 @@ public final class FeatureContainer {
      * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of abilities.
+     * @return A stream of abilities.
      */
-    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
-                                     Turn turn) {
+    public Stream<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
+                                        Turn turn) {
         Set<Ability> result = new HashSet<>();
         if (abilitiesPresent()) {
             synchronized (abilitiesLock) {
@@ -165,7 +168,7 @@ public final class FeatureContainer {
             }
             removeInPlace(result, a -> !a.appliesTo(fcgot, turn));
         }
-        return result;
+        return result.stream();
     }
 
     /**
@@ -499,15 +502,15 @@ public final class FeatureContainer {
     public String toString() {
         StringBuilder sb = new StringBuilder(256);
         sb.append("[FeatureContainer");
-        Set<Ability> abilities = getAbilities(null, null, null);
-        if (!abilities.isEmpty()) {
-            sb.append(" [abilities");
-            for (Ability ability : getAbilities(null, null, null)) {
-                sb.append(' ').append(ability);
-            }
+        int siz = sb.length();
+        for (Ability ability : iterable(getAbilities(null, null, null))) {
+            sb.append(' ').append(ability);
+        }
+        if (sb.length() > siz) {
+            sb.insert(siz, " [abilities");
             sb.append(']');
         }
-        int siz = sb.length();
+        siz = sb.length();
         for (Modifier modifier : iterable(getModifiers(null, null, null))) {
             sb.append(' ').append(modifier);
         }

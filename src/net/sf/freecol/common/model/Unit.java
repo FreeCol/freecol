@@ -1724,8 +1724,6 @@ public class Unit extends GoodsLocation
      */
     public Role getAutomaticRole() {
         if (!hasDefaultRole()) return null;
-        Set<Ability> autoDefence = getAbilities(Ability.AUTOMATIC_EQUIPMENT);
-        if (autoDefence.isEmpty()) return null;
         Settlement settlement = (isInColony()) ? getColony()
             : (getLocation() instanceof IndianSettlement)
             ? (Settlement)getLocation()
@@ -1733,7 +1731,8 @@ public class Unit extends GoodsLocation
         if (settlement == null) return null;
 
         final Specification spec = getSpecification();
-        return find(transform(flatten(autoDefence, Ability::getScopes),
+        return find(transform(flatten(getAbilities(Ability.AUTOMATIC_EQUIPMENT),
+                                      Ability::getScopes),
                               alwaysTrue(), s -> spec.getRole(s.getType())),
                     r -> r != null
                         && settlement.containsGoods(getGoodsDifference(r, 1)));
@@ -4140,43 +4139,61 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public Set<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
-                                     Turn turn) {
+    public Stream <Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
+                                         Turn turn) {
         final Player owner = getOwner();
         final UnitType unitType = getType();
-        Set<Ability> result = new HashSet<>();
 
-        // UnitType abilities always apply.
-        result.addAll(unitType.getAbilities(id));
+        return concat(
+            // UnitType abilities always apply.
+            unitType.getAbilities(id),
 
-        // Roles apply with qualification.
-        result.addAll(role.getAbilities(id, fcgot, turn));
+            // Roles apply with qualification.
+            role.getAbilities(id, fcgot, turn),
 
-        // The player's abilities require more qualification.
-        result.addAll(owner.getAbilities(id, fcgot, turn));
+            // The player's abilities require more qualification.
+            owner.getAbilities(id, fcgot, turn),
 
-        // Location abilities may apply.
-        // FIXME: extend this to all locations?  May simplify
-        // code.  Units are also Locations however, which complicates
-        // the issue as we do not want Units aboard other Units to share
-        // the abilities of the carriers.
-        if (getSettlement() != null) {
-            result.addAll(getSettlement().getAbilities(id, unitType, turn));
-        } else if (isInEurope()) {
-            // @compat 0.10.x
-            // It makes sense here to do:
-            //   Europe europe = owner.getEurope();
-            // However while there is fixup code in readChildren that calls
-            // this routine we can not rely on owner.europe being initialized
-            // yet.  Hence the following:
-            Location loc = getLocation();
-            Europe europe = (loc instanceof Europe) ? (Europe)loc
-                : (loc instanceof Unit) ? (Europe)((Unit)loc).getLocation()
-                : null;
-            // end @compat 0.10.x
-            if (europe != null) result.addAll(europe.getAbilities(id, unitType, turn));
+            // Location abilities may apply.
+            getLocationAbilities(id, turn));
+    }
+
+    /**
+     * Get abilities specific to this location.
+     *
+     * This is here just to simplify getAbilities().  Perhaps one day
+     * it could be wrapped back in, but there is unresolved complexity.
+     *
+     * FIXME: extend this to all locations?  May simplify code.  Units
+     * are also Locations however, which complicates the issue as we
+     * do not want Units aboard other Units to share the abilities of
+     * the carriers.
+     *
+     * @param id The identifier to check.
+     * @param turn The turn that applies.
+     * @return A stream of <code>Ability</code>s found.
+     */
+    private Stream<Ability> getLocationAbilities(String id, Turn turn) {
+        final UnitType unitType = getType();
+        final Settlement settlement = getSettlement();
+        if (settlement != null) {
+            return settlement.getAbilities(id, unitType, turn);
         }
-        return result;
+        if (!isInEurope()) return Stream.<Ability>empty();
+        
+        // @compat 0.10.x
+        // Europe is special.  It makes sense here to do:
+        //   Europe europe = owner.getEurope();
+        // However while there is fixup code in readChildren that
+        // calls getAbilities() we can not rely on owner.europe being
+        // initialized yet.  Hence the following:
+        Location loc = getLocation();
+        Europe europe = (loc instanceof Europe) ? (Europe)loc
+            : (loc instanceof Unit) ? (Europe)((Unit)loc).getLocation()
+            : null;
+        // end @compat 0.10.x
+        return (europe == null) ? Stream.<Ability>empty()
+            : europe.getAbilities(id, getType(), turn);
     }
 
     /**

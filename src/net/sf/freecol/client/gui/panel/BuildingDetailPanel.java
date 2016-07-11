@@ -243,7 +243,7 @@ public class BuildingDetailPanel
             }
         }
 
-        for (Ability ability : buildingType.getAbilities()) {
+        for (Ability ability : iterable(buildingType.getAbilities())) {
             JComponent component = getAbilityComponent(ability);
             if (component != null) {
                 labels.add(component);

@@ -401,7 +401,7 @@ public abstract class FreeColObject
      * @return True if the key is present.
      */
     public boolean containsAbilityKey(String key) {
-        return !getAbilities(key, null, null).isEmpty();
+        return first(getAbilities(key, null, null)) != null;
     }
 
     /**
@@ -416,9 +416,9 @@ public abstract class FreeColObject
     /**
      * Gets a copy of the abilities of this object.
      *
-     * @return A set of abilities.
+     * @return A stream of abilities.
      */
-    public final Set<Ability> getAbilities() {
+    public final Stream<Ability> getAbilities() {
         return getAbilities(null);
     }
 
@@ -426,9 +426,9 @@ public abstract class FreeColObject
      * Gets the set of abilities with the given identifier from this object.
      *
      * @param id The object identifier.
-     * @return A set of abilities.
+     * @return A stream of abilities.
      */
-    public final Set<Ability> getAbilities(String id) {
+    public final Stream<Ability> getAbilities(String id) {
         return getAbilities(id, null);
     }
 
@@ -438,10 +438,10 @@ public abstract class FreeColObject
      * @param id The object identifier.
      * @param fcgot An optional <code>FreeColSpecObjectType</code> the
      *     ability applies to.
-     * @return A set of abilities.
+     * @return A stream of abilities.
      */
-    public final Set<Ability> getAbilities(String id,
-                                           FreeColSpecObjectType fcgot) {
+    public final Stream<Ability> getAbilities(String id,
+                                              FreeColSpecObjectType fcgot) {
         return getAbilities(id, fcgot, null);
     }
 
@@ -456,11 +456,11 @@ public abstract class FreeColObject
      * @param turn An optional applicable <code>Turn</code>.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilities(String id,
-                                     FreeColSpecObjectType fcgot,
-                                     Turn turn) {
+    public Stream<Ability> getAbilities(String id,
+                                        FreeColSpecObjectType fcgot,
+                                        Turn turn) {
         FeatureContainer fc = getFeatureContainer();
-        return (fc == null) ? Collections.<Ability>emptySet()
+        return (fc == null) ? Stream.<Ability>empty()
             : fc.getAbilities(id, fcgot, turn);
     }
 
