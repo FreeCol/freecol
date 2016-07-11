@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.104">
+<freecol-specification id="classic" version="0.107">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1437,41 +1437,63 @@
       <required-goods id="model.goods.food"
                       value="200"/>
       <downgrade unit="model.unit.freeColonist" delete="true" />
-      <upgrade unit="model.unit.expertFarmer" turns-to-learn="4"
+      <upgrade unit="model.unit.expertFarmer"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.expertFisherman" turns-to-learn="4"
+      <upgrade unit="model.unit.expertFisherman"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.expertFurTrapper" turns-to-learn="4"
+      <upgrade unit="model.unit.expertFurTrapper"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.expertSilverMiner" turns-to-learn="4"
+      <upgrade unit="model.unit.expertSilverMiner"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.expertLumberJack" turns-to-learn="4"
+      <upgrade unit="model.unit.expertLumberJack"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.expertOreMiner" turns-to-learn="4"
+      <upgrade unit="model.unit.expertOreMiner"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.masterSugarPlanter" turns-to-learn="6"
+      <upgrade unit="model.unit.masterSugarPlanter"
+               learn-in-school="100" turns-to-learn="6"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.masterCottonPlanter" turns-to-learn="6"
+      <upgrade unit="model.unit.masterCottonPlanter"
+               learn-in-school="100" turns-to-learn="6"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.masterTobaccoPlanter" turns-to-learn="6"
+      <upgrade unit="model.unit.masterTobaccoPlanter"
+               learn-in-school="100" turns-to-learn="6"
                learn-from-natives="100" learn-from-experience="4"/>
-      <upgrade unit="model.unit.firebrandPreacher" turns-to-learn="8"/>
-      <upgrade unit="model.unit.elderStatesman" turns-to-learn="8"/>
-      <upgrade unit="model.unit.masterCarpenter" turns-to-learn="4"/>
-      <upgrade unit="model.unit.masterDistiller" turns-to-learn="6"/>
-      <upgrade unit="model.unit.masterWeaver" turns-to-learn="6"
+      <upgrade unit="model.unit.firebrandPreacher"
+               learn-in-school="100" turns-to-learn="8"/>
+      <upgrade unit="model.unit.elderStatesman"
+               learn-in-school="100" turns-to-learn="8"/>
+      <upgrade unit="model.unit.masterCarpenter"
+               learn-in-school="100" turns-to-learn="4"/>
+      <upgrade unit="model.unit.masterDistiller"
+               learn-in-school="100" turns-to-learn="6"/>
+      <upgrade unit="model.unit.masterWeaver"
+               learn-in-school="100" turns-to-learn="6"
                learn-from-natives="100"/>
-      <upgrade unit="model.unit.masterTobacconist" turns-to-learn="6"/>
-      <upgrade unit="model.unit.masterFurTrader" turns-to-learn="6"
+      <upgrade unit="model.unit.masterTobacconist"
+               learn-in-school="100" turns-to-learn="6"/>
+      <upgrade unit="model.unit.masterFurTrader"
+               learn-in-school="100" turns-to-learn="6"
                learn-from-natives="100"/>
-      <upgrade unit="model.unit.masterBlacksmith" turns-to-learn="6"/>
-      <upgrade unit="model.unit.masterGunsmith" turns-to-learn="6"/>
-      <upgrade unit="model.unit.seasonedScout" turns-to-learn="4"
+      <upgrade unit="model.unit.masterBlacksmith"
+               learn-in-school="100" turns-to-learn="6"/>
+      <upgrade unit="model.unit.masterGunsmith"
+               learn-in-school="100" turns-to-learn="6"/>
+      <upgrade unit="model.unit.seasonedScout"
+               learn-in-school="100" turns-to-learn="4"
                learn-from-natives="100" learn-in-lost-city="100"/>
-      <upgrade unit="model.unit.hardyPioneer" turns-to-learn="4"/>
-      <upgrade unit="model.unit.veteranSoldier" turns-to-learn="6"
+      <upgrade unit="model.unit.hardyPioneer"
+               learn-in-school="100" turns-to-learn="4"/>
+      <upgrade unit="model.unit.veteranSoldier"
+               learn-in-school="100" turns-to-learn="6"
                promotion="100"/>
-      <upgrade unit="model.unit.jesuitMissionary" turns-to-learn="8"/>
+      <upgrade unit="model.unit.jesuitMissionary"
+               learn-in-school="100" turns-to-learn="8"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer" extends="colonist"
                price="1100" skill="1" expert-production="model.goods.grain"
@@ -1633,7 +1655,8 @@
                skill="-1" recruit-probability="20" score-value="2">
       <downgrade unit="model.unit.freeColonist" delete="true"/>
       <upgrade unit="model.unit.freeColonist"
-               turns-to-learn="4" promotion="100"/>
+               learn-in-school="100" turns-to-learn="4"
+               promotion="100"/>
       <upgrade unit="model.unit.expertFarmer"
                learn-from-natives="100" learn-in-school="0"/>
       <upgrade unit="model.unit.expertFisherman"

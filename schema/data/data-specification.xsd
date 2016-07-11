@@ -1005,7 +1005,16 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
+
+      <xs:attribute name="unit" use="required" type="xs:string"/>
+
+      <xs:attribute name="turns-to-learn" use="optional"
+                    type="xs:nonNegativeInteger"/>
+      
+      <!-- TODO: delete is mutually exclusive with any of the following. -->
       <xs:attribute name="delete" type="xs:boolean"/>
+
+      <!-- We need a rule to insist there is at least one of these. -->
       <xs:attribute name="conversion" type="PercentageType"/>
       <xs:attribute name="creation" type="PercentageType"/>
       <xs:attribute name="enter-colony" type="PercentageType"/>
@@ -1015,8 +1024,6 @@
       <xs:attribute name="learn-in-lost-city" type="PercentageType"/>
       <xs:attribute name="learn-in-school" type="PercentageType"/>
       <xs:attribute name="promotion" type="PercentageType"/>
-      <xs:attribute name="turns-to-learn" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <!-- TODO: these are downgrades, but serialization can not
         handle non-static XML Element tag names! We need to combine
         upgrade and downgrade into a typechange. -->
@@ -1041,12 +1048,15 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
       </xs:sequence>
+
+      <xs:attribute name="unit" use="optional" type="xs:string"/>
+
       <xs:attribute name="delete" type="xs:boolean"/>
+
       <xs:attribute name="capture" type="xs:string"/>
       <xs:attribute name="clear-skill" type="xs:string"/>
       <xs:attribute name="demotion" type="xs:string"/>
       <xs:attribute name="undead" type="xs:string"/>
-      <xs:attribute name="unit" use="optional" type="xs:string"/>
       <!-- @compat 0.11.3 -->
       <xs:attribute name="clearSkill" type="PercentageType"/>
       <!-- end @compat 0.11.3 -->

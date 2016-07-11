@@ -159,22 +159,12 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     }
 
     /**
-     * Does at least one of this effect's scopes apply to an object type.
-     *
-     * @param objectType The <code>FreeColSpecObjectType</code> to check.
-     * @return True if this effect applies.
-     */
-    public boolean appliesTo(final FreeColSpecObjectType objectType) {
-        return appliesTo((FreeColObject)objectType);
-    }
-
-    /**
      * Does at least one of this effect's scopes apply to an object.
      *
      * @param object The <code>FreeColObject</code> to check.
      * @return True if this effect applies.
      */
-    protected boolean appliesTo(FreeColObject object) {
+    public boolean appliesTo(FreeColObject object) {
         return (this.scopes == null || this.scopes.isEmpty()) ? true
             : any(this.scopes, s -> s.appliesTo(object));
     }

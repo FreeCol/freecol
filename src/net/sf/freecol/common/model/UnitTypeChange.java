@@ -35,7 +35,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 /**
  * The possible changes of a unit type.
  */
-public class UnitTypeChange extends FreeColSpecObject {
+public class UnitTypeChange extends FreeColSpecObjectType {
 
     public static enum ChangeType {
         EDUCATION,
@@ -90,9 +90,6 @@ public class UnitTypeChange extends FreeColSpecObject {
     /** A map of change type to probability. */
     protected final Map<ChangeType, Integer> changeTypes
         = new EnumMap<>(ChangeType.class);
-
-    /** A list of Scopes limiting the applicability of this Feature. */
-    private List<Scope> scopes = null;
 
 
     /**
@@ -198,48 +195,6 @@ public class UnitTypeChange extends FreeColSpecObject {
         return asResultOf(ChangeType.EDUCATION) && turnsToLearn > 0;
     }
 
-    /**
-     * Gets the scopes associated with this type change.
-     *
-     * @return The list of scopes.
-     */
-    public List<Scope> getScopes() {
-        return (scopes == null) ? Collections.<Scope>emptyList()
-            : scopes;
-    }
-
-    /**
-     * Sets the scopes associated with this type change.
-     * Public for the test suite.
-     *
-     * @param scopes The new list of <code>Scope</code>s.
-     */
-    public void setScopes(List<Scope> scopes) {
-        this.scopes = scopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    private void addScope(Scope scope) {
-        if (scopes == null) scopes = new ArrayList<>();
-        scopes.add(scope);
-    }
-
-    /**
-     * Does this change type apply to a given player?
-     *
-     * @param player The <code>Player</code> to test.
-     * @return True if this change is applicable.
-     */
-    public boolean appliesTo(Player player) {
-        List<Scope> scopeList = getScopes();
-        return (scopeList.isEmpty()) ? true
-            : any(scopeList, s -> s.appliesTo(player));
-    }
-
 
     // Serialization
 
@@ -276,75 +231,43 @@ public class UnitTypeChange extends FreeColSpecObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeChildren(xw);
-
-        for (Scope scope : getScopes()) scope.toXML(xw);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // UnitTypeChange do not have ids, no super.readAttributes().
         // However, they might in future.
-
         final Specification spec = getSpecification();
 
-        if (xr.hasAttribute(UNIT_TAG)) {
-            newUnitType = xr.getType(spec, UNIT_TAG,
-                                     UnitType.class, (UnitType)null);
+        // @compat 0.11.6
+        // unit tag became required for 0.11.7
+        // end @compat 0.11.6
+        newUnitType = xr.getType(spec, UNIT_TAG,
+                                 UnitType.class, (UnitType)null);
 
+        // @compat 0.11.3
+        if (xr.hasAttribute(OLD_TURNS_TO_LEARN_TAG)) {
+            turnsToLearn = xr.getAttribute(OLD_TURNS_TO_LEARN_TAG, UNDEFINED);
+        } else
+        // end @compat 0.11.3
+            turnsToLearn = xr.getAttribute(TURNS_TO_LEARN_TAG, UNDEFINED);
+
+        for (ChangeType type : ChangeType.values()) {
+            int value = xr.getAttribute(tags.get(type), -1);
             // @compat 0.11.3
-            if (xr.hasAttribute(OLD_TURNS_TO_LEARN_TAG)) {
-                turnsToLearn = xr.getAttribute(OLD_TURNS_TO_LEARN_TAG, UNDEFINED);
-            } else
+            if (value < 0) {
+                String x = compatTags.get(type);
+                if (x != null) value = xr.getAttribute(x, -1);
+            }
             // end @compat 0.11.3
-                turnsToLearn = xr.getAttribute(TURNS_TO_LEARN_TAG, UNDEFINED);
-            if (turnsToLearn > 0) {
-                changeTypes.put(ChangeType.EDUCATION, 100);
-            }
-
-            for (ChangeType type : ChangeType.values()) {
-                int value = xr.getAttribute(tags.get(type), -1);
-                // @compat 0.11.3
-                if (value < 0) {
-                    String x = compatTags.get(type);
-                    if (x != null) value = xr.getAttribute(x, -1);
-                }
-                // end @compat 0.11.3
-                if (value >= 0) {
-                    changeTypes.put(type, Math.min(100, value));
-                }
+            if (value >= 0) {
+                changeTypes.put(type, Math.min(100, value));
             }
         }
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        scopes = null;
-
-        super.readChildren(xr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final String tag = xr.getLocalName();
-
-        if (Scope.getTagName().equals(tag)) {
-            addScope(new Scope(xr));
-
-        } else {
-            super.readChild(xr);
-        }
+        // @compat 0.11.6
+        // Prior to 0.11.7 education upgrades were specified only by the
+        // "turns-to-learn" attribute, but now "learn-in-school" is always
+        // present if education is allowed.
+        if (turnsToLearn > 0) changeTypes.put(ChangeType.EDUCATION, 100);
+        // end @compat 0.11.6
     }
 
     /**

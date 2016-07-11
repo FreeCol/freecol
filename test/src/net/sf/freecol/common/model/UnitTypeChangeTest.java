@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 public class UnitTypeChangeTest extends FreeColTestCase {
@@ -36,8 +37,8 @@ public class UnitTypeChangeTest extends FreeColTestCase {
     public void testEmptyScope() {
         UnitTypeChange change = new UnitTypeChange(spec());
 
-        assertTrue("A new change has empty scopes",
-                   change.getScopes().isEmpty());
+        assertEquals("A new change has no scopes", 0,
+                     count(change.getScopes()));
 
         // empty scope applies to all players
         for (Player player : getStandardGame().getPlayerList()) {
@@ -60,7 +61,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitTypeChange change = new UnitTypeChange(game.getSpecification());
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(education, 100);
-        List<Scope> scopes = new ArrayList<>(change.getScopes());
+        List<Scope> scopes = toList(change.getScopes());
         scopes.add(scope);
         change.setScopes(scopes);
 
