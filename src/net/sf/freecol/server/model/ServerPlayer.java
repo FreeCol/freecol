@@ -986,6 +986,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Checks if this player can see a unit.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the <code>Unit</code> is visible to the player.
+     */
+    public boolean canSeeUnit(Unit unit) {
+        Tile tile;
+        return (this.owns(unit)) ? true
+            : ((tile = unit.getTile()) == null) ? false
+            : (!this.canSee(tile)) ? false
+            : (tile.hasSettlement()) ? false
+            : (unit.isOnCarrier()) ? false
+            : true;
+    }
+        
+    /**
      * Try to reassign the ownership of a collection of tiles,
      * preferring this player.
      *

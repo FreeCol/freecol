@@ -409,7 +409,7 @@ public class ChangeSet {
             element.setAttribute("attackerTile", attacker.getTile().getId());
             element.setAttribute("defenderTile", defender.getTile().getId());
             element.setAttribute("success", Boolean.toString(success));
-            if (!canSeeUnit(serverPlayer, attacker)) {
+            if (!serverPlayer.canSeeUnit(attacker)) {
                 element.appendChild(DOMMessage.toXMLElement(attacker, doc,
                                                             (Player)null));
                 if (attacker.getLocation() instanceof Unit) {
@@ -417,7 +417,7 @@ public class ChangeSet {
                     element.appendChild(DOMMessage.toXMLElement(loc, doc, serverPlayer));
                 }
             }
-            if (!canSeeUnit(serverPlayer, defender)
+            if (!serverPlayer.canSeeUnit(defender)
                 || this.defenderInSettlement) {
                 element.appendChild(DOMMessage.toXMLElement(defender, doc,
                                                             (Player)null));
@@ -612,7 +612,7 @@ public class ChangeSet {
         }
 
         private boolean seeNew(ServerPlayer serverPlayer) {
-            return canSeeUnit(serverPlayer, unit);
+            return serverPlayer.canSeeUnit(unit);
         }
 
 
@@ -767,7 +767,7 @@ public class ChangeSet {
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
                 // the more general interface-based tests.
-                return canSeeUnit(serverPlayer, (Unit)fcgo);
+                return serverPlayer.canSeeUnit((Unit)fcgo);
             }
             // If we own it, we can see it.
             if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
@@ -1787,23 +1787,6 @@ public class ChangeSet {
     }
 
     // Conversion of a change set to a corresponding element.
-
-    /**
-     * Checks if a player can see a unit.
-     *
-     * @param serverPlayer The <code>ServerPlayer</code> looking for the unit.
-     * @param unit The <code>Unit</code> to check.
-     * @return True if the <code>Unit</code> is visible to the player.
-     */
-    private static boolean canSeeUnit(ServerPlayer serverPlayer, Unit unit) {
-        Tile tile;
-        return (serverPlayer.owns(unit)) ? true
-            : ((tile = unit.getTile()) == null) ? false
-            : (!serverPlayer.canSee(tile)) ? false
-            : (tile.hasSettlement()) ? false
-            : (unit.isOnCarrier()) ? false
-            : true;
-    }
 
     /**
      * Collapse one element into another.

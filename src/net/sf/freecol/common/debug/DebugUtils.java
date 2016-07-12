@@ -576,77 +576,24 @@ public class DebugUtils {
      */
     public static boolean checkDesyncAction(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game game = freeColClient.getGame();
-        final Map map = game.getMap();
-        final Player player = freeColClient.getMyPlayer();
+        final Game cGame = freeColClient.getGame();
+        final Player cPlayer = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
         final Map sMap = sGame.getMap();
-        final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                                ServerPlayer.class);
+        final ServerPlayer sPlayer
+            = sGame.getFreeColGameObject(cPlayer.getId(), ServerPlayer.class);
 
-        boolean problemDetected = false;
         LogBuilder lb = new LogBuilder(256);
         lb.add("Desynchronization detected\n");
-        for (Tile t : toList(sMap.getAllTiles())) {
-            if (!sPlayer.canSee(t)) continue;
-            for (Unit u : transform(t.getUnits(), u ->
-                    sPlayer.owns(u) || (!t.hasSettlement() && !u.isOnCarrier()))) {
-                if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
-                    lb.add("Unit missing on client-side.\n", "  Server: ",
-                           u.getDescription(Unit.UnitLabelType.NATIONAL),
-                           "(", u.getId(), ") from: ", 
-                           u.getLocation().getId(), ".\n");
-                    try {
-                        lb.add("  Client: ", map.getTile(u.getTile().getX(),
-                               u.getTile().getY()).getFirstUnit().getId(),
-                               "\n");
-                    } catch (NullPointerException npe) {}
-                    problemDetected = true;
-                } else {
-                    Unit cUnit = game.getFreeColGameObject(u.getId(),
-                                                           Unit.class);
-                    if (cUnit.hasTile()
-                        && !cUnit.getTile().getId().equals(u.getTile().getId())) {
-                        lb.add("Unit located on different tiles.\n",
-                            "  Server: ", u.getDescription(Unit.UnitLabelType.NATIONAL),
-                            "(", u.getId(), ") from: ",
-                            u.getLocation().getId(), "\n",
-                            "  Client: ", cUnit.getDescription(Unit.UnitLabelType.NATIONAL),
-                            "(", cUnit.getId(), ") at: ",
-                            cUnit.getLocation().getId(), "\n");
-                        problemDetected = true;
-                    }
-                }
-            }
-            Tile ct = game.getFreeColGameObject(t.getId(), Tile.class);
-            Settlement sSettlement = t.getSettlement();
-            Settlement cSettlement = ct.getSettlement();
-            if (sSettlement == null) {
-                if (cSettlement == null) {
-                    ;// OK
-                } else {
-                    lb.add("Settlement still present in client: ", cSettlement);
-                    problemDetected = true;
-                }
-            } else {
-                if (cSettlement == null) {
-                    lb.add("Settlement not present in client: ", sSettlement);
-                    problemDetected = true;
-                } else if (sSettlement.getId().equals(cSettlement.getId())) {
-                    ;// OK
-                } else {
-                    lb.add("Settlements differ.\n  Server: ",
-                        sSettlement.toString(), "\n  Client: ", 
-                        cSettlement.toString(), "\n");
-                }
-            }
-        }
-
+        lb.mark();
+        sMap.forEachTile(t -> sPlayer.canSee(t),
+                         t -> checkDesyncTile(cGame, sPlayer, t, lb));
+        boolean problemDetected = lb.grew();
         boolean goodsProblemDetected = false;
         for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
             int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
-            GoodsType cg = game.getSpecification().getGoodsType(sg.getId());
-            int cPrice = player.getMarket().getBidPrice(cg, 1);
+            GoodsType cg = cGame.getSpecification().getGoodsType(sg.getId());
+            int cPrice = cPlayer.getMarket().getBidPrice(cg, 1);
             if (sPrice != cPrice) {
                 lb.add("Goods prices for ", sg, " differ.\n");
                 goodsProblemDetected = true;
@@ -654,7 +601,7 @@ public class DebugUtils {
         }
         if (goodsProblemDetected) {
             lb.add("  Server:\n", sPlayer.getMarket(), "\n",
-                "  Client:\n", player.getMarket(), "\n");
+                "  Client:\n", cPlayer.getMarket(), "\n");
             problemDetected = true;
         }
 
@@ -667,6 +614,61 @@ public class DebugUtils {
         return problemDetected;
     }
 
+    /**
+     * Check if a tile is desynchronized.
+     *
+     * @param cGame The client-side <code>Game</code>.
+     * @param sPlayer The server-side <code>ServerPlayer</code> to check for.
+     * @param sTile The server-side <code>Tile</code> to check.
+     * @param lb A <code>LogBuilder</code> to log problems to.
+     */
+    private static void checkDesyncTile(Game cGame, ServerPlayer sPlayer,
+                                        Tile sTile, LogBuilder lb) {
+        Tile cTile = cGame.getFreeColGameObject(sTile.getId(), Tile.class);
+        for (Unit su : transform(sTile.getUnits(), u -> sPlayer.canSeeUnit(u))) {
+            Unit cu = cGame.getFreeColGameObject(su.getId(), Unit.class);
+            if (cu == null) {
+                lb.add("Unit missing on client-side.\n", "  Server: ",
+                    su.getDescription(Unit.UnitLabelType.NATIONAL),
+                    "(", su.getId(), ") from: ", 
+                    su.getLocation().getId(), ".\n");
+                try {
+                    lb.add("  Client: ", cTile.getFirstUnit(), "\n");
+                } catch (NullPointerException npe) {}
+            } else {
+                if (cu.hasTile()
+                    && !cu.getTile().getId().equals(su.getTile().getId())) {
+                    lb.add("Unit located on different tiles.\n",
+                        "  Server: ", su.getDescription(Unit.UnitLabelType.NATIONAL),
+                        "(", su.getId(), ") from: ",
+                        su.getLocation().getId(), "\n",
+                        "  Client: ", cu.getDescription(Unit.UnitLabelType.NATIONAL),
+                        "(", cu.getId(), ") at: ",
+                        cu.getLocation().getId(), "\n");
+                }
+            }
+        }
+        Settlement sSettlement = sTile.getSettlement();
+        Settlement cSettlement = cTile.getSettlement();
+        if (sSettlement == null) {
+            if (cSettlement == null) {
+                ;// OK
+            } else {
+                lb.add("Settlement still present in client: ", cSettlement);
+            }
+        } else {
+            if (cSettlement == null) {
+                lb.add("Settlement not present in client: ", sSettlement);
+            } else if (sSettlement.getId().equals(cSettlement.getId())) {
+                ;// OK
+            } else {
+                lb.add("Settlements differ.\n  Server: ",
+                    sSettlement.toString(), "\n  Client: ", 
+                    cSettlement.toString(), "\n");
+            }
+        }
+    }
+        
     /**
      * Debug action to display an AI colony plan.
      *
