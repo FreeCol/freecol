@@ -147,8 +147,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
      */
     private Element error(Element element)  {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
-
-        getGUI().showErrorMessage(errorMessage.getMessageId(),
+        getGUI().showErrorMessage(errorMessage.getTemplate(),
                                   errorMessage.getMessage());
         return null;
     }

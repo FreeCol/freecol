@@ -3445,9 +3445,8 @@ public final class InGameController extends FreeColClientHolder {
      * @param message An alternative non-i18n message to display if
      *     the resource specified by <code>messageId</code> is unavailable.
      */
-    public void error(String messageId, String message) {
-        logger.warning("Error: " + messageId + "/" + message);
-        getGUI().showErrorMessage(messageId, message);
+    public void error(StringTemplate template, String message) {
+        getGUI().showErrorMessage(template, message);
     }
 
     /**

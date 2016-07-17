@@ -1201,24 +1201,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showErrorMessage(StringTemplate template) {
-        canvas.showErrorMessage(Messages.message(template));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void showErrorMessage(String messageId) {
-        canvas.showErrorMessage(messageId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void showErrorMessage(String messageId, String message) {
-        canvas.showErrorMessage(messageId, message);
+    public void showBasicErrorMessage(String message) {
+        canvas.showErrorMessage(message);
     }
 
     /**

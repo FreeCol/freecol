@@ -157,11 +157,12 @@ public final class ConnectController extends FreeColClientHolder {
      * @param port The port to use when connecting to the host.
      * @param query The <code>DOMMessage</code> query to send.
      * @param replyTag The expected tag of the reply, or null for anything.
-     * @param errorId An optional error message identifier.
+     * @param err An optional <code>StringTemplate</code> override for any
+     *     error messages.
      * @return The reply message matching the specified tag, or null on error.
      */
     private DOMMessage ask(String host, int port, DOMMessage query,
-                           String replyTag, String errorId) {
+                           String replyTag, StringTemplate err) {
         DOMMessage reply;
         try (
             Connection c = new Connection(host, port, null,
@@ -181,10 +182,8 @@ public final class ConnectController extends FreeColClientHolder {
             return reply;
         } else if (reply.isType(ErrorMessage.TAG)) {
             ErrorMessage em = (ErrorMessage)reply;
-            if (errorId == null && em.getMessageId() != null) {
-                errorId = em.getMessageId();
-            }
-            getGUI().showErrorMessage(errorId, em.getMessage());
+            if (err != null) em.setTemplate(err);
+            getGUI().showErrorMessage(em.getTemplate(), em.getMessage());
         } else {
             throw new IllegalStateException("Bogus tag: " + reply.getType());
         }
@@ -309,7 +308,7 @@ public final class ConnectController extends FreeColClientHolder {
         if (fcc.isLoggedIn()) logout(true);
 
         DOMMessage msg = ask(host, port, new GameStateMessage(),
-                             GameStateMessage.TAG, "client.noState");
+            GameStateMessage.TAG, StringTemplate.template("client.noState"));
         GameState state = (msg instanceof GameStateMessage)
             ? ((GameStateMessage)msg).getGameState()
             : null;        
@@ -329,7 +328,8 @@ public final class ConnectController extends FreeColClientHolder {
                 return false;
             }
             msg = ask(host, port, new VacantPlayersMessage(),
-                VacantPlayersMessage.TAG, "client.noPlayers");
+                      VacantPlayersMessage.TAG,
+                      StringTemplate.template("client.noPlayers"));
             List<String> names = (msg instanceof VacantPlayersMessage)
                 ? ((VacantPlayersMessage)msg).getVacantPlayers()
                 : null;
@@ -641,7 +641,8 @@ public final class ConnectController extends FreeColClientHolder {
     public List<ServerInfo> getServerList() {
         DOMMessage msg = ask(FreeCol.META_SERVER_ADDRESS,
             FreeCol.META_SERVER_PORT, new ServerListMessage(),
-            ServerListMessage.TAG, "metaServer.communicationError");
+            ServerListMessage.TAG,
+            StringTemplate.template("metaServer.communicationError"));
         return (msg instanceof ServerListMessage)
             ? ((ServerListMessage)msg).getServers()
             : null;

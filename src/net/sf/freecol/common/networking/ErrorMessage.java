@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -33,39 +35,48 @@ import org.w3c.dom.Element;
 public class ErrorMessage extends DOMMessage {
 
     public static final String TAG = "error";
-    private static final String MESSAGE_ID_TAG = "messageId";
     private static final String MESSAGE_TAG = "message";
 
-    /** A message identifier, if available. */
-    private final String messageId;
+    /** A template to present to the client. */
+    private StringTemplate template;
 
-    /** A more detailed but non-i18n message for logging/debugging. */
-    private final String message;
+    /** An optional detailed but non-i18n message for logging/debugging. */
+    private String message;
 
 
     /**
-     * Create a new <code>ErrorMessage</code> with the given message
-     * identifier and message.
+     * Create a new <code>ErrorMessage</code> with the given template
+     * and optional message.
      *
-     * @param messageId The message identifier.
-     * @param message The message.
+     * @param template The <code>StringTemplate</code> to send.
+     * @param message An optional non-i18n message.
      */
-    public ErrorMessage(String messageId, String message) {
+    public ErrorMessage(StringTemplate template, String message) {
         super(getTagName());
 
-        this.messageId = messageId;
+        this.template = template;
         this.message = message;
     }
 
     /**
+     * Create a new <code>ErrorMessage</code> with the given template
+     *
+     * @param template The <code>StringTemplate</code> to send.
+     */
+    public ErrorMessage(StringTemplate template) {
+        this(template, null);
+    }
+
+    /**
      * Create a new <code>ErrorMessage</code> with the standard client
-     * error message identifier and given message.
+     * error template and given message.
      *
      * @param message The message.
      */
     public ErrorMessage(String message) {
-        this("server.reject", message);
+        this(StringTemplate.template("server.reject"), message);
     }
+
     
     /**
      * Create a new <code>ErrorMessage</code> from a
@@ -77,20 +88,30 @@ public class ErrorMessage extends DOMMessage {
     public ErrorMessage(Game game, Element element) {
         super(getTagName());
 
-        this.messageId = element.getAttribute(MESSAGE_ID_TAG);
         this.message = element.getAttribute(MESSAGE_TAG);
+        this.template = DOMMessage.getChild(game, element, 0,
+                                            StringTemplate.class);
     }
 
 
     // Public interface
 
     /**
-     * Get the message identifier.
+     * Get the template.
      *
-     * @return The message identifier.
+     * @return The template.
      */
-    public String getMessageId() {
-        return this.messageId;
+    public StringTemplate getTemplate() {
+        return this.template;
+    }
+    
+    /**
+     * Set the template.
+     *
+     * @param template The new template.
+     */
+    public void setTemplate(StringTemplate template) {
+        this.template = template;
     }
     
     /**
@@ -126,8 +147,8 @@ public class ErrorMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            MESSAGE_ID_TAG, this.messageId,
-            MESSAGE_TAG, this.message).toXMLElement();
+            MESSAGE_TAG, this.message)
+            .add(this.template).toXMLElement();
     }
 
     /**

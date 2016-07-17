@@ -590,7 +590,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      */
     private Element error(Element element) {
         final ErrorMessage errorMessage = new ErrorMessage(getGame(), element);
-        invokeLater(() -> igc().error(errorMessage.getMessageId(),
+        invokeLater(() -> igc().error(errorMessage.getTemplate(),
                                       errorMessage.getMessage()));
         return null;
     }

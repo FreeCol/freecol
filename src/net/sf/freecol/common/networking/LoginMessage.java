@@ -19,11 +19,16 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -165,14 +170,19 @@ public class LoginMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Connection connection) {
         if (this.userName == null || this.userName.isEmpty()) {
-            return new ErrorMessage("server.missingUserName", null)
+            return new ErrorMessage(StringTemplate
+                .template("server.missingUserName"))
                 .toXMLElement();
         } else if (this.version == null || this.version.isEmpty()) {
-            return new ErrorMessage("server.missingVersion", null)
+            return new ErrorMessage(StringTemplate
+                .template("server.missingVersion"))
                 .toXMLElement();
         } else if (!this.version.equals(FreeCol.getVersion())) {
-            return new ErrorMessage("server.wrongFreeColVersion",
-                this.version + " != " + FreeCol.getVersion()).toXMLElement();
+            return new ErrorMessage(StringTemplate
+                .template("server.wrongFreeColVersion")
+                .addName("%clientVersion%", this.version)
+                .addName("%serverVersion%", FreeCol.getVersion()))
+                .toXMLElement();
         }
 
         Game game;
@@ -190,17 +200,21 @@ public class LoginMessage extends DOMMessage {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {}
                 if ((timeOut -= 1000) <= 0) {
-                    return new ErrorMessage("server.timeOut", null)
+                    return new ErrorMessage(StringTemplate
+                        .template("server.timeOut"))
                         .toXMLElement();
                 }
             }
 
             if (!game.canAddNewPlayer()) {
-                return new ErrorMessage("server.maximumPlayers", null)
+                return new ErrorMessage(StringTemplate
+                    .template("server.maximumPlayers"))
                     .toXMLElement();
             } else if (game.playerNameInUse(this.userName)) {
-                return new ErrorMessage("server.userNameInUse",
-                    this.userName + " is already in use.").toXMLElement();
+                return new ErrorMessage(StringTemplate
+                    .template("server.userNameInUse")
+                    .addName("%name%", this.userName))
+                    .toXMLElement();
             }
 
             // Create and add the new player:
@@ -221,18 +235,19 @@ public class LoginMessage extends DOMMessage {
             game = server.getGame();
             player = (ServerPlayer)game.getPlayerByName(this.userName);
             if (player == null) {
-                StringBuilder sb = new StringBuilder("Player \"");
-                sb.append(userName).append("\" is not present in the game.")
-                    .append("\n  Known players = ( ");
-                for (Player p : game.getLiveEuropeanPlayerList()) {
-                    sb.append(p.getName()).append(' ');
-                }
-                sb.append(')');
-                return new ErrorMessage("server.userNameNotPresent",
-                    sb.toString()).toXMLElement();
+                return new ErrorMessage(StringTemplate
+                    .template("server.userNameNotPresent")
+                    .addName("%name%", userName)
+                    .addName("%names%",
+                        transform(game.getLiveEuropeanPlayers(),
+                                  alwaysTrue(), Player::getName,
+                                  Collectors.joining(", "))))
+                    .toXMLElement();
             } else if (player.isConnected() && !player.isAI()) {
-                return new ErrorMessage("server.userNameInUse",
-                    this.userName + " is already in use.").toXMLElement();
+                return new ErrorMessage(StringTemplate
+                    .template("server.userNameInUse")
+                    .addName("%name%", this.userName))
+                    .toXMLElement();
             }
             player.setConnection(connection);
             player.setConnected(true);

@@ -562,7 +562,7 @@ public class ClientOptions extends OptionGroup {
      * Merge the options from the given save game.
      *
      * @param save The <code>FreeColSaveGame</code> to merge from.
-     * @return True if the options were merge without error.
+     * @return True if the options were merged without error.
      */
     public boolean merge(FreeColSavegameFile save) {
         ClientOptions clop = new ClientOptions();

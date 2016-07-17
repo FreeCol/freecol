@@ -1119,11 +1119,28 @@ public class GUI extends FreeColClientHolder {
     public void showEndTurnDialog(final List<Unit> units,
                                   DialogHandler<Boolean> handler) {}
 
-    public void showErrorMessage(StringTemplate template) {}
+    public final void showErrorMessage(String messageId) {
+        showErrorMessage(StringTemplate.template(messageId));
+    }
+    
+    public final void showErrorMessage(StringTemplate template) {
+        showErrorMessage(template, null);
+    }
 
-    public void showErrorMessage(String messageId) {}
+    public final void showErrorMessage(String messageId, String message) {
+        showErrorMessage(StringTemplate.template(messageId), message);
+    }
+    
+    public final void showErrorMessage(StringTemplate template,
+                                       String message) {
+        String display = Messages.message(template);
+        if (message != null && FreeColDebugger.isInDebugMode()) {
+            display += "/" + message + "/";
+        }
+        showBasicErrorMessage(display);
+    }
 
-    public void showErrorMessage(String messageID, String message) {}
+    public void showBasicErrorMessage(String message) {}
 
     public void showEuropePanel() {}
 

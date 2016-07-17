@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CurrentPlayerNetworkRequestHandler;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -170,8 +171,9 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         // Check if launching player is an admin.
         if (!player.isAdmin()) {
-            return new ErrorMessage("server.onlyAdminCanLaunch",
-                "Only the server admin can launch the game.").toXMLElement();
+            return new ErrorMessage(StringTemplate
+                .template("server.onlyAdminCanLaunch"))
+                .toXMLElement();
         }
         if (launching) return null;
         launching = true;
@@ -182,8 +184,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
         for (Player p : game.getLivePlayerList()) {
             final Nation nation = spec.getNation(p.getNationId());
             if (nations.contains(nation)) {
-                return new ErrorMessage("server.invalidPlayerNations",
-                    "All players need to pick a unique nation before the game can start.")
+                return new ErrorMessage(StringTemplate
+                    .template("server.invalidPlayerNations"))
                     .toXMLElement();
             }
             nations.add(nation);
@@ -191,14 +193,17 @@ public final class PreGameInputHandler extends ServerInputHandler {
 
         // Check if all players are ready.
         if (!game.allPlayersReadyToLaunch()) {
-            return new ErrorMessage("server.notAllReady",
-                "Not all players are ready to begin the game!").toXMLElement();
+            return new ErrorMessage(StringTemplate
+                .template("server.notAllReady"))
+                .toXMLElement();
         }
         try {
             ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
-            return new ErrorMessage("server.errorStartingGame",
-                                    e.getMessage()).toXMLElement();
+            return new ErrorMessage(StringTemplate
+                .template("server.errorStartingGame")
+                .addName("%extra%", e.getMessage()))
+                .toXMLElement();
         }
 
         return null;
@@ -251,8 +256,10 @@ public final class PreGameInputHandler extends ServerInputHandler {
                 int rgb = Integer.decode(str);
                 color = new Color(rgb);
             } catch (NumberFormatException nfe) {
-                return new ErrorMessage("server.badColor",
-                    "Invalid color: " + str).toXMLElement();
+                return new ErrorMessage(StringTemplate
+                    .template("server.badColor")
+                    .addName("%color%", str))
+                    .toXMLElement();
             }
             nation.setColor(color);
             freeColServer.sendToAll(new DOMMessage("updateColor",
@@ -287,8 +294,10 @@ public final class PreGameInputHandler extends ServerInputHandler {
                         "value", nation.getId()),
                     player.getConnection());
             } else {
-                return new ErrorMessage("server.badNation",
-                    "Selected non-selectable nation: " + nation)
+                return new ErrorMessage(StringTemplate
+                    .template("server.badNation")
+                    .addName("%nation%", (nation == null) ? "null"
+                        : nation.getId()))
                     .toXMLElement();
             }
         } else {
@@ -337,8 +346,9 @@ public final class PreGameInputHandler extends ServerInputHandler {
                         "value", nationType.getId()),
                     player.getConnection());
             } else {
-                return new ErrorMessage("server.badNationType",
-                    "Selected non-selectable nation type: " + nationType)
+                return new ErrorMessage(StringTemplate
+                    .template("server.badNationType")
+                    .addName("%nationType%", String.valueOf(nationType)))
                     .toXMLElement();
             }
         } else {

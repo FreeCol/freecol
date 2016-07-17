@@ -44,6 +44,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -465,7 +466,9 @@ public class Connection implements Closeable {
         try {
             reply = ask(message);
         } catch (IOException e) {
-            return new ErrorMessage("reject", e.getMessage());
+            return new ErrorMessage(StringTemplate
+                .template("connection.io")
+                .addName("%extra%", e.getMessage()));
         }
         return DOMMessage.createMessage(game, reply);
     }
@@ -482,12 +485,15 @@ public class Connection implements Closeable {
      */
     public DOMMessage ask(Game game, DOMMessage message, String replyTag) {
         DOMMessage reply = ask(game, message);
-        return (reply != null && (reply.isType(replyTag)
-                || reply.isType(ErrorMessage.TAG))) ? reply
-            : new ErrorMessage("reject", "Request: "
-                + ((message == null) ? "null" : message.getType())
-                + ", Reply: " + ((reply == null) ? "null" : reply.getType())
-                + ", Expected: " + ((replyTag == null) ? "null" : replyTag));
+        return (replyTag == null
+            || (reply != null
+                && (reply.isType(replyTag)
+                    || reply.isType(ErrorMessage.TAG)))) ? reply
+            : new ErrorMessage(StringTemplate
+                .template("connection.wrong")
+                .addName("%sentTag%", (message == null) ? "-" : message.getType())
+                .addName("%expectedTag%", replyTag)
+                .addName("%actualTag%", (reply == null) ? "-" : reply.getType()));
     }
 
     /**
