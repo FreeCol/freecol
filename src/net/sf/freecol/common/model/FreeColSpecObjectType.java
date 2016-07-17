@@ -42,12 +42,15 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * A FreeColSpecObjectType does not always need a reference to the
  * specification. However, if it has attributes or children that are
  * themselves FreeColSpecObjectTypes, then the specification must be
- * set before the type is de-serialized, otherwise the identifiers can
- * not be resolved.
+ * set before the type is de-serialized, otherwise the identifiers
+ * therein can not be resolved.
  *
  * FreeColSpecObjectTypes can be abstract. Abstract types can be used
  * to derive other types, but can not be instantiated.  They will be
  * removed from the Specification after it has loaded completely.
+ *
+ * Many FreeColSpecObjectTypes have ids, but some leaf types do not
+ * need them and there they may be omitted.
  */
 public abstract class FreeColSpecObjectType extends FreeColSpecObject
     implements Named {
@@ -272,7 +275,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
-        if (getId() == null) throw new XMLStreamException("Null id");
 
         this.abstractType = xr.getAttribute(ABSTRACT_TAG, false);
     }

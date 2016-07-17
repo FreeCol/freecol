@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.107
+<!-- XSD for specification version 0.108
      CHANGELOG:
      0.26:  add capture-equipment
      0.27:  add limits
@@ -84,6 +84,7 @@
      0.105: Fix capitalization in Operand.
      0.106: Add priority to unit-type.
      0.107: Improve unit changes.
+     0.108: Start migrating <change> to <tile-type-change>.
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
@@ -390,6 +391,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="scope"/>
         <xs:choice>
+          <xs:element ref="tile-type-change"/>
           <xs:element ref="change"/>
           <xs:element name="disaster">
             <xs:complexType>
@@ -438,7 +440,10 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="scope"/>
         <xs:choice>
+          <xs:element ref="tile-type-change"/>
+          <!-- @compat 0.11.6 -->
           <xs:element ref="change"/>
+          <!-- end @compat 0.11.6 -->
           <xs:element name="disaster">
             <xs:complexType>
               <xs:attribute name="id" type="xs:string"/>
@@ -470,7 +475,9 @@
       <!-- end @compat 0.10.x -->
     </xs:complexType>
   </xs:element>
-  
+
+  <!-- @compat 0.11.6
+       Replace the non-specific "change" with tile-type-change. -->
   <xs:element name="change">
     <xs:complexType>
       <xs:sequence>
@@ -480,7 +487,18 @@
       <xs:attribute name="to" use="required" type="TileTypeId"/>
     </xs:complexType>
   </xs:element>
+  <!-- end @compat 0.11.6 -->
 
+  <xs:element name="tile-type-change">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="production" type="AbstractGoodsType"/>
+      </xs:sequence>
+      <xs:attribute name="from" use="required" type="TileTypeId"/>
+      <xs:attribute name="to" use="required" type="TileTypeId"/>
+    </xs:complexType>
+  </xs:element>
+  
   <xs:element name="action">
     <xs:complexType>
       <xs:attribute name="name" use="required" type="xs:string"/>

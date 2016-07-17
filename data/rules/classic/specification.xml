@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.107">
+<freecol-specification id="classic" version="0.108">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1363,30 +1363,37 @@
                            expended-amount="1"
                            expose-resource-percent="5">
       <scope method-name="isForested" method-value="true" />
-      <change from="model.tile.mixedForest" to="model.tile.plains">
+      <tile-type-change from="model.tile.mixedForest" to="model.tile.plains">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.coniferForest" to="model.tile.grassland">
+      </tile-type-change>
+      <tile-type-change from="model.tile.coniferForest"
+                        to="model.tile.grassland">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.broadleafForest" to="model.tile.prairie">
+      </tile-type-change>
+      <tile-type-change from="model.tile.broadleafForest"
+                        to="model.tile.prairie">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.tropicalForest" to="model.tile.savannah">
+      </tile-type-change>
+      <tile-type-change from="model.tile.tropicalForest"
+                        to="model.tile.savannah">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.wetlandForest" to="model.tile.marsh">
+      </tile-type-change>
+      <tile-type-change from="model.tile.wetlandForest"
+                        to="model.tile.marsh">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.rainForest" to="model.tile.swamp">
+      </tile-type-change>
+      <tile-type-change from="model.tile.rainForest"
+                        to="model.tile.swamp">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
-      <change from="model.tile.scrubForest" to="model.tile.desert">
+      </tile-type-change>
+      <tile-type-change from="model.tile.scrubForest"
+                        to="model.tile.desert">
         <production goods-type="model.goods.lumber" value="10" />
-      </change>
-      <change from="model.tile.borealForest" to="model.tile.tundra">
+      </tile-type-change>
+      <tile-type-change from="model.tile.borealForest"
+                        to="model.tile.tundra">
         <production goods-type="model.goods.lumber" value="20" />
-      </change>
+      </tile-type-change>
     </tile-improvement-type>
     <tile-improvement-type id="model.improvement.fishBonusLand" natural="true"
                            zIndex="250">

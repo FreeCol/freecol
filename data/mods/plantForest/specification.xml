@@ -29,14 +29,22 @@
       <scope type="model.tile.arctic"      match-negated="true" />
       <scope type="model.tile.hills"       match-negated="true" />
       <scope type="model.tile.mountains"   match-negated="true" />
-      <change from="model.tile.plains"     to="model.tile.mixedForest"/>
-      <change from="model.tile.grassland"  to="model.tile.coniferForest"/>
-      <change from="model.tile.prairie"    to="model.tile.broadleafForest"/>
-      <change from="model.tile.savannah"   to="model.tile.tropicalForest"/>
-      <change from="model.tile.marsh"      to="model.tile.wetlandForest"/>
-      <change from="model.tile.swamp"      to="model.tile.rainForest"/>
-      <change from="model.tile.desert"     to="model.tile.scrubForest"/>
-      <change from="model.tile.tundra"     to="model.tile.borealForest"/>
+      <tile-type-change from="model.tile.plains"
+                        to="model.tile.mixedForest"/>
+      <tile-type-change from="model.tile.grassland"
+                        to="model.tile.coniferForest"/>
+      <tile-type-change from="model.tile.prairie"
+                        to="model.tile.broadleafForest"/>
+      <tile-type-change from="model.tile.savannah"
+                        to="model.tile.tropicalForest"/>
+      <tile-type-change from="model.tile.marsh"
+                        to="model.tile.wetlandForest"/>
+      <tile-type-change from="model.tile.swamp"
+                        to="model.tile.rainForest"/>
+      <tile-type-change from="model.tile.desert"
+                        to="model.tile.scrubForest"/>
+      <tile-type-change from="model.tile.tundra"
+                        to="model.tile.borealForest"/>
     </tile-improvement-type>
   </tile-improvement-types>
 </freecol-specification>

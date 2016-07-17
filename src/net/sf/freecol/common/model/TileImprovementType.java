@@ -385,7 +385,6 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     // Serialization
 
     private static final String ADD_WORK_TURNS_TAG = "add-work-turns";
-    private static final String CHANGE_TAG = "change";
     private static final String DELIVER_AMOUNT_TAG = "deliver-amount";
     private static final String DELIVER_GOODS_TYPE_TAG = "deliver-goods-type";
     private static final String DISASTER_TAG = "disaster";
@@ -398,6 +397,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     private static final String PROBABILITY_TAG = "probability";
     private static final String REQUIRED_IMPROVEMENT_TAG = "required-improvement";
     private static final String REQUIRED_ROLE_TAG = "required-role";
+    private static final String TILE_TYPE_CHANGE_TAG = "tile-type-change";
     private static final String TO_TAG = "to";
     private static final String WORKER_TAG = "worker";
     private static final String ZINDEX_TAG = "zIndex";
@@ -406,8 +406,10 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     // end @compat 0.10.x
     // @compat 0.11.3
     private static final String OLD_EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
-
     // end @compat 0.11.3
+    // @compat 0.11.6
+    private static final String OLD_CHANGE_TAG = "change";
+    // end @compat 0.11.6
 
 
     /**
@@ -548,24 +550,31 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         final Specification spec = getSpecification();
         final String tag = xr.getLocalName();
 
-        if (CHANGE_TAG.equals(tag)) {
-            TileTypeChange change = new TileTypeChange();
-            if (deliverGoodsType == null) {
-                change.readFromXML(xr, spec);
-            } else {
-                // @compat 0.10.4
+        if (TILE_TYPE_CHANGE_TAG.equals(tag)) {
+            TileTypeChange change = new TileTypeChange(xr, spec);
+            if (change != null) addChange(change);
+
+        // @compat 0.11.6
+        } else if (OLD_CHANGE_TAG.equals(tag)) {
+            // @compat 0.10.4
+            if (deliverGoodsType != null) {
+                TileTypeChange change = new TileTypeChange(spec);
                 TileType from = xr.getType(spec, FROM_TAG,
                                            TileType.class, (TileType)null);
                 TileType to = xr.getType(spec, TO_TAG,
                                          TileType.class, (TileType)null);
+                xr.closeTag(OLD_CHANGE_TAG);
                 change.setFrom(from);
                 change.setTo(to);
                 change.setProduction(new AbstractGoods(deliverGoodsType,
                                                        deliverAmount));
-                xr.closeTag(CHANGE_TAG);
-                // end @compat
+                addChange(change);
+            } else {
+            // end @compat 0.10.4
+                TileTypeChange change = new TileTypeChange(xr, spec);
+                if (change != null) addChange(change);
             }
-            addChange(change);
+        // end @compat 0.11.6
 
         } else if (DISASTER_TAG.equals(tag)) {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,

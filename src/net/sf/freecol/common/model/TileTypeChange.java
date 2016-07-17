@@ -30,7 +30,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * A change in a tile type, including some bonus production when this occurs.
  */
-public class TileTypeChange implements Comparable<TileTypeChange> {
+public class TileTypeChange extends FreeColSpecObjectType {
 
     /** The original tile type. */
     private TileType from;
@@ -46,6 +46,29 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
 
 
     /**
+     * Create a new tile type change.
+     *
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public TileTypeChange(Specification specification) {
+        super(specification);
+    }
+
+    /**
+     * Creates a new <code>TileTypeChange</code> instance.
+     *
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if an error occurs
+     */
+    public TileTypeChange(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
+        this(specification);
+
+        readFromXML(xr);
+    }
+
+
+    /**
      * Gets the original tile type.
      *
      * @return The original tile type.
@@ -54,6 +77,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
         return from;
     }
 
+    // @compat 0.10.4
     /**
      * Set the original tile type.
      *
@@ -62,6 +86,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     public final void setFrom(final TileType from) {
         this.from = from;
     }
+    // end @compat 0.10.4
 
     /**
      * Gets the destination tile type.
@@ -72,6 +97,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
         return to;
     }
 
+    // @compat 0.10.4
     /**
      * Set the destination tile type.
      *
@@ -80,6 +106,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     public final void setTo(final TileType to) {
         this.to = to;
     }
+    // end @compat 0.10.4
 
     /**
      * Gets the production consequent to the type change.
@@ -90,6 +117,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
         return production;
     }
 
+    // @compat 0.10.4
     /**
      * Set the production consequent to the type change.
      *
@@ -98,23 +126,28 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     public final void setProduction(final AbstractGoods production) {
         this.production = production;
     }
+    // end @compat 0.10.4
 
 
-    // Interface Comparable<TileTypeChange>
+    // Override FreeColObject
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int compareTo(TileTypeChange other) {
-        int cmp;
-        cmp = (from == null) ? ((other.from == null) ? 0 : -1)
-            : (other.from == null) ? 1
-            : FreeColObject.compareIds(from, other.from);
-        if (cmp != 0) return cmp;
-        return (to == null) ? ((other.to == null) ? 0 : -1)
-            : (other.to == null) ? 1
-            : FreeColObject.compareIds(to, other.to);
+    public int compareTo(FreeColObject fco) {
+        int cmp = 0;
+        if (fco instanceof TileTypeChange) {
+            TileTypeChange other = (TileTypeChange)fco;
+            cmp = (from == null) ? ((other.from == null) ? 0 : -1)
+                : (other.from == null) ? 1
+                : FreeColObject.compareIds(from, other.from);
+            if (cmp == 0) cmp = (to == null) ? ((other.to == null) ? 0 : -1)
+                              : (other.to == null) ? 1
+                              : FreeColObject.compareIds(to, other.to);
+        }
+        if (cmp == 0) cmp = super.compareTo(fco);
+        return cmp;
     }
 
     // Override Object
@@ -136,9 +169,9 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 37 * hash + Utils.hashCode(from);
-        hash = 37 * hash + Utils.hashCode(to);
-        return 37 * hash + Utils.hashCode(production);
+        hash = 37 * hash + Utils.hashCode(this.from);
+        hash = 37 * hash + Utils.hashCode(this.to);
+        return 37 * hash + Utils.hashCode(this.production);
     }
 
 
@@ -152,46 +185,60 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
 
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getTagName());
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        // No id, so no super.writeAttributes().
 
-        xw.writeAttribute(FROM_TAG, from);
+        xw.writeAttribute(FROM_TAG, this.from);
 
-        xw.writeAttribute(TO_TAG, to);
-
-        if (production != null) {
-            xw.writeStartElement(PRODUCTION_TAG);
-
-            xw.writeAttribute(GOODS_TYPE_TAG, production.getType());
-
-            xw.writeAttribute(VALUE_TAG, production.getAmount());
-
-            xw.writeEndElement();
-        }
-
-        xw.writeEndElement();
+        xw.writeAttribute(TO_TAG, this.to);
     }
 
     /**
-     * Reads this object from an XML stream.
-     *
-     * @param xr The XML input stream.
-     * @param spec The <code>Specification</code> to use.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(FreeColXMLReader xr,
-                            Specification spec) throws XMLStreamException {
+    @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        if (this.production != null) {
+            xw.writeStartElement(PRODUCTION_TAG);
+
+            xw.writeAttribute(GOODS_TYPE_TAG, this.production.getType());
+
+            xw.writeAttribute(VALUE_TAG, this.production.getAmount());
+
+            xw.writeEndElement();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        // No id, so no super.readAttributes().
+        final Specification spec = getSpecification();
+    
         from = xr.getType(spec, FROM_TAG, TileType.class, (TileType)null);
 
         to = xr.getType(spec, TO_TAG, TileType.class, (TileType)null);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        // Clear containers.
+        if (xr.shouldClearContainers()) {
+            this.production = null;
+        }
+    
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tag = xr.getLocalName();
 
@@ -201,7 +248,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
 
                 int amount = xr.getAttribute(VALUE_TAG, 0);
 
-                production = new AbstractGoods(type, amount);
+                this.production = new AbstractGoods(type, amount);
 
                 xr.closeTag(PRODUCTION_TAG);
 
@@ -222,9 +269,9 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "change".
+     * @return "tile-type-change".
      */
     public static String getTagName() {
-        return "change";
+        return "tile-type-change";
     }
 }
