@@ -224,7 +224,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      */
     protected boolean save(File file) {
         if (this.group.save(file, null, true)) return true;
-        getGUI().showErrorMessage(FreeCol.badSave(file));
+        getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave", file));
         return false;
     }
 

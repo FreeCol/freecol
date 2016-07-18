@@ -1286,25 +1286,15 @@ public final class FreeCol {
 
 
     /**
-     * Utility to make a load failure message.
+     * Generate a failure message depending on a file parameter.
      *
-     * @param file The <code>File</code> that failed to load.
+     * @param messageId The failure message identifier.
+     * @param file The <code>File</code> that caused the failure.
      * @return A <code>StringTemplate</code> with the error message.
      */
-    public static StringTemplate badLoad(File file) {
-        return StringTemplate.template("error.couldNotLoad")
-            .addName("%name%", file.getPath());
-    }
-
-    /**
-     * Utility to make a save failure message.
-     *
-     * @param file The <code>File</code> that failed to save.
-     * @return A <code>StringTemplate</code> with the error message.
-     */
-    public static StringTemplate badSave(File file) {
-        return StringTemplate.template("error.couldNotSave")
-            .addName("%name%", file.getPath());
+    public static StringTemplate badFile(String messageId, File file) {
+        return StringTemplate.template(messageId)
+            .addName("%name%", (file == null) ? "-" : file.getPath());
     }
 
     /**
@@ -1401,7 +1391,7 @@ public final class FreeCol {
                 }
             } catch (Exception e) {
                 if (checkIntegrity) gripe("cli.check-savegame.failure");
-                fatal(Messages.message(badLoad(saveGame))
+                fatal(Messages.message(badFile("error.couldNotLoad", saveGame))
                     + ": " + e.getMessage());
                 return;
             }

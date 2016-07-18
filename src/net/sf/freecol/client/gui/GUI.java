@@ -35,6 +35,7 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
@@ -1119,28 +1120,52 @@ public class GUI extends FreeColClientHolder {
     public void showEndTurnDialog(final List<Unit> units,
                                   DialogHandler<Boolean> handler) {}
 
-    public final void showErrorMessage(String messageId) {
-        showErrorMessage(StringTemplate.template(messageId));
-    }
-    
+    /**
+     * Show an i18n compliant error message derived from a template.
+     *
+     * @param template The <code>StringTemplate</code> containing the message.
+     */
     public final void showErrorMessage(StringTemplate template) {
         showErrorMessage(template, null);
     }
 
-    public final void showErrorMessage(String messageId, String message) {
-        showErrorMessage(StringTemplate.template(messageId), message);
-    }
-    
+    /**
+     * Show an i18n compliant error message derived from a template,
+     * with optional extra debug information.
+     *
+     * @param template The <code>StringTemplate</code> containing the message.
+     * @param messsage Optional extra debug information.
+     */
     public final void showErrorMessage(StringTemplate template,
                                        String message) {
+        showErrorMessage(template, message, null);
+    }
+    
+    /**
+     * Show an i18n compliant error message derived from a template,
+     * with optional extra debug information and an optional callback.
+     *
+     * @param template The <code>StringTemplate</code> containing the message.
+     * @param messsage Optional extra debug information.
+     * @param callback Optional routine to run when the error panel is closed.
+     */
+    public final void showErrorMessage(StringTemplate template, String message,
+                                       Runnable callback) {
         String display = Messages.message(template);
         if (message != null && FreeColDebugger.isInDebugMode()) {
             display += "/" + message + "/";
         }
-        showBasicErrorMessage(display);
+        showErrorMessage(display, callback);
     }
 
-    public void showBasicErrorMessage(String message) {}
+    /**
+     * Show an error message.  The error message should be fully formatted
+     * by now.
+     *
+     * @param message The actual final error message.
+     * @param callback Optional routine to run when the error panel is closed.
+     */
+    protected void showErrorMessage(String message, Runnable callback) {}
 
     public void showEuropePanel() {}
 
@@ -1206,7 +1231,7 @@ public class GUI extends FreeColClientHolder {
     final public File showLoadSaveFileDialog() {
         File file = showLoadDialog(FreeColDirectories.getSaveDirectory());
         if (file != null && !file.isFile()) {
-            showErrorMessage("error.noSuchFile");
+            showErrorMessage(FreeCol.badFile("error.noSuchFile", file));
             file = null;
         }
         return file;

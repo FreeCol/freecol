@@ -135,12 +135,14 @@ public final class ConnectController extends FreeColClientHolder {
                                               spec, port, null);
         } catch (IOException e) {
             freeColServer = null;
-            getGUI().showErrorMessage("server.initialize");
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.initialize"));
             logger.log(Level.WARNING, "Could not start server.", e);
         }
         if (publicServer && freeColServer != null
             && !freeColServer.getPublicServer()) {
-            getGUI().showErrorMessage("server.noRouteToServer");
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.noRouteToServer"));
         }
         return freeColServer;
     }
@@ -170,8 +172,8 @@ public final class ConnectController extends FreeColClientHolder {
         ) {
             reply = c.ask(getGame(), query, replyTag);
         } catch (IOException ioe) {
-            getGUI().showErrorMessage("server.couldNotConnect",
-                                      ioe.getMessage());
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.couldNotConnect"), ioe.getMessage());
             logger.log(Level.WARNING, "Could not connect to " + host
                 + ":" + port, ioe);
             return null;
@@ -222,7 +224,8 @@ public final class ConnectController extends FreeColClientHolder {
             if (message == null) message = "connection exception";
         }
         if (message != null) {
-            getGUI().showErrorMessage("server.couldNotConnect", message);
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.couldNotConnect"), message);
             return false;
         }
         logger.info("Connected to " + host + ":" + port);
@@ -233,7 +236,7 @@ public final class ConnectController extends FreeColClientHolder {
         Game game;
         if (!askServer().login(user, FreeCol.getVersion())
             || (game = getGame()) == null) {
-            getGUI().showErrorMessage("server.couldNotLogin");
+            getGUI().showErrorMessage(StringTemplate.template("server.couldNotLogin"));
             return false;
         } else if (getMyPlayer() == null) {
             return false; // Error handled in PGIH.login
@@ -324,7 +327,8 @@ public final class ConnectController extends FreeColClientHolder {
         case IN_GAME:
             // Disable this check if you need to debug a multiplayer client.
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-                getGUI().showErrorMessage("client.debugConnect");
+                getGUI().showErrorMessage(StringTemplate
+                    .template("client.debugConnect"));
                 return false;
             }
             msg = ask(host, port, new VacantPlayersMessage(),
@@ -349,7 +353,7 @@ public final class ConnectController extends FreeColClientHolder {
             break;
 
         case ENDING_GAME: default:
-            getGUI().showErrorMessage("client.ending");
+            getGUI().showErrorMessage(StringTemplate.template("client.ending"));
             return false;
         }
         return true;
@@ -432,7 +436,7 @@ public final class ConnectController extends FreeColClientHolder {
                 if (this.template != null) {
                     getGUI().showErrorMessage(template);
                 } else {
-                    getGUI().showErrorMessage(message);
+                    getGUI().showErrorMessage(StringTemplate.name(message));
                 }
             }
         }
@@ -444,7 +448,7 @@ public final class ConnectController extends FreeColClientHolder {
         try {
             fis = new FreeColSavegameFile(file);
         } catch (IOException ioe) {
-            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badFile("error.couldNotLoad", file)));
             logger.log(Level.WARNING, "Could not open save file: "
                 + file.getName());
             return false;
@@ -475,12 +479,12 @@ public final class ConnectController extends FreeColClientHolder {
                 e);
             return false;
         } catch (XMLStreamException e) {
-            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badFile("error.couldNotLoad", file)));
             logger.log(Level.WARNING, "Error reading game from: "
                 + file.getName(), e);
             return false;
         } catch (Exception e) {
-            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(file)));
+            SwingUtilities.invokeLater(new ErrorJob(FreeCol.badFile("error.couldNotLoad", file)));
             logger.log(Level.WARNING, "Could not load game from: "
                 + file.getName(), e);
             return false;
@@ -545,7 +549,7 @@ public final class ConnectController extends FreeColClientHolder {
                 err = StringTemplate.key("server.initialize");
                 logger.log(Level.WARNING, "Error starting game.", e);
             } catch (XMLStreamException e) {
-                err = FreeCol.badLoad(theFile);
+                err = FreeCol.badFile("error.couldNotLoad", theFile);
                 logger.log(Level.WARNING, "Stream error.", e);
             } catch (Exception e) {
                 String msg = e.getMessage();
@@ -640,9 +644,9 @@ public final class ConnectController extends FreeColClientHolder {
      */
     public List<ServerInfo> getServerList() {
         DOMMessage msg = ask(FreeCol.META_SERVER_ADDRESS,
-            FreeCol.META_SERVER_PORT, new ServerListMessage(),
-            ServerListMessage.TAG,
-            StringTemplate.template("metaServer.communicationError"));
+                             FreeCol.META_SERVER_PORT, new ServerListMessage(),
+                             ServerListMessage.TAG,
+                             StringTemplate.template("metaServer.communicationError"));
         return (msg instanceof ServerListMessage)
             ? ((ServerListMessage)msg).getServers()
             : null;

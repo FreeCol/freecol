@@ -1201,8 +1201,8 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public void showBasicErrorMessage(String message) {
-        canvas.showErrorMessage(message);
+    protected void showErrorMessage(String message, Runnable callback) {
+        canvas.showErrorMessage(message, callback);
     }
 
     /**

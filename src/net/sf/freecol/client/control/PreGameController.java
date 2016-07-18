@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -89,7 +90,8 @@ public final class PreGameController extends FreeColClientHolder {
             askServer().requestLaunch();
 
         } else {
-            getGUI().showErrorMessage("server.notAllReady");
+            getGUI().showErrorMessage(StringTemplate
+                .template("server.notAllReady"));
         }
     }
 

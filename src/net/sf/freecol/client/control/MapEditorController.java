@@ -113,7 +113,7 @@ public final class MapEditorController extends FreeColClientHolder {
             getGUI().changeViewMode(GUI.VIEW_TERRAIN_MODE);
             getGUI().startMapEditorGUI();
         } catch (IOException e) {
-            getGUI().showErrorMessage("server.initialize");
+            getGUI().showErrorMessage(StringTemplate.template("server.initialize"));
             return;
         }
     }
@@ -197,31 +197,34 @@ public final class MapEditorController extends FreeColClientHolder {
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
+        final GUI gui = getGUI();
         final Game game = getGame();
         Map map = game.getMap();
         map.resetContiguity();
         map.resetHighSeasCount();
         map.resetLayers();
 
-        getGUI().showStatusPanel(Messages.message("status.savingGame"));
-        Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
+        gui.showStatusPanel(Messages.message("status.savingGame"));
+        new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
                 @Override
                 public void run() {
                     try {
-                        BufferedImage thumb = getGUI().createMiniMapThumbNail();
+                        BufferedImage thumb = gui.createMiniMapThumbNail();
                         getFreeColServer().saveMapEditorGame(file, thumb);
                         SwingUtilities.invokeLater(() -> {
-                                getGUI().closeStatusPanel();
-                                getGUI().requestFocusInWindow();
+                                gui.closeStatusPanel();
+                                gui.requestFocusInWindow();
                             });
                     } catch (IOException e) {
                         SwingUtilities.invokeLater(() -> {
-                                getGUI().showErrorMessage(FreeCol.badSave(file));
-                            });
+                                gui.closeStatusPanel();
+                                gui.showErrorMessage(FreeCol
+                                    .badFile("error.couldNotSave", file),
+                                    (e == null) ? null : e.getMessage());
+                            });    
                     }
                 }
-            };
-        t.start();
+            }.start();
     }
 
     /**
@@ -300,7 +303,7 @@ public final class MapEditorController extends FreeColClientHolder {
                 SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.initialize")));
             } catch (XMLStreamException e) {
                 reloadMainPanel();
-                SwingUtilities.invokeLater(new ErrorJob(FreeCol.badLoad(theFile)));
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.badFile("error.couldNotLoad", theFile)));
             }
         };
         getFreeColClient().setWork(loadGameJob);

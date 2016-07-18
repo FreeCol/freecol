@@ -1878,34 +1878,13 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays an error message.
      *
-     * @param messageId The i18n-keyname of the error message to display.
+     * @param message The message to display.
+     * @param callback Optional routine to run when the error panel is closed.
      */
-    public void showErrorMessage(String messageId) {
-        showErrorMessage(messageId, "Unspecified error: " + messageId);
-    }
-
-    /**
-     * Displays an error message.
-     *
-     * @param messageId The i18n-keyname of the error message to display.
-     * @param message An alternative (possibly non-i18n) message to
-     *     display if the resource specified by <code>messageId</code>
-     *     is unavailable.
-     */
-    public void showErrorMessage(String messageId, String message) {
-        String display = (messageId == null) ? null
-            : Messages.message(messageId);
-        if (message != null
-            && (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)
-                || display == null)) {
-            // If debugging suppress the bland but i18n compliant
-            // failure message in favour of the higher detail non-i18n text.
-            // Otherwise use the message if the messageId failed to provide
-            // anything useful.
-            display = message;
-        }
-        if (display != null) {
-            ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
+    public void showErrorMessage(String message, Runnable callback) {
+        if (message != null) {
+            ErrorPanel errorPanel = new ErrorPanel(freeColClient, message);
+            if (callback != null) errorPanel.addClosingCallback(callback);
             showSubPanel(errorPanel, true);
         }
     }
@@ -2065,7 +2044,7 @@ public final class Canvas extends JDesktopPane {
      * @param icon The icon to display for the object.
      * @param template The <code>StringTemplate</code> to display.
      */
-    void showInformationMessage(FreeColObject displayObject,
+    public void showInformationMessage(FreeColObject displayObject,
                                        Tile tile, ImageIcon icon,
                                        StringTemplate template) {
         String text = Messages.message(template);
@@ -2081,17 +2060,16 @@ public final class Canvas extends JDesktopPane {
      * @param filters The file filters which the user can select in the dialog.
      * @return The selected <code>File</code>.
      */
-    File showLoadDialog(File directory, FileFilter[] filters) {
+    public File showLoadDialog(File directory, FileFilter[] filters) {
         if (filters == null) filters = getFileFilters();
-        File response = null;
+        File file = null;
         for (;;) {
-            response = showFreeColDialog(new LoadDialog(freeColClient, frame,
-                                                        directory, filters),
-                                         null);
-            if (response == null || response.isFile()) break;
-            showErrorMessage("error.noSuchFile");
+            file = showFreeColDialog(new LoadDialog(freeColClient, frame,
+                                                    directory, filters), null);
+            if (file == null || file.isFile()) break;
+            showErrorMessage(Messages.message(FreeCol.badFile("error.noSuchFile", file)), null);
         }
-        return response;
+        return file;
     }
 
     /**

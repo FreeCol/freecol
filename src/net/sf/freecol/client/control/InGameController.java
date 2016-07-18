@@ -598,7 +598,8 @@ public final class InGameController extends FreeColClientHolder {
                 server.saveGame(file, getClientOptions(), getGUI().getActiveUnit());
                 result = true;
             } catch (IOException e) {
-                getGUI().showErrorMessage(FreeCol.badSave(file));
+                getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave",
+                                                          file));
             } finally {
                 getGUI().closeStatusPanel();
             }
@@ -3441,9 +3442,8 @@ public final class InGameController extends FreeColClientHolder {
      *
      * Called from IGIH.error.
      *
-     * @param messageId The i18n-keyname of the error message to display.
-     * @param message An alternative non-i18n message to display if
-     *     the resource specified by <code>messageId</code> is unavailable.
+     * @param template A <code>StringTemplate</code> to display.
+     * @param message An extra non-i18n message to display if debugging.
      */
     public void error(StringTemplate template, String message) {
         getGUI().showErrorMessage(template, message);
