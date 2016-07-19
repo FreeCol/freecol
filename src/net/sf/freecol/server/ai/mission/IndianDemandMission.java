@@ -155,6 +155,8 @@ public class IndianDemandMission extends Mission {
      */
     public Goods selectGoods(Colony target) {
         final Specification spec = getSpecification();
+        final List<GoodsType> goodsTypes = transform(spec.getGoodsTypeList(),
+            gt -> target.getGoodsCount(gt) > 0);
         final int dx = spec.getInteger(GameOptions.NATIVE_DEMANDS) + 1;
         final Game game = target.getGame();
         final Market market = target.getOwner().getMarket();
@@ -178,7 +180,7 @@ public class IndianDemandMission extends Mission {
         if (goods == null
             && tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             final Predicate<Goods> angryPred = g ->
-                !g.getType().isFoodType() && !g.getType().isMilitaryGoods();
+                !g.isFoodType() && !g.getType().isMilitaryGoods();
             goods = maximize(target.getCompactGoods(), angryPred, marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }
@@ -186,9 +188,7 @@ public class IndianDemandMission extends Mission {
         // Otherwise try military, building, trade, refined goods in order,
         if (goods == null) {
             GoodsType goodsType = first(flatten(selectPredicates,
-                    pred -> transform(spec.getGoodsTypeList(),
-                        gt -> pred.test(gt) && target.getGoodsCount(gt) > 0)
-                        .stream()));
+                    pred -> transform(goodsTypes, gt -> pred.test(gt)).stream()));
             if (goodsType != null) {
                 goods = new Goods(getGame(), target, goodsType,
                     capAmount(target.getGoodsCount(goodsType), dx));

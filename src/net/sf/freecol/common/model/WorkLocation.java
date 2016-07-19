@@ -388,7 +388,7 @@ public abstract class WorkLocation extends UnitLocation
         GoodsType work;
         Suggestion sug;
         // Check if the existing non-student units can be improved.
-        for (Unit u : transform(getUnits(), u -> u.getTeacher() == null)) {
+        for (Unit u : transform(getUnits(), isNull(Unit::getTeacher))) {
             if ((work = u.getWorkType()) == null) {
                 if (occ != null) work = occ.workType;
             }
@@ -537,7 +537,7 @@ public abstract class WorkLocation extends UnitLocation
         return (pt == null) ? null
             : find(map(pt.getOutputs(),
                        ag -> spec.getExpertForProducing(ag.getType())),
-                   notNull());
+                   isNotNull());
     }
 
     /**

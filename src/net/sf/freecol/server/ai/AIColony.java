@@ -1023,7 +1023,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         List<GoodsType> producing
             = sort(transform(flatten(colony.getAvailableWorkLocations(),
                                      WorkLocation::getUnits),
-                             u -> u.getWorkType() != null,
+                             isNotNull(Unit::getWorkType),
                              u -> u.getWorkType().getStoredAs(),
                              Collectors.toSet()),
                    comp);
@@ -1239,7 +1239,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             GoodsType goodsType;
             if (colonyTile.isColonyCenterTile()) {
                 AbstractGoods food = find(wl.getProduction(),
-                                          AbstractGoods.isFoodType);
+                                          AbstractGoods::isFoodType);
                 goodsType = (food == null) ? null : food.getType();
             } else {
                 goodsType = (wl.isEmpty()) ? null : wl.getCurrentWorkType();

@@ -101,7 +101,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
             }
         }
         // Buy what is needed
-        for (AbstractGoods ag : transform(required, g -> g.getAmount() > 0)) {
+        for (AbstractGoods ag : transform(required, AbstractGoods::isPositive)) {
             int m = owner.buy(null, ag.getType(), ag.getAmount());
             if (m > 0) {
                 owner.addExtraTrade(new AbstractGoods(ag.getType(), -m));

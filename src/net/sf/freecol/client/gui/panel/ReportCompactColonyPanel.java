@@ -89,6 +89,10 @@ import static net.sf.freecol.common.util.StringUtils.*;
 public final class ReportCompactColonyPanel extends ReportPanel
     implements ActionListener {
 
+    /** Predicate to select units that are not working. */
+    private static final Predicate<Unit> notWorkingPred = u ->
+        u.getState() != Unit.UnitState.FORTIFIED && u.getState() != Unit.UnitState.SENTRY;
+    
     /** Container class for all the information about a colony. */
     private static class ColonySummary {
 
@@ -207,10 +211,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
             this.sizeChange = colony.getPreferredSizeChange();
 
             for (GoodsType gt : goodsTypes) produce(gt);
-                
+
             this.notWorking.addAll(transform(colony.getTile().getUnits(),
-                    u -> (u.getState() != Unit.UnitState.FORTIFIED
-                        && u.getState() != Unit.UnitState.SENTRY)));
+                                             notWorkingPred));
 
             // Collect the types of the units at work in the colony
             // (colony tiles and buildings) that are suboptimal (and
@@ -221,8 +224,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
             // FIXME: this needs to be merged with the requirements
             // checking code, but that in turn should be opened up
             // so the AI can use it...
-            for (WorkLocation wl : transform(colony.getAvailableWorkLocations(),
-                                             w -> w.canBeWorked())) {
+            for (WorkLocation wl :transform(colony.getAvailableWorkLocations(),
+                                            WorkLocation::canBeWorked)) {
                 if (wl.canTeach()) {
                     for (Unit u : wl.getUnitList()) {
                         teachers.put(u, u.getNeededTurnsOfTraining()
@@ -344,6 +347,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
         }
     };
 
+    /** Predicate to select the goods to report on. */
+    private static final Predicate<GoodsType> reportGoodsPred = gt ->
+        gt.isStorable() && !gt.isTradeGoods();
     private static final String BUILDQUEUE = "buildQueue.";
     private static final String cAlarmKey = "color.report.colony.alarm";
     private static final String cWarnKey = "color.report.colony.warning";
@@ -388,13 +394,10 @@ public final class ReportCompactColonyPanel extends ReportPanel
             = freeColClient.getClientOptions().getColonyComparator();
         final Comparator<List<Colony>> firstColonyComparator
             = Comparator.comparing(l -> first(l), colonyComparator);
-        this.colonies.addAll(transform(continents.entrySet(), alwaysTrue(),
-                                       Entry::getValue, firstColonyComparator));
+        this.colonies.addAll(sort(continents.values(), firstColonyComparator));
 
-        final Predicate<GoodsType> goodsPred = gt ->
-            gt.isStorable() && !gt.isTradeGoods();
-        this.goodsTypes.addAll(transform(spec.getGoodsTypeList(), goodsPred,
-                                         Function.identity(),
+        this.goodsTypes.addAll(transform(spec.getGoodsTypeList(),
+                                         reportGoodsPred, Function.identity(),
                                          GoodsType.goodsTypeComparator));
 
         loadResources();

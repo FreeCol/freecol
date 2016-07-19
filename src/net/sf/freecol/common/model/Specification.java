@@ -1349,7 +1349,7 @@ public final class Specification {
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
         return transform(getUnitTypesWithAbility(Ability.REF_UNIT),
-                         ut -> ut.isNaval() == naval);
+                         matchKey(naval, UnitType::isNaval));
     }
 
     /**
@@ -2016,28 +2016,28 @@ public final class Specification {
             });
 
         // Unit type indexes moved into the spec
-        for (Modifier mod : transform(flatten(unitTypeList, UnitType::getModifiers),
-                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+        final Predicate<Modifier> goodsPred = m ->
+            allTypes.get(m.getId()) instanceof GoodsType;
+        for (Modifier mod : transform(flatten(unitTypeList,
+                    UnitType::getModifiers), goodsPred)) {
             mod.setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
         }
 
         // Father production modifiers have moved to the spec
         for (Modifier mod : transform(flatten(foundingFathers,
-                                              FoundingFather::getModifiers),
-                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+                    FoundingFather::getModifiers), goodsPred)) {
             mod.setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
         }
 
         // Tile improvement type modifier index has moved to the spec
-        for (Modifier mod : transform(flatten(tileImprovementTypeList, TileImprovementType::getModifiers),
-                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+        for (Modifier mod : transform(flatten(tileImprovementTypeList,
+                    TileImprovementType::getModifiers), goodsPred)) {
             mod.setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
         }
 
         // Building type modifier indexes have moved to the spec
         for (BuildingType bt : buildingTypeList) {
-            for (Modifier mod : transform(bt.getModifiers(),
-                    m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+            for (Modifier mod : transform(bt.getModifiers(), goodsPred)) {
                 mod.setModifierIndex((bt.hasAbility(Ability.AUTO_PRODUCTION))
                     ? Modifier.AUTO_PRODUCTION_INDEX
                     : Modifier.BUILDING_PRODUCTION_INDEX);
@@ -2045,8 +2045,8 @@ public final class Specification {
         }
 
         // European nation type production modifier indexes moved to the spec
-        for (Modifier mod : transform(flatten(europeanNationTypes, EuropeanNationType::getModifiers),
-                m -> allTypes.get(m.getId()) instanceof GoodsType)) {
+        for (Modifier mod : transform(flatten(europeanNationTypes,
+                    EuropeanNationType::getModifiers), goodsPred)) {
             mod.setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
         }
 

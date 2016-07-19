@@ -612,7 +612,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
-                         t -> t.getContiguity() == contiguity,
+                         matchKey(contiguity, Tile::getContiguity),
                          Function.identity(), Collectors.toSet());
     }
 
@@ -1291,7 +1291,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The number of adjacent available tiles.
      */
     public int getAvailableAdjacentCount() {
-        return count(getSurroundingTiles(1, 1), t -> t.isLand() == isLand());
+        return count(getSurroundingTiles(1, 1),
+                     matchKey(isLand(), Tile::isLand));
     }
 
     /**
@@ -1300,7 +1301,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of adjacent <code>Colony</code>s.
      */
     public List<Colony> getAdjacentColonies() {
-        return transform(getSurroundingTiles(0, 1), t -> t.getColony() != null,
+        return transform(getSurroundingTiles(0,1), isNotNull(Tile::getColony),
                          Tile::getColony);
     }
 
@@ -1790,7 +1791,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 getPotentialProduction(ag.getType(), null));
         return maximize(flatten(getType().getAvailableProductionTypes(true),
                                 pt -> pt.getOutputs()),
-                        AbstractGoods.isFoodType, goodsComp);
+                        AbstractGoods::isFoodType, goodsComp);
     }
 
 

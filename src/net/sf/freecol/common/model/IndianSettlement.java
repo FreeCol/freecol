@@ -420,7 +420,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @return The number of wanted goods.
      */
     public int getWantedGoodsCount() {
-        return count(this.wantedGoods, notNull());
+        return count(this.wantedGoods, isNotNull());
     }
 
     /**

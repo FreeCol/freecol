@@ -833,7 +833,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     private void csActivateSentries(Tile tile, ChangeSet cs) {
         for (Unit u : transform(tile.getUnits(),
-                                u -> u.getState() == UnitState.SENTRY)) {
+                                matchKey(UnitState.SENTRY, Unit::getState))) {
             u.setState(UnitState.ACTIVE);
             cs.add(See.perhaps(), u);
         }

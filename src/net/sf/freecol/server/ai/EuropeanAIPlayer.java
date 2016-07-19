@@ -116,6 +116,15 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
+    /** Predicate to select units that can be equipped. */
+    private static final Predicate<Unit> equipPred = u ->
+        u.hasDefaultRole() && u.hasAbility(Ability.CAN_BE_EQUIPPED);
+
+    /** Predicate to select party modifiers. */
+    private static final Predicate<Modifier> partyPred
+        = matchKey(Specification.COLONY_GOODS_PARTY_SOURCE,
+                   Modifier::getSource);
+
     /** Maximum number of turns to travel to a building site. */
     private static final int buildingRange = 5;
 
@@ -434,14 +443,12 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 // benefit of `temporary' cheat code).  If we do not
                 // do this, AI colonies accumulate heaps of party
                 // modifiers because of the cheat boycott removal.
-                final Predicate<Modifier> partyPred = m ->
-                    Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource();
                 final CachingFunction<Colony, Modifier> partyModifierMapper
                     = new CachingFunction<>(c ->
                         first(transform(c.getModifiers(), partyPred)));
                 Colony party = getRandomMember(logger, "end boycott",
                     transform(player.getColonies(),
-                              c -> partyModifierMapper.apply(c) != null),
+                              isNotNull(c -> partyModifierMapper.apply(c))),
                     air);
                 if (party != null) {
                     party.removeModifier(partyModifierMapper.apply(party));
@@ -451,8 +458,6 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }
         }
     
-        final Predicate<Unit> equipPred = u ->
-            u.hasDefaultRole() && u.hasAbility(Ability.CAN_BE_EQUIPPED);
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
             && randoms[cheatIndex++] < equipScoutCheatPercent) {
@@ -831,7 +836,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             tipMap.get(t);
         TileImprovementPlan best
             = maximize(map(colony.getOwnedTiles(), tileMapper),
-                       notNull(), valueComp);
+                       isNotNull(), valueComp);
         return (best == null) ? null : best.getTarget();
     }
 

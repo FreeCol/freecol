@@ -707,7 +707,7 @@ public class ColonyPlan {
                             t2 -> (t2.getOwningSettlement() == colony
                                 || player.canClaimForSettlement(t2)))) {
                         for (AbstractGoods ag : t.getSortedPotential()) {
-                            if (ag.getType().isFoodType()) {
+                            if (ag.isFoodType()) {
                                 if (t.isLand()) {
                                     landFood += ag.getAmount();
                                 } else {

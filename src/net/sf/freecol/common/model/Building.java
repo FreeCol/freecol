@@ -233,7 +233,7 @@ public class Building extends WorkLocation
         if (canAutoProduce()) {
             // Autoproducers are special
             for (AbstractGoods output : transform(getOutputs(),
-                                                  o -> o.getAmount() > 0)) {
+                                                  AbstractGoods::isPositive)) {
                 final GoodsType goodsType = output.getType();
                 int available = getColony().getGoodsCount(goodsType);
                 if (available >= capacity) {

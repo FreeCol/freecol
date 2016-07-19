@@ -362,7 +362,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         int limit = getWarehouseCapacity();
         int adjustment = limit / GoodsContainer.CARGO_SIZE;
         for (Goods goods : transform(getCompactGoods(),
-                                     g -> g.getType().isStorable())) {
+                                     AbstractGoods::isStorable)) {
             GoodsType type = goods.getType();
             ExportData exportData = getExportData(type);
             int low = exportData.getLowLevel() * adjustment;

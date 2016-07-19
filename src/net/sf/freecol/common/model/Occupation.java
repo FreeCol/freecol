@@ -98,11 +98,10 @@ public class Occupation {
 
         // Try the available production types for the best production.
         final Colony colony = wl.getColony();
-        for (ProductionType pt : transform(productionTypes, pt -> pt != null)) {
+        for (ProductionType pt : transform(productionTypes, isNotNull())) {
             lb.add("\n      try=", pt);
             
-            for (GoodsType gt : transform(workTypes,
-                                          g -> pt.getOutput(g) != null)) {
+            for (GoodsType gt : transform(workTypes, isNotNull(g -> pt.getOutput(g)))) {
                 int minInput = min(pt.getInputs(),
                     ag -> Math.max(colony.getNetProductionOf(ag.getType()),
                                    colony.getGoodsCount(ag.getType())));

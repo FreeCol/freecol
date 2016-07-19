@@ -1682,7 +1682,7 @@ public final class InGameController extends Controller {
             lost = true;
         }
         for (Unit u : transform(serverPlayer.getHighSeas().getUnits(),
-                                u -> u.getDestination() == europe)) {
+                                matchKey(europe, Unit::getDestination))) {
             seized.addStringTemplate(u.getLabel());
             cs.addRemove(See.only(serverPlayer), null, u);
             u.dispose();

@@ -93,7 +93,7 @@ public class ResourcesDetailPanel
             if (modifier.hasScope()) {
                 final Specification spec = getSpecification();
                 String scopes = transform(modifier.getScopes(),
-                                          s -> s.getType() != null,
+                                          isNotNull(Scope::getType),
                                           s -> Messages.getName(spec.findType(s.getType())),
                                           Collectors.joining(", "));
                 if (!scopes.isEmpty()) text += " (" + scopes + ")";

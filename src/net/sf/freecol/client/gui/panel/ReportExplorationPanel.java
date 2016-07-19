@@ -82,7 +82,7 @@ public final class ReportExplorationPanel extends ReportPanel {
         // Content Rows
         // TODO: Display "None" if no contents, though this would be rare.
         for (Region region : transform(getGame().getMap().getRegions(),
-                                       r -> r.getDiscoveredIn() != null,
+                                       isNotNull(Region::getDiscoveredIn),
                                        Function.identity(), regionComparator)) {
             reportPanel.add(new JLabel(region.getName()));
             reportPanel.add(Utility.localizedLabel(region.getType().getNameKey()));

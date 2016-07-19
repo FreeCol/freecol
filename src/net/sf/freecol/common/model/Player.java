@@ -1379,7 +1379,7 @@ public class Player extends FreeColGameObject implements Nameable {
     protected boolean recalculateBellsBonus() {
         boolean ret = false;
         for (Ability ability : transform(getAbilities(Ability.ADD_TAX_TO_BELLS),
-                                         a -> a.getSource() != null)) {
+                                         isNotNull(Ability::getSource))) {
             FreeColObject source = ability.getSource();
             for (Modifier modifier : transform(getModifiers("model.goods.bells"),
                                                matchKeyEquals(source, Modifier::getSource))) {
@@ -3628,7 +3628,7 @@ public class Player extends FreeColGameObject implements Nameable {
         Set<GoodsType> highProduction = new HashSet<>();
         Set<GoodsType> goodProduction = new HashSet<>();
         for (Tile t : transform(tile.getSurroundingTiles(1,1),
-                                t2 -> t2.getType() != null)) {
+                                isNotNull(Tile::getType))) {
             if (t.getSettlement() != null) { // Should not happen, tested above
                 values.set(ColonyValueCategory.A_OVERRIDE.ordinal(),
                            NoValueType.SETTLED.getDouble());
@@ -4194,8 +4194,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // @compat 0.10.7
         // Fixup production modifiers deriving from founding fathers
         final Specification spec = getSpecification();
-        for (Modifier m : transform(getModifiers(),
-                                    m -> m.getSource() != null)) {
+        for (Modifier m : transform(getModifiers(), isNotNull(Modifier::getSource))) {
             String type = spec.fatherGoodsFixMap.get(m.getSource().getId());
             if (type != null && m.getId().equals(type)) {
                 m.requireNegatedPersonScope();

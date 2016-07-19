@@ -1062,6 +1062,54 @@ public class CollectionUtils {
     }
         
     /**
+     * Create a predicate for a type that returns true if the argument is
+     * not null.
+     *
+     * @param <T> The input type.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T> Predicate<T> isNotNull() {
+        return (T t) -> t != null;
+    }
+
+    /**
+     * Create a predicate for a type that returns true if the argument is
+     * not null.
+     *
+     * @param <T> The input type.
+     * @param <V> A type to transform to.
+     * @param mapper A function to transform the input type.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T,V> Predicate<T> isNotNull(Function<? super T,V> mapper) {
+        return (T t) -> mapper.apply(t) != null;
+    }
+
+    /**
+     * Create a predicate for a type that returns true if the argument is
+     * null.
+     *
+     * @param <T> The input type.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T> Predicate<T> isNull() {
+        return (T t) -> t == null;
+    }
+
+    /**
+     * Create a predicate for a type that returns true if the argument is
+     * not null.
+     *
+     * @param <T> The input type.
+     * @param <V> A type to transform to.
+     * @param mapper A function to transform the input type.
+     * @return A suitable <code>Predicate</code>.
+     */
+    public static <T,V> Predicate<T> isNull(Function<? super T,V> mapper) {
+        return (T t) -> mapper.apply(t) == null;
+    }
+
+    /**
      * Convenience function to convert a stream to an iterable.
      *
      * @param <T> The stream member type.
@@ -1672,17 +1720,6 @@ public class CollectionUtils {
     private static <T> boolean none_internal(Stream<T> stream,
                                              Predicate<? super T> predicate) {
         return stream.noneMatch(predicate);
-    }
-
-    /**
-     * Create a predicate for a type that returns true if the argument is
-     * not null.
-     *
-     * @param <T> The input type.
-     * @return A suitable <code>Predicate</code>.
-     */
-    public static <T> Predicate<T> notNull() {
-        return (T t) -> t != null;
     }
 
     /**

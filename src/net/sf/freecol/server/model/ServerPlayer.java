@@ -872,7 +872,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         
         int bonus = 0;
-        for (HistoryEvent h : transform(getHistory(), matchKeyEquals(getId(), HistoryEvent::getPlayerId))) {
+        for (HistoryEvent h : transform(getHistory(),
+                matchKeyEquals(getId(), HistoryEvent::getPlayerId))) {
             switch (h.getEventType()) {
             case INDEPENDENCE:
                 switch (h.getScore()) {
@@ -2226,7 +2227,7 @@ outer:  for (Effect effect : effects) {
     public List<BuildingType> getFreeBuildingTypes() {
         final Specification spec = getGame().getSpecification();
         return transform(flatten(getFathers(), ff -> ff.getEvents().stream()),
-                         ev -> "model.event.freeBuilding".equals(ev.getId()),
+                         matchKeyEquals("model.event.freeBuilding", Event::getId),
                          ev -> spec.getBuildingType(ev.getValue()));
     }
 
@@ -2956,10 +2957,9 @@ outer:  for (Effect effect : effects) {
         }
 
         // Remove goods party modifiers as they apply to a different monarch.
-        for (Modifier m : transform(colony.getModifiers(), m ->
-                Specification.COLONY_GOODS_PARTY_SOURCE == m.getSource())) {
-            colony.removeModifier(m);
-        }
+        for (Modifier m : transform(colony.getModifiers(),
+                matchKey(Specification.COLONY_GOODS_PARTY_SOURCE,
+                         Modifier::getSource))) colony.removeModifier(m);
 
         // Hand over the colony.  Inform former owner of loss of owned
         // tiles, and process possible increase in line of sight.

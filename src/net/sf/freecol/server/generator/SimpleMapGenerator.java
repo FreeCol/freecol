@@ -273,7 +273,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // Make new settlements.
         Set<IndianSettlement> newSettlements = new HashSet<>();
         for (Tile iTile : transform(importGame.getMap().getAllTiles(),
-                                    t -> t.getIndianSettlement() != null)) {
+                                    isNotNull(Tile::getIndianSettlement))) {
             final IndianSettlement is = iTile.getIndianSettlement();
             if (is.getOwner() == null) continue;
             final Player owner = game
@@ -523,8 +523,8 @@ public class SimpleMapGenerator implements MapGenerator {
         randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
             List<Tile> tiles = transform(is.getOwnedTiles(),
-                t -> any(t.getSurroundingTiles(1,1),
-                         matchKeyEquals(null, Tile::getOwningSettlement)));
+                t -> any(t.getSurroundingTiles(1, 1),
+                         isNull(Tile::getOwningSettlement)));
             randomShuffle(logger, "Settlement tiles", tiles, random);
             int minGrow = is.getType().getMinimumGrowth();
             int maxGrow = is.getType().getMaximumGrowth();

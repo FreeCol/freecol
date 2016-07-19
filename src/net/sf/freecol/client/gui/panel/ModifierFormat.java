@@ -118,12 +118,12 @@ public class ModifierFormat {
     public static String getFeatureAsString(Feature feature) {
         return Messages.getName(feature) + ":"
             + ((!feature.hasScope()) ? ""
-                : transform(feature.getScopes(), notNull(),
+                : transform(feature.getScopes(), isNotNull(),
                             Scope::getFeatureString, Collectors.joining(",")));
     }
 
     public static String getModifierAsString(Modifier modifier) {
-        return transform(getModifierStrings(modifier), notNull(),
+        return transform(getModifierStrings(modifier), isNotNull(),
                          Function.identity(), Collectors.joining());
     }
 }

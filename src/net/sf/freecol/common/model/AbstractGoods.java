@@ -55,10 +55,6 @@ public class AbstractGoods extends FreeColObject implements Named {
             .thenComparing(AbstractGoods::getType,
                            GoodsType.goodsTypeComparator);
 
-    /** A predicate for food types. */
-    public static final Predicate<AbstractGoods> isFoodType = ag ->
-        ag.getType().isFoodType();
-
     /** The type of goods. */
     protected GoodsType type;
 
@@ -114,6 +110,15 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
+     * Is the goods type a food type?
+     *
+     * @return True if this is food.
+     */
+    public final boolean isFoodType() {
+        return getType().isFoodType();
+    }
+
+    /**
      * Get the goods amount.
      *
      * @return The goods amount.
@@ -132,12 +137,30 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
+     * Is the amount positive?
+     *
+     * @return True if the amount is greater than zero.
+     */
+    public final boolean isPositive() {
+        return getAmount() > 0;
+    }
+
+    /**
      * Get a label for these goods.
      *
      * @return The label for these goods.
      */
     public StringTemplate getLabel() {
         return getLabel(getType(), getAmount());
+    }
+
+    /**
+     * Are these goods storable.
+     *
+     * @return True if the goods are storable.
+     */
+    public boolean isStorable() {
+        return getType().isStorable();
     }
 
     /**

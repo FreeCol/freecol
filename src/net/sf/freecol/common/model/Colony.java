@@ -387,7 +387,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         for (AbstractGoods ag : transform(unit.getType().getConsumedGoods(),
                 g -> productionCache.getNetProductionOf(g.getType())
                     < g.getAmount())) {
-            if (ag.getType().isFoodType()) {
+            if (ag.isFoodType()) {
                 food.addAll(ag.getType().getEquivalentTypes());
             } else {
                 nonFood.addAll(ag.getType().getEquivalentTypes());
@@ -1676,7 +1676,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public List<Goods> getLootableGoodsList() {
         return transform(getGoodsContainer().getGoods(),
-                         g -> g.getType().isStorable());
+                         AbstractGoods::isStorable);
     }
 
     /**
@@ -2238,19 +2238,21 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     .addAmount("%amount%", ag.getAmount() - amount)
                     .addNamed("%goodsType%", goodsType);
             result.addAll(transform(currentlyBuilding.getRequiredGoods(),
-                                    ag -> ag.getType().equals(goodsType)
+                                    ag -> ag.getType() == goodsType
                                         && amount < ag.getAmount(),
                                     bMapper));
         }
 
         // Add insufficient production messages for each production location
         // that has a deficit in producing the goods type.
+        final Function<WorkLocation, ProductionInfo> piMapper = wl ->
+            getProductionInfo(wl);
+        final Predicate<WorkLocation> prodPred = isNotNull(piMapper);
         final Function<WorkLocation, StringTemplate> pMapper = wl ->
             getInsufficientProductionMessage(getProductionInfo(wl),
                 wl.getProductionDeficit(goodsType));
         result.addAll(transform(getWorkLocationsForProducing(goodsType),
-                                wl -> getProductionInfo(wl) != null,
-                                pMapper, toListNoNulls()));
+                                prodPred, pMapper, toListNoNulls()));
 
         // Add insufficient production messages for each consumption
         // location for the goods type where there is a consequent
@@ -2260,12 +2262,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             final Function<AbstractGoods, StringTemplate> gMapper = ag ->
                 getInsufficientProductionMessage(info,
                     wl.getProductionDeficit(ag.getType()));
-            return transform(wl.getOutputs(), ag -> ag.getType().isStorable(),
+            return transform(wl.getOutputs(), AbstractGoods::isStorable,
                              gMapper, toListNoNulls());
         };
         result.addAll(transform(getWorkLocationsForConsuming(goodsType),
-                                wl -> getProductionInfo(wl) != null,
-                                cMapper, toAppendedList()));
+                                prodPred, cMapper, toAppendedList()));
 
         return result;
     }

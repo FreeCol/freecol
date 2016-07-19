@@ -149,8 +149,7 @@ public class TerrainDetailPanel
 
     private void addProduction(JPanel panel, Stream<AbstractGoods> production) {
         // Positive production only
-        List<AbstractGoods> pro = transform(production,
-                                            ag -> ag.getAmount() > 0);
+        List<AbstractGoods> pro = transform(production, AbstractGoods::isPositive);
         String tag = null;
         switch (pro.size()) {
         case 0:
