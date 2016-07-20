@@ -23,6 +23,7 @@ import junit.framework.*;
 import static org.junit.Assert.*;
 
 import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -41,9 +42,9 @@ public class ClientTestHelper {
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        boolean connected = connectController.login("test",
+        StringTemplate err = connectController.login("test",
             freeColServer.getHost(), freeColServer.getPort());
-        assertTrue(connected);
+        assertNull(err);
         client.getPreGameController().setReady(true);
         return client;
     }
