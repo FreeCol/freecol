@@ -229,6 +229,24 @@ public final class FreeColClient {
     }
 
     /**
+     * Handy utility to create a runnable to restart the main panel.
+     *
+     * Called in a few places to recover from assorted failure.
+     * The indirection through invokeLater is necessary if this is
+     * called in the closing callback of another panel --- if called
+     * directly it loops when Canvas.showMainPanel tries to close all
+     * existing panels.     
+     *
+     * @param userMsg A message to the user.
+     * @return A <code>Runnable</code> for the main panel.
+     */
+    public Runnable invokeMainPanel(final String userMsg) {
+        return () -> SwingUtilities.invokeLater(() -> {
+                gui.showMainPanel(userMsg);
+            });
+    }
+
+    /**
      * Starts the new <code>FreeColClient</code>, including the GUI.
      *
      * @param size An optional window size.
@@ -299,9 +317,7 @@ public final class FreeColClient {
                 });
         } else {
             soundController.playSound("sound.intro.general");
-            SwingUtilities.invokeLater(() -> {
-                    gui.showMainPanel(userMsg);
-                });
+            invokeMainPanel(userMsg).run();
         }
 
         String quit = FreeCol.CLIENT_THREAD + "Quit Game";

@@ -946,16 +946,16 @@ public class SwingGUI extends GUI {
      * {@inheritDoc}
      */
     @Override
-    public boolean isMapboardActionsEnabled() {
-        return canvas!=null && canvas.isMapboardActionsEnabled();
+    public boolean onClosingErrorPanel(Runnable callback) {
+        return canvas != null && canvas.onClosingErrorPanel(callback);
     }
-
+        
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isShowingSubPanel() {
-        return canvas!=null && canvas.isShowingSubPanel();
+    public boolean isMapboardActionsEnabled() {
+        return canvas!=null && canvas.isMapboardActionsEnabled();
     }
 
     /**

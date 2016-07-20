@@ -427,27 +427,23 @@ public final class ConnectController extends FreeColClientHolder {
         fcc.setMapEditor(false);
 
         class ErrorJob implements Runnable {
-            private final String message;
             private final StringTemplate template;
+            private final Runnable runnable;
             
-            ErrorJob(String message) {
-                this.message = message;
-                this.template = null;
+            ErrorJob(StringTemplate template) {
+                this.template = template;
+                this.runnable = null;
             }
 
-            ErrorJob(StringTemplate template) {
-                this.message = null;
+            ErrorJob(StringTemplate template, Runnable runnable) {
                 this.template = template;
+                this.runnable = runnable;
             }
             
             @Override
             public void run() {
                 getGUI().closeMenus();
-                if (this.template != null) {
-                    getGUI().showErrorMessage(template);
-                } else {
-                    getGUI().showErrorMessage(StringTemplate.name(message));
-                }
+                getGUI().showErrorMessage(template, null, runnable);
             }
         }
 
@@ -484,7 +480,8 @@ public final class ConnectController extends FreeColClientHolder {
                 = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
 
         } catch (FileNotFoundException e) {
-            SwingUtilities.invokeLater(new ErrorJob("server.fileNotFound"));
+            SwingUtilities.invokeLater(new ErrorJob(StringTemplate
+                    .template("server.fileNotFound")));
             logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                 e);
             return false;
@@ -571,11 +568,12 @@ public final class ConnectController extends FreeColClientHolder {
                 if (fcc.isHeadless() || FreeColDebugger.getDebugRunTurns() >= 0) {
                     FreeCol.fatal(Messages.message(err));
                 }
-                SwingUtilities.invokeLater(() -> {
-                        getGUI().closeMainPanel();
-                        getGUI().showMainPanel(null);
-                    });
-                SwingUtilities.invokeLater(new ErrorJob(err));
+                // login may have received an error message from the server,
+                // which is already being displayed.  Do not override it.
+                if (!getGUI().onClosingErrorPanel(fcc.invokeMainPanel(null))) {
+                    SwingUtilities.invokeLater(new ErrorJob(err,
+                            fcc.invokeMainPanel(null)));
+                }
             }
         };
         fcc.setWork(loadGameJob);

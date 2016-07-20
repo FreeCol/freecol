@@ -1035,6 +1035,10 @@ public class GUI extends FreeColClientHolder {
         return false;
     }
 
+    public boolean onClosingErrorPanel(Runnable callback) {
+        return false;
+    }
+
     public boolean isMapboardActionsEnabled() {
         return false;
     }

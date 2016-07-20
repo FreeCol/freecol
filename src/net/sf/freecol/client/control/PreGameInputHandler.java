@@ -171,9 +171,6 @@ public final class PreGameInputHandler extends ClientInputHandler {
         Player player = game.getPlayerByName(user);
         if (player == null) {
             logger.warning("New game does not contain player: " + user);
-            StringTemplate st = StringTemplate.template("server.noSuchPlayer")
-                .addName("%player%", user);
-            getGUI().showErrorMessage(st);
             return null;
         }
         fcc.setMyPlayer(player);

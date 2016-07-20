@@ -66,7 +66,6 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -1237,6 +1236,19 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Attach a closing callback to any current error panel.
+     *
+     * @param callback The <code>Runnable</code> to attach.
+     * @return True if an error panel was present.
+     */
+    public boolean onClosingErrorPanel(Runnable callback) {
+        ErrorPanel ep = getExistingFreeColPanel(ErrorPanel.class);
+        if (ep == null) return false;
+        ep.addClosingCallback(callback);
+        return true;
+    }
+
+    /**
      * Checks if this <code>Canvas</code> displaying another panel.
      * <p>
      * Note that the previous implementation could throw exceptions
@@ -1245,7 +1257,7 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the <code>Canvas</code> is displaying an
      *         internal frame.
      */
-    boolean isShowingSubPanel() {
+    public boolean isShowingSubPanel() {
         return getShowingSubPanel() != null;
     }
 
@@ -2554,7 +2566,7 @@ public final class Canvas extends JDesktopPane {
     void showVictoryDialog(DialogHandler<Boolean> handler) {
         SwingUtilities.invokeLater(
             new DialogCallback<>(new VictoryDialog(freeColClient, frame),
-                                        null, handler));
+                                                   null, handler));
     }
 
     /**
