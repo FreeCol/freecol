@@ -3986,7 +3986,7 @@
             <template>
               <unitOption id="model.option.immigrants.template">
                 <unitType value="model.unit.freeColonist"
-                          generate="IMMIGRANTS" />
+                          generate="immigrants" />
                 <role value="model.role.default" >
                   <choice value="model.role.default" />
                 </role>
@@ -4048,7 +4048,7 @@
           <unitListOption id="model.option.refSize">
             <template>
               <unitOption id="model.option.refSize.template">
-                <unitType value="model.unit.kingsRegular" generate="UNITS" />
+                <unitType value="model.unit.kingsRegular" generate="units" />
                 <role value="model.role.infantry">
                   <choice value="model.role.infantry" />
                   <choice value="model.role.cavalry" />
@@ -4057,7 +4057,7 @@
               </unitOption>
             </template>
             <unitOption id="model.option.refSize.soldiers">
-              <unitType value="model.unit.kingsRegular" generate="UNITS" />
+              <unitType value="model.unit.kingsRegular" generate="units" />
               <role value="model.role.infantry">
                 <choice value="model.role.infantry" />
                 <choice value="model.role.cavalry" />
@@ -4065,7 +4065,7 @@
               <number value="60" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.dragoons">
-              <unitType value="model.unit.kingsRegular" generate="UNITS" />
+              <unitType value="model.unit.kingsRegular" generate="units" />
               <role value="model.role.cavalry" >
                 <choice value="model.role.infantry" />
                 <choice value="model.role.cavalry" />
@@ -4073,34 +4073,34 @@
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.artillery">
-              <unitType value="model.unit.artillery" generate="UNITS" />
+              <unitType value="model.unit.artillery" generate="units" />
               <role value="model.role.default" />
               <number value="30" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.refSize.menOfWar">
-              <unitType value="model.unit.manOWar" generate="UNITS" />
+              <unitType value="model.unit.manOWar" generate="units" />
               <role value="model.role.default" />
               <number value="20" minimumValue="0" maximumValue="999" />
             </unitOption>
           </unitListOption>
           <unitListOption id="model.option.interventionForce">
             <unitOption id="model.option.interventionForce.regulars">
-              <unitType value="model.unit.colonialRegular" generate="UNITS" />
+              <unitType value="model.unit.colonialRegular" generate="units" />
               <role value="model.role.soldier" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.dragoons">
-              <unitType value="model.unit.colonialRegular" generate="UNITS" />
+              <unitType value="model.unit.colonialRegular" generate="units" />
               <role value="model.role.dragoon" />
               <number value="1" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.artillery">
-              <unitType value="model.unit.artillery" generate="UNITS" />
+              <unitType value="model.unit.artillery" generate="units" />
               <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
             <unitOption id="model.option.interventionForce.menOfWar">
-              <unitType value="model.unit.manOWar" generate="UNITS" />
+              <unitType value="model.unit.manOWar" generate="units" />
               <role value="model.role.default" />
               <number value="2" minimumValue="0" maximumValue="999" />
             </unitOption>
