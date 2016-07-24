@@ -23,13 +23,8 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd">
-    <xs:annotation>
-      <xs:documentation>
-	Include common data model type definitions.
-      </xs:documentation>
-    </xs:annotation>
-  </xs:include>
+  <xs:include schemaLocation="data-common.xsd"/>
+  <xs:include schemaLocation="data-model.xsd"/>
 
   <!-- @compat 0.11.3 -->
   <xs:simpleType name="tileimprovementId">
@@ -41,8 +36,7 @@
   <xs:element name="tileimprovement">
     <xs:annotation>
       <xs:documentation>
-	Represents a tile improvement, such as a river or
-	road.
+	      Represents a tile improvement, such as a river or road.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -64,8 +58,7 @@
   <xs:element name="tileImprovement">
     <xs:annotation>
       <xs:documentation>
-	Represents a tile improvement, such as a river or
-	road.
+	      Represents a tile improvement, such as a river or	road.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -79,7 +72,7 @@
       <xs:attribute name="magnitude" type="xs:int" use="required" />
       <xs:attribute name="style" type="xs:int" use="optional" />
       <xs:attribute name="virtual" type="xs:boolean" use="optional"
-		    default="false" />
+		                default="false" />
     </xs:complexType>
   </xs:element>
 

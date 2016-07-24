@@ -24,6 +24,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
 
   <xs:element name="region">
     <xs:annotation>
@@ -70,9 +71,8 @@
 		                default="false">
 	      <xs:annotation>
 	        <xs:documentation>
-	          Whether this Region is claimable. Ocean Regions
-	          and non-leaf Regions
-	          should not be claimable.
+	          Whether this Region is claimable. Ocean Regions and
+	          non-leaf Regions should not be claimable.
           </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
@@ -80,12 +80,10 @@
 		                default="false">
 	      <xs:annotation>
 	        <xs:documentation>
-	          Whether this Region is discoverable. The Eastern
-	          Ocean regions should not
-	          be discoverable. In general, non-leaf
-	          regions should not be
-	          discoverable. The Pacific Ocean is an
-	          exception, however.
+	          Whether this Region is discoverable. The Eastern Ocean
+	          regions should not be discoverable. In general, non-leaf
+	          regions should not be discoverable. The Pacific Ocean is
+	          an exception, however.
           </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
@@ -93,8 +91,8 @@
 		                use="optional" default="false">
 	      <xs:annotation>
 	        <xs:documentation>
-	          Whether the Region is already discovered when the
-	          game starts.
+	          Whether the Region is already discovered when the game
+	          starts.
           </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
@@ -102,9 +100,9 @@
 		                default="0">
 	      <xs:annotation>
 	        <xs:documentation>
-	          How much discovering this Region contributes to
-	          your score. This
-	          should be zero unless the Region is discoverable.
+	          How much discovering this Region contributes to your
+	          score. This should be zero unless the Region is
+	          discoverable.
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>

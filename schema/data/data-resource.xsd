@@ -24,12 +24,12 @@
 	</xs:annotation>
 
 	<xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
 
   <xs:element name="resource">
     <xs:annotation>
       <xs:documentation>
-        Represents a locatable goods of a specified type
-        and quantity.
+        Represents a locatable goods of a specified type and quantity.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>

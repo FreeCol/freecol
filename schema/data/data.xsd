@@ -24,6 +24,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
 
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
@@ -36,8 +37,8 @@
   <xs:include schemaLocation="data-historyEvent.xsd" />
   <xs:include schemaLocation="data-indianSettlement.xsd" />
   <xs:include schemaLocation="data-market.xsd" />
-  <xs:include schemaLocation="data-modifier.xsd" />
   <xs:include schemaLocation="data-monarch.xsd" />
+  <xs:include schemaLocation="data-options.xsd" />
   <xs:include schemaLocation="data-player.xsd" />
   <xs:include schemaLocation="data-playerExploredTile.xsd" />
   <xs:include schemaLocation="data-region.xsd" />

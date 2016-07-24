@@ -23,35 +23,29 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd">
-    <xs:annotation>
-      <xs:documentation>
-	Include common data model type definitions.
-      </xs:documentation>
-    </xs:annotation>
-  </xs:include>
+  <xs:include schemaLocation="data-common.xsd"/>
+  <xs:include schemaLocation="data-model.xsd"/>
 
   <xs:element name="equipment">
     <xs:annotation>
       <xs:documentation>
-	List of unit's equipment
+	      List of unit's equipment
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:attribute name="xLength" type="xs:int">
-	<xs:annotation>
-	  <xs:documentation>
-	    Number of elements in the list
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          Number of elements in the list
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:anyAttribute namespace="##local" processContents="skip">
-	<xs:annotation>
-	  <xs:documentation>
-	    Equipment type list with attributes "x0", "x1",
-	    "x2" etc.
+	      <xs:annotation>
+	        <xs:documentation>
+	          Equipment type list with attributes "x0", "x1", "x2" etc.
           </xs:documentation>
-	</xs:annotation>
+	      </xs:annotation>
       </xs:anyAttribute>
     </xs:complexType>
   </xs:element>

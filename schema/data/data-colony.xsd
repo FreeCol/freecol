@@ -25,11 +25,12 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
   <xs:include schemaLocation="data-colonyTile.xsd" />
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-goodsContainer.xsd" />
   <xs:include schemaLocation="data-exportData.xsd" />
-  <xs:include schemaLocation="data-modifier.xsd" />
+  <!-- <xs:include schemaLocation="data-modifier.xsd" /> -->
 
   <xs:element name="colony">
     <xs:complexType>

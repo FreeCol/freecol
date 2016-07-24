@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="optionGroup">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="audioMixerOption"/>
+        <xs:element ref="booleanOption"/>
+        <xs:element ref="fileOption"/>
+        <xs:element ref="integerOption"/>
+        <xs:element ref="languageOption"/>
+        <xs:element ref="optionGroup"/>
+        <xs:element ref="percentageOption"/>
+        <xs:element ref="rangeOption"/>
+        <xs:element ref="selectOption"/>
+        <xs:element ref="stringOption"/>
+        <xs:element ref="textOption"/>
+        <xs:element ref="unitListOption"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="editable" use="optional" type="xs:boolean"/>
+      <xs:attribute name="recursive" use="optional" type="xs:boolean"/>
+      <xs:attribute name="visible" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="audioMixerOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="booleanOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:boolean"/>
+      <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="fileOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="integerOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:int"/>
+      <xs:attribute name="maximumValue" type="xs:int"/>
+      <xs:attribute name="minimumValue" type="xs:int"/>
+      <xs:attribute name="value" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="languageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="percentageOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="PercentageType"/>
+      <xs:attribute name="value" type="PercentageType"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="rangeOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="rangeValue" minOccurs="2" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="label" use="required" type="xs:string"/>
+            <xs:attribute name="value" use="required"
+                          type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="localizedLabels" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="selectOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="selectValue" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="label" use="required" type="xs:string"/>
+            <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="localizedLabels" type="xs:boolean"/>
+      <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="stringOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="textOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="defaultValue" use="optional" type="xs:string"/>
+      <xs:attribute name="value" use="optional" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unitListOption">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="template" minOccurs="0" maxOccurs="unbounded" >
+          <xs:complexType>
+            <xs:all>
+              <xs:element ref="unitOption"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="unitOption" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+
+      <xs:attribute name="maximumNumber" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unitOption">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="number">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string"/>
+
+            <xs:attribute name="defaultValue" type="xs:int"/>
+            <xs:attribute name="maximumValue" type="xs:int"/>
+            <xs:attribute name="minimumValue" type="xs:int"/>
+            <xs:attribute name="value" type="xs:int"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="role">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="value" type="RoleId" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string"/>
+
+            <xs:attribute name="defaultValue" type="xs:string"/>
+            <xs:attribute name="value" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="unitType"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unitType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="choice" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="generate">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="immigrants" />
+            <xs:enumeration value="land_units" />
+            <xs:enumeration value="naval_units" />
+            <xs:enumeration value="units" />
+            <!-- @compat 0.10.7 -->
+            <xs:enumeration value="BUILDINGS" />
+            <xs:enumeration value="FOUNDING_FATHERS" />
+            <xs:enumeration value="IMMIGRANTS" />
+            <xs:enumeration value="LAND_UNITS" />
+            <xs:enumeration value="NAVAL_UNITS" />
+            <xs:enumeration value="UNITS" />
+            <!-- end @compat -->
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

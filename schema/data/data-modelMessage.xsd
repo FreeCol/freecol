@@ -24,6 +24,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
 
   <xs:element name="modelMessage">
     <xs:annotation>
@@ -34,7 +35,6 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="StringTemplateType" >
-          <!-- TODO: remove compatibility code -->
           <xs:choice minOccurs="0" maxOccurs="unbounded">
 	          <xs:element name="data">
 	            <xs:complexType>
@@ -49,10 +49,12 @@
           <xs:attribute name="owner" type="PlayerId" use="required" />
           <xs:attribute name="source" type="SourceId" use="optional" />
           <xs:attribute name="display" type="xs:string" use="optional" />
-          <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
-		        default="false" />
-          <xs:attribute name="messageType" type="ModelMessageType" use="optional" />
-          <!-- TODO: remove support for old format and make messageType required -->
+          <xs:attribute name="hasBeenDisplayed" type="xs:boolean"
+                        use="optional" default="false" />
+          <xs:attribute name="messageType" type="ModelMessageType"
+                        use="optional" />
+          <!-- TODO: remove support for old format and make
+               messageType required -->
           <xs:attribute name="type" type="ModelMessageType" use="optional" />
         </xs:extension>
       </xs:complexContent>

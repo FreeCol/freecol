@@ -23,17 +23,19 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd">
-    <xs:annotation>
-      <xs:documentation>
-	      Include common data model type definitions.
-      </xs:documentation>
-    </xs:annotation>
-  </xs:include>
-
+  <xs:include schemaLocation="data-common.xsd"/>
+  <xs:include schemaLocation="data-model.xsd"/>
   <xs:include schemaLocation="data-goodsContainer.xsd"/>
   <xs:include schemaLocation="data-equipment.xsd"/>
   <xs:include schemaLocation="data-tileimprovement.xsd"/>
+
+  <xs:element name="units">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="unit"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
   <xs:element name="unit" type="unitElementType">
     <xs:annotation>
@@ -44,17 +46,7 @@
 	      Every Unit is owned by a Player and has a Location.
       </xs:documentation>
     </xs:annotation>
-
   </xs:element>
-
-  <xs:element name="units">
-    <xs:complexType>
-      <xs:sequence minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="unit"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
 
   <xs:element name="missionary">
     <xs:annotation>
@@ -70,7 +62,6 @@
   </xs:element>
 
   <xs:complexType name="unitElementType">
-
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:element ref="goodsContainer"/>
       <xs:element ref="equipment"/>

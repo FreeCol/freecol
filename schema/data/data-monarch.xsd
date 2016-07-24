@@ -24,6 +24,7 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
 
   <xs:element name="monarch">

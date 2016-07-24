@@ -24,11 +24,12 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
 
   <xs:element name="modifier">
     <xs:annotation>
       <xs:documentation>
-	WARNING! Asymmetric read/write
+	      WARNING! Asymmetric read/write
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>

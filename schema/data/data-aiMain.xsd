@@ -23,15 +23,9 @@
     </xs:documentation>
   </xs:annotation>
 
+  <xs:include schemaLocation="data-common.xsd"/>
+  <xs:include schemaLocation="data-model.xsd"/>
   <xs:include schemaLocation="data-goods.xsd"/>
-
-  <xs:include schemaLocation="data-common.xsd">
-    <xs:annotation>
-      <xs:documentation>
-	Include common data model type definitions.
-      </xs:documentation>
-    </xs:annotation>
-  </xs:include>
 
   <xs:element name="aiMain">
 

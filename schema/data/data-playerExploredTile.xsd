@@ -24,14 +24,14 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
   <xs:include schemaLocation="data-resource.xsd" />
 
   <xs:element name="playerExploredTile">
     <xs:annotation>
       <xs:documentation>
-	This class contains the data visible to a specific
-	player.
+	      This class contains the data visible to a specific player.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>

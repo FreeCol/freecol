@@ -24,7 +24,9 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-model.xsd" />
   <xs:include schemaLocation="data-nationOptions.xsd" />
+  <xs:include schemaLocation="data-options.xsd" />
   <xs:include schemaLocation="data-player.xsd" />
   <xs:include schemaLocation="data-map.xsd" />
   <xs:include schemaLocation="data-modelMessage.xsd" />
@@ -63,7 +65,7 @@
       <xs:attribute name="currentPlayer" type="PlayerId" use="optional" >
         <xs:annotation>
           <xs:documentation>
-	        May be absent in map files.
+	          May be absent in map files.
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
@@ -85,7 +87,7 @@
   <xs:element name="gameOptions">
     <xs:annotation>
       <xs:documentation>
-	    This class contains the game options.
+	      This class contains the game options.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -102,7 +104,7 @@
   <xs:element name="mapGeneratorOptions">
     <xs:annotation>
       <xs:documentation>
-	      This class contains the game options.
+	      This class contains the map generator options.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
