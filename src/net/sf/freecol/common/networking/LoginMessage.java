@@ -231,6 +231,10 @@ public class LoginMessage extends DOMMessage {
             // Ready now to handle pre-game messages.
             mh = server.getPreGameInputHandler();
 
+        } else if (FreeColServer.MAP_EDITOR_NAME.equals(this.userName)) {
+            // Trying to start a map, see BR#2976 -> IR#217
+            return new ErrorMessage(StringTemplate
+                .template("error.mapEditorGame")).toXMLElement();
         } else { // Restoring from existing game.
             game = server.getGame();
             player = (ServerPlayer)game.getPlayerByName(this.userName);

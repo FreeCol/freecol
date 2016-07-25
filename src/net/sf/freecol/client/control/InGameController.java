@@ -4491,12 +4491,12 @@ public final class InGameController extends FreeColClientHolder {
         if (game == null) return false; // Keyboard handling can race init
         String fileName = getSaveGameString(game);
         File file = getGUI().showSaveDialog(FreeColDirectories.getSaveDirectory(),
-                                       fileName);
+                                            fileName);
         if (file == null) return false;
         if (!getClientOptions().getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE)
             || !file.exists()
             || getGUI().confirm("saveConfirmationDialog.areYouSure.text",
-                           "ok", "cancel")) {
+                                "ok", "cancel")) {
             FreeColDirectories.setSavegameFile(file.getPath());
             return saveGame(file);
         }

@@ -69,7 +69,7 @@ public class RiverSection {
 
     /**
      * Creates a new RiverSection with the given branches. This
-     * constructor is used by the MapEditor.
+     * constructor is used by the map editor.
      *
      * @param branches The encoded style
      */

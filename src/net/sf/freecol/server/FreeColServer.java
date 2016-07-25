@@ -110,6 +110,18 @@ public final class FreeColServer {
 
     private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
+    /**
+     * The name to use as the owner of maps that have been edited by
+     * the map editor.
+     *
+     * This is used so we can tell when a user tries to start a map
+     * (which may be lacking vital pieces) as a game.  Make sure all
+     * the maps in data/maps have this owner.
+     *
+     * TODO: Make loading a map as a game work.
+     */
+    public static final String MAP_EDITOR_NAME = "mapEditor";
+    
     // @compat 0.11.6
     public static final String ACTIVE_UNIT_TAG = "activeUnit";
     // end @compat 0.11.6
@@ -753,7 +765,7 @@ public final class FreeColServer {
      */
     public void saveGame(File file, OptionGroup options, Unit active)
         throws IOException {
-        saveGame(file, options, active, null);
+        saveGame(file, null, options, active, null);
     }
 
     /**
@@ -767,21 +779,22 @@ public final class FreeColServer {
     public void saveMapEditorGame(File file, BufferedImage image) 
         throws IOException {
         this.setAIMain(null);
-        saveGame(file, null, null, image);
+        saveGame(file, MAP_EDITOR_NAME, null, null, image);
     }
 
     /**
      * Saves a game.
      *
      * @param file The file where the data will be written.
+     * @param owner An optional name to use as the owner of the game.
      * @param options Optional client options to save in the game.
      * @param active An optional active <code>Unit</code>.
      * @param image A thumbnail <code>Image</code> value to save in the game.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
-    private void saveGame(File file, OptionGroup options, Unit active,
-                          BufferedImage image) throws IOException {
+    private void saveGame(File file, String owner, OptionGroup options,
+                          Unit active, BufferedImage image) throws IOException {
         final ServerGame game = getGame();
         try (
             JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
@@ -818,7 +831,8 @@ public final class FreeColServer {
                 xw.writeStartElement(SAVED_GAME_TAG);
 
                 // Add the attributes:
-                xw.writeAttribute(OWNER_TAG, FreeCol.getName());
+                xw.writeAttribute(OWNER_TAG,
+                                  (owner != null) ? owner : FreeCol.getName());
 
                 xw.writeAttribute(PUBLIC_SERVER_TAG, publicServer);
 
@@ -892,9 +906,9 @@ public final class FreeColServer {
         try {
             g = FreeColServer.readGame(new FreeColSavegameFile(file),
                                        spec, server);
-            logger.info("Imported file " + file.getPath());
+            logger.info("Read file " + file.getPath());
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Import failed for " + file.getPath(), e);
+            logger.log(Level.WARNING, "Read failed for " + file.getPath(), e);
         }
 
         // If importing as a result of "Start Game" in the map editor,
@@ -949,6 +963,10 @@ public final class FreeColServer {
             xr.nextTag();
 
             if (server != null) {
+                String owner = xr.getAttribute(OWNER_TAG, (String)null);
+                if (MAP_EDITOR_NAME.equals(owner) && specification == null) {
+                    throw new FreeColException("error.mapEditorGame");
+                }
                 server.setSinglePlayer(xr.getAttribute(SINGLE_PLAYER_TAG,
                                                        true));
 

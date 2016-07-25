@@ -103,7 +103,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         JMenuItem playItem = Utility.localizedMenuItem("startGame");
         playItem.addActionListener((ActionEvent ae) -> {
                 File startFile = FreeColDirectories.getStartMapFile();
-                freeColClient.getMapEditorController().saveGame(startFile);
+                freeColClient.getMapEditorController()
+                    .saveMapEditorGame(startFile);
                 OptionGroup options = freeColClient.getGame()
                     .getMapGeneratorOptions();
                 FileOption fileOption = (FileOption)options

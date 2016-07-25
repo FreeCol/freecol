@@ -50,7 +50,7 @@ public class SaveAndQuitAction extends FreeColAction {
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (freeColClient.isMapEditor()) {
-            freeColClient.getMapEditorController().saveGame();
+            freeColClient.getMapEditorController().saveMapEditorGame();
         } else {
             if (!igc().saveGame()) return;
         }

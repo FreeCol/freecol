@@ -88,7 +88,7 @@ public final class MapEditorController extends FreeColClientHolder {
 
 
     /**
-     * Enters map editor modus.
+     * Enters map editor mode.
      *
      * FIXME: The TC and difficulty level can now be set at the
      * command line, but we should do better.
@@ -185,10 +185,10 @@ public final class MapEditorController extends FreeColClientHolder {
      * Opens a dialog where the user should specify the filename
      * and saves the game.
      */
-    public void saveGame() {
+    public void saveMapEditorGame() {
         File file = getGUI().showSaveDialog(FreeColDirectories.getSaveDirectory(),
                                             FreeColDirectories.MAP_FILE_NAME);
-        if (file != null) saveGame(file);
+        if (file != null) saveMapEditorGame(file);
     }
 
     /**
@@ -196,7 +196,7 @@ public final class MapEditorController extends FreeColClientHolder {
      *
      * @param file The <code>File</code>.
      */
-    public void saveGame(final File file) {
+    public void saveMapEditorGame(final File file) {
         final GUI gui = getGUI();
         final Game game = getGame();
         Map map = game.getMap();

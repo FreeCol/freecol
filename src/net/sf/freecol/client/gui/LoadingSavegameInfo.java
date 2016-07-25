@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui;
 
 /**
  * Used for transferring data for the savegame to be loaded.
-*/
+ */
 public class LoadingSavegameInfo {
 
     private final boolean singlePlayer;
