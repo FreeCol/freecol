@@ -156,9 +156,18 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      *
      * @param scope The <code>Scope</code> to add.
      */
-    private void addScope(Scope scope) {
+    protected void addScope(Scope scope) {
         if (this.scopes == null) this.scopes = new ArrayList<>();
         this.scopes.add(scope);
+    }
+
+    /**
+     * Remove a scope.
+     *
+     * @param scope The <code>Scope</code> to remove.
+     */
+    protected void removeScope(Scope scope) {
+        if (this.scopes != null) this.scopes.remove(scope);
     }
 
     /**

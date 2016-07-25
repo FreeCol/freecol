@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
@@ -83,6 +83,13 @@ public class Unit extends GoodsLocation
     public static final Comparator<Unit> typeRoleComparator
         = Comparator.comparing(Unit::getType)
             .thenComparing(Comparator.comparing(Unit::getRole));
+
+    /** A comparator to compare units by increasing skill level. */
+    public static final Comparator<Unit> increasingSkillComparator
+        = Comparator.comparingInt(Unit::getSkillLevel);
+    /** A comparator to compare units by decreasing skill level. */
+    public static final Comparator<Unit> decreasingSkillComparator
+        = increasingSkillComparator.reversed();
 
     /**
      * Comparator to rank settlements by accessibility by sea to Europe.
@@ -1322,7 +1329,8 @@ public class Unit extends GoodsLocation
         // number of turns is 4/6/8 for skill 1/2/3
         int result = 0;
         if (student != null) {
-            result = getNeededTurnsOfTraining(unitType, student.unitType);
+            result = getSpecification()
+                .getNeededTurnsOfTraining(getType(), student.getType());
             if (getColony() != null) {
                 result -= getColony().getProductionBonus();
             }
@@ -1331,70 +1339,106 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the number of turns this unit has to train to educate a student.
-     * This value is only meaningful for units that can be put in a school.
+     * Get a unit change for this unit.
      *
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @param typeStudent the student <code>UnitType</code>.
-     * @return The turns of training needed to teach its current type
-     *     to a free colonist or to promote an indentured servant or a
-     *     petty criminal.
-     * @see #getTurnsOfTraining
+     * @param id The identifier for the required change type.
+     * @return The <code>UnitChange</code> found, or null if the
+     *     change is impossible.
      */
-    public int getNeededTurnsOfTraining(UnitType typeTeacher,
-                                        UnitType typeStudent) {
-        UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
-        if (teaching != null) {
-            return typeStudent.getEducationTurns(teaching);
-        } else {
-            throw new IllegalStateException("typeTeacher=" + typeTeacher
-                + " typeStudent=" + typeStudent);
+    public UnitChange getUnitChange(String change) {
+        return getUnitChange(change, null);
+    }
+    
+    /**
+     * Get a unit change for this unit.
+     *
+     * @param id The identifier for the required change type.
+     * @param toType A <code>UnitType</code> to change to.
+     * @return The <code>UnitChange</code> found, or null if the
+     *     change is impossible.
+     */
+    public UnitChange getUnitChange(String change, UnitType toType) {
+        UnitChangeType uct = getSpecification().getUnitChangeType(change);
+        if (uct != null && uct.getOwnerChange()) {
+            throw new RuntimeException("2-arg getUnitChange of " + this
+                + " change=" + change + " which changes owner");
         }
+        return getUnitChange(change, toType, getOwner());
     }
 
     /**
-     * Gets the UnitType which a teacher is teaching to a student.
-     * This value is only meaningful for teachers that can be put in a
-     * school.
+     * Get a unit change for this unit, including the ownership check.
      *
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @param typeStudent The student <code>UnitType</code>.
-     * @return The <code>UnitType</code> taught.
-     * @see #getTurnsOfTraining
-     *
+     * @param id The identifier for the required change type.
+     * @param toType A <code>UnitType</code> to change to.
+     * @param player The expected <code>Player</code> that will own the unit.
+     * @return The <code>UnitChange</code> found, or null if the
+     *     change is impossible.
      */
-    public static UnitType getUnitTypeTeaching(UnitType typeTeacher,
-                                               UnitType typeStudent) {
-        UnitType skillTaught = typeTeacher.getSkillTaught();
-        if (typeStudent.canBeUpgraded(skillTaught, ChangeType.EDUCATION)) {
-            return skillTaught;
-        } else {
-            return typeStudent.getEducationUnit(0);
+    public UnitChange getUnitChange(String change, UnitType toType,
+                                    Player player) {
+        if (player == null) {
+            throw new RuntimeException("getUnitChange null player");
         }
+        UnitChangeType uct = getSpecification().getUnitChangeType(change);
+        if (uct != null && uct.getOwnerChange() != (player != getOwner())) {
+            throw new RuntimeException("getUnitChange of " + this
+                + " change=" + change
+                + " getOwnerChange=" + uct.getOwnerChange()
+                + " != player-change=" + (player != getOwner())
+                + " player=" + player.getSuffix()
+                + " owner=" + getOwner().getSuffix());
+        }
+        UnitChange uc = (uct == null || !uct.appliesTo(this)) ? null
+            : uct.getUnitChange(getType(), toType);
+        return (uc == null || !uc.isAvailableTo(player)) ? null : uc;
     }
 
     /**
-     * Can this unit be a student?
+     * Get the skill another unit type can teach this unit.
+     *
+     * @param teacherType The <code>UnitType</code> to teach this unit.
+     * @return The <code>UnitType</code> (skill) this unit can learn.
+     */
+    public UnitType getTeachingType(UnitType teacherType) {
+        UnitType ret = (getSpecification()
+            .getUnitChangeType(UnitChangeType.EDUCATION).appliesTo(this))
+            ? getType().getTeachingType(teacherType)
+            : null;
+        return (ret == null || !ret.isAvailableTo(getOwner())) ? null : ret;
+    }
+
+    /**
+     * Get the skill another unit can teach this unit.
+     *
+     * @param teacher The <code>Unit</code> to teach this unit.
+     * @return The <code>UnitType</code> (skill) this unit can learn.
+     */
+    public UnitType getTeachingType(Unit teacher) {
+        return getTeachingType(teacher.getType());
+    }
+
+    /**
+     * Can this unit be a student of a teacher unit?
      *
      * @param teacher The teacher <code>Unit</code> which is trying to
      *     teach it.
      * @return True if the unit can be taught by the teacher.
      */
     public boolean canBeStudent(Unit teacher) {
-        return teacher != this && canBeStudent(unitType, teacher.unitType);
+        return teacher != null && teacher != this
+            && getTeachingType(teacher) != null;
     }
 
     /**
-     * Can a unit be a student?
+     * Support for the convertUpgrade mod.
      *
-     * @param typeStudent The student <code>UnitType</code>.
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @return True if the student can be taught by the teacher.
+     * @return True if the convert upgrade mod is enabled and Casas elected.
      */
-    public boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
-        return getUnitTypeTeaching(typeTeacher, typeStudent) != null;
+    public boolean canUpgradeOnEnterColony() {
+        return getOwner().hasAbility("model.ability.upgradeConvertsAtColony");
     }
-
+        
     /**
      * Gets the nationality of this Unit.
      *
@@ -2285,7 +2329,7 @@ public class Unit extends GoodsLocation
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
                 : (!allowMoveFrom(from))
                 ? MoveType.MOVE_NO_ACCESS_WATER
-                : (!getType().canBeUpgraded(null, ChangeType.NATIVES))
+                : (getUnitChange(UnitChangeType.NATIVES) == null)
                 ? MoveType.MOVE_NO_ACCESS_SKILL
                 : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
         } else {
@@ -3409,18 +3453,6 @@ public class Unit extends GoodsLocation
     public float getBurnProbability() {
         final Specification spec = getSpecification();
         return 0.01f * spec.getInteger(GameOptions.BURN_PROBABILITY);
-    }
-
-    /**
-     * Get a type change for this unit.
-     *
-     * @param change The <code>ChangeType</code> to consider.
-     * @param owner The <code>Player</code> to own this unit after a
-     *    change of type CAPTURE or UNDEAD.
-     * @return The resulting unit type or null if there is no change suitable.
-     */
-    public UnitType getTypeChange(ChangeType change, Player owner) {
-        return getType().getTargetType(change, owner);
     }
 
     /**

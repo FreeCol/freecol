@@ -65,8 +65,9 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
@@ -165,8 +166,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                       UnitType type, Role role) {
         super(game);
 
-        UnitType newType = type.getTargetType(ChangeType.CREATION, owner);
-        this.unitType = (newType == null) ? type : newType;
+        final Specification spec = getSpecification();
+        this.unitType = type;
         this.owner = owner;
         this.state = UnitState.ACTIVE; // placeholder
         this.role = getSpecification().getDefaultRole(); // placeholder
@@ -197,6 +198,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this.treasureAmount = 0;
         this.attrition = 0;
         this.visibleGoodsCount = -1;
+
+        // Check for creation change
+        UnitChange uc = getUnitChange(UnitChangeType.CREATION);
+        if (uc != null) this.unitType = uc.to;
 
         // Fix up role, state and location now other values are present.
         changeRole(role, role.getMaximumCount());
@@ -253,14 +258,14 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Check for experience-promotion.
         GoodsType produce;
         UnitType learn;
+        UnitChange uc;
         if (isInColony()
             && (produce = getWorkType()) != null
             && (learn = spec.getExpertForProducing(produce)) != null
             && learn != getType()
-            && getType().canBeUpgraded(learn, ChangeType.EXPERIENCE)) {
+            && (uc = getUnitChange(UnitChangeType.EXPERIENCE,learn)) != null) {
             int maximumExperience = getType().getMaximumExperience();
-            int maxValue = (100 * maximumExperience) /
-                getType().getUnitTypeChange(learn).getProbability(ChangeType.EXPERIENCE);
+            int maxValue = (100 * maximumExperience) / uc.probability;
             if (maxValue > 0
                 && randomInt(logger, "Experience", random, maxValue)
                 < Math.min(getExperience(), maximumExperience)) {
@@ -646,7 +651,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             break;
         case LEARN:
-            if (getType().getUnitTypesLearntInLostCity().isEmpty()) {
+            if (getUnitChange(UnitChangeType.LOST_CITY) != null) {
                 rumour = RumourType.NOTHING;
             }
             break;
@@ -709,10 +714,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
-            List<UnitType> learnTypes = getType().getUnitTypesLearntInLostCity();
-            unitType = getRandomMember(logger, "Choose learn",
-                                       learnTypes, random);
-            changeType(unitType);//-vis(serverPlayer)
+            UnitChange uc = getRandomMember(logger, "Choose learn",
+                spec.getUnitChanges(UnitChangeType.LOST_CITY, getType()),
+                random);
+            changeType(uc.to);//-vis(serverPlayer)
             serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -724,7 +729,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             int chiefAmount = randomInt(logger, "Chief base amount",
                                         random, dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
-            cs.addPartial(See.only(serverPlayer), serverPlayer, "gold", "score");
+            cs.addPartial(See.only(serverPlayer), serverPlayer,
+                          "gold", "score");
             if (mounds) key = rumour.getAlternateDescriptionKey("mounds");
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,

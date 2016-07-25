@@ -90,8 +90,9 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
@@ -2992,7 +2993,7 @@ outer:  for (Effect effect : effects) {
         ServerUnit convert = (ServerUnit)getRandomMember(logger,
             "Choose convert", units, random);
         if (nativePlayer.csChangeOwner(convert, attackerPlayer,
-                                       ChangeType.CONVERSION,
+                                       UnitChangeType.CONVERSION,
                                        attacker.getTile(),
                                        cs)) { //-vis(attackerPlayer)
             convert.changeRole(spec.getDefaultRole(), 0);
@@ -3092,11 +3093,12 @@ outer:  for (Effect effect : effects) {
         // Capture the unit.  There are visibility implications for
         // both players because the captured unit might be the only
         // one on its tile, and the winner might have captured a unit
-        // with greater line of sight.
+        // with greater line of sight.  Remember where the loser was,
+        // as it might be destroyed on capture.
+        final Tile oldTile = loser.getTile();
         String key;
-        Tile oldTile = loser.getTile();
-        ChangeType change = (winnerPlayer.isUndead()) ? ChangeType.UNDEAD
-            : ChangeType.CAPTURE;
+        String change = (winnerPlayer.isUndead()) ? UnitChangeType.UNDEAD
+            : UnitChangeType.CAPTURE;
         if (loserPlayer.csChangeOwner(loser, winnerPlayer, change,
                                       winner.getTile(), cs)) {//-vis(both)
             loser.setMovesLeft(0);
@@ -3116,7 +3118,7 @@ outer:  for (Effect effect : effects) {
         key = "combat.unitCaptured.ours." + loser.getType().getSuffix();
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                             key, loser.getTile())
+                             key, oldTile)
                 .addDefaultId("combat.unitCaptured.ours")
                 .addStringTemplate("%location%", loserLocation)
                 .addStringTemplate("%unit%", loserLabel)
@@ -3274,6 +3276,7 @@ outer:  for (Effect effect : effects) {
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
+        final Specification spec = getSpecification();
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loser.getApparentOwnerName();
         StringTemplate loserLocation = loser.getLocation()
@@ -3285,13 +3288,13 @@ outer:  for (Effect effect : effects) {
             .getLocationLabelFor(winnerPlayer);
         String key;
         
-        UnitType type = loser.getTypeChange(ChangeType.DEMOTION, loserPlayer);
-        if (type == null || type == loser.getType()) {
+        UnitChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
+        if (uc == null || uc.to == loser.getType()) {
             logger.warning("Demotion failed, type="
-                + ((type == null) ? "null" : "same type: " + type));
+                + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
         }
-        loser.changeType(type);//-vis(loserPlayer)
+        loser.changeType(uc.to);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
         key = "combat.unitDemoted.enemy." + loser.getType().getSuffix();
@@ -3869,14 +3872,13 @@ outer:  for (Effect effect : effects) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerLabel = winner.getLabel();
 
-        UnitType type = winner.getTypeChange(ChangeType.PROMOTION,
-                                             winnerPlayer);
-        if (type == null || type == winner.getType()) {
+        UnitChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
+        if (uc == null || uc.to == winner.getType()) {
             logger.warning("Promotion failed, type="
-                + ((type == null) ? "null" : "same type: " + type));
+                + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
         }
-        winner.changeType(type);//-vis(winnerPlayer)
+        winner.changeType(uc.to);//-vis(winnerPlayer)
         winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
 
         cs.addMessage(See.only(winnerPlayer),
@@ -4377,41 +4379,55 @@ outer:  for (Effect effect : effects) {
      *
      * @param unit The <code>Unit</code> to change ownership of.
      * @param newOwner The new owning <code>ServerPlayer</code>.
-     * @param change An optional accompanying <code>ChangeType</code>.
+     * @param change An optional accompanying change type.
      * @param loc A optional new <code>Location</code> for the unit.
      * @param cs A <code>ChangeSet</code> to update.
      * @return True if the new owner can have this unit.
      */
     public boolean csChangeOwner(Unit unit, ServerPlayer newOwner,
-                                 ChangeType change, Location loc,
+                                 String change, Location loc,
                                  ChangeSet cs) {
         if (newOwner == this) return true; // No transfer needed
 
+        final Specification spec = getSpecification();
         final Tile oldTile = unit.getTile();
-        UnitType mainType = unit.getTypeChange(change, newOwner);
-        if (mainType == null) mainType = unit.getType(); // No change needed.
-        if (!mainType.isAvailableTo(newOwner)) { // Can not have this unit.
-            cs.addRemove(See.perhaps().always(this), oldTile, unit);
-            unit.dispose();
-            return false;
-        }
+logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change + " uc=" + ((change == null) ? "-" : unit.getUnitChange(change, null, newOwner)));
+        if (change != null) {
+            UnitType mainType = unit.getType();
+            UnitChange uc;
+            if ((uc = unit.getUnitChange(change, null, newOwner)) == null) {
+                ; // mainType is unchanged
+            } else if (uc.isAvailableTo(newOwner)) {
+                mainType = uc.to;
+            } else { // Can not have this unit.
+                logger.warning("Change type/owner failed for " + unit
+                    + " -> " + newOwner + "(" + change + "/" +  uc + ")");
+                cs.addRemove(See.perhaps().always(this), oldTile, unit);
+                unit.dispose();
+                return false;
+            }
 
-        for (Unit u : unit.getUnitList()) {
-            UnitType type = u.getTypeChange(change, newOwner);
-            if (type == null) type = u.getType();
-            if (!type.isAvailableTo(newOwner)) {
-                cs.addRemove(See.only(this), unit, u);
-                u.dispose();
-            } else {
-                if (!u.changeType(type)) {
-                    throw new IllegalStateException("Type change failure: "
-                        + u + " -> " + type);
+            for (Unit u : unit.getUnitList()) {
+                if ((uc = u.getUnitChange(change, null, newOwner)) == null) {
+                    ; // no change for this passenger
+                } else if (uc.isAvailableTo(newOwner)) {
+                    if (uc.to != u.getType() && !u.changeType(uc.to)) {
+                        logger.warning("Type change failure: " + u
+                            + " -> " + uc.to);
+                    }
+                } else {
+                    logger.warning("Change type/owner failed for cargo " + u
+                        + " -> " + newOwner + "(" + change + "/" + uc + ")");
+                    cs.addRemove(See.only(this), unit, u);
+                    u.dispose();
                 }
             }
-        }
-        if (mainType != unit.getType() && !unit.changeType(mainType)) {
-            throw new IllegalStateException("Type change failure: " + unit
-                + " -> " + mainType);
+
+            if (mainType != unit.getType() && !unit.changeType(mainType)) {
+                logger.warning("Type change failure: " + unit
+                    + " -> " + mainType);
+                return false;
+            }
         }
         unit.changeOwner(newOwner);
         if (loc != null) unit.setLocation(loc);

@@ -161,7 +161,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
         StringTemplate oldName = student.getLabel();
         UnitType teach = teacher.getType().getSkillTaught();
-        UnitType skill = Unit.getUnitTypeTeaching(teach, student.getType());
+        UnitType skill = student.getTeachingType(teacher);
         boolean ret = skill != null;
         if (skill == null) {
             logger.warning("Student " + student.getId()

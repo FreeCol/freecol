@@ -50,8 +50,8 @@ import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -1075,10 +1075,10 @@ public class ColonyPlan {
             boolean relevant = u.getWorkType() == goodsType;
             int score = (relevant) ? u.getExperience() : -u.getExperience();
             if (expert != null
-                && u.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)) {
+                && u.getUnitChange(UnitChangeType.EXPERIENCE, expert) != null) {
                 score += 10000;
             } else if (expert != null
-                && u.getType().canBeUpgraded(null, ChangeType.EXPERIENCE)) {
+                && u.getUnitChange(UnitChangeType.EXPERIENCE, expert) != null) {
                 score -= 10000;
             }
             if (score > bestValue) {

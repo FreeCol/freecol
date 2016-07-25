@@ -26,11 +26,11 @@
     </founding-father>
   </founding-fathers>
 
-  <unit-types>
-    <unit-type id="model.unit.indianConvert" preserve="true">
-      <upgrade unit="model.unit.freeColonist" enter-colony="100">
-        <scope ability-id="model.ability.upgradeConvertsAtColony" />
-      </upgrade>
-    </unit-type>
-  </unit-types>
+  <unit-change-types>
+    <unit-change-type id="model.unitChange.enterColony">
+      <scope methodName="canUpgradeOnEnterColony" methodValue="true"/>
+      <unit-type-change from="model.unit.indianConvert"
+                        to="model.unit.freeColonist" probability="100"/>
+    </unit-change-type>
+  </unit-change-types>
 </freecol-specification>

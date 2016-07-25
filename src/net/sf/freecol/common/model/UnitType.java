@@ -22,7 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -112,9 +114,6 @@ public final class UnitType extends BuildableType implements Consumer {
 
     /** The default role for a unit of this type. */
     private Role defaultRole = null;
-
-    /** The possible type changes for this unit type. */
-    private List<UnitTypeChange> typeChanges = null;
 
     /** The goods consumed per turn when in a settlement. */
     private TypeCountMap<GoodsType> consumption = null;
@@ -426,133 +425,36 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     /**
-     * Gets the list of all type changes associated with this unit type.
+     * Get the type that this unit type can be educated to by a
+     * teacher unit type, if any.
      *
-     * @return The list of type changes.
+     * @param teacherType The <code>UnitType</code> of the teacher.
+     * @return The <code>UnitType</code> that this unit type can be educated
+     *     to by the teacher unit type, or null if education is not possible.
      */
-    public List<UnitTypeChange> getTypeChanges() {
-        return (typeChanges == null) ? Collections.<UnitTypeChange>emptyList()
-            : typeChanges;
-    }
+    public UnitType getTeachingType(UnitType teacherType) {
+        final Specification spec = getSpecification();
+        final UnitType taught = teacherType.getSkillTaught();
+        final int taughtLevel = taught.getSkill();
+        if (getSkill() >= taughtLevel) return null; // Fail fast
 
-    /**
-     * Sets the list of all type changes associated with this unit type.
-     * Public for the test suite.
-     *
-     * @param typeChanges The new list of type changes.
-     */
-    public void setTypeChanges(List<UnitTypeChange> typeChanges) {
-        this.typeChanges = typeChanges;
+        // Is there an education change that gets this unit type to the
+        // type taught by the teacher type?  If so, the taught type is valid
+        // and should be returned at once.  Accumulate other intermediate
+        // changes that do not reach the taught type level.
+        List<UnitType> todo = new ArrayList<>();
+        for (UnitChange uc : spec.getUnitChanges(UnitChangeType.EDUCATION, this)) {
+            if (uc.to == taught) return taught;
+            if (uc.to.getSkill() < taughtLevel) todo.add(uc.to);
+        }
+        // Can the teacher teach any of the intermediate changes?  If so,
+        // that change is valid.  Otherwise, education is not possible.
+        for (UnitType ut : todo) {
+            if (ut.getTeachingType(teacherType) != null) return ut;
+        }
+        return null;
     }
-
-    /**
-     * Add a unit type change.
-     *
-     * @param change The <code>UnitTypeChange</code> to add.
-     */
-    private void addTypeChange(UnitTypeChange change) {
-        if (typeChanges == null) typeChanges = new ArrayList<>();
-        typeChanges.add(change);
-    }
-
-    /**
-     * Gets a unit type resulting from a given change type and player.
-     *
-     * @param changeType A <code>ChangeType</code> to match.
-     * @param player A <code>Player</code> to check.
-     * @return Any changed <code>UnitType</code> found, or null if none.
-     */
-    public UnitType getTargetType(ChangeType changeType, Player player) {
-        UnitTypeChange change = getUnitTypeChange(changeType, player);
-        return (change == null) ? null : change.getNewUnitType();
-    }
-
-    /**
-     * Gets any suitable unit type changes applicable to a given change type
-     * and player.
-     *
-     * @param changeType The <code>ChangeType</code> to match.
-     * @param player The <code>Player</code> to check.
-     * @return Any <code>UnitTypeChange</code> found, or null if none.
-     */
-    public UnitTypeChange getUnitTypeChange(ChangeType changeType,
-                                            Player player) {
-        return find(getTypeChanges(),
-            c -> c.asResultOf(changeType) && c.appliesTo(player)
-                && c.getNewUnitType().isAvailableTo(player));
-    }
-
-    /**
-     * Gets the type change required to become another given unit type.
-     *
-     * @param newType The target <code>UnitType</code>.
-     * @return The type change, or null if impossible.
-     */
-    public UnitTypeChange getUnitTypeChange(UnitType newType) {
-        return find(getTypeChanges(),
-                    matchKey(newType, UnitTypeChange::getNewUnitType));
-    }
-
-    /**
-     * Can this type of unit be upgraded to another given type by a given
-     * educational change type?
-     *
-     * If the target type is null, return true if the UnitType can be
-     * upgraded to any other type by the given means of education.
-     *
-     * @param newType The <code>UnitType</code> to learn (may be null
-     *     in the case of attempting to move to a native settlement
-     *     when the skill taught there is still unknown).
-     * @param changeType The educational <code>ChangeType</code>.
-     * @return True if this unit type can learn.
-     */
-    public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
-        return any(getTypeChanges(),
-            c -> (newType == null || newType == c.getNewUnitType())
-                && c.getProbability(changeType) > 0);
-    }
-
-    /**
-     * Gets the unit types which can be learned from a lost city rumour.
-     *
-     * @return A list of unit types.
-     */
-    public List<UnitType> getUnitTypesLearntInLostCity() {
-        return transform(getTypeChanges(),
-                         c -> c.asResultOf(ChangeType.LOST_CITY),
-                         UnitTypeChange::getNewUnitType);
-    }
-
-    /**
-     * Get a UnitType to learn with a level skill less or equal than
-     * given level.
-     *
-     * @param maximumSkill The maximum level skill which we are searching for.
-     * @return A <code>UnitType</code> with a skill equal or less than given
-     *     maximum.
-     */
-    public UnitType getEducationUnit(int maximumSkill) {
-        final Predicate<UnitType> educationPred = ut ->
-            ut.hasSkill() && ut.getSkill() <= maximumSkill;
-        return find(transform(getTypeChanges(), UnitTypeChange::canBeTaught,
-                              UnitTypeChange::getNewUnitType),
-                    educationPred);
-    }
-
-    /**
-     * Get the number of turns to educate this unit type to become
-     * another type.
-     *
-     * @param unitType The <code>UnitType</code> to teach.
-     * @return The number of turns, or UNDEFINED if impossible.
-     */
-    public int getEducationTurns(UnitType unitType) {
-        UnitTypeChange utc = find(getTypeChanges(),
-            c -> c.asResultOf(UnitTypeChange.ChangeType.EDUCATION)
-                && unitType == c.getNewUnitType());
-        return (utc == null) ? UNDEFINED : utc.getTurnsToLearn();
-    }
-
+        
     /**
      * Is this a naval unit type?
      *
@@ -683,9 +585,6 @@ public final class UnitType extends BuildableType implements Consumer {
     // Serialization
 
     private static final String CONSUMES_TAG = "consumes";
-    // @compat 0.10.7
-    private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
-    // end @compat
     private static final String DEFAULT_ROLE_TAG = "default-role";
     private static final String DEFAULT_UNIT_TAG = "default-unit";
     private static final String DEFENCE_TAG = "defence";
@@ -704,9 +603,10 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String SKILL_TAUGHT_TAG = "skill-taught";
     private static final String SPACE_TAG = "space";
     private static final String SPACE_TAKEN_TAG = "space-taken";
-    private static final String DOWNGRADE_TAG = "downgrade";
     private static final String UNIT_TAG = "unit";
-    private static final String UPGRADE_TAG = "upgrade";
+    // @compat 0.10.7
+    private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
+    // end @compat
     // @compat 0.11.3
     private static final String OLD_DEFAULT_UNIT_TAG = "defaultUnit";
     private static final String OLD_HIT_POINTS_TAG = "hitPoints";
@@ -718,6 +618,10 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String OLD_SKILL_TAUGHT_TAG = "skillTaught";
     private static final String OLD_SPACE_TAKEN_TAG = "spaceTaken";
     // end @compat 0.11.3
+    // @compat 0.11.6
+    private static final String DOWNGRADE_TAG = "downgrade";
+    private static final String UPGRADE_TAG = "upgrade";
+    // end @compat 0.11.6
 
     /**
      * {@inheritDoc}
@@ -785,8 +689,6 @@ public final class UnitType extends BuildableType implements Consumer {
 
             xw.writeEndElement();
         }
-
-        for (UnitTypeChange change : getTypeChanges()) change.toXML(xw);
 
         if (consumption != null) {
             for (GoodsType goodsType : consumption.keySet()) {
@@ -916,18 +818,12 @@ public final class UnitType extends BuildableType implements Consumer {
         // Clear containers.
         if (xr.shouldClearContainers()) {
             consumption = null;
-            typeChanges = null;
         }
         defaultRole = spec.getDefaultRole();
 
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
         if (parent != this) {
             defaultRole = parent.defaultRole;
-
-            if (parent.typeChanges != null) {
-                if (typeChanges == null) typeChanges = new ArrayList<>();
-                typeChanges.addAll(parent.typeChanges);
-            }
 
             if (parent.consumption != null) {
                 if (consumption == null) consumption = new TypeCountMap<>();
@@ -1000,26 +896,12 @@ public final class UnitType extends BuildableType implements Consumer {
                                      Role.class, spec.getDefaultRole());
             xr.closeTag(DEFAULT_ROLE_TAG);
 
+        // @compat 0.11.6
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
-            if (xr.getAttribute(DELETE_TAG, false)) {
-                if (typeChanges != null) {
-                    String unitId = xr.getAttribute(UNIT_TAG, (String)null);
-                    removeInPlace(typeChanges, tc ->
-                        unitId.equals(tc.getNewUnitType().getId()));
-                }
-                xr.closeTag(tag);
-
-            } else {
-                UnitTypeChange change
-                    = new UnitTypeChange(xr, spec);// Closes tag
-                if (DOWNGRADE_TAG.equals(tag)
-                    && change.getChangeTypes().isEmpty()) {
-                    // add default downgrade type
-                    change.getChangeTypes().put(ChangeType.CLEAR_SKILL, 100);
-                }
-                addTypeChange(change);
-            }
-
+            spec.setNeedUnitChangeTypes();
+            xr.closeTag(tag);
+        // end @compat 0.11.6
+            
         } else {
             super.readChild(xr);
         }

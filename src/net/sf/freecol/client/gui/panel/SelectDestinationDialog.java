@@ -70,12 +70,14 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders.MultipleAdjacentDecider;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -164,6 +166,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
          */
         private String getExtras(Location loc, Unit unit,
                                  List<GoodsType> goodsTypes) {
+            final Specification spec = unit.getSpecification();
             final String sep = ", ";
             final Player owner = unit.getOwner();
             LogBuilder lb = new LogBuilder(32);
@@ -199,12 +202,11 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     UnitType sk = is.getLearnableSkill();
                     if (sk != null) {
                         final Predicate<Unit> upgradePred = u ->
-                            u.getType().canBeUpgraded(sk, ChangeType.NATIVES);
-                        Unit up = (unit.getType().canBeUpgraded(sk,
-                                ChangeType.NATIVES)) ? unit : null;
-                        if (unit.isCarrier()) {
-                            up = find(unit.getUnits(), upgradePred);
-                        }
+                            u.getUnitChange(UnitChangeType.NATIVES) != null;
+                        Unit up = (unit.isCarrier())
+                            ? find(unit.getUnits(), upgradePred)
+                            : (upgradePred.test(unit)) ? unit
+                            : null;
                         if (up != null) {
                             lb.add("[", Messages.getName(sk), "]");
                         }

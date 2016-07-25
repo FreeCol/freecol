@@ -67,10 +67,11 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -440,12 +441,13 @@ public final class QuickActionMenu extends JPopupMenu {
         int experience = unit.getExperience();
         GoodsType goods = unit.getExperienceType();
         if (experience > 0 && goods != null) {
-            UnitType expertType = freeColClient.getGame()
-                .getSpecification().getExpertForProducing(goods);
-            if (unit.getType().canBeUpgraded(expertType, ChangeType.EXPERIENCE)) {
+            UnitType expertType = spec.getExpertForProducing(goods);
+            UnitChange uc = unit.getUnitChange(UnitChangeType.EXPERIENCE,
+                                               expertType);
+            if (uc != null) {
                 int maxExperience = unit.getType().getMaximumExperience();
-                double probability = unit.getType().getUnitTypeChange(expertType)
-                    .getProbability(ChangeType.EXPERIENCE) * experience / (double) maxExperience;
+                double probability = uc.probability * experience
+                    / (double)maxExperience;
                 String jobName = Messages.message(goods.getWorkingAsKey());
                 JPanel experiencePanel = new MigPanel();
                 experiencePanel.setLayout(new MigLayout("wrap 3"));
@@ -628,6 +630,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * @return True if menu items were added and a separator is now needed.
      */
     private boolean addRoleItems(final UnitLabel unitLabel) {
+        final Specification spec = freeColClient.getGame().getSpecification();
         final Unit unit = unitLabel.getUnit();
         final Role role = unit.getRole();
         final int roleCount = unit.getRoleCount();
@@ -660,18 +663,16 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        UnitType newUnitType = unit.getType()
-            .getTargetType(ChangeType.CLEAR_SKILL, unit.getOwner());
-        if (newUnitType != null) {
+        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        if (uc != null) {
             if (separatorNeeded) this.addSeparator();
             JMenuItem menuItem = Utility.localizedMenuItem("quickActionMenu.clearSpeciality",
-                new ImageIcon(
-                    gui.getImageLibrary().getTinyUnitImage(newUnitType)));
+                new ImageIcon(gui.getImageLibrary().getTinyUnitImage(uc.to)));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);
             if (unit.getLocation() instanceof Building
-                && !((Building)unit.getLocation()).canAddType(newUnitType)) {
+                && !((Building)unit.getLocation()).canAddType(uc.to)) {
                 menuItem.setEnabled(false);
             }
             separatorNeeded = true;

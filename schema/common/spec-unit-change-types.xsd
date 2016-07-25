@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="unit-change-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="UnitChangeTypeId" />
+
+        <xs:element ref="unit-change-type"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unit-change-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="scope"/>
+        <xs:element ref="unit-type-change"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="UnitChangeTypeId"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="owner-change" use="optional" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unit-type-change">
+    <xs:complexType>
+      <xs:attribute name="from" use="required" type="UnitTypeId"/>
+      <xs:attribute name="probability" use="required" type="PercentageType"/>
+      <xs:attribute name="to" use="required" type="UnitTypeId"/>
+      <xs:attribute name="turns" use="optional" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

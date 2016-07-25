@@ -357,7 +357,7 @@ public final class CompactLabourReport extends ReportPanel {
                     return student != null && student.getType() == unitType;
                 };
                 final Function<Unit, UnitType> studentMapper = u ->
-                    Unit.getUnitTypeTeaching(u.getType(), unitType);
+                    unitType.getTeachingType(u.getType());
                 Set<UnitType> resultOfTraining = (colony == null)
                     ? Collections.<UnitType>emptySet()
                     : transform(colony.getTeachers(), teachingPred,

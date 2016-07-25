@@ -49,6 +49,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.NationOptions.Advantages;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -80,6 +81,10 @@ public final class Specification {
     /** Roles backward compatibility fragment. */
     public static final String ROLES_COMPAT_FILE_NAME = "roles-compat.xml";
 
+    /** Unit change types backward compatibility fragment. */
+    public static final String UNIT_CHANGE_TYPES_COMPAT_FILE_NAME
+        = "unit-change-types-compat.xml";
+    
     /** The default role. */
     public static final String DEFAULT_ROLE_ID = "model.role.default";
 
@@ -204,6 +209,8 @@ public final class Specification {
     private final List<TileType> tileTypeList = new ArrayList<>();
     // readerMap("tile-improvement-types")
     private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<>();
+    // readerMap("unit-change-types")
+    private final List<UnitChangeType> unitChangeTypeList = new ArrayList<>();
     // readerMap("unit-types")
     private final List<UnitType> unitTypeList = new ArrayList<>();
 
@@ -272,6 +279,11 @@ public final class Specification {
     /** The turn number for the game ages for FF recruitment. */
     private final int[] ages = new int[NUMBER_OF_AGES];
 
+    /**
+     * Do we need to load the unit-change-types backward
+     * compatibility fragment. */
+    private boolean needUnitChangeTypes = false;
+
 
     /**
      * Creates a new Specification object.
@@ -312,6 +324,8 @@ public final class Specification {
         readerMap.put(OLD_TILEIMPROVEMENT_TYPES_TAG,
                       new TypeReader<>(TileImprovementType.class, tileImprovementTypeList));
         // end @compat 0.11.3
+        readerMap.put(UNIT_CHANGE_TYPES_TAG,
+                      new TypeReader<>(UnitChangeType.class, unitChangeTypeList));
         readerMap.put(UNIT_TYPES_TAG,
                       new TypeReader<>(UnitType.class, unitTypeList));
 
@@ -642,6 +656,7 @@ public final class Specification {
             + ", " + roles.size() + " Roles"
             + ", " + tileTypeList.size() + " TileTypes"
             + ", " + tileImprovementTypeList.size() + " TileImprovementTypes"
+            + ", " + unitChangeTypeList.size() + " UnitChangeTypes"
             + ", " + unitTypeList.size() + " UnitTypes"
             + " read.");
     }
@@ -710,6 +725,13 @@ public final class Specification {
         getGameOptions().add(prices);
     }
 
+    /**
+     * Call this when old style unit changes are seen, so the spec can
+     * load the backward compatiblity fragment.
+     */
+    public void setNeedUnitChangeTypes() {
+        this.needUnitChangeTypes = true;
+    }
 
     private interface ChildReader {
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
@@ -1212,6 +1234,119 @@ public final class Specification {
         return getType(id, TileImprovementType.class);
     }
 
+    // -- UnitChangeTypes --
+
+    /**
+     * Get the list of all unit change types.
+     *
+     * @return The unit change type list.
+     */
+    public List<UnitChangeType> getUnitChangeTypeList() {
+        return unitChangeTypeList;
+    }
+
+    /**
+     * Get a specific type of unit change type.
+     *
+     * Suitable indexing constants are in UnitChangeType.
+     *
+     * @param id The identifier for the required change type.
+     * @return The <code>UnitChangeType</code> found, or null if none present.
+     */
+    public UnitChangeType getUnitChangeType(String id) {
+        return find(unitChangeTypeList,
+                    matchKeyEquals(id, UnitChangeType::getId));
+    }
+
+    /**
+     * Get a specific unit change for a given unit change type and
+     * source unit type to change.
+     *
+     * Suitable indexing constants are in UnitChangeType.
+     *
+     * @param id The identifier for the required change type.
+     * @param fromType The <code>UnitType</code> to change.
+     * @return A list of <code>UnitChange</code>s.
+     */
+    public List<UnitChange> getUnitChanges(String id, UnitType fromType) {
+        UnitChangeType uct = getUnitChangeType(id);
+        return (uct == null) ? Collections.<UnitChange>emptyList()
+            : uct.getUnitChanges(fromType);
+    }
+
+    /**
+     * Get a specific unit change for a given unit change type, a
+     * source unit type to change, and a destination unit type.
+     *
+     * Suitable indexing constants are in UnitChangeType.
+     *
+     * @param id The identifier for the required change type.
+     * @param fromType The <code>UnitType</code> to change from.
+     * @return The <code>UnitChange</code> found, or null if the
+     *     change is impossible.
+     */
+    public UnitChange getUnitChange(String id, UnitType fromType) {
+        return getUnitChange(id, fromType, null);
+    }
+
+    /**
+     * Get a specific unit change for a given unit change type, a
+     * source unit type to change, and a destination unit type.
+     *
+     * Suitable indexing constants are in UnitChangeType.
+     *
+     * @param id The identifier for the required change type.
+     * @param fromType The <code>UnitType</code> to change from.
+     * @param toType The <code>UnitType</code> to change to.
+     * @return The <code>UnitChange</code> found, or null if the
+     *     change is impossible.
+     */
+    public UnitChange getUnitChange(String id, UnitType fromType,
+                                    UnitType toType) {
+        UnitChangeType uct = getUnitChangeType(id);
+        return (uct == null) ? null
+            : uct.getUnitChange(fromType, toType);
+    }
+
+    /**
+     * Gets the number of turns a unit has to train to educate a student.
+     * This value is only meaningful for units that can be put in a school.
+     *
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @param typeStudent the student <code>UnitType</code>.
+     * @return The turns of training needed.
+     */
+    public int getNeededTurnsOfTraining(UnitType typeTeacher,
+                                        UnitType typeStudent) {
+        UnitType learn = typeStudent.getTeachingType(typeTeacher);
+        if (learn == null) {
+            throw new RuntimeException("Can not learn: teacher=" + typeTeacher
+                + " student=" + typeStudent);
+        }
+        return getUnitChange(UnitChangeType.EDUCATION, typeStudent, learn).turns;
+    }
+
+    /**
+     * Add a unit change.
+     *
+     * Needed by the test suite.
+     *
+     * @param from The <code>UnitType</code> that can change.
+     * @param to The <code>UnitType</code> to change to.
+     * @param prob The percentage chance of the change occurring.
+     * @param turns The number of turns the change will take, if not
+     *     immediate.
+     */
+    public void addUnitChange(String id, UnitType from, UnitType to,
+                              int prob, int turns) {
+        UnitChangeType uct = getUnitChangeType(id);
+        if (uct == null) {
+            uct = new UnitChangeType(id, this);
+            unitChangeTypeList.add(uct);
+        }
+        if (uct != null) uct.addUnitChange(from, to, prob, turns);
+    }
+        
     // -- Units --
 
     public List<UnitType> getUnitTypeList() {
@@ -2702,6 +2837,7 @@ public final class Specification {
     private static final String ROLES_TAG = "roles";
     private static final String TILE_TYPES_TAG = "tile-types";
     private static final String TILE_IMPROVEMENT_TYPES_TAG = "tile-improvement-types";
+    private static final String UNIT_CHANGE_TYPES_TAG = "unit-change-types";
     private static final String UNIT_TYPES_TAG = "unit-types";
     private static final String VERSION_TAG = "version";
     // @compat 0.10.x
@@ -2741,6 +2877,7 @@ public final class Specification {
         writeSection(xw, TILE_TYPES_TAG, tileTypeList);
         writeSection(xw, ROLES_TAG, roles);
         writeSection(xw, TILE_IMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
+        writeSection(xw, UNIT_CHANGE_TYPES_TAG, unitChangeTypeList);
         writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
         writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
         writeSection(xw, FOUNDING_FATHERS_TAG, foundingFathers);
@@ -2829,6 +2966,25 @@ public final class Specification {
             } else {  
                 reader.readChildren(xr);
             }
+        }
+
+        if (this.needUnitChangeTypes) {
+            this.needUnitChangeTypes = false;
+            File base = FreeColDirectories.getBaseDirectory();
+            File uctf = new File(base, UNIT_CHANGE_TYPES_COMPAT_FILE_NAME); 
+            try (
+                 FileInputStream fis = new FileInputStream(uctf);
+                 ) {
+                load(fis);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to load unit-change-types.", e);
+                return;
+            }
+
+            logger.info("Loading unit-change-types backward compatibility fragment: "
+                + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
+                + transform(getUnitChangeTypeList(), alwaysTrue(),
+                            UnitChangeType::getId, Collectors.joining(" ")));
         }
     }
 

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
+<freecol-specification id="unitChangeTypesCompat" version="0.110">
+<!--
+    A copy of the latest unit-change-types section of
+    classic/specification.xml to be loaded into the specification of
+    games lacking a unit-change-types section (0.11.6 or earlier).
+-->
+  <unit-change-types>
+    <unit-change-type id="model.unitChange.capture" owner-change="true">
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.colonialRegular"
+                        to="model.unit.veteranSoldier" probability="100"/>
+      <unit-type-change from="model.unit.jesuitMissionary"
+                        to="model.unit.freeColonist" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.clearSkill">
+      <unit-type-change from="model.unit.expertFarmer"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.expertFisherman"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.expertFurTrapper"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.expertSilverMiner"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.expertLumberJack"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.expertOreMiner"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterSugarPlanter"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterCottonPlanter"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterTobaccoPlanter"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.firebrandPreacher"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.elderStatesman"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterCarpenter"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterDistiller"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterWeaver"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterTobacconist"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterFurTrader"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterBlacksmith"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.masterGunsmith"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.seasonedScout"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.hardyPioneer"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.jesuitMissionary"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.colonialRegular"
+                        to="model.unit.freeColonist" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.conversion" owner-change="true">
+      <unit-type-change from="model.unit.brave"
+                        to="model.unit.indianConvert" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.creation"/>
+    <unit-change-type id="model.unitChange.demotion">
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.colonialRegular"
+                        to="model.unit.veteranSoldier" probability="100"/>
+      <unit-type-change from="model.unit.artillery"
+                        to="model.unit.damagedArtillery" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.education">
+      <unit-type-change from="model.unit.pettyCriminal"
+                        to="model.unit.indenturedServant"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.freeColonist"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFarmer"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFisherman"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFurTrapper"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertSilverMiner"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertLumberJack"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertOreMiner"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterSugarPlanter"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterCottonPlanter"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterTobaccoPlanter"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.firebrandPreacher"
+                        probability="100" turns="8"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.elderStatesman"
+                        probability="100" turns="8"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterCarpenter"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterDistiller"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterWeaver"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterTobacconist"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterFurTrader"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterBlacksmith"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterGunsmith"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.seasonedScout"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.hardyPioneer"
+                        probability="100" turns="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.veteranSoldier"
+                        probability="100" turns="6"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.jesuitMissionary"
+                        probability="100" turns="8"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.experience">
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFarmer" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFisherman" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFurTrapper" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertSilverMiner" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertLumberJack" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertOreMiner" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterSugarPlanter" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterCottonPlanter" probability="4"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterTobaccoPlanter" probability="4"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.independence">
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.colonialRegular" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.lostCity">
+      <unit-type-change from="model.unit.pettyCriminal"
+                        to="model.unit.seasonedScout" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.seasonedScout" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.seasonedScout" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.natives">
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertFarmer" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFarmer" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertFisherman" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFisherman" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertFurTrapper" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertFurTrapper" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertSilverMiner" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertSilverMiner" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertLumberJack" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertLumberJack" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.expertOreMiner" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.expertOreMiner" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterCottonPlanter" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterCottonPlanter" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterSugarPlanter" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterSugarPlanter" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterTobaccoPlanter" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterTobaccoPlanter" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterWeaver" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterWeaver" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.seasonedScout" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.seasonedScout" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.promotion">
+      <unit-type-change from="model.unit.pettyCriminal"
+                        to="model.unit.indenturedServant" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.freeColonist" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.veteranSoldier" probability="100"/>
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.colonialRegular" probability="100"/>
+    </unit-change-type>
+    <unit-change-type id="model.unitChange.undead" owner-change="true">
+      <unit-type-change from="model.unit.pettyCriminal"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertFarmer"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertFisherman"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertFurTrapper"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertSilverMiner"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertLumberJack"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.expertOreMiner"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterSugarPlanter"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterCottonPlanter"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterTobaccoPlanter"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.firebrandPreacher"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.elderStatesman"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterCarpenter"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterDistiller"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterWeaver"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterTobacconist"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterFurTrader"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterBlacksmith"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.masterGunsmith"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.seasonedScout"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.hardyPioneer"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.veteranSoldier"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.jesuitMissionary"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.kingsRegular"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.indianConvert"
+                        to="model.unit.undead" probability="100"/>
+      <unit-type-change from="model.unit.brave"
+                        to="model.unit.undead" probability="100"/>
+    </unit-change-type>
+  </unit-change-types>
+</freecol-specification>

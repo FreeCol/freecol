@@ -38,8 +38,8 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ServerTestHelper;
@@ -396,9 +396,8 @@ public class ServerUnitTest extends FreeColTestCase {
         // Can colonist be upgraded
         UnitType learn = spec().getExpertForProducing(colonist.getWorkType());
         assertNotNull(learn);
-        assertTrue(learn != colonist.getType());
-        assertTrue(colonist.getType().canBeUpgraded(learn,
-                                                    ChangeType.EXPERIENCE));
+        assertFalse(learn == colonist.getType());
+        assertNotNull(colonist.getUnitChange(UnitChangeType.EXPERIENCE));
 
         // set some experience
         int expectXP = 10;

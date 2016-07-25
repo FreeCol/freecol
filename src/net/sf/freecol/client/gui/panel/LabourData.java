@@ -518,7 +518,7 @@ public class LabourData {
         if (teacher != null) {
             colonyData.students++;
 
-            UnitData learning = getUnitData(Unit.getUnitTypeTeaching(teacher.getType(), unit.getType()));
+            UnitData learning = getUnitData(unit.getTeachingType(teacher));
             learning.getLocationData(colony).addOtherStudent(unitData.getUnitName());
         }
         if (wl.canTeach()) colonyData.teachers++;

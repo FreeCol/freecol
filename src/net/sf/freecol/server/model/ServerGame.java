@@ -64,7 +64,8 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -426,7 +427,7 @@ public class ServerGame extends Game implements ServerModelObject {
                 is.setContacted(strongest);//-til
                 ServerUnit missionary = (ServerUnit)is.getMissionary();
                 if (weakest.csChangeOwner(missionary, strongest,//-vis(both),-til
-                                          ChangeType.CAPTURE, null, cs)) {
+                                          UnitChangeType.CAPTURE, null, cs)) {
                     is.getTile().updateIndianSettlement(strongest);
                     cs.add(See.perhaps().always(strongest), is);
                 }
@@ -436,21 +437,26 @@ public class ServerGame extends Game implements ServerModelObject {
             ((ServerColony)c).csChangeOwner(strongest, false, cs);//-vis(both),-til
             lb.add(" ", c.getName());
         }
-        for (Unit unit : transform(weakest.getUnits(),
-                u -> weakest.csChangeOwner(u, strongest, //-vis(both)
-                                           ChangeType.CAPTURE, null, cs))) {
-            unit.setMovesLeft(0);
-            unit.setState(Unit.UnitState.ACTIVE);
+        for (Unit unit : weakest.getUnitList()) {
             lb.add(" ", unit.getId());
-            if (unit.getLocation() instanceof Europe) {
-                unit.setLocation(strongAI.getEurope());//-vis
-                cs.add(See.only(strongest), unit);
-            } else if (unit.getLocation() instanceof HighSeas) {
-                unit.setLocation(strongAI.getHighSeas());//-vis
-                cs.add(See.only(strongest), unit);
-            } else if (unit.getLocation() instanceof Tile) {
-                Tile tile = unit.getTile();
-                if (!tiles.contains(tile)) tiles.add(tile);
+            if (unit.isOnCarrier()) {
+                ; // Allow carrier to handle
+            } else if (!weakest.csChangeOwner(unit, strongest, //-vis(both)
+                    UnitChangeType.CAPTURE, null, cs)) {
+                logger.warning("Owner change failed for " + unit);
+            } else {
+                unit.setMovesLeft(0);
+                unit.setState(Unit.UnitState.ACTIVE);
+                if (unit.getLocation() instanceof Europe) {
+                    unit.setLocation(strongAI.getEurope());//-vis
+                    cs.add(See.only(strongest), unit);
+                } else if (unit.getLocation() instanceof HighSeas) {
+                    unit.setLocation(strongAI.getHighSeas());//-vis
+                    cs.add(See.only(strongest), unit);
+                } else if (unit.getLocation() instanceof Tile) {
+                    Tile tile = unit.getTile();
+                    if (!tiles.contains(tile)) tiles.add(tile);
+                }
             }
         }
 

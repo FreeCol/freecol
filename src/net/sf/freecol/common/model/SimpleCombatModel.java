@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -693,12 +693,14 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void resolveAttack(Unit winner, Unit loser, boolean great,
                                double r, List<CombatResult> crs) {
+        final Specification spec = winner.getSpecification();
         Player loserPlayer = loser.getOwner();
         Tile tile = loser.getTile();
         Player winnerPlayer = winner.getOwner();
         boolean attackerWon = crs.get(0) == CombatResult.WIN;
         boolean loserMustDie = loser.hasAbility(Ability.DISPOSE_ON_COMBAT_LOSS);
-
+        UnitChange uc;
+        
         if (loser.isNaval()) {
             // Naval victors get to loot the defenders hold.  Sink the
             // loser on great win/loss, lack of repair location, or
@@ -846,8 +848,7 @@ public class SimpleCombatModel extends CombatModel {
                     crs.add(CombatResult.CAPTURE_UNIT);
 
                 // Or losing just causes a demotion.
-                } else if (loser.getTypeChange(ChangeType.DEMOTION,
-                                               loserPlayer) != null) {
+                } else if (loser.getUnitChange(UnitChangeType.DEMOTION) != null) {
                     crs.add(CombatResult.DEMOTE_UNIT);
 
                 // But finally, the default is to kill them.
@@ -858,13 +859,11 @@ public class SimpleCombatModel extends CombatModel {
         }
 
         // Promote great winners or with automatic promotion, if possible.
-        UnitTypeChange promotion = winner.getType()
-            .getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
-        if (promotion != null
+        uc = winner.getUnitChange(UnitChangeType.PROMOTION);
+        if (uc != null
             && (winner.hasAbility(Ability.AUTOMATIC_PROMOTION)
                 || (great
-                    && (100 * (r - Math.floor(r))
-                        <= promotion.getProbability(ChangeType.PROMOTION))))) {
+                    && (100 * (r - Math.floor(r)) <= uc.probability)))) {
             crs.add(CombatResult.PROMOTE_UNIT);
         }
     }

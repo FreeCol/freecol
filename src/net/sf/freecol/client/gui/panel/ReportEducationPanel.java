@@ -22,12 +22,14 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -53,23 +55,31 @@ public final class ReportEducationPanel extends ReportPanel {
         for (Colony colony : colonies) {
             for (Building building : colony.getBuildings()) {
                 if (building.canTeach()) {
-                    int maxSkill = Unit.UNDEFINED;
-                    reportPanel.add(createColonyButton(colony), "newline, split 2, flowy");
-                    BuildingPanel bp = new BuildingPanel(getFreeColClient(), building);
+                    reportPanel.add(createColonyButton(colony),
+                                    "newline, split 2, flowy");
+                    BuildingPanel bp = new BuildingPanel(freeColClient, building);
                     bp.initialize();
                     reportPanel.add(bp);
                     JPanel teacherPanel = getPanel("report.education.teachers");
-                    for (Unit unit : transform(colony.getUnits(),
-                                               u -> building.canAdd(u))) {
-                        teacherPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
-                        maxSkill = Math.max(maxSkill, unit.getType().getSkill());
+                    List<Unit> teachers = transform(colony.getUnits(),
+                        u -> building.canAdd(u), Function.identity(),
+                        Unit.increasingSkillComparator);
+                    for (Unit u : teachers) {
+                        teacherPanel.add(new UnitLabel(freeColClient, u,
+                                                       true, true));
                     }
                     reportPanel.add(teacherPanel, "split 2, flowy, grow");
                     JPanel studentPanel = getPanel("report.education.students");
                     for (Unit unit : colony.getUnitList()) {
-                        if (unit.getType().getEducationUnit(maxSkill) != null) {
-                            studentPanel.add(new UnitLabel(getFreeColClient(),
-                                                           unit, true, true));
+                        Unit teacher = find(teachers, u -> unit.canBeStudent(u));
+                        if (teacher != null) {
+                            UnitLabel ul = new UnitLabel(freeColClient, unit,
+                                                         true, true);
+                            studentPanel.add(ul);
+                            Utility.localizeToolTip(ul, StringTemplate
+                                .template("report.education.tooltip")
+                                .addNamed("%skill%",
+                                    unit.getTeachingType(teacher)));
                         }
                     }
                     reportPanel.add(studentPanel, "grow");

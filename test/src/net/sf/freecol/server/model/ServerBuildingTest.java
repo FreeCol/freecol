@@ -741,19 +741,25 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         // Move teachers back to school, miner first to pick up the criminal
         teacher1.setLocation(university);
+        assertNotNull(teacher1.getStudent());
+        assertEquals(teacher1, teacher1.getStudent().getTeacher());
+        assertEquals(pettyCriminalType, teacher1.getStudent().getType());
         teacher2.setLocation(university);
+        assertNotNull(teacher2.getStudent());
+        assertEquals(teacher2, teacher2.getStudent().getTeacher());
+        assertEquals(freeColonistType, teacher2.getStudent().getType());
 
         ServerTestHelper.newTurn();
-        assertEquals(1, teacher1.getTurnsOfTraining());
-        assertEquals(1, teacher2.getTurnsOfTraining());
+        ServerTestHelper.newTurn();
+        ServerTestHelper.newTurn();
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(3, teacher2.getTurnsOfTraining());
+        assertEquals(4, teacher1.getNeededTurnsOfTraining());
+        assertEquals(4, teacher2.getNeededTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(1, getUnitList(colony, pettyCriminalType).size());
 
         ServerTestHelper.newTurn();
-        ServerTestHelper.newTurn();
-        ServerTestHelper.newTurn();
-        assertEquals(0, teacher1.getTurnsOfTraining());
-        assertEquals(0, teacher2.getTurnsOfTraining());
 
         // Teacher1's student (criminal) should be a servant now
         // Teacher2's student (colonist) should be a carpenter now
@@ -762,6 +768,9 @@ public class ServerBuildingTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, indenturedServantType).size());
         assertEquals(1, getUnitList(colony, expertOreMinerType).size());
         assertEquals(2, getUnitList(colony, masterCarpenterType).size());
+
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
 
         FreeColTestUtils.setStudentSelection(selection);
     }
@@ -1134,7 +1143,8 @@ public class ServerBuildingTest extends FreeColTestCase {
 
         regular.setLocation(university);
         assertEquals(colonist, regular.getStudent());
-        trainForTurns(colony, freeColonistType.getEducationTurns(veteranSoldierType));
+        trainForTurns(colony,
+            spec().getNeededTurnsOfTraining(veteranSoldierType, freeColonistType));
 
         assertEquals(veteranSoldierType, colonist.getType());
 

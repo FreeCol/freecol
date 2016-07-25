@@ -588,7 +588,7 @@ public class CombatTest extends FreeColTestCase {
         dutch.csCombat(soldier, defender, crs, new Random(),
                        new ChangeSet());
         assertEquals("Two units on tile", 2, tile2.getUnitList().size());
-        assertEquals("Convert on tile", tile2.getUnitList().get(1).getType(),
-                     indianConvertType);
+        assertEquals("Convert on tile", indianConvertType,
+                     tile2.getUnitList().get(1).getType());
     }
 }

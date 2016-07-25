@@ -20,7 +20,7 @@
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
 
-      XSD for specification version 0.110
+      XSD for specification version 0.111
       CHANGELOG:
       0.26:  add capture-equipment
       0.27:  add limits
@@ -108,6 +108,7 @@
       0.108: Migrate change to tile-type-change.
       0.109: Big reorganization.
       0.110: Add experts-with-connections-production attribute to BuildingType.
+      0.111: Add unit-change-types etc.
     </xs:documentation>
   </xs:annotation>
 
@@ -127,6 +128,7 @@
   <xs:include schemaLocation="../common/spec-roles.xsd"/>
   <xs:include schemaLocation="../common/spec-tile-improvement.xsd"/>
   <xs:include schemaLocation="../common/spec-tile-types.xsd"/>
+  <xs:include schemaLocation="../common/spec-unit-change-types.xsd"/>
   <xs:include schemaLocation="../common/spec-unit-types.xsd"/>
   <xs:include schemaLocation="../common/spec-common.xsd"/>
 
@@ -148,6 +150,7 @@
         <xs:element ref="roles"/>
         <xs:element ref="tile-improvement-types"/>
         <xs:element ref="tile-types"/>
+        <xs:element ref="unit-change-types"/>
         <xs:element ref="unit-types"/>
         <!-- @compat 0.11.3 -->
         <xs:element ref="tileimprovement-types"/>

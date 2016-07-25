@@ -97,11 +97,11 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
@@ -514,7 +514,7 @@ public final class InGameController extends Controller {
         final Predicate<Unit> surrenderPred = u -> //-vis(both)
             (u.hasTile() && !u.isNaval() && !u.isOnCarrier()
                 && serverPlayer.csChangeOwner(u, independent,
-                                              ChangeType.CAPTURE, null, cs));
+                    UnitChangeType.CAPTURE, null, cs));
         List<Unit> surrenderUnits
             = transform(serverPlayer.getUnits(), surrenderPred);
         for (Unit u : surrenderUnits) {
@@ -906,7 +906,7 @@ public final class InGameController extends Controller {
                 } else {
                     newLoc = settlement.getTile();
                 }
-                if (source.csChangeOwner(newUnit, dest, ChangeType.CAPTURE,
+                if (source.csChangeOwner(newUnit, dest, UnitChangeType.CAPTURE,
                                          newLoc, cs)) {//-vis(both)
                     newUnit.setMovesLeft(0);
                     cs.add(See.perhaps().always(former), oldTile);
@@ -1561,9 +1561,8 @@ public final class InGameController extends Controller {
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
-        UnitType newType = unit.getTypeChange(ChangeType.CLEAR_SKILL,
-                                              serverPlayer);
-        if (newType == null) {
+        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        if (uc == null) {
             return serverPlayer.clientError("Can not clear unit speciality: "
                 + unit.getId());
         }
@@ -1578,7 +1577,7 @@ public final class InGameController extends Controller {
         }
 
         // Valid, change type.
-        unit.changeType(newType);//-vis: safe in colony
+        unit.changeType(uc.to);//-vis: safe in colony
 
         // Update just the unit, others can not see it as this only happens
         // in-colony.
@@ -1716,12 +1715,6 @@ public final class InGameController extends Controller {
 
         // Generalized continental army muster.
         // Do not use UnitType.getTargetType.
-        java.util.Map<UnitType, UnitType> upgrades = new HashMap<>();
-        for (UnitType unitType : spec.getUnitTypeList()) {
-            UnitType upgrade = unitType.getTargetType(ChangeType.INDEPENDENCE,
-                                                      serverPlayer);
-            if (upgrade != null) upgrades.put(unitType, upgrade);
-        }
         java.util.Map<UnitType, List<Unit>> unitMap = new HashMap<>();
         for (Colony colony : transform(serverPlayer.getColonies(),
                                        c -> c.getSoL() > 50)) {
@@ -1730,16 +1723,18 @@ public final class InGameController extends Controller {
 
             unitMap.clear();
             for (Unit unit : transform(allUnits,
-                    u -> upgrades.containsKey(u.getType()))) {
+                    u -> u.getUnitChange(UnitChangeType.INDEPENDENCE) != null)) {
                 appendToMapList(unitMap, unit.getType(), unit);
             }
             for (Entry<UnitType, List<Unit>> entry : unitMap.entrySet()) {
                 int n = 0;
-                UnitType type = entry.getKey();
+                UnitType fromType = entry.getKey();
+                UnitType toType = spec.getUnitChange(UnitChangeType.INDEPENDENCE,
+                                                     fromType).to;
                 List<Unit> units = entry.getValue();
                 while (!units.isEmpty() && n < limit) {
                     Unit unit = units.remove(0);
-                    unit.changeType(upgrades.get(type));//-vis
+                    unit.changeType(toType);//-vis
                     cs.add(See.only(serverPlayer), unit);
                     n++;
                 }
@@ -1749,8 +1744,8 @@ public final class InGameController extends Controller {
                                      serverPlayer, colony)
                         .addName("%colony%", colony.getName())
                         .addAmount("%number%", n)
-                        .addNamed("%oldUnit%", type)
-                        .addNamed("%unit%", upgrades.get(type)));
+                        .addNamed("%oldUnit%", fromType)
+                        .addNamed("%unit%", toType));
                 limit -= n;
             }
         }
@@ -2923,18 +2918,18 @@ public final class InGameController extends Controller {
     public ChangeSet learnFromIndianSettlement(ServerPlayer serverPlayer,
                                                Unit unit, IndianSettlement is) {
         // Sanity checks.
-        UnitType skill = is.getLearnableSkill();
+        final Specification spec = getGame().getSpecification();
+        final UnitType skill = is.getLearnableSkill();
         if (skill == null) {
             return serverPlayer.clientError("No skill to learn at "
                 + is.getName());
         }
-        if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+        if (unit.getUnitChange(UnitChangeType.NATIVES, skill) == null) {
             return serverPlayer.clientError("Unit " + unit
                 + " can not learn skill " + skill + " at " + is.getName());
         }
 
         // Try to learn
-        final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
         csVisit(serverPlayer, is, 0, cs);
@@ -4162,9 +4157,8 @@ public final class InGameController extends Controller {
         colony.equipForRole(unit, spec.getDefaultRole(), 0);
 
         // Check for upgrade.
-        UnitType newType = unit.getTypeChange(ChangeType.ENTER_COLONY,
-                                              unit.getOwner());
-        if (newType != null) unit.changeType(newType);//-vis: safe in colony
+        UnitChange uc = unit.getUnitChange(UnitChangeType.ENTER_COLONY);
+        if (uc != null) unit.changeType(uc.to);//-vis: safe in colony
 
         // Change the location.
         // We could avoid updating the whole tile if we knew that this

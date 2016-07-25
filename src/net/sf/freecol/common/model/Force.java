@@ -319,4 +319,3 @@ public class Force extends FreeColSpecObject {
         return "force";
     }
 }
-

@@ -100,9 +100,10 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -1498,7 +1499,7 @@ public final class InGameController extends FreeColClientHolder {
         UnitType skill = is.getLearnableSkill();
         if (skill == null) {
             getGUI().showInformationMessage(is, "info.noMoreSkill");
-        } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+        } else if (unit.getUnitChange(UnitChangeType.NATIVES) == null) {
             getGUI().showInformationMessage(is, StringTemplate
                 .template("info.cantLearnSkill")
                 .addStringTemplate("%unit%",
@@ -3112,8 +3113,8 @@ public final class InGameController extends FreeColClientHolder {
         if (!requireOurTurn() || unit == null) return false;
 
         UnitType oldType = unit.getType();
-        UnitType newType = oldType.getTargetType(ChangeType.CLEAR_SKILL,
-                                                 unit.getOwner());
+        UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
+        UnitType newType = (uc == null) ? null : uc.to;
         if (newType == null) {
             getGUI().showInformationMessage(unit, StringTemplate
                 .template("clearSpeciality.impossible")

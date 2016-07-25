@@ -52,8 +52,8 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitChangeType;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -169,7 +169,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                     int experience = goods.getAmount() / workLocation.getUnitCount();
                     for (Unit unit : transform(workLocation.getUnits(),
                             u -> u.getExperienceType() == goods.getType()
-                                && u.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE))) {
+                            && u.getUnitChange(UnitChangeType.EXPERIENCE,
+                                               expert) != null)) {
                         unit.setExperience(unit.getExperience() + experience);
                         cs.addPartial(See.only(owner), unit, "experience");
                     }
@@ -738,8 +739,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         
         changeOwner(newOwner);//-vis(both),-til
 
-        ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
-            : ChangeType.CAPTURE;
+        String change = (newOwner.isUndead()) ? UnitChangeType.UNDEAD
+            : UnitChangeType.CAPTURE;
         List<Unit> units = getAllUnitsList();
         for (Unit u : units) {//-vis(both)
             oldOwner.csChangeOwner(u, newOwner, change, null, cs);
@@ -841,7 +842,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (brave == null) return;
         ServerPlayer newOwner = (ServerPlayer)getOwner();
         ServerPlayer oldOwner = (ServerPlayer)brave.getOwner();
-        if (oldOwner.csChangeOwner(brave, newOwner, ChangeType.CONVERSION, 
+        if (oldOwner.csChangeOwner(brave, newOwner, UnitChangeType.CONVERSION, 
                                    getTile(), cs)) { //-vis(other)
             brave.changeRole(getSpecification().getDefaultRole(), 0);
             for (Goods g : brave.getGoods()) brave.removeGoods(g);

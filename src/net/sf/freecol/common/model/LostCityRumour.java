@@ -186,7 +186,8 @@ public class LostCityRumour extends TileItem {
         final Specification spec = getSpecification();
         final Tile tile = getTile();
         final boolean allowLearn = unit != null
-            && !unit.getType().getUnitTypesLearntInLostCity().isEmpty();
+            && !spec.getUnitChanges(UnitChangeType.LOST_CITY,
+                                    unit.getType()).isEmpty();
 
         // Base bad and good chances are difficulty options.
         int percentBad = spec.getInteger(GameOptions.BAD_RUMOUR);
