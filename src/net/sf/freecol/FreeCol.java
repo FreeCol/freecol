@@ -1298,6 +1298,39 @@ public final class FreeCol {
     }
 
     /**
+     * Build an error template from an exception.
+     *
+     * @param ex The <code>Exception</code> to make an error from.
+     * @param fallbackKey A message key to use to make a fallback message
+     *     if the exception is unsuitable.
+     * @return An error <code>StringTemplate</code>.
+     */
+    public static StringTemplate errorFromException(Exception ex,
+                                                    String fallbackKey) {
+        return errorFromException(ex, StringTemplate.template(fallbackKey));
+    }
+
+    /**
+     * Build an error template from an exception.
+     *
+     * @param ex The <code>Exception</code> to make an error from.
+     * @param fallback A <code>StringTemplate</code> to use as a fall
+     *     back if the exception is unsuitable.
+     * @return An error <code>StringTemplate</code>.
+     */
+    public static StringTemplate errorFromException(Exception ex,
+                                                    StringTemplate fallback) {
+        String msg;
+        return (ex == null || (msg = ex.getMessage()) == null)
+            ? fallback
+            : (Messages.containsKey(msg))
+            ? StringTemplate.template(msg)
+            : (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+            ? StringTemplate.name(msg)
+            : fallback;
+    }
+
+    /**
      * We get a lot of lame bug reports with insufficient configuration
      * information.  Get a buffer containing as much information as we can
      * to embed in the log file and saved games.

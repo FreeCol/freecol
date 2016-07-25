@@ -292,18 +292,18 @@ public final class MapEditorController extends FreeColClientHolder {
                         getGUI().updateMenuBar();
                         getGUI().refresh();
                     });
-            } catch (FreeColException e) {
+            } catch (FileNotFoundException fnfe) {
                 reloadMainPanel();
-                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.name(e.getMessage())));
-            } catch (FileNotFoundException e) {
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.errorFromException(fnfe, FreeCol.badFile("error.couldNotFind", theFile))));
+            } catch (IOException ioe) {
                 reloadMainPanel();
-                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.fileNotFound")));
-            } catch (IOException e) {
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.errorFromException(ioe, "server.initialize")));
+            } catch (XMLStreamException xse) {
                 reloadMainPanel();
-                SwingUtilities.invokeLater(new ErrorJob(StringTemplate.key("server.initialize")));
-            } catch (XMLStreamException e) {
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.errorFromException(xse, FreeCol.badFile("error.couldNotLoad", theFile))));
+            } catch (FreeColException ex) {
                 reloadMainPanel();
-                SwingUtilities.invokeLater(new ErrorJob(FreeCol.badFile("error.couldNotLoad", theFile)));
+                SwingUtilities.invokeLater(new ErrorJob(FreeCol.errorFromException(ex, "server.initialize")));
             }
         };
         getFreeColClient().setWork(loadGameJob);

@@ -200,10 +200,7 @@ public final class PreGameInputHandler extends ServerInputHandler {
         try {
             ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
-            return new ErrorMessage(StringTemplate
-                .template("server.errorStartingGame")
-                .addName("%extra%", e.getMessage()))
-                .toXMLElement();
+            return new ErrorMessage(e).toXMLElement();
         }
 
         return null;

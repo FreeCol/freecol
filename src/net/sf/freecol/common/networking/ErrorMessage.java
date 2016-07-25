@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
-import net.sf.freecol.common.i18n.Messages;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
@@ -77,7 +77,16 @@ public class ErrorMessage extends DOMMessage {
         this(StringTemplate.template("server.reject"), message);
     }
 
-    
+    /**
+     * Create a new <code>ErrorMessage</code> from an exception with
+     * the standard client error template as the fallback.
+     *
+     * @param ex The <code>Exception</code> to use.
+     */
+    public ErrorMessage(Exception ex) {
+        this(FreeCol.errorFromException(ex, "server.reject"));
+    }
+
     /**
      * Create a new <code>ErrorMessage</code> from a
      * supplied element.
