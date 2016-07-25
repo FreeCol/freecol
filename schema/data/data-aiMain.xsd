@@ -79,7 +79,6 @@
               <xs:element name="privateerMission">
                 <xs:complexType>
                   <xs:attribute name="unit" type="UnitId" use="required" />
-                  <xs:attribute name="state" type="PrivateerState" use="optional" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="scoutingMission" type="SimpleMissionType" />
@@ -250,12 +249,5 @@
   <xs:complexType name="SimpleMissionType">
     <xs:attribute name="unit" type="UnitId" />
   </xs:complexType>
-
-  <xs:simpleType name="PrivateerState">
-    <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="HUNTING" />
-      <xs:enumeration value="TRANSPORTING" />
-    </xs:restriction>
-  </xs:simpleType>
 
 </xs:schema>

@@ -63,25 +63,46 @@
 
   <xs:simpleType name="ModelMessageType">
     <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="DEFAULT" />
-      <xs:enumeration value="WARNING" />
-      <xs:enumeration value="SONS_OF_LIBERTY" />
-      <xs:enumeration value="GOVERNMENT_EFFICIENCY" />
-      <xs:enumeration value="WAREHOUSE_CAPACITY" />
-      <xs:enumeration value="UNIT_IMPROVED" />
-      <xs:enumeration value="UNIT_DEMOTED" />
-      <xs:enumeration value="UNIT_LOST" />
-      <xs:enumeration value="UNIT_ADDED" />
-      <xs:enumeration value="BUILDING_COMPLETED" />
-      <xs:enumeration value="FOREIGN_DIPLOMACY" />
-      <xs:enumeration value="MARKET_PRICES" />
-      <xs:enumeration value="LOST_CITY_RUMOUR" />
-      <xs:enumeration value="GIFT_GOODS" />
-      <xs:enumeration value="MISSING_GOODS" />
-      <xs:enumeration value="TUTORIAL" />
-      <xs:enumeration value="COMBAT_RESULT" />
+      <xs:enumeration value="accepted_demands" />
+      <xs:enumeration value="building_completed" />
+      <xs:enumeration value="combat_result" />
+      <xs:enumeration value="default" />
+      <xs:enumeration value="foreign_diplomacy" />
+      <xs:enumeration value="gift_goods" />
+      <xs:enumeration value="government_efficiency" />
+      <xs:enumeration value="lost_city_rumour" />
+      <xs:enumeration value="market_prices" />
+      <xs:enumeration value="missing_goods" />
+      <xs:enumeration value="rejected_demands" />
+      <xs:enumeration value="sons_of_liberty" />
+      <xs:enumeration value="tutorial" />
+      <xs:enumeration value="unit_added" />
+      <xs:enumeration value="unit_demoted" />
+      <xs:enumeration value="unit_improved" />
+      <xs:enumeration value="unit_lost" />
+      <xs:enumeration value="warehouse_capacity" />
+      <xs:enumeration value="warning" />
+      <!-- @compat 0.10.7 -->
       <xs:enumeration value="ACCEPTED_DEMANDS" />
+      <xs:enumeration value="BUILDING_COMPLETED" />
+      <xs:enumeration value="COMBAT_RESULT" />
+      <xs:enumeration value="DEFAULT" />
+      <xs:enumeration value="FOREIGN_DIPLOMACY" />
+      <xs:enumeration value="GIFT_GOODS" />
+      <xs:enumeration value="GOVERNMENT_EFFICIENCY" />
+      <xs:enumeration value="LOST_CITY_RUMOUR" />
+      <xs:enumeration value="MARKET_PRICES" />
+      <xs:enumeration value="MISSING_GOODS" />
       <xs:enumeration value="REJECTED_DEMANDS" />
+      <xs:enumeration value="SONS_OF_LIBERTY" />
+      <xs:enumeration value="TUTORIAL" />
+      <xs:enumeration value="UNIT_ADDED" />
+      <xs:enumeration value="UNIT_DEMOTED" />
+      <xs:enumeration value="UNIT_IMPROVED" />
+      <xs:enumeration value="UNIT_LOST" />
+      <xs:enumeration value="WAREHOUSE_CAPACITY" />
+      <xs:enumeration value="WARNING" />
+      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 

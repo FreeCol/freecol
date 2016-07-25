@@ -45,16 +45,28 @@
 
   <xs:simpleType name="LostCityRumourType">
     <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="NO_SUCH_RUMOUR" />
+      <xs:enumeration value="burial_ground" />
+      <xs:enumeration value="colonist" />
+      <xs:enumeration value="expedition_vanishes" /> 
+      <xs:enumeration value="fountain_of_youth" />
+      <xs:enumeration value="learn" />
+      <xs:enumeration value="mounds" />
+      <xs:enumeration value="nothing" />
+      <xs:enumeration value="no_such_rumour" />
+      <xs:enumeration value="treasure" />
+      <xs:enumeration value="tribal_chief" />
+      <!-- @compat 0.10.7 -->
       <xs:enumeration value="BURIAL_GROUND" />
-      <xs:enumeration value="EXPEDITION_VANISHES" /> 
-      <xs:enumeration value="NOTHING" />
-      <xs:enumeration value="LEARN" />
-      <xs:enumeration value="TRIBAL_CHIEF" />
       <xs:enumeration value="COLONIST" />
-      <xs:enumeration value="TREASURE" />
+      <xs:enumeration value="EXPEDITION_VANISHES" /> 
       <xs:enumeration value="FOUNTAIN_OF_YOUTH" />
+      <xs:enumeration value="LEARN" />
       <xs:enumeration value="MOUNDS" />
+      <xs:enumeration value="NOTHING" />
+      <xs:enumeration value="NO_SUCH_RUMOUR" />
+      <xs:enumeration value="TREASURE" />
+      <xs:enumeration value="TRIBAL_CHIEF" />
+      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 

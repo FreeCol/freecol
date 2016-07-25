@@ -51,20 +51,36 @@
 
   <xs:simpleType name="HistoryEventType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="abandon_colony" />
+      <xs:enumeration value="city_of_gold" />
+      <xs:enumeration value="colony_conquered" />
+      <xs:enumeration value="colony_destroyed" />
+      <xs:enumeration value="conquer_colony" />
+      <xs:enumeration value="declare_independence" />
+      <xs:enumeration value="destroy_nation" />
+      <xs:enumeration value="destroy_settlement" />
+      <xs:enumeration value="discover_new_world" />
+      <xs:enumeration value="discover_region" />
+      <xs:enumeration value="founding_father" />
+      <xs:enumeration value="found_colony" />
+      <xs:enumeration value="independence" />
+      <xs:enumeration value="meet_nation" />
+      <!-- @compat 0.10.7 -->
+      <xs:enumeration value="ABANDON_COLONY" />
+      <xs:enumeration value="CITY_OF_GOLD" />
+      <xs:enumeration value="COLONY_CONQUERED" />
+      <xs:enumeration value="COLONY_DESTROYED" />
+      <xs:enumeration value="CONQUER_COLONY" />
+      <xs:enumeration value="DECLARE_INDEPENDENCE" />
+      <xs:enumeration value="DESTROY_NATION" />
+      <xs:enumeration value="DESTROY_SETTLEMENT" />
       <xs:enumeration value="DISCOVER_NEW_WORLD" />
       <xs:enumeration value="DISCOVER_REGION" />
-      <xs:enumeration value="MEET_NATION" />
-      <xs:enumeration value="CITY_OF_GOLD" />
-      <xs:enumeration value="FOUND_COLONY" />
-      <xs:enumeration value="ABANDON_COLONY" />
-      <xs:enumeration value="CONQUER_COLONY" />
-      <xs:enumeration value="COLONY_DESTROYED" />
-      <xs:enumeration value="COLONY_CONQUERED" />
-      <xs:enumeration value="DESTROY_SETTLEMENT" />
-      <xs:enumeration value="DESTROY_NATION" />
       <xs:enumeration value="FOUNDING_FATHER" />
-      <xs:enumeration value="DECLARE_INDEPENDENCE" />
+      <xs:enumeration value="FOUND_COLONY" />
       <xs:enumeration value="INDEPENDENCE" />
+      <xs:enumeration value="MEET_NATION" />
+      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 
