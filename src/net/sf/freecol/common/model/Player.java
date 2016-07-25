@@ -4183,7 +4183,12 @@ public class Player extends FreeColGameObject implements Nameable {
         monarch = null;
         clearHistory();
         clearTradeRoutes();
-        clearModelMessages();
+        if (xr.getReadScope() == FreeColXMLReader.ReadScope.SERVER) {
+            // ModelMessages are always sent direct to the client, not
+            // passed through the player structure, so only clear the
+            // current list on the server side.
+            clearModelMessages();
+        }
         lastSales = null;
         highSeas = null;
         featureContainer.clear();

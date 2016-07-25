@@ -2259,18 +2259,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     public String getNameKey() {
-        if (getGame().isInClient()) {
-            return (isExplored()) ? getType().getNameKey() : "unexplored";
-        } else {
-            Player player = getGame().getCurrentPlayer();
-            if (player != null) {
-                return (getCachedTile(player) == null) ? "unexplored"
-                    : getType().getNameKey();
-            } else {
-                logger.warning("player == null");
-                return "";
-            }
+        Player player = getGame().getCurrentPlayer();
+        if (player == null) {
+            logger.warning("player == null");
+            return "";
         }
+        return (getCachedTile(player) == null) ? "unexplored"
+            : getType().getNameKey();
     }
 
 
