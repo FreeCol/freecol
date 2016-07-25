@@ -130,7 +130,7 @@ public class Game extends FreeColGameObject {
     private UUID uuid = UUID.randomUUID();
 
     /** The client player name, null in the server. */
-    private final String clientUserName;
+    private String clientUserName;
 
     /** All the players in the game. */
     protected final List<Player> players = new ArrayList<>();
@@ -1304,6 +1304,7 @@ public class Game extends FreeColGameObject {
     // game when it is read again.  Similarly we try to fail fast
     // if required to read those fields if a spec has not shown up.
     private static final String CIBOLA_TAG = "cibola";
+    private static final String CLIENT_USER_NAME_TAG = "clientUserName";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String INITIAL_ACTIVE_UNIT_ID = "initialActiveUnitId";
     private static final String NEXT_ID_TAG = "nextId";
@@ -1323,8 +1324,10 @@ public class Game extends FreeColGameObject {
         super.writeAttributes(xw);
 
         if (xw.validForSave()) {
-
             xw.writeAttribute(NEXT_ID_TAG, nextId);
+        } else if (xw.getClientPlayer() != null) {
+            xw.writeAttribute(CLIENT_USER_NAME_TAG,
+                              xw.getClientPlayer().getName());
         }
 
         xw.writeAttribute(UUID_TAG, getUUID());
@@ -1381,6 +1384,9 @@ public class Game extends FreeColGameObject {
         // @compat 0.10.x
         if (nextId < 0) nextId = xr.getAttribute(OLD_NEXT_ID_TAG, 0);
         // end @compat
+
+        this.clientUserName = xr.getAttribute(CLIENT_USER_NAME_TAG,
+                                              (String)null);
 
         String str = xr.getAttribute(UUID_TAG, (String)null);
         if (str != null) {
