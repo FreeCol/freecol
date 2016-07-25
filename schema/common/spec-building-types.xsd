@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Building types -->
+  <xs:element name="building-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="BuildingTypeId" />
+
+        <xs:element ref="building-type" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="building-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="limit"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="production"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-goods"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="maximum-skill" type="xs:int"/>
+      <xs:attribute name="minimum-skill" type="xs:int"/>
+      <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="upgrades-from" type="BuildingTypeId"/>
+      <xs:attribute name="upkeep" type="xs:int"/>
+      <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="maxSkill" type="xs:int"/>
+      <xs:attribute name="minSkill" type="xs:int"/>
+      <xs:attribute name="upgradesFrom" type="BuildingTypeId"/>
+      <!-- end @compat 0.11.3 -->
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

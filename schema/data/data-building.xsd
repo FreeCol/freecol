@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	   elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
 
@@ -24,8 +23,8 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd" />
-  <xs:include schemaLocation="data-model.xsd" />
+  <xs:include schemaLocation="../common/spec-model.xsd" />
+  <xs:include schemaLocation="../common/spec-common.xsd" />
   <xs:include schemaLocation="data-unit.xsd" />
 
   <xs:element name="building">
@@ -39,13 +38,7 @@
 	      <xs:element ref="unit" />
         <xs:element ref="production" />
       </xs:choice>
-      <xs:attribute name="id" type="BuildingId" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          ID of this object
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="id" type="BuildingId" use="required"/>
       <!-- @compat 0.10.x -->
       <xs:attribute name="ID" type="BuildingId" use="optional"/>
       <!-- end @compat -->
@@ -56,13 +49,7 @@
 	        </xs:documentation>
 	      </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="buildingType" type="xs:string" use="required">
-	      <xs:annotation>
-	        <xs:documentation>
-	          The type of building
-	        </xs:documentation>
-	      </xs:annotation>
-      </xs:attribute>
+      <xs:attribute name="buildingType" type="xs:string" use="required"/>
     </xs:complexType>
   </xs:element>
 

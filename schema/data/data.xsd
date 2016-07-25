@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	   elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
 
@@ -23,8 +22,7 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd" />
-  <xs:include schemaLocation="data-model.xsd" />
+  <xs:include schemaLocation="data-specification.xsd" />
 
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />
@@ -38,13 +36,13 @@
   <xs:include schemaLocation="data-indianSettlement.xsd" />
   <xs:include schemaLocation="data-market.xsd" />
   <xs:include schemaLocation="data-monarch.xsd" />
-  <xs:include schemaLocation="data-options.xsd" />
   <xs:include schemaLocation="data-player.xsd" />
+  <!-- @compat 0.10.x -->
   <xs:include schemaLocation="data-playerExploredTile.xsd" />
+  <!-- end @compat 0.10.x -->
   <xs:include schemaLocation="data-region.xsd" />
   <xs:include schemaLocation="data-resource.xsd" />
   <xs:include schemaLocation="data-savedGame.xsd" />
-  <xs:include schemaLocation="data-specification.xsd" />
   <xs:include schemaLocation="data-template.xsd" />
   <xs:include schemaLocation="data-tile.xsd" />
   <xs:include schemaLocation="data-tileimprovement.xsd" />

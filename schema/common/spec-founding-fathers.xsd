@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Founding Fathers -->
+  <xs:element name="founding-fathers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="FoundingFatherId" />
+
+        <xs:element ref="founding-father"
+                    minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="founding-father">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element ref="event"/>
+        <xs:element ref="modifier"/>
+        <xs:element name="nation">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="NationId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="nation-type">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="NationTypeId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="unit">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="UnitTypeId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="upgrade">
+          <xs:complexType>
+            <xs:attribute name="from-id" use="required" type="UnitTypeId"/>
+            <xs:attribute name="to-id" use="required" type="UnitTypeId"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="type" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="exploration"/>
+            <xs:enumeration value="military"/>
+            <xs:enumeration value="political"/>
+            <xs:enumeration value="religious"/>
+            <xs:enumeration value="trade"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="weight1" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="weight2" use="required" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="weight3" use="required" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

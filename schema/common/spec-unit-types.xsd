@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Unit types -->
+  <xs:element name="unit-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="UnitTypeId" />
+
+        <xs:element ref="unit-type" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="unit-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element name="consumes">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="GoodsTypeId"/>
+
+            <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="default-role">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="RoleId"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="downgrade"/>
+        <xs:element ref="limit"/>
+        <xs:element ref="modifier"/>
+        <xs:element ref="required-ability"/>
+        <xs:element ref="required-goods"/>
+        <xs:element ref="upgrade"/>
+        <!-- @compat 0.10.7 -->
+        <xs:element name="default-equipment">
+          <xs:complexType>
+            <xs:attribute name="id" use="required" type="EquipmentTypeId"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- end @compat -->
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+      <xs:attribute name="extends" use="optional" type="xs:string" />
+
+      <xs:attribute name="abstract" use="optional" type="xs:boolean"/>
+      <xs:attribute name="default-unit" use="optional" type="xs:boolean"/>
+      <xs:attribute name="defence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expert-production" type="GoodsTypeId"/>
+      <xs:attribute name="hit-points" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="increasing-price" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="line-of-sight" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximum-attrition" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximum-experience" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="price" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="recruit-probability" type="PercentageType"/>
+      <xs:attribute name="score-value" type="xs:int"/>
+      <xs:attribute name="skill" type="xs:int"/>
+      <xs:attribute name="skill-taught" type="xs:string"/>
+      <xs:attribute name="space" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="space-taken" type="xs:nonNegativeInteger"/>
+
+      <!-- @compat 0.11.3: drop optional in due course -->
+      <xs:attribute name="priority" use="optional" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
+
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="defaultUnit" use="optional" type="xs:boolean"/>
+      <xs:attribute name="hitPoints" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="lineOfSight" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="maximumExperience" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="recruitProbability" type="PercentageType"/>
+      <xs:attribute name="scoreValue" type="xs:int"/>
+      <xs:attribute name="skillTaught" type="xs:string"/>
+      <xs:attribute name="spaceTaken" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="downgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="scope" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="unit" use="required" type="xs:string"/>
+
+      <xs:attribute name="delete" type="xs:boolean"/>
+
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="clear-skill" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <!-- end @compat 0.11.3 -->
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="upgrade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="scope" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="unit" use="required" type="xs:string"/>
+
+      <xs:attribute name="turns-to-learn" use="optional"
+                    type="xs:nonNegativeInteger"/>
+      
+      <!-- TODO: delete is mutually exclusive with any of the following. -->
+      <xs:attribute name="delete" type="xs:boolean"/>
+
+      <!-- We need a rule to insist there is at least one of these. -->
+      <xs:attribute name="conversion" type="PercentageType"/>
+      <xs:attribute name="creation" type="PercentageType"/>
+      <xs:attribute name="enter-colony" type="PercentageType"/>
+      <xs:attribute name="independence" type="PercentageType"/>
+      <xs:attribute name="learn-from-experience" type="PercentageType"/>
+      <xs:attribute name="learn-from-natives" type="PercentageType"/>
+      <xs:attribute name="learn-in-lost-city" type="PercentageType"/>
+      <xs:attribute name="learn-in-school" type="PercentageType"/>
+      <xs:attribute name="promotion" type="PercentageType"/>
+      <!-- TODO: these are downgrades, but serialization can not
+        handle non-static XML Element tag names! We need to combine
+        upgrade and downgrade into a type change. -->
+      <xs:attribute name="capture" type="PercentageType"/>
+      <xs:attribute name="clear-skill" type="PercentageType"/>
+      <xs:attribute name="demotion" type="PercentageType"/>
+      <xs:attribute name="undead" type="PercentageType"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="learnFromNatives" type="PercentageType"/>
+      <xs:attribute name="learnFromExperience" type="PercentageType"/>
+      <xs:attribute name="learnInLostCity" type="PercentageType"/>
+      <xs:attribute name="learnInSchool" type="PercentageType"/>
+      <xs:attribute name="enterColony" type="PercentageType"/>
+      <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="clearSkill" type="PercentageType"/>
+      <!-- end @compat 0.11.3 -->
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

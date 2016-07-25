@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	   elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
 
@@ -30,15 +29,15 @@
   <xs:element name="savedGame">
     <xs:annotation>
       <xs:documentation>
-	This class contains server objects.
+	      This class contains server objects.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="serverObjects" />
-	<xs:element ref="game" />
-	<xs:element ref="aiMain" />
+	      <xs:element ref="serverObjects" />
+	      <xs:element ref="game" />
+	      <xs:element ref="aiMain" />
       </xs:choice>
 
       <xs:attribute name="owner" type="xs:string" use="required" />
@@ -48,6 +47,5 @@
       <xs:attribute name="randomState" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
-
 
 </xs:schema>

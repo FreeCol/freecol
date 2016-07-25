@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	   elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
 
@@ -24,21 +23,18 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-common.xsd" />
-  <xs:include schemaLocation="data-model.xsd" />
+  <xs:include schemaLocation="../common/spec-model.xsd" />
+  <xs:include schemaLocation="../common/spec-common.xsd" />
   <xs:include schemaLocation="data-colonyTile.xsd" />
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-goodsContainer.xsd" />
   <xs:include schemaLocation="data-exportData.xsd" />
-  <!-- <xs:include schemaLocation="data-modifier.xsd" /> -->
 
   <xs:element name="colony">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	      <xs:element ref="colonyTile" minOccurs="9" maxOccurs="9" />
 	      <xs:element ref="goodsContainer" minOccurs="0" maxOccurs="1" />
-        <!-- TODO: remove compatibility code -->
-        <xs:element name="buildQueue" minOccurs="0" maxOccurs="1" />
         <xs:element ref="buildQueueItem" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="populationQueueItem" minOccurs="0" maxOccurs="unbounded" />
 	      <xs:element ref="building" />

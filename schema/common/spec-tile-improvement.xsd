@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Tile Improvement types -->
+  <!-- @compat 0.11.3 -->
+  <xs:element name="tileimprovement-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="TileImprovementTypeId" />
+
+        <xs:element ref="tileimprovement-type"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tileimprovement-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="scope"/>
+        <xs:choice>
+          <xs:element ref="tile-type-change"/>
+          <xs:element ref="change"/>
+          <xs:element name="disaster">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string"/>
+              <xs:attribute name="probability" type="xs:int"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element ref="modifier"/>
+        </xs:choice>
+      </xs:choice>
+
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expended-amount" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="natural" type="xs:boolean"/>
+      <xs:attribute name="occupation-string" type="xs:string"/>
+      <xs:attribute name="required-role" use="optional" type="RoleId"/>
+      <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
+      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.10.x -->
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat 0.11.3 -->
+
+  <xs:element name="tile-improvement-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="TileImprovementTypeId" />
+
+        <xs:element ref="tile-improvement-type"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="tile-improvement-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="scope"/>
+        <xs:choice>
+          <xs:element ref="tile-type-change"/>
+          <!-- @compat 0.11.6 -->
+          <xs:element ref="change"/>
+          <!-- end @compat 0.11.6 -->
+          <xs:element name="disaster">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string"/>
+              <xs:attribute name="probability" type="xs:int"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element ref="modifier"/>
+        </xs:choice>
+      </xs:choice>
+
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expended-amount" use="optional" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="expose-resource-percent" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="natural" type="xs:boolean"/>
+      <xs:attribute name="occupation-string" type="xs:string"/>
+      <xs:attribute name="required-role" use="optional" type="RoleId"/>
+      <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
+      <!-- @compat 0.11.3 -->
+      <xs:attribute name="exposeResourcePercent" type="xs:nonNegativeInteger"/>
+      <!-- end @compat 0.11.3 -->
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="deliver-goods-type" type="GoodsTypeId"/>
+      <xs:attribute name="expended-equipment-type" type="EquipmentTypeId"/>
+      <!-- end @compat 0.10.x -->
+    </xs:complexType>
+  </xs:element>
+
+  <!-- @compat 0.11.6
+       Replace the non-specific "change" with tile-type-change. -->
+  <xs:element name="change">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="production" type="AbstractGoodsType"/>
+      </xs:sequence>
+      <xs:attribute name="from" use="required" type="TileTypeId"/>
+      <xs:attribute name="to" use="required" type="TileTypeId"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- end @compat 0.11.6 -->
+
+  <xs:element name="tile-type-change">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="production" type="AbstractGoodsType"/>
+      </xs:sequence>
+      <xs:attribute name="from" use="required" type="TileTypeId"/>
+      <xs:attribute name="to" use="required" type="TileTypeId"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

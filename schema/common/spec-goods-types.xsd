@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    *  Copyright (C) 2002-2016  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+
+    In case of incompatible changes, please update version number and
+    XSD schema for validation.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Goods types -->
+  <xs:element name="goods-types">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="delete" minOccurs="0" maxOccurs="unbounded" 
+                    type="GoodsTypeId" />
+
+        <xs:element ref="goods-type" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="goods-type">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ability"/>
+        <xs:element name="market" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="initial-amount" use="required"
+                          type="xs:nonNegativeInteger"/>
+            <xs:attribute name="initial-price" use="required"
+                          type="xs:nonNegativeInteger"/>
+            <xs:attribute name="price-difference" use="required"
+                          type="xs:nonNegativeInteger"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref="modifier"/>
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:ID"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
+
+      <xs:attribute name="breeding-number" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="ignore-limit" type="xs:boolean"/>
+      <xs:attribute name="is-farmed" type="xs:boolean"/>
+      <xs:attribute name="is-food" type="xs:boolean"/>
+      <xs:attribute name="is-military" type="xs:boolean"/>
+      <xs:attribute name="low-production-threshold" use="optional" type="xs:float"/>
+      <xs:attribute name="made-from" type="GoodsTypeId"/>
+      <xs:attribute name="new-world-goods" type="xs:boolean"/>
+      <xs:attribute name="price" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="production-weight" use="optional" type="xs:float"/>
+      <xs:attribute name="storable" type="xs:boolean"/>
+      <xs:attribute name="stored-as" type="GoodsTypeId"/>
+      <xs:attribute name="trade-goods" type="xs:boolean"/>
+      <xs:attribute name="zero-production-factor" use="optional" type="xs:float"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
