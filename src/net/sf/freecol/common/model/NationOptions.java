@@ -258,34 +258,18 @@ public class NationOptions extends FreeColSpecObject {
     }
 
     /**
-     * Defend against an invalid nation tag.  This can happen when
-     * using classic mode (no extra Europeans) but loading a map that
-     * contains the extra Europeans.
-     *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @return A suitable <code>Nation</code> or null on error.
-     */
-    private Nation readNation(FreeColXMLReader xr) {
-        try {
-            return xr.getType(getSpecification(), ID_ATTRIBUTE_TAG,
-                              Nation.class, (Nation)null);
-        } catch (IllegalArgumentException iae) {
-            logger.warning("Bad nation tag: " + xr.readId());
-        }
-        return null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
         String tag = xr.getLocalName();
 
         if (NATION_OPTION_TAG.equals(tag)) {
-            Nation nation = readNation(xr);
-            NationState state = xr.getAttribute(STATE_TAG,
-                NationState.class, (NationState)null);
+            Nation nation = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                       Nation.class, (Nation)null);
+            NationState state = xr.getAttribute(STATE_TAG, NationState.class,
+                                                (NationState)null);
             if (nation != null && state != null) {
                 nations.put(nation, state);
             }
@@ -296,7 +280,8 @@ public class NationOptions extends FreeColSpecObject {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 tag = xr.getLocalName();
                 if (OLD_NATION_TAG.equals(tag)) {
-                    Nation nation = readNation(xr);
+                    Nation nation = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                               Nation.class, (Nation)null);
                     NationState state = xr.getAttribute(STATE_TAG,
                         NationState.class, (NationState)null);
                     if (nation != null && state != null) {

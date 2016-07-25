@@ -1298,7 +1298,11 @@ public class Game extends FreeColGameObject {
 
 
     // Serialization
-
+    // Note: The order of the children is really sensitive.
+    // Several fields can not be read without a specification, so it
+    // must be written first if the intent is to use that spec in the
+    // game when it is read again.  Similarly we try to fail fast
+    // if required to read those fields if a spec has not shown up.
     private static final String CIBOLA_TAG = "cibola";
     private static final String CURRENT_PLAYER_TAG = "currentPlayer";
     private static final String INITIAL_ACTIVE_UNIT_ID = "initialActiveUnitId";
@@ -1345,7 +1349,7 @@ public class Game extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        specification.toXML(xw);
+        specification.toXML(xw); // *Must be first*
 
         for (String cityName : NameCache.getCitiesOfCibola()) {
             // Preserve existing order
@@ -1430,7 +1434,6 @@ public class Game extends FreeColGameObject {
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
         final String tag = xr.getLocalName();
-        //logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
             String cibola = xr.readId();
@@ -1442,12 +1445,24 @@ public class Game extends FreeColGameObject {
             xr.closeTag(CIBOLA_TAG);
 
         } else if (Map.getTagName().equals(tag)) {
+            if (this.specification == null) {
+                throw new XMLStreamException("Tried to read " + tag
+                    + " with null specification");
+            }
             map = xr.readFreeColGameObject(game, Map.class);
 
         } else if (NationOptions.getTagName().equals(tag)) {
+            if (this.specification == null) {
+                throw new XMLStreamException("Tried to read " + tag
+                    + " with null specification");
+            }
             nationOptions = new NationOptions(xr, specification);
 
         } else if (Player.getTagName().equals(tag)) {
+            if (this.specification == null) {
+                throw new XMLStreamException("Tried to read " + tag
+                    + " with null specification");
+            }
             Player player = xr.readFreeColGameObject(game, Player.class);
             if (player.isUnknownEnemy()) {
                 setUnknownEnemy(player);
@@ -1458,7 +1473,7 @@ public class Game extends FreeColGameObject {
         } else if (Specification.getTagName().equals(tag)) {
             logger.info(((specification == null) ? "Loading" : "Reloading")
                 + " specification.");
-            specification = new Specification(xr);
+            this.specification = new Specification(xr);
 
         } else {
             super.readChild(xr);
