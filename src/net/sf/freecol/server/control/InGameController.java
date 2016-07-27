@@ -84,6 +84,7 @@ import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.RandomRange;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -116,7 +117,7 @@ import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage;
-import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
+import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -3491,56 +3492,57 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is querying.
      * @param colony The <code>Colony</code> to rearrange.
-     * @param unitChanges A list of <code>UnitChange</code>s to apply.
+     * @param arrangements A list of <code>Arrangement</code>s to apply.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
     public ChangeSet rearrangeColony(ServerPlayer serverPlayer, Colony colony,
-                                     List<UnitChange> unitChanges) {
+                                     List<Arrangement> arrangements) {
         final Role defaultRole = getGame().getSpecification().getDefaultRole();
         Tile tile = colony.getTile();
         tile.cacheUnseen();//+til
 
         // Move everyone out of the way and stockpile their equipment.
-        for (UnitChange uc : unitChanges) {
-            uc.unit.setLocation(tile);//-til
-            if (!uc.unit.hasDefaultRole()) {
-                colony.equipForRole(uc.unit, defaultRole, 0);
+        for (Arrangement a : arrangements) {
+            a.unit.setLocation(tile);//-til
+            if (!a.unit.hasDefaultRole()) {
+                colony.equipForRole(a.unit, defaultRole, 0);
             }
         }
 
-        List<UnitChange> todo = new ArrayList<>(unitChanges);
+        List<Arrangement> todo = new ArrayList<>(arrangements);
         while (!todo.isEmpty()) {
-            UnitChange uc = todo.remove(0);
-            if (uc.loc == tile) continue;
-            WorkLocation wl = (WorkLocation)uc.loc;
+            Arrangement a = todo.remove(0);
+            if (a.loc == tile) continue;
+            WorkLocation wl = (WorkLocation)a.loc;
             // Adding to wl can fail, and in the worst case there
             // might be a circular dependency.  If the move can
             // succeed, do it, but if not, retry.
-            switch (wl.getNoAddReason(uc.unit)) {
+            switch (wl.getNoAddReason(a.unit)) {
             case NONE:
-                uc.unit.setLocation(wl);
+                a.unit.setLocation(wl);
                 // Fall through
             case ALREADY_PRESENT:
-                if (uc.unit.getWorkType() != uc.work) {
-                    uc.unit.changeWorkType(uc.work);
+                if (a.unit.getWorkType() != a.work) {
+                    a.unit.changeWorkType(a.work);
                 }
                 break;
             case CAPACITY_EXCEEDED:
-                todo.add(todo.size(), uc);
+                todo.add(todo.size(), a);
                 break;
             default:
-                logger.warning("Bad move for " + uc.unit + " to " + wl);
+                logger.warning("Bad move for " + a.unit + " to " + wl);
                 break;
             }
         }
 
         // Collect roles that cause a change, ordered by simplest change
-        for (UnitChange uc : transform(unitChanges,
-                uc -> uc.role != uc.unit.getRole() && uc.role != defaultRole,
-                Function.identity(), Comparator.<UnitChange>reverseOrder())) {
-            if (!colony.equipForRole(uc.unit, uc.role, uc.roleCount)) {
+        for (Arrangement a : transform(arrangements,
+                a -> a.role != a.unit.getRole() && a.role != defaultRole,
+                Function.identity(),
+                Comparator.<Arrangement>reverseOrder())) {
+            if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {
                 return serverPlayer.clientError("Failed to equip "
-                    + uc.unit.getId() + " for role " + uc.role
+                    + a.unit.getId() + " for role " + a.role
                     + " at " + colony);
             }
         }

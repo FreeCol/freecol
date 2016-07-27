@@ -46,7 +46,7 @@ public class RearrangeColonyMessage extends DOMMessage {
     private static final String COLONY_TAG = "colony";
 
     /** Container for the unit change information. */
-    public static class UnitChange implements Comparable<UnitChange> {
+    public static class Arrangement implements Comparable<Arrangement> {
 
         public Unit unit;
         public Location loc;
@@ -54,9 +54,9 @@ public class RearrangeColonyMessage extends DOMMessage {
         public Role role;
         public int roleCount;
 
-        public UnitChange() {} // deliberately empty
+        public Arrangement() {} // deliberately empty
 
-        public UnitChange(Unit unit, Location loc, GoodsType work,
+        public Arrangement(Unit unit, Location loc, GoodsType work,
                           Role role, int roleCount) {
             this.unit = unit;
             this.loc = loc;
@@ -65,7 +65,7 @@ public class RearrangeColonyMessage extends DOMMessage {
             this.roleCount = roleCount;
         }
 
-        public UnitChange(Game game, String unitId,
+        public Arrangement(Game game, String unitId,
                           String locId, String workId,
                           String roleId, String roleCount) {
             init(game, unitId, locId, workId, roleId, roleCount);
@@ -86,7 +86,7 @@ public class RearrangeColonyMessage extends DOMMessage {
             }
         }
 
-        public UnitChange readFromElement(Game game, Element e, int i) {
+        public Arrangement readFromElement(Game game, Element e, int i) {
             init(game,
                 getStringAttribute(e, unitKey(i)),
                 getStringAttribute(e, locKey(i)),
@@ -118,17 +118,17 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         @Override
         public String toString() {
-            return "[UnitChange " + unit.getId() + " at " + loc.getId()
+            return "[Arrangement " + unit.getId() + " at " + loc.getId()
                 + " " + role.getRoleSuffix() + "." + roleCount
                 + ((work == null) ? "" : " work " + work.getId()) + "]";
         }
 
-        // Interface Comparable<UnitChange>
+        // Interface Comparable<Arrangement>
 
         /**
          * {@inheritDoc}
          */
-        public int compareTo(UnitChange other) {
+        public int compareTo(Arrangement other) {
             int cmp = this.role.compareTo(other.role);
             if (cmp == 0) cmp = this.roleCount - other.roleCount;
             return cmp;
@@ -138,8 +138,8 @@ public class RearrangeColonyMessage extends DOMMessage {
     /** The id of the colony requesting the rearrangement. */
     private final String colonyId;
 
-    /** A list of unitChanges to make. */
-    private final List<UnitChange> unitChanges = new ArrayList<>();
+    /** A list of arrangements to make. */
+    private final List<Arrangement> arrangements = new ArrayList<>();
 
 
     /**
@@ -155,7 +155,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         super(getTagName());
 
         this.colonyId = colony.getId();
-        this.unitChanges.clear();
+        this.arrangements.clear();
         for (Unit u : workers) {
             Unit su = scratch.getCorresponding(u);
             if (u.getLocation().getId().equals(su.getLocation().getId())
@@ -185,9 +185,9 @@ public class RearrangeColonyMessage extends DOMMessage {
         } catch (NumberFormatException nfe) {
             n = 0;
         }
-        this.unitChanges.clear();
+        this.arrangements.clear();
         for (int i = 0; i < n; i++) {
-            this.unitChanges.add(new UnitChange().readFromElement(game, element, i));
+            this.arrangements.add(new Arrangement().readFromElement(game, element, i));
         }
     }
 
@@ -200,7 +200,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @return True if no changes have been added.
      */
     public boolean isEmpty() {
-        return this.unitChanges.isEmpty();
+        return this.arrangements.isEmpty();
     }
 
     /**
@@ -214,7 +214,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public void addChange(Unit unit, Location loc, GoodsType work,
                           Role role, int roleCount) {
-        this.unitChanges.add(new UnitChange(unit, loc, work, role, roleCount));
+        this.arrangements.add(new Arrangement(unit, loc, work, role, roleCount));
     }
 
     
@@ -244,7 +244,7 @@ public class RearrangeColonyMessage extends DOMMessage {
                 .build(serverPlayer);
         }
         int i = 0;
-        for (UnitChange uc : unitChanges) {
+        for (Arrangement uc : arrangements) {
             if (uc.unit == null) {
                 return serverPlayer.clientError("Invalid unit " + i)
                     .build(serverPlayer);
@@ -265,7 +265,7 @@ public class RearrangeColonyMessage extends DOMMessage {
 
         // Rearrange can proceed.
         return server.getInGameController()
-            .rearrangeColony(serverPlayer, colony, this.unitChanges)
+            .rearrangeColony(serverPlayer, colony, this.arrangements)
             .build(serverPlayer);
     }
 
@@ -278,9 +278,9 @@ public class RearrangeColonyMessage extends DOMMessage {
     public Element toXMLElement() {
         DOMMessage result = new DOMMessage(getTagName(),
             COLONY_TAG, this.colonyId,
-            FreeColObject.ARRAY_SIZE_TAG, Integer.toString(unitChanges.size()));
+            FreeColObject.ARRAY_SIZE_TAG, Integer.toString(arrangements.size()));
         int i = 0;
-        for (UnitChange uc : unitChanges) {
+        for (Arrangement uc : arrangements) {
             result.setAttribute(uc.unitKey(i), uc.unit.getId());
             result.setAttribute(uc.locKey(i), uc.loc.getId());
             if (uc.work != null) {
