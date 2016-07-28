@@ -18,7 +18,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<freecol-specification id="rolesCompat" version="0.85">
+<freecol-specification id="rolesCompat" version="0.110">
 <!--
     A copy of the latest roles section of classic/specification.xml
     to be loaded into the specification of games lacking a roles
@@ -29,162 +29,270 @@
 
     <role id="model.role.scout"
           expert-unit="model.unit.seasonedScout">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.horses" value="50"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.horses"
+                      value="50"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.demandTribute" value="true"/>
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
-      <ability id="model.ability.negotiate" value="true"/>
-      <ability id="model.ability.speakWithChief" value="true"/>
-      <ability id="model.ability.spyOnColony" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
-      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.canBeCaptured"
+               value="false"/>
+      <ability id="model.ability.captureUnits"
+               value="true"/>
+      <ability id="model.ability.demandTribute"
+               value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss"
+               value="true"/>
+      <ability id="model.ability.mounted"
+               value="true"/>
+      <ability id="model.ability.negotiate"
+               value="true"/>
+      <ability id="model.ability.speakWithChief"
+               value="true"/>
+      <ability id="model.ability.spyOnColony"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.lineOfSightBonus"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="9"/>
     </role>
 
     <role id="model.role.soldier"
           expert-unit="model.unit.veteranSoldier">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.muskets" value="50"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.muskets"
+                      value="50"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.demandTribute" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.canBeCaptured"
+               value="false"/>
+      <ability id="model.ability.captureUnits"
+               value="true"/>
+      <ability id="model.ability.demandTribute"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="2"/>
     </role>
 
     <role id="model.role.dragoon" downgrade="model.role.soldier"
           expert-unit="model.unit.veteranSoldier">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.muskets" value="50"/>
-      <required-goods id="model.goods.horses" value="50"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.muskets"
+                      value="50"/>
+      <required-goods id="model.goods.horses"
+                      value="50"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.demandTribue" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="2"/>
-      <modifier id="model.modifier.offence" type="additive" value="3"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.canBeCaptured"
+               value="false"/>
+      <ability id="model.ability.captureUnits"
+               value="true"/>
+      <ability id="model.ability.demandTribue"
+               value="true"/>
+      <ability id="model.ability.mounted"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="2"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="9"/>
     </role>
 
     <role id="model.role.pioneer"
           expert-unit="model.unit.hardyPioneer" maximum-count="5">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.tools" value="20"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.tools"
+                      value="20"/>
 
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
-      <ability id="model.ability.improveTerrain" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss"
+               value="true"/>
+      <ability id="model.ability.improveTerrain"
+               value="true"/>
     </role>
 
     <role id="model.role.missionary"
           expert-unit="model.unit.jesuitMissionary">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.dressMissionary" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.dressMissionary"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
 
-      <ability id="model.ability.denounceHeresy" value="true"/>
-      <ability id="model.ability.establishMission" value="true"/>
-      <ability id="model.ability.inciteNatives" value="true"/>
-      <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
+      <ability id="model.ability.denounceHeresy"
+               value="true"/>
+      <ability id="model.ability.establishMission"
+               value="true"/>
+      <ability id="model.ability.inciteNatives"
+               value="true"/>
+      <modifier id="model.modifier.missionaryTradeBonus"
+                type="percentage" value="10"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="3"/>
     </role>
 
     <role id="model.role.infantry"
           expert-unit="model.unit.kingsRegular">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="true"/>
-      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
-      <required-goods id="model.goods.muskets" value="50"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="true"/>
+      <required-ability id="model.ability.royalExpeditionaryForce"
+                        value="true"/>
+      <required-goods id="model.goods.muskets"
+                      value="50"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.demandTribute" value="true"/>
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.captureUnits"
+               value="true"/>
+      <ability id="model.ability.demandTribute"
+               value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="2"/>
     </role>
 
     <role id="model.role.cavalry" downgrade="model.role.infantry"
           expert-unit="model.unit.kingsRegular">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="false"/>
-      <required-ability id="model.ability.refUnit" value="true"/>
-      <required-ability id="model.ability.royalExpeditionaryForce" value="true"/>
-      <required-goods id="model.goods.muskets" value="50"/>
-      <required-goods id="model.goods.horses" value="50"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="false"/>
+      <required-ability id="model.ability.refUnit"
+                        value="true"/>
+      <required-ability id="model.ability.royalExpeditionaryForce"
+                        value="true"/>
+      <required-goods id="model.goods.muskets"
+                      value="50"/>
+      <required-goods id="model.goods.horses"
+                      value="50"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.captureUnits" value="true"/>
-      <ability id="model.ability.demandTribute" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="2"/>
-      <modifier id="model.modifier.offence" type="additive" value="3"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.captureUnits"
+               value="true"/>
+      <ability id="model.ability.demandTribute"
+               value="true"/>
+      <ability id="model.ability.mounted"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="2"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="9"/>
     </role>
 
     <role id="model.role.mountedBrave">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="true"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.horses" value="25"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="true"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.horses"
+                      value="25"/>
 
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.disposeOnCombatLoss"
+               value="true"/>
+      <ability id="model.ability.mounted"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="9"/>
       <role-change from="model.role.default" capture="model.role.scout"/>
       <role-change from="model.role.default" capture="model.role.dragoon"/>
       <role-change from="model.role.default" capture="model.role.cavalry"/>
     </role>
 
     <role id="model.role.armedBrave">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="true"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.muskets" value="25"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="true"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.muskets"
+                      value="25"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="1"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="2"/>
       <role-change from="model.role.default" capture="model.role.soldier"/>
       <role-change from="model.role.default" capture="model.role.infantry"/>
     </role>
 
     <role id="model.role.nativeDragoon" downgrade="model.role.armedBrave">
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-ability id="model.ability.native" value="true"/>
-      <required-ability id="model.ability.refUnit" value="false"/>
-      <required-goods id="model.goods.muskets" value="25"/>
-      <required-goods id="model.goods.horses" value="25"/>
+      <required-ability id="model.ability.canBeEquipped"
+                        value="true"/>
+      <required-ability id="model.ability.native"
+                        value="true"/>
+      <required-ability id="model.ability.refUnit"
+                        value="false"/>
+      <required-goods id="model.goods.muskets"
+                      value="25"/>
+      <required-goods id="model.goods.horses"
+                      value="25"/>
 
-      <ability id="model.ability.armed" value="true"/>
-      <ability id="model.ability.mounted" value="true"/>
-      <modifier id="model.modifier.defence" type="additive" value="2"/>
-      <modifier id="model.modifier.offence" type="additive" value="3"/>
-      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
-      <role-change from="model.role.mountedBrave" capture="model.role.soldier"/>
-      <role-change from="model.role.mountedBrave" capture="model.role.infantry"/>
+      <ability id="model.ability.armed"
+               value="true"/>
+      <ability id="model.ability.mounted"
+               value="true"/>
+      <modifier id="model.modifier.defence" index="30"
+                type="additive" value="2"/>
+      <modifier id="model.modifier.offence" index="30"
+                type="additive" value="3"/>
+      <modifier id="model.modifier.movementBonus"
+                type="additive" value="9"/>
+      <role-change from="model.role.mountedBrave"
+                   capture="model.role.soldier"/>
+      <role-change from="model.role.mountedBrave"
+                   capture="model.role.infantry"/>
       <role-change from="model.role.armedBrave" capture="model.role.scout"/>
       <role-change from="model.role.armedBrave" capture="model.role.dragoon"/>
       <role-change from="model.role.armedBrave" capture="model.role.cavalry"/>
