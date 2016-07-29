@@ -279,15 +279,16 @@ public class Building extends WorkLocation
             // Experts in factory level buildings may produce a
             // certain amount of goods even when no input is available.
             // Factories have the EXPERTS_USE_CONNECTIONS ability.
+            long minimumGoodsInput;
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-                && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-                final UnitType expertType = getExpertUnitType();
-                long minimumGoodsInput = 4 // FIXME: magic number
-                    * count(getUnits(), matchKey(expertType, Unit::getType));
-                if (minimumGoodsInput > available) {
-                    available = minimumGoodsInput;
-                }
+                && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
+                && ((minimumGoodsInput = getType()
+                        .getExpertWithConnectionsProduction()
+                        * count(getUnits(),
+                            matchKey(getExpertUnitType(), Unit::getType)))
+                    > available)) {
+                available = minimumGoodsInput;
             }
             // Scale production by limitations on availability.
             if (available < required) {

@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.108">
+<freecol-specification id="classic" version="0.110">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -2063,6 +2063,7 @@
     <building-type id="model.building.ironWorks"
                    extends="model.building.blacksmithShop"
                    upgrades-from="model.building.blacksmithShop"
+                   experts-with-connections-production="4"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
@@ -2098,6 +2099,7 @@
     <building-type id="model.building.cigarFactory"
                    extends="model.building.tobacconistShop"
                    upgrades-from="model.building.tobacconistShop"
+                   experts-with-connections-production="4"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
@@ -2133,6 +2135,7 @@
     <building-type id="model.building.textileMill"
                    extends="model.building.weaverShop"
                    upgrades-from="model.building.weaverShop"
+                   experts-with-connections-production="4"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
@@ -2168,6 +2171,7 @@
     <building-type id="model.building.rumFactory"
                    extends="model.building.rumDistillery"
                    upgrades-from="model.building.rumDistillery"
+                   experts-with-connections-production="4"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
@@ -2203,6 +2207,7 @@
     <building-type id="model.building.furFactory"
                    extends="model.building.furTradingPost"
                    upgrades-from="model.building.furTradingPost"
+                   experts-with-connections-production="4"
                    required-population="6" upkeep="15">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
@@ -2274,6 +2279,7 @@
     <building-type id="model.building.arsenal"
                    extends="model.building.magazine"
                    upgrades-from="model.building.magazine"
+                   experts-with-connections-production="4"
                    upkeep="15">
       <production>
         <input goods-type="model.goods.tools" value="9"/>

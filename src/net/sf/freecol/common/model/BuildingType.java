@@ -55,6 +55,9 @@ public final class BuildingType extends BuildableType {
     /** Consumption order. */
     private int priority = Consumer.BUILDING_PRIORITY;
 
+    /** Maximum production from the "experts have connections" option. */
+    private int expertConnectionProduction = 0;
+    
     /** The building type this upgrades from. */
     private BuildingType upgradesFrom = null;
 
@@ -103,6 +106,15 @@ public final class BuildingType extends BuildableType {
      */
     public int getUpkeep() {
         return upkeep;
+    }
+
+    /**
+     * Get the maximum production for the Experts-With-Connections option.
+     *
+     * @return The production amount.
+     */
+    public int getExpertWithConnectionsProduction() {
+        return this.expertConnectionProduction;
     }
 
     /**
@@ -341,6 +353,8 @@ public final class BuildingType extends BuildableType {
 
     // Serialization
 
+    private static final String EXPERTS_WITH_CONNECTION_PRODUCTION_TAG
+        = "experts-with-connections-production";
     private static final String MAXIMUM_SKILL_TAG = "maximum-skill";
     private static final String MINIMUM_SKILL_TAG = "minimum-skill";
     private static final String PRIORITY_TAG = "priority";
@@ -389,6 +403,8 @@ public final class BuildingType extends BuildableType {
             xw.writeAttribute(PRIORITY_TAG, priority);
         }
 
+        xw.writeAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
+                          this.expertConnectionProduction);
     }
 
     /**
@@ -451,6 +467,10 @@ public final class BuildingType extends BuildableType {
 
         priority = xr.getAttribute(PRIORITY_TAG, parent.priority);
 
+        this.expertConnectionProduction
+            = xr.getAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
+                              parent.expertConnectionProduction);
+
         // @compat 0.10.6
         int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);
         if (basicProduction > 0) {
@@ -495,6 +515,12 @@ public final class BuildingType extends BuildableType {
         } else {
             super.readChild(xr);
         }
+
+        // @compat 0.11.6
+        if (hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
+            && this.expertConnectionProduction == 0)
+            this.expertConnectionProduction = 4;
+        // end @compat 0.11.6
     }
 
     /**

@@ -49,6 +49,8 @@
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
 
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="experts-with-connections-production" use="optional"
+                    type="xs:int"/>
       <xs:attribute name="maximum-skill" type="xs:int"/>
       <xs:attribute name="minimum-skill" type="xs:int"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
