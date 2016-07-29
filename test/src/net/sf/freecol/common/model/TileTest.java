@@ -503,6 +503,8 @@ public class TileTest extends FreeColTestCase {
         assertFalse(tile2.canProduce(silver, null));
         oldBase = tile2.getBaseProduction(null, silver, null);
         Resource addedSilver = new Resource(game, tile2, mineralsResource);
+        assertTrue(addedSilver.canProduce(silver, null));
+        assertTrue(addedSilver.canProduce(silver, colonistType));
         tile2.addResource(addedSilver);
         newBase = tile2.getBaseProduction(null, silver, null);
         assertTrue(tile2.canProduce(silver, null));
@@ -697,6 +699,36 @@ public class TileTest extends FreeColTestCase {
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));
         assertEquals(colonyTile, colony.getWorkLocationFor(unit, silver));
+
+        // However minerals are *necessary* to produce silver
+        Tile marshTile = colony.getTile().getNeighbourOrNull(Direction.S);
+        marshTile.setType(marsh);
+        ColonyTile marshColonyTile = colony.getColonyTile(marshTile);
+        for (Unit u : marshColonyTile.getUnitList()) {
+            u.setLocation(colony.getBuilding(townHallType));
+        }
+        // No production yet
+        assertTrue(marshColonyTile.isEmpty());
+        assertEquals(marshColonyTile.getWorkTile().getOwningSettlement(),
+                     colony);
+        assertEquals(0, marsh.getPotentialProduction(silver, colonistType));
+        assertEquals(0, marshTile.getPotentialProduction(silver, colonistType));
+        assertEquals(0, count(marshTile.getProductionModifiers(silver, colonistType)));
+        assertEquals(0, marshColonyTile.getPotentialProduction(silver, unit.getType()));        
+        // Adding the road should not trigger any production
+        TileImprovement road = marshTile.addRoad();
+        road.setTurnsToComplete(0);
+        assertTrue(road.isComplete());
+        assertEquals(0, marsh.getPotentialProduction(silver, colonistType));
+        assertEquals(0, marshTile.getPotentialProduction(silver, colonistType));
+        assertEquals(0, count(marshTile.getProductionModifiers(silver, colonistType)));
+        assertEquals(0, marshColonyTile.getPotentialProduction(silver, unit.getType()));        
+        // Add the minerals and production should be available
+        marshTile.addResource(new Resource(game, marshTile, mineralsResource));
+        assertEquals(0, marsh.getPotentialProduction(silver, colonistType));
+        assertEquals(2, marshTile.getPotentialProduction(silver, colonistType));
+        assertEquals(2, count(marshTile.getProductionModifiers(silver, colonistType)));
+        assertEquals(2, marshColonyTile.getPotentialProduction(silver, unit.getType()));        
     }
 
     public void testDefenceModifiers() {

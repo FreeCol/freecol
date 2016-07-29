@@ -302,10 +302,10 @@ public class ProductionType extends FreeColSpecObject {
      * @return The most productive output that produces the goods type,
      *     or null if none found.
      */
-    public static boolean canProduce(GoodsType goodsType,
+    public static boolean canProduce(final GoodsType goodsType,
                                      Collection<ProductionType> types) {
-        return any(types, pt -> any(pt.getOutputs(),
-                                    AbstractGoods.matches(goodsType)));
+        return any(flatten(types, ProductionType::getOutputs),
+            ag -> goodsType == ag.getType() && ag.getAmount() > 0);
     }
 
     /**
