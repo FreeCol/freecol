@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -59,7 +60,9 @@ public final class ErrorPanel extends FreeColPanel {
     public ErrorPanel(FreeColClient freeColClient, String message) {
         super(freeColClient, new MigLayout());
 
-        JButton showButton = Utility.localizedButton("errorPanel.showLogFile");
+        JButton showButton = Utility.localizedButton(StringTemplate
+            .template("errorPanel.showLogFile")
+            .addName("%path%", FreeColDirectories.getLogFilePath()));
         showButton.setActionCommand(SHOW);
         showButton.addActionListener(this);
 

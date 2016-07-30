@@ -179,6 +179,7 @@ public class Utils {
                 logger.log(Level.WARNING, "Read failed for " + file.getPath(),
                            ioe);
             }
+            cb.flip();
             ret = cb.toString();
             try {
                 reader.close();
