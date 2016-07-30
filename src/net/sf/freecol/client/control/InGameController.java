@@ -896,7 +896,10 @@ public final class InGameController extends FreeColClientHolder {
      *     and has more moves to make.
      */
     private boolean moveToDestination(Unit unit, List<ModelMessage> messages) {
+        final Player player = getMyPlayer();
         Location destination;
+        PathNode path;
+
         if (!requireOurTurn()
             || unit.isAtSea()
             || unit.getMovesLeft() <= 0
@@ -908,13 +911,7 @@ public final class InGameController extends FreeColClientHolder {
             return unit.getMovesLeft() > 0;
         } else if (!changeState(unit, UnitState.ACTIVE)) {
             return false;
-        }
-        getGUI().setActiveUnit(unit);
-
-        // Find a path to the destination and try to follow it.
-        final Player player = getMyPlayer();
-        PathNode path = unit.findPath(destination);
-        if (path == null) {
+        } else if ((path = unit.findPath(destination)) == null) {
             StringTemplate src = unit.getLocation()
                 .getLocationLabelFor(player);
             StringTemplate dst = destination.getLocationLabelFor(player);
@@ -925,10 +922,12 @@ public final class InGameController extends FreeColClientHolder {
                 .addStringTemplate("%location%", src)
                 .addStringTemplate("%destination%", dst);
             getGUI().showInformationMessage(unit, template);
+            changeState(unit, UnitState.SKIPPED);
             return false;
         }
 
         // Clear ordinary destinations if arrived.
+        getGUI().setActiveUnit(unit);
         if (movePath(unit, path) && unit.isAtLocation(destination)) {
             askClearGotoOrders(unit);
             Colony colony = (unit.hasTile()) ? unit.getTile().getColony()
