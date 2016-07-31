@@ -271,6 +271,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
+     * Sets the production bonus of the colony.
+     *
+     * Only public for the convenience of the test suite.
+     *
+     * @param productionBonus The new production bonus of the colony.
+     */
+    public void setProductionBonus(int productionBonus) {
+        this.productionBonus = productionBonus;
+    }
+
+    /**
      * Gets the immigration points.
      *
      * @return The current immigration.
@@ -1264,7 +1275,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             : 0;
         if (productionBonus != newBonus) {
             invalidateCache();
-            productionBonus = newBonus;
+            setProductionBonus(newBonus);
             return true;
         }
         return false;

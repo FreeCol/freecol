@@ -20,8 +20,10 @@
 package net.sf.freecol.common.model;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
@@ -40,8 +42,10 @@ public class BuildingTest extends FreeColTestCase {
 
     private static final BuildingType armoryType
         = spec().getBuildingType("model.building.armory");
-    private static final BuildingType blacksmithType
+    private static final BuildingType blacksmithHouseType
         = spec().getBuildingType("model.building.blacksmithHouse");
+    private static final BuildingType blacksmithShopType
+        = spec().getBuildingType("model.building.blacksmithShop");
     private static final BuildingType carpenterHouseType
         = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType chapelType
@@ -54,6 +58,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.fort");
     private static final BuildingType fortressType
         = spec().getBuildingType("model.building.fortress");
+    private static final BuildingType ironWorksType
+        = spec().getBuildingType("model.building.ironWorks");
     private static final BuildingType newspaperType
         = spec().getBuildingType("model.building.newspaper");
     private static final BuildingType printingPressType
@@ -114,6 +120,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.indenturedServant");
     private static final UnitType indianConvertType
         = spec().getUnitType("model.unit.indianConvert");
+    private static final UnitType masterBlacksmithType
+        = spec().getUnitType("model.unit.masterBlacksmith");
     private static final UnitType masterCarpenterType
         = spec().getUnitType("model.unit.masterCarpenter");
     private static final UnitType masterDistillerType
@@ -289,7 +297,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Church total cross production, 3 x free colonist", 11,
             church.getTotalProductionOf(crossesType));
 
-        Building smithy = colony.getBuilding(blacksmithType);
+        Building smithy = colony.getBuilding(blacksmithHouseType);
         assertTrue(unit0.setLocation(smithy));
         assertTrue(unit1.setLocation(smithy));
         assertTrue(unit2.setLocation(smithy));
@@ -890,6 +898,90 @@ public class BuildingTest extends FreeColTestCase {
         }
     }
 
+    // Tools production data contributed by Lone_Wolf in BR#2979.
+    private static int toolsProd[][][] = {
+        { // house
+            { 0, 0, 0, 1, 2 }, // -2
+            { 0, 0, 1, 2, 4 }, // -1
+            { 1, 1, 2, 3, 6 }, // 0
+            { 2, 2, 3, 4, 8 }, // 1
+            { 3, 3, 4, 5, 10 }, // 2
+        }, { // shop
+            { 0, 0, 2, 4, 8 }, // -2
+            { 1, 1, 3, 5, 10 }, // -1
+            { 2, 2, 4, 6, 12 }, // 0
+            { 3, 3, 5, 7, 14 }, // 1
+            { 4, 4, 6, 8, 16 }, // 2
+        }, { // iron works
+            { 0, 0, 3, 6, 12 }, // -2
+            { 1, 1, 4, 7, 14 }, // -1
+            { 3, 3, 6, 9, 18 }, // 0
+            { 4, 4, 7, 10, 20 }, // 1
+            { 6, 6, 9, 12, 24 }, // 2
+        }
+    };
+    private static final BuildingType[] toolBuildings = new BuildingType[] {
+        blacksmithHouseType, blacksmithShopType, ironWorksType };
+    private static final Integer[] bonusLevels = new Integer[] { -2,-1,0,1,2 };
+    private static final UnitType[] toolUnits = new UnitType[] {
+        indianConvertType, pettyCriminalType, indenturedServantType,
+        freeColonistType, masterBlacksmithType };
+    public void testToolsProduction() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        Colony colony = getStandardColony(5);
+        Building smithy = colony.getBuilding(blacksmithHouseType);
+        assertEquals(0, smithy.getUnitCount());
+        assertFalse(smithy.setWorkFor(colony.getUnitList().get(0)));
+        colony.addGoods(oreType, 50); // Add ore so the smithy becomes viable
+
+        Tile tile = colony.getTile();
+        for (UnitType ut : toolUnits) {
+            if (none(colony.getUnits(), matchKey(ut, Unit::getType))) {
+                Unit u = find(colony.getUnits(),
+                              matchKey(freeColonistType, Unit::getType));
+                u.changeType(ut);
+            }
+        }
+
+        for (int i = 0; i < toolsProd.length; i++) {
+            final BuildingType bt = toolBuildings[i];
+
+            colony.addGoods(bellsType, -colony.getGoodsCount(bellsType));
+            for (int j = 0; j < toolsProd[0].length; j++) {
+                final int level = bonusLevels[j];
+                
+                for (int k = 0; k < toolsProd[0][0].length; k++) {
+                    final UnitType ut = toolUnits[k];
+                    // Set up conditions for bt,level,ut
+                    while (smithy.getType() != bt) smithy.upgrade();
+                    assertEquals(smithy.getType(), bt);
+                    for (Unit u : smithy.getUnitList()) {
+                        u.setLocation(tile);
+                        u.setWorkType(grainType);
+                        colony.joinColony(u);
+                    }
+                    assertEquals(0, smithy.getUnitCount());
+                    colony.setProductionBonus(level);
+                    Unit worker = find(colony.getUnits(),
+                                       matchKey(ut, Unit::getType));
+                    worker.setWorkType(toolsType);
+                    worker.setLocation(smithy);
+                    assertEquals(1, smithy.getUnitCount());
+                    colony.invalidateCache();
+                    assertEquals(colony.getProductionBonus(), level);
+                        
+                    // At last! The test.
+                    String test = "Tools produced in " + bt.getSuffix()
+                        + " at bonus " + level + " with " + ut.getSuffix();
+                    assertEquals(test, toolsProd[i][j][k],
+                                 smithy.getTotalProductionOf(toolsType));
+                }
+            }
+        }
+    }                            
+        
     public void testToolsMusketProduction() {
         Game game = getGame();
         game.setMap(getTestMap(true));
@@ -916,7 +1008,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(colony.getBuilding(townHallType)
             .setWorkFor(units.get(7)));
 
-        Building smithy = colony.getBuilding(blacksmithType);
+        Building smithy = colony.getBuilding(blacksmithHouseType);
         assertFalse(smithy.setWorkFor(units.get(0)));
         colony.addGoods(oreType, 50); // Add ore so the smithy becomes viable
         assertTrue(smithy.setWorkFor(units.get(0)));
