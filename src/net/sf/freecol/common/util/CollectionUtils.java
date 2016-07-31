@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -107,6 +108,28 @@ public class CollectionUtils {
         List<T> tmp = new ArrayList<>();
         for (T t : members) tmp.add(t);
         return Collections.<T>unmodifiableList(tmp);
+    }
+
+    /**
+     * Make an unmodifiable map with member pairs specified in two arrays.
+     *
+     * The array lengths *must* match.
+     *
+     * @param <K> The type of the keys.
+     * @param <V> The type of the values.
+     * @param keys The array of keys.
+     * @param values The array of values.
+     * @return An unmodifiable map containing the specified members.
+     */
+    public static <K,V> Map<K,V> makeUnmodifiableMap(K[] keys, V[] values) {
+        if (keys.length != values.length) {
+            throw new RuntimeException("Length mismatch");
+        }
+        Map<K,V> tmp = new HashMap<K,V>();
+        for (int i = 0; i < keys.length; i++) {
+            tmp.put(keys[i], values[i]);
+        }
+        return Collections.<K,V>unmodifiableMap(tmp);
     }
 
     /**

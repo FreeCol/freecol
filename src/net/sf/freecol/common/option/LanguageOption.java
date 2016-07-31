@@ -48,15 +48,15 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     private static final Logger logger = Logger.getLogger(LanguageOption.class.getName());
 
     /** Extra languages with alternate names. */
-    private static final Map<String, String> languageNames = new HashMap<>();
-    static { // Add non-standard language names here.
-        languageNames.put("arz", "\u0645\u0635\u0631\u064A");
-        languageNames.put("hsb", "Serb\u0161\u0107ina");
-        languageNames.put("nds", "Plattd\u00fc\u00fctsch");
-        languageNames.put("pms", "Piemont\u00e9s");
-        languageNames.put("be-tarask", "\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f "
-            + "(\u0442\u0430\u0440\u0430\u0448\u043a\u0435\u0432\u0456\u0446\u0430)");
-    }
+    private static final Map<String, String> languageNames
+        = makeUnmodifiableMap(new String[] {
+                "arz", "hsb", "nds", "pms", "be-tarask" },
+            new String[] {
+                "\u0645\u0635\u0631\u064A",
+                "Serb\u0161\u0107ina",
+                "Plattd\u00fc\u00fctsch",
+                "Piemont\u00e9s",
+                "\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f (\u0442\u0430\u0440\u0430\u0448\u043a\u0435\u0432\u0456\u0446\u0430)" });
 
     public static class Language implements Comparable<Language> {
 
