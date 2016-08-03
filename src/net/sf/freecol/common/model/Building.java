@@ -529,7 +529,7 @@ public class Building extends WorkLocation
             // With a unit, also the unit specific bonuses
             : concat(this.getModifiers(id, unitType, turn),
                      colony.getProductionModifiers(goodsType),
-                     unitType.getModifiers(id, goodsType, turn),
+                     unitType.getModifiers(id, type, turn),
                      owner.getModifiers(id, unitType, turn));
     }
 

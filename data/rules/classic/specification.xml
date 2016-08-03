@@ -1889,15 +1889,65 @@
     <unit-type id="model.unit.indenturedServant" extends="colonist"
                skill="-1" recruit-probability="20" score-value="2">
       <modifier id="model.goods.rum" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.distillerHouse"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.rumDistillery"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.rumFactory"/>
+      </modifier>
       <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.tobacconistHouse"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.tobacconistShop"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.cigarFactory"/>
+      </modifier>
       <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.weaverHouse"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.weaverShop"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.textileMill"/>
+      </modifier>
       <modifier id="model.goods.coats" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.furTraderHouse"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.furTradingPost"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.furFactory"/>
+      </modifier>
       <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.armory"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.magazine"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.arsenal"/>
+      </modifier>
       <modifier id="model.goods.bells" index="30"
                 type="additive" value="-1"/>
       <modifier id="model.goods.crosses" index="30"
@@ -1905,20 +1955,80 @@
       <modifier id="model.goods.hammers" index="30"
                 type="additive" value="-1"/>
       <modifier id="model.goods.tools" index="30"
-                type="additive" value="-1"/>
+                type="additive" value="-1">
+        <scope type="model.building.blacksmithHouse"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-2">
+        <scope type="model.building.blacksmithShop"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-3">
+        <scope type="model.building.ironWorks"/>
+      </modifier>
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" extends="colonist"
                skill="-2" recruit-probability="20" score-value="1">
       <modifier id="model.goods.rum" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.distillerHouse"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.rumDistillery"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.rumFactory"/>
+      </modifier>
       <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.tobacconistHouse"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.tobacconistShop"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.cigarFactory"/>
+      </modifier>
       <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.weaverHouse"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.weaverShop"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.textileMill"/>
+      </modifier>
       <modifier id="model.goods.coats" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.furTraderHouse"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.furTradingPost"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.furFactory"/>
+      </modifier>
       <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.armory"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.magazine"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.arsenal"/>
+      </modifier>
       <modifier id="model.goods.bells" index="30"
                 type="additive" value="-2"/>
       <modifier id="model.goods.crosses" index="30"
@@ -1926,7 +2036,17 @@
       <modifier id="model.goods.hammers" index="30"
                 type="additive" value="-2"/>
       <modifier id="model.goods.tools" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.blacksmithHouse"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.blacksmithShop"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.ironWorks"/>
+      </modifier>
     </unit-type>
     <unit-type id="model.unit.indianConvert" 
                skill="0" offence="0" defence="1" movement="3" line-of-sight="1"
@@ -1950,15 +2070,65 @@
       <modifier id="model.goods.fish" index="30"
                 type="additive" value="1"/>
       <modifier id="model.goods.rum" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.distillerHouse"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.rumDistillery"/>
+      </modifier>
+      <modifier id="model.goods.rum" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.rumFactory"/>
+      </modifier>
       <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.tobacconistHouse"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.tobacconistShop"/>
+      </modifier>
+      <modifier id="model.goods.cigars" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.cigarFactory"/>
+      </modifier>
       <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.weaverHouse"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.weaverShop"/>
+      </modifier>
+      <modifier id="model.goods.cloth" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.textileMill"/>
+      </modifier>
       <modifier id="model.goods.coats" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.furTraderHouse"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.furTradingPost"/>
+      </modifier>
+      <modifier id="model.goods.coats" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.furFactory"/>
+      </modifier>
       <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.armory"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.magazine"/>
+      </modifier>
+      <modifier id="model.goods.muskets" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.arsenal"/>
+      </modifier>
       <modifier id="model.goods.bells" index="30"
                 type="additive" value="-2"/>
       <modifier id="model.goods.crosses" index="30"
@@ -1966,7 +2136,17 @@
       <modifier id="model.goods.hammers" index="30"
                 type="additive" value="-2"/>
       <modifier id="model.goods.tools" index="30"
-                type="additive" value="-2"/>
+                type="additive" value="-2">
+        <scope type="model.building.blacksmithHouse"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-4">
+        <scope type="model.building.blacksmithShop"/>
+      </modifier>
+      <modifier id="model.goods.tools" index="30"
+                type="additive" value="-6">
+        <scope type="model.building.ironWorks"/>
+      </modifier>
     </unit-type>
     <unit-type id="model.unit.brave"
                offence="1" defence="1"
