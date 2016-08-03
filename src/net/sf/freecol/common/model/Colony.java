@@ -58,8 +58,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     public static final String REARRANGE_COLONY = "rearrangeColony";
     public static final int LIBERTY_PER_REBEL = 200;
+
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
+
+    /** The level of the factory buildings. */
+    public static final int FACTORY_LEVEL = 3;
     
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
@@ -1954,7 +1958,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType) {
         if (productionBonus == 0) return Stream.<Modifier>empty();
-        Modifier mod = new Modifier(goodsType.getId(), productionBonus,
+        int bonus = productionBonus;
+        if (max(getWorkLocationsForProducing(goodsType),
+                WorkLocation::getLevel) == FACTORY_LEVEL) {
+            bonus = (int)Math.floor(1.5 * bonus);
+        }
+        Modifier mod = new Modifier(goodsType.getId(), bonus,
                                     Modifier.ModifierType.ADDITIVE,
                                     Specification.SOL_MODIFIER_SOURCE);
         mod.setModifierIndex(Modifier.COLONY_PRODUCTION_INDEX);
