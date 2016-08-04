@@ -1013,7 +1013,7 @@ public class BuildingTest extends FreeColTestCase {
             { 2, 2, 4, 6, 12 }, // 0
             { 3, 3, 5, 7, 14 }, // 1
             { 4, 4, 6, 8, 16 }, // 2
-        }, { // iron works
+        }, { // factory
             { 0, 0, 3, 6, 12 }, // -2
             { 1, 1, 4, 7, 14 }, // -1
             { 3, 3, 6, 9, 18 }, // 0

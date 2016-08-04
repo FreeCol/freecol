@@ -1954,15 +1954,15 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * generated from the current production bonus.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to do the work.
+     * @param workLocation The <code>WorkLocation</code> where the work
+     *     is done.
      * @return A stream of suitable <code>Modifier</code>s.
      */
-    public Stream<Modifier> getProductionModifiers(GoodsType goodsType) {
+    public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
+        UnitType unitType, WorkLocation wl) {
         if (productionBonus == 0) return Stream.<Modifier>empty();
-        int bonus = productionBonus;
-        if (max(getWorkLocationsForProducing(goodsType),
-                WorkLocation::getLevel) == FACTORY_LEVEL) {
-            bonus = (int)Math.floor(1.5 * bonus);
-        }
+        int bonus = (int)Math.floor(productionBonus * wl.getRebelFactor());
         Modifier mod = new Modifier(goodsType.getId(), bonus,
                                     Modifier.ModifierType.ADDITIVE,
                                     Specification.SOL_MODIFIER_SOURCE);

@@ -528,7 +528,7 @@ public class Building extends WorkLocation
                      owner.getModifiers(id, type, turn))
             // With a unit, also the unit specific bonuses
             : concat(this.getModifiers(id, unitType, turn),
-                     colony.getProductionModifiers(goodsType),
+                     colony.getProductionModifiers(goodsType, unitType, this),
                      unitType.getModifiers(id, type, turn),
                      owner.getModifiers(id, unitType, turn));
     }
@@ -540,6 +540,14 @@ public class Building extends WorkLocation
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (buildingType == null) ? Collections.<ProductionType>emptyList()
             : getType().getAvailableProductionTypes(unattended);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public float getRebelFactor() {
+        return getType().getRebelFactor();
     }
 
 

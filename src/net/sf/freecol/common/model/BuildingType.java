@@ -58,6 +58,9 @@ public final class BuildingType extends BuildableType {
     /** Maximum production from the "experts have connections" option. */
     private int expertConnectionProduction = 0;
     
+    /** The multiplier for the colony rebel bonus for this building type. */
+    private float rebelFactor = 1.0f;
+    
     /** The building type this upgrades from. */
     private BuildingType upgradesFrom = null;
 
@@ -115,6 +118,16 @@ public final class BuildingType extends BuildableType {
      */
     public int getExpertWithConnectionsProduction() {
         return this.expertConnectionProduction;
+    }
+
+    /**
+     * Get a work location specific factor to multiply the colony
+     * rebel bonus by.
+     *
+     * @return The rebel factor.
+     */
+    public float getRebelFactor() {
+        return this.rebelFactor;
     }
 
     /**
@@ -359,6 +372,7 @@ public final class BuildingType extends BuildableType {
     private static final String MINIMUM_SKILL_TAG = "minimum-skill";
     private static final String PRIORITY_TAG = "priority";
     private static final String PRODUCTION_TAG = "production";
+    private static final String REBEL_FACTOR_TAG = "rebel-factor";
     private static final String UPGRADES_FROM_TAG = "upgrades-from";
     private static final String UPKEEP_TAG = "upkeep";
     private static final String WORKPLACES_TAG = "workplaces";
@@ -405,6 +419,8 @@ public final class BuildingType extends BuildableType {
 
         xw.writeAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
                           this.expertConnectionProduction);
+
+        xw.writeAttribute(REBEL_FACTOR_TAG, this.rebelFactor);
     }
 
     /**
@@ -470,6 +486,9 @@ public final class BuildingType extends BuildableType {
         this.expertConnectionProduction
             = xr.getAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
                               parent.expertConnectionProduction);
+
+        this.rebelFactor = xr.getAttribute(REBEL_FACTOR_TAG,
+                                           parent.rebelFactor);
 
         // @compat 0.10.6
         int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);

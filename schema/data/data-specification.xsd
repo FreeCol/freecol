@@ -20,7 +20,7 @@
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
 
-      XSD for specification version 0.111
+      XSD for specification version 0.112
       CHANGELOG:
       0.26:  add capture-equipment
       0.27:  add limits
@@ -109,6 +109,7 @@
       0.109: Big reorganization.
       0.110: Add experts-with-connections-production attribute to BuildingType.
       0.111: Add unit-change-types etc.
+      0.112: Added rebel-factor attribute to building-type.
     </xs:documentation>
   </xs:annotation>
 

@@ -454,14 +454,14 @@ public class ColonyTile extends WorkLocation {
         return (unitType != null)
             // Unit modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, unitType),
-                     colony.getProductionModifiers(goodsType),
+                     colony.getProductionModifiers(goodsType, unitType, this),
                      unitType.getModifiers(id, type, turn),
                      ((owner == null) ? null
                          : owner.getModifiers(id, unitType, turn)))
             : (isColonyCenterTile())
             // Unattended only possible in center, colony modifiers apply
             ? concat(workTile.getProductionModifiers(goodsType, null),
-                     colony.getProductionModifiers(goodsType),
+                     colony.getProductionModifiers(goodsType, null, this),
                      colony.getModifiers(id, null, turn),
                      ((owner == null) ? null
                          : owner.getModifiers(id, type, turn)))
@@ -478,6 +478,14 @@ public class ColonyTile extends WorkLocation {
             || unattended != isColonyCenterTile())
             ? Collections.<ProductionType>emptyList()
             : workTile.getType().getAvailableProductionTypes(unattended);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public float getRebelFactor() {
+        return 1.0f;
     }
 
     /**

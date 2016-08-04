@@ -54,6 +54,7 @@
       <xs:attribute name="maximum-skill" type="xs:int"/>
       <xs:attribute name="minimum-skill" type="xs:int"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="rebel-factor" type="xs:float"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="upgrades-from" type="BuildingTypeId"/>
       <xs:attribute name="upkeep" type="xs:int"/>
