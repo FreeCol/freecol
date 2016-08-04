@@ -151,6 +151,8 @@ public class BuildingTest extends FreeColTestCase {
     private static final UnitType pettyCriminalType
         = spec().getUnitType("model.unit.pettyCriminal");
 
+    private static final Integer[] bonusLevels = new Integer[] { -2,-1,0,1,2 };
+
 
     private void clearBuilding(Building b) {
         final Colony colony = b.getColony();
@@ -161,6 +163,73 @@ public class BuildingTest extends FreeColTestCase {
         }
         assertEquals(0, b.getUnitCount());
     }
+        
+    private void productionTest(BuildingType[] buildings, int[][][]values) {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        // Enable factory
+        Colony colony = getStandardColony(8); // Big enough for factory
+        colony.getOwner().addFather(spec()
+            .getFoundingFather("model.foundingFather.adamSmith"));
+
+        Building building = colony.getBuilding(buildings[0]);
+        clearBuilding(building);
+        // Add goods so production is viable
+        forEach(building.getBestProductionType(false, null).getInputs(),
+            ag -> colony.addGoods(ag.getType(), 50));
+        GoodsType outputType = first(building.getBestProductionType(false, null).getOutputs()).getType();
+        
+        UnitType[] unitTypes = new UnitType[] {
+            indianConvertType, pettyCriminalType, indenturedServantType,
+            freeColonistType, building.getExpertUnitType() };
+        Tile tile = colony.getTile();
+        for (UnitType ut : unitTypes) {
+            if (none(colony.getUnits(), matchKey(ut, Unit::getType))) {
+                Unit u = find(colony.getUnits(),
+                              matchKey(freeColonistType, Unit::getType));
+                u.changeType(ut);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder(64);
+        for (int i = 0; i < values.length; i++) {
+            final BuildingType bt = buildings[i];
+
+            for (int j = 0; j < values[0].length; j++) {
+                final int level = bonusLevels[j];
+
+                for (int k = 0; k < values[0][0].length; k++) {
+                    final UnitType ut = unitTypes[k];
+
+                    // Set up conditions for bt,level,ut
+                    while (building.getType() != bt) building.upgrade();
+                    assertEquals(building.getType(), bt);
+                    clearBuilding(building);
+                    colony.setProductionBonus(level);
+                    Unit worker = find(colony.getUnits(),
+                                       matchKey(ut, Unit::getType));
+                    assertNotNull(worker);
+                    worker.setWorkType(outputType);
+                    worker.setLocation(building);
+                    assertEquals(1, building.getUnitCount());
+                    assertEquals(worker, building.getUnitList().get(0));
+                    assertEquals(outputType, worker.getWorkType());
+                    colony.invalidateCache();
+                    assertEquals(colony.getProductionBonus(), level);
+                        
+                    // At last! The test.
+                    sb.setLength(0);
+                    sb.append(outputType.getSuffix())
+                        .append(" produced in ").append(bt.getSuffix())
+                        .append(" at bonus ").append(String.valueOf(level))
+                        .append(" with ").append(ut.getSuffix());
+                    assertEquals(sb.toString(), values[i][j][k],
+                                 building.getTotalProductionOf(outputType));
+                }
+            }
+        }
+    }                            
         
     public void testCanBuildNext() {
         Game game = getGame();
@@ -931,7 +1000,7 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     // Tools production data contributed by Lone_Wolf in BR#2979.
-    private static int goodsProd[][][] = {
+    private static int factoryProd[][][] = {
         { // house
             { 0, 0, 0, 1, 2 }, // -2
             { 0, 0, 1, 2, 4 }, // -1
@@ -952,90 +1021,22 @@ public class BuildingTest extends FreeColTestCase {
             { 6, 6, 9, 12, 24 }, // 2
         }
     };
-    private static final Integer[] bonusLevels = new Integer[] { -2,-1,0,1,2 };
-    private void factoryProduction(BuildingType[] buildings) {
-        Game game = getGame();
-        game.setMap(getTestMap(true));
-
-        // Enable factory
-        Colony colony = getStandardColony(8); // Big enough for factory
-        colony.getOwner().addFather(spec()
-            .getFoundingFather("model.foundingFather.adamSmith"));
-
-        Building building = colony.getBuilding(buildings[0]);
-        clearBuilding(building);
-        // Add goods so production is viable
-        forEach(building.getBestProductionType(false, null).getInputs(),
-            ag -> colony.addGoods(ag.getType(), 50));
-        GoodsType outputType = first(building.getBestProductionType(false, null).getOutputs()).getType();
-        
-        UnitType[] unitTypes = new UnitType[] {
-            indianConvertType, pettyCriminalType, indenturedServantType,
-            freeColonistType, building.getExpertUnitType() };
-        Tile tile = colony.getTile();
-        for (UnitType ut : unitTypes) {
-            if (none(colony.getUnits(), matchKey(ut, Unit::getType))) {
-                Unit u = find(colony.getUnits(),
-                              matchKey(freeColonistType, Unit::getType));
-                u.changeType(ut);
-            }
-        }
-
-        StringBuilder sb = new StringBuilder(64);
-        for (int i = 0; i < goodsProd.length; i++) {
-            final BuildingType bt = buildings[i];
-
-            for (int j = 0; j < goodsProd[0].length; j++) {
-                final int level = bonusLevels[j];
-
-                for (int k = 0; k < goodsProd[0][0].length; k++) {
-                    final UnitType ut = unitTypes[k];
-
-                    // Set up conditions for bt,level,ut
-                    while (building.getType() != bt) building.upgrade();
-                    assertEquals(building.getType(), bt);
-                    clearBuilding(building);
-                    colony.setProductionBonus(level);
-                    Unit worker = find(colony.getUnits(),
-                                       matchKey(ut, Unit::getType));
-                    assertNotNull(worker);
-                    worker.setWorkType(outputType);
-                    worker.setLocation(building);
-                    assertEquals(1, building.getUnitCount());
-                    assertEquals(worker, building.getUnitList().get(0));
-                    assertEquals(outputType, worker.getWorkType());
-                    colony.invalidateCache();
-                    assertEquals(colony.getProductionBonus(), level);
-                        
-                    // At last! The test.
-                    sb.setLength(0);
-                    sb.append(outputType.getSuffix())
-                        .append(" produced in ").append(bt.getSuffix())
-                        .append(" at bonus ").append(String.valueOf(level))
-                        .append(" with ").append(ut.getSuffix());
-                    assertEquals(sb.toString(), goodsProd[i][j][k],
-                                 building.getTotalProductionOf(outputType));
-                }
-            }
-        }
-    }                            
-        
+    private static final BuildingType[] clothBuildings = new BuildingType[] {
+        weaverHouseType, weaverShopType, textileMillType };
+    private static final BuildingType[] furBuildings = new BuildingType[] {
+        furTraderHouseType, furTradingPostType, furFactoryType };
+    private static final BuildingType[] sugarBuildings = new BuildingType[] {
+        distillerHouseType, rumDistilleryType, rumFactoryType };
+    private static final BuildingType[] tobaccoBuildings = new BuildingType[] {
+        tobacconistHouseType, tobacconistShopType, cigarFactoryType };
+    private static final BuildingType[] toolBuildings = new BuildingType[] {
+        blacksmithHouseType, blacksmithShopType, ironWorksType };
     public void testFactoryProduction() {
-        BuildingType[] clothBuildings = new BuildingType[] {
-            weaverHouseType, weaverShopType, textileMillType };
-        factoryProduction(clothBuildings);
-        BuildingType[] furBuildings = new BuildingType[] {
-            furTraderHouseType, furTradingPostType, furFactoryType };
-        factoryProduction(clothBuildings);
-        BuildingType[] sugarBuildings = new BuildingType[] {
-            distillerHouseType, rumDistilleryType, rumFactoryType };
-        factoryProduction(sugarBuildings);
-        BuildingType[] tobaccoBuildings = new BuildingType[] {
-            tobacconistHouseType, tobacconistShopType, cigarFactoryType };
-        factoryProduction(tobaccoBuildings);
-        BuildingType[] toolBuildings = new BuildingType[] {
-            blacksmithHouseType, blacksmithShopType, ironWorksType };
-        factoryProduction(toolBuildings);
+        productionTest(clothBuildings, factoryProd);
+        productionTest(clothBuildings, factoryProd);
+        productionTest(sugarBuildings, factoryProd);
+        productionTest(tobaccoBuildings, factoryProd);
+        productionTest(toolBuildings, factoryProd);
         // Testing muskets below
     }
         
