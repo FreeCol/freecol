@@ -484,6 +484,14 @@ public class ColonyTile extends WorkLocation {
      * {@inheritDoc}
      */
     @Override
+    public float getCompetenceFactor() {
+        return 1.0f;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public float getRebelFactor() {
         return 1.0f;
     }

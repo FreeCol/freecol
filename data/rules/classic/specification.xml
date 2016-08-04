@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.112">
+<freecol-specification id="classic" version="0.113">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -1888,165 +1888,27 @@
     </unit-type>
     <unit-type id="model.unit.indenturedServant" extends="colonist"
                skill="-1" recruit-probability="20" score-value="2">
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.distillerHouse"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.rumDistillery"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.rumFactory"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.tobacconistHouse"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.tobacconistShop"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.cigarFactory"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.weaverHouse"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.weaverShop"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.textileMill"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.furTraderHouse"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.furTradingPost"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.furFactory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.armory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.magazine"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.arsenal"/>
-      </modifier>
-      <modifier id="model.goods.bells" index="30"
-                type="additive" value="-1"/>
-      <modifier id="model.goods.crosses" index="30"
-                type="additive" value="-1"/>
-      <modifier id="model.goods.hammers" index="30"
-                type="additive" value="-1"/>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-1">
-        <scope type="model.building.blacksmithHouse"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.blacksmithShop"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-3">
-        <scope type="model.building.ironWorks"/>
-      </modifier>
+      <modifier id="model.goods.rum"     index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.cigars"  index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.cloth"   index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.coats"   index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.muskets" index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.bells"   index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.crosses" index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.hammers" index="30" type="additive" value="-1"/>
+      <modifier id="model.goods.tools"   index="30" type="additive" value="-1"/>
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" extends="colonist"
                skill="-2" recruit-probability="20" score-value="1">
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.distillerHouse"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.rumDistillery"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.rumFactory"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.tobacconistHouse"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.tobacconistShop"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.cigarFactory"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.weaverHouse"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.weaverShop"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.textileMill"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.furTraderHouse"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.furTradingPost"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.furFactory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.armory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.magazine"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.arsenal"/>
-      </modifier>
-      <modifier id="model.goods.bells" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.crosses" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.hammers" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.blacksmithHouse"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.blacksmithShop"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.ironWorks"/>
-      </modifier>
+      <modifier id="model.goods.rum"     index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.cigars"  index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.cloth"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.coats"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.muskets" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.bells"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.crosses" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.hammers" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.tools"   index="30" type="additive" value="-2"/>
     </unit-type>
     <unit-type id="model.unit.indianConvert" 
                skill="0" offence="0" defence="1" movement="3" line-of-sight="1"
@@ -2057,96 +1919,21 @@
                value="true"/>
       <ability id="model.ability.foundColony"
                value="false"/>
-      <modifier id="model.goods.grain" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.sugar" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.tobacco" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.cotton" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.furs" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.fish" index="30"
-                type="additive" value="1"/>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.distillerHouse"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.rumDistillery"/>
-      </modifier>
-      <modifier id="model.goods.rum" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.rumFactory"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.tobacconistHouse"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.tobacconistShop"/>
-      </modifier>
-      <modifier id="model.goods.cigars" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.cigarFactory"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.weaverHouse"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.weaverShop"/>
-      </modifier>
-      <modifier id="model.goods.cloth" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.textileMill"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.furTraderHouse"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.furTradingPost"/>
-      </modifier>
-      <modifier id="model.goods.coats" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.furFactory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.armory"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.magazine"/>
-      </modifier>
-      <modifier id="model.goods.muskets" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.arsenal"/>
-      </modifier>
-      <modifier id="model.goods.bells" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.crosses" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.hammers" index="30"
-                type="additive" value="-2"/>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-2">
-        <scope type="model.building.blacksmithHouse"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-4">
-        <scope type="model.building.blacksmithShop"/>
-      </modifier>
-      <modifier id="model.goods.tools" index="30"
-                type="additive" value="-6">
-        <scope type="model.building.ironWorks"/>
-      </modifier>
+      <modifier id="model.goods.grain"   index="30" type="additive" value="1"/>
+      <modifier id="model.goods.sugar"   index="30" type="additive" value="1"/>
+      <modifier id="model.goods.tobacco" index="30" type="additive" value="1"/>
+      <modifier id="model.goods.cotton"  index="30" type="additive" value="1"/>
+      <modifier id="model.goods.furs"    index="30" type="additive" value="1"/>
+      <modifier id="model.goods.fish"    index="30" type="additive" value="1"/>
+      <modifier id="model.goods.rum"     index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.cigars"  index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.cloth"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.coats"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.muskets" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.bells"   index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.crosses" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.hammers" index="30" type="additive" value="-2"/>
+      <modifier id="model.goods.tools"   index="30" type="additive" value="-2"/>
     </unit-type>
     <unit-type id="model.unit.brave"
                offence="1" defence="1"
@@ -2420,6 +2207,7 @@
     <building-type id="model.building.blacksmithShop"
                    extends="model.building.blacksmithHouse"
                    upgrades-from="model.building.blacksmithHouse"
+                   competence-factor="2"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
@@ -2433,7 +2221,8 @@
     <building-type id="model.building.ironWorks"
                    extends="model.building.blacksmithShop"
                    upgrades-from="model.building.blacksmithShop"
-                   experts-with-connections-production="4" rebel-factor="1.5"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.ore" value="6"/>
@@ -2456,6 +2245,7 @@
     <building-type id="model.building.tobacconistShop"
                    extends="model.building.tobacconistHouse"
                    upgrades-from="model.building.tobacconistHouse"
+                   competence-factor="2"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
@@ -2469,7 +2259,8 @@
     <building-type id="model.building.cigarFactory"
                    extends="model.building.tobacconistShop"
                    upgrades-from="model.building.tobacconistShop"
-                   experts-with-connections-production="4" rebel-factor="1.5"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.tobacco" value="6"/>
@@ -2492,6 +2283,7 @@
     <building-type id="model.building.weaverShop"
                    extends="model.building.weaverHouse"
                    upgrades-from="model.building.weaverHouse"
+                   competence-factor="2"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
@@ -2505,7 +2297,8 @@
     <building-type id="model.building.textileMill"
                    extends="model.building.weaverShop"
                    upgrades-from="model.building.weaverShop"
-                   experts-with-connections-production="4" rebel-factor="1.5"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.cotton" value="6"/>
@@ -2528,6 +2321,7 @@
     <building-type id="model.building.rumDistillery"
                    extends="model.building.distillerHouse"
                    upgrades-from="model.building.distillerHouse"
+                   competence-factor="2"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
@@ -2541,7 +2335,8 @@
     <building-type id="model.building.rumFactory"
                    extends="model.building.rumDistillery"
                    upgrades-from="model.building.rumDistillery"
-                   experts-with-connections-production="4" rebel-factor="1.5"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    required-population="8" upkeep="15">
       <production>
         <input goods-type="model.goods.sugar" value="6"/>
@@ -2564,6 +2359,7 @@
     <building-type id="model.building.furTradingPost"
                    extends="model.building.furTraderHouse"
                    upgrades-from="model.building.furTraderHouse"
+                   competence-factor="2"
                    upkeep="5">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
@@ -2577,7 +2373,8 @@
     <building-type id="model.building.furFactory"
                    extends="model.building.furTradingPost"
                    upgrades-from="model.building.furTradingPost"
-                   experts-with-connections-production="4" rebel-factor="1.5"
+                   experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    required-population="6" upkeep="15">
       <production>
         <input goods-type="model.goods.furs" value="6"/>
@@ -2636,6 +2433,7 @@
     <building-type id="model.building.magazine"
                    extends="model.building.armory"
                    upgrades-from="model.building.armory"
+                   competence-factor="2"
                    required-population="8" upkeep="10">
       <production>
         <input goods-type="model.goods.tools" value="6"/>
@@ -2650,6 +2448,7 @@
                    extends="model.building.magazine"
                    upgrades-from="model.building.magazine"
                    experts-with-connections-production="4"
+                   competence-factor="3" rebel-factor="1.5"
                    upkeep="15">
       <production>
         <input goods-type="model.goods.tools" value="9"/>

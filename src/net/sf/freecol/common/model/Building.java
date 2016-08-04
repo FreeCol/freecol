@@ -133,6 +133,32 @@ public class Building extends WorkLocation
     }
 
     /**
+     * Gets the production modifiers for the given type of goods and
+     * unit type.
+     *
+     * We use UnitType.getModifiers but modify this according to the
+     * competence factor of this building type.  Note that we do not modify
+     * *multiplicative* modifiers, as this would capture the master blacksmith
+     * doubling.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The optional <code>UnitType</code> to produce them.
+     * @return A stream of the applicable modifiers.
+     */
+    public Stream<Modifier> getCompetenceModifiers(String id,
+        UnitType unitType, Turn turn) {
+        final float competence = getCompetenceFactor();
+        return (competence == 1.0f) // Floating comparison OK!
+            ? unitType.getModifiers(id, getType(), turn)
+            : map(unitType.getModifiers(id, getType(), turn),
+                m -> {
+                    return (m.getType() == Modifier.ModifierType.ADDITIVE)
+                        ? new Modifier(m).setValue(m.getValue() * competence)
+                        : m;
+                });
+    }
+        
+    /**
      * Does this building have a higher level?
      *
      * @return True if this <code>Building</code> can have a higher level.
@@ -529,7 +555,7 @@ public class Building extends WorkLocation
             // With a unit, also the unit specific bonuses
             : concat(this.getModifiers(id, unitType, turn),
                      colony.getProductionModifiers(goodsType, unitType, this),
-                     unitType.getModifiers(id, type, turn),
+                     getCompetenceModifiers(id, unitType, turn),
                      owner.getModifiers(id, unitType, turn));
     }
 
@@ -540,6 +566,14 @@ public class Building extends WorkLocation
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (buildingType == null) ? Collections.<ProductionType>emptyList()
             : getType().getAvailableProductionTypes(unattended);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public float getCompetenceFactor() {
+        return getType().getCompetenceFactor();
     }
 
     /**

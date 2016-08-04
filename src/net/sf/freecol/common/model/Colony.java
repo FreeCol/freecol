@@ -62,9 +62,6 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
 
-    /** The level of the factory buildings. */
-    public static final int FACTORY_LEVEL = 3;
-    
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,

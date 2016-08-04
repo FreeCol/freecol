@@ -49,12 +49,13 @@
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
 
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
+      <xs:attribute name="competence-factor" use="optional" type="xs:float"/>
       <xs:attribute name="experts-with-connections-production" use="optional"
                     type="xs:int"/>
       <xs:attribute name="maximum-skill" type="xs:int"/>
       <xs:attribute name="minimum-skill" type="xs:int"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="rebel-factor" type="xs:float"/>
+      <xs:attribute name="rebel-factor" use="optional" type="xs:float"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="upgrades-from" type="BuildingTypeId"/>
       <xs:attribute name="upkeep" type="xs:int"/>

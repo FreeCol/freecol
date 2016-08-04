@@ -870,13 +870,21 @@ public abstract class WorkLocation extends UnitLocation
     public abstract List<ProductionType> getAvailableProductionTypes(boolean unattended);
 
     /**
+     * Get a work location specific factor to multiply any goods-specific
+     * unit production bonuses by.
+     *
+     * @return The competence factor.
+     */
+    public abstract float getCompetenceFactor();
+
+    /**
      * Get a work location specific factor to multiply the colony
      * rebel bonus by.
      *
      * @return The rebel factor.
      */
     public abstract float getRebelFactor();
-       
+      
     /**
      * Evaluate this work location for a given player.
      * To be overridden by subclasses.

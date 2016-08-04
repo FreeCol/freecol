@@ -58,6 +58,11 @@ public final class BuildingType extends BuildableType {
     /** Maximum production from the "experts have connections" option. */
     private int expertConnectionProduction = 0;
     
+    /**
+     * A multiplier for any unit goods-specific bonus for this building type.
+     */
+    private float competenceFactor = 1.0f;
+
     /** The multiplier for the colony rebel bonus for this building type. */
     private float rebelFactor = 1.0f;
     
@@ -118,6 +123,16 @@ public final class BuildingType extends BuildableType {
      */
     public int getExpertWithConnectionsProduction() {
         return this.expertConnectionProduction;
+    }
+
+    /**
+     * Get a work location specific factor to multiply any unit goods specific
+     * bonuses by.
+     *
+     * @return The competence factor.
+     */
+    public float getCompetenceFactor() {
+        return this.competenceFactor;
     }
 
     /**
@@ -366,6 +381,7 @@ public final class BuildingType extends BuildableType {
 
     // Serialization
 
+    private static final String COMPETENCE_FACTOR_TAG = "competence-factor";
     private static final String EXPERTS_WITH_CONNECTION_PRODUCTION_TAG
         = "experts-with-connections-production";
     private static final String MAXIMUM_SKILL_TAG = "maximum-skill";
@@ -419,6 +435,8 @@ public final class BuildingType extends BuildableType {
 
         xw.writeAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
                           this.expertConnectionProduction);
+
+        xw.writeAttribute(COMPETENCE_FACTOR_TAG, this.competenceFactor);
 
         xw.writeAttribute(REBEL_FACTOR_TAG, this.rebelFactor);
     }
@@ -486,6 +504,9 @@ public final class BuildingType extends BuildableType {
         this.expertConnectionProduction
             = xr.getAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
                               parent.expertConnectionProduction);
+
+        this.competenceFactor = xr.getAttribute(COMPETENCE_FACTOR_TAG,
+                                                parent.competenceFactor);
 
         this.rebelFactor = xr.getAttribute(REBEL_FACTOR_TAG,
                                            parent.rebelFactor);
