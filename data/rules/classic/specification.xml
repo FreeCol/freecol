@@ -1806,7 +1806,7 @@
                price="1000" skill="1" expert-production="model.goods.hammers"
                recruit-probability="1" score-value="4">
       <modifier id="model.goods.hammers" index="30"
-                type="multiplicative" value="2"/>
+                type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller" extends="colonist"
                price="1100" skill="2" expert-production="model.goods.rum"
@@ -2186,6 +2186,7 @@
     <building-type id="model.building.lumberMill"
                    extends="model.building.carpenterHouse"
                    upgrades-from="model.building.carpenterHouse"
+                   competence-factor="2" rebel-factor="2"
                    required-population="3" upkeep="10">
       <production>
         <input goods-type="model.goods.lumber" value="6"/>

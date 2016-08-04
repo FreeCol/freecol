@@ -70,6 +70,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.furFactory");
     private static final BuildingType ironWorksType
         = spec().getBuildingType("model.building.ironWorks");
+    private static final BuildingType lumberMillType
+        = spec().getBuildingType("model.building.lumberMill");
     private static final BuildingType newspaperType
         = spec().getBuildingType("model.building.newspaper");
     private static final BuildingType printingPressType
@@ -1000,7 +1002,29 @@ public class BuildingTest extends FreeColTestCase {
         }
     }
 
-    // Tools production data contributed by Lone_Wolf in BR#2979.
+    // Lumber production data contributed by Lone_Wolf in BR#2981.
+    private static int lumberProd[][][] = {
+        { // carpenterHouse
+            { 0, 0, 0, 1, 4 }, // -2
+            { 0, 0, 1, 2, 5 }, // -1
+            { 1, 1, 2, 3, 6 }, // 0
+            { 2, 2, 3, 4, 7 }, // +1
+            { 3, 3, 4, 5, 8 }, // +2
+        }, { // lumber mill
+            { 0, 0, 0, 2, 8 }, // -2
+            { 0, 0, 2, 4, 10 }, // -1
+            { 2, 2, 4, 6, 12 }, // 0
+            { 4, 4, 6, 8, 14 }, // +1
+            { 6, 6, 8, 10, 16 }, // +2
+        }
+    };
+    private static final BuildingType[] lumberBuildings = new BuildingType[] {
+        carpenterHouseType, lumberMillType };
+    public void testCarpenter() {
+        productionTest(lumberBuildings, lumberProd);
+    }
+    
+    // Factory production data contributed by Lone_Wolf in BR#2979.
     private static int factoryProd[][][] = {
         { // house
             { 0, 0, 0, 1, 2 }, // -2
