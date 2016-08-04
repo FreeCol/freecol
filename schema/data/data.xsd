@@ -22,7 +22,7 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="data-specification.xsd" />
+  <xs:include schemaLocation="../spec/spec.xsd" />
 
   <xs:include schemaLocation="data-building.xsd" />
   <xs:include schemaLocation="data-colony.xsd" />

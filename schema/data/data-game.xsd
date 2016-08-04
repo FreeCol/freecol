@@ -23,7 +23,7 @@
   </xs:annotation>
 
 
-  <xs:include schemaLocation="data-specification.xsd" />
+  <xs:include schemaLocation="../spec/spec.xsd" />
   
   <xs:include schemaLocation="data-nationOptions.xsd" />
   <xs:include schemaLocation="data-player.xsd" />

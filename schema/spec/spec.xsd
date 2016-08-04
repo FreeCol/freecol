@@ -114,25 +114,25 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="../common/spec-model.xsd" />
-  <xs:include schemaLocation="../common/spec-building-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-disasters.xsd"/>
+  <xs:include schemaLocation="spec-model.xsd" />
+  <xs:include schemaLocation="spec-building-types.xsd"/>
+  <xs:include schemaLocation="spec-disasters.xsd"/>
   <!-- @compat 0.10.x -->
-  <xs:include schemaLocation="../common/spec-equipment-types.xsd"/>
+  <xs:include schemaLocation="spec-equipment-types.xsd"/>
   <!-- end @compat 0.10.x -->
-  <xs:include schemaLocation="../common/spec-events.xsd"/>
-  <xs:include schemaLocation="../common/spec-founding-fathers.xsd"/>
-  <xs:include schemaLocation="../common/spec-goods-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-modifiers.xsd"/>
-  <xs:include schemaLocation="../common/spec-nations.xsd"/>
-  <xs:include schemaLocation="../common/spec-options.xsd"/>
-  <xs:include schemaLocation="../common/spec-resource-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-roles.xsd"/>
-  <xs:include schemaLocation="../common/spec-tile-improvement.xsd"/>
-  <xs:include schemaLocation="../common/spec-tile-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-unit-change-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-unit-types.xsd"/>
-  <xs:include schemaLocation="../common/spec-common.xsd"/>
+  <xs:include schemaLocation="spec-events.xsd"/>
+  <xs:include schemaLocation="spec-founding-fathers.xsd"/>
+  <xs:include schemaLocation="spec-goods-types.xsd"/>
+  <xs:include schemaLocation="spec-modifiers.xsd"/>
+  <xs:include schemaLocation="spec-nations.xsd"/>
+  <xs:include schemaLocation="spec-options.xsd"/>
+  <xs:include schemaLocation="spec-resource-types.xsd"/>
+  <xs:include schemaLocation="spec-roles.xsd"/>
+  <xs:include schemaLocation="spec-tile-improvement.xsd"/>
+  <xs:include schemaLocation="spec-tile-types.xsd"/>
+  <xs:include schemaLocation="spec-unit-change-types.xsd"/>
+  <xs:include schemaLocation="spec-unit-types.xsd"/>
+  <xs:include schemaLocation="spec-common.xsd"/>
 
   <xs:element name="freecol-specification">
     <xs:complexType>

@@ -22,7 +22,7 @@
     </xs:documentation>
   </xs:annotation>
 
-  <xs:include schemaLocation="../common/spec-model.xsd" />
+  <xs:include schemaLocation="../spec/spec-model.xsd" />
 
   <xs:element name="nationOptions">
     <xs:annotation>
