@@ -43,6 +43,8 @@ public class BuildingTest extends FreeColTestCase {
 
     private static final BuildingType armoryType
         = spec().getBuildingType("model.building.armory");
+    private static final BuildingType arsenalType
+        = spec().getBuildingType("model.building.arsenal");
     private static final BuildingType blacksmithHouseType
         = spec().getBuildingType("model.building.blacksmithHouse");
     private static final BuildingType blacksmithShopType
@@ -77,6 +79,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.ironWorks");
     private static final BuildingType lumberMillType
         = spec().getBuildingType("model.building.lumberMill");
+    private static final BuildingType magazineType
+        = spec().getBuildingType("model.building.magazine");
     private static final BuildingType newspaperType
         = spec().getBuildingType("model.building.newspaper");
     private static final BuildingType printingPressType
@@ -181,6 +185,10 @@ public class BuildingTest extends FreeColTestCase {
             .getFoundingFather("model.foundingFather.adamSmith"));
 
         Building building = colony.getBuilding(buildings[0]);
+        if (building == null) {
+            building = new ServerBuilding(game, colony, buildings[0]);
+            colony.addBuilding(building);
+        }
         while (building.getType() != buildings[0]) building.upgrade();
         clearBuilding(building);
         // Add goods so production is viable
@@ -1032,6 +1040,8 @@ public class BuildingTest extends FreeColTestCase {
         productionTest(lumberBuildings, lumberProd);
     }
 
+    // Cross production is very like lumber production, with the addition of
+    // the unattended production.
     private static int crossProd[][][] = {
         { // church
             { 2, 2, 2, 3, 6 }, // -2
@@ -1085,16 +1095,19 @@ public class BuildingTest extends FreeColTestCase {
         tobacconistHouseType, tobacconistShopType, cigarFactoryType };
     private static final BuildingType[] toolBuildings = new BuildingType[] {
         blacksmithHouseType, blacksmithShopType, ironWorksType };
+    private static final BuildingType[] musketBuildings = new BuildingType[] {
+        armoryType, magazineType, arsenalType };
     public void testFactoryProduction() {
         productionTest(clothBuildings, factoryProd);
         productionTest(clothBuildings, factoryProd);
         productionTest(sugarBuildings, factoryProd);
         productionTest(tobaccoBuildings, factoryProd);
         productionTest(toolBuildings, factoryProd);
-        // Testing muskets below
+        productionTest(musketBuildings, factoryProd);
     }
         
     public void testToolsMusketProduction() {
+        // Test the interaction between tools and muskets
         Game game = getGame();
         game.setMap(getTestMap(true));
 
