@@ -1794,7 +1794,7 @@
                price="1500" skill="3" expert-production="model.goods.crosses"
                recruit-probability="1" score-value="6">
       <modifier id="model.goods.crosses" index="30"
-                type="multiplicative" value="2"/>
+                type="additive" value="3"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman" extends="colonist"
                price="1900" skill="3" expert-production="model.goods.bells"
@@ -2487,6 +2487,7 @@
     <building-type id="model.building.cathedral"
                    extends="model.building.church"
                    upgrades-from="model.building.church"
+                   competence-factor="2" rebel-factor="2"
                    required-population="8" upkeep="15">
       <production unattended="true">
         <output goods-type="model.goods.crosses" value="3"/>

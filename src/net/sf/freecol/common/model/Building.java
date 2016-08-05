@@ -548,15 +548,15 @@ public class Building extends WorkLocation
         final Player owner = getOwner();
         final Turn turn = getGame().getTurn();
 
-        return (unitType == null)
-            // With no unit, only the building-specific bonuses 
-            ? concat(colony.getModifiers(id, type, turn),
-                     owner.getModifiers(id, type, turn))
-            // With a unit, also the unit specific bonuses
-            : concat(this.getModifiers(id, unitType, turn),
+        return (unitType != null)
+            // With a unit, unit specific bonuses apply
+            ? concat(this.getModifiers(id, unitType, turn),
                      colony.getProductionModifiers(goodsType, unitType, this),
                      getCompetenceModifiers(id, unitType, turn),
-                     owner.getModifiers(id, unitType, turn));
+                     owner.getModifiers(id, unitType, turn))
+            // With no unit, only the building-specific bonuses 
+            : concat(colony.getModifiers(id, type, turn),
+                     owner.getModifiers(id, type, turn));
     }
 
     /**

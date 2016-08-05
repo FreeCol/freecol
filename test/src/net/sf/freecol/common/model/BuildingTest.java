@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Tile;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.model.ServerBuilding;
@@ -48,8 +49,12 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.blacksmithShop");
     private static final BuildingType carpenterHouseType
         = spec().getBuildingType("model.building.carpenterHouse");
+    private static final BuildingType cathedralType
+        = spec().getBuildingType("model.building.cathedral");
     private static final BuildingType chapelType
         = spec().getBuildingType("model.building.chapel");
+    private static final BuildingType churchType
+        = spec().getBuildingType("model.building.church");
     private static final BuildingType cigarFactoryType
         = spec().getBuildingType("model.building.cigarFactory");
     private static final BuildingType countryType
@@ -176,13 +181,13 @@ public class BuildingTest extends FreeColTestCase {
             .getFoundingFather("model.foundingFather.adamSmith"));
 
         Building building = colony.getBuilding(buildings[0]);
+        while (building.getType() != buildings[0]) building.upgrade();
         clearBuilding(building);
         // Add goods so production is viable
-        forEach(building.getBestProductionType(false, null).getInputs(),
-            ag -> colony.addGoods(ag.getType(), 50));
-        GoodsType outputType = first(building.getBestProductionType(false, null)
-            .getOutputs()).getType();
-        
+        ProductionType pt = building.getBestProductionType(false, null);
+        assertNotNull(pt);
+        forEach(pt.getInputs(), ag -> colony.addGoods(ag.getType(), 50));
+        GoodsType outputType = first(pt.getOutputs()).getType();
         UnitType[] unitTypes = new UnitType[] {
             indianConvertType, pettyCriminalType, indenturedServantType,
             freeColonistType, building.getExpertUnitType() };
@@ -220,7 +225,10 @@ public class BuildingTest extends FreeColTestCase {
                     assertEquals(outputType, worker.getWorkType());
                     colony.invalidateCache();
                     assertEquals(colony.getProductionBonus(), level);
-                        
+
+                    //System.err.println("PM " + outputType.getSuffix()+"/"+bt.getSuffix() + "/" + ut.getSuffix() + " PI=" + building.getProductionInfo());
+                    //forEach(building.getProductionModifiers(outputType, ut), m -> System.err.println("M=" + m));
+
                     // At last! The test.
                     sb.setLength(0);
                     sb.append(outputType.getSuffix())
@@ -1002,7 +1010,7 @@ public class BuildingTest extends FreeColTestCase {
         }
     }
 
-    // Lumber production data contributed by Lone_Wolf in BR#2981.
+    // Lumber and cross production data contributed by Lone_Wolf in BR#2981.
     private static int lumberProd[][][] = {
         { // carpenterHouse
             { 0, 0, 0, 1, 4 }, // -2
@@ -1020,8 +1028,29 @@ public class BuildingTest extends FreeColTestCase {
     };
     private static final BuildingType[] lumberBuildings = new BuildingType[] {
         carpenterHouseType, lumberMillType };
-    public void testCarpenter() {
+    public void testLumberProduction() {
         productionTest(lumberBuildings, lumberProd);
+    }
+
+    private static int crossProd[][][] = {
+        { // church
+            { 2, 2, 2, 3, 6 }, // -2
+            { 2, 2, 3, 4, 7 }, // -1
+            { 3, 3, 4, 5, 8 }, // 0
+            { 4, 4, 5, 6, 9 }, // +1
+            { 5, 5, 6, 7, 10 }, // +2
+        }, { // cathedral
+            { 3, 3, 3, 5, 11 }, // -2
+            { 3, 3, 5, 7, 13 }, // -1
+            { 5, 5, 7, 9, 15 }, // 0
+            { 7, 7, 9, 11, 17 }, // +1
+            { 9, 9, 11, 13, 19 }, // +2
+        }
+    };
+    private static final BuildingType[] crossBuildings = new BuildingType[] {
+        churchType, cathedralType };
+    public void testCrossProduction() {
+        productionTest(crossBuildings, crossProd);
     }
     
     // Factory production data contributed by Lone_Wolf in BR#2979.

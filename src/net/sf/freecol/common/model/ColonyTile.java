@@ -458,8 +458,8 @@ public class ColonyTile extends WorkLocation {
                      unitType.getModifiers(id, type, turn),
                      ((owner == null) ? null
                          : owner.getModifiers(id, unitType, turn)))
-            : (isColonyCenterTile())
             // Unattended only possible in center, colony modifiers apply
+            : (isColonyCenterTile())
             ? concat(workTile.getProductionModifiers(goodsType, null),
                      colony.getProductionModifiers(goodsType, null, this),
                      colony.getModifiers(id, null, turn),
