@@ -162,8 +162,8 @@ public final class GoodsType extends FreeColSpecObjectType {
      *
      * @return True if this is a military goods type.
      */
-    public boolean isMilitaryGoods() {
-        return isMilitary;
+    public boolean getMilitary() {
+        return this.isMilitary;
     }
 
     // @compat 0.10.x

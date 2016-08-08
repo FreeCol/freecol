@@ -893,7 +893,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 price /= 2;
                 break;
             case ANGRY:
-                if (!goods.getType().isMilitaryGoods())
+                if (!goods.getType().getMilitary())
                     return Constants.NO_TRADE_HOSTILE;
                 price /= 2;
                 break;

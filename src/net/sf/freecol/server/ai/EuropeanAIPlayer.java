@@ -2678,7 +2678,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
                 lb.add("rejected: breedable-type-", goodsType.getSuffix(),
                        "-present-in-", n, "-settlements.");
             }
-        } else if (goodsType.isMilitaryGoods()
+        } else if (goodsType.getMilitary()
             || goodsType.isTradeGoods()
             || goodsType.isBuildingMaterial()) {
             // By age 3 we should be able to produce enough ourselves.

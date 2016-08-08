@@ -739,7 +739,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         }
 
         int price = 0;
-        if (type.isMilitaryGoods()) {
+        if (type.getMilitary()) {
             // Might return zero if a surplus is present
             price = getMilitaryGoodsPriceToBuy(type, amount);
         }
@@ -824,7 +824,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final List<Role> militaryRoles = Role.getAvailableRoles(getOwner(),
             unitType, spec.getMilitaryRolesList());
 
-        if (type.isMilitaryGoods()) { // Retain enough goods to fully arm
+        if (type.getMilitary()) { // Retain enough goods to fully arm
             return sum(getOwnedUnits(),
                        u -> !militaryRoles.contains(u.getRole()),
                        u -> AbstractGoods.getCount(type, 
@@ -908,7 +908,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // - military goods at double value
         // - trade goods at +50%
         int price = amount + Math.max(0, 11 * getPriceToBuy(type, amount) / 10);
-        if (type.isMilitaryGoods()) {
+        if (type.getMilitary()) {
             price = Math.max(price, amount * full * 2);
         } else if (type.isTradeGoods()) {
             price = Math.max(price, 150 * amount * full / 100);
@@ -975,25 +975,17 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Allows spread of horses and arms between settlements
      *
-     * FIXME: the hardwired goods/equipment types are a wart.
-     *
      * @param is The other <code>IndianSettlement</code> to trade with.
      */
     public void tradeGoodsWithSettlement(IndianSettlement is) {
-        GoodsType armsType = getSpecification().getGoodsType("model.goods.muskets");
-        GoodsType horsesType = getSpecification().getGoodsType("model.goods.horses");
-        List<GoodsType> goodsToTrade = new ArrayList<>();
-        goodsToTrade.add(armsType);
-        goodsToTrade.add(horsesType);
-
-        for (GoodsType goods : goodsToTrade) {
-            int goodsInStock = getGoodsCount(goods);
-            if (goodsInStock <= 50) {
-                continue;
-            }
+        final Specification spec = getSpecification();
+        for (GoodsType gt : transform(spec.getGoodsTypeList(),
+                                      GoodsType::getMilitary)) {
+            int goodsInStock = getGoodsCount(gt);
+            if (goodsInStock <= 50) continue; // FIXME: magic number
             int goodsTraded = goodsInStock / 2;
-            is.addGoods(goods, goodsTraded);
-            removeGoods(goods, goodsTraded);
+            is.addGoods(gt, goodsTraded);
+            this.removeGoods(gt, goodsTraded);
         }
     }
 
@@ -1025,7 +1017,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         final Function<GoodsType, GoodsType> identity = Function.identity();
         final java.util.Map<GoodsType, Integer> prices
             = transform(spec.getGoodsTypeList(),
-                        gt -> !gt.isMilitaryGoods() && gt.isStorable(),
+                        gt -> !gt.getMilitary() && gt.isStorable(),
                         identity,
                         Collectors.toMap(identity,
                             gt -> getNormalGoodsPriceToBuy(gt,

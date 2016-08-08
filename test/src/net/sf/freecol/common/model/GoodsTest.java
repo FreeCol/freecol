@@ -149,12 +149,12 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testMilitaryGoods() {
-        assertFalse(bellsType.isMilitaryGoods());
-        assertFalse(crossesType.isMilitaryGoods());
-        assertFalse(clothType.isMilitaryGoods());
-        assertFalse(cottonType.isMilitaryGoods());
-        assertTrue(horsesType.isMilitaryGoods());
-        assertTrue(musketsType.isMilitaryGoods());
+        assertFalse(bellsType.getMilitary());
+        assertFalse(crossesType.getMilitary());
+        assertFalse(clothType.getMilitary());
+        assertFalse(cottonType.getMilitary());
+        assertTrue(horsesType.getMilitary());
+        assertTrue(musketsType.getMilitary());
     }
 
     public void testBuildingMaterials() {

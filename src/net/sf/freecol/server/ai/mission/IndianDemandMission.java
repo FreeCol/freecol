@@ -72,7 +72,7 @@ public class IndianDemandMission extends Mission {
     private static final List<Predicate<GoodsType>> selectPredicates
         = new ArrayList<>();
     static {
-        selectPredicates.add(gt -> gt.isMilitaryGoods());
+        selectPredicates.add(gt -> gt.getMilitary());
         selectPredicates.add(gt -> gt.isBuildingMaterial());
         selectPredicates.add(gt -> gt.isTradeGoods());
         selectPredicates.add(gt -> gt.isRefined());
@@ -180,7 +180,7 @@ public class IndianDemandMission extends Mission {
         if (goods == null
             && tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             final Predicate<Goods> angryPred = g ->
-                !g.isFoodType() && !g.getType().isMilitaryGoods();
+                !g.isFoodType() && !g.getType().getMilitary();
             goods = maximize(target.getCompactGoods(), angryPred, marketPrice);
             if (goods != null) goods = makeGoods.apply(goods);
         }

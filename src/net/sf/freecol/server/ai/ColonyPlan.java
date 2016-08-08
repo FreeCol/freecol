@@ -447,7 +447,7 @@ public class ColonyPlan {
                 libertyGoodsTypes.add(g);
             } else if (g.isImmigrationType()) {
                 immigrationGoodsTypes.add(g);
-            } else if (g.isMilitaryGoods()) {
+            } else if (g.getMilitary()) {
                 militaryGoodsTypes.add(g);
             } else if (g.isRawBuildingMaterial()) {
                 rawBuildingGoodsTypes.add(g);
@@ -630,7 +630,7 @@ public class ColonyPlan {
             // Handles building, agriculture, furTrapping advantages
             factor *= 1.2;
         }
-        if (goodsType.isMilitaryGoods()) {
+        if (goodsType.getMilitary()) {
             if ("conquest".equals(advantage)) factor = 1.2;
             ret = prioritize(type, MILITARY_WEIGHT * factor,
                 1.0/*FIXME: amount present wrt amount to equip*/);
