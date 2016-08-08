@@ -899,7 +899,7 @@ public final class UnitType extends BuildableType implements Consumer {
         // @compat 0.11.6
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             spec.setNeedUnitChangeTypes();
-            xr.closeTag(tag);
+            xr.closeTag(tag, Scope.getTagName());
         // end @compat 0.11.6
             
         } else {

@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Specification;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIMain;
 
@@ -279,6 +280,26 @@ public class FreeColXMLReader extends StreamReaderDelegate
         expectTag(tag);
     }
 
+    /**
+     * Close the current tag, but accept some alternative elements first.
+     *
+     * @param tag The expected tag to close.
+     * @param others Alternate elements to accept.
+     * @exception XMLStreamException if a closing tag is not found.
+     */
+    public void closeTag(String tag, String... others) throws XMLStreamException {
+        for (int next = nextTag(); next != XMLStreamConstants.END_ELEMENT;
+             next = nextTag()) {
+            String at = find(others, s -> atTag(s));
+            if (at == null) {
+                throw new XMLStreamException("Parse error, END_ELEMENT(" + tag
+                    + " or alternatives) expected, not: " + getLocalName());
+            }
+            closeTag(at);
+        }
+        expectTag(tag);
+    }
+            
     /**
      * Extract the current tag and its attributes from an input stream.
      * Useful for error messages.
