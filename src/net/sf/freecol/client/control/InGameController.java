@@ -426,17 +426,6 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * End a native trade.
-     *
-     * @param nt The <code>NativeTrade</code> to finish.
-     */
-    private void askEndNativeTradeSession(NativeTrade nt) {
-        if (askServer().endNativeTradeSession(nt)) {
-            this.nativeTrades.remove(nt.getKey());
-        }
-    }
-
-    /**
      * Load some goods onto a carrier.
      *
      * @param loc The <code>Location</code> to load from.
@@ -1740,55 +1729,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        if (!askServer().newNativeTradeSession(unit, is)) return true;
-
-        NativeTrade nt = this.nativeTrades.get(NativeTrade.getKey(unit, is));
-        if (nt == null) return true;
-        boolean buy = nt.getBuy();
-        boolean sel = nt.getSell();
-        boolean gif = nt.getGift();
-        StringTemplate baseTemplate = StringTemplate
-            .template("tradeProposition.welcome")
-            .addStringTemplate("%nation%",
-                is.getOwner().getNationLabel())
-            .addName("%settlement%", is.getName());
-        StringTemplate template = baseTemplate;
-        while (buy || sel || gif) {
-            // The session tracks buy/sell/gift events and disables
-            // them when one happens.  So only offer such options if
-            // the session allows it and the carrier is in good shape.
-            buy = buy && unit.hasSpaceLeft();
-            sel = sel && unit.hasGoodsCargo();
-            gif = gif && unit.hasGoodsCargo();
-
-            TradeAction act = getGUI().getIndianSettlementTradeChoice(is,
-                template, buy, sel, gif);
-            if (act == null) break;
-            StringTemplate t = null;
-            switch (act) {
-            case BUY:
-                t = attemptBuyFromSettlement(unit, is);
-                if (t == null) buy = false;
-                break;
-            case SELL:
-                t = attemptSellToSettlement(unit, is);
-                if (t == null) sel = false;
-                break;
-            case GIFT:
-                t = attemptGiftToSettlement(unit, is);
-                if (t == null) gif = false;
-                break;
-            default:
-                logger.warning("showIndianSettlementTradeDialog fail: "
-                    + act);
-                continue;
-            }
-            template = (t == null || t == abortTrade) ? baseTemplate : t;
-        }
-
-        askEndNativeTradeSession(nt);
-        if (unit.getMovesLeft() > 0) getGUI().setActiveUnit(unit); // No trade?
-        return false;
+        return !askServer().newNativeTradeSession(unit, is);
     }
 
     /**
@@ -4104,7 +4045,76 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void nativeTrade(NativeTrade nt) {
         if (nt == null) return;
-        this.nativeTrades.put(nt.getKey(), nt);
+        switch (nt.getAction()) { // Only consider actions returned by server
+        case HOSTILE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHaggle"));
+            return;
+        case HAGGLE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHaggle"));
+            return;
+        case UPDATE: // normal case continues below
+            break;
+        case INVALID: // should not happen
+        default:
+            logger.warning("Bogus native trade: " + nt.toString());
+            return;
+        }
+
+        final IndianSettlement is = nt.getIndianSettlement();
+        final Unit unit = nt.getUnit();
+        if (!getMyPlayer().owns(unit)) {
+            logger.warning("We do not own the trading unit: " + unit);
+            return;
+        }
+
+        boolean buy = nt.getBuy();
+        boolean sel = nt.getSell();
+        boolean gif = nt.getGift();
+        StringTemplate baseTemplate = StringTemplate
+            .template("tradeProposition.welcome")
+            .addStringTemplate("%nation%",
+                is.getOwner().getNationLabel())
+            .addName("%settlement%", is.getName());
+        StringTemplate template = baseTemplate;
+        while (buy || sel || gif) {
+            // The session tracks buy/sell/gift events and disables
+            // them when one happens.  So only offer such options if
+            // the session allows it and the carrier is in good shape.
+            buy = buy && unit.hasSpaceLeft();
+            sel = sel && unit.hasGoodsCargo();
+            gif = gif && unit.hasGoodsCargo();
+
+            TradeAction act = getGUI().getIndianSettlementTradeChoice(is,
+                template, buy, sel, gif);
+            if (act == null) break;
+            StringTemplate t = null;
+            switch (act) {
+            case BUY:
+                t = attemptBuyFromSettlement(unit, is);
+                if (t == null) buy = false;
+                break;
+            case SELL:
+                t = attemptSellToSettlement(unit, is);
+                if (t == null) sel = false;
+                break;
+            case GIFT:
+                t = attemptGiftToSettlement(unit, is);
+                if (t == null) gif = false;
+                break;
+            default:
+                logger.warning("showIndianSettlementTradeDialog fail: "
+                    + act);
+                continue;
+            }
+            template = (t == null || t == abortTrade) ? baseTemplate : t;
+        }
+
+        if (askServer().endNativeTradeSession(nt)) {
+            // Might have done nothing, allow unit to resume.
+            if (unit.getMovesLeft() > 0) getGUI().setActiveUnit(unit);
+        }
     }
 
     /**

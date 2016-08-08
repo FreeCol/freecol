@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
@@ -336,8 +337,16 @@ public abstract class AIPlayer extends AIObject {
     public abstract void registerSellGoods(Goods goods);
 
     /**
+     * Handle a native trade request.
+     *
+     * @param nt The <code>NativeTrade</code> to handle.
+     */
+    public abstract void handleTrade(NativeTrade nt);
+    
+    /**
      * Called when another <code>Player</code> proposes to buy.
      *
+     * Deprecating, this is being replaced by handleTrade.
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
@@ -353,6 +362,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Called when another <code>Player</code> proposes a sale.
      *
+     * Deprecating, this is being replaced by handleTrade.
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and

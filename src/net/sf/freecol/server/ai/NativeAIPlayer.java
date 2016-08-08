@@ -48,6 +48,8 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.HaggleItem;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -794,6 +796,48 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
 
         return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handleTrade(NativeTrade nt) {
+        if (nt == null) return;
+        if (!this.getPlayer().owns(nt.getIndianSettlement())) {
+            nt.setAction(NativeTrade.NativeTradeAction.INVALID);
+            return;
+        }
+        final Specification spec = getSpecification();
+        final IndianSettlement is = nt.getIndianSettlement();
+        final Unit unit = nt.getUnit();
+        final Player other = unit.getOwner();
+        final Turn turn = getGame().getTurn();
+
+        switch (nt.getAction()) {
+        case OPEN:
+            int anger = 1;
+            switch (is.getAlarm(other).getLevel()) {
+            case HAPPY: case CONTENT:
+                break;
+            case DISPLEASED:
+                anger = 2;
+                break;
+            case ANGRY:
+                anger = (any(nt.getBuying(), hi -> hi.goods.getType().getMilitary()))
+                    ? 3 : -1;
+                break;
+            default:
+                anger = -1;
+                break;
+            }
+            nt.setAction((anger < 0) ? NativeTrade.NativeTradeAction.HOSTILE
+                : NativeTrade.NativeTradeAction.UPDATE);
+            break;
+        default: // NYI
+            nt.setAction(NativeTrade.NativeTradeAction.INVALID);
+            break;
+        }
     }
 
     /**

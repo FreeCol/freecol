@@ -98,17 +98,15 @@ public class NativeTradeMessage extends DOMMessage {
      * Handle a "nativeTrade"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      * @return A reply encapsulating the possibilities for this
      *     trade, or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         return server.getInGameController()
-            .nativeTrade(serverPlayer, getAction(), getNativeTrade())
+            .nativeTrade(serverPlayer, getNativeTrade())
             .build(serverPlayer);
     }
 

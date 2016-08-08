@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -2557,6 +2558,14 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return result;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handleTrade(NativeTrade nt) {
+        nt.setAction(NativeTrade.NativeTradeAction.INVALID);
+    }
 
     /**
      * {@inheritDoc}

@@ -46,20 +46,40 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class NativeTrade extends FreeColGameObject {
 
+    /** Container class for goods being traded. */
+    public static class HaggleItem {
+        public AbstractGoods goods;
+        public int price;
+        public int haggleCount;
+    };
+    
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
 
     /** The type of native trade command. */
     public static enum NativeTradeAction {
-        UPDATE,     // Server update of a session, rest are client-sent
-        OPEN,       // Start a new trade session
-        CLOSE,      // End an existing session
-        BUY,        // Buy goods
-        SELL,       // Sell goods
-        GIFT,       // Gift goods
-        PRICE_BUY,  // Get a price to buy
-        PRICE_SELL, // Get a price to sell
+        UPDATE(false),   // Server update of a session, rest are client-sent
+        OPEN(false),     // Start a new trade session
+        CLOSE(true),     // End an existing session
+        BUY(false),      // Buy goods
+        SELL(false),     // Sell goods
+        GIFT(false),     // Gift goods
+        // Rejections
+        INVALID(true),   // Trade is completely invalid
+        HOSTILE(true),   // Natives are hostile
+        HAGGLE(true);    // Trade failed due to too much haggling
+
+        /** Does this action close the trade? */
+        private final boolean closing;
+
+        NativeTradeAction(boolean closing) {
+            this.closing = closing;
+        }
+
+        public boolean isClosing() {
+            return this.closing;
+        }
     };
 
     /** Trading result types. */
@@ -200,7 +220,15 @@ public class NativeTrade extends FreeColGameObject {
         this.count = -1;
     }
 
+    public List<HaggleItem> getBuying() {
+        return Collections.<HaggleItem>emptyList();
+    }
 
+    public List<HaggleItem> getSelling() {
+        return Collections.<HaggleItem>emptyList();
+    }
+
+    
     // Override FreeColGameObject
 
     /**

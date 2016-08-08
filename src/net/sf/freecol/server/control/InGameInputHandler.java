@@ -434,14 +434,6 @@ public final class InGameInputHandler extends ServerInputHandler {
                 return new NativeGiftMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
-        register(NativeTradeMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new NativeTradeMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
         register(NewLandNameMessage.getTagName(),
                  new CurrentPlayerNetworkRequestHandler(freeColServer) {
             @Override
@@ -606,6 +598,10 @@ public final class InGameInputHandler extends ServerInputHandler {
         register(HighScoreMessage.getTagName(),
             (Connection connection, Element element) ->
             new HighScoreMessage(getGame(), element)
+                .handle(freeColServer, connection));
+        register(NativeTradeMessage.getTagName(),
+            (Connection connection, Element element) ->
+            new NativeTradeMessage(getGame(), element)
                 .handle(freeColServer, connection));
         register("retire",
             (Connection connection, Element element) ->

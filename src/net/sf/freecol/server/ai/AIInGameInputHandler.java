@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
@@ -169,6 +170,8 @@ public final class AIInGameInputHandler implements MessageHandler {
                 reply = multiple(connection, element); break;
             case NationSummaryMessage.TAG:
                 reply = nationSummary(connection, element); break;
+            case NativeTradeMessage.TAG:
+                reply = nativeTrade(connection, element); break;
             case "newLandName":
                 reply = newLandName(connection, element); break;
             case "newRegionName":
@@ -193,7 +196,6 @@ public final class AIInGameInputHandler implements MessageHandler {
             case GoodsForSaleMessage.TAG:
             case "logout":
             case NativeGiftMessage.TAG:
-            case NativeTradeMessage.TAG:
             case "newTurn":
             case "newTradeRoute":
             case "remove":
@@ -433,7 +435,25 @@ public final class AIInGameInputHandler implements MessageHandler {
             + " for AI " + player.getSuffix());
         return null;
     }
-    
+
+    /**
+     * Handle a native trade message.
+     *
+     * @param connection The <code>Connection</code> the element arrived on.
+     * @param element The <code>Element</code> to process.
+     * @return An <code>Element</code> containing the response/s.
+     */
+    private Element nativeTrade(
+        @SuppressWarnings("unused") Connection connection,
+        Element element) {
+        final NativeTradeMessage message
+            = new NativeTradeMessage(aiMain.getGame(), element);
+        final NativeTrade nt = message.getNativeTrade();
+
+        getAIPlayer().handleTrade(nt);
+        return new NativeTradeMessage(nt).toXMLElement();
+    }
+
     /**
      * Replies to offer to name the new land.
      *
