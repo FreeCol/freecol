@@ -2714,10 +2714,16 @@ public final class InGameController extends Controller {
         List<Goods> sellGoods = null;
 
         if (settlement instanceof IndianSettlement) {
+            final Game game = serverPlayer.getGame();
+            int goodsSellNumber = Math.max(1, game.getSpecification()
+                .getInteger(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL));
             IndianSettlement indianSettlement = (IndianSettlement) settlement;
             AIPlayer aiPlayer = getFreeColServer()
                 .getAIPlayer(indianSettlement.getOwner());
-            sellGoods = indianSettlement.getSellGoods(3, unit);
+            sellGoods = indianSettlement.getSellGoods(unit);
+            if (sellGoods.size() > goodsSellNumber) {
+                sellGoods = sellGoods.subList(0, goodsSellNumber);
+            }
             for (Goods goods : sellGoods) {
                 aiPlayer.registerSellGoods(goods);
             }

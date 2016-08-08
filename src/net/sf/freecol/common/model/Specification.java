@@ -2775,6 +2775,11 @@ public final class Specification {
                                   GameOptions.GAMEOPTIONS_MAP, false);
         // end @compat 0.11.3
 
+        // @compat 0.11.6
+        ret |= checkIntegerOption(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL,
+                                  GameOptions.GAMEOPTIONS_MAP, 3);
+        // end @compat 0.11.6
+
         return ret;
     }
 

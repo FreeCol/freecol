@@ -4395,7 +4395,8 @@
         <!-- Missionaries grant visibility and enhance trade and training -->
         <booleanOption id="model.option.enhancedMissionaries"
                        defaultValue="false"/>
-        <!-- The strength of the influence of a Mission to the alarm level of the natives in a settlement -->
+        <!-- The strength of the influence of a Mission to the alarm
+             level of the natives in a settlement -->
         <integerOption id="model.option.missionInfluence"
                        defaultValue="-10" minimumValue="-1000" maximumValue="0"/>
         <!-- Per turn probability that a peaceful native settlement
@@ -4407,6 +4408,10 @@
              settlement. -->
         <percentageOption id="model.option.demandProbability"
                           defaultValue="10" />
+        <!-- Maximum number of goods a native settlement will offer
+             for sale. -->
+        <integerOption id="model.option.settlementNumberOfGoodsToSell"
+                       defaultValue="3" minimumValue="1" maximumValue="99"/>
         <!-- Founding father recruitment continues after declaring
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"

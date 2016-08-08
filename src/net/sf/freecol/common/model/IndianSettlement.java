@@ -933,11 +933,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Sell new world goods first, then by decreasing price, then
      * decreasing amount.
      *
-     * @param limit The maximum number of goods required.
      * @param unit An optional <code>Unit</code> that is trading.
      * @return A list of goods to sell.
      */
-    public List<Goods> getSellGoods(int limit, Unit unit) {
+    public List<Goods> getSellGoods(Unit unit) {
         // Collect all the candidate goods
         List<Goods> result = new ArrayList<>();
         for (Goods g : transform(getCompactGoods(),
@@ -968,7 +967,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
                     (g.getType().isNewWorldGoodsType()) ? 0 : 1)
                 .thenComparing(salePriceComparator)
                 .thenComparing(AbstractGoods.descendingAmountComparator);
-        return sort(result, exportGoodsComparator).subList(0, limit);
+        return sort(result, exportGoodsComparator);
     }
 
 

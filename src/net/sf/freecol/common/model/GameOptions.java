@@ -76,6 +76,10 @@ public class GameOptions {
     public static final String DEMAND_PROBABILITY
         = "model.option.demandProbability";
 
+    /** Maximum number of goods a native settlement will offer for sale. */
+    public static final String SETTLEMENT_NUMBER_OF_GOODS_TO_SELL
+        = "model.option.settlementNumberOfGoodsToSell";
+
     /** Continue recruiting founding fathers after declaring independence. */
     public static final String CONTINUE_FOUNDING_FATHER_RECRUITMENT
         = "model.option.continueFoundingFatherRecruitment";

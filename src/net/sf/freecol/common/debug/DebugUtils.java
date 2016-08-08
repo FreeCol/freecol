@@ -1150,7 +1150,7 @@ public class DebugUtils {
         }
 
         lb.add("\nPotential sales\n");
-        for (Goods g : sis.getSellGoods(sGoodsTypes.size(), null)) {
+        for (Goods g : sis.getSellGoods(null)) {
             lb.add(Messages.getName(g.getType()), " ", g.getAmount(),
                 " = ", sis.getPriceToSell(g.getType(), g.getAmount()), "\n");
         }
