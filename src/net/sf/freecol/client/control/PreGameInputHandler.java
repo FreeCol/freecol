@@ -373,9 +373,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final UpdateGameOptionsMessage message
             = new UpdateGameOptionsMessage(game, element);
 
-        if (message.mergeOptions(game)) {
-            spec.clean("update game options (server initiated)");
-        } else {
+        if (!spec.mergeGameOptions(message.getGameOptions(), "client")) {
             logger.warning("Game option update failed");
         }
         return null;
@@ -394,9 +392,8 @@ public final class PreGameInputHandler extends ClientInputHandler {
         final UpdateMapGeneratorOptionsMessage message
             = new UpdateMapGeneratorOptionsMessage(game, element);
 
-        if (message.mergeOptions(game)) {
-            spec.clean("update map options (server initiated)");
-        } else {
+        if (!spec.mergeMapGeneratorOptions(message.getMapGeneratorOptions(),
+                                           "client")) {
             logger.warning("Map generator option update failed");
         }
         return null;

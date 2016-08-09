@@ -76,21 +76,6 @@ public class UpdateGameOptionsMessage extends DOMMessage {
         return this.options;
     }
 
-    /**
-     * Merge the options in this message into the given game.
-     *
-     * @param game The <code>Game</code> to merge to.
-     * @return True if the merge succeeds.
-     */
-    public boolean mergeOptions(Game game) {
-        boolean result = false;        
-        if (this.options != null) {
-            OptionGroup gameOptions = game.getGameOptions();
-            result = gameOptions.merge(this.options);
-        }
-        return result;
-    }
-
 
     /**
      * Handle a "updateGameOptions"-message.
@@ -109,16 +94,18 @@ public class UpdateGameOptionsMessage extends DOMMessage {
             return serverPlayer.clientError("Not an admin: " + player)
                 .build(serverPlayer);
         }
-        final Game game = freeColServer.getGame();
-        if (!mergeOptions(game)) {
-            return serverPlayer.clientError("Option merge failed")
+        final Specification spec = freeColServer.getGame().getSpecification();
+        if (this.options == null) {
+            return serverPlayer.clientError("No game options to merge")
+                .build(serverPlayer);
+        }
+        if (!spec.mergeGameOptions(this.options, "server")) {
+            return serverPlayer.clientError("Game option merge failed")
                 .build(serverPlayer);
         }
 
-        final Specification spec = game.getSpecification();
-        spec.clean("update game options (server)");
         UpdateGameOptionsMessage message
-            = new UpdateGameOptionsMessage(game.getGameOptions());
+            = new UpdateGameOptionsMessage(spec.getGameOptions());
         freeColServer.sendToAll(message, connection);
         return null;
     }

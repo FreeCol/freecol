@@ -726,6 +726,39 @@ public final class Specification {
     }
 
     /**
+     * Merge in a new set of game options.
+     *
+     * @param newGameOptions The new game options <code>OptionGroup</code>
+     *     to merge.
+     * @param who Where are we, client or server?
+     * @return True if the merge succeeded.
+     */
+    public boolean mergeGameOptions(OptionGroup newGameOptions, String who) {
+        OptionGroup go = getGameOptions();
+        if (!go.merge(newGameOptions)) return false;
+        addOptionGroup(go, true); // make sure allOptions is seeing any changes
+        clean("merged game options (" + who + ")");
+        return true;
+    }
+        
+    /**
+     * Merge in a new set of map options.
+     *
+     * @param newMapGeneratorOptions The new game options
+     *     <code>OptionGroup</code> to merge.
+     * @param who Where are we, client or server?
+     * @return True if the merge succeeded.
+     */
+    public boolean mergeMapGeneratorOptions(OptionGroup newMapGeneratorOptions,
+                                            String who) {
+        OptionGroup go = getMapGeneratorOptions();
+        if (!go.merge(newMapGeneratorOptions)) return false;
+        addOptionGroup(go, true); // make sure allOptions is seeing any changes
+        clean("merged map options (" + who + ")");
+        return true;
+    }
+        
+    /**
      * Call this when old style unit changes are seen, so the spec can
      * load the backward compatiblity fragment.
      */

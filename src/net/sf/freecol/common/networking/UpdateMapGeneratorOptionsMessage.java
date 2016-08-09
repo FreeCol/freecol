@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -75,21 +76,6 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
         return this.options;
     }
 
-    /**
-     * Merge the options in this message into the given game.
-     *
-     * @param game The <code>Game</code> to merge to.
-     * @return True if the merge succeeds.
-     */
-    public boolean mergeOptions(Game game) {
-        boolean result = false;        
-        if (this.options != null) {
-            OptionGroup mapGeneratorOptions = game.getMapGeneratorOptions();
-            result = mapGeneratorOptions.merge(this.options);
-        }
-        return result;
-    }
-
 
     /**
      * Handle a "updateMapGeneratorOptions"-message.
@@ -108,13 +94,18 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
             return serverPlayer.clientError("Not an admin: " + player)
                 .build(serverPlayer);
         }
-        final Game game = freeColServer.getGame();
-        if (!mergeOptions(game)) {
-            return serverPlayer.clientError("Option merge failed")
+        final Specification spec = freeColServer.getGame().getSpecification();
+        if (this.options == null) {
+            return serverPlayer.clientError("No map options to merge")
                 .build(serverPlayer);
         }
-
-        DOMMessage message = new UpdateMapGeneratorOptionsMessage(game.getMapGeneratorOptions());
+        if (!spec.mergeMapGeneratorOptions(this.options, "server")) {
+            return serverPlayer.clientError("Map option merge failed")
+                .build(serverPlayer);
+        }
+            
+        UpdateMapGeneratorOptionsMessage message
+            = new UpdateMapGeneratorOptionsMessage(spec.getMapGeneratorOptions());
         freeColServer.sendToAll(message, connection);
         return null;
     }
