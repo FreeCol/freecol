@@ -587,8 +587,8 @@ public final class Specification {
         }
 
         // Initialize UI containers.
-        for (AbstractOption option : allOptions.values()) {
-            option.generateChoices();
+        for (OptionGroup og : allOptionGroups.values()) {
+            og.generateChoices();
         }
 
         // Initialize the Turn class using GameOptions and messages.

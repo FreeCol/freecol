@@ -634,6 +634,18 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * {@inheritDoc}
      */
     @Override
+    public void generateChoices() {
+        for (Option o : options) {
+            if (o instanceof AbstractOption) {
+                ((AbstractOption)o).generateChoices();
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isNullValueOK() {
         return true;
     }
