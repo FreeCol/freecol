@@ -3358,6 +3358,7 @@ public final class InGameController extends Controller {
             nt = new NativeTrade(nt.getAction(), nt.getUnit(),
                                  nt.getIndianSettlement());
             session = new NativeTradeSession(nt);
+            nt.initializeBuying();
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                    new NativeTradeMessage(nt));
             // Sets unit moves to zero to avoid cheating.  If no

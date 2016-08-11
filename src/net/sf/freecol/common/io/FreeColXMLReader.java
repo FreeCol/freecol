@@ -267,13 +267,24 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
 
     /**
+     * Check if there are more tags in the current element.
+     *
+     * @return True if the stream has not reached the end of the
+     *     current element.
+     * @exception XMLStreamException if there is an error with the stream.
+     */
+    public boolean moreTags() throws XMLStreamException {
+        return nextTag() != XMLStreamConstants.END_ELEMENT;
+    }
+
+    /**
      * Close the current tag, checking that it did indeed close correctly.
      *
      * @param tag The expected tag name.
      * @exception XMLStreamException if a closing tag is not found.
      */
     public void closeTag(String tag) throws XMLStreamException {
-        if (nextTag() != XMLStreamConstants.END_ELEMENT) {
+        if (moreTags()) {
             throw new XMLStreamException("Parse error, END_ELEMENT expected,"
                 + " not: " + getLocalName());
         }

@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -503,7 +502,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         xw.writeStartElement(tag);
 
         for (GoodsType goodsType : sort(storage.keySet())) {
-
+            
             xw.writeStartElement(Goods.getTagName());
 
             xw.writeAttribute(TYPE_TAG, goodsType);
@@ -561,7 +560,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         Map<GoodsType, Integer> storage) throws XMLStreamException {
         final Specification spec = getGame().getSpecification();
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             String tag = xr.getLocalName();
 
             if (Goods.getTagName().equals(tag)) {

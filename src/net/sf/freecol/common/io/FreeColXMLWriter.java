@@ -354,6 +354,8 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      */
     public <T extends FreeColObject> void writeToListElement(String tag,
         Collection<T> members) throws XMLStreamException {
+        if (members.isEmpty()) return;
+        
         writeStartElement(tag);
 
         writeAttribute(FreeColObject.ARRAY_SIZE_TAG, members.size());

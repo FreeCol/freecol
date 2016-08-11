@@ -36,6 +36,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -46,13 +47,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class NativeTrade extends FreeColGameObject {
 
-    /** Container class for goods being traded. */
-    public static class HaggleItem {
-        public AbstractGoods goods;
-        public int price;
-        public int haggleCount;
-    };
-    
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
@@ -108,6 +102,12 @@ public class NativeTrade extends FreeColGameObject {
 
     /** True if no gifts made in this trade. */
     private boolean gift;
+
+    /**
+     * The goods on the unit that are being offered for purchase by
+     * the settlement.
+     */
+    private List<NativeTradeItem> buying = new ArrayList<>();
 
 
     /**
@@ -220,15 +220,24 @@ public class NativeTrade extends FreeColGameObject {
         this.count = -1;
     }
 
-    public List<HaggleItem> getBuying() {
-        return Collections.<HaggleItem>emptyList();
+    public List<NativeTradeItem> getBuying() {
+        return this.buying;
     }
 
-    public List<HaggleItem> getSelling() {
-        return Collections.<HaggleItem>emptyList();
+    public List<NativeTradeItem> getSelling() {
+        return Collections.<NativeTradeItem>emptyList();
     }
 
-    
+    public void initializeBuying() {
+        final Player source = this.unit.getOwner();
+        final Player destination = this.is.getOwner();
+        final Game game = this.unit.getGame();
+        for (Goods g : unit.getGoodsList()) {
+            this.buying.add(new NativeTradeItem(game, source, destination, g));
+        }
+    }
+
+
     // Override FreeColGameObject
 
     /**
@@ -276,6 +285,17 @@ public class NativeTrade extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        for (NativeTradeItem nti : this.buying) nti.toXML(xw);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
         super.readAttributes(xr);
@@ -301,6 +321,36 @@ public class NativeTrade extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers
+        this.buying.clear();
+
+        super.readChildren(xr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
+        Game game = getGame();
+
+        if (NativeTradeItem.getTagName().equals(tag)) {
+            NativeTradeItem nti = new NativeTradeItem(game, xr);
+            if (nti.getSource().isEuropean()) {
+                this.buying.add(nti);
+            }
+
+        } else {
+            super.readChild(xr);
+        }
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getTagName())
@@ -311,8 +361,11 @@ public class NativeTrade extends FreeColGameObject {
             .append(" sell=").append(getSell())
             .append(" gift=").append(getGift())
             .append(" count=").append(getCount())
-            .append(']');
-        return sb.toString();
+            .append(" buying[");
+        for (NativeTradeItem nti : this.buying) {
+            sb.append(' ').append(nti.toString());
+        }
+        return sb.append(" ]]").toString();
     }
 
     /**

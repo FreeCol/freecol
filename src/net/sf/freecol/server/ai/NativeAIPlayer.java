@@ -49,7 +49,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NativeTrade;
-import net.sf.freecol.common.model.NativeTrade.HaggleItem;
+import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -824,15 +824,36 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 anger = 2;
                 break;
             case ANGRY:
-                anger = (any(nt.getBuying(), hi -> hi.goods.getType().getMilitary()))
+                anger = (any(nt.getBuying(),
+                             nti -> nti.getGoods().getType().getMilitary()))
                     ? 3 : -1;
                 break;
             default:
                 anger = -1;
                 break;
             }
-            nt.setAction((anger < 0) ? NativeTrade.NativeTradeAction.HOSTILE
-                : NativeTrade.NativeTradeAction.UPDATE);
+            if (anger < 0) {
+                nt.setAction(NativeTrade.NativeTradeAction.HOSTILE);
+                return;
+            }
+
+            for (NativeTradeItem nti : nt.getBuying()) {
+                if (nti.priceIsSet()) continue;
+                Set<Modifier> modifiers = new HashSet<>();
+                if (is.hasMissionary(other)
+                    && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                    Unit u = is.getMissionary();
+                    modifiers.addAll(u.getMissionaryTradeModifiers(true));
+                }
+                if (unit.isNaval()) {
+                    modifiers.addAll(getShipTradePenalties(true));
+                }
+                int price = (int)FeatureContainer.applyModifiers(1.0f / anger
+                    * is.getPriceToBuy(nti.getGoods()), turn, modifiers);
+                if (price == NativeTradeItem.PRICE_UNSET) price = -1;
+                nti.setPrice(price);
+            }
+            nt.setAction(NativeTrade.NativeTradeAction.UPDATE);
             break;
         default: // NYI
             nt.setAction(NativeTrade.NativeTradeAction.INVALID);

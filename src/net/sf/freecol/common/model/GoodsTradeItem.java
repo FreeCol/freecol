@@ -33,7 +33,7 @@ import net.sf.freecol.common.util.Utils;
 public class GoodsTradeItem extends TradeItem {
     
     /** The goods to change hands. */
-    private Goods goods;
+    protected Goods goods;
 
 
     /**
