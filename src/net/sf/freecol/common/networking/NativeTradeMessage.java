@@ -37,11 +37,7 @@ import org.w3c.dom.Element;
 public class NativeTradeMessage extends DOMMessage {
 
     public static final String TAG = "nativeTrade";
-    private static final String ACTION_TAG = "action";
 
-    /** The action to perform. */
-    private NativeTradeAction action;
-    
     /** The native trade underway. */
     private NativeTrade nt = null;
 
@@ -56,7 +52,7 @@ public class NativeTradeMessage extends DOMMessage {
      * @param action The <code>NativeTradeAction</code> to use.
      */
     public NativeTradeMessage(Unit unit, IndianSettlement is) {
-        this(NativeTradeAction.OPEN, new NativeTrade(unit, is));
+        this(new NativeTrade(NativeTradeAction.OPEN, unit, is));
     }
 
     /**
@@ -67,10 +63,9 @@ public class NativeTradeMessage extends DOMMessage {
      * @param is The <code>IndianSettlement</code> where the
      *     session occurs.
      */
-    public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
+    public NativeTradeMessage(NativeTrade nt) {
         super(getTagName());
 
-        this.action = action;
         this.nt = nt;
     }
 
@@ -84,8 +79,6 @@ public class NativeTradeMessage extends DOMMessage {
     public NativeTradeMessage(Game game, Element element) {
         super(getTagName());
 
-        this.action = getEnumAttribute(element, ACTION_TAG,
-            NativeTradeAction.class, (NativeTradeAction)null);
         this.nt = getChild(game, element, 0, false, NativeTrade.class);
     }
 
@@ -93,7 +86,7 @@ public class NativeTradeMessage extends DOMMessage {
     // Public interface
 
     public NativeTradeAction getAction() {
-        return this.action;
+        return this.nt.getAction();
     }
 
     public NativeTrade getNativeTrade() {
@@ -126,8 +119,7 @@ public class NativeTradeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            ACTION_TAG, this.action.toString())
+        return new DOMMessage(getTagName())
             .add(this.nt).toXMLElement();
     }
 

@@ -68,6 +68,9 @@ public class NativeTrade extends FreeColGameObject {
                             NO_TRADE_HAGGLE = -2,
                             NO_TRADE_HOSTILE = -3;
 
+    /** The action underway. */
+    private NativeTradeAction action;
+    
     /** The unit that is trading. */
     private Unit unit;
 
@@ -77,13 +80,13 @@ public class NativeTrade extends FreeColGameObject {
     /** How many times this trade has been tried. */
     private int count;
 
-    /** Can goods be bought? */
+    /** True if no purchases made in this trade. */
     private boolean buy;
         
-    /** Can goods be sold? */
+    /** True if no sales made in this trade. */
     private boolean sell;
 
-    /** Can goods be given? */
+    /** True if no gifts made in this trade. */
     private boolean gift;
 
 
@@ -100,22 +103,24 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Create a new trade session.
      *
+     * @param action The <code>NativeTradeAction</code> to perform.
      * @param unit The <code>Unit</code> that is trading.
      * @param is The <code>IndianSettlement</code> to trade with.
      */
-    public NativeTrade(Unit unit, IndianSettlement is) {
+    public NativeTrade(NativeTradeAction action, Unit unit, IndianSettlement is) {
         this(unit.getGame(), ""); // Identifier not needed
 
+        this.action = action;
         this.unit = unit;
         this.is = is;
         this.count = 0;
-
-        boolean atWar = this.is.getOwner().atWarWith(this.unit.getOwner());
-        this.buy = !atWar;
-        this.sell = !atWar && this.unit.hasGoodsCargo();
-        this.gift = this.unit.hasGoodsCargo();
+        this.buy = this.sell = this.gift = true;
     }
 
+
+    private boolean atWar() {
+        return this.is.getOwner().atWarWith(this.unit.getOwner());
+    }
 
     public String getKey() {
         return getKey(this.unit, this.is);
@@ -133,10 +138,23 @@ public class NativeTrade extends FreeColGameObject {
         return this.is;
     }
 
+    public NativeTradeAction getAction() {
+        return this.action;
+    }
+
+    public NativeTrade setAction(NativeTradeAction action) {
+        this.action = action;
+        return this;
+    }
+    
     public boolean getBuy() {
         return this.buy;
     }
 
+    public boolean canBuy() {
+        return getBuy() && !atWar() && this.unit.getSpaceLeft() > 0;
+    }
+    
     public void setBuy(boolean buy) {
         this.buy = buy;
     }
@@ -145,6 +163,10 @@ public class NativeTrade extends FreeColGameObject {
         return this.sell;
     }
 
+    public boolean canSell() {
+        return getSell() && !atWar() && this.unit.hasGoodsCargo();
+    }
+    
     public void setSell(boolean sell) {
         this.sell = sell;
     }
@@ -153,6 +175,10 @@ public class NativeTrade extends FreeColGameObject {
         return this.gift;
     }
 
+    public boolean canGift() {
+        return getGift() && this.unit.hasGoodsCargo();
+    }
+    
     public void setGift(boolean gift) {
         this.gift = gift;
     }
@@ -167,7 +193,7 @@ public class NativeTrade extends FreeColGameObject {
 
     public boolean getDone() {
         return this.count < 0
-            || (!getBuy() && !getSell() && !getGift());
+            || (!canBuy() && !canSell() && !canGift());
     }
 
     public void setDone() {
@@ -187,6 +213,7 @@ public class NativeTrade extends FreeColGameObject {
 
     // Serialization
 
+    private static final String ACTION_TAG = "action";
     private static final String BUY_TAG = "buy";
     private static final String COUNT_TAG = "count";
     private static final String GIFT_TAG = "gift";
@@ -201,6 +228,8 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
+
+        xw.writeAttribute(ACTION_TAG, this.action);
 
         xw.writeAttribute(BUY_TAG, this.buy);
         
@@ -220,7 +249,11 @@ public class NativeTrade extends FreeColGameObject {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
         super.readAttributes(xr);
+
+        this.action = xr.getAttribute(ACTION_TAG, NativeTradeAction.class,
+                                      (NativeTradeAction)null);
 
         this.buy = xr.getAttribute(BUY_TAG, false);
 
@@ -230,11 +263,10 @@ public class NativeTrade extends FreeColGameObject {
 
         this.sell = xr.getAttribute(SELL_TAG, false);
 
-        this.is = xr.getAttribute(getGame(), SETTLEMENT_TAG,
+        this.is = xr.getAttribute(game, SETTLEMENT_TAG,
             IndianSettlement.class, (IndianSettlement)null);
 
-        this.unit = xr.getAttribute(getGame(), UNIT_TAG,
-                                    Unit.class, (Unit)null);
+        this.unit = xr.getAttribute(game, UNIT_TAG, Unit.class, (Unit)null);
     }
 
     /**
@@ -243,7 +275,8 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
-        sb.append('[').append(getId())
+        sb.append('[').append(getTagName())
+            .append(' ').append(getAction())
             .append(' ').append(getUnit().getId())
             .append(' ').append(getIndianSettlement().getId())
             .append(" buy=").append(getBuy())

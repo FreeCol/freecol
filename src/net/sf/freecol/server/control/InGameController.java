@@ -3347,6 +3347,7 @@ public final class InGameController extends Controller {
                     + " has no moves left.");
             }
             session = new NativeTradeSession(nt);
+
             // Sets unit moves to zero to avoid cheating.  If no
             // action is taken, the moves will be restored when
             // closing the session
@@ -3371,8 +3372,8 @@ public final class InGameController extends Controller {
         }
 
         // Update the client with the current session state.
-        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_NORMAL,
-            new NativeTradeMessage(NativeTradeAction.UPDATE, nt));
+        cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+            new NativeTradeMessage(nt.setAction(NativeTradeAction.UPDATE)));
 
         // Others can not see transactions.
         return cs;
