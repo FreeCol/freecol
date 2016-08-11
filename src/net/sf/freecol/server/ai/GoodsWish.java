@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -162,11 +163,12 @@ public class GoodsWish extends Wish {
     /**
      * Does some specified goods satisfy this wish?
      *
-     * @param goods The <code>Goods</code> to test.
+     * @param T The base type of the goods.
+     * @param goods The goods to test.
      * @return True if the goods type matches and amount is not less than
      *     that requested.
      */
-    public boolean satisfiedBy(Goods goods) {
+    public <T extends AbstractGoods> boolean satisfiedBy(T goods) {
         return goods.getType() == goodsType
             && goods.getAmount() >= amountRequested;
     }

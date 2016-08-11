@@ -246,10 +246,11 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the price of a given goods when the <code>Player</code> sells.
      *
-     * @param goods a <code>Goods</code> value
-     * @return an <code>int</code> value
+     * @param T The base type of the goods.
+     * @param goods The <code>Goods</code> to evaluate.
+     * @return The price.
      */
-    public int getSalePrice(Goods goods) {
+    public <T extends AbstractGoods> int getSalePrice(T goods) {
         return getSalePrice(goods.getType(), goods.getAmount());
     }
 

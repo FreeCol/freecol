@@ -879,10 +879,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
      *
-     * @param goods The <code>Goods</code> to price.
+     * @param T The base type of the goods.
+     * @param goods The goods to price.
      * @return The price.
      */
-    public int getPriceToSell(Goods goods) {
+    public <T extends AbstractGoods> int getPriceToSell(T goods) {
         return getPriceToSell(goods.getType(), goods.getAmount());
     }
 

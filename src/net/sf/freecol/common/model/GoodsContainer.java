@@ -117,11 +117,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Checks if the specified <code>Goods</code> is in this container.
      *
-     * @param g The <code>Goods</code> to test the presence of.
+     * @param T The base type of the goods.
+     * @param g The goods to test the presence of.
      * @return True if there is enough of the specified goods present that it
      *     can be removed without error.
      */
-    public boolean contains(Goods g) {
+    public <T extends AbstractGoods> boolean contains(T g) {
         return getGoodsCount(g.getType()) >= g.getAmount();
     }
 
@@ -157,10 +158,11 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Adds goods to this goods container.
      *
-     * @param goods The <code>Goods</code> to add.
+     * @param T The base type of the goods.
+     * @param goods The goods to add.
      * @return True if the addition succeeds.
      */
-    public boolean addGoods(AbstractGoods goods) {
+    public <T extends AbstractGoods> boolean addGoods(T goods) {
         return addGoods(goods.getType(), goods.getAmount());
     }
 
@@ -196,10 +198,11 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Removes goods from this goods container.
      *
-     * @param goods The <code>Goods</code> to remove from this container.
+     * @param T The base type of the goods.
+     * @param goods The goods to remove from this container.
      * @return The <code>Goods</code> actually removed.
      */
-    public Goods removeGoods(AbstractGoods goods) {
+    public <T extends AbstractGoods> Goods removeGoods(T goods) {
         return removeGoods(goods.getType(), goods.getAmount());
     }
 
