@@ -109,6 +109,9 @@ public class NativeTrade extends FreeColGameObject {
      */
     private List<NativeTradeItem> buying = new ArrayList<>();
 
+    /** The goods in the settlement that are being offered for sale. */
+    private List<NativeTradeItem> selling = new ArrayList<>();
+    
 
     /**
      * Simple constructor, used in FreeColGameObject.newInstance.
@@ -225,7 +228,7 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public List<NativeTradeItem> getSelling() {
-        return Collections.<NativeTradeItem>emptyList();
+        return this.selling;
     }
 
     public void initializeBuying() {
@@ -237,7 +240,15 @@ public class NativeTrade extends FreeColGameObject {
         }
     }
 
-
+    public void initializeSelling() {
+        final Player source = this.is.getOwner();
+        final Player destination = this.unit.getOwner();
+        final Game game = this.unit.getGame();
+        for (Goods g : this.is.getSellGoods(this.unit)) {
+            this.selling.add(new NativeTradeItem(game, source, destination, g));
+        }
+    }
+        
     // Override FreeColGameObject
 
     /**
@@ -289,6 +300,8 @@ public class NativeTrade extends FreeColGameObject {
         super.writeChildren(xw);
 
         for (NativeTradeItem nti : this.buying) nti.toXML(xw);
+
+        for (NativeTradeItem nti : this.selling) nti.toXML(xw);
     }
 
 
@@ -340,6 +353,8 @@ public class NativeTrade extends FreeColGameObject {
             NativeTradeItem nti = new NativeTradeItem(game, xr);
             if (nti.getSource().isEuropean()) {
                 this.buying.add(nti);
+            } else {
+                this.selling.add(nti);
             }
 
         } else {
@@ -363,6 +378,10 @@ public class NativeTrade extends FreeColGameObject {
             .append(" count=").append(getCount())
             .append(" buying[");
         for (NativeTradeItem nti : this.buying) {
+            sb.append(' ').append(nti.toString());
+        }
+        sb.append("] selling[");
+        for (NativeTradeItem nti : this.selling) {
             sb.append(' ').append(nti.toString());
         }
         return sb.append(" ]]").toString();

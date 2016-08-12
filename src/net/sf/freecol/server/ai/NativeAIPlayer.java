@@ -837,22 +837,41 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 return;
             }
 
+            // Price the goods to buy
+            Set<Modifier> modifiers = new HashSet<>();
+            if (is.hasMissionary(other)
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                Unit u = is.getMissionary();
+                modifiers.addAll(u.getMissionaryTradeModifiers(true));
+            }
+            if (unit.isNaval()) {
+                modifiers.addAll(getShipTradePenalties(true));
+            }
             for (NativeTradeItem nti : nt.getBuying()) {
                 if (nti.priceIsSet()) continue;
-                Set<Modifier> modifiers = new HashSet<>();
-                if (is.hasMissionary(other)
-                    && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                    Unit u = is.getMissionary();
-                    modifiers.addAll(u.getMissionaryTradeModifiers(true));
-                }
-                if (unit.isNaval()) {
-                    modifiers.addAll(getShipTradePenalties(true));
-                }
                 int price = (int)FeatureContainer.applyModifiers(1.0f / anger
                     * is.getPriceToBuy(nti.getGoods()), turn, modifiers);
                 if (price == NativeTradeItem.PRICE_UNSET) price = -1;
                 nti.setPrice(price);
             }
+
+            // Price the goods to sell
+            modifiers.clear();
+            if (is.hasMissionary(other)
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                Unit u = is.getMissionary();
+                modifiers.addAll(u.getMissionaryTradeModifiers(false));
+            }
+            if (unit.isNaval()) {
+                modifiers.addAll(getShipTradePenalties(false));
+            }
+            nt.initializeSelling();
+            for (NativeTradeItem nti : nt.getSelling()) {
+                int price = (int)FeatureContainer.applyModifiers((float)anger
+                    * is.getPriceToSell(nti.getGoods()), turn, modifiers);
+                nti.setPrice(price);
+            }
+            
             nt.setAction(NativeTrade.NativeTradeAction.UPDATE);
             break;
         default: // NYI

@@ -961,8 +961,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
 
         // Sort and truncate to limit
         final Comparator<Goods> salePriceComparator
-            = Comparator.comparingInt((Goods g) -> getPriceToSell(g.getType(),
-                    Math.min(g.getAmount(), GoodsContainer.CARGO_SIZE)))
+            = Comparator.comparingInt((Goods g)
+                -> getPriceToSell(g.getType(), g.getAmount()))
             .reversed();
         final Comparator<Goods> exportGoodsComparator
             = Comparator.comparingInt((Goods g) ->
