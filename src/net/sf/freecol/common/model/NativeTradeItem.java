@@ -19,11 +19,14 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.function.Predicate;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -126,6 +129,15 @@ public class NativeTradeItem extends GoodsTradeItem {
      */
     public void setHaggleCount(int haggleCount) {
         this.haggleCount = haggleCount;
+    }
+
+    /**
+     * Get a predicate to match this native trade item by its goods.
+     *
+     * @return A suitable {@code Predicate}.
+     */
+    public Predicate<NativeTradeItem> goodsMatcher() {
+        return matchKeyEquals(this.getGoods(), NativeTradeItem::getGoods);
     }
 
 

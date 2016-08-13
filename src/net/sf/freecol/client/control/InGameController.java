@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
@@ -152,9 +153,6 @@ public final class InGameController extends FreeColClientHolder {
     /** The messages in the last turn report. */
     private final List<ModelMessage> turnReportMessages = new ArrayList<>();
 
-    /** Current native trades. */
-    private final HashMap<String, NativeTrade> nativeTrades = new HashMap<>();
-    
 
     /**
      * The constructor to use.
@@ -1724,7 +1722,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         IndianSettlement is
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        return !askServer().newNativeTradeSession(unit, is);
+        return is == null || !askServer().newNativeTradeSession(unit, is);
     }
 
     /**
@@ -4041,76 +4039,147 @@ public final class InGameController extends FreeColClientHolder {
      */
     public void nativeTrade(NativeTradeAction action, NativeTrade nt) {
         if (nt == null) return;
-        switch (action) { // Only consider actions returned by server
-        case ACK_OPEN: // normal case continues below
-            break;
-        case NAK_HOSTILE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHaggle"));
-            return;
-        case NAK_HAGGLE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHaggle"));
-            return;
-        case NAK_INVALID: // should not happen
-        default:
-            logger.warning("Bogus native trade: " + nt.toString());
-            return;
-        }
-
         final IndianSettlement is = nt.getIndianSettlement();
         final Unit unit = nt.getUnit();
         if (!getMyPlayer().owns(unit)) {
             logger.warning("We do not own the trading unit: " + unit);
             return;
         }
-
-        boolean buy = nt.getBuy();
-        boolean sel = nt.getSell();
-        boolean gif = nt.getGift();
-        StringTemplate baseTemplate = StringTemplate
-            .template("tradeProposition.welcome")
-            .addStringTemplate("%nation%",
-                is.getOwner().getNationLabel())
+        final StringTemplate base = StringTemplate
+            .template("trade.welcome")
+            .addStringTemplate("%nation%", is.getOwner().getNationLabel())
             .addName("%settlement%", is.getName());
-        StringTemplate template = baseTemplate;
-        while (buy || sel || gif) {
-            // The session tracks buy/sell/gift events and disables
-            // them when one happens.  So only offer such options if
-            // the session allows it and the carrier is in good shape.
-            buy = buy && unit.hasSpaceLeft();
-            sel = sel && unit.hasGoodsCargo();
-            gif = gif && unit.hasGoodsCargo();
 
-            TradeAction act = getGUI().getIndianSettlementTradeChoice(is,
-                template, buy, sel, gif);
-            if (act == null) break;
-            StringTemplate t = null;
+        TradeAction act = null;
+        NativeTradeItem nti = null;
+        StringTemplate prompt = null;
+        switch (action) { // Only consider actions returned by server
+        case ACK_OPEN:
+            break;
+        case ACK_BUY:
+            prompt = StringTemplate
+                .template("trade.bought")
+                .addNamed("%goodsType%", nt.getItem().getGoods().getType())
+                .addStringTemplate("%nation%", is.getOwner().getNationLabel())
+                .addName("%settlement%", is.getName());
+            break;
+        case ACK_SELL:
+            prompt = StringTemplate
+                .template("trade.sold")
+                .addNamed("%goodsType%", nt.getItem().getGoods().getType())
+                .addStringTemplate("%nation%", is.getOwner().getNationLabel())
+                .addName("%settlement%", is.getName());
+            break;
+        case ACK_GIFT:
+            prompt = StringTemplate
+                .template("trade.gave")
+                .addNamed("%goodsType%", nt.getItem().getGoods().getType())
+                .addStringTemplate("%nation%", is.getOwner().getNationLabel())
+                .addName("%settlement%", is.getName());
+            break;
+        case ACK_BUY_HAGGLE:
+            act = TradeAction.BUY;
+            nti = nt.getItem();
+            break;
+        case ACK_SELL_HAGGLE:
+            act = TradeAction.SELL;
+            nti = nt.getItem();
+            break;
+        case NAK_GOODS: // Polite refusal, does not end the session
+            prompt = StringTemplate
+                .template("trade.noTradeGoods")
+                .addNamed("%goodsType%", nt.getItem().getGoods().getType());
+            break;
+        case NAK_HAGGLE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHaggle"));
+            return;
+        case NAK_HOSTILE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHostile"));
+            return;
+        case NAK_INVALID: // Should not happen, log and fail quietly.
+        default:
+            logger.warning("Bogus native trade: " + nt.toString());
+            return;
+        }
+
+        final Function<NativeTradeItem, ChoiceItem<NativeTradeItem>>
+            goodsMapper = i -> {
+            String label = Messages.message(i.getGoods().getLabel(true));
+            return new ChoiceItem<>(label, i);
+        };
+        while (!nt.getDone()) {
+            if (act == null) {
+                if (prompt == null) prompt = base;
+                act = getGUI().getIndianSettlementTradeChoice(is, prompt,
+                    nt.canBuy(), nt.canSell(), nt.canGift());
+                prompt = base; // Revert to base after first time through
+                if (act == null) break;
+            }
             switch (act) {
             case BUY:
-                t = attemptBuyFromSettlement(unit, is);
-                if (t == null) buy = false;
+                act = null;
+                if (nti == null) {
+                    nti = getGUI().getChoice(unit.getTile(),
+                        Messages.message("buyProposition.text"), is, "nothing",
+                        transform(nt.getSettlementToUnit(), alwaysTrue(),
+                                  goodsMapper));
+                    if (nti == null) break;
+                    nt.setItem(nti);
+                }
+                TradeBuyAction tba = getGUI().getBuyChoice(unit, is,
+                    nti.getGoods(), nti.getPrice(), true);
+                if (tba == TradeBuyAction.BUY) {
+                    askServer().nativeTrade(NativeTradeAction.BUY, nt);
+                    return;
+                } else if (tba == TradeBuyAction.HAGGLE) {
+                    nti.setPrice(NativeTradeItem.PRICE_UNSET);
+                    askServer().nativeTrade(NativeTradeAction.BUY, nt);
+                    return;
+                }                    
                 break;
             case SELL:
-                t = attemptSellToSettlement(unit, is);
-                if (t == null) sel = false;
+                act = null;
+                if (nti == null) {
+                    nti = getGUI().getChoice(unit.getTile(),
+                        Messages.message("sellProposition.text"), is, "nothing",
+                        transform(nt.getUnitToSettlement(), alwaysTrue(),
+                                  goodsMapper));
+                    if (nti == null) break;
+                    nt.setItem(nti);
+                }
+                TradeSellAction tsa = getGUI().getSellChoice(unit, is,
+                    nti.getGoods(), nti.getPrice());
+                if (tsa == TradeSellAction.SELL) {
+                    askServer().nativeTrade(NativeTradeAction.SELL, nt);
+                    return;
+                } else if (tsa == TradeSellAction.HAGGLE) {
+                    nti.setPrice(NativeTradeItem.PRICE_UNSET);
+                    askServer().nativeTrade(NativeTradeAction.SELL, nt);
+                    return;
+                }
                 break;
             case GIFT:
-                t = attemptGiftToSettlement(unit, is);
-                if (t == null) gif = false;
+                act = null;
+                nti = getGUI().getChoice(unit.getTile(),
+                    Messages.message("gift.text"), is, "cancel",
+                    transform(nt.getUnitToSettlement(), alwaysTrue(),
+                              goodsMapper));
+                if (nti != null) {
+                    nt.setItem(nti);
+                    askServer().nativeTrade(NativeTradeAction.GIFT, nt);
+                    return;
+                }
                 break;
             default:
                 logger.warning("showIndianSettlementTradeDialog fail: "
                     + act);
-                continue;
+                nt.setDone();
+                break;
             }
-            template = (t == null || t == abortTrade) ? baseTemplate : t;
         }
-
-        if (askServer().endNativeTradeSession(nt)) {
-            // Might have done nothing, allow unit to resume.
-            if (unit.getMovesLeft() > 0) getGUI().setActiveUnit(unit);
-        }
+        askServer().nativeTrade(NativeTradeAction.CLOSE, nt);
     }
 
     /**
@@ -4207,7 +4276,6 @@ public final class InGameController extends FreeColClientHolder {
                 .addAmount("%amount%", currTurn.getSeasonNumber()));
         }
         player.clearNationCache();
-        nativeTrades.clear();
         return true;
     }
 

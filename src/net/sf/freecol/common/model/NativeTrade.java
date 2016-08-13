@@ -21,15 +21,16 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.Unit;
+import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
@@ -38,6 +39,8 @@ import net.sf.freecol.common.model.Unit;
  */
 public class NativeTrade extends FreeColGameObject {
 
+    private static final Logger logger = Logger.getLogger(NativeTrade.class.getName());
+
     /** A template to use as a magic cookie for aborted trades. */
     private static final StringTemplate abortTrade
         = StringTemplate.template("");
@@ -45,27 +48,57 @@ public class NativeTrade extends FreeColGameObject {
     /** The type of native trade command. */
     public static enum NativeTradeAction {
         // Requests from European trader
-        OPEN(false),          // Start a new trade session
-        CLOSE(true),          // End an existing session
-        BUY(false),           // Buy goods
-        SELL(false),          // Sell goods
-        GIFT(false),          // Gift goods
+        OPEN(false, true),         // Start a new trade session
+        CLOSE(true, true),         // End an existing session
+        BUY(false, true),          // Buy goods
+        SELL(false, true),         // Sell goods
+        GIFT(false, true),         // Gift goods
         // Positive responses from native trader
-        ACK_OPEN(false),      // Open accepted
+        ACK_OPEN(false, false),    // Open accepted
+        ACK_BUY(false, false),     // Purchase accepted
+        ACK_SELL(false, false),    // Sale accepted
+        ACK_GIFT(false, false),    // Gift accepted
+        ACK_BUY_HAGGLE(false,false),    // Haggle accepted
+        ACK_SELL_HAGGLE(false,false),   // Haggle accepted
         // Negative responses from native trader
-        NAK_INVALID(true),    // Trade is completely invalid
-        NAK_HOSTILE(true),    // Natives are hostile
-        NAK_HAGGLE(true);     // Trade failed due to too much haggling
+        NAK_GOODS(false, false),   // Gift failed due to storage
+        NAK_HAGGLE(true, false),   // Trade failed due to too much haggling
+        NAK_HOSTILE(true, false),  // Natives are hostile
+        NAK_INVALID(true, false);  // Trade is completely invalid
 
         /** Does this action close the trade? */
         private final boolean closing;
 
-        NativeTradeAction(boolean closing) {
+        /** Should this action originate with a European player? */
+        private final boolean fromEuropeans;
+
+
+        /**
+         * Create a new native trade action.
+         *
+         * @param closing If true this is an action that closes the session.
+         */
+        NativeTradeAction(boolean closing, boolean fromEuropeans) {
             this.closing = closing;
+            this.fromEuropeans = fromEuropeans;
         }
 
+        /**
+         * Is this a closing action?
+         *
+         * @return True if a closing action.
+         */
         public boolean isClosing() {
             return this.closing;
+        }
+
+        /**
+         * Should this action have come from a European player?
+         *
+         * @return True if a European action.
+         */
+        public boolean isEuropean() {
+            return this.fromEuropeans;
         }
     };
 
@@ -93,15 +126,22 @@ public class NativeTrade extends FreeColGameObject {
     /** True if no gifts made in this trade. */
     private boolean gift;
 
+    /** An item under consideration for a transaction. */
+    private NativeTradeItem item;
+    
     /**
      * The goods on the unit that are being offered for purchase by
      * the settlement.
      */
-    private List<NativeTradeItem> buying = new ArrayList<>();
+    private List<NativeTradeItem> unitToSettlement = new ArrayList<>();
 
-    /** The goods in the settlement that are being offered for sale. */
-    private List<NativeTradeItem> selling = new ArrayList<>();
-    
+    /**
+     * The goods in the settlement that are being offered for purchase
+     * by the unit.
+     */
+    private List<NativeTradeItem> settlementToUnit = new ArrayList<>();
+
+
 
     /**
      * Simple constructor, used in FreeColGameObject.newInstance.
@@ -160,7 +200,7 @@ public class NativeTrade extends FreeColGameObject {
     public void setBuy(boolean buy) {
         this.buy = buy;
     }
-    
+
     public boolean getSell() {
         return this.sell;
     }
@@ -206,43 +246,76 @@ public class NativeTrade extends FreeColGameObject {
         return getBuy() && getSell() && getGift();
     }
 
-    public List<NativeTradeItem> getBuying() {
-        return this.buying;
+    public List<NativeTradeItem> getUnitToSettlement() {
+        return this.unitToSettlement;
     }
 
-    public List<NativeTradeItem> getSelling() {
-        return this.selling;
+    public List<NativeTradeItem> getSettlementToUnit() {
+        return this.settlementToUnit;
     }
 
+    public void addToUnit(NativeTradeItem nti) {
+        this.unitToSettlement.add(nti);
+    }
+
+    public void removeFromUnit(NativeTradeItem nti) {
+        removeInPlace(this.unitToSettlement, nti.goodsMatcher());
+    }
+    
     public boolean isCompatible(final NativeTrade nt) {
         return this.getKey().equals(nt.getKey());
     }
 
-    public void initializeBuying() {
-        final Player source = this.unit.getOwner();
-        final Player destination = this.is.getOwner();
+    public void initialize() {
+        final Player unitPlayer = this.unit.getOwner();
+        final Player settlementPlayer = this.is.getOwner();
         final Game game = this.unit.getGame();
-        for (Goods g : unit.getGoodsList()) {
-            this.buying.add(new NativeTradeItem(game, source, destination, g));
+        for (Goods g : this.unit.getGoodsList()) {
+            this.unitToSettlement.add(new NativeTradeItem(game,
+                    unitPlayer, settlementPlayer, g));
         }
-    }
-
-    public void initializeSelling() {
-        final Player source = this.is.getOwner();
-        final Player destination = this.unit.getOwner();
-        final Game game = this.unit.getGame();
         for (Goods g : this.is.getSellGoods(this.unit)) {
-            this.selling.add(new NativeTradeItem(game, source, destination, g));
+            this.settlementToUnit.add(new NativeTradeItem(game,
+                    settlementPlayer, unitPlayer, g));
         }
     }
 
-    public void mergeFromNatives(final NativeTrade nt) {
+    public void mergeFrom(final NativeTrade nt) {
         if (isCompatible(nt)) {
-            this.buying.clear();
-            this.buying.addAll(nt.getBuying());
-            this.selling.clear();
-            this.selling.addAll(nt.getSelling());
+            this.unitToSettlement.clear();
+            this.unitToSettlement.addAll(nt.getUnitToSettlement());
+            this.settlementToUnit.clear();
+            this.settlementToUnit.addAll(nt.getSettlementToUnit());
+            this.item = nt.getItem();
         }
+    }
+
+    public NativeTradeItem getItem() {
+        return this.item;
+    }
+
+    public void setItem(NativeTradeItem nti) {
+        this.item = nti;
+    }
+
+    /**
+     * Choose the next available upward haggling price.
+     *
+     * @param price The initial price.
+     * @return The new upward haggled price.
+     */
+    public static int haggleUp(int price) {
+        return (price * 11) / 10;
+    }
+
+    /**
+     * Choose the next available downward haggling price.
+     *
+     * @param price The initial price.
+     * @return The new downward haggled price.
+     */
+    public static int haggleDown(int price) {
+        return (price * 9) / 10;
     }
 
 
@@ -263,7 +336,9 @@ public class NativeTrade extends FreeColGameObject {
     private static final String GIFT_TAG = "gift";
     private static final String SELL_TAG = "sell";
     private static final String SETTLEMENT_TAG = "settlement";
+    private static final String SETTLEMENT_TO_UNIT_TAG = "settlementToUnit";
     private static final String UNIT_TAG = "unit";
+    private static final String UNIT_TO_SETTLEMENT_TAG = "unitToSettlement";
 
 
     /**
@@ -293,9 +368,19 @@ public class NativeTrade extends FreeColGameObject {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (NativeTradeItem nti : this.buying) nti.toXML(xw);
+        xw.writeStartElement(SETTLEMENT_TO_UNIT_TAG);
 
-        for (NativeTradeItem nti : this.selling) nti.toXML(xw);
+        for (NativeTradeItem nti : this.settlementToUnit) nti.toXML(xw);
+
+        xw.writeEndElement();
+
+        xw.writeStartElement(UNIT_TO_SETTLEMENT_TAG);
+
+        for (NativeTradeItem nti : this.unitToSettlement) nti.toXML(xw);
+
+        xw.writeEndElement();
+
+        if (this.item != null) this.item.toXML(xw);
     }
 
 
@@ -327,7 +412,9 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
-        this.buying.clear();
+        this.unitToSettlement.clear();
+        this.settlementToUnit.clear();
+        this.item = null;
 
         super.readChildren(xr);
     }
@@ -337,16 +424,33 @@ public class NativeTrade extends FreeColGameObject {
      */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final String tag = xr.getLocalName();
+        String tag = xr.getLocalName();
         Game game = getGame();
 
-        if (NativeTradeItem.getTagName().equals(tag)) {
-            NativeTradeItem nti = new NativeTradeItem(game, xr);
-            if (nti.getSource().isEuropean()) {
-                this.buying.add(nti);
-            } else {
-                this.selling.add(nti);
+        if (SETTLEMENT_TO_UNIT_TAG.equals(tag)) {
+            while (xr.moreTags()) {
+                tag = xr.getLocalName();
+                if (NativeTradeItem.getTagName().equals(tag)) {
+                    NativeTradeItem nti = new NativeTradeItem(game, xr);
+                    if (nti != null) this.settlementToUnit.add(nti);
+                } else {
+                    logger.warning("SettlementToUnit-item expected, not: " + tag);
+                }
             }
+
+        } else if (UNIT_TO_SETTLEMENT_TAG.equals(tag)) {
+            while (xr.moreTags()) {
+                tag = xr.getLocalName();
+                if (NativeTradeItem.getTagName().equals(tag)) {
+                    NativeTradeItem nti = new NativeTradeItem(game, xr);
+                    if (nti != null) this.unitToSettlement.add(nti);
+                } else {
+                    logger.warning("UnitToSettlement-item expected, not: " + tag);
+                }
+            }
+
+        } else if (NativeTradeItem.getTagName().equals(tag)) {
+            this.item = new NativeTradeItem(game, xr);
 
         } else {
             super.readChild(xr);
@@ -359,6 +463,7 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
+        NativeTradeItem item = getItem();
         sb.append('[').append(getTagName())
             .append(' ').append(getUnit().getId())
             .append(' ').append(getIndianSettlement().getId())
@@ -366,12 +471,13 @@ public class NativeTrade extends FreeColGameObject {
             .append(" sell=").append(getSell())
             .append(" gift=").append(getGift())
             .append(" count=").append(getCount())
-            .append(" buying[");
-        for (NativeTradeItem nti : this.buying) {
+            .append(" item=").append((item == null) ? "null" : item.toString())
+            .append(" unitToSettlement[");
+        for (NativeTradeItem nti : this.unitToSettlement) {
             sb.append(' ').append(nti.toString());
         }
-        sb.append("] selling[");
-        for (NativeTradeItem nti : this.selling) {
+        sb.append("] settlementToUnit[");
+        for (NativeTradeItem nti : this.settlementToUnit) {
             sb.append(' ').append(nti.toString());
         }
         return sb.append(" ]]").toString();

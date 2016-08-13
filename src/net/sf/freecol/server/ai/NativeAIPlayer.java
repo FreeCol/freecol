@@ -798,11 +798,64 @@ public class NativeAIPlayer extends MissionAIPlayer {
     }
 
     /**
+     * Price the goods to buy.
+     *
+     * @param nt The {@code NativeTrade} to update.
+     * @param anger A penalty to the native prices due to anger.
+     */
+    public void updateTrade(NativeTrade nt, int anger) {
+        final Specification spec = getSpecification();
+        final Turn turn = getGame().getTurn();
+        final IndianSettlement is = nt.getIndianSettlement();
+        final Unit unit = nt.getUnit();
+        Set<Modifier> modifiers = new HashSet<>();
+
+        if (is.hasMissionary(unit.getOwner())
+            && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+            Unit u = is.getMissionary();
+            modifiers.addAll(u.getMissionaryTradeModifiers(true));
+        }
+        if (unit.isNaval()) {
+            modifiers.addAll(getShipTradePenalties(true));
+        }
+        for (NativeTradeItem nti : nt.getUnitToSettlement()) {
+            if (nti.priceIsSet()) continue;
+            int price = (int)FeatureContainer.applyModifiers(1.0f / anger
+                * is.getPriceToBuy(nti.getGoods()), turn, modifiers);
+            for (int h = nti.getHaggleCount(); h >= 0; h--) {
+                price = NativeTrade.haggleUp(price);
+            }
+            if (price == NativeTradeItem.PRICE_UNSET) price = -1;
+            nti.setPrice(price);
+        }
+
+        modifiers.clear();
+        if (is.hasMissionary(unit.getOwner())
+            && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+            Unit u = is.getMissionary();
+            modifiers.addAll(u.getMissionaryTradeModifiers(false));
+        }
+        if (unit.isNaval()) {
+            modifiers.addAll(getShipTradePenalties(false));
+        }
+        for (NativeTradeItem nti : nt.getSettlementToUnit()) {
+            int price = (int)FeatureContainer.applyModifiers((float)anger
+                * is.getPriceToSell(nti.getGoods()), turn, modifiers);
+            for (int h = nti.getHaggleCount(); h >= 0; h--) {
+                price = NativeTrade.haggleDown(price);
+            }
+            if (price == NativeTradeItem.PRICE_UNSET) price = -1;
+            nti.setPrice(price);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public NativeTradeAction handleTrade(NativeTradeAction action,
                                          NativeTrade nt) {
+        final int HAGGLE_NUMBER = 3;
         if (nt == null || !this.getPlayer().owns(nt.getIndianSettlement())) {
             return NativeTradeAction.NAK_INVALID;
         }
@@ -811,18 +864,66 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final Unit unit = nt.getUnit();
         final Player other = unit.getOwner();
         final Turn turn = getGame().getTurn();
-
+        NativeTradeItem ours;
+        int anger, haggle;
+        
         switch (action) {
         case OPEN:
-            int anger = 1;
             switch (is.getAlarm(other).getLevel()) {
             case HAPPY: case CONTENT:
+                anger = 1;
+                break;
+            case DISPLEASED:
+                anger = 2;
+                break;
+            case ANGRY: default:
+                anger = -1;
+                break;
+            }
+            if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
+            updateTrade(nt, anger);
+            return NativeTradeAction.ACK_OPEN;
+
+        case BUY:
+            switch (is.getAlarm(other).getLevel()) {
+            case HAPPY: case CONTENT:
+                anger = 1;
+                break;
+            case DISPLEASED:
+                anger = 2;
+                break;
+            case ANGRY: default:
+                anger = -1;
+                break;
+            }
+            if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
+            updateTrade(nt, anger);
+            ours = find(nt.getSettlementToUnit(), nt.getItem().goodsMatcher());
+            if (ours == null) return NativeTradeAction.NAK_INVALID;
+            if (nt.getItem().priceIsSet()
+                && nt.getItem().getPrice() >= ours.getPrice()) {
+                return NativeTradeAction.ACK_BUY;
+            }
+            haggle = ours.getHaggleCount() + 1;
+            if (randomInt(logger, "Haggle-buy", getAIRandom(),
+                          HAGGLE_NUMBER + haggle) >= HAGGLE_NUMBER) {
+                return NativeTradeAction.NAK_HAGGLE;
+            }
+            ours.setHaggleCount(haggle);
+            updateTrade(nt, anger);
+            nt.setItem(ours);
+            return NativeTradeAction.ACK_BUY_HAGGLE;
+
+        case SELL:
+            switch (is.getAlarm(other).getLevel()) {
+            case HAPPY: case CONTENT:
+                anger = 1;
                 break;
             case DISPLEASED:
                 anger = 2;
                 break;
             case ANGRY:
-                anger = (any(nt.getBuying(),
+                anger = (any(nt.getUnitToSettlement(),
                              nti -> nti.getGoods().getType().getMilitary()))
                     ? 3 : -1;
                 break;
@@ -831,45 +932,31 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 break;
             }
             if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
+            updateTrade(nt, anger);
+            ours = find(nt.getUnitToSettlement(), nt.getItem().goodsMatcher());
+            if (ours == null) return NativeTradeAction.NAK_INVALID;
+            if (nt.getItem().priceIsSet()
+                && nt.getItem().getPrice() <= ours.getPrice()) {
+                return NativeTradeAction.ACK_SELL;
+            }
+            haggle = ours.getHaggleCount() + 1;
+            if (randomInt(logger, "Haggle-sell", getAIRandom(),
+                          HAGGLE_NUMBER + haggle) >= HAGGLE_NUMBER) {
+                return NativeTradeAction.NAK_HAGGLE;
+            }
+            ours.setHaggleCount(haggle);
+            updateTrade(nt, anger);
+            nt.setItem(ours);
+            return NativeTradeAction.ACK_SELL_HAGGLE;
 
-            // Price the goods to buy
-            Set<Modifier> modifiers = new HashSet<>();
-            if (is.hasMissionary(other)
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                Unit u = is.getMissionary();
-                modifiers.addAll(u.getMissionaryTradeModifiers(true));
-            }
-            if (unit.isNaval()) {
-                modifiers.addAll(getShipTradePenalties(true));
-            }
-            for (NativeTradeItem nti : nt.getBuying()) {
-                if (nti.priceIsSet()) continue;
-                int price = (int)FeatureContainer.applyModifiers(1.0f / anger
-                    * is.getPriceToBuy(nti.getGoods()), turn, modifiers);
-                if (price == NativeTradeItem.PRICE_UNSET) price = -1;
-                nti.setPrice(price);
-            }
+        case GIFT:
+            ours = find(nt.getUnitToSettlement(), nt.getItem().goodsMatcher());
+            if (ours == null) return NativeTradeAction.NAK_INVALID;
+            return (is.canAdd(nt.getItem().getGoods()))
+                ? NativeTradeAction.ACK_GIFT
+                : NativeTradeAction.NAK_GOODS;
 
-            // Price the goods to sell
-            modifiers.clear();
-            if (is.hasMissionary(other)
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                Unit u = is.getMissionary();
-                modifiers.addAll(u.getMissionaryTradeModifiers(false));
-            }
-            if (unit.isNaval()) {
-                modifiers.addAll(getShipTradePenalties(false));
-            }
-            nt.initializeSelling();
-            for (NativeTradeItem nti : nt.getSelling()) {
-                int price = (int)FeatureContainer.applyModifiers((float)anger
-                    * is.getPriceToSell(nti.getGoods()), turn, modifiers);
-                if (price == NativeTradeItem.PRICE_UNSET) price = -1;
-                nti.setPrice(price);
-            }
-            
-            return NativeTradeAction.ACK_OPEN;
-        default: // NYI
+        default: // Invalid
             return NativeTradeAction.NAK_INVALID;
         }
     }

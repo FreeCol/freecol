@@ -74,6 +74,7 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
@@ -397,6 +398,86 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Buy goods from a native settlement.
+     *
+     * @param unit The {@code Unit} that is buying.
+     * @param goods The {@code Goods} to buy.
+     * @param price The price to pay.
+     * @param sis The {@code ServerIndianSettlement} to give to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void csBuy(Unit unit, Goods goods, int price,
+                       ServerIndianSettlement sis, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        csVisit(owner, sis, 0, cs);
+        moveGoods(sis, goods.getType(), goods.getAmount(), unit);
+        cs.add(See.perhaps(), unit);
+        sis.getOwner().modifyGold(price);
+        owner.modifyGold(-price);
+        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.updateWantedGoods();
+        final Tile tile = sis.getTile();
+        tile.updateIndianSettlement(owner);
+        cs.add(See.only(owner), tile);
+        cs.addPartial(See.only(owner), owner, "gold");
+        logger.finest(owner.getSuffix() + " " + unit + " buys " + goods
+                      + " at " + sis.getName() + " for " + price);
+    }
+
+    /**
+     * Sell goods to a native settlement.
+     *
+     * @param unit The {@code Unit} that is selling.
+     * @param goods The {@code Goods} to sell.
+     * @param price The price to charge.
+     * @param sis The {@code ServerIndianSettlement} to sell to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void csSell(Unit unit, Goods goods, int price,
+                        ServerIndianSettlement sis, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        csVisit(owner, sis, 0, cs);
+        moveGoods(unit, goods.getType(), goods.getAmount(), sis);
+        cs.add(See.perhaps(), unit);
+        sis.getOwner().modifyGold(-price);
+        owner.modifyGold(price);
+        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.updateWantedGoods();
+        final Tile tile = sis.getTile();
+        tile.updateIndianSettlement(owner);
+        cs.add(See.only(owner), tile);
+        cs.addPartial(See.only(owner), owner, "gold");
+        cs.addSale(owner, sis, goods.getType(),
+                   Math.round((float)price/goods.getAmount()));
+        logger.finest(owner.getSuffix() + " " + unit + " sells " + goods
+                      + " at " + sis.getName() + " for " + price);
+    }
+
+    /**
+     * Give goods to a native settlement.
+     *
+     * @param unit The {@code Unit} that is giving.
+     * @param goods The {@code Goods} to give.
+     * @param price A price that the natives might have been willing to pay.
+     * @param sis The {@code ServerIndianSettlement} to give to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    private void csGift(Unit unit, Goods goods, int price,
+                        ServerIndianSettlement sis, ChangeSet cs) {
+        final ServerPlayer owner = (ServerPlayer)unit.getOwner();
+        csVisit(owner, sis, 0, cs);
+        moveGoods(unit, goods.getType(), goods.getAmount(), sis);
+        cs.add(See.perhaps(), unit);
+        sis.csModifyAlarm(owner, -price/50, true, cs);
+        sis.updateWantedGoods();
+        final Tile tile = sis.getTile();
+        tile.updateIndianSettlement(owner);
+        cs.add(See.only(owner), tile);
+        logger.finest(owner.getSuffix() + " " + unit + " gives " + goods
+                      + " at " + sis.getName());
+    }
+    
+    /**
      * Visits a native settlement, possibly scouting it full if it is
      * as a result of a scout actually asking to speak to the chief,
      * or for other settlement-contacting events such as missionary
@@ -556,13 +637,13 @@ public final class InGameController extends Controller {
      * @param taxRaise The amount of tax raise.
      * @param goods The {@code Goods} for a goods party.
      * @param result Whether the tax was accepted or not.
-     */
     private void raiseTax(ServerPlayer serverPlayer, int taxRaise, Goods goods,
                           boolean result) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csRaiseTax(taxRaise, goods, result, cs);
         getGame().sendTo(serverPlayer, cs);
     }
+     */
 
     /**
      * Performs a monarch action.
@@ -3314,77 +3395,179 @@ public final class InGameController extends Controller {
      */
     public ChangeSet nativeTrade(ServerPlayer serverPlayer,
                                  NativeTradeAction action, NativeTrade nt) {
-        if (nt == null) {
-            return serverPlayer.clientError("Null NativeTrade");
-        }
         final Unit unit = nt.getUnit();
         final IndianSettlement is = nt.getIndianSettlement();
-        if (unit == null || is == null) {
-            String dat;
-            try {
-                dat = nt.serialize();
-            } catch (Exception e) {
-                dat = null;
-            }
-            return serverPlayer.clientError("Bogus NativeTrade: " + dat);
-        }
         final ServerPlayer otherPlayer = (ServerPlayer)
             ((serverPlayer.owns(unit)) ? is.getOwner() : unit.getOwner());
 
-        ChangeSet cs = new ChangeSet();
+        // Server view of the transaction is kept in the NativeTradeSession,
+        // which is always updated with what the native player says, and
+        // only partially update with what the human player says.
         NativeTradeSession session = Session.lookup(NativeTradeSession.class,
-            nt.getUnit(), nt.getIndianSettlement());
+                                                    unit, is);
+System.err.println("NT " + action + " from " + serverPlayer.getSuffix()
+    + " session=" + session);
+        if (action.isEuropean() != serverPlayer.isEuropean()) {
+            return serverPlayer.clientError(((action.isEuropean())
+                    ? "European" : "Native")
+                + " player expected for " + action
+                + ": " + serverPlayer.getSuffix());
+        } else if (action == NativeTradeAction.OPEN && session != null) {
+            return serverPlayer.clientError("Session already open for: " + nt);
+        } else if (action != NativeTradeAction.OPEN && session == null) {
+            return serverPlayer.clientError("No session found for: " + nt);
+        }            
+
+        ChangeSet cs = new ChangeSet();
+        NativeTradeItem item;
         switch (action) {
-        case ACK_OPEN: case NAK_INVALID: case NAK_HOSTILE: case NAK_HAGGLE:
-            if (!serverPlayer.isIndian()) {
-                return serverPlayer.clientError("Native player expected for "
-                    + action + ": " + serverPlayer.getSuffix());
-            } else if (session == null) {
-                return serverPlayer.clientError("No session for: " + nt);
-            }
-            session.getNativeTrade().mergeFromNatives(nt);
-            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-                   new NativeTradeMessage(action, nt));
-            if (action == NativeTradeAction.ACK_OPEN) {
-                // Sets unit moves to zero to avoid cheating.  If no action
-                // is taken, the moves will be restored when closing the session
-                unit.setMovesLeft(0);
-                cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
-            }
-            if (action.isClosing()) session.complete(cs);
-            break;
-        case OPEN:
-            if (!serverPlayer.isEuropean()) {
-                return serverPlayer.clientError("European player expected for "
-                    + action + ": " + serverPlayer.getSuffix());
-            } else if (session != null) {
-                return serverPlayer.clientError("Session already open");
-            } else if (unit.getMovesLeft() <= 0) {
+        case OPEN: // Open a new session if possible
+            if (unit.getMovesLeft() <= 0) {
                 return serverPlayer.clientError("Unit " + unit.getId()
                     + " has no moves left.");
             }
-            // Never wholly trust the user:-)
             nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
-            session = new NativeTradeSession(nt);
-            nt.initializeBuying();
+            if (nt.getDone()) {
+                // Trade can not happen, just outright NAK as invalid.
+                cs.add(See.only(serverPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                       new NativeTradeMessage(NativeTradeAction.NAK_INVALID, nt));
+            } else {
+                // Trade can proceed.  Register a session and ask the natives
+                // to price the goods.
+                session = new NativeTradeSession(nt);
+                nt.initialize();
+                cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                       new NativeTradeMessage(action, nt));
+            }
+            break;
+
+        case CLOSE: // Just close the session
+            session.complete(cs);
+            break;
+
+        case BUY: // Check goods (not whole item, price might be wrong), forward
+            item = nt.getItem();
+            nt.mergeFrom(session.getNativeTrade());
+            if (item == null) {
+                return serverPlayer.clientError("Null purchase: " + nt);
+            } else if (!nt.canBuy()) {
+                return serverPlayer.clientError("Can not buy: " + nt);
+            } else if (find(nt.getSettlementToUnit(),
+                            item.goodsMatcher()) == null) {
+                return serverPlayer.clientError("Item missing for "
+                    + action + ": " + nt);
+            }
+            nt.setItem(item);
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
                    new NativeTradeMessage(action, nt));
             break;
-        case CLOSE:
-            if (!serverPlayer.isEuropean()) {
-                return serverPlayer.clientError("European player expected for "
-                    + action + ": " + serverPlayer.getSuffix());
-            } else if (session == null) {
-                return serverPlayer.clientError("No session for: " + nt);
+
+        case SELL: // Check goods, forward
+            item = nt.getItem();
+            nt.mergeFrom(session.getNativeTrade());
+            if (item == null) {
+                return serverPlayer.clientError("Null sale: " + nt);
+            } else if (!nt.canSell()) {
+                return serverPlayer.clientError("Can not sell: " + nt);
+            } else if (find(nt.getUnitToSettlement(),
+                            item.goodsMatcher()) == null) {
+                return serverPlayer.clientError("Item missing for "
+                    + action + ": " + nt);
             }
-            session.complete(cs);
+            nt.setItem(item);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
             break;
-           
+            
+        case GIFT: // Check goods, forward
+            item = nt.getItem();
+            nt.mergeFrom(session.getNativeTrade());
+            if (item == null) {
+                return serverPlayer.clientError("Null gift: " + nt);
+            } else if (!nt.canGift()) {
+                return serverPlayer.clientError("Can not gift: " + nt);
+            } else if (find(nt.getUnitToSettlement(),
+                            item.goodsMatcher()) == null) {
+                return serverPlayer.clientError("Item missing for "
+                    + action + ": " + nt);
+            }
+            nt.setItem(item);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+
+        case ACK_OPEN: // Natives are prepared to trade, inform player
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            // Set unit moves to zero to avoid cheating.  If no
+            // action is taken, the moves will be restored when
+            // closing the session.
+            unit.setMovesLeft(0);
+            cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
+            break;
+
+        case ACK_BUY_HAGGLE: case ACK_SELL_HAGGLE: // Successful haggle
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+            
+        case ACK_BUY: // Buy succeeded, update goods, inform player
+            item = nt.getItem();
+            csBuy(unit, item.getGoods(), item.getPrice(),
+                  (ServerIndianSettlement)is, cs);
+            nt.setBuy(false);
+            nt.addToUnit(item);
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+
+        case ACK_SELL: // Sell succeeded, update goods, inform player
+            item = nt.getItem();
+            csSell(unit, item.getGoods(), item.getPrice(),
+                   (ServerIndianSettlement)is, cs);
+            nt.setSell(false);
+            nt.removeFromUnit(item);
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+
+        case ACK_GIFT: // Gift succeeded, update goods, inform player
+            item = nt.getItem();
+            csGift(unit, item.getGoods(), item.getPrice(),
+                   (ServerIndianSettlement)is, cs);
+            nt.setGift(false);
+            nt.removeFromUnit(item);
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+
+        case NAK_GOODS: // Polite refusal of gift
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            break;
+
+        case NAK_INVALID: case NAK_HOSTILE: case NAK_HAGGLE: // Fail, close
+            session.getNativeTrade().mergeFrom(nt);
+            cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
+                   new NativeTradeMessage(action, nt));
+            session.complete(cs);
+            if (action == NativeTradeAction.NAK_HAGGLE) {
+                unit.setMovesLeft(0); // Clear moves again on hagglers
+                cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
+            }                
+            break;
+            
         default:
             return serverPlayer.clientError("Bogus action: " + action);
         }
 
-        // Update the other player
+        // Update the other player if needed
         getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }

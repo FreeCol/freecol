@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
@@ -664,17 +665,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to close a session for a trade.
-     *
-     * @param nt The {@code NativeTrade}
-     * @return True if the server interaction succeeded.
-     */
-    public boolean endNativeTradeSession(NativeTrade nt) {
-        return askHandling(nt.getUnit().getGame(),
-            new NativeTradeMessage(NativeTrade.NativeTradeAction.CLOSE, nt));
-    }
-
-    /**
      * Server query-response for asking for the turn to end.
      *
      * @param game The {@code Game} to construct a reply message in.
@@ -929,6 +919,18 @@ public abstract class ServerAPI {
     public boolean newLandName(Unit unit, String name) {
         return askHandling(unit.getGame(),
                            new NewLandNameMessage(unit, name));
+    }
+
+    /**
+     * Server query-response for simple native trades.
+     *
+     * @param nt The {@code NativeTrade} underway.
+     * @param action The {@code NativeTradeAction} to perform.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean nativeTrade(NativeTradeAction action, NativeTrade nt) {
+        return askHandling(nt.getUnit().getGame(),
+                           new NativeTradeMessage(action, nt));
     }
 
     /**

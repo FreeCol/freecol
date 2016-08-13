@@ -109,8 +109,34 @@ public class NativeTradeMessage extends DOMMessage {
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
+        final NativeTrade nt = getNativeTrade();
+        if (nt == null) {
+            return serverPlayer.clientError("Null native trade")
+                .build(serverPlayer);
+        }
+        
+        final Unit unit = nt.getUnit();
+        if (unit == null) {
+            return serverPlayer.clientError("Null unit").build(serverPlayer);
+        }
+        if (!unit.hasTile()) {
+            return serverPlayer.clientError("Unit not on the map: "
+                + unit.getId()).build(serverPlayer);
+        }
+
+        final IndianSettlement is = nt.getIndianSettlement();
+        if (is == null) {
+            return serverPlayer.clientError("Null settlement")
+                .build(serverPlayer);
+        }
+
+        if (!unit.getTile().isAdjacent(is.getTile())) {
+            return serverPlayer.clientError("Unit not adjacent to settlement")
+                .build(serverPlayer);
+        }
+
         return server.getInGameController()
-            .nativeTrade(serverPlayer, getAction(), getNativeTrade())
+            .nativeTrade(serverPlayer, getAction(), nt)
             .build(serverPlayer);
     }
 
