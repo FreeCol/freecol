@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.control.ChangeSet.See;
 
 
 /**
@@ -36,9 +37,6 @@ public class NativeTradeSession extends Session {
 
     /** The moves the trading unit has left at start of session. */
     private final int movesLeft;
-
-    /** Whether any action has been taken in this session. */
-    private boolean actionTaken;
 
     /** The native trade information. */
     private NativeTrade nt;
@@ -55,51 +53,31 @@ public class NativeTradeSession extends Session {
                              nt.getIndianSettlement()));
 
         this.movesLeft = nt.getUnit().getMovesLeft();
-        this.actionTaken = false;
         this.nt = nt;
     }
 
-    @Override
-    public void complete(ChangeSet cs) {
-        super.complete(cs);
-    }
-
-    public int getMovesLeft() {
-        return this.movesLeft;
-    }
-
-    public boolean getActionTaken() {
-        return this.actionTaken;
-    }
-
+    /**
+     * Get the native trade underway.
+     *
+     * @return The <code>NativeTrade</code>.
+     */
     public NativeTrade getNativeTrade() {
         return this.nt;
     }
-    
-    public boolean getBuy() {
-        return this.nt.getBuy();
-    }
 
-    public boolean getSell() {
-        return this.nt.getSell();
-    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void complete(ChangeSet cs) {
+        super.complete(cs);
 
-    public boolean getGift() {
-        return this.nt.getGift();
-    }
-
-    public void setBuy() {
-        this.actionTaken = true;
-        this.nt.setBuy(false);
-    }
-
-    public void setSell() {
-        this.actionTaken = true;
-        this.nt.setSell(false);
-    }
-
-    public void setGift() {
-        this.actionTaken = true;
-        this.nt.setGift(false);
+        if (this.nt.hasNotTraded()) { // Reset the moves if nothing happened
+            Unit unit = this.nt.getUnit();
+            unit.setMovesLeft(this.movesLeft);
+            cs.addPartial(See.only((ServerPlayer)unit.getOwner()), unit,
+                          "movesLeft");
+        }
+        this.nt.setDone();
     }
 }

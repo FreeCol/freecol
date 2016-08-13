@@ -82,6 +82,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -4041,22 +4042,23 @@ public final class InGameController extends FreeColClientHolder {
      *
      * Called from IGIH.nativeTrade.
      *
-     * @param nt The <code>NativeTrade</code> to update.
+     * @param action The <code>NativeTradeAction</code> to handle.
+     * @param nt The <code>NativeTrade</code> underway.
      */
-    public void nativeTrade(NativeTrade nt) {
+    public void nativeTrade(NativeTradeAction action, NativeTrade nt) {
         if (nt == null) return;
-        switch (nt.getAction()) { // Only consider actions returned by server
-        case HOSTILE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHaggle"));
-            return;
-        case HAGGLE:
-            getGUI().showInformationMessage(StringTemplate
-                .template("trade.noTradeHaggle"));
-            return;
-        case UPDATE: // normal case continues below
+        switch (action) { // Only consider actions returned by server
+        case ACK_OPEN: // normal case continues below
             break;
-        case INVALID: // should not happen
+        case NAK_HOSTILE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHaggle"));
+            return;
+        case NAK_HAGGLE:
+            getGUI().showInformationMessage(StringTemplate
+                .template("trade.noTradeHaggle"));
+            return;
+        case NAK_INVALID: // should not happen
         default:
             logger.warning("Bogus native trade: " + nt.toString());
             return;

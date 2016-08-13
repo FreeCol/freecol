@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
@@ -774,14 +775,11 @@ public final class InGameInputHandler extends ClientInputHandler {
     private Element nativeTrade(Element element) {
         final Game game = getGame();
 
-        NativeTradeMessage message = new NativeTradeMessage(game, element);
-        NativeTrade nt = message.getNativeTrade();
-        if (message.getAction() != NativeTrade.NativeTradeAction.UPDATE) {
-            logger.warning("Bogus server native trade action: "
-                + message.getAction());
-        } else {
-            invokeLater(() -> igc().nativeTrade(nt));
-        }
+        final NativeTradeMessage message
+            = new NativeTradeMessage(game, element);
+        final NativeTradeAction action = message.getAction();
+        final NativeTrade nt = message.getNativeTrade();
+        invokeLater(() -> igc().nativeTrade(action, nt));
         return null;
     }
 

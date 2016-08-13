@@ -449,9 +449,10 @@ public final class AIInGameInputHandler implements MessageHandler {
         final NativeTradeMessage message
             = new NativeTradeMessage(aiMain.getGame(), element);
         final NativeTrade nt = message.getNativeTrade();
+        NativeTrade.NativeTradeAction action = message.getAction();
 
-        getAIPlayer().handleTrade(nt);
-        return new NativeTradeMessage(nt).toXMLElement();
+        action = getAIPlayer().handleTrade(action, nt);
+        return new NativeTradeMessage(action, nt).toXMLElement();
     }
 
     /**

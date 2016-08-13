@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Stance;
@@ -339,9 +340,12 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Handle a native trade request.
      *
+     * @param action The <code>NativeTradeAction</code> to perform.
      * @param nt The <code>NativeTrade</code> to handle.
+     * @return The action in response.
      */
-    public abstract void handleTrade(NativeTrade nt);
+    public abstract NativeTradeAction handleTrade(NativeTradeAction action,
+                                                  NativeTrade nt);
     
     /**
      * Called when another <code>Player</code> proposes to buy.

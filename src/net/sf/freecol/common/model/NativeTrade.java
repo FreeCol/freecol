@@ -53,16 +53,18 @@ public class NativeTrade extends FreeColGameObject {
 
     /** The type of native trade command. */
     public static enum NativeTradeAction {
-        UPDATE(false),   // Server update of a session, rest are client-sent
-        OPEN(false),     // Start a new trade session
-        CLOSE(true),     // End an existing session
-        BUY(false),      // Buy goods
-        SELL(false),     // Sell goods
-        GIFT(false),     // Gift goods
-        // Rejections
-        INVALID(true),   // Trade is completely invalid
-        HOSTILE(true),   // Natives are hostile
-        HAGGLE(true);    // Trade failed due to too much haggling
+        // Requests from European trader
+        OPEN(false),          // Start a new trade session
+        CLOSE(true),          // End an existing session
+        BUY(false),           // Buy goods
+        SELL(false),          // Sell goods
+        GIFT(false),          // Gift goods
+        // Positive responses from native trader
+        ACK_OPEN(false),      // Open accepted
+        // Negative responses from native trader
+        NAK_INVALID(true),    // Trade is completely invalid
+        NAK_HOSTILE(true),    // Natives are hostile
+        NAK_HAGGLE(true);     // Trade failed due to too much haggling
 
         /** Does this action close the trade? */
         private final boolean closing;
@@ -82,9 +84,6 @@ public class NativeTrade extends FreeColGameObject {
                             NO_TRADE_HAGGLE = -2,
                             NO_TRADE_HOSTILE = -3;
 
-    /** The action underway. */
-    private NativeTradeAction action;
-    
     /** The unit that is trading. */
     private Unit unit;
 
@@ -126,14 +125,12 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Create a new trade session.
      *
-     * @param action The <code>NativeTradeAction</code> to perform.
      * @param unit The <code>Unit</code> that is trading.
      * @param is The <code>IndianSettlement</code> to trade with.
      */
-    public NativeTrade(NativeTradeAction action, Unit unit, IndianSettlement is) {
+    public NativeTrade(Unit unit, IndianSettlement is) {
         this(unit.getGame(), ""); // Identifier not needed
 
-        this.action = action;
         this.unit = unit;
         this.is = is;
         this.count = 0;
@@ -161,15 +158,6 @@ public class NativeTrade extends FreeColGameObject {
         return this.is;
     }
 
-    public NativeTradeAction getAction() {
-        return this.action;
-    }
-
-    public NativeTrade setAction(NativeTradeAction action) {
-        this.action = action;
-        return this;
-    }
-    
     public boolean getBuy() {
         return this.buy;
     }
@@ -223,12 +211,20 @@ public class NativeTrade extends FreeColGameObject {
         this.count = -1;
     }
 
+    public boolean hasNotTraded() {
+        return getBuy() && getSell() && getGift();
+    }
+
     public List<NativeTradeItem> getBuying() {
         return this.buying;
     }
 
     public List<NativeTradeItem> getSelling() {
         return this.selling;
+    }
+
+    public boolean isCompatible(final NativeTrade nt) {
+        return this.getKey().equals(nt.getKey());
     }
 
     public void initializeBuying() {
@@ -248,7 +244,17 @@ public class NativeTrade extends FreeColGameObject {
             this.selling.add(new NativeTradeItem(game, source, destination, g));
         }
     }
-        
+
+    public void mergeFromNatives(final NativeTrade nt) {
+        if (isCompatible(nt)) {
+            this.buying.clear();
+            this.buying.addAll(nt.getBuying());
+            this.selling.clear();
+            this.selling.addAll(nt.getSelling());
+        }
+    }
+
+
     // Override FreeColGameObject
 
     /**
@@ -261,7 +267,6 @@ public class NativeTrade extends FreeColGameObject {
 
     // Serialization
 
-    private static final String ACTION_TAG = "action";
     private static final String BUY_TAG = "buy";
     private static final String COUNT_TAG = "count";
     private static final String GIFT_TAG = "gift";
@@ -276,8 +281,6 @@ public class NativeTrade extends FreeColGameObject {
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
-
-        xw.writeAttribute(ACTION_TAG, this.action);
 
         xw.writeAttribute(BUY_TAG, this.buy);
         
@@ -312,9 +315,6 @@ public class NativeTrade extends FreeColGameObject {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
         super.readAttributes(xr);
-
-        this.action = xr.getAttribute(ACTION_TAG, NativeTradeAction.class,
-                                      (NativeTradeAction)null);
 
         this.buy = xr.getAttribute(BUY_TAG, false);
 
@@ -369,7 +369,6 @@ public class NativeTrade extends FreeColGameObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getTagName())
-            .append(' ').append(getAction())
             .append(' ').append(getUnit().getId())
             .append(' ').append(getIndianSettlement().getId())
             .append(" buy=").append(getBuy())

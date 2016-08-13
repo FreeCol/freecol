@@ -681,7 +681,7 @@ public abstract class ServerAPI {
      */
     public boolean endNativeTradeSession(NativeTrade nt) {
         return askHandling(nt.getUnit().getGame(),
-            new NativeTradeMessage(nt.setAction(NativeTrade.NativeTradeAction.CLOSE)),
+            new NativeTradeMessage(NativeTrade.NativeTradeAction.CLOSE, nt),
             null);
     }
 

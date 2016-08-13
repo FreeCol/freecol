@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.NativeTradeItem;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
@@ -802,11 +803,10 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * {@inheritDoc}
      */
     @Override
-    public void handleTrade(NativeTrade nt) {
-        if (nt == null) return;
-        if (!this.getPlayer().owns(nt.getIndianSettlement())) {
-            nt.setAction(NativeTrade.NativeTradeAction.INVALID);
-            return;
+    public NativeTradeAction handleTrade(NativeTradeAction action,
+                                         NativeTrade nt) {
+        if (nt == null || !this.getPlayer().owns(nt.getIndianSettlement())) {
+            return NativeTradeAction.NAK_INVALID;
         }
         final Specification spec = getSpecification();
         final IndianSettlement is = nt.getIndianSettlement();
@@ -814,7 +814,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         final Player other = unit.getOwner();
         final Turn turn = getGame().getTurn();
 
-        switch (nt.getAction()) {
+        switch (action) {
         case OPEN:
             int anger = 1;
             switch (is.getAlarm(other).getLevel()) {
@@ -832,10 +832,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 anger = -1;
                 break;
             }
-            if (anger < 0) {
-                nt.setAction(NativeTrade.NativeTradeAction.HOSTILE);
-                return;
-            }
+            if (anger < 0) return NativeTradeAction.NAK_HOSTILE;
 
             // Price the goods to buy
             Set<Modifier> modifiers = new HashSet<>();
@@ -869,14 +866,13 @@ public class NativeAIPlayer extends MissionAIPlayer {
             for (NativeTradeItem nti : nt.getSelling()) {
                 int price = (int)FeatureContainer.applyModifiers((float)anger
                     * is.getPriceToSell(nti.getGoods()), turn, modifiers);
+                if (price == NativeTradeItem.PRICE_UNSET) price = -1;
                 nti.setPrice(price);
             }
             
-            nt.setAction(NativeTrade.NativeTradeAction.UPDATE);
-            break;
+            return NativeTradeAction.ACK_OPEN;
         default: // NYI
-            nt.setAction(NativeTrade.NativeTradeAction.INVALID);
-            break;
+            return NativeTradeAction.NAK_INVALID;
         }
     }
 

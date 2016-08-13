@@ -1245,7 +1245,8 @@ public final class InGameController extends Controller {
         if (session == null) {
             return serverPlayer.clientError("Trying to buy without opening a session");
         }
-        if (!session.getBuy()) {
+        NativeTrade nt = session.getNativeTrade();
+        if (!nt.getBuy()) {
             return serverPlayer.clientError("Trying to buy in a session where buying is not allowed.");
         }
         if (!unit.hasSpaceLeft()) {
@@ -1276,7 +1277,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        session.setBuy();
+        nt.setBuy(true);
         logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
                       + " at " + is.getName() + " for " + amount);
 
@@ -1341,7 +1342,8 @@ public final class InGameController extends Controller {
         if (session == null) {
             return new ErrorMessage("Proposing to buy without opening a session?!");
         }
-        if (!session.getBuy()) {
+        NativeTrade nt = session.getNativeTrade();
+        if (!nt.getBuy()) {
             return new ErrorMessage("Proposing to buy in a session where buying is not allowed.");
         }
         ChangeSet cs = new ChangeSet();
@@ -1906,7 +1908,8 @@ public final class InGameController extends Controller {
         if (session == null) {
             return serverPlayer.clientError("Trying to deliver gift without opening a session");
         }
-        if (!session.getGift()) {
+        NativeTrade nt = session.getNativeTrade();
+        if (!nt.getGift()) {
             return serverPlayer.clientError("Trying to deliver gift in a session where gift giving is not allowed: " + unit + " " + settlement + " " + session);
         }
 
@@ -1923,7 +1926,7 @@ public final class InGameController extends Controller {
             tile.updateIndianSettlement(serverPlayer);
             cs.add(See.only(serverPlayer), tile);
         }
-        session.setGift();
+        nt.setGift(true);
 
         // Inform the receiver of the gift.
         ModelMessage m = new ModelMessage(MessageType.GIFT_GOODS,
@@ -3310,10 +3313,12 @@ public final class InGameController extends Controller {
      * Handle native trade sessions.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is trading.
+     * @param action The <code>NativeTradeAction</code> to perform.
      * @param nt The <code>NativeTrade</code> underway.
      * @return A <code>ChangeSet</code> encapsulating this action.
      */
-    public ChangeSet nativeTrade(ServerPlayer serverPlayer, NativeTrade nt) {
+    public ChangeSet nativeTrade(ServerPlayer serverPlayer,
+                                 NativeTradeAction action, NativeTrade nt) {
         if (nt == null) {
             return serverPlayer.clientError("Null NativeTrade");
         }
@@ -3331,23 +3336,32 @@ public final class InGameController extends Controller {
         final ServerPlayer otherPlayer = (ServerPlayer)
             ((serverPlayer.owns(unit)) ? is.getOwner() : unit.getOwner());
 
+        ChangeSet cs = new ChangeSet();
         NativeTradeSession session = Session.lookup(NativeTradeSession.class,
             nt.getUnit(), nt.getIndianSettlement());
-        ChangeSet cs = new ChangeSet();
-        switch (nt.getAction()) {
-        case UPDATE: case INVALID: case HOSTILE: case HAGGLE:
+        switch (action) {
+        case ACK_OPEN: case NAK_INVALID: case NAK_HOSTILE: case NAK_HAGGLE:
             if (!serverPlayer.isIndian()) {
-                return serverPlayer.clientError("Server sent update!?!");
+                return serverPlayer.clientError("Native player expected for "
+                    + action + ": " + serverPlayer.getSuffix());
             } else if (session == null) {
-                return serverPlayer.clientError("No such session");
+                return serverPlayer.clientError("No session for: " + nt);
             }
+            session.getNativeTrade().mergeFromNatives(nt);
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-                   new NativeTradeMessage(nt));
-            if (nt.getAction().isClosing()) session.complete(cs);
+                   new NativeTradeMessage(action, nt));
+            if (action == NativeTradeAction.ACK_OPEN) {
+                // Sets unit moves to zero to avoid cheating.  If no action
+                // is taken, the moves will be restored when closing the session
+                unit.setMovesLeft(0);
+                cs.addPartial(See.only(otherPlayer), unit, "movesLeft");
+            }
+            if (action.isClosing()) session.complete(cs);
             break;
         case OPEN:
             if (!serverPlayer.isEuropean()) {
-                return serverPlayer.clientError("Non-European trade open?");
+                return serverPlayer.clientError("European player expected for "
+                    + action + ": " + serverPlayer.getSuffix());
             } else if (session != null) {
                 return serverPlayer.clientError("Session already open");
             } else if (unit.getMovesLeft() <= 0) {
@@ -3355,33 +3369,24 @@ public final class InGameController extends Controller {
                     + " has no moves left.");
             }
             // Never wholly trust the user:-)
-            nt = new NativeTrade(nt.getAction(), nt.getUnit(),
-                                 nt.getIndianSettlement());
+            nt = new NativeTrade(nt.getUnit(), nt.getIndianSettlement());
             session = new NativeTradeSession(nt);
             nt.initializeBuying();
             cs.add(See.only(otherPlayer), ChangeSet.ChangePriority.CHANGE_LATE,
-                   new NativeTradeMessage(nt));
-            // Sets unit moves to zero to avoid cheating.  If no
-            // action is taken, the moves will be restored when
-            // closing the session
-            unit.setMovesLeft(0);
-            cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
+                   new NativeTradeMessage(action, nt));
             break;
         case CLOSE:
-            if (session == null) {
-                return serverPlayer.clientError("No such session");
+            if (!serverPlayer.isEuropean()) {
+                return serverPlayer.clientError("European player expected for "
+                    + action + ": " + serverPlayer.getSuffix());
+            } else if (session == null) {
+                return serverPlayer.clientError("No session for: " + nt);
             }
-            if (!session.getActionTaken()) {
-                unit.setMovesLeft(session.getMovesLeft());
-                cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
-            }
-            nt = session.getNativeTrade();
-            nt.setDone();
             session.complete(cs);
             break;
            
         default:
-            return serverPlayer.clientError("Bogus action: " + nt.getAction());
+            return serverPlayer.clientError("Bogus action: " + action);
         }
 
         // Update the other player
@@ -3791,7 +3796,8 @@ public final class InGameController extends Controller {
         if (session == null) {
             return new ErrorMessage("Proposing to sell without opening a session");
         }
-        if (!session.getSell()) {
+        NativeTrade nt = session.getNativeTrade();
+        if (!nt.getSell()) {
             return new ErrorMessage("Proposing to sell in a session where selling is not allowed.");
         }
         ChangeSet cs = new ChangeSet();
@@ -3829,7 +3835,8 @@ public final class InGameController extends Controller {
         if (session == null) {
             return serverPlayer.clientError("Trying to sell without opening a session");
         }
-        if (!session.getSell()) {
+        NativeTrade nt = session.getNativeTrade();
+        if (!nt.getSell()) {
             return serverPlayer.clientError("Trying to sell in a session where selling is not allowed.");
         }
         final Player settlementPlayer = is.getOwner();
@@ -3854,7 +3861,7 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlement(serverPlayer);
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        session.setSell();
+        nt.setSell(true);
         cs.addSale(serverPlayer, is, goods.getType(),
                 Math.round((float) amount / goods.getAmount()));
         logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
