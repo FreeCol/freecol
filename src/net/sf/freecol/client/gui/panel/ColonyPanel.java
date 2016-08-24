@@ -2013,6 +2013,10 @@ public final class ColonyPanel extends PortPanel
              */
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
                 this.colonyTile = colonyTile;
+                if (colonyTile == null) {
+                    logger.warning("Null colony tile for " + getColony()
+                        + " " + x + "," + y);
+                }
 
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
@@ -2067,6 +2071,7 @@ public final class ColonyPanel extends PortPanel
              */
             public void update() {
                 removeAll();
+                if (this.colonyTile == null) return;
 
                 UnitLabel label = null;
                 for (Unit unit : colonyTile.getUnitList()) {
