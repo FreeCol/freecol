@@ -319,8 +319,8 @@ public class SimpleMapGenerator implements MapGenerator {
             }
             
             sis.setWantedGoods(transform(is.getWantedGoods(), alwaysTrue(),
-                                         ig -> spec.getGoodsType(ig.getId()),
-                                         toListNoNulls()));
+                    ig -> (ig == null) ? null : spec.getGoodsType(ig.getId()),
+                    toListNoNulls()));
 
             owner.addSettlement(sis);
             newSettlements.add(sis);
