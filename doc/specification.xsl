@@ -498,20 +498,20 @@
     </div>
     <ul>
       <li>
-        <xsl:value-of select="freecol:localize('model.settlement.claimableRadius')"/>:
-        <xsl:value-of select="@claimableRadius"/>
+        <xsl:value-of select="freecol:localize('claimableRadius')"/>:
+        <xsl:value-of select="@claimable-radius"/>
       </li>
       <li>
-        <xsl:value-of select="freecol:localize('model.settlement.extraClaimableRadius')"/>:
-        <xsl:value-of select="@extraClaimableRadius"/>
+        <xsl:value-of select="freecol:localize('extraClaimableRadius')"/>:
+        <xsl:value-of select="@extra-claimable-radius"/>
       </li>
       <li>
-        <xsl:value-of select="freecol:localize('model.settlement.minimumSize')"/>:
-        <xsl:value-of select="@minimumSize"/>
+        <xsl:value-of select="freecol:localize('minimumSize')"/>:
+        <xsl:value-of select="@minimum-size"/>
       </li>
       <li>
-        <xsl:value-of select="freecol:localize('model.settlement.maximumSize')"/>:
-        <xsl:value-of select="@maximumSize"/>
+        <xsl:value-of select="freecol:localize('maximumSize')"/>:
+        <xsl:value-of select="@maximum-size"/>
       </li>
       <xsl:apply-templates select="ability"/>
       <xsl:apply-templates select="modifier"/>
@@ -591,7 +591,7 @@
       </xsl:choose>
       <xsl:choose>
         <xsl:when test="scope">
-          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/>
+          <br /><xsl:value-of select="freecol:localize('Scope')"/>
           <ul>
             <xsl:apply-templates select="scope"/>
           </ul>
@@ -626,7 +626,7 @@
       </xsl:choose>
       <xsl:choose>
         <xsl:when test="scope">
-          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/><xsl:text>:</xsl:text>
+          <br /><xsl:value-of select="freecol:localize('Scope')"/><xsl:text>:</xsl:text>
           <ul>
             <xsl:apply-templates select="scope"/>
           </ul>
@@ -659,7 +659,7 @@
           <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
           <xsl:if test="@role">
             <xsl:text> / </xsl:text>
-            <xsl:value-of select="freecol:localize(concat('model.unit.role.', @role))"/>
+            <xsl:value-of select="freecol:localize(concat(@role, '.name'))"/>
           </xsl:if>
         </xsl:when>
         <xsl:otherwise>
