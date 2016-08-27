@@ -845,7 +845,7 @@
     <target name="generate-documentation" depends="build"
             description="Creates HTML documentation from specification.">
         <java classname="net.sf.freecol.tools.GenerateDocumentation"
-              classpath="build/" />
+              classpath="build/" fork="true"/>
     </target>
 
     <!-- Creates 'freecol.desktop' file. -->
