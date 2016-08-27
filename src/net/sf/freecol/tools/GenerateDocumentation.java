@@ -131,7 +131,8 @@ public class GenerateDocumentation {
                     if (index >= 0) {
                         String key = line.substring(0, index).trim();
                         String value = line.substring(index + 1).trim()
-                            .replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+                            .replace("<", "&lt;").replace(">", "&gt;")
+                            .replace("&", "&amp;");
                         Map<String, String> map = translations.get(key);
                         if (map == null) {
                             map = new HashMap<>();
@@ -217,7 +218,23 @@ public class GenerateDocumentation {
     }
 
     public static String getResource(String key) {
-        return resources.get(key);
+        final String[] options = {
+            null,null,/*placeholders*/ "icon", "flavor", "tileitem" };
+        String ourKey = key;
+        final String[] splitKey = key.split("\\.");
+        String found = resources.get(ourKey);
+        if (found == null && splitKey.length > 2
+            && splitKey[0].equals("model")) {
+            String suffix = (splitKey[1].equals("tile")) ? ".center.r0" : "";
+            options[0] = splitKey[1];
+            options[1] = splitKey[1] + "icon";
+            for (String x : options) {
+                ourKey = "image." + x + "." + key + suffix;
+                found = resources.get(ourKey);
+                if (found != null) break;
+            }
+        }
+        return found;
     }
 
     public static String localize(String template) {

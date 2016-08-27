@@ -81,7 +81,8 @@
         <xsl:choose>
           <xsl:when test="@made-from">
             <xsl:variable name="id" select="@made-from"/>
-            <xsl:variable name="src" select="freecol:getResource(concat(@made-from, '.image'))"/>
+            <xsl:variable name="src"
+                          select="freecol:getResource(@made-from)"/>
             <img src="../data/rules/classic/{$src}"/><br />
             <a href="#{$id}">
               <xsl:value-of select="freecol:localize(concat(@made-from, '.name'))"/>
@@ -213,12 +214,6 @@
     <tr>
       <xsl:call-template name="name">
         <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
-        <xsl:with-param name="key">
-          <xsl:choose>
-            <xsl:when test="@is-forest='true'">.forest</xsl:when>
-            <xsl:otherwise>.center0.image</xsl:otherwise>
-          </xsl:choose>
-        </xsl:with-param>
       </xsl:call-template>
       <td>
         <xsl:value-of select="@basic-move-cost"/>
@@ -498,7 +493,7 @@
 
   <xsl:template match="settlement">
     <div class="center">
-      <xsl:variable name="src" select="freecol:getResource(concat(@id, '.image'))"/>
+      <xsl:variable name="src" select="freecol:getResource(@id)"/>
       <img src="../data/rules/classic/{$src}"/>
     </div>
     <ul>
@@ -733,8 +728,7 @@
   </xsl:template>
   <xsl:template name="name">
     <xsl:param name="id"></xsl:param>
-    <xsl:param name="key">.image</xsl:param>
-    <xsl:variable name="src" select="freecol:getResource(concat($id, $key))"/>
+    <xsl:variable name="src" select="freecol:getResource($id)"/>
     <td class="name">
       <a id="{$id}">
         <img src="../data/rules/classic/{$src}"/><br />
