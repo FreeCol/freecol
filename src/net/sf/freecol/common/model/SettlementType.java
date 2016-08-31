@@ -74,10 +74,10 @@ public class SettlementType extends FreeColSpecObjectType {
     private int convertThreshold = 100;
 
     /** The plunder this SettlementType generates when destroyed. */
-    private List<RandomRange> plunder = null;
+    private List<PlunderType> plunder = null;
 
     /** The gifts this SettlementType generates when visited by a scout. */
-    private List<RandomRange> gifts = null;
+    private RandomRange gifts = null;
 
 
     /**
@@ -213,8 +213,9 @@ public class SettlementType extends FreeColSpecObjectType {
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunderRange(Unit unit) {
-        return (plunder == null) ? null
-            : find(plunder, p -> p.appliesTo(unit));
+        if (this.plunder == null) return null;
+        PlunderType pt = find(plunder, p -> p.appliesTo(unit));
+        return (pt == null) ? null : pt.getPlunder();
     }
 
     /**
@@ -224,8 +225,7 @@ public class SettlementType extends FreeColSpecObjectType {
      * @return A range of gifts, or null if none applicable.
      */
     public final RandomRange getGifts(Unit unit) {
-        return (gifts == null) ? null
-            : find(gifts, g -> g.appliesTo(unit));
+        return this.gifts;
     }
 
 
@@ -239,23 +239,13 @@ public class SettlementType extends FreeColSpecObjectType {
     }
 
     /**
-     * Add a gift.
-     *
-     * @param gift The gift to add.
-     */
-    private void addGift(RandomRange gift) {
-        if (gifts == null) gifts = new ArrayList<>();
-        gifts.add(gift);
-    }
-
-    /**
      * Add a plunder.
      *
-     * @param range The plunder to add.
+     * @param pt The <code>PlunderType</code> to add.
      */
-    private void addPlunder(RandomRange range) {
+    private void addPlunder(PlunderType pt) {
         if (plunder == null) plunder = new ArrayList<>();
-        plunder.add(range);
+        plunder.add(pt);
     }
 
 
@@ -270,7 +260,6 @@ public class SettlementType extends FreeColSpecObjectType {
     private static final String MAXIMUM_SIZE_TAG = "maximum-size";
     private static final String MINIMUM_GROWTH_TAG = "minimum-growth";
     private static final String MINIMUM_SIZE_TAG = "minimum-size";
-    private static final String PLUNDER_TAG = "plunder";
     private static final String TRADE_BONUS_TAG = "trade-bonus";
     private static final String VISIBLE_RADIUS_TAG = "visible-radius";
     private static final String WANDERING_RADIUS_TAG = "wandering-radius";
@@ -325,12 +314,16 @@ public class SettlementType extends FreeColSpecObjectType {
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (plunder != null) {
-            for (RandomRange range : plunder) range.toXML(xw, PLUNDER_TAG);
+        if (this.plunder != null) {
+            for (PlunderType pt : this.plunder) pt.toXML(xw);
         }
 
-        if (gifts != null) {
-            for (RandomRange range : gifts) range.toXML(xw, GIFTS_TAG);
+        if (this.gifts != null) {
+            xw.writeStartElement(GIFTS_TAG);
+                
+            this.gifts.writeAttributes(xw);
+
+            xw.writeEndElement();
         }
     }
 
@@ -421,8 +414,8 @@ public class SettlementType extends FreeColSpecObjectType {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (xr.shouldClearContainers()) {
-            plunder = null;
-            gifts = null;
+            this.plunder = null;
+            this.gifts = null;
         }
 
         super.readChildren(xr);
@@ -436,10 +429,11 @@ public class SettlementType extends FreeColSpecObjectType {
         final String tag = xr.getLocalName();
 
         if (GIFTS_TAG.equals(tag)) {
-            addGift(new RandomRange(xr));
+            this.gifts = new RandomRange(xr);
+            xr.closeTag(GIFTS_TAG);
 
-        } else if (PLUNDER_TAG.equals(tag)) {
-            addPlunder(new RandomRange(xr));
+        } else if (PlunderType.getTagName().equals(tag)) {
+            addPlunder(new PlunderType(xr, getSpecification()));
 
         } else {
             super.readChild(xr);
