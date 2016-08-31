@@ -22,9 +22,13 @@ public static int getOppositeDirection(int direction) {
   return (direction < 4) ? direction + 4 : direction - 4;
 }
 
-and then check manually by running the program (System.out.printlns are often used).
+and then manually check that the method works correctly by either testing the compiled code 
+within the application itself (in FreeCol this would mean verifying that each direction is
+properly made opposite via the GUI output) or for a console-based application performing a
+series of calls to the System.out.println function to output whether or not each case worked
+properly.
 
-Instead we can write source code that makes sure whether the function behaves correctly:
+Instead we can write source code that verifies whether the function behaves correctly:
 
         public void testGetOppositeDirection() throws FreeColException {
 		assertEquals(Map.S, Map.getOppositeDirection(Map.N));
@@ -37,15 +41,16 @@ Instead we can write source code that makes sure whether the function behaves co
 		assertEquals(Map.SE, Map.getOppositeDirection(Map.NW));
 	}
 
-Each assert-statement will check whether the given condition holds. If all assert succeed 
-then the test passes (and usually a green bar is displayed to the developer) otherwise the 
-test fails (red bar), telling you which line did not pass the assertion.
+Each assert statement will check whether the given condition holds true. If all assert 
+statements succeed, the test passes (this may be indicated by a green bar in some IDEs) 
+otherwise the test fails (this may be indicated with a red bar), telling you which line 
+did not pass the assertion.
 
 2. Why write tests?
 
-* Make sure that code works as expected in certain situations.
+* Verify that code works as expected in certain situations.
 
-* To describe a bug to other developers, a test which fails can be used.
+* To describe a bug to other developers, a test which fails can be cited as an example.
 
 3. What are the benefits?
 
@@ -53,7 +58,7 @@ test fails (red bar), telling you which line did not pass the assertion.
   ("regression test"), thus after enough tests have been written, it is easier to be 
   confident about changing the code.
   
-* A test describes what a pieces of code is supposed to do and often can help to understand 
+* A test describes what a piece of code is supposed to do and often can help to understand 
   how it is supposed to be used.
   
 * Since the test is written in source code it is much faster to run than manual tests in 
@@ -102,7 +107,7 @@ java -cp bin;test/lib/junit.jar junit.swingui.TestRunner net.sf.freecol.AllTests
 
 c.) Using ant run:
 
-If you have ant 1.7 you can just
+If you have Apache Ant 1.7 or higher you can just run
 
 ant testall
 
@@ -131,4 +136,4 @@ http://junit.sourceforge.net/doc/testinfected/testing.htm
 
 [2] JUnit Homepage
 
-http://junit.sourceforge.net
+http://junit.org
