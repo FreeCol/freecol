@@ -38,7 +38,8 @@ import net.sf.freecol.common.util.Utils;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public abstract class Feature extends FreeColSpecObject implements Named {
+public abstract class Feature extends FreeColSpecObject
+    implements Named, Scoped {
 
     /** The source of this Feature, e.g. a UnitType. */
     private FreeColObject source;
@@ -135,54 +136,6 @@ public abstract class Feature extends FreeColSpecObject implements Named {
      */
     public final void setLastTurn(final Turn newLastTurn) {
         this.lastTurn = newLastTurn;
-    }
-
-    /**
-     * Does this feature have a scope?
-     *
-     * @return True if there are any scopes attached to this feature.
-     */
-    public final boolean hasScope() {
-        return this.scopes != null && !this.scopes.isEmpty();
-    }
-
-    /**
-     * Get the scopes for this feature.
-     *
-     * @return A list of <code>Scope</code>s.
-     */
-    public final List<Scope> getScopeList() {
-        return (this.scopes == null) ? Collections.<Scope>emptyList()
-            : new ArrayList<>(this.scopes);
-    }
-
-    /**
-     * Get the scopes for this feature.
-     *
-     * @return A stream of <code>Scope</code>s.
-     */
-    public final Stream<Scope> getScopes() {
-        return (this.scopes == null) ? Stream.<Scope>empty()
-            : getScopeList().stream();
-    }
-
-    /**
-     * Set the scopes for this feature.
-     *
-     * @param scopes A list of new <code>Scope</code>s.
-     */
-    public final void setScopes(List<Scope> scopes) {
-        this.scopes = scopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    public void addScope(Scope scope) {
-        if (this.scopes == null) this.scopes = new ArrayList<>();
-        this.scopes.add(scope);
     }
 
     /**
@@ -316,6 +269,49 @@ public abstract class Feature extends FreeColSpecObject implements Named {
     }
 
 
+    // Interface Scoped, and scope support
+
+    /**
+     * {@inheritDoc}
+     */
+    public final List<Scope> getScopeList() {
+        return (this.scopes == null) ? Collections.<Scope>emptyList()
+            : new ArrayList<>(this.scopes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Stream<Scope> getScopes() {
+        return (this.scopes == null) ? Stream.<Scope>empty()
+            : getScopeList().stream();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setScopes(List<Scope> scopes) {
+        this.scopes = scopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addScope(Scope scope) {
+        if (this.scopes == null) this.scopes = new ArrayList<>();
+        this.scopes.add(scope);
+    }
+
+    /**
+     * Does this feature have a scope?
+     *
+     * @return True if there are any scopes attached to this feature.
+     */
+    public final boolean hasScope() {
+        return this.scopes != null && !this.scopes.isEmpty();
+    }
+
+    
     // Override Object
 
     /**
@@ -345,18 +341,13 @@ public abstract class Feature extends FreeColSpecObject implements Named {
             } else if (lastTurn.getNumber() != feature.lastTurn.getNumber()) {
                 return false;
             }
-            if (this.scopes == null) {
-                if (feature.scopes != null) {
-                    return false;
-                }
-            } else if (feature.scopes == null) {
-                return false;
-            } else {
+            List<Scope> tScopes = getScopeList();
+            List<Scope> fScopes = feature.getScopeList();
+            if (tScopes.size() != fScopes.size()
                 // Not very efficient, but we do not expect many scopes
-                if (any(this.scopes, s -> !feature.scopes.contains(s))
-                    || any(feature.scopes, s -> !this.scopes.contains(s)))
-                    return false;
-            }
+                || any(this.scopes, s -> !feature.scopes.contains(s))
+                || any(feature.scopes, s -> !this.scopes.contains(s)))
+                return false;
             return true;
         }
         return false;
@@ -373,11 +364,9 @@ public abstract class Feature extends FreeColSpecObject implements Named {
         hash += 31 * hash + ((lastTurn == null) ? 0 : lastTurn.getNumber());
         hash += 31 * hash + duration;
         hash += 31 * ((temporary) ? 1 : 0);
-        if (this.scopes != null) {
-            // FIXME: is this safe?  It is an easy way to ignore
-            // the order of scope elements.
-            hash += sum(this.scopes, s -> Utils.hashCode(s));
-        }
+        // FIXME: is this safe?  It is an easy way to ignore
+        // the order of scope elements.
+        hash += sum(getScopeList(), s -> Utils.hashCode(s));
         return hash;
     }
 
