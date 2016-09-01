@@ -544,7 +544,7 @@ public final class ConnectController extends FreeColClientHolder {
                         });
                     return; // Success!
                 }
-                logger.warning("Could not log in.");
+                logger.warning("Could not log in: " + Messages.message(err));
             } catch (FileNotFoundException fnfe) {
                 err = FreeCol.errorFromException(fnfe,
                     FreeCol.badFile("error.couldNotFind", theFile));
