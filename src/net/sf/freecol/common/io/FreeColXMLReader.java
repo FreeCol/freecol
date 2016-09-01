@@ -71,6 +71,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
         NOINTERN,   // Do not intern any object that are read
     }
 
+    /** Trace all reads? */
+    private boolean tracing = false;
+
     /** The stream to read from. */
     private InputStream inputStream = null;
 
@@ -148,6 +151,17 @@ public class FreeColXMLReader extends StreamReaderDelegate
         this.readScope = ReadScope.NORMAL;
     }
 
+
+    /**
+     * Set the tracing state.
+     *
+     * @param tracing The new tracing state.
+     * @return This reader.
+     */
+    public FreeColXMLReader setTracing(boolean tracing) {
+        this.tracing = tracing;
+        return this;
+    }
 
     /**
      * Should reads from this stream intern their objects into the
@@ -242,6 +256,54 @@ public class FreeColXMLReader extends StreamReaderDelegate
     }
     // end @compat 0.10.x
 
+    /** Map for the XMLStreamConstants. */
+    private static final Map<Integer, String> tagStrings
+        = makeUnmodifiableMap(new Integer[] {
+                XMLStreamConstants.ATTRIBUTE,
+                XMLStreamConstants.CDATA,
+                XMLStreamConstants.CHARACTERS,
+                XMLStreamConstants.COMMENT,
+                XMLStreamConstants.DTD,
+                XMLStreamConstants.END_DOCUMENT,
+                XMLStreamConstants.END_ELEMENT,
+                XMLStreamConstants.ENTITY_DECLARATION,
+                XMLStreamConstants.ENTITY_REFERENCE,
+                XMLStreamConstants.NAMESPACE,
+                XMLStreamConstants.NOTATION_DECLARATION,
+                XMLStreamConstants.PROCESSING_INSTRUCTION,
+                XMLStreamConstants.SPACE,
+                XMLStreamConstants.START_DOCUMENT,
+                XMLStreamConstants.START_ELEMENT },
+            new String[] {
+                "Attribute", "CData", "Characters", "Comment", "DTD",
+                "EndDocument", "EndElement", "EntityDeclaration",
+                "EntityReference", "Namespace", "NotationDeclaration",
+                "ProcessingInstruction", "Space", "StartDocument",
+                "StartElement" });
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int nextTag() throws XMLStreamException {
+        int tag = super.nextTag();
+        if (tracing) {
+            switch (tag) {
+            case XMLStreamConstants.START_ELEMENT:
+                System.err.println("[" + getLocalName());
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                System.err.println(getLocalName() + "]");
+                break;
+            default:
+                System.err.println((tagStrings.containsKey(tag))
+                    ? tagStrings.get(tag)
+                    : "Weird tag: " + tag);
+                break;
+            }
+        }
+        return tag;
+    }
+             
     /**
      * Is the stream at the given tag?
      *
