@@ -21,7 +21,6 @@ package net.sf.freecol.common.model.mission;
 
 import java.util.List;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -197,7 +196,7 @@ public class CompoundMission extends AbstractMission {
         // Clear containers.
         missions.clear();
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             Mission mission = MissionManager.getMission(getGame(), xr);
             if (mission != null) missions.add(mission);
         }

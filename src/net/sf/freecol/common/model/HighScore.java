@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -388,7 +387,7 @@ public class HighScore extends FreeColObject {
         ) {
             xr.nextTag();
 
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 final String tag = xr.getLocalName();
                 if (HighScore.getTagName().equals(tag)) {
                     scores.add(new HighScore(xr));

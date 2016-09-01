@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
@@ -4602,7 +4601,7 @@ public class Unit extends GoodsLocation
 
         // @compat 0.10.5
         } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 super.readChild(xr);
             }
         // end @compat 0.10.5

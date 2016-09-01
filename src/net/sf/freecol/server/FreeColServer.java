@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -984,12 +983,10 @@ public final class FreeColServer {
                 // end @compat 0.11.6
             }
 
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 final String tag = xr.getLocalName();
                 if (SERVER_OBJECTS_TAG.equals(tag)) { // No longer used
-                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        xr.nextTag();
-                    }
+                    while (xr.moreTags()) xr.nextTag();
 
                 } else if (Game.getTagName().equals(tag)) {
                     // Read the game

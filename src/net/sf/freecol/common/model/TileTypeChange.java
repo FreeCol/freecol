@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -239,7 +238,7 @@ public class TileTypeChange extends FreeColSpecObjectType {
             this.production = null;
         }
     
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             final String tag = xr.getLocalName();
 
             if (PRODUCTION_TAG.equals(tag)) {

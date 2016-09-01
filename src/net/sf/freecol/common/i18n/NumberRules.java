@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Number.Category;
@@ -121,7 +120,7 @@ public class NumberRules {
 
 
     private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             String tag = xr.getLocalName();
             if (null != tag) switch (tag) {
                 case VERSION_TAG:
@@ -131,7 +130,7 @@ public class NumberRules {
                     xr.nextTag();
                     break;
                 case PLURALS_TAG:
-                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    while (xr.moreTags()) {
                         tag = xr.getLocalName();
                         if (PLURAL_RULES_TAG.equals(tag)) {
                             readChild(xr);
@@ -146,7 +145,7 @@ public class NumberRules {
         String[] locales = (loc == null) ? null : loc.split(" ");
         if (locales != null) {
             DefaultNumberRule numberRule = new DefaultNumberRule();
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 if (PLURAL_RULE_TAG.equals(xr.getLocalName())) {
                     String plu = xr.getAttribute(COUNT_TAG, (String)null);
                     Category category = Category.valueOf(plu);

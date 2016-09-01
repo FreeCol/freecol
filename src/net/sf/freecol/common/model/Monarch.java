@@ -27,7 +27,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -909,7 +908,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // @compat 0.10.5
         } else if (Force.LAND_UNITS_TAG.equals(tag)) {
             expeditionaryForce.clearLandUnits();
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 AbstractUnit newUnit = new AbstractUnit(xr);
                 expeditionaryForce.add(newUnit);
             }
@@ -925,7 +924,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
             expeditionaryForce.clearNavalUnits();
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 AbstractUnit newUnit = new AbstractUnit(xr);
                 expeditionaryForce.add(newUnit);
             }

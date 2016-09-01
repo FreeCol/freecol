@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -774,7 +773,7 @@ public final class Specification {
 
         @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 Modifier modifier = new Modifier(xr, Specification.this);
                 Specification.this.addModifier(modifier);
                 Specification.this.specialModifiers.add(modifier);
@@ -796,7 +795,7 @@ public final class Specification {
 
         @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 final String tag = xr.getLocalName();
                 String id = xr.readId();
                 if (id == null) {
@@ -845,7 +844,7 @@ public final class Specification {
 
         @Override
         public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 readChild(xr);
             }
         }
@@ -2985,7 +2984,7 @@ public final class Specification {
             }
         }
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             String childName = xr.getLocalName();
             // @compat 0.10.x
             // Ideally we would handle role backward compatibility in

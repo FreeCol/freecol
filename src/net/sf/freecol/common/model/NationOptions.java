@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
@@ -277,7 +276,7 @@ public class NationOptions extends FreeColSpecObject {
 
         // @compat 0.11.3
         } else if (OLD_NATIONS_TAG.equals(tag)) {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 tag = xr.getLocalName();
                 if (OLD_NATION_TAG.equals(tag)) {
                     Nation nation = xr.getType(spec, ID_ATTRIBUTE_TAG,

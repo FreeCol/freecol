@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -621,8 +620,7 @@ public class AIMain extends FreeColObject
             // We are hosed.  Try to resynchronize at the end of the tag
             // or aiMain.
             final String mainTag = getTagName();
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT
-                || !(xr.atTag(tag) || xr.atTag(mainTag)));
+            while (xr.moreTags() || !(xr.atTag(tag) || xr.atTag(mainTag)));
         }
     }
 

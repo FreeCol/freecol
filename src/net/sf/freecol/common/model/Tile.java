@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -2682,7 +2681,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         // @compat 0.10.1
         } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 super.readChild(xr);
             }
         // end @compat

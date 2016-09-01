@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -1137,16 +1136,12 @@ public abstract class FreeColObject
         if (tag == null) {
             throw new XMLStreamException("Parse error, null opening tag.");
         }
-        int next = -1;
-        for (;;) {
-            try {
-                next = xr.nextTag();
-            } catch (XMLStreamException xse) {
-                logger.log(Level.SEVERE, "nextTag failed at " + tag
-                    + ", previous=" + next, xse);
+        try {
+            while (xr.moreTags()) {
+                readChild(xr);
             }
-            if (next == XMLStreamConstants.END_ELEMENT) break;
-            readChild(xr);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.SEVERE, "nextTag failed at " + tag, xse);
         }
         xr.expectTag(tag);
     }

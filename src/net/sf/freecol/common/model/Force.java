@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -285,16 +284,16 @@ public class Force extends FreeColSpecObject {
         clearLandUnits();
         clearNavalUnits();
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (xr.moreTags()) {
             final String tag = xr.getLocalName();
 
             if (LAND_UNITS_TAG.equals(tag)) {
-                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                while (xr.moreTags()) {
                     AbstractUnit au = new AbstractUnit(xr);
                     if (au != null) add(au);
                 }
             } else if (NAVAL_UNITS_TAG.equals(tag)) {
-                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                while (xr.moreTags()) {
                     AbstractUnit au = new AbstractUnit(xr);
                     if (au != null) add(au);
                 }

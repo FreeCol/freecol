@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -626,7 +625,7 @@ public class Europe extends UnitLocation
 
         // @compat 0.10.0
         } else if (UNITS_TAG.equals(tag)) {
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            while (xr.moreTags()) {
                 super.readChild(xr);
             }
         // end @compat 0.10.0
