@@ -931,7 +931,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @see #hasExplored
      */
     public Set<Tile> exploreTiles(Collection<? extends Tile> tiles) {
-        return transform(tiles, t -> exploreTile(t), Function.identity(),
+        return transform(tiles, t -> exploreTile(t), (Tile t) -> t,
                          Collectors.toSet());
     }
 
