@@ -244,10 +244,6 @@ public final class FreeCol {
             }
         }
 
-        // Java bug #7075600 causes BR#2554.  The workaround is to set
-        // the following property.  Remove if/when they fix Java.
-        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
-
         // We can not even emit localized error messages until we find
         // the data directory, which might have been specified on the
         // command line.
