@@ -33,9 +33,9 @@ public class CenterAction extends UnitAction {
 
 
     /**
-     * Creates a new <code>CenterAction</code>.
+     * Creates a new {@code CenterAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public CenterAction(FreeColClient freeColClient) {
         super(freeColClient, id);

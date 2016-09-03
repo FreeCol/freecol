@@ -52,7 +52,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
      */
     public ServerBuilding(Game game, String id) {
@@ -62,9 +62,9 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Creates a new ServerBuilding.
      *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param colony The <code>Colony</code> in which this building is located.
-     * @param type The <code>BuildingType</code> of building.
+     * @param game The {@code Game} this object belongs to.
+     * @param colony The {@code Colony} in which this building is located.
+     * @param type The {@code BuildingType} of building.
      */
     public ServerBuilding(Game game, Colony colony, BuildingType type) {
         super(game, colony, type);
@@ -74,9 +74,9 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * New turn for this building.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -92,7 +92,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Teach all the units in this school.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csTeach(ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)getColony().getOwner();
@@ -129,8 +129,8 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * teaching required if the colony production bonus rises at end
      * of new turn calculations.
      *
-     * @param teacher The teaching <code>Unit</code>.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param teacher The teaching {@code Unit}.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if teaching occurred.
      */
     public boolean csCheckTeach(Unit teacher, ChangeSet cs) {
@@ -152,9 +152,9 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Train a student.
      *
-     * @param teacher The teacher <code>Unit</code>.
-     * @param student The student <code>Unit</code> to train.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param teacher The teacher {@code Unit}.
+     * @param student The student {@code Unit} to train.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if teaching occurred.
      */
     private boolean csTrainStudent(Unit teacher, Unit student, ChangeSet cs) {
@@ -191,8 +191,8 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Assigns a student to a teacher within a building.
      *
-     * @param teacher The <code>Unit</code> that is teaching.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param teacher The {@code Unit} that is teaching.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if a student was assigned.
      */
     private boolean csAssignStudent(Unit teacher, ChangeSet cs) {
@@ -217,7 +217,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     /**
      * Repair the units in this building.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csRepairUnits(ChangeSet cs) {
         for (Unit unit : transform(getTile().getUnits(), u ->
@@ -233,8 +233,8 @@ public class ServerBuilding extends Building implements ServerModelObject {
      * The building must need input, have a person working there, and have
      * no production occurring.
      *
-     * @param pi The <code>ProductionInfo</code> for the building.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param pi The {@code ProductionInfo} for the building.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csCheckMissingInput(ProductionInfo pi, ChangeSet cs) {
         if (!canAutoProduce() && pi.getProduction().isEmpty()) {

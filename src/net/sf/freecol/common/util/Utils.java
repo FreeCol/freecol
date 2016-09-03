@@ -73,7 +73,7 @@ public class Utils {
     /**
      * Get a hash code for an object, even null.
      *
-     * @param object The <code>Object</code> to use.
+     * @param object The {@code Object} to use.
      * @return A hash code.
      */
     public static int hashCode(Object object) {
@@ -86,7 +86,7 @@ public class Utils {
      * the current seed, but unfortunately it is private.
      *
      * @param random A pseudo-random number source.
-     * @return A <code>String</code> encapsulating the object state.
+     * @return A {@code String} encapsulating the object state.
      */
     public static synchronized String getRandomState(Random random) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -110,7 +110,7 @@ public class Utils {
      * Restore a previously saved state.
      *
      * @param state The saved state (@see #getRandomState()).
-     * @return The restored <code>Random</code>.
+     * @return The restored {@code Random}.
      */
     public static synchronized Random restoreRandomState(String state) {
         if (state == null || state.isEmpty()) return null;
@@ -134,8 +134,8 @@ public class Utils {
     /**
      * Create a new file reader that uses UTF-8.
      *
-     * @param file A <code>File</code> to read from.
-     * @return A <code>Reader</code> for this file.
+     * @param file A {@code File} to read from.
+     * @return A {@code Reader} for this file.
      */
     public static Reader getFileUTF8Reader(File file) {
         FileInputStream fis;
@@ -165,7 +165,7 @@ public class Utils {
     /**
      * Get the UTF-8 encoded contents of a file.
      *
-     * @param file The <code>File</code> to query.
+     * @param file The {@code File} to query.
      * @return The contents string, or null on error.
      */
     public static String getUTF8Contents(File file) {
@@ -193,8 +193,8 @@ public class Utils {
     /**
      * Create a new file writer that uses UTF-8.
      *
-     * @param file A <code>File</code> to write to.
-     * @return A <code>Writer</code> for this file.
+     * @param file A {@code File} to write to.
+     * @return A {@code Writer} for this file.
      */
     public static Writer getFileUTF8Writer(File file) {
         return getF8W(file, false);
@@ -203,8 +203,8 @@ public class Utils {
     /**
      * Create a new appending file writer that uses UTF-8.
      *
-     * @param file A <code>File</code> to append to.
-     * @return A <code>Writer</code> for this file.
+     * @param file A {@code File} to append to.
+     * @return A {@code Writer} for this file.
      */
     public static Writer getFileUTF8AppendWriter(File file) {
         return getF8W(file, true);
@@ -213,9 +213,9 @@ public class Utils {
     /**
      * Create a new file writer that uses UTF-8.
      *
-     * @param file A <code>File</code> to write to.
+     * @param file A {@code File} to write to.
      * @param append If true, append to the file.
-     * @return A <code>Writer</code> for this file.
+     * @return A {@code Writer} for this file.
      */
     private static Writer getF8W(File file, boolean append) {
         FileOutputStream fos;
@@ -240,8 +240,8 @@ public class Utils {
     /**
      * Create a new file writer that uses UTF-8.
      *
-     * @param os An <code>OutputStream</code> to write to.
-     * @return A <code>Writer</code> for this file.
+     * @param os An {@code OutputStream} to write to.
+     * @return A {@code Writer} for this file.
      */
     public static Writer getUTF8Writer(OutputStream os) {
         try {
@@ -257,7 +257,7 @@ public class Utils {
      *
      * @param declaration If true, include the XML declaration.
      * @param indent If true, set up the transformer to indent.
-     * @return A suitable <code>Transformer</code>.
+     * @return A suitable {@code Transformer}.
      */
     public static Transformer makeTransformer(boolean declaration,
                                               boolean indent) {

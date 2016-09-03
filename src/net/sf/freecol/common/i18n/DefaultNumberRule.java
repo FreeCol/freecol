@@ -36,8 +36,8 @@ public class DefaultNumberRule extends Number {
     /**
      * Add a parsed rule for category.
      *
-     * @param number a <code>Category</code> value
-     * @param rule a <code>Rule</code> value
+     * @param number a {@code Category} value
+     * @param rule a {@code Rule} value
      */
     public void addRule(Category number, Rule rule) {
         rules.put(number, rule);
@@ -46,8 +46,8 @@ public class DefaultNumberRule extends Number {
     /**
      * Add an unparsed rule for category.
      *
-     * @param number a <code>Category</code> value
-     * @param input a <code>String</code> value
+     * @param number a {@code Category} value
+     * @param input a {@code String} value
      */
     public void addRule(Category number, String input) {
         rules.put(number, new Rule(input));
@@ -56,7 +56,7 @@ public class DefaultNumberRule extends Number {
     /**
      * Return the number of rules added.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public int countRules() {
         return rules.values().size();
@@ -65,8 +65,8 @@ public class DefaultNumberRule extends Number {
     /**
      * Return the rule for the given category.
      *
-     * @param category a <code>Category</code> value
-     * @return a <code>Rule</code> value
+     * @param category a {@code Category} value
+     * @return a {@code Rule} value
      */
     public Rule getRule(Category category) {
         return rules.get(category);

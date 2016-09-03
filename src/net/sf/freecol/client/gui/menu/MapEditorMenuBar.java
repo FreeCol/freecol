@@ -46,7 +46,7 @@ import net.sf.freecol.common.option.OptionGroup;
  * <br><br>
  *
  * The menu bar that is displayed on the top left corner of the
- * <code>Canvas</code>.
+ * {@code Canvas}.
  *
  * @see InGameMenuBar
  */
@@ -57,10 +57,10 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
 
     /**
-     * Creates a new <code>MapEditorMenuBar</code>. This menu bar will include
+     * Creates a new {@code MapEditorMenuBar}. This menu bar will include
      * all of the submenus and items.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param listener An optional mouse motion listener.
      */
     public MapEditorMenuBar(final FreeColClient freeColClient, MouseMotionListener listener) {

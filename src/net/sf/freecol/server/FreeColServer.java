@@ -215,7 +215,7 @@ public final class FreeColServer {
      *
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
-     * @param specification The <code>Specification</code> to use in this game.
+     * @param specification The {@code Specification} to use in this game.
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
      * @exception IOException If the public socket cannot be created.
@@ -253,7 +253,7 @@ public final class FreeColServer {
      * MapConverter does call this with an overriding specification.
      *
      * @param savegame The file where the game data is located.
-     * @param specification An optional <code>Specification</code> to use.
+     * @param specification An optional {@code Specification} to use.
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
      * @exception IOException If save game can not be found.
@@ -372,7 +372,7 @@ public final class FreeColServer {
      * If the port is unspecified (negative), try multiple times.
      *
      * @param firstPort The port to start trying to connect at.
-     * @return A started <code>Server</code>.
+     * @return A started {@code Server}.
      * @exception IOException on failure to open the port.
      */
     private Server serverStart(int firstPort) throws IOException {
@@ -417,9 +417,9 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the <code>UserConnectionHandler</code>.
+     * Gets the {@code UserConnectionHandler}.
      *
-     * @return The <code>UserConnectionHandler</code> that is beeing used when
+     * @return The {@code UserConnectionHandler} that is beeing used when
      *         new client connect.
      */
     public UserConnectionHandler getUserConnectionHandler() {
@@ -427,9 +427,9 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the <code>Controller</code>.
+     * Gets the {@code Controller}.
      *
-     * @return The <code>Controller</code>.
+     * @return The {@code Controller}.
      */
     public Controller getController() {
         if (getGameState() == GameState.IN_GAME) {
@@ -440,18 +440,18 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the <code>PreGameInputHandler</code>.
+     * Gets the {@code PreGameInputHandler}.
      *
-     * @return The <code>PreGameInputHandler</code>.
+     * @return The {@code PreGameInputHandler}.
      */
     public PreGameInputHandler getPreGameInputHandler() {
         return preGameInputHandler;
     }
 
     /**
-     * Gets the <code>InGameInputHandler</code>.
+     * Gets the {@code InGameInputHandler}.
      *
-     * @return The <code>InGameInputHandler</code>.
+     * @return The {@code InGameInputHandler}.
      */
     public InGameInputHandler getInGameInputHandler() {
         return inGameInputHandler;
@@ -467,9 +467,9 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the <code>Game</code> that is being played.
+     * Gets the {@code Game} that is being played.
      *
-     * @return The <code>Game</code> which is the main class of the game-model
+     * @return The {@code Game} which is the main class of the game-model
      *         being used in this game.
      */
     public ServerGame getGame() {
@@ -477,9 +477,9 @@ public final class FreeColServer {
     }
 
     /**
-     * Sets the <code>Game</code> that is being played.
+     * Sets the {@code Game} that is being played.
      *
-     * @param game The new <code>Game</code>.
+     * @param game The new {@code Game}.
      */
     public void setGame(ServerGame game) {
         this.game = game;
@@ -547,7 +547,7 @@ public final class FreeColServer {
     /**
      * Get the map generator.
      *
-     * @return The <code>MapGenerator</code>.
+     * @return The {@code MapGenerator}.
      */
     public MapGenerator getMapGenerator() {
         return this.mapGenerator;
@@ -556,7 +556,7 @@ public final class FreeColServer {
     /**
      * Set the map generator.
      *
-     * @param mapGenerator The new <code>MapGenerator</code>.
+     * @param mapGenerator The new {@code MapGenerator}.
      */
     public void setMapGenerator(MapGenerator mapGenerator) {
         this.mapGenerator = mapGenerator;
@@ -616,8 +616,8 @@ public final class FreeColServer {
     /**
      * Send a message to all connections.
      *
-     * @param msg The <code>DOMMessage</code> to send.
-     * @param conn An option <code>Connection</code> to omit.
+     * @param msg The {@code DOMMessage} to send.
+     * @param conn An option {@code Connection} to omit.
      */
     public void sendToAll(DOMMessage msg, Connection conn) {
         getServer().sendToAll(msg, conn);
@@ -705,7 +705,7 @@ public final class FreeColServer {
 
     /**
      * Removes this server from the metaserver's list. The information is only
-     * sent if <code>public == true</code>.
+     * sent if {@code public == true}.
      *
      * @return True if the MetaServer was updated.
      */
@@ -758,7 +758,7 @@ public final class FreeColServer {
      *
      * @param file The file where the data will be written.
      * @param options The client options to save.
-     * @param active An optional active <code>Unit</code>.
+     * @param active An optional active {@code Unit}.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
@@ -787,8 +787,8 @@ public final class FreeColServer {
      * @param file The file where the data will be written.
      * @param owner An optional name to use as the owner of the game.
      * @param options Optional client options to save in the game.
-     * @param active An optional active <code>Unit</code>.
-     * @param image A thumbnail <code>Image</code> value to save in the game.
+     * @param active An optional active {@code Unit}.
+     * @param image A thumbnail {@code Image} value to save in the game.
      * @exception IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
@@ -894,8 +894,8 @@ public final class FreeColServer {
      * When the specification is not supplied, the one found in the saved
      * game will be used.
      *
-     * @param file The <code>File</code> to read from.
-     * @param spec An optional <code>Specification</code> to use.
+     * @param file The {@code File} to read from.
+     * @param spec An optional {@code Specification} to use.
      * @param server Use this (optional) server to load into.
      * @return The game found in the stream.
      */
@@ -934,7 +934,7 @@ public final class FreeColServer {
      * game will be used.
      *
      * @param fis The stream to read from.
-     * @param specification An optional <code>Specification</code> to use.
+     * @param specification An optional {@code Specification} to use.
      * @param server Use this (optional) server to load into.
      * @return The game found in the stream.
      * @exception FreeColException if the format is incompatible.
@@ -1017,7 +1017,7 @@ public final class FreeColServer {
      * Loads a game.
      *
      * @param fis The file where the game data is located.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      * @param server The server to connect the AI players to.
      * @return The new game.
      * @exception FreeColException if the savegame contains incompatible data.
@@ -1137,8 +1137,8 @@ public final class FreeColServer {
      * Add option to capture units under repair in a colony.
      * Establish a new unknown enemy player.
      *
-     * @param game The <code>Game</code> to establish the enemy within.
-     * @return The new unknown enemy <code>Player</code>.
+     * @param game The {@code Game} to establish the enemy within.
+     * @return The new unknown enemy {@code Player}.
      */
     private ServerPlayer establishUnknownEnemy(Game game) {
         final Specification spec = game.getSpecification();
@@ -1154,10 +1154,10 @@ public final class FreeColServer {
      *
      * Public for the map generator.
      *
-     * @param game The <code>Game</code> to create the map for.
+     * @param game The {@code Game} to create the map for.
      * @param width The map width.
      * @param height The map height.
-     * @return The new empty <code>Map</code>.
+     * @return The new empty {@code Map}.
      */
     public Map createEmptyMap(Game game, int width, int height) {
         return getMapGenerator().createEmptyMap(width, height,
@@ -1229,8 +1229,8 @@ public final class FreeColServer {
      *
      * Public so the controller can add REF players.
      *
-     * @param nation The <code>Nation</code> to add.
-     * @return The new AI <code>ServerPlayer</code>.
+     * @param nation The {@code Nation} to add.
+     * @return The new AI {@code ServerPlayer}.
      */
     public ServerPlayer makeAIPlayer(Nation nation) {
         DummyConnection theConnection
@@ -1306,10 +1306,10 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets a <code>Player</code> specified by a connection.
+     * Gets a {@code Player} specified by a connection.
      *
      * @param connection The connection to use while searching for a
-     *            <code>ServerPlayer</code>.
+     *            {@code ServerPlayer}.
      * @return The player.
      */
     public ServerPlayer getPlayer(Connection connection) {
@@ -1320,7 +1320,7 @@ public final class FreeColServer {
     /**
      * Gets the AI player corresponding to a given player.
      *
-     * @param player The <code>Player</code> to look up.
+     * @param player The {@code Player} to look up.
      * @return The corresponding AI player, or null if not found.
      */
     public AIPlayer getAIPlayer(Player player) {

@@ -47,19 +47,19 @@ public class IntegerOption extends AbstractOption<Integer> {
 
 
     /**
-     * Creates a new <code>IntegerOption</code>.
+     * Creates a new {@code IntegerOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public IntegerOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>IntegerOption</code>.
+     * Creates a new {@code IntegerOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public IntegerOption(String id, Specification specification) {
         super(id, specification);

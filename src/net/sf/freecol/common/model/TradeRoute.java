@@ -46,7 +46,7 @@ public class TradeRoute extends FreeColGameObject
     private String name;
 
     /**
-     * The <code>Player</code> who owns this trade route.  This is
+     * The {@code Player} who owns this trade route.  This is
      * necessary to ensure that malicious clients can not modify the
      * trade routes of other players.
      */
@@ -60,11 +60,11 @@ public class TradeRoute extends FreeColGameObject
 
 
     /**
-     * Creates a new <code>TradeRoute</code> instance.
+     * Creates a new {@code TradeRoute} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param name The name of the trade route.
-     * @param player The owner <code>Player</code>.
+     * @param player The owner {@code Player}.
      */
     public TradeRoute(Game game, String name, Player player) {
         super(game);
@@ -74,9 +74,9 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
-     * Creates a new <code>TradeRoute</code> instance.
+     * Creates a new {@code TradeRoute} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public TradeRoute(Game game, String id) {
@@ -89,7 +89,7 @@ public class TradeRoute extends FreeColGameObject
      * useful when an updated route is received on the server side
      * from the client.
      *
-     * @param other The <code>TradeRoute</code> to copy from.
+     * @param other The {@code TradeRoute} to copy from.
      */
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
@@ -122,7 +122,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get the stops in this trade route.
      *
-     * @return A list of <code>TradeRouteStop</code>s.
+     * @return A list of {@code TradeRouteStop}s.
      */
     public final List<TradeRouteStop> getStops() {
         return this.stops;
@@ -132,8 +132,8 @@ public class TradeRoute extends FreeColGameObject
      * Get a list of the trade route stops in this trade route, starting
      * at a given stop (inclusive) and a final stop (exclusive).
      *
-     * @param start The starting <code>TradeRouteStop</code>.
-     * @param end The end <code>TradeRouteStop</code>.
+     * @param start The starting {@code TradeRouteStop}.
+     * @param end The end {@code TradeRouteStop}.
      * @return A list of stops, or null on error.
      */
     public List<TradeRouteStop> getStopSublist(TradeRouteStop start,
@@ -149,18 +149,18 @@ public class TradeRoute extends FreeColGameObject
     }
 
     /**
-     * Add a new <code>TradeRouteStop</code> to this trade route.
+     * Add a new {@code TradeRouteStop} to this trade route.
      *
-     * @param stop The <code>TradeRouteStop</code> to add.
+     * @param stop The {@code TradeRouteStop} to add.
      */
     public void addStop(TradeRouteStop stop) {
         if (stop != null) this.stops.add(stop);
     }
 
     /**
-     * Remove a <code>TradeRouteStop</code> from this trade route.
+     * Remove a {@code TradeRouteStop} from this trade route.
      *
-     * @param stop The <code>TradeRouteStop</code> to remove.
+     * @param stop The {@code TradeRouteStop} to remove.
      */
     public void removeStop(TradeRouteStop stop) {
         if (stop != null) this.stops.remove(stop);
@@ -169,7 +169,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Remove any stops matching a given location.
      *
-     * @param loc The <code>Location</code> to match.
+     * @param loc The {@code Location} to match.
      * @return True if any stop was removed.
      */
     public boolean removeMatchingStops(Location loc) {
@@ -180,7 +180,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get the index of a stop in this trade route.
      *
-     * @param stop The <code>TradeRouteStop</code> to look for.
+     * @param stop The {@code TradeRouteStop} to look for.
      * @return The index of the given stop, or negative on failure.
      */
     public int getIndex(TradeRouteStop stop) {
@@ -202,7 +202,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get the units assigned to this route.
      *
-     * @return A list of assigned <code>Unit</code>s.
+     * @return A list of assigned {@code Unit}s.
      */
     public List<Unit> getAssignedUnits() {
         return transform(getOwner().getUnits(),
@@ -212,8 +212,8 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Is a stop valid for a given unit?
      *
-     * @param unit The <code>Unit</code> to check.
-     * @param stop The <code>TradeRouteStop</code> to check.
+     * @param unit The {@code Unit} to check.
+     * @param stop The {@code TradeRouteStop} to check.
      * @return True if the stop is valid.
      */
     public static boolean isStopValid(Unit unit, TradeRouteStop stop) {
@@ -223,8 +223,8 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Is a stop valid for a given player?
      *
-     * @param player The <code>Player</code> to check.
-     * @param stop The <code>TradeRouteStop</code> to check.
+     * @param player The {@code Player} to check.
+     * @param stop The {@code TradeRouteStop} to check.
      * @return True if the stop is valid.
      */
     public static boolean isStopValid(Player player, TradeRouteStop stop) {
@@ -234,7 +234,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Check the uniqueness of the trade route name.
      *
-     * @return Null if the name is unique, or a <code>StringTemplate</code>
+     * @return Null if the name is unique, or a {@code StringTemplate}
      *     containing an error message if not.
      */
     public StringTemplate verifyUniqueName() {
@@ -247,7 +247,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Check that the trade route is valid.
      *
-     * @return Null if the route is valid, or a <code>StringTemplate</code>
+     * @return Null if the route is valid, or a {@code StringTemplate}
      *     explaining the problem if invalid.
      */
     public StringTemplate verify() {

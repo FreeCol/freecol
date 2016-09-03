@@ -37,9 +37,9 @@ public class DebugAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>DebugAction</code>.
+     * Creates a new {@code DebugAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DebugAction(FreeColClient freeColClient) {
         super(freeColClient, id);

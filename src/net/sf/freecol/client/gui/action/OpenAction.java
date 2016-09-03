@@ -33,9 +33,9 @@ public class OpenAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>OpenAction</code>.
+     * Creates a new {@code OpenAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public OpenAction(FreeColClient freeColClient) {
         super(freeColClient, id);

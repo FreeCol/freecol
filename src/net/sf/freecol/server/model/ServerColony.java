@@ -74,7 +74,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The {@code Game} in which this object belongs.
      * @param id The object identifier.
      */
     public ServerColony(Game game, String id) {
@@ -84,10 +84,10 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Creates a new ServerColony.
      *
-     * @param game The <code>Game</code> in which this object belongs.
-     * @param owner The <code>Player</code> owning this <code>Colony</code>.
-     * @param name The name of the new <code>Colony</code>.
-     * @param tile The location of the <code>Colony</code>.
+     * @param game The {@code Game} in which this object belongs.
+     * @param owner The {@code Player} owning this <code>Colony</code>.
+     * @param name The name of the new {@code Colony}.
+     * @param tile The location of the {@code Colony}.
      */
     public ServerColony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, name, tile);
@@ -131,9 +131,9 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Try to find out if the colony is going to survive (last colonist does
      * not starve) before generating lots of production-related messages.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -500,7 +500,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Is a goods type needed for a buildable that this colony could
      * be building.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if the goods could be used to build something.
      */
     private boolean neededForBuildableType(GoodsType goodsType) {
@@ -515,9 +515,9 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Build a unit from a build queue.
      *
-     * @param buildQueue The <code>BuildQueue</code> to find the unit in.
+     * @param buildQueue The {@code BuildQueue} to find the unit in.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return The unit that was built.
      */
     private Unit csBuildUnit(BuildQueue<? extends BuildableType> buildQueue,
@@ -553,8 +553,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      *
      * -til: Might change the visible colony size.
      *
-     * @param workLocation The <code>WorkLocation</code> to eject from.
-     * @param units A list of <code>Unit</code>s to eject.
+     * @param workLocation The {@code WorkLocation} to eject from.
+     * @param units A list of {@code Unit}s to eject.
      * @return True if units were ejected.
      */
     public boolean ejectUnits(WorkLocation workLocation, List<Unit> units) {
@@ -576,8 +576,8 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Builds a building from a build queue.
      *
-     * @param buildQueue The <code>BuildQueue</code> to build from.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param buildQueue The {@code BuildQueue} to build from.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the build succeeded.
      */
     private boolean csBuildBuilding(BuildQueue<? extends BuildableType> buildQueue,
@@ -619,8 +619,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Removes a buildable from a build queue, and updates the queue so that
      * a valid buildable is now being built if possible.
      *
-     * @param queue The <code>BuildQueue</code> to update.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param queue The {@code BuildQueue} to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return The next buildable that can be built, or null if nothing.
      */
     private BuildableType csNextBuildable(BuildQueue<? extends BuildableType> queue,
@@ -678,8 +678,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Evict the users from a tile used by this colony, due to military
      * action from another unit.
      *
-     * @param enemyUnit The <code>Unit</code> that has moved in.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param enemyUnit The {@code Unit} that has moved in.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csEvictUsers(Unit enemyUnit, ChangeSet cs) {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
@@ -706,9 +706,9 @@ public class ServerColony extends Colony implements ServerModelObject {
      *
      * -vis: Owner and new owner
      *
-     * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param newOwner The new owning {@code ServerPlayer}.
      * @param reassign If true, reassign the colony tiles.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csChangeOwner(ServerPlayer newOwner, boolean reassign,
                               ChangeSet cs) {
@@ -778,8 +778,8 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Triggered by election of laSalle and colony capture by a player
      * with laSalle.
      *
-     * @param type The <code>BuildingType</code> to add.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param type The {@code BuildingType} to add.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csFreeBuilding(BuildingType type, ChangeSet cs) {
         if (canBuild(type)) {
@@ -796,7 +796,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Build a new building in this colony.
      *
-     * @param building The <code>Building</code> to build.
+     * @param building The {@code Building} to build.
      * @return True if the building was built.
      */
     public boolean buildBuilding(Building building) {
@@ -811,11 +811,11 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Equip a unit for a specific role.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the equipping succeeds.
      */
     public boolean csEquipForRole(Unit unit, Role role, int roleCount,
@@ -835,8 +835,8 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Add a new convert to this colony.
      *
-     * @param brave The convert <code>Unit</code>.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param brave The convert {@code Unit}.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csAddConvert(Unit brave, ChangeSet cs) {
         if (brave == null) return;
@@ -864,7 +864,7 @@ public class ServerColony extends Colony implements ServerModelObject {
     /**
      * Destroy an existing building in this colony.
      *
-     * @param building The <code>Building</code> to destroy.
+     * @param building The {@code Building} to destroy.
      * @return True if the building was destroyed.
      */
     public boolean destroyBuilding(Building building) {

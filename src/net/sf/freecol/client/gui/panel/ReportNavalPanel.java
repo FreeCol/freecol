@@ -44,7 +44,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportNavalPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportNavalAction", false);

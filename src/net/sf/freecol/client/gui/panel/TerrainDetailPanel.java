@@ -56,8 +56,8 @@ public class TerrainDetailPanel
     /**
      * Creates a new instance of this TerrainDetailPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colopediaPanel The parent {@code ColopediaPanel}.
      */
     public TerrainDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {

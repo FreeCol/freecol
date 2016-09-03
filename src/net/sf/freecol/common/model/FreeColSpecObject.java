@@ -34,14 +34,14 @@ public abstract class FreeColSpecObject extends FreeColObject {
 
     protected static final Logger logger = Logger.getLogger(FreeColSpecObject.class.getName());
 
-    /** The <code>Specification</code> this object uses, which may be null. */
+    /** The {@code Specification} this object uses, which may be null. */
     private Specification specification;
 
 
     /**
      * Create a new specification-object.
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     public FreeColSpecObject(Specification specification) {
         this.specification = specification;
@@ -52,7 +52,7 @@ public abstract class FreeColSpecObject extends FreeColObject {
      * Instantiate a FreeCol specification object.
      *
      * @param <T> The actual instance type.
-     * @param spec The <code>Specification</code> to use in the constructor.
+     * @param spec The {@code Specification} to use in the constructor.
      * @param returnClass The expected class of the object.
      * @return The new spec object, or null on error.
      */
@@ -71,7 +71,7 @@ public abstract class FreeColSpecObject extends FreeColObject {
     /**
      * Get the specification.  It may be null.
      *
-     * @return The <code>Specification</code> used by this object.
+     * @return The {@code Specification} used by this object.
      */
     @Override
     public Specification getSpecification() {
@@ -81,7 +81,7 @@ public abstract class FreeColSpecObject extends FreeColObject {
     /**
      * Sets the specification for this object. 
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     @Override
     protected void setSpecification(Specification specification) {

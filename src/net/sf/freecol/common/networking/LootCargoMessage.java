@@ -52,11 +52,11 @@ public class LootCargoMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>LootCargoMessage</code>.
+     * Create a new {@code LootCargoMessage}.
      *
-     * @param winner The <code>Unit</code> that is looting.
-     * @param loserId The identifier of the <code>Unit</code> that is looted.
-     * @param goods The <code>AbstractGoods</code> to loot.
+     * @param winner The {@code Unit} that is looting.
+     * @param loserId The identifier of the {@code Unit} that is looted.
+     * @param goods The {@code AbstractGoods} to loot.
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
         super(getTagName());
@@ -67,11 +67,11 @@ public class LootCargoMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>LootCargoMessage</code> from a
+     * Create a new {@code LootCargoMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public LootCargoMessage(Game game, Element element) {
         super(getTagName());
@@ -87,7 +87,7 @@ public class LootCargoMessage extends DOMMessage {
     /**
      * Public accessor to help the client in game controller.
      *
-     * @param game The <code>Game</code> to look for the unit in.
+     * @param game The {@code Game} to look for the unit in.
      * @return The winner unit.
      */
     public Unit getUnit(Game game) {
@@ -116,10 +116,10 @@ public class LootCargoMessage extends DOMMessage {
     /**
      * Handle a "lootCargo"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return An <code>Element</code> encapsulating the looting.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
+     * @return An {@code Element} encapsulating the looting.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

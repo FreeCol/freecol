@@ -37,7 +37,7 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
     /**
      * Internal constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     protected FreeColConfirmDialog(FreeColClient freeColClient, JFrame frame) {
@@ -45,10 +45,10 @@ public class FreeColConfirmDialog extends FreeColDialog<Boolean> {
     }
 
     /**
-     * Create a new <code>FreeColConfirmDialog</code> with a text and a
+     * Create a new {@code FreeColConfirmDialog} with a text and a
      * ok/cancel option.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj An object that explains the choice for the user.

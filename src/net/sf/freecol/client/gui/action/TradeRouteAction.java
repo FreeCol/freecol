@@ -35,7 +35,7 @@ public class TradeRouteAction extends MapboardAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public TradeRouteAction(FreeColClient freeColClient) {
         super(freeColClient, id);

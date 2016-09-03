@@ -103,7 +103,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      * Create a FreeColSpecObjectType with a given specification but
      * no object identifier.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public FreeColSpecObjectType(Specification specification) {
         this(null, specification);
@@ -114,7 +114,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      * specification.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public FreeColSpecObjectType(String id, Specification specification) {
         super(specification);
@@ -214,7 +214,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     /**
      * Remove a scope.
      *
-     * @param scope The <code>Scope</code> to remove.
+     * @param scope The {@code Scope} to remove.
      */
     protected void removeScope(Scope scope) {
         if (this.scopes != null) this.scopes.remove(scope);

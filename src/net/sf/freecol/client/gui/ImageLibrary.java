@@ -130,8 +130,8 @@ public final class ImageLibrary {
         /**
          * Get the broad class of image to show along unit paths.
          *
-         * @param u A <code>Unit</code> to classify.
-         * @return A suitable <code>PathType</code>.
+         * @param u A {@code Unit} to classify.
+         * @return A suitable {@code PathType}.
          */
         public static PathType getPathType(Unit u) {
             return (u == null) ? PathType.FOOT
@@ -145,7 +145,7 @@ public final class ImageLibrary {
 
     /**
      * The scale factor used when creating this
-     * <code>ImageLibrary</code>.  The value <code>1</code> is used if
+     * {@code ImageLibrary}.  The value <code>1</code> is used if
      * this object is not a result of a scaling operation.
      */
     private final float scaleFactor;
@@ -155,14 +155,14 @@ public final class ImageLibrary {
     private final HashMap<String,BufferedImage> stringImageCache;
 
     /**
-     * The constructor to use when needing an unscaled <code>ImageLibrary</code>.
+     * The constructor to use when needing an unscaled {@code ImageLibrary}.
      */
     public ImageLibrary() {
         this(1f);
     }
 
     /**
-     * The constructor to use when needing a scaled <code>ImageLibrary</code>.
+     * The constructor to use when needing a scaled {@code ImageLibrary}.
      * 
      * Please avoid using too many different scaling factors, as this will
      * lead to wasted memory for caching images in ResourceManager!
@@ -184,7 +184,7 @@ public final class ImageLibrary {
 
 
     /**
-     * Returns the scaling factor used when creating this <code>ImageLibrary</code>.
+     * Returns the scaling factor used when creating this {@code ImageLibrary}.
      * It is 1 if the constructor without scaling factor was used to create
      * this object.
      * @return The scaling factor of this ImageLibrary.
@@ -208,8 +208,8 @@ public final class ImageLibrary {
      * Our eyes have different sensitivity towards red, green and
      * blue.  We want a foreground color with the inverse brightness.
      *
-     * @param background The background <code>Color</code> to complement.
-     * @return A suitable foreground <code>Color</code>.
+     * @param background The background {@code Color} to complement.
+     * @return A suitable foreground {@code Color}.
      */
     public static Color getForegroundColor(Color background) {
         return (background == null
@@ -223,8 +223,8 @@ public final class ImageLibrary {
      * The string border colors should be black unless the color of
      * the string is really dark.
      *
-     * @param color The <code>Color</code> to complement.
-     * @return A suitable border <code>Color</code>.
+     * @param color The {@code Color} to complement.
+     * @return A suitable border {@code Color}.
      */
     public static Color getStringBorderColor(Color color) {
         return (color.getRed() * 0.3
@@ -242,9 +242,9 @@ public final class ImageLibrary {
      * for the same tile type in order to prevent big stripes or a
      * checker-board effect.
      *
-     * @param x an <code>int</code> value
-     * @param y an <code>int</code> value
-     * @return a <code>boolean</code> value
+     * @param x an {@code int} value
+     * @param y an {@code int} value
+     * @return a {@code boolean} value
      */
     private static boolean isEven(int x, int y) {
         return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
@@ -254,8 +254,8 @@ public final class ImageLibrary {
      * Returns the beach corner image at the given index.
      *
      * @param index The index of the image to return.
-     * @param x an <code>int</code> value
-     * @param y an <code>int</code> value
+     * @param x an {@code int} value
+     * @param y an {@code int} value
      * @return The image at the given index.
      */
     public BufferedImage getBeachCornerImage(int index, int x, int y) {
@@ -268,8 +268,8 @@ public final class ImageLibrary {
      * Returns the beach edge image at the given index.
      *
      * @param index The index of the image to return.
-     * @param x an <code>int</code> value
-     * @param y an <code>int</code> value
+     * @param x an {@code int} value
+     * @param y an {@code int} value
      * @return The image at the given index.
      */
     public BufferedImage getBeachEdgeImage(int index, int x, int y) {
@@ -282,7 +282,7 @@ public final class ImageLibrary {
      * Returns the border terrain-image for the given type.
      *
      * @param type The type of the terrain-image to return.
-     * @param direction a <code>Direction</code> value
+     * @param direction a {@code Direction} value
      * @param x The x-coordinate of the location of the tile that is being
      *     drawn.
      * @param y The x-coordinate of the location of the tile that is being
@@ -339,9 +339,9 @@ public final class ImageLibrary {
     /**
      * Returns the portrait of this Founding Father.
      *
-     * @param father a <code>FoundingFather</code> value
+     * @param father a {@code FoundingFather} value
      * @param grey if the image should be in greyscale
-     * @return an <code>BufferedImage</code> value
+     * @return an {@code BufferedImage} value
      */
     public static BufferedImage getFoundingFatherImage(FoundingFather father, boolean grey) {
         String resource = "image.flavor." + father.getId();
@@ -579,8 +579,8 @@ public final class ImageLibrary {
     /**
      * Gets an image to represent the path of given path type.
      *
-     * @param pt The <code>PathType</code>
-     * @return The <code>BufferedImage</code>.
+     * @param pt The {@code PathType}
+     * @return The {@code BufferedImage}.
      */
     public static BufferedImage getPathImage(PathType pt) {
         return (pt == null) ? null
@@ -588,10 +588,10 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
+     * Gets an image to represent the path of the given {@code Unit}.
      *
-     * @param u The <code>Unit</code>
-     * @return The <code>BufferedImage</code>.
+     * @param u The {@code Unit}
+     * @return The {@code BufferedImage}.
      */
     public static BufferedImage getPathImage(Unit u) {
         return (u == null) ? null
@@ -599,10 +599,10 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
+     * Gets an image to represent the path of the given {@code Unit}.
      *
-     * @param pt The <code>PathType</code>
-     * @return The <code>BufferedImage</code>.
+     * @param pt The {@code PathType}
+     * @return The {@code BufferedImage}.
      */
     public static BufferedImage getPathNextTurnImage(PathType pt) {
         return (pt == null) ? null
@@ -610,10 +610,10 @@ public final class ImageLibrary {
     }
 
     /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
+     * Gets an image to represent the path of the given {@code Unit}.
      *
-     * @param u The <code>Unit</code>
-     * @return The <code>BufferedImage</code>.
+     * @param u The {@code Unit}
+     * @return The {@code BufferedImage}.
      */
     public static BufferedImage getPathNextTurnImage(Unit u) {
         return (u == null) ? null
@@ -623,7 +623,7 @@ public final class ImageLibrary {
     /**
      * Returns the river image with the given style.
      *
-     * @param style a <code>TileImprovementStyle</code> value
+     * @param style a {@code TileImprovementStyle} value
      * @return The image with the given style.
      */
     public BufferedImage getRiverImage(TileImprovementStyle style) {
@@ -645,8 +645,8 @@ public final class ImageLibrary {
     /**
      * Returns the river mouth terrain-image for the direction and magnitude.
      *
-     * @param direction a <code>Direction</code> value
-     * @param magnitude an <code>int</code> value
+     * @param direction a {@code Direction} value
+     * @param magnitude an {@code int} value
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn (ignored).
      * @param y The x-coordinate of the location of the tile that is being
@@ -678,7 +678,7 @@ public final class ImageLibrary {
      * Returns the graphics that will represent the given settlement.
      *
      * @param settlement The settlement whose graphics type is needed.
-     * @param scale a <code>double</code> value
+     * @param scale a {@code double} value
      * @return The graphics that will represent the given settlement.
      */
     public static BufferedImage getSettlementImage(Settlement settlement, float scale) {
@@ -806,7 +806,7 @@ public final class ImageLibrary {
      * @param nativeEthnicity If true the unit is a former native.
      * @param grayscale If true draw in inactive/disabled-looking state.
      * @param scale How much the image is scaled.
-     * @return A suitable <code>BufferedImage</code>.
+     * @return A suitable {@code BufferedImage}.
      */
     public static BufferedImage getUnitImage(UnitType unitType, String roleId,
                                              boolean nativeEthnicity,
@@ -872,10 +872,10 @@ public final class ImageLibrary {
      * space.  If the image is not available, just fill with the background
      * colour.
      *
-     * @param resource The name of the <code>ImageResource</code> to tile with.
-     * @param g The <code>Graphics</code> to draw to.
-     * @param c The <code>JComponent</code> that defines the space.
-     * @param insets Optional <code>Insets</code> to apply.
+     * @param resource The name of the {@code ImageResource} to tile with.
+     * @param g The {@code Graphics} to draw to.
+     * @param c The {@code JComponent} that defines the space.
+     * @param insets Optional {@code Insets} to apply.
      */
     public static void drawTiledImage(String resource, Graphics g,
                                       JComponent c, Insets insets) {
@@ -913,8 +913,8 @@ public final class ImageLibrary {
     /**
      * Fills a certain rectangle with the image texture.
      * 
-     * @param g2 The <code>Graphics</code> used for painting the border.
-     * @param img The <code>BufferedImage</code> to fill the texture.
+     * @param g2 The {@code Graphics} used for painting the border.
+     * @param img The {@code BufferedImage} to fill the texture.
      * @param x The x-component of the offset.
      * @param y The y-component of the offset.
      * @param width The width of the rectangle.
@@ -931,10 +931,10 @@ public final class ImageLibrary {
 
 
     /**
-     * Creates a buffered image out of a given <code>Image</code> object.
+     * Creates a buffered image out of a given {@code Image} object.
      * 
-     * @param image The <code>Image</code> object.
-     * @return The created <code>BufferedImage</code> object.
+     * @param image The {@code Image} object.
+     * @return The created {@code BufferedImage} object.
      */
     public static BufferedImage createBufferedImage(Image image) {
         if(image == null)
@@ -975,7 +975,7 @@ public final class ImageLibrary {
     /**
      * Create a faded version of an image.
      *
-     * @param img The <code>Image</code> to fade.
+     * @param img The {@code Image} to fade.
      * @param fade The amount of fading.
      * @param target The offset.
      * @return The faded image.
@@ -1003,9 +1003,9 @@ public final class ImageLibrary {
      *
      * @param g Graphics2D for getting the FontMetrics.
      * @param text The text to display.
-     * @param border The border <code>Color</code>.
-     * @param background The background <code>Color</code>.
-     * @param foreground The foreground <code>Color</code>.
+     * @param border The border {@code Color}.
+     * @param background The background {@code Color}.
+     * @param foreground The foreground {@code Color}.
      * @return A chip.
      */
     private BufferedImage createChip(Graphics2D g, String text, Color border,
@@ -1036,11 +1036,11 @@ public final class ImageLibrary {
      *
      * @param g Graphics2D for getting the FontMetrics.
      * @param text The text to display.
-     * @param border The border <code>Color</code>.
-     * @param background The background <code>Color</code>.
+     * @param border The border {@code Color}.
+     * @param background The background {@code Color}.
      * @param amount How much to fill the chip with the fill color
-     * @param fill The fill <code>Color</code>.
-     * @param foreground The foreground <code>Color</code>.
+     * @param fill The fill {@code Color}.
+     * @param foreground The foreground {@code Color}.
      * @return A chip.
      */
     private BufferedImage createFilledChip(Graphics2D g, String text,
@@ -1081,8 +1081,8 @@ public final class ImageLibrary {
      * most hated nation if any.
      *
      * @param g Graphics2D for getting the FontMetrics.
-     * @param is The <code>IndianSettlement</code> to check.
-     * @param player The observing <code>Player</code>.
+     * @param is The {@code IndianSettlement} to check.
+     * @param player The observing {@code Player}.
      * @return An alarm chip, or null if none suitable.
      */
     public BufferedImage getAlarmChip(Graphics2D g,
@@ -1116,7 +1116,7 @@ public final class ImageLibrary {
      * Gets the owner chip for the settlement.
      *
      * @param g Graphics2D for getting the FontMetrics.
-     * @param is The <code>IndianSettlement</code> to check.
+     * @param is The {@code IndianSettlement} to check.
      * @return A chip.
      */
     public BufferedImage getIndianSettlementChip(Graphics2D g,
@@ -1156,7 +1156,7 @@ public final class ImageLibrary {
      * single letter or symbol that indicates the Unit's state.
      *
      * @param g Graphics2D for getting the FontMetrics.
-     * @param unit The <code>Unit</code> with the occupation.
+     * @param unit The {@code Unit} with the occupation.
      * @param text The text for the chip.
      * @return A suitable chip.
      */
@@ -1172,10 +1172,10 @@ public final class ImageLibrary {
      * Gets an image with a string of a given color and with
      * a black border around the glyphs.
      *
-     * @param g A <code>Graphics</code>-object for getting the font metrics.
-     * @param text The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use for the text.
-     * @param font The <code>Font</code> to display the text with.
+     * @param g A {@code Graphics}-object for getting the font metrics.
+     * @param text The {@code String} to make an image of.
+     * @param color The {@code Color} to use for the text.
+     * @param font The {@code Font} to display the text with.
      * @return The image that was created.
      */
     public BufferedImage getStringImage(Graphics g, String text, Color color,

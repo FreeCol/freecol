@@ -57,9 +57,9 @@ public class SelectOption extends IntegerOption {
 
 
     /**
-     * Creates a new <code>SelectOption</code>.
+     * Creates a new {@code SelectOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public SelectOption(Specification specification) {
         super(specification);
@@ -67,7 +67,7 @@ public class SelectOption extends IntegerOption {
 
 
     /**
-     * Gets the range values of this <code>RangeOption</code>.
+     * Gets the range values of this {@code RangeOption}.
      *
      * @return The value.
      */

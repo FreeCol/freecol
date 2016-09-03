@@ -41,10 +41,10 @@ public class AbandonColonyMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AbandonColonyMessage</code> with the specified
+     * Create a new {@code AbandonColonyMessage} with the specified
      * colony.
      *
-     * @param colony The <code>Colony</code> to abandon.
+     * @param colony The {@code Colony} to abandon.
      */
     public AbandonColonyMessage(Colony colony) {
         super(getTagName());
@@ -53,10 +53,10 @@ public class AbandonColonyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AbandonColonyMessage</code> from a supplied element.
+     * Create a new {@code AbandonColonyMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AbandonColonyMessage(Game game, Element element) {
         super(getTagName());
@@ -68,12 +68,12 @@ public class AbandonColonyMessage extends DOMMessage {
     /**
      * Handle a "abandonColony"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the request.
-     * @param player The <code>Player</code> abandoning the colony.
-     * @param connection The <code>Connection</code> the message is from.
-     * @return An update <code>Element</code> defining the new colony
+     * @param server The {@code FreeColServer} handling the request.
+     * @param player The {@code Player} abandoning the colony.
+     * @param connection The {@code Connection} the message is from.
+     * @return An update {@code Element} defining the new colony
      *     and updating its surrounding tiles, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

@@ -48,8 +48,8 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     /**
      * Create a new AbstractCanvasListener.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param canvas The <code>Canvas</code> to listen on.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param canvas The {@code Canvas} to listen on.
      */
     public AbstractCanvasListener(FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient);
@@ -62,7 +62,7 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     /**
      * Auto-scroll to a mouse position if necessary.
      *
-     * @param e The <code>MouseEvent</code> that initiating the scroll.
+     * @param e The {@code MouseEvent} that initiating the scroll.
      */
     protected void performAutoScrollIfActive(MouseEvent e) {
         if (e.getComponent().isEnabled()
@@ -76,7 +76,7 @@ public class AbstractCanvasListener extends FreeColClientHolder {
     /**
      * Drag-scroll to a mouse position if necessary.
      *
-     * @param e The <code>MouseEvent</code> that initiating the scroll.
+     * @param e The {@code MouseEvent} that initiating the scroll.
      */
     protected void performDragScrollIfActive(MouseEvent e) {
         if (e.getComponent().isEnabled()

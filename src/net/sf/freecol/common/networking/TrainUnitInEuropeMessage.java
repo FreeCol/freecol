@@ -41,10 +41,10 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>TrainUnitInEuropeMessage</code> with the
+     * Create a new {@code TrainUnitInEuropeMessage} with the
      * supplied type.
      *
-     * @param type The <code>UnitType</code> to train.
+     * @param type The {@code UnitType} to train.
      */
     public TrainUnitInEuropeMessage(UnitType type) {
         super(getTagName());
@@ -53,11 +53,11 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>TrainUnitInEuropeMessage</code> from a
+     * Create a new {@code TrainUnitInEuropeMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public TrainUnitInEuropeMessage(Game game, Element element) {
         super(getTagName());
@@ -69,12 +69,12 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
     /**
      * Handle a "trainUnitInEurope"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
      * @return An update containing the trainUnitInEuroped unit,
-     *         or an error <code>Element</code> on failure.
+     *         or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

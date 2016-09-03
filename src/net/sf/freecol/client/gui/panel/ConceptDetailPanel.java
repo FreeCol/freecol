@@ -72,8 +72,8 @@ public class ConceptDetailPanel extends FreeColPanel
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param colopediaPanel The parent {@code ColopediaPanel}.
      */
     public ConceptDetailPanel(FreeColClient freeColClient,
                               ColopediaPanel colopediaPanel) {

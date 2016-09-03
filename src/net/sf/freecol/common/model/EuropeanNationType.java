@@ -51,7 +51,7 @@ public class EuropeanNationType extends NationType {
      * Create a new European nation type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public EuropeanNationType(String id, Specification specification) {
         super(id, specification);
@@ -91,7 +91,7 @@ public class EuropeanNationType extends NationType {
     /**
      * Gets the starting units for this nation type.
      *
-     * @return A list of <code>AbstractUnit</code>s to start with.
+     * @return A list of {@code AbstractUnit}s to start with.
      */
     public List<AbstractUnit> getStartingUnits() {
         boolean ex = getSpecification().getBoolean(GameOptions.EXPERT_STARTING_UNITS);
@@ -103,7 +103,7 @@ public class EuropeanNationType extends NationType {
      * difficulty.
      *
      * @param key The value of the expert-starting-units field.
-     * @return A list of <code>AbstractUnit</code>s to start with.
+     * @return A list of {@code AbstractUnit}s to start with.
      */
     public List<AbstractUnit> getStartingUnits(String key) {
         Map<String, AbstractUnit> result = new HashMap<>();
@@ -122,7 +122,7 @@ public class EuropeanNationType extends NationType {
      * Add a starting unit.
      *
      * @param id The unit identifier.
-     * @param unit The <code>AbstractUnit</code> to add.
+     * @param unit The {@code AbstractUnit} to add.
      * @param expert Is this an expert unit?
      */
     private void addStartingUnit(String id, AbstractUnit unit, boolean expert) {

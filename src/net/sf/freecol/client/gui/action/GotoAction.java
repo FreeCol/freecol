@@ -38,7 +38,7 @@ public class GotoAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public GotoAction(FreeColClient freeColClient) {
         super(freeColClient, id);

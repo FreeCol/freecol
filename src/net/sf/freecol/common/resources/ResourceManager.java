@@ -287,7 +287,7 @@ public class ResourceManager {
      *
      * @param key The resource to get.
      * @return The resource if there is one with the given
-     *     resource key and type, or else <code>null</code>.
+     *     resource key and type, or else {@code null}.
      */
     private static synchronized ColorResource getColorResource(final String key) {
         final ColorResource r = mergedContainer.getColorResource(key);
@@ -365,7 +365,7 @@ public class ResourceManager {
      * and a warning logged.
      *
      * @param key The name of the resource to return.
-     * @return The image identified by <code>resource</code>.
+     * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key) {
         BufferedImage image = getImageResource(key).getImage();
@@ -389,7 +389,7 @@ public class ResourceManager {
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The image identified by <code>resource</code>.
+     * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key, final float scale) {
         BufferedImage image = getImageResource(key).getImage(scale);
@@ -411,7 +411,7 @@ public class ResourceManager {
      * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
-     * @return The image identified by <code>resource</code>.
+     * @return The image identified by {@code resource}.
      */
     public static BufferedImage getImage(final String key, final Dimension size) {
         BufferedImage image = getImageResource(key).getImage(size);
@@ -432,7 +432,7 @@ public class ResourceManager {
      * @param key The name of the resource to return.
      * @param size The size of the requested image. Rescaling
      *      will be performed if necessary.
-     * @return The image identified by <code>resource</code>.
+     * @return The image identified by {@code resource}.
      */
     public static BufferedImage getGrayscaleImage(final String key, final Dimension size) {
         BufferedImage image = getImageResource(key).getGrayscaleImage(size);
@@ -453,7 +453,7 @@ public class ResourceManager {
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The image identified by <code>resource</code>.
+     * @return The image identified by {@code resource}.
      */
     public static BufferedImage getGrayscaleImage(final String key, final float scale) {
         BufferedImage image = getImageResource(key).getGrayscaleImage(scale);
@@ -475,8 +475,8 @@ public class ResourceManager {
      *        null return with calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to return.
-     * @return The animation identified by <code>resource</code>
-     *      or <code>null</code> if there is no animation
+     * @return The animation identified by {@code resource}
+     *      or {@code null} if there is no animation
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(final String key) {
@@ -491,8 +491,8 @@ public class ResourceManager {
      * @param scale The size of the requested animation (with 1
      *      being normal size, 2 twice the size, 0.5 half the
      *      size etc). Rescaling will be performed unless using 1.
-     * @return The animation identified by <code>resource</code>
-     *      or <code>null</code> if there is no animation
+     * @return The animation identified by {@code resource}
+     *      or {@code null} if there is no animation
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(final String key, final float scale) {
@@ -501,13 +501,13 @@ public class ResourceManager {
     }
 
     /**
-     * Returns the <code>Color</code> with the given name.
+     * Returns the {@code Color} with the given name.
      * Trying to get a non-existing color is an error and will return
      * magenta as replacement color to prevent crashes when modding.
      *
      * @param key The name of the resource to return.
-     * @return An <code>Color</code> created with the image
-     *      identified by <code>resource</code> or
+     * @return An {@code Color} created with the image
+     *      identified by {@code resource} or
      *      a replacement color if there is no color identified
      *      by that name.
      */
@@ -522,7 +522,7 @@ public class ResourceManager {
      * in only getting the emergency font to prevent crashes when modding.
      *
      * @param key The name of the resource to query.
-     * @return The <code>Font</code> found in a FontResource, which
+     * @return The {@code Font} found in a FontResource, which
      *     may default to the Java default font if the resource failed
      *     to load.
      */
@@ -540,7 +540,7 @@ public class ResourceManager {
      *        replace null return with calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to query.
-     * @return A <code>File</code> containing the audio data.
+     * @return A {@code File} containing the audio data.
      */
     public static File getAudio(final String key) {
         final AudioResource r = getAudioResource(key);
@@ -548,12 +548,12 @@ public class ResourceManager {
     }
 
     /**
-     * Gets the <code>Video</code> represented by the given resource.
+     * Gets the {@code Video} represented by the given resource.
      * This can return null as there is only one video in FreeCol.
      * FIXME: Consider calling FreeColClient.fatal on error.
      * 
      * @param key The name of the resource to return.
-     * @return The <code>Video</code> in it's original size.
+     * @return The {@code Video} in it's original size.
      */
     public static Video getVideo(final String key) {
         final VideoResource r = getVideoResource(key);
@@ -566,7 +566,7 @@ public class ResourceManager {
      * FIXME: Consider calling FreeColClient.fatal on error.
      *
      * @param key The name of the resource to query.
-     * @return The <code>FAFile</code> found in a FAFileResource.
+     * @return The {@code FAFile} found in a FAFileResource.
      */
     public static FAFile getFAFile(final String key) {
         final FAFileResource r = getFAFileResource(key);

@@ -43,7 +43,7 @@ public class NetworkReplyObject {
     }
 
     /**
-     * Sets the response and continues <code>getResponse()</code>.
+     * Sets the response and continues {@code getResponse()}.
      *
      * @param response The response.
      * @see #getResponse

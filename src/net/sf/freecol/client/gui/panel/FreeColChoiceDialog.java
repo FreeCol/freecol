@@ -37,7 +37,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
     /**
      * Internal constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     protected FreeColChoiceDialog(FreeColClient freeColClient, JFrame frame) {
@@ -45,16 +45,16 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
     }
 
     /**
-     * Create a new <code>FreeColChoiceDialog</code> with a text and a
+     * Create a new {@code FreeColChoiceDialog} with a text and a
      * ok/cancel option.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
-     * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
+     * @param choices A list of {@code ChoiceItem}s to create buttons for.
      */
     public FreeColChoiceDialog(final FreeColClient freeColClient, JFrame frame,
             boolean modal, Object obj, ImageIcon icon, String cancelKey,
@@ -71,7 +71,7 @@ public class FreeColChoiceDialog<T> extends FreeColDialog<T> {
      * @param obj An object that explains the choice for the user.
      * @param icon An optional icon to display.
      * @param cancelKey Key for the text of the optional cancel button.
-     * @param choices A list of <code>ChoiceItem</code>s to create buttons for.
+     * @param choices A list of {@code ChoiceItem}s to create buttons for.
      */
     protected final void initializeChoiceDialog(JFrame frame, boolean modal,
             Object obj, ImageIcon icon, String cancelKey,

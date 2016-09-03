@@ -33,8 +33,8 @@ public interface MessageHandler {
     /**
      * Handles the main element of an XML message.
      *
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> to handle.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} to handle.
      * @return The reply (if any) or <i>null</i>.
      * @throws FreeColException on error.
      */

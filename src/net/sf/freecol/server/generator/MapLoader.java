@@ -31,9 +31,9 @@ public interface MapLoader {
      * e.g. NONE if map loading failed, or the highest level available
      * if an even higher level was requested.
      *
-     * @param game a <code>Game</code> value
-     * @param layer a <code>Layer</code> value
-     * @return a <code>Layer</code> value
+     * @param game a {@code Game} value
+     * @param layer a {@code Layer} value
+     * @return a {@code Layer} value
      */
     public Layer loadMap(Game game, Layer layer);
 
@@ -41,7 +41,7 @@ public interface MapLoader {
     /**
      * Returns the highest layer this MapLoader is able to load.
      *
-     * @return a <code>Layer</code> value
+     * @return a {@code Layer} value
      */
     public Layer getHighestLayer();
 

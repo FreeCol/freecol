@@ -67,8 +67,8 @@ public final class TilePanel extends FreeColPanel {
     /**
      * Creates a panel describing a tile.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param tile The <code>Tile</code> to describe.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param tile The {@code Tile} to describe.
      */
     public TilePanel(FreeColClient freeColClient, Tile tile) {
         super(freeColClient, new MigLayout("wrap 2, insets 20 30 10 30",

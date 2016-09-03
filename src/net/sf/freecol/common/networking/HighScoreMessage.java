@@ -47,7 +47,7 @@ public class HighScoreMessage extends DOMMessage {
     
 
     /**
-     * Create a new <code>HighScoreMessage</code> in request form (no
+     * Create a new {@code HighScoreMessage} in request form (no
      * scores attached).
      *
      * @param key A message key for the final display.
@@ -59,10 +59,10 @@ public class HighScoreMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>HighScoreMessage</code> from a supplied element.
+     * Create a new {@code HighScoreMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public HighScoreMessage(Game game, Element element) {
         super(getTagName());
@@ -87,7 +87,7 @@ public class HighScoreMessage extends DOMMessage {
     /**
      * Accessor for the scores list.
      *
-     * @return The list of <code>HighScore</code>s.
+     * @return The list of {@code HighScore}s.
      */
     public List<HighScore> getScores() {
         return this.scores;
@@ -97,8 +97,8 @@ public class HighScoreMessage extends DOMMessage {
     /**
      * Handle a "highScore"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the high scores.
      */
     public Element handle(FreeColServer server, Connection connection) {

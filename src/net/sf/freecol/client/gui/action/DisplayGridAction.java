@@ -38,7 +38,7 @@ public class DisplayGridAction extends SelectableAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DisplayGridAction(FreeColClient freeColClient) {
         super(freeColClient, id, ClientOptions.DISPLAY_GRID);

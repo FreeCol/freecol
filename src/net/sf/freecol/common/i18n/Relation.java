@@ -43,7 +43,7 @@ public class Relation {
     /**
      * Sets the divisor for a modulo operation (defaults to 1).
      *
-     * @param mod an <code>int</code> value
+     * @param mod an {@code int} value
      */
     public void setMod(int mod) {
         this.mod = mod;
@@ -52,7 +52,7 @@ public class Relation {
     /**
      * Negates the return value of the relation (defaults to false).
      *
-     * @param value a <code>boolean</code> value
+     * @param value a {@code boolean} value
      */
     public void setNegated(boolean value) {
         this.negated = value;
@@ -62,7 +62,7 @@ public class Relation {
      * Determines whether this relation only matches integers
      * (defaults to true).
      *
-     * @param value a <code>boolean</code> value
+     * @param value a {@code boolean} value
      */
     public void setInteger(boolean value) {
         this.integer = value;
@@ -71,8 +71,8 @@ public class Relation {
     /**
      * Returns true if the given number matches this relation.
      *
-     * @param number a <code>double</code> value
-     * @return a <code>boolean</code> value
+     * @param number a {@code double} value
+     * @return a {@code boolean} value
      */
     public boolean matches(double number) {
         double value = (mod == 1) ? number : number % mod;

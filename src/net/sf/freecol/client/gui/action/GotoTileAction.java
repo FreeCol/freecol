@@ -35,7 +35,7 @@ public class GotoTileAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public GotoTileAction(FreeColClient freeColClient) {
         super(freeColClient, id);

@@ -48,7 +48,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param colopediaPanel The parent ColopediaPanel.
      */
     public NationDetailPanel(FreeColClient freeColClient,

@@ -28,7 +28,7 @@ import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * A <code>Panel</code> for showing status information on screen.
+ * A {@code Panel} for showing status information on screen.
  */
 public final class StatusPanel extends FreeColPanel {
 
@@ -41,7 +41,7 @@ public final class StatusPanel extends FreeColPanel {
     /**
      * Creates a basic status panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public StatusPanel(FreeColClient freeColClient) {
         super(freeColClient, new FlowLayout());
@@ -57,7 +57,7 @@ public final class StatusPanel extends FreeColPanel {
     
     /**
      * Sets a new status message to be displayed by this
-     * <code>StatusPanel</code>.
+     * {@code StatusPanel}.
      *
      * @param message The message to be displayed.
      */

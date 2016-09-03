@@ -263,7 +263,7 @@ public class Flag {
     /**
      * Returns the background of the flag.
      *
-     * @return A <code>Background</code> value.
+     * @return A {@code Background} value.
      */
     public Background getBackground() {
         return background;
@@ -272,7 +272,7 @@ public class Flag {
     /**
      * Sets the background of the flag and returns the flag itself.
      *
-     * @param background The new <code>Background</code> value.
+     * @param background The new {@code Background} value.
      * @return The modified flag.
      */
     public Flag setBackground(Background background) {
@@ -283,7 +283,7 @@ public class Flag {
     /**
      * Returns the decoration of the flag.
      *
-     * @return A <code>Decoration</code> value.
+     * @return A {@code Decoration} value.
      */
     public Decoration getDecoration() {
         return decoration;
@@ -292,7 +292,7 @@ public class Flag {
     /**
      * Sets the decoration of the flag and returns the flag itself.
      *
-     * @param decoration The new <code>Decoration</code> value.
+     * @param decoration The new {@code Decoration} value.
      * @return The modified flag.
      */
     public Flag setDecoration(Decoration decoration) {
@@ -303,7 +303,7 @@ public class Flag {
     /**
      * Returns the union position of the flag.
      *
-     * @return A <code>UnionPosition</code> value.
+     * @return A {@code UnionPosition} value.
      */
     public UnionPosition getUnionPosition() {
         return unionPosition;
@@ -313,7 +313,7 @@ public class Flag {
      * Sets the union position of the flag and returns the flag
      * itself.
      *
-     * @param position The new <code>UnionPosition</code> value.
+     * @param position The new {@code UnionPosition} value.
      * @return The modified flag.
      */
     public Flag setUnionPosition(UnionPosition position) {
@@ -324,7 +324,7 @@ public class Flag {
     /**
      * Returns the union shape of the flag.
      *
-     * @return A <code>UnionShape</code> value.
+     * @return A {@code UnionShape} value.
      */
     public UnionShape getUnionShape() {
         return unionShape;
@@ -333,7 +333,7 @@ public class Flag {
     /**
      * Sets the union shape of the flag and returns the flag itself.
      *
-     * @param shape The new <code>UnionShape</code> value.
+     * @param shape The new {@code UnionShape} value.
      * @return The modified flag.
      */
     public Flag setUnionShape(UnionShape shape) {
@@ -342,9 +342,9 @@ public class Flag {
     }
 
     /**
-     * Returns a <code>List</code> of background colors.
+     * Returns a {@code List} of background colors.
      *
-     * @return A <code>List</code> of background colors.
+     * @return A {@code List} of background colors.
      */
     public List<Color> getBackgroundColors() {
         return backgroundColors;
@@ -354,7 +354,7 @@ public class Flag {
      * Sets the background colors of the flag and returns the flag
      * itself.
      *
-     * @param backgroundColors A <code>List</code> of background colors.
+     * @param backgroundColors A {@code List} of background colors.
      * @return The modified flag.
      */
     public Flag setBackgroundColors(List<Color> backgroundColors) {
@@ -382,7 +382,7 @@ public class Flag {
     /**
      * Returns the union color of the flag.
      *
-     * @return A <code>Color</code> value.
+     * @return A {@code Color} value.
      */
     public Color getUnionColor() {
         return unionColor;
@@ -391,7 +391,7 @@ public class Flag {
     /**
      * Sets the union color of the flag and returns the flag itself.
      *
-     * @param unionColor The new <code>Color</code> value.
+     * @param unionColor The new {@code Color} value.
      * @return The modified flag.
      */
     public Flag setUnionColor(Color unionColor) {
@@ -402,7 +402,7 @@ public class Flag {
     /**
      * Returns the decoration color of the flag.
      *
-     * @return A <code>Color</code> value.
+     * @return A {@code Color} value.
      */
     public Color getDecorationColor() {
         return decorationColor;
@@ -412,7 +412,7 @@ public class Flag {
      * Sets the decoration color of the flag and returns the flag
      * itself.
      *
-     * @param decorationColor The new <code>Color</code> value.
+     * @param decorationColor The new {@code Color} value.
      * @return The modified flag.
      */
     public Flag setDecorationColor(Color decorationColor) {
@@ -423,7 +423,7 @@ public class Flag {
     /**
      * Returns the star color of the flag.
      *
-     * @return A <code>Color</code> value.
+     * @return A {@code Color} value.
      */
     public Color getStarColor() {
         return starColor;
@@ -432,7 +432,7 @@ public class Flag {
     /**
      * Sets the star color of the flag and returns the flag itself.
      *
-     * @param starColor The new <code>Color</code> value.
+     * @param starColor The new {@code Color} value.
      * @return The modified flag.
      */
     public Flag setStarColor(Color starColor) {

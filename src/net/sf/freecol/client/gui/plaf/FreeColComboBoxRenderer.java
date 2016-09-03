@@ -41,9 +41,9 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 
 
 /**
- * A <code>ListCellRenderer</code> to be used by
- * <code>FreeColListUI</code> and <code>JComboBox</code>es that
- * display <code>ObjectWithId</code> values.
+ * A {@code ListCellRenderer} to be used by
+ * {@code FreeColListUI} and <code>JComboBox</code>es that
+ * display {@code ObjectWithId} values.
  */
 public class FreeColComboBoxRenderer<T>
     implements ListCellRenderer<T>, UIResource {
@@ -57,7 +57,7 @@ public class FreeColComboBoxRenderer<T>
     private boolean localize = true;
 
     /**
-     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * Creates a new {@code FreeColComboBoxRenderer} instance
      * with an empty prefix.
      *
      */
@@ -66,10 +66,10 @@ public class FreeColComboBoxRenderer<T>
     }
 
     /**
-     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * Creates a new {@code FreeColComboBoxRenderer} instance
      * with a given prefix.
      *
-     * @param prefix a <code>String</code> value
+     * @param prefix a {@code String} value
      */
     public FreeColComboBoxRenderer(String prefix) {
         this(prefix, true);
@@ -77,11 +77,11 @@ public class FreeColComboBoxRenderer<T>
 
 
     /**
-     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * Creates a new {@code FreeColComboBoxRenderer} instance
      * with a given prefix.
      *
-     * @param prefix a <code>String</code> value
-     * @param localize a <code>boolean</code> value
+     * @param prefix a {@code String} value
+     * @param localize a {@code boolean} value
      */
     public FreeColComboBoxRenderer(String prefix, boolean localize) {
         this.prefix = prefix;
@@ -90,15 +90,15 @@ public class FreeColComboBoxRenderer<T>
 
 
     /**
-     * Returns a <code>ListCellRenderer</code> for the given
-     * <code>JList</code>.
+     * Returns a {@code ListCellRenderer} for the given
+     * {@code JList}.
      *
-     * @param list The <code>JList</code>.
+     * @param list The {@code JList}.
      * @param value The list cell.
      * @param index The index in the list.
-     * @param isSelected <code>true</code> if the given list cell is selected.
-     * @param hasFocus <code>false</code> if the given list cell has the focus.
-     * @return The <code>ListCellRenderer</code>
+     * @param isSelected {@code true} if the given list cell is selected.
+     * @param hasFocus {@code false} if the given list cell has the focus.
+     * @return The {@code ListCellRenderer}
      */
     @Override
     public Component getListCellRendererComponent(JList<? extends T> list,
@@ -115,7 +115,7 @@ public class FreeColComboBoxRenderer<T>
     /**
      * Set the text to place in a label.
      *
-     * @param c The <code>JLabel</code> to assign.
+     * @param c The {@code JLabel} to assign.
      * @param value The object to derive a text value from.
      */
     public void setLabelValues(JLabel c, T value) {

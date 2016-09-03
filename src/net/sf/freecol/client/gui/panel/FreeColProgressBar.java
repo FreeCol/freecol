@@ -63,7 +63,7 @@ public class FreeColProgressBar extends JPanel {
 
 
     /**
-     * Creates a new <code>FreeColProgressBar</code> instance.
+     * Creates a new {@code FreeColProgressBar} instance.
      *
      * @param goodsType the type of goods produced
      */
@@ -72,7 +72,7 @@ public class FreeColProgressBar extends JPanel {
     }
 
     /**
-     * Creates a new <code>FreeColProgressBar</code> instance.
+     * Creates a new {@code FreeColProgressBar} instance.
      *
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
@@ -83,7 +83,7 @@ public class FreeColProgressBar extends JPanel {
     }
 
     /**
-     * Creates a new <code>FreeColProgressBar</code> instance.
+     * Creates a new {@code FreeColProgressBar} instance.
      *
      * @param goodsType the type of goods produced
      * @param min the minimum value of the progress bar
@@ -133,7 +133,7 @@ public class FreeColProgressBar extends JPanel {
     /**
      * Get an image to use for the goods type, if any.
      *
-     * @return A suitable <code>Image</code>, or null if there is no
+     * @return A suitable {@code Image}, or null if there is no
      *      goods type.
      */
     private Image getImage() {

@@ -64,7 +64,7 @@ public final class ColopediaPanel extends FreeColPanel
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param id The object identifier of the item to select.
      */
     public ColopediaPanel(FreeColClient freeColClient, String id) {
@@ -102,12 +102,12 @@ public final class ColopediaPanel extends FreeColPanel
     }
 
     /**
-     * Creates a new <code>ColopediaPanel</code> instance suitable
+     * Creates a new {@code ColopediaPanel} instance suitable
      * only for the construction of ColopediaDetailPanels.
      *
      * FIXME: find a more elegant solution.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ColopediaPanel(FreeColClient freeColClient) {
         super(freeColClient);
@@ -164,7 +164,7 @@ public final class ColopediaPanel extends FreeColPanel
      * right methods to take care of building the requested unit's
      * details.
      *
-     * @param event The incoming <code>TreeSelectionEvent</code>.
+     * @param event The incoming {@code TreeSelectionEvent}.
      */
     @Override
     public void valueChanged(TreeSelectionEvent event) {

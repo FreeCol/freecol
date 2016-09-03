@@ -34,9 +34,9 @@ public class EuropeAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>EuropeAction</code>.
+     * Creates a new {@code EuropeAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public EuropeAction(FreeColClient freeColClient) {
         super(freeColClient, id);

@@ -40,10 +40,10 @@ public class Occupation {
     /**
      * Create an Occupation.
      *
-     * @param workLocation The <code>WorkLocation</code> to work at.
-     * @param productionType The <code>ProductionType</code> to
+     * @param workLocation The {@code WorkLocation} to work at.
+     * @param productionType The {@code ProductionType} to
      *     use at the work location.
-     * @param workType The <code>GoodsType</code> to produce at the
+     * @param workType The {@code GoodsType} to produce at the
      *     work location with the production type.
      */
     public Occupation(WorkLocation workLocation,
@@ -57,7 +57,7 @@ public class Occupation {
     /**
      * Install a unit into this occupation.
      *
-     * @param unit The <code>Unit</code> to establish.
+     * @param unit The {@code Unit} to establish.
      * @return True if the unit is installed.
      */
     public boolean install(Unit unit) {
@@ -75,14 +75,14 @@ public class Occupation {
      * Improve this occupation to the best available production for the
      * given unit type.
      *
-     * @param unitType The <code>UnitType</code> to produce the goods.
-     * @param wl The <code>WorkLocation</code> to check.
+     * @param unitType The {@code UnitType} to produce the goods.
+     * @param wl The {@code WorkLocation} to check.
      * @param bestAmount The best amount of goods produced found so far.
-     * @param workTypes A collection of <code>GoodsType</code> to
+     * @param workTypes A collection of {@code GoodsType} to
      *     consider producing.
      * @param alone True if the unit is alone, and can set the
      *     production type.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return The best amount of production found.
      */
     private int improve(UnitType unitType, WorkLocation wl, int bestAmount,
@@ -124,12 +124,12 @@ public class Occupation {
      * Improve this occupation to the best available production for the
      * given unit.
      *
-     * @param unit The <code>Unit</code> to produce the goods.
-     * @param wl The <code>WorkLocation</code> to check.
+     * @param unit The {@code Unit} to produce the goods.
+     * @param wl The {@code WorkLocation} to check.
      * @param bestAmount The best amount of goods produced found so far.
-     * @param workTypes A collection of <code>GoodsType</code> to
+     * @param workTypes A collection of {@code GoodsType} to
      *     consider producing.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return The best amount of production found.
      */
     public int improve(Unit unit, WorkLocation wl, int bestAmount,
@@ -154,12 +154,12 @@ public class Occupation {
      * Improve this occupation to the best available production for the
      * given unit type.
      *
-     * @param unitType The <code>UnitType</code> to produce the goods.
-     * @param wl The <code>WorkLocation</code> to check.
+     * @param unitType The {@code UnitType} to produce the goods.
+     * @param wl The {@code WorkLocation} to check.
      * @param bestAmount The best amount of goods produced found so far.
-     * @param workTypes A collection of <code>GoodsType</code> to
+     * @param workTypes A collection of {@code GoodsType} to
      *     consider producing.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return The best amount of production found.
      */
     public int improve(UnitType unitType, WorkLocation wl, int bestAmount,

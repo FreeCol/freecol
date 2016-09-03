@@ -33,9 +33,9 @@ public class MapEditorAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>MapEditorAction</code>.
+     * Creates a new {@code MapEditorAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MapEditorAction(FreeColClient freeColClient) {
         super(freeColClient, id);

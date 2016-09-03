@@ -152,7 +152,7 @@ public final class StatisticsPanel extends FreeColPanel {
     /**
      * Creates the statistics panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param serverStatistics A map of key,value pairs of server statistics.
      * @param clientStatistics A map of key,value pairs of client statistics.
      */

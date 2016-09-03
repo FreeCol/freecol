@@ -143,12 +143,12 @@ public class RearrangeColonyMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>RearrangeColonyMessage</code> with the
+     * Create a new {@code RearrangeColonyMessage} with the
      * supplied colony.  Add changes with addChange().
      *
-     * @param colony The <code>Colony</code> that is rearranging.
-     * @param workers A list of worker <code>Unit</code>s to rearrange.
-     * @param scratch A scratch <code>Colony</code> laid out as required.
+     * @param colony The {@code Colony} that is rearranging.
+     * @param workers A list of worker {@code Unit}s to rearrange.
+     * @param scratch A scratch {@code Colony} laid out as required.
      */
     public RearrangeColonyMessage(Colony colony, List<Unit> workers,
                                   Colony scratch) {
@@ -169,11 +169,11 @@ public class RearrangeColonyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>RearrangeColonyMessage</code> from a
+     * Create a new {@code RearrangeColonyMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public RearrangeColonyMessage(Game game, Element element) {
         super(getTagName());
@@ -206,10 +206,10 @@ public class RearrangeColonyMessage extends DOMMessage {
     /**
      * Add a change to this message.
      *
-     * @param unit The <code>Unit</code> that is to change.
-     * @param loc The destination <code>Location</code> for the unit.
-     * @param work The <code>GoodsType</code> to produce (may be null).
-     * @param role The unit <code>Role</code>.
+     * @param unit The {@code Unit} that is to change.
+     * @param loc The destination {@code Location} for the unit.
+     * @param work The {@code GoodsType} to produce (may be null).
+     * @param role The unit {@code Role}.
      * @param roleCount The role count.
      */
     public void addChange(Unit unit, Location loc, GoodsType work,
@@ -221,11 +221,11 @@ public class RearrangeColonyMessage extends DOMMessage {
     /**
      * Handle a "rearrangeColony"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the request.
-     * @param player The <code>Player</code> rearrangeing the colony.
-     * @param connection The <code>Connection</code> the message is from.
-     * @return An update <code>Element</code> with the rearranged colony,
-     *     or an error <code>Element</code> on failure.
+     * @param server The {@code FreeColServer} handling the request.
+     * @param player The {@code Player} rearrangeing the colony.
+     * @param connection The {@code Connection} the message is from.
+     * @return An update {@code Element} with the rearranged colony,
+     *     or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

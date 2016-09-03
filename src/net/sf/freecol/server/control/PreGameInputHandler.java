@@ -111,8 +111,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "logout"-message.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return A logout reply message.
      */
     @Override
@@ -135,8 +135,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "ready"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null.
      */
     private Element ready(Connection connection, Element element) {
@@ -159,8 +159,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "requestLaunch"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null, or an error message on failure.
      */
     private Element requestLaunch(Connection connection,
@@ -209,8 +209,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "setAvailable"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null, or an error message on failure.
      */
     private Element setAvailable(Connection connection, Element element) {
@@ -236,8 +236,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "setColor"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null, or an error message on failure.
      */
     private Element setColor(Connection connection, Element element) {
@@ -272,8 +272,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "setNation"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null.
      */
     private Element setNation(Connection connection, Element element) {
@@ -306,8 +306,8 @@ public final class PreGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "setNationType"-message from a client.
      * 
-     * @param connection The <code>Connection</code> the message came from.
-     * @param element The <code>Element</code> containing the request.
+     * @param connection The {@code Connection} the message came from.
+     * @param element The {@code Element} containing the request.
      * @return Null, or an error message on failure.
      */
     private Element setNationType(Connection connection, Element element) {

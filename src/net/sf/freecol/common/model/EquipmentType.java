@@ -78,7 +78,7 @@ public class EquipmentType extends BuildableType {
      * Simple constructor.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public EquipmentType(String id, Specification specification) {
         super(id, specification);
@@ -114,11 +114,11 @@ public class EquipmentType extends BuildableType {
 
     /**
      * Get the type of equipment to capture, handling the case where
-     * Europeans and Indians use different <code>EquipmentType</code>s
+     * Europeans and Indians use different {@code EquipmentType}s
      * for the same underlying goods.
      *
      * @param byIndians Is the capture by the Indians?
-     * @return The captured <code>EquipmentType</code>.
+     * @return The captured {@code EquipmentType}.
      */
     public EquipmentType getCaptureEquipment(boolean byIndians) {
         return (captureEquipmentId != null
@@ -130,7 +130,7 @@ public class EquipmentType extends BuildableType {
     /**
      * Is this type of equipment compatible with the given type of equipment?
      *
-     * @param otherType The other <code>EquipmentType</code>.
+     * @param otherType The other {@code EquipmentType}.
      * @return True if the equipment is compatible.
      */
     public boolean isCompatibleWith(EquipmentType otherType) {
@@ -165,7 +165,7 @@ public class EquipmentType extends BuildableType {
     /**
      * Set the role for this equipment type.
      *
-     * @param role The new equipment related <code>Role</code>.
+     * @param role The new equipment related {@code Role}.
      */
     public void setRole(Role role) {
         this.role = role;

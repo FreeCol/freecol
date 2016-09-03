@@ -44,8 +44,8 @@ public class AbstractGoodsLabel extends JLabel {
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param lib The <code>ImageLibrary</code> to use to display the label.
-     * @param abstractGoods The <code>AbstractGoods</code> that this JLabel
+     * @param lib The {@code ImageLibrary} to use to display the label.
+     * @param abstractGoods The {@code AbstractGoods} that this JLabel
      *     will visually represent.
      */
     public AbstractGoodsLabel(ImageLibrary lib, AbstractGoods abstractGoods) {

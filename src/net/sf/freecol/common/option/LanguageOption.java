@@ -93,7 +93,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         /**
          * Get the locale.
          *
-         * @return The <code>Locale</code>.
+         * @return The {@code Locale}.
          */
         public final Locale getLocale() {
             return locale;
@@ -102,7 +102,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         /**
          * Set the locale.
          *
-         * @param newLocale The new <code>Locale</code>.
+         * @param newLocale The new {@code Locale}.
          */
         public final void setLocale(final Locale newLocale) {
             this.locale = newLocale;
@@ -176,9 +176,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
 
     /**
-     * Creates a new <code>LanguageOption</code>.
+     * Creates a new {@code LanguageOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public LanguageOption(Specification specification) {
         super(specification);

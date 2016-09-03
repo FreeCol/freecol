@@ -35,10 +35,10 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
 
     /**
-     * Creates a new <code>BooleanOptionUI</code> for the given
-     * <code>BooleanOption</code>.
+     * Creates a new {@code BooleanOptionUI} for the given
+     * {@code BooleanOption}.
      *
-     * @param option The <code>BooleanOption</code> to make a user
+     * @param option The {@code BooleanOption} to make a user
      *     interface for.
      * @param editable Whether user can modify the setting.
      */

@@ -46,7 +46,7 @@ public final class ChatPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ChatPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout(10, 10));

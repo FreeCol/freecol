@@ -41,7 +41,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
     /**
      * Internal constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     protected FreeColInputDialog(FreeColClient freeColClient, JFrame frame) {
@@ -49,10 +49,10 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
     }
 
     /**
-     * Create a new <code>FreeColInputDialog</code> with an object and
+     * Create a new {@code FreeColInputDialog} with an object and
      * a ok/cancel option.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param obj The object containing the input fields and

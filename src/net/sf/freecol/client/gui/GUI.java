@@ -103,7 +103,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Create the GUI.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param scaleFactor The scale factor for the GUI.
      */
     public GUI(FreeColClient freeColClient, float scaleFactor) {
@@ -163,7 +163,7 @@ public class GUI extends FreeColClientHolder {
     public void hideSplashScreen() {}
 
     /**
-     * Shows the <code>VideoPanel</code>.
+     * Shows the {@code VideoPanel}.
      *
      * @param userMsg An optional user message.
      */
@@ -208,7 +208,7 @@ public class GUI extends FreeColClientHolder {
      *        sensible code directly drawing in necessary size,
      *        without creating a throwaway GUI panel, drawing in wrong
      *        size and immediately resizing.
-     * @return The created <code>BufferedImage</code>.
+     * @return The created {@code BufferedImage}.
      */
     public BufferedImage createMiniMapThumbNail() {
         MiniMap miniMap = new MiniMap(getFreeColClient());
@@ -277,7 +277,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Set the active unit.
      *
-     * @param unit The <code>Unit</code> to activate.
+     * @param unit The {@code Unit} to activate.
      * @return True if the focus was set.
      */
     public boolean setActiveUnit(Unit unit) {
@@ -295,7 +295,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Require the given tile to be in the onScreen()-area.
      *
-     * @param tile The <code>Tile</code> to check.
+     * @param tile The {@code Tile} to check.
      * @return True if the focus was set.
      */
     public boolean requireFocus(Tile tile) {
@@ -305,10 +305,10 @@ public class GUI extends FreeColClientHolder {
     /**
      * Animate a unit attack.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param defender The defending <code>Unit</code>.
-     * @param attackerTile The <code>Tile</code> to show the attacker on.
-     * @param defenderTile The <code>Tile</code> to show the defender on.
+     * @param attacker The attacking {@code Unit}.
+     * @param defender The defending {@code Unit}.
+     * @param attackerTile The {@code Tile} to show the attacker on.
+     * @param defenderTile The {@code Tile} to show the defender on.
      * @param success Did the attack succeed?
      */
     public void animateUnitAttack(Unit attacker, Unit defender,
@@ -318,9 +318,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Animate a unit move.
      *
-     * @param unit The <code>Unit</code> that is moving.
-     * @param srcTile The <code>Tile</code> the unit starts at.
-     * @param dstTile The <code>Tile</code> the unit moves to.
+     * @param unit The {@code Unit} that is moving.
+     * @param srcTile The {@code Tile} the unit starts at.
+     * @param dstTile The {@code Tile} the unit moves to.
      */
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {}
 
@@ -372,8 +372,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * General modal confirmation dialog.
      *
-     * @param tile An optional <code>Tile</code> to expose.
-     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param tile An optional {@code Tile} to expose.
+     * @param template The {@code StringTemplate} explaining the choice.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
      * @return True if the "ok" button was selected.
@@ -386,8 +386,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * General modal confirmation dialog.
      *
-     * @param tile An optional <code>Tile</code> to expose.
-     * @param template The <code>StringTemplate</code> explaining the choice.
+     * @param tile An optional {@code Tile} to expose.
+     * @param template The {@code StringTemplate} explaining the choice.
      * @param unit An optional unit to make an icon for the dialog from.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
@@ -413,7 +413,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Confirm that a unit should abandon its educational activity.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @param leaveColony True if the unit is about to leave the colony,
      *     not just the education building.
      * @return True if the unit can proceed.
@@ -451,7 +451,7 @@ public class GUI extends FreeColClientHolder {
      * If a unit has a trade route, get confirmation that it is
      * ok to clear it and set a destination.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return Whether it is acceptable to set a destination for this unit.
      */
     public boolean confirmClearTradeRoute(Unit unit) {
@@ -477,9 +477,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Confirm whether the player wants to demand tribute from a colony.
      *
-     * @param attacker The potential attacking <code>Unit</code>.
-     * @param colony The target <code>Colony</code>.
-     * @param ns A <code>NationSummary</code> of the other nation.
+     * @param attacker The potential attacking {@code Unit}.
+     * @param colony The target {@code Colony}.
+     * @param ns A {@code NationSummary} of the other nation.
      * @return The amount of tribute to demand, positive if the demand
      *     should proceed.
      */
@@ -516,8 +516,8 @@ public class GUI extends FreeColClientHolder {
      * Check if an attack results in a transition from peace or cease fire to
      * war and, if so, warn the player.
      *
-     * @param attacker The potential attacking <code>Unit</code>.
-     * @param target The target <code>Tile</code>.
+     * @param attacker The potential attacking {@code Unit}.
+     * @param target The target {@code Tile}.
      * @return True to attack, false to abort.
      */
     public boolean confirmHostileAction(Unit attacker, Tile target) {
@@ -572,7 +572,7 @@ public class GUI extends FreeColClientHolder {
      * - Check for population limit.
      * - Query if education should be abandoned.
      *
-     * @param unit The <code>Unit</code> that is leaving the colony.
+     * @param unit The {@code Unit} that is leaving the colony.
      * @return True if the unit is allowed to leave.
      */
     public boolean confirmLeaveColony(Unit unit) {
@@ -589,8 +589,8 @@ public class GUI extends FreeColClientHolder {
      * Confirm whether the player wants to demand tribute from a native
      * settlement.
      *
-     * @param attacker The potential attacking <code>Unit</code>.
-     * @param is The target <code>IndianSettlement</code>.
+     * @param attacker The potential attacking {@code Unit}.
+     * @param is The target {@code IndianSettlement}.
      * @return The amount of tribute to demand, positive if the demand
      *     should proceed.
      */
@@ -616,8 +616,8 @@ public class GUI extends FreeColClientHolder {
      * Shows the pre-combat dialog if enabled, allowing the user to
      * view the odds and possibly cancel the attack.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param tile The target <code>Tile</code>.
+     * @param attacker The attacking {@code Unit}.
+     * @param tile The target {@code Tile}.
      * @return True to attack, false to abort.
      */
     public boolean confirmPreCombat(Unit attacker, Tile tile) {
@@ -645,7 +645,7 @@ public class GUI extends FreeColClientHolder {
      * Get the choice of what a user wants to do with an armed unit at
      * a foreign settlement.
      *
-     * @param settlement The <code>Settlement</code> to consider.
+     * @param settlement The {@code Settlement} to consider.
      * @return The chosen action, tribute, attack or cancel.
      */
     public ArmedUnitSettlementAction getArmedUnitSettlementChoice(Settlement settlement) {
@@ -666,10 +666,10 @@ public class GUI extends FreeColClientHolder {
      * Get the user choice of whether to pay arrears for boycotted
      * goods or to dump them instead.
      *
-     * @param goods The <code>Goods</code> to possibly dump.
-     * @param europe The player <code>Europe</code> where the boycott
+     * @param goods The {@code Goods} to possibly dump.
+     * @param europe The player {@code Europe} where the boycott
      *     is in force.
-     * @return The chosen <code>BoycottAction</code>.
+     * @return The chosen {@code BoycottAction}.
      */
     public BoycottAction getBoycottChoice(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
@@ -692,9 +692,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Gets the user choice when negotiating a purchase from a settlement.
      *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param settlement The <code>Settlement</code> to buy from.
-     * @param goods The <code>Goods</code> to buy.
+     * @param unit The {@code Unit} that is buying.
+     * @param settlement The {@code Settlement} to buy from.
+     * @param goods The {@code Goods} to buy.
      * @param gold The current negotiated price.
      * @param canBuy True if buy is a valid option.
      * @return The chosen action, buy, haggle, or cancel.
@@ -719,10 +719,10 @@ public class GUI extends FreeColClientHolder {
     /**
      * Gets the user choice for claiming a tile.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param player The <code>Player</code> that is claiming.
+     * @param tile The {@code Tile} to claim.
+     * @param player The {@code Player} that is claiming.
      * @param price An asking price, if any.
-     * @param owner The <code>Player</code> that owns the land.
+     * @param owner The {@code Player} that owns the land.
      * @return The chosen action, accept, steal or cancel.
      */
     public ClaimAction getClaimChoice(Tile tile, Player player, int price,
@@ -752,7 +752,7 @@ public class GUI extends FreeColClientHolder {
      * Get the user choice when trading with a native settlement.
      *
      * @param settlement The native settlement to trade with.
-     * @param template A <code>StringTemplate</code> containing the message
+     * @param template A {@code StringTemplate} containing the message
      *     to display.
      * @param canBuy Show a "buy" option.
      * @param canSell Show a "sell" option.
@@ -788,8 +788,8 @@ public class GUI extends FreeColClientHolder {
      * Get the user choice of what to do with a missionary at a native
      * settlement.
      *
-     * @param unit The <code>Unit</code> speaking to the settlement.
-     * @param is The <code>IndianSettlement</code> being visited.
+     * @param unit The {@code Unit} speaking to the settlement.
+     * @param is The {@code IndianSettlement} being visited.
      * @param canEstablish Is establish a valid option.
      * @param canDenounce Is denounce a valid option.
      * @return The chosen action, establish mission, denounce, incite
@@ -826,8 +826,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get a name for a new colony for a player.
      *
-     * @param player The <code>Player</code> to get the colony name for.
-     * @param tile The <code>Tile</code> for the new colony.
+     * @param player The {@code Player} to get the colony name for.
+     * @param tile The {@code Tile} for the new colony.
      * @return A colony name, or null if the user has reconsidered.
      */
     public String getNewColonyName(Player player, Tile tile) {
@@ -854,8 +854,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the user choice for what to do with a scout at a foreign colony.
      *
-     * @param colony The <code>Colony</code> to be scouted.
-     * @param unit The <code>Unit</code> that is scouting.
+     * @param colony The {@code Colony} to be scouted.
+     * @param unit The {@code Unit} that is scouting.
      * @param neg True if negotation is a valid choice.
      * @return The selected action, either negotiate, spy, attack or cancel.
      */
@@ -882,7 +882,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the user choice for what to do at a native settlement.
      *
-     * @param is The <code>IndianSettlement</code> to be scouted.
+     * @param is The {@code IndianSettlement} to be scouted.
      * @param numberString The number of settlements in the settlement
      *     owner nation.
      * @return The chosen action, speak, tribute, attack or cancel.
@@ -936,9 +936,9 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the user choice for negotiating a sale to a settlement.
      *
-     * @param unit The <code>Unit</code> that is selling.
-     * @param settlement The <code>Settlement</code> to sell to.
-     * @param goods The <code>Goods</code> to sell.
+     * @param unit The {@code Unit} that is selling.
+     * @param settlement The {@code Settlement} to sell to.
+     * @param goods The {@code Goods} to sell.
      * @param gold The current negotiated price.
      * @return The chosen action, sell, gift or haggle, or null.
      */
@@ -969,11 +969,11 @@ public class GUI extends FreeColClientHolder {
      * General modal choice dialog.
      *
      * @param <T> The choice type.
-     * @param tile An optional <code>Tile</code> to expose.
+     * @param tile An optional {@code Tile} to expose.
      * @param explain An object explaining the choice.
      * @param cancelKey A key for the "cancel" button.
-     * @param choices A list a <code>ChoiceItem</code>s to choose from.
-     * @return The selected value of the selected <code>ChoiceItem</code>,
+     * @param choices A list a {@code ChoiceItem}s to choose from.
+     * @return The selected value of the selected {@code ChoiceItem},
      *     or null if cancelled.
      */
     public <T> T getChoice(Tile tile, Object explain,
@@ -1004,8 +1004,8 @@ public class GUI extends FreeColClientHolder {
     /**
      * General modal string input dialog.
      *
-     * @param tile An optional <code>Tile</code> to expose.
-     * @param template A <code>StringTemplate</code> explaining the choice.
+     * @param tile An optional {@code Tile} to expose.
+     * @param template A {@code StringTemplate} explaining the choice.
      * @param defaultValue The default value to show initially.
      * @param okKey A key for the "ok" button.
      * @param cancelKey A key for the "cancel" button.
@@ -1080,7 +1080,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Display the appropriate panel for a given settlement.
      *
-     * @param settlement The <code>Settlement</code> to display.
+     * @param settlement The {@code Settlement} to display.
      */
     void showSettlement(Settlement settlement) {
         if (settlement instanceof Colony) {
@@ -1127,7 +1127,7 @@ public class GUI extends FreeColClientHolder {
     /**
      * Show an i18n compliant error message derived from a template.
      *
-     * @param template The <code>StringTemplate</code> containing the message.
+     * @param template The {@code StringTemplate} containing the message.
      */
     public final void showErrorMessage(StringTemplate template) {
         showErrorMessage(template, null);
@@ -1137,7 +1137,7 @@ public class GUI extends FreeColClientHolder {
      * Show an i18n compliant error message derived from a template,
      * with optional extra debug information.
      *
-     * @param template The <code>StringTemplate</code> containing the message.
+     * @param template The {@code StringTemplate} containing the message.
      * @param messsage Optional extra debug information.
      */
     public final void showErrorMessage(StringTemplate template,
@@ -1149,7 +1149,7 @@ public class GUI extends FreeColClientHolder {
      * Show an i18n compliant error message derived from a template,
      * with optional extra debug information and an optional callback.
      *
-     * @param template The <code>StringTemplate</code> containing the message.
+     * @param template The {@code StringTemplate} containing the message.
      * @param messsage Optional extra debug information.
      * @param callback Optional routine to run when the error panel is closed.
      */
@@ -1430,7 +1430,7 @@ public class GUI extends FreeColClientHolder {
      * Wrapper for SwingUtilities.invokeLater that handles the case
      * where we are already in the EDT.
      *
-     * @param runnable A <code>Runnable</code> to run.
+     * @param runnable A {@code Runnable} to run.
      */
     public void invokeNowOrLater(Runnable runnable) {
         if (SwingUtilities.isEventDispatchThread()) {
@@ -1444,7 +1444,7 @@ public class GUI extends FreeColClientHolder {
      * Wrapper for SwingUtilities.invokeAndWait that handles the case
      * where we are already in the EDT.
      *
-     * @param runnable A <code>Runnable</code> to run.
+     * @param runnable A {@code Runnable} to run.
      */
     public void invokeNowOrWait(Runnable runnable) {
         if (SwingUtilities.isEventDispatchThread()) {

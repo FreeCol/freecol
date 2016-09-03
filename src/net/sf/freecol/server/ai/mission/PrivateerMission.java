@@ -64,22 +64,22 @@ public class PrivateerMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code> for this mission.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location} for this mission.
      */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);
     }
 
     /**
-     * Creates a new <code>UnitWanderHostileMission</code> and reads
+     * Creates a new {@code UnitWanderHostileMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -96,8 +96,8 @@ public class PrivateerMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from,
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
@@ -120,8 +120,8 @@ public class PrivateerMission extends Mission {
     /**
      * Score a potential attack on a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> that may attack.
-     * @param defender The <code>Unit</code> to attack.
+     * @param aiUnit The {@code AIUnit} that may attack.
+     * @param defender The {@code Unit} to attack.
      * @return A score for the attack.
      */
     private static int scoreUnit(AIUnit aiUnit, Unit defender) {
@@ -141,8 +141,8 @@ public class PrivateerMission extends Mission {
     /**
      * Evaluate a potential mission for a given unit and path.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -159,11 +159,11 @@ public class PrivateerMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for this mission.
+     * Gets a {@code GoalDecider} for this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param aiUnit The {@code AIUnit} that is searching.
      * @param deferOK Enable colony fallback (not implemented).
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
@@ -191,7 +191,7 @@ public class PrivateerMission extends Mission {
     /**
      * Finds a suitable privateering target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a path for.
+     * @param aiUnit The {@code AIUnit} to find a path for.
      * @param range The maximum number of turns to seek for a target.
      * @param deferOK Not implemented in this mission.
      * @return A path to the new target.
@@ -211,10 +211,10 @@ public class PrivateerMission extends Mission {
     /**
      * Finds a suitable privateering target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a path for.
+     * @param aiUnit The {@code AIUnit} to find a path for.
      * @param range The maximum number of turns to seek for a target.
      * @param deferOK Enables deferring to a fallback colony.
-     * @return A <code>PathNode</code> to the target, or null if none found.
+     * @return A {@code PathNode} to the target, or null if none found.
      */
     public static Location findTarget(AIUnit aiUnit, int range,
                                       boolean deferOK) {
@@ -226,7 +226,7 @@ public class PrivateerMission extends Mission {
     /**
      * Why would a PrivateeringMission be invalid with the given unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -244,8 +244,8 @@ public class PrivateerMission extends Mission {
     /**
      * Is this a valid target because it is one of our colonies.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param settlement The <code>Settlement</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param settlement The {@code Settlement} to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -259,8 +259,8 @@ public class PrivateerMission extends Mission {
     /**
      * Is this a valid target because it is a hostile unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param unit The <code>Unit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param unit The {@code Unit} to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -283,7 +283,7 @@ public class PrivateerMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -293,8 +293,8 @@ public class PrivateerMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

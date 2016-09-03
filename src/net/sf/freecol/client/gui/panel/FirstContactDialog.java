@@ -51,11 +51,11 @@ public class FirstContactDialog extends FreeColConfirmDialog {
     /**
      * Create an FirstContactDialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param player The <code>Player</code> making contact.
-     * @param other The <code>Player</code> to contact.
-     * @param tile An optional <code>Tile</code> on offer.
+     * @param player The {@code Player} making contact.
+     * @param other The {@code Player} to contact.
+     * @param tile An optional {@code Tile} on offer.
      * @param settlementCount The number of settlements the other
      *     player has.
      */

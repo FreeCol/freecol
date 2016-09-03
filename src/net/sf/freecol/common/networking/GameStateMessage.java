@@ -41,7 +41,7 @@ public class GameStateMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>GameStateMessage</code>.
+     * Create a new {@code GameStateMessage}.
      */
     public GameStateMessage() {
         super(getTagName());
@@ -50,11 +50,11 @@ public class GameStateMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>GameStateMessage</code> from a
+     * Create a new {@code GameStateMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public GameStateMessage(Game game, Element element) {
         this();
@@ -73,9 +73,9 @@ public class GameStateMessage extends DOMMessage {
     /**
      * Handle a "gameState"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return An <code>Element</code> to update the originating player
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
+     * @return An {@code Element} to update the originating player
      *     with the result of the query.
      */
     public Element handle(FreeColServer server, Connection connection) {

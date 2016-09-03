@@ -42,9 +42,9 @@ public class AddPlayerMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AddPlayerMessage</code>.
+     * Create a new {@code AddPlayerMessage}.
      *
-     * @param player The <code>Player</code>s to add.
+     * @param player The {@code Player}s to add.
      */
     public AddPlayerMessage(Player player) {
         super(getTagName());
@@ -54,11 +54,11 @@ public class AddPlayerMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AddPlayerMessage</code> from a supplied
+     * Create a new {@code AddPlayerMessage} from a supplied
      * element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AddPlayerMessage(Game game, Element element) {
         this(null);
@@ -76,7 +76,7 @@ public class AddPlayerMessage extends DOMMessage {
     /**
      * Get the attached players.
      *
-     * @return The list of <code>Player</code>s to add.
+     * @return The list of {@code Player}s to add.
      */
     public List<Player> getPlayers() {
         return this.players;
@@ -86,9 +86,9 @@ public class AddPlayerMessage extends DOMMessage {
     /**
      * Handle a "addPlayer"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
     public Element handle(FreeColServer server, Player player,

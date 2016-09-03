@@ -111,7 +111,7 @@ public enum Direction implements Named {
     /**
      * Get the next direction after this one (clockwise).
      *
-     * @return The next <code>Direction</code>.
+     * @return The next {@code Direction}.
      */
     public Direction getNextDirection() {
         return rotate(1);
@@ -120,7 +120,7 @@ public enum Direction implements Named {
     /**
      * Get the previous direction after this one (anticlockwise).
      *
-     * @return The previous <code>Direction</code>.
+     * @return The previous {@code Direction}.
      */
     public Direction getPreviousDirection() {
         return rotate(-1);
@@ -129,7 +129,7 @@ public enum Direction implements Named {
     /**
      * Gets the reverse direction of this one.
      *
-     * @return The reverse <code>Direction</code>.
+     * @return The reverse {@code Direction}.
      */
     public Direction getReverseDirection() {
         return rotate(NUMBER_OF_DIRECTIONS/2);
@@ -138,7 +138,7 @@ public enum Direction implements Named {
     /**
      * Gets the direction with east-west part mirrored.
      *
-     * @return The mirrored <code>Direction</code>.
+     * @return The mirrored {@code Direction}.
      */
     public Direction getEWMirroredDirection() {
         switch(this) {
@@ -156,9 +156,9 @@ public enum Direction implements Named {
      * Gets a random Direction.
      *
      * @param logMe A string to log with the random results.
-     * @param logger A <code>Logger</code> to log to.
-     * @param random A <code>Random</code> number source.
-     * @return A random <code>Direction</code> value.
+     * @param logger A {@code Logger} to log to.
+     * @param random A {@code Random} number source.
+     * @return A random {@code Direction} value.
      */
     public static Direction getRandomDirection(String logMe, Logger logger,
                                                Random random) {
@@ -170,9 +170,9 @@ public enum Direction implements Named {
      * Creates an array of the eight directions in a random order.
      *
      * @param logMe A string to log with the random results.
-     * @param logger A <code>Logger</code> to log to.
-     * @param random A <code>Random</code> number source.
-     * @return An array of the <code>Direction</code>s in a random order.
+     * @param logger A {@code Logger} to log to.
+     * @param random A {@code Random} number source.
+     * @return An array of the {@code Direction}s in a random order.
      */
     public static Direction[] getRandomDirections(String logMe, Logger logger,
                                                   Random random) {
@@ -193,9 +193,9 @@ public enum Direction implements Named {
      * directions to the original one in order.
      *
      * @param logMe A string to log with the random results.
-     * @param logger A <code>Logger</code> to log to.
-     * @param random A <code>Random</code> number source.
-     * @return An array of the <code>Direction</code>s favouring this one.
+     * @param logger A {@code Logger} to log to.
+     * @param random A {@code Random} number source.
+     * @return An array of the {@code Direction}s favouring this one.
      */
     public Direction[] getClosestDirections(String logMe, Logger logger,
                                             Random random) {
@@ -225,7 +225,7 @@ public enum Direction implements Named {
      * Convert an angle (radians) to a direction.
      *
      * @param angle The angle to convert.
-     * @return An equivalent <code>Direction</code>.
+     * @return An equivalent {@code Direction}.
      */
     public static Direction angleToDirection(double angle) {
         return Direction.values()[(int)Math.floor(angle / (Math.PI/4))];

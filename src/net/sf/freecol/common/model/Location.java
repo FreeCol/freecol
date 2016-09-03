@@ -26,7 +26,7 @@ import net.sf.freecol.common.ObjectWithId;
 
 
 /**
- * A place where a <code>Locatable</code> can be put.
+ * A place where a {@code Locatable} can be put.
  *
  * @see Locatable
  */
@@ -40,7 +40,7 @@ public interface Location extends ObjectWithId {
     public static final int LOCATION_RANK_HIGHSEAS = -1;
     
     /**
-     * Gets the identifier of this <code>Location</code>.
+     * Gets the identifier of this {@code Location}.
      *
      * @return The object identifier.
      * @see FreeColGameObject#getId
@@ -65,42 +65,42 @@ public interface Location extends ObjectWithId {
     /**
      * Get a label for this location for a particular player.
      *
-     * @param player The <code>Player</code> to return the name for.
+     * @param player The {@code Player} to return the name for.
      * @return A label for this location.
      */
     public StringTemplate getLocationLabelFor(Player player);
 
     /**
-     * Adds a <code>Locatable</code> to this Location.
+     * Adds a {@code Locatable} to this Location.
      *
-     * @param locatable The <code>Locatable</code> to add to this Location.
+     * @param locatable The {@code Locatable} to add to this Location.
      * @return True if the locatable was added.
      */
     public boolean add(Locatable locatable);
 
     /**
-     * Removes a <code>Locatable</code> from this Location.
+     * Removes a {@code Locatable} from this Location.
      *
-     * @param locatable The <code>Locatable</code> to remove from this
+     * @param locatable The {@code Locatable} to remove from this
      *     Location.
      * @return True if the locatable was removed.
      */
     public boolean remove(Locatable locatable);
 
     /**
-     * Checks if this <code>Location</code> contains the specified
-     * <code>Locatable</code>.
+     * Checks if this {@code Location} contains the specified
+     * {@code Locatable}.
      *
-     * @param locatable The <code>Locatable</code> to test the presence of.
+     * @param locatable The {@code Locatable} to test the presence of.
      * @return True if the locatable is present at this location.
      */
     public boolean contains(Locatable locatable);
 
     /**
      * Checks whether or not the specified locatable may be added to this
-     * <code>Location</code>.
+     * {@code Location}.
      *
-     * @param locatable The <code>Locatable</code> to add.
+     * @param locatable The {@code Locatable} to add.
      * @return True if the locatable can be added to this location.
      */
     public boolean canAdd(Locatable locatable);
@@ -127,26 +127,26 @@ public interface Location extends ObjectWithId {
     public List<Unit> getUnitList();
 
     /**
-     * Gets the <code>GoodsContainer</code> this <code>Location</code> use
+     * Gets the {@code GoodsContainer} this <code>Location</code> use
      * for storing it's goods.
      *
-     * @return The <code>GoodsContainer</code> or <code>null</code> if the
-     *     <code>Location</code> cannot store any goods.
+     * @return The {@code GoodsContainer} or <code>null</code> if the
+     *     {@code Location} cannot store any goods.
      */
     public GoodsContainer getGoodsContainer();
 
     /**
-     * Gets the <code>Settlement</code> this <code>Location</code> is
+     * Gets the {@code Settlement} this <code>Location</code> is
      * located in.
      *
-     * @return The associated <code>Settlement</code>, or null if none.
+     * @return The associated {@code Settlement}, or null if none.
      */
     public Settlement getSettlement();
 
     /**
      * Get the colony at this location.
      *
-     * @return A <code>Colony</code> at this location if any, or null
+     * @return A {@code Colony} at this location if any, or null
      *     if none found.
      */
     public Colony getColony();
@@ -154,7 +154,7 @@ public interface Location extends ObjectWithId {
     /**
      * Gets the native settlement at this location.
      *
-     * @return The <code>IndianSettlement</code> at this location if
+     * @return The {@code IndianSettlement} at this location if
      *     any, or null if none found.
      */
     public IndianSettlement getIndianSettlement();
@@ -165,7 +165,7 @@ public interface Location extends ObjectWithId {
      * For example: a settlement is more meaningful than the tile
      * it occupies.
      *
-     * @return A more meaningful <code>Location</code>, or this one.
+     * @return A more meaningful {@code Location}, or this one.
      */
     public Location up();
 
@@ -188,8 +188,8 @@ public interface Location extends ObjectWithId {
     /**
      * Static frontend to up().
      *
-     * @param loc The <code>Location</code> to improve.
-     * @return The improved <code>Location</code>.
+     * @param loc The {@code Location} to improve.
+     * @return The improved {@code Location}.
      */
     public static Location upLoc(Location loc) {
         return (loc == null) ? null : loc.up();
@@ -198,7 +198,7 @@ public interface Location extends ObjectWithId {
     /**
      * Static front end to getRank.
      *
-     * @param loc A <code>Location</code> to check.
+     * @param loc A {@code Location} to check.
      * @return The integer rank of the given location.
      */
     public static int getRank(Location loc) {

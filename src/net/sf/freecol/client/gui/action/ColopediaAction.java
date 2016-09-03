@@ -60,8 +60,8 @@ public class ColopediaAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param panelType The <code>PanelType</code> to use.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param panelType The {@code PanelType} to use.
      */
     public ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
         super(freeColClient, id + panelType.getKey());

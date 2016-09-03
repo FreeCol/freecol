@@ -55,7 +55,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
     /**
      * Create a new parameters dialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public ParametersDialog(FreeColClient freeColClient, JFrame frame) {

@@ -49,7 +49,7 @@ public class Event extends FreeColSpecObjectType {
      * Create a new event.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public Event(String id, Specification specification) {
         super(id, specification);
@@ -58,8 +58,8 @@ public class Event extends FreeColSpecObjectType {
     /**
      * Create a new event.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there a problem reading the stream.
      */
     public Event(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
@@ -101,7 +101,7 @@ public class Event extends FreeColSpecObjectType {
      * Gets a particular limit by identifier.
      *
      * @param id The object identifier.
-     * @return The corresponding <code>Limit</code> or null if not found.
+     * @return The corresponding {@code Limit} or null if not found.
      */
     public final Limit getLimit(String id) {
         return (limits == null) ? null : limits.get(id);
@@ -110,7 +110,7 @@ public class Event extends FreeColSpecObjectType {
     /**
      * Add a limit.
      *
-     * @param limit The <code>Limit</code> to add.
+     * @param limit The {@code Limit} to add.
      */
     private void addLimit(Limit limit) {
         if (limits == null) limits = new HashMap<>();

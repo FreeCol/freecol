@@ -47,11 +47,11 @@ public class ChangeWorkTypeMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ChangeWorkTypeMessage</code> with the
+     * Create a new {@code ChangeWorkTypeMessage} with the
      * supplied unit and produce.
      *
-     * @param unit The <code>Unit</code> that is working.
-     * @param workType The <code>GoodsType</code> to produce.
+     * @param unit The {@code Unit} that is working.
+     * @param workType The {@code GoodsType} to produce.
      */
     public ChangeWorkTypeMessage(Unit unit, GoodsType workType) {
         super(getTagName());
@@ -61,11 +61,11 @@ public class ChangeWorkTypeMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ChangeWorkTypeMessage</code> from a
+     * Create a new {@code ChangeWorkTypeMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ChangeWorkTypeMessage(Game game, Element element) {
         super(getTagName());
@@ -78,11 +78,11 @@ public class ChangeWorkTypeMessage extends DOMMessage {
     /**
      * Handle a "changeWorkType"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the changes, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

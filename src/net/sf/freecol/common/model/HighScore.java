@@ -146,7 +146,7 @@ public class HighScore extends FreeColObject {
     /**
      * Create a new high score record.
      *
-     * @param player The <code>Player</code> the score is for.
+     * @param player The {@code Player} the score is for.
      */
     private HighScore(Player player) {
         Game game = player.getGame();
@@ -170,9 +170,9 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Create a new <code>HighScore</code> by reading a stream.
+     * Create a new {@code HighScore} by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read.
+     * @param xr The {@code FreeColXMLReader} to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public HighScore(FreeColXMLReader xr) throws XMLStreamException {
@@ -235,7 +235,7 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the <code>ScoreLevel</code> corresponding to the score.
+     * Get the {@code ScoreLevel} corresponding to the score.
      *
      * @return The score level.
      */
@@ -298,7 +298,7 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the <code>Date</code> the score was achieved as a string.
+     * Get the {@code Date} the score was achieved as a string.
      *
      * @return The date string.
      */
@@ -318,7 +318,7 @@ public class HighScore extends FreeColObject {
      * Tidy a list of scores into canonical form.  That is, sorted and
      * with no more that NUMBER_OF_HIGH_SCORES members.
      *
-     * @param scores The list of <code>HighScore</code>s to operate on.
+     * @param scores The list of {@code HighScore}s to operate on.
      */
     private static void tidyScores(List<HighScore> scores) {
         if (scores.size() > NUMBER_OF_HIGH_SCORES) {
@@ -331,7 +331,7 @@ public class HighScore extends FreeColObject {
      * Can a given score be added to a high score list.
      *
      * @param score The score to check.
-     * @param scores A list of <code>HighScore</code> to check against.
+     * @param scores A list of {@code HighScore} to check against.
      * @return True if the given score can be added to the list.
      */
     public static boolean checkHighScore(int score, List<HighScore> scores) {
@@ -343,7 +343,7 @@ public class HighScore extends FreeColObject {
     /**
      * Tries to adds a new high score for player.
      *
-     * @param player The <code>Player</code> to add a high score for.
+     * @param player The {@code Player} to add a high score for.
      * @return True if the score was high enough to be added to the
      *     high score list.
      */
@@ -359,7 +359,7 @@ public class HighScore extends FreeColObject {
     /**
      * Load the high scores.
      *
-     * @return A list of <code>HighScore</code>s from the high score file.
+     * @return A list of {@code HighScore}s from the high score file.
      */
     public static List<HighScore> loadHighScores() {
         List<HighScore> scores = new ArrayList<>();
@@ -403,7 +403,7 @@ public class HighScore extends FreeColObject {
     /**
      * Saves high scores.
      *
-     * @param scores The list of <code>HighScore</code>s to save.
+     * @param scores The list of {@code HighScore}s to save.
      * @return True if the high scores were saved to the high score file.
      */
     public static boolean saveHighScores(List<HighScore> scores) {

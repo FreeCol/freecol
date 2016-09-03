@@ -52,8 +52,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
     /**
      * Creates a panel to show information about a native settlement.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param is The <code>IndianSettlement</code> to display.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param is The {@code IndianSettlement} to display.
      */
     public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement is) {

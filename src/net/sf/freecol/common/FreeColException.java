@@ -38,7 +38,7 @@ public final class FreeColException extends Exception {
      * Build a new FreeCol specific exception with the given message.
      *
      * @param message The message for this exception.
-     * @param throwable The <code>Throwable</code> cause for the exception.
+     * @param throwable The {@code Throwable} cause for the exception.
      */
     public FreeColException(String message, Throwable throwable) {
         super(message, throwable);

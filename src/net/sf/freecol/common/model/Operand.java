@@ -33,7 +33,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * The <code>Operand</code> class implements Operands to be used in
+ * The {@code Operand} class implements Operands to be used in
  * relations, such as the Limit class. The OperandType specifies which
  * types of objects will be considered, and the ScopeLevel specifies
  * the level at which these objects are to be selected. If the
@@ -74,7 +74,7 @@ public class Operand extends Scope {
     public Operand() {}
 
     /**
-     * Creates a new <code>Operand</code> instance.
+     * Creates a new {@code Operand} instance.
      *
      * @param value The initial operand value.
      */
@@ -83,10 +83,10 @@ public class Operand extends Scope {
     }
 
     /**
-     * Creates a new <code>Operand</code> instance.
+     * Creates a new {@code Operand} instance.
      *
-     * @param operandType The <code>OperandType</code> to use.
-     * @param scopeLevel The <code>ScopeLevel</code> to use.
+     * @param operandType The {@code OperandType} to use.
+     * @param scopeLevel The {@code ScopeLevel} to use.
      */
     public Operand(OperandType operandType, ScopeLevel scopeLevel) {
         this.operandType = operandType;
@@ -96,7 +96,7 @@ public class Operand extends Scope {
     /**
      * Create a new operand by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read.
+     * @param xr The {@code FreeColXMLReader} to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected Operand(FreeColXMLReader xr) throws XMLStreamException {
@@ -107,7 +107,7 @@ public class Operand extends Scope {
     /**
      * Gets the operand type.
      *
-     * @return The <code>OperandType</code>.
+     * @return The {@code OperandType}.
      */
     public final OperandType getOperandType() {
         return this.operandType;
@@ -116,7 +116,7 @@ public class Operand extends Scope {
     /**
      * Set the operand type.
      *
-     * @param newOperandType The new <code>OperandType</code>.
+     * @param newOperandType The new {@code OperandType}.
      */
     public final void setOperandType(final OperandType newOperandType) {
         this.operandType = newOperandType;
@@ -134,7 +134,7 @@ public class Operand extends Scope {
     /**
      * Sets the scope level.
      *
-     * @param newScopeLevel The new <code>ScopeLevel</code>.
+     * @param newScopeLevel The new {@code ScopeLevel}.
      */
     public final void setScopeLevel(final ScopeLevel newScopeLevel) {
         this.scopeLevel = newScopeLevel;
@@ -161,7 +161,7 @@ public class Operand extends Scope {
     /**
      * Gets the operand value if it is applicable to the given Game.
      *
-     * @param game The <code>Game</code> to check.
+     * @param game The {@code Game} to check.
      * @return The operand value or null if inapplicable.
      */
     public Integer getValue(Game game) {
@@ -184,7 +184,7 @@ public class Operand extends Scope {
     /**
      * Calculate the operand value within a given game.
      *
-     * @param game The <code>Game</code> to check.
+     * @param game The {@code Game} to check.
      * @return The operand value.
      */
     private Integer calculateGameValue(Game game) {
@@ -227,7 +227,7 @@ public class Operand extends Scope {
     /**
      * Gets the operand value if it is applicable to the given Player.
      *
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return The operand value, or null if inapplicable.
      */
     public Integer getValue(Player player) {
@@ -268,7 +268,7 @@ public class Operand extends Scope {
     /**
      * Gets the operand value if it is applicable to the given Settlement.
      *
-     * @param settlement The <code>Settlement</code> to check.
+     * @param settlement The {@code Settlement} to check.
      * @return The operand value, or null if inapplicable.
      */
     public Integer getValue(Settlement settlement) {

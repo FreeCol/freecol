@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
- * The <code>UnitLocation</code> is a place where a <code>Unit</code>
+ * The {@code UnitLocation} is a place where a <code>Unit</code>
  * can be put.  The UnitLocation can not store any other Locatables,
  * such as {@link Goods}, or {@link TileItem}s.
  *
@@ -132,18 +132,18 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     /**
-     * Creates a new <code>UnitLocation</code> instance.
+     * Creates a new {@code UnitLocation} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public UnitLocation(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>UnitLocation</code> instance.
+     * Creates a new {@code UnitLocation} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public UnitLocation(Game game, String id) {
@@ -154,7 +154,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Internal addition of a unit to this location.
      *
-     * @param u The <code>Unit</code> to add.
+     * @param u The {@code Unit} to add.
      */
     private void addUnit(Unit u) {
         if (u == null) return;
@@ -176,7 +176,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Is this unit location empty?
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public final boolean isEmpty() {
         return getUnitCount() == 0;
@@ -194,7 +194,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Gets the first Unit at this unit location.
      *
-     * @return The first <code>Unit</code>.
+     * @return The first {@code Unit}.
      */
     public final Unit getFirstUnit() {
         return first(getUnits());
@@ -203,7 +203,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Gets the last Unit at this unit location.
      *
-     * @return The last <code>Unit</code>.
+     * @return The last {@code Unit}.
      */
     public final Unit getLastUnit() {
         if (isEmpty()) return null;
@@ -215,8 +215,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * Gets the total amount of Units at this Location, including
      * units on a carrier.
      *
-     * @return The total number of <code>Unit</code>s at this
-     *     <code>Location</code>.
+     * @return The total number of {@code Unit}s at this
+     *     {@code Location}.
      */
     public int getTotalUnitCount() {
         return sum(getUnits(), u -> 1 + u.getUnitCount());
@@ -238,7 +238,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Gets a list of all naval units here.
      *
-     * @return A list of naval <code>Unit</code>s present.
+     * @return A list of naval {@code Unit}s present.
      */
     public List<Unit> getNavalUnits() {
         return transform(getUnits(), Unit::isNaval);
@@ -247,7 +247,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Gets a carrier for the supplied unit, if one exists.
      *
-     * @param unit The <code>Unit</code> to carry.
+     * @param unit The {@code Unit} to carry.
      * @return A suitable carrier or null if none found.
      */
     public Unit getCarrierForUnit(Unit unit) {
@@ -462,7 +462,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Move the given unit to the front of the units list.
      *
-     * @param u The <code>Unit</code> to move to the front.
+     * @param u The {@code Unit} to move to the front.
      */
     public void moveToFront(Unit u) {
         synchronized (this.units) {
@@ -480,7 +480,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Gets the reason why a given <code>Locatable</code> can not be
+     * Gets the reason why a given {@code Locatable} can not be
      * added to this Location.
      *
      * Be careful to test for unit presence last before success
@@ -491,7 +491,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      *
      * FIXME: consider moving this up to Location?
      *
-     * @param locatable The <code>Locatable</code> to test.
+     * @param locatable The {@code Locatable} to test.
      * @return The reason why adding would fail.
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
@@ -508,7 +508,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Gets the maximum number of <code>Units</code> this Location
+     * Gets the maximum number of {@code Units} this Location
      * can hold.  To be overridden by subclasses.
      *
      * @return Integer.MAX_VALUE, denoting no effective limit.
@@ -520,7 +520,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * What would the price be for a collection of goods at this location?
      *
-     * @param goods The list of <code>AbstractGoods</code> to check for.
+     * @param goods The list of {@code AbstractGoods} to check for.
      * @return Negative if the goods are unavailable, otherwise the
      *     price (may be zero).
      */
@@ -531,8 +531,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Equip a unit for a role using resources at this location.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to build for.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to build for.
      * @param roleCount The role count.
      * @return True if the equipping succeeded.
      */

@@ -100,9 +100,9 @@ public class DOMMessage {
      * Constructs a new DOMMessage with data from the given InputStream. The
      * constructor to use if this is an INCOMING message.
      *
-     * @param inputStream The <code>InputStream</code> to get the XML-data
+     * @param inputStream The {@code InputStream} to get the XML-data
      *            from.
-     * @exception IOException if thrown by the <code>InputStream</code>.
+     * @exception IOException if thrown by the {@code InputStream}.
      * @exception SAXException if thrown during parsing.
      */
     public DOMMessage(InputStream inputStream)
@@ -130,8 +130,8 @@ public class DOMMessage {
     /**
      * Create a DOMMessage from an element.
      *
-     * @param game The <code>Game</code> to create the message in.
-     * @param element The <code>Element</code> to create the message from.
+     * @param game The {@code Game} to create the message in.
+     * @param element The {@code Element} to create the message from.
      * @return The message created, or null on failure.
      */
     public static DOMMessage createMessage(Game game, Element element) {
@@ -165,7 +165,7 @@ public class DOMMessage {
     /**
      * Gets the type of an element.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @return The type of the element.
      */
     public static String getType(Element element) {
@@ -187,8 +187,8 @@ public class DOMMessage {
      * Checks if this message is of a given type.
      *
      * @param type The type you wish to test against.
-     * @return <code>true</code> if the type of this message equals the given
-     *         type and <code>false</code> otherwise.
+     * @return {@code true} if the type of this message equals the given
+     *         type and {@code false} otherwise.
      */
     public boolean isType(String type) {
         return getType().equals(type);
@@ -275,7 +275,7 @@ public class DOMMessage {
      * Checks if an attribute is set on the root element.
      *
      * @param attribute The attribute in which to verify the existence of.
-     * @return <code>true</code> if the root element has the given attribute.
+     * @return {@code true} if the root element has the given attribute.
      */
     public boolean hasAttribute(String attribute) {
         return getElement().hasAttribute(attribute);
@@ -352,7 +352,7 @@ public class DOMMessage {
      * Collapses a list of elements into a "multiple" element
      * with the original elements added as child nodes.
      *
-     * @param elements A list of <code>Element</code>s to collapse.
+     * @param elements A list of {@code Element}s to collapse.
      * @return A new "multiple" element, or the singleton element of the list,
      *     or null if the list is empty.
      */
@@ -372,10 +372,10 @@ public class DOMMessage {
     /**
      * Handle the child nodes of an element.
      *
-     * @param mh The <code>MessageHandler</code> to handle the nodes.
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param mh The {@code MessageHandler} to handle the nodes.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     public static final Element handleChildren(MessageHandler mh,
         Connection connection, Element element) {
@@ -386,10 +386,10 @@ public class DOMMessage {
     /**
      * Handle a list of messages.
      *
-     * @param mh The <code>MessageHandler</code> to handle the messages.
-     * @param connection The <code>Connection</code> the messages arrived on.
-     * @param elements The list of <code>Element</code>s to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param mh The {@code MessageHandler} to handle the messages.
+     * @param connection The {@code Connection} the messages arrived on.
+     * @param elements The list of {@code Element}s to process.
+     * @return An {@code Element} containing the response/s.
      */
     public static final Element handleList(MessageHandler mh,
         Connection connection, List<Element> elements) {
@@ -413,7 +413,7 @@ public class DOMMessage {
      * Convenience method to find the first child element with the
      * specified tagname.
      *
-     * @param element The <code>Element</code> to search for the child
+     * @param element The {@code Element} to search for the child
      *     element in.
      * @param tagName The tag name of the child element to be found.
      * @return The first child element with the given name.
@@ -433,8 +433,8 @@ public class DOMMessage {
      * Convenience method to extract a child element of a particular class.
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to instantiate within.
-     * @param element The parent <code>Element</code>.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
      * @param index The index of the child element.
      * @param intern Whether to intern the object found.
      * @param returnClass The expected class of the child.
@@ -454,8 +454,8 @@ public class DOMMessage {
      * Convenience method to extract a child element of a particular class.
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to instantiate within.
-     * @param element The parent <code>Element</code>.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
      * @param index The index of the child element.
      * @param returnClass The expected class of the child.
      * @return A new instance of the return class, or null on error.
@@ -475,8 +475,8 @@ public class DOMMessage {
      * particular class.
      *
      * @param <T> The actual list member return type.
-     * @param game The <code>Game</code> to instantiate within.
-     * @param element The parent <code>Element</code>.
+     * @param game The {@code Game} to instantiate within.
+     * @param element The parent {@code Element}.
      * @param returnClass The expected class of the child.
      * @return A list of new instances of the return class.
      */
@@ -495,7 +495,7 @@ public class DOMMessage {
      * Convenience method to map a function over the children of an Element.
      *
      * @param <T> The actual list member return type.
-     * @param element The <code>Element</code> to extract children from.
+     * @param element The {@code Element} to extract children from.
      * @param mapper A mapper function.
      * @return A list of results of the mapping.
      */
@@ -515,7 +515,7 @@ public class DOMMessage {
     /**
      * Get a boolean attribute value from an element.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @param tag The attribute name.
      * @param defaultValue A default value to return on failure.
      * @return The boolean value found, or the default value on error.
@@ -534,7 +534,7 @@ public class DOMMessage {
     /**
      * Get an integer attribute value from an element.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @param tag The attribute name.
      * @param defaultValue A default value to return on failure.
      * @return The integer value found, or the default value on error.
@@ -553,7 +553,7 @@ public class DOMMessage {
     /**
      * Get a string attribute value from an element.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @param tag The attribute name.
      * @return The string value found, or the default value on error.
      */
@@ -567,7 +567,7 @@ public class DOMMessage {
      * Get an enum attribute value from an element.
      *
      * @param <T> The actual enum return type.
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @param tag The attribute name.
      * @param returnClass The class of the return value.
      * @param defaultValue A default value to return on failure.
@@ -587,7 +587,7 @@ public class DOMMessage {
     /**
      * Get all the attributes of an element as a map.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @return A map of the attribute pairs found.
      */
     public static Map<String, String> getAttributes(Element element) {
@@ -604,7 +604,7 @@ public class DOMMessage {
     /**
      * Get an array of string attributes from an element.
      *
-     * @param element The <code>Element</code> to query.
+     * @param element The {@code Element} to query.
      * @return A list of the attributes found.
      */
     public static List<String> getArrayAttributes(Element element) {
@@ -623,9 +623,9 @@ public class DOMMessage {
     /**
      * Read a Document from an input source.
      * 
-     * @param inputSource An <code>InputSource</code> to read from.
-     * @return The resulting <code>Document</code>.
-     * @exception IOException if thrown by the <code>InputStream</code>.
+     * @param inputSource An {@code InputSource} to read from.
+     * @return The resulting {@code Document}.
+     * @exception IOException if thrown by the {@code InputStream}.
      * @exception SAXException if thrown during parsing.
      */
     public static Document readDocument(InputSource inputSource)
@@ -671,8 +671,8 @@ public class DOMMessage {
     /**
      * Convert an element to a string.
      *
-     * @param element The <code>Element</code> to convert.
-     * @return The <code>String</code> representation of an element.
+     * @param element The {@code Element} to convert.
+     * @return The {@code String} representation of an element.
      */
     public static String elementToString(Element element) {
         try {
@@ -718,8 +718,8 @@ public class DOMMessage {
      * Read a new FreeCol game object from an element.
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to check for existing objects.
-     * @param element The <code>Element</code> to read from.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
      * @param intern Whether to intern the instantiated object.
      * @param returnClass The expected return class.
      * @return The object found or instantiated, or null on error.
@@ -744,9 +744,9 @@ public class DOMMessage {
     /**
      * Update an existing game object from an element.
      *
-     * @param game The <code>Game</code> to update in.
-     * @param element The <code>Element</code> containing the object.
-     * @return The updated <code>FreeColGameObject</code>.
+     * @param game The {@code Game} to update in.
+     * @param element The {@code Element} containing the object.
+     * @return The updated {@code FreeColGameObject}.
      */
     public static FreeColGameObject updateFromElement(Game game,
                                                       Element element) {
@@ -764,8 +764,8 @@ public class DOMMessage {
      * Read a new FreeCol object from an element.
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to check for existing objects.
-     * @param element The <code>Element</code> to read from.
+     * @param game The {@code Game} to check for existing objects.
+     * @param element The {@code Element} to read from.
      * @param returnClass The expected return class.
      * @return The object found or instantiated, or null on error.
      */
@@ -779,7 +779,7 @@ public class DOMMessage {
     /**
      * Initialize a FreeColObject from an Element.
      *
-     * @param fco The <code>FreeColObject</code> to read into.
+     * @param fco The {@code FreeColObject} to read into.
      * @param element An XML-element that will be used to initialize
      *      the object.
      */
@@ -790,8 +790,8 @@ public class DOMMessage {
     /**
      * Make a new reader for an element.
      *
-     * @param element The <code>Element</code> to read.
-     * @return A new <code>FreeColXMLReader</code> to read from.
+     * @param element The {@code Element} to read.
+     * @return A new {@code FreeColXMLReader} to read from.
      * @exception IOException if the reader can not be created,
      *     and miscellaneous run time exceptions for problems with the
      *     transformer mechanisms.
@@ -815,7 +815,7 @@ public class DOMMessage {
     /**
      * Initialize a FreeColObject from an Element.
      *
-     * @param fco The <code>FreeColObject</code> to read into.
+     * @param fco The {@code FreeColObject} to read into.
      * @param intern Whether to intern the instantiated object.
      * @param element An XML-element that will be used to initialize
      *      the object.
@@ -838,13 +838,13 @@ public class DOMMessage {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
+     * Only attributes visible to the given {@code Player} will
+     * be added to that representation if {@code showAll} is
+     * set to {@code false}.
      *
-     * @param fco The <code>FreeColObject</code> to write.
-     * @param document The <code>Document</code>.
-     * @param player The <code>Player</code> to send to, or to server if null.
+     * @param fco The {@code FreeColObject} to write.
+     * @param document The {@code Document}.
+     * @param player The {@code Player} to send to, or to server if null.
      * @return An XML-representation of this object.
      */
     public static Element toXMLElement(FreeColObject fco, Document document,
@@ -858,13 +858,13 @@ public class DOMMessage {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
+     * Only attributes visible to the given {@code Player} will
+     * be added to that representation if {@code showAll} is
+     * set to {@code false}.
      *
-     * @param fco The <code>FreeColObject</code> to write.
-     * @param document The <code>Document</code>.
-     * @param writeScope The <code>WriteScope</code> to apply.
+     * @param fco The {@code FreeColObject} to write.
+     * @param document The {@code Document}.
+     * @param writeScope The {@code WriteScope} to apply.
      * @return An XML-representation of this object.
      */
     public static Element toXMLElement(FreeColObject fco, Document document,
@@ -880,8 +880,8 @@ public class DOMMessage {
      * This method writes a partial XML-representation of this object to
      * an element using only the mandatory and specified fields.
      *
-     * @param fco The <code>FreeColObject</code> to write.
-     * @param document The <code>Document</code>.
+     * @param fco The {@code FreeColObject} to write.
+     * @param document The {@code Document}.
      * @param fields The fields to write.
      * @return An XML-representation of this object.
      */
@@ -895,13 +895,13 @@ public class DOMMessage {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
+     * Only attributes visible to the given {@code Player} will
+     * be added to that representation if {@code showAll} is
+     * set to {@code false}.
      *
-     * @param fco The <code>FreeColObject</code> to write.
-     * @param document The <code>Document</code>.
-     * @param writeScope The <code>WriteScope</code> to apply.
+     * @param fco The {@code FreeColObject} to write.
+     * @param document The {@code Document}.
+     * @param writeScope The {@code WriteScope} to apply.
      * @param fields An array of field names, which if non-null
      *               indicates this should be a partial write.
      * @return An XML-representation of this object.

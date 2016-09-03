@@ -63,7 +63,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     
 
     /**
-     * Creates a new <code>OptionGroup</code>.
+     * Creates a new {@code OptionGroup}.
      *
      * @param id The object identifier.
      */
@@ -72,29 +72,29 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Creates a new <code>OptionGroup</code>.
+     * Creates a new {@code OptionGroup}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public OptionGroup(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>OptionGroup</code>.
+     * Creates a new {@code OptionGroup}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public OptionGroup(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Creates a new <code>OptionGroup</code>.
+     * Creates a new {@code OptionGroup}.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public OptionGroup(FreeColXMLReader xr,
@@ -133,7 +133,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Gets the i18n-name of this <code>Option</code>.
+     * Gets the i18n-name of this {@code Option}.
      *
      * @return The name as provided in the constructor.
      */
@@ -142,10 +142,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Gets the i18n short description of this <code>Option</code>.
+     * Gets the i18n short description of this {@code Option}.
      * Should be suitable for use as a tooltip text.
      *
-     * @return A short description of this <code>Option</code>.
+     * @return A short description of this {@code Option}.
      */
     public String getShortDescription() {
         return Messages.getShortDescription(getId());
@@ -154,7 +154,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Get the options in this group.
      *
-     * @return The list of <code>Option</code>s.
+     * @return The list of {@code Option}s.
      */
     public List<Option> getOptions() {
         return options;
@@ -173,7 +173,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Does this option group contain any subgroups?
      *
-     * @return True if there are any child <code>OptionGroup</code>s present.
+     * @return True if there are any child {@code OptionGroup}s present.
      */
     public boolean hasOptionGroup() {
         return any(options, o -> o instanceof OptionGroup);
@@ -183,7 +183,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Adds the given option to this group.  The option is assumed to
      * be correct.
      *
-     * @param option The <code>Option</code> to add.
+     * @param option The {@code Option} to add.
      */
     public void add(Option option) {
         String id = option.getId();
@@ -207,7 +207,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Merges the given <code>Option</code> into this group.
+     * Merges the given {@code Option} into this group.
      *
      * - Option groups are *not* merged, but their leaf options are.
      * - If an option is not already present it is ignored.
@@ -217,7 +217,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * The intent is that the option group structure is never subject to
      * merging.
      *
-     * @param option The <code>Option</code> to merge.
+     * @param option The {@code Option} to merge.
      * @return True if the merge was accepted.
      */
     public boolean merge(Option option) {
@@ -285,7 +285,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Helper function to recursively add option group members to the
      * optionMap.
      *
-     * @param group The initial <code>OptionGroup</code> to add.
+     * @param group The initial {@code OptionGroup} to add.
      */
     private void addOptionGroup(OptionGroup group) {
         for (Option option : group.getOptions()) {
@@ -300,7 +300,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Remove an option.
      *
      * @param id The identifier of the option to remove.
-     * @return The <code>Option</code> removed if any.
+     * @return The {@code Option} removed if any.
      */
     public Option remove(String id) {
         Option op = optionMap.remove(id);
@@ -309,8 +309,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Removes all of the <code>Option</code>s from this
-     * <code>OptionGroup</code>.
+     * Removes all of the {@code Option}s from this
+     * {@code OptionGroup}.
      */
     public void removeAll() {
         options.clear();
@@ -320,7 +320,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Loads the options from the given reader.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @return True if the options were loaded without error.
      * @exception XMLStreamException if there is an error reading the stream.
      */
@@ -334,7 +334,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Loads the options from the given file.
      *
-     * @param file The <code>File</code> to read the options from.
+     * @param file The {@code File} to read the options from.
      * @return True if the options were loaded without error.
      */
     public boolean load(File file) {
@@ -357,10 +357,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Load a specific option group from a file by identifier.
      *
-     * @param file The <code>File</code> to load from.
+     * @param file The {@code File} to load from.
      * @param optionId The option identifier to look for.
-     * @param spec A base <code>Specification</code>.
-     * @return The <code>OptionGroup</code> found, or null on error or
+     * @param spec A base {@code Specification}.
+     * @return The {@code OptionGroup} found, or null on error or
      *     not found.
      */
     public static OptionGroup load(File file, String optionId,
@@ -380,9 +380,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Read a option file until an option identifier is found.
      *
-     * @param file The <code>File</code> to read.
+     * @param file The {@code File} to read.
      * @param optionId The option identifier to look for.
-     * @return A <code>FreeColXMLReader</code> positions such that the
+     * @return A {@code FreeColXMLReader} positions such that the
      *     required identifier current, or null on error or if not found.
      */
     public static FreeColXMLReader findOption(File file, String optionId) {
@@ -410,11 +410,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Gets the value of an option as an option group.
      *
      * @param id The object identifier.
-     * @return The <code>OptionGroup</code> value.
+     * @return The {@code OptionGroup} value.
      * @exception IllegalArgumentException If there is no option group
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public OptionGroup getOptionGroup(String id) {
         try {
@@ -433,7 +433,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public int getInteger(String id) {
         try {
@@ -452,7 +452,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public void setInteger(String id, int value) {
         try {
@@ -471,7 +471,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public boolean getBoolean(String id) {
         try {
@@ -490,7 +490,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public void setBoolean(String id, boolean value) {
         try {
@@ -509,7 +509,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public String getString(String id) {
         try {
@@ -528,7 +528,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public void setString(String id, String value) {
         try {
@@ -547,7 +547,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public String getText(String id) {
         try {
@@ -566,7 +566,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public void setText(String id, String value) {
         try {

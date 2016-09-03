@@ -42,8 +42,8 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * The <code>WorkLocation</code> is a place in a {@link Colony} where
- * <code>Units</code> can work.  The unit capacity of a WorkLocation
+ * The {@code WorkLocation} is a place in a {@link Colony} where
+ * {@code Units} can work.  The unit capacity of a WorkLocation
  * is likely to be limited.  ColonyTiles can only hold a single
  * worker, and Buildings can hold no more than three workers, for
  * example.  WorkLocations do not store any Goods.  They take any
@@ -77,17 +77,17 @@ public abstract class WorkLocation extends UnitLocation
 
 
         /**
-         * Suggest that work done by (optional) <code>oldType</code>
-         * would be better done by <code>newType</code> because it
-         * could produce <code>amount</code> more
-         * <code>goodsType</code>.
+         * Suggest that work done by (optional) {@code oldType}
+         * would be better done by {@code newType} because it
+         * could produce {@code amount} more
+         * {@code goodsType}.
          *
-         * @param workLocation The <code>WorkLocation</code> to add
+         * @param workLocation The {@code WorkLocation} to add
          *     a unit to.
-         * @param oldType The optional <code>UnitType</code> currently
+         * @param oldType The optional {@code UnitType} currently
          *     doing the work.
-         * @param newType A new <code>UnitType</code> to do the work.
-         * @param goodsType The <code>GoodsType</code> to produce.
+         * @param newType A new {@code UnitType} to do the work.
+         * @param goodsType The {@code GoodsType} to produce.
          * @param amount The extra goods that would be produced if the
          *     suggestion is taken.
          */
@@ -123,18 +123,18 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Constructor for ServerWorkLocation.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     protected WorkLocation(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>WorkLocation</code> with the given identifier.
+     * Creates a new {@code WorkLocation} with the given identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public WorkLocation(Game game, String id) {
@@ -154,7 +154,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Get the production type.
      *
-     * @return The <code>ProductionType</code> for this work location.
+     * @return The {@code ProductionType} for this work location.
      */
     public final ProductionType getProductionType() {
         return productionType;
@@ -163,7 +163,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Set the prodution type.
      *
-     * @param newProductionType The new <code>ProductionType</code> value.
+     * @param newProductionType The new {@code ProductionType} value.
      */
     public final void setProductionType(final ProductionType newProductionType) {
         if (!Utils.equals(newProductionType, productionType)) {
@@ -180,7 +180,7 @@ public abstract class WorkLocation extends UnitLocation
      * This assumes that all units in a work location are doing the same
      * work, which is true for now.
      *
-     * @return The current <code>GoodsType</code> being produced, or
+     * @return The current {@code GoodsType} being produced, or
      *     null if none.
      */
     public GoodsType getCurrentWorkType() {
@@ -204,7 +204,7 @@ public abstract class WorkLocation extends UnitLocation
      *
      * @param unattended Whether to require unattended production.
      * @param workType An optional work type to require.
-     * @return The best available <code>ProductionType</code> given the
+     * @return The best available {@code ProductionType} given the
      *     argument constraints.
      */
     public ProductionType getBestProductionType(boolean unattended,
@@ -216,11 +216,11 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Gets the best occupation for a given unit at this work location.
      *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
+     * @param unit The {@code Unit} to find an
+     *     {@code Occupation} for.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @return An <code>Occupation</code> for the given unit, or
+     * @return An {@code Occupation} for the given unit, or
      *     null if none found.
      */
     public Occupation getOccupation(Unit unit, boolean userMode) {
@@ -247,9 +247,9 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Gets the best occupation for a given unit type at this work location.
      *
-     * @param unitType An optional <code>UnitType</code> to find an
-     *     <code>Occupation</code> for.  If null, use the default unit type.
-     * @return An <code>Occupation</code> for the given unit, or
+     * @param unitType An optional {@code UnitType} to find an
+     *     {@code Occupation} for.  If null, use the default unit type.
+     * @return An {@code Occupation} for the given unit, or
      *     null if none found.
      */
     public Occupation getOccupation(UnitType unitType) {
@@ -280,8 +280,8 @@ public abstract class WorkLocation extends UnitLocation
      * Get the best work type for a unit at this work location, favouring
      * the existing work.
      *
-     * @param unit The <code>Unit</code> to find a work type for.
-     * @return The best work <code>GoodsType</code> for the unit, or null
+     * @param unit The {@code Unit} to find a work type for.
+     * @return The best work {@code GoodsType} for the unit, or null
      *     if none found.
      */
     public GoodsType getWorkFor(Unit unit) {
@@ -292,7 +292,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Install a unit at the best occupation for it at this work location.
      *
-     * @param unit The <code>Unit</code> to install.
+     * @param unit The {@code Unit} to install.
      * @return True if the installation succeeds.
      */
     public boolean setWorkFor(Unit unit) {
@@ -304,11 +304,11 @@ public abstract class WorkLocation extends UnitLocation
      * Is it a good idea to produce a goods type at this work location
      * using a better unit type?
      *
-     * @param unit The <code>Unit</code> that is doing the job at
+     * @param unit The {@code Unit} that is doing the job at
      *     present, which may be null if none is at work.
-     * @param productionType The <code>ProductionType</code> to use.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return A <code>Suggestion</code> for a better worker, or null if
+     * @param productionType The {@code ProductionType} to use.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @return A {@code Suggestion} for a better worker, or null if
      *     improvement is not worthwhile.
      */
     private Suggestion getSuggestion(Unit unit, ProductionType productionType,
@@ -378,7 +378,7 @@ public abstract class WorkLocation extends UnitLocation
      * Get a map of suggestions for better or additional units.
      *
      * @return A mapping of either existing units or null (denoting
-     *     adding a unit) to a <code>Suggestion</code>.
+     *     adding a unit) to a {@code Suggestion}.
      */
     public java.util.Map<Unit, Suggestion> getSuggestions() {
         java.util.Map<Unit, Suggestion> result = new HashMap<>();
@@ -406,9 +406,9 @@ public abstract class WorkLocation extends UnitLocation
     }
             
     /**
-     * Get the <code>AbstractGoods</code> consumed by this work location.
+     * Get the {@code AbstractGoods} consumed by this work location.
      *
-     * @return A stream of <code>AbstractGoods</code> consumed.
+     * @return A stream of {@code AbstractGoods} consumed.
      */
     public Stream<AbstractGoods> getInputs() {
         return (productionType == null) ? Stream.<AbstractGoods>empty()
@@ -416,9 +416,9 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
-     * Get the <code>AbstractGoods</code> produced by this work location.
+     * Get the {@code AbstractGoods} produced by this work location.
      *
-     * @return A stream of <code>AbstractGoods</code> produced.
+     * @return A stream of {@code AbstractGoods} produced.
      */
     public Stream<AbstractGoods> getOutputs() {
         return (productionType == null) ? Stream.<AbstractGoods>empty()
@@ -428,9 +428,9 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Does this work location produce a given type of goods?
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return True if this <code>WorkLocation</code> produces the
-     *     given <code>GoodsType</code>.
+     * @param goodsType The {@code GoodsType} to check.
+     * @return True if this {@code WorkLocation} produces the
+     *     given {@code GoodsType}.
      */
     public boolean produces(GoodsType goodsType) {
         return any(getOutputs(), AbstractGoods.matches(goodsType));
@@ -477,7 +477,7 @@ public abstract class WorkLocation extends UnitLocation
      * Gets the ProductionInfo for this WorkLocation from the Colony's
      * cache.
      *
-     * @return The work location <code>ProductionInfo</code>.
+     * @return The work location {@code ProductionInfo}.
      */
     public ProductionInfo getProductionInfo() {
         return getColony().getProductionInfo(this);
@@ -497,7 +497,7 @@ public abstract class WorkLocation extends UnitLocation
      * Gets the total production of a specified goods type at this
      * work location.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return The amount of production.
      */
     public int getTotalProductionOf(GoodsType goodsType) {
@@ -511,7 +511,7 @@ public abstract class WorkLocation extends UnitLocation
      * Gets the maximum production of this work location for a given
      * goods type, assuming the current workers and input goods.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return The maximum production of the goods at this work location.
      */
     public int getMaximumProductionOf(GoodsType goodsType) {
@@ -529,7 +529,7 @@ public abstract class WorkLocation extends UnitLocation
      * Gets the unit type that is the expert for this work location
      * using its first output for which an expert type can be found.
      *
-     * @return The expert <code>UnitType</code> or null if none found.
+     * @return The expert {@code UnitType} or null if none found.
      */
     public UnitType getExpertUnitType() {
         final Specification spec = getSpecification();
@@ -544,7 +544,7 @@ public abstract class WorkLocation extends UnitLocation
      * Get the potential production of a given goods type using the
      * default unit.  This is useful for planning.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return The potential production.
      */
     public int getGenericPotential(GoodsType goodsType) {
@@ -559,8 +559,8 @@ public abstract class WorkLocation extends UnitLocation
      *
      * Used below, only public for the test suite.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @param goodsType The <code>GoodsType</code> to check the production of.
+     * @param unit The {@code Unit} to check.
+     * @param goodsType The {@code GoodsType} to check the production of.
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
@@ -605,8 +605,8 @@ public abstract class WorkLocation extends UnitLocation
      * willing to change (a case could be made for including the
      * OCCUPIED_BY_ENEMY condition).
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>UnitType</code> to do the work.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code UnitType} to do the work.
      * @return The potential production with the given goods type and
      *     unit type.
      */
@@ -641,8 +641,8 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Helper to get the production deficit for a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The production deficit as <code>AbstractGoods</code>, or null
+     * @param goodsType The {@code GoodsType} to check.
+     * @return The production deficit as {@code AbstractGoods}, or null
      *     if not in deficit.
      */
     public AbstractGoods getProductionDeficit(GoodsType goodsType) {
@@ -771,7 +771,7 @@ public abstract class WorkLocation extends UnitLocation
      * Get a description of the work location, with any expected extra
      * detail.
      *
-     * @return A label <code>StringTemplate</code> for this work location.
+     * @return A label {@code StringTemplate} for this work location.
      */
     public abstract StringTemplate getLabel();
 
@@ -800,7 +800,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Get an associated tile, if any.
      *
-     * @return The underlying <code>Tile</code> which is worked, if any.
+     * @return The underlying {@code Tile} which is worked, if any.
      */
     public abstract Tile getWorkTile();
     
@@ -825,8 +825,8 @@ public abstract class WorkLocation extends UnitLocation
      * Can this work location produce a given goods type with
      * an optional unit.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code>, if null the
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType}, if null the
      *     unattended production is considered.
      * @return True if this location can produce the goods.
      */
@@ -839,10 +839,10 @@ public abstract class WorkLocation extends UnitLocation
      * production exclusive of any modifiers.  If no unit type is
      * specified, the unattended production is calculated.
      *
-     * @param productionType An optional <code>ProductionType</code> to use,
+     * @param productionType An optional {@code ProductionType} to use,
      *     if null the best available one is used.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to produce
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} to produce
      *     the goods.
      * @return The amount of goods potentially produced.
      */
@@ -855,8 +855,8 @@ public abstract class WorkLocation extends UnitLocation
      * unit type.  If no unit is specified the unattended production
      * is calculated.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>UnitType</code> to produce them.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */
     public abstract Stream<Modifier> getProductionModifiers(GoodsType goodsType,
@@ -866,7 +866,7 @@ public abstract class WorkLocation extends UnitLocation
      * Get the production types available for this work location.
      *
      * @param unattended If true, get unattended production types.
-     * @return A list of suitable <code>ProductionType</code>s.
+     * @return A list of suitable {@code ProductionType}s.
      */
     public abstract List<ProductionType> getAvailableProductionTypes(boolean unattended);
 
@@ -890,7 +890,7 @@ public abstract class WorkLocation extends UnitLocation
      * Evaluate this work location for a given player.
      * To be overridden by subclasses.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the player.
      */
     public int evaluateFor(Player player) {
@@ -919,9 +919,9 @@ public abstract class WorkLocation extends UnitLocation
     // Interface Ownable
 
     /**
-     * Gets the owner of this <code>Ownable</code>.
+     * Gets the owner of this {@code Ownable}.
      *
-     * @return The <code>Player</code> controlling this
+     * @return The {@code Player} controlling this
      *         {@link Ownable}.
      */
     @Override
@@ -930,11 +930,11 @@ public abstract class WorkLocation extends UnitLocation
     }
 
     /**
-     * Sets the owner of this <code>Ownable</code>.  Do not call this
+     * Sets the owner of this {@code Ownable}.  Do not call this
      * method, ever.  The owner of this WorkLocation is the owner
      * of the Colony, you must set the owner of the Colony instead.
      *
-     * @param p The <code>Player</code> that should take ownership
+     * @param p The {@code Player} that should take ownership
      *     of this {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by
      *     this method.

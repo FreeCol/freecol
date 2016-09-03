@@ -73,7 +73,7 @@ public class LandMap {
     /**
      * Create a land map by importing it from a given game.
      *
-     * @param game The <code>Game</code> to get the land map from.
+     * @param game The {@code Game} to get the land map from.
      */
     public LandMap(Game game) {
         this(game.getMap().getWidth(), game.getMap().getHeight());
@@ -93,7 +93,7 @@ public class LandMap {
      * Create a new land map using parameters from a supplied map
      * generator options option group.
      *
-     * @param mgo The map generator <code>OptionGroup</code> to use.
+     * @param mgo The map generator {@code OptionGroup} to use.
      * @param random A pseudo random number source.
      */
     public LandMap(OptionGroup mgo, Random random) {
@@ -322,9 +322,9 @@ public class LandMap {
      * Get the positions surrounding a central position that are potential
      * valid land positions.
      *
-     * @param position The central <code>Position</code> to work from.
+     * @param position The central {@code Position} to work from.
      * @param distanceToEdge The preferred distance to the map edge.
-     * @return A list of suitable <code>Position</code>s.
+     * @return A list of suitable {@code Position}s.
      */
     private List<Position> newPositions(Position position,
                                         int distanceToEdge) {

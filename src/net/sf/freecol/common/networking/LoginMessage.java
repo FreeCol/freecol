@@ -71,7 +71,7 @@ public class LoginMessage extends DOMMessage {
 
         
     /**
-     * Create a new <code>LoginMessage</code> with the supplied parameters.
+     * Create a new {@code LoginMessage} with the supplied parameters.
      *
      * @param userName The name of the user logging in.
      * @param version The version of FreeCol at the client.
@@ -96,7 +96,7 @@ public class LoginMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>LoginMessage</code> request with name and version
+     * Create a new {@code LoginMessage} request with name and version
      * only.
      *
      * @param userName The name of the user logging in.
@@ -107,10 +107,10 @@ public class LoginMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>LoginMessage</code> from a supplied element.
+     * Create a new {@code LoginMessage} from a supplied element.
      *
-     * @param game A <code>Game</code> (not used).
-     * @param e The <code>Element</code> to use to create the message.
+     * @param game A {@code Game} (not used).
+     * @param e The {@code Element} to use to create the message.
      */
     public LoginMessage(Game game, Element e) {
         super(getTagName());
@@ -163,9 +163,9 @@ public class LoginMessage extends DOMMessage {
      * to a single player game. This would be easy if we used a
      * dummy connection for single player games.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return An <code>Element</code> to update the originating player
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
+     * @return An {@code Element} to update the originating player
      *     with the result of the query.
      */
     public Element handle(FreeColServer server, Connection connection) {

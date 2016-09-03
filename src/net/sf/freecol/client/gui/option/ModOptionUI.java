@@ -75,10 +75,10 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
 
 
     /**
-     * Creates a new <code>ModOptionUI</code> for the given
-     * <code>ModOption</code>.
+     * Creates a new {@code ModOptionUI} for the given
+     * {@code ModOption}.
      *
-     * @param option The <code>ModOption</code> to make a user interface for
+     * @param option The {@code ModOption} to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
     public ModOptionUI(final ModOption option, boolean editable) {
@@ -102,8 +102,8 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     /**
      * Add information from a mod file to a label.
      *
-     * @param label The <code>JLabel</code> to modify.
-     * @param modFile The <code>FreeColModFile</code> to use.
+     * @param label The {@code JLabel} to modify.
+     * @param modFile The {@code FreeColModFile} to use.
      */
     private static void labelModFile(JLabel label, FreeColModFile modFile) {
         String key = "mod." + modFile.getId();

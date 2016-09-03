@@ -35,8 +35,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * Represents Europe in the game.  Each <code>Player</code> has it's
- * own <code>Europe</code>.
+ * Represents Europe in the game.  Each {@code Player} has it's
+ * own {@code Europe}.
  *
  * In Europe, you can recruit, train and purchase new units.  You can
  * also equip units, as well as sell and buy goods.
@@ -156,8 +156,8 @@ public class Europe extends UnitLocation
     /**
      * Constructor for ServerEurope.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param owner The owning <code>Player</code>.
+     * @param game The enclosing {@code Game}.
+     * @param owner The owning {@code Player}.
      */
     protected Europe(Game game, Player owner) {
         super(game);
@@ -168,11 +168,11 @@ public class Europe extends UnitLocation
     }
 
     /**
-     * Creates a new <code>Europe</code> with the given identifier.
+     * Creates a new {@code Europe} with the given identifier.
      (
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Europe(Game game, String id) {
@@ -183,7 +183,7 @@ public class Europe extends UnitLocation
     /**
      * Get a list of the current recruitables.
      *
-     * @return A list of recruitable <code>UnitType</code>s.
+     * @return A list of recruitable {@code UnitType}s.
      */
     public List<UnitType> getRecruitables() {
         return new ArrayList<>(recruitables);
@@ -192,7 +192,7 @@ public class Europe extends UnitLocation
     /**
      * Add a recruitable unit type.
      *
-     * @param unitType The recruitable <code>UnitType</code> to add.
+     * @param unitType The recruitable {@code UnitType} to add.
      * @return True if the recruitable was added.
      */
     protected boolean addRecruitable(UnitType unitType) {
@@ -206,7 +206,7 @@ public class Europe extends UnitLocation
     /**
      * Gets the price of a unit in Europe.
      *
-     * @param unitType The <code>UnitType</code> to price.
+     * @param unitType The {@code UnitType} to price.
      * @return The price of this unit when trained/purchased in Europe,
      *     or UNDEFINED on failure.
      */
@@ -218,7 +218,7 @@ public class Europe extends UnitLocation
     /**
      * Gets the current price for a recruit.
      *
-     * @return The current price of the recruit in this <code>Europe</code>.
+     * @return The current price of the recruit in this {@code Europe}.
      */
     public int getRecruitPrice() {
         if (!owner.isColonial()) return -1;

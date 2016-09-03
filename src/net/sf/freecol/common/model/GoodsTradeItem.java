@@ -37,12 +37,12 @@ public class GoodsTradeItem extends TradeItem {
 
 
     /**
-     * Creates a new <code>GoodsTradeItem</code> instance.
+     * Creates a new {@code GoodsTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param goods The <code>Goods</code> to trade.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param goods The {@code Goods} to trade.
      */
     public GoodsTradeItem(Game game, Player source, Player destination,
                           Goods goods) {
@@ -53,10 +53,10 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new <code>GoodsTradeItem</code> instance.
+     * Creates a new {@code GoodsTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public GoodsTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

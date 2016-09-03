@@ -53,7 +53,7 @@ public class Introspector {
     /**
      * Build a new Introspector for the specified class and field name.
      *
-     * @param theClass The <code>Class</code> of interest.
+     * @param theClass The {@code Class} of interest.
      * @param field The field name within the class of interest.
      */
     public Introspector(Class<?> theClass, String field) {
@@ -68,7 +68,7 @@ public class Introspector {
     /**
      * Get a get-method for this Introspector.
      *
-     * @return A <code>Method</code> representing getField().
+     * @return A {@code Method} representing getField().
      * @exception IntrospectorException if the get-method is not available.
      */
     private Method getGetMethod() throws IntrospectorException {
@@ -86,9 +86,9 @@ public class Introspector {
     /**
      * Get a set-method for this Introspector.
      *
-     * @param argType A <code>Class</code> that is the argument to
+     * @param argType A {@code Class} that is the argument to
      *        the set-method
-     * @return A <code>Method</code> representing setField().
+     * @return A {@code Method} representing setField().
      * @exception IntrospectorException if the set-method is not available.
      */
     private Method getSetMethod(Class<?> argType) throws IntrospectorException {
@@ -104,9 +104,9 @@ public class Introspector {
     }
 
     /**
-     * Get the return type from a <code>Method</code>.
+     * Get the return type from a {@code Method}.
      *
-     * @param method The <code>Method</code> to examine.
+     * @param method The {@code Method} to examine.
      * @return The method return type, or null on error.
      * @exception IntrospectorException if the return type is not available.
      */
@@ -127,7 +127,7 @@ public class Introspector {
      * Get a function that converts to String from a given class.
      * We use Enum.name() for enums, and String.valueOf(argType) for the rest.
      *
-     * @param argType A <code>Class</code> to find a converter for.
+     * @param argType A {@code Class} to find a converter for.
      * @return A conversion function, or null on error.
      * @exception NoSuchMethodException if no converter is found.
      */
@@ -143,7 +143,7 @@ public class Introspector {
      * argType.valueOf(String) for the rest, having first dodged
      * the primitive types.
      *
-     * @param argType A <code>Class</code> to find a converter for.
+     * @param argType A {@code Class} to find a converter for.
      * @return A conversion function, or null on error.
      */
     private Method getFromStringConverter(Class<?> argType) {
@@ -184,9 +184,9 @@ public class Introspector {
     /**
      * Invoke the get-method for this Introspector.
      *
-     * @param obj An <code>Object</code> (really of type theClass)
+     * @param obj An {@code Object} (really of type theClass)
      *        whose get-method is to be invoked.
-     * @return A <code>String</code> containing the result of invoking
+     * @return A {@code String} containing the result of invoking
      *         the get-method.
      * @exception IntrospectorException encompasses many failures.
      */
@@ -241,9 +241,9 @@ public class Introspector {
     /**
      * Invoke the set-method provided by this Introspector.
      *
-     * @param obj An <code>Object</code> (really of type theClass)
+     * @param obj An {@code Object} (really of type theClass)
      *        whose set-method is to be invoked.
-     * @param value A <code>String</code> containing the value to be set.
+     * @param value A {@code String} containing the value to be set.
      * @exception IntrospectorException encompasses many failures.
      */
     public void setter(Object obj, String value) throws IntrospectorException {

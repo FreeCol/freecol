@@ -40,7 +40,7 @@ public class PlunderType extends FreeColSpecObjectType {
      * Creates a new plunder type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public PlunderType(String id, Specification specification) {
         super(id, specification);
@@ -49,8 +49,8 @@ public class PlunderType extends FreeColSpecObjectType {
     /**
      * Creates a new plunder type.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is problem reading the stream.
      */
     public PlunderType(FreeColXMLReader xr,
@@ -64,7 +64,7 @@ public class PlunderType extends FreeColSpecObjectType {
     /**
      * Gets the plunder range available for the supplied unit.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunder() {

@@ -91,7 +91,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> in which this unit belongs.
+     * @param game The {@code Game} in which this unit belongs.
      * @param id The object identifier.
      */
     public ServerUnit(Game game, String id) {
@@ -104,9 +104,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * -vis: Visibility issues depending on location.
      * -til: Changes appearance if unit goes into a colony.
      *
-     * @param game The <code>Game</code> in which this unit belongs.
-     * @param location The <code>Location</code> to place this at.
-     * @param owner The <code>Player</code> owning this unit.
+     * @param game The {@code Game} in which this unit belongs.
+     * @param location The {@code Location} to place this at.
+     * @param owner The {@code Player} owning this unit.
      * @param type The type of the unit.
      */
     public ServerUnit(Game game, Location location, Player owner,
@@ -124,9 +124,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * -vis: Visibility issues depending on location.
      * -til: Changes appearance if unit goes into a colony.
      *
-     * @param game The <code>Game</code> in which this unit belongs.
-     * @param location The <code>Location</code> to place this at.
-     * @param template A <code>Unit</code> to copy from.
+     * @param game The {@code Game} in which this unit belongs.
+     * @param location The {@code Location} to place this at.
+     * @param template A {@code Unit} to copy from.
      */
     public ServerUnit(Game game, Location location, Unit template) {
         this(game, location,
@@ -156,9 +156,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * -vis: Visibility issues depending on location.
      * -til: Changes appearance if unit goes into a colony.
      *
-     * @param game The <code>Game</code> in which this unit belongs.
-     * @param location The <code>Location</code> to place this at.
-     * @param owner The <code>Player</code> owning this unit.
+     * @param game The {@code Game} in which this unit belongs.
+     * @param location The {@code Location} to place this at.
+     * @param owner The {@code Player} owning this unit.
      * @param type The type of the unit.
      * @param role The role of the unit.
      */
@@ -218,9 +218,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * New turn for this unit.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -408,7 +408,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * +til: Resolves the change of appearance.
      *
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csImproveTile(Random random, ChangeSet cs) {
         Tile tile = getTile();
@@ -491,8 +491,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Embark a unit.
      *
-     * @param carrier The <code>Unit</code> to embark on.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param carrier The {@code Unit} to embark on.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csEmbark(Unit carrier, ChangeSet cs) {
         final ServerPlayer owner = (ServerPlayer)getOwner();
@@ -522,7 +522,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Repair a unit.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csRepairUnit(ChangeSet cs) {
         ServerPlayer owner = (ServerPlayer) getOwner();
@@ -545,7 +545,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * If a unit moves, check if an opposing naval unit slows it down.
      * Note that the unit moves are reduced here.
      *
-     * @param newTile The <code>Tile</code> the unit is moving to.
+     * @param newTile The {@code Tile} the unit is moving to.
      * @param random A pseudo-random number source.
      * @return Either an enemy unit that causes a slowdown, or null if none.
      */
@@ -599,7 +599,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Explores a lost city, finding a native burial ground.
      *
-     * @param cs A <code>ChangeSet</code> to add changes to.
+     * @param cs A {@code ChangeSet} to add changes to.
      */
     private void csNativeBurialGround(ChangeSet cs) {
         ServerPlayer serverPlayer = (ServerPlayer)getOwner();
@@ -620,7 +620,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * Explore a lost city.
      *
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to add changes to.
+     * @param cs A {@code ChangeSet} to add changes to.
      * @return True if the unit survives.
      */
     private boolean csExploreLostCityRumour(Random random, ChangeSet cs) {
@@ -834,8 +834,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Activate sentried units on a tile.
      *
-     * @param tile The <code>Tile</code> to activate sentries on.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param tile The {@code Tile} to activate sentries on.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csActivateSentries(Tile tile, ChangeSet cs) {
         for (Unit u : transform(tile.getUnits(),
@@ -861,9 +861,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Move a unit.
      *
-     * @param newTile The <code>Tile</code> to move to.
+     * @param newTile The {@code Tile} to move to.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csMove(Tile newTile, Random random, ChangeSet cs) {
         final ServerPlayer serverPlayer = (ServerPlayer)getOwner();

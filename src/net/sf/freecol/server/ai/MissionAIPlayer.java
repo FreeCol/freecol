@@ -50,7 +50,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
- * An AIPlayer with support for executing <code>Mission</code>s.
+ * An AIPlayer with support for executing {@code Mission}s.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
@@ -91,8 +91,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Creates a new AI player.
      *
-     * @param aiMain The <code>AIMain</code> the player exists within.
-     * @param player The <code>ServerPlayer</code> to associate this
+     * @param aiMain The {@code AIMain} the player exists within.
+     * @param player The {@code ServerPlayer} to associate this
      *            AI player with.
      */
     public MissionAIPlayer(AIMain aiMain, ServerPlayer player) {
@@ -100,7 +100,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     }
 
     /**
-     * Creates a new <code>AIPlayer</code> from the given
+     * Creates a new {@code AIPlayer} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -124,7 +124,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Add an AI unit owned by this player.
      *
-     * @param aiUnit The <code>AIUnit</code> to add.
+     * @param aiUnit The {@code AIUnit} to add.
      */
     public void addAIUnit(AIUnit aiUnit) {
         aiUnits.add(aiUnit);
@@ -133,7 +133,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Removes an AI unit owned by this player.
      *
-     * @param aiUnit The <code>AIUnit</code> to remove.
+     * @param aiUnit The {@code AIUnit} to remove.
      */
     @Override
     public void removeAIUnit(AIUnit aiUnit) {
@@ -156,7 +156,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Counts the number of defenders allocated to a settlement.
      *
-     * @param settlement The <code>Settlement</code> to examine.
+     * @param settlement The {@code Settlement} to examine.
      * @return The number of defenders.
      */
     public int getSettlementDefenders(Settlement settlement) {
@@ -177,8 +177,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      *
      * FIXME: Package for access by a test only - necessary?
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param tile The <code>Tile</code> to attack into.
+     * @param attacker The attacking {@code Unit}.
+     * @param tile The {@code Tile} to attack into.
      * @return True if an attack can be launched.
      */
     public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
@@ -222,7 +222,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * Log the missions of this player.
      *
      * @param reasons A map of reasons for the current mission by unit.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     protected void logMissions(java.util.Map<Unit, String> reasons,
                                LogBuilder lb) {
@@ -254,7 +254,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * Get a DefendSettlementMission for the current settlement of a
      * unit if it is badly defended.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new misison, or null if impossible or not worthwhile.
      */
     public Mission getDefendCurrentSettlementMission(AIUnit aiUnit) {
@@ -271,8 +271,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Gets a new DefendSettlementMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param target The <code>Settlement</code> to defend.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param target The {@code Settlement} to defend.
      * @return A new mission, or null if impossible.
      */
     public Mission getDefendSettlementMission(AIUnit aiUnit,
@@ -284,7 +284,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Gets a new IdleAtSettlementMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to use.
+     * @param aiUnit The {@code AIUnit} to use.
      * @return A new mission, or null if impossible.
      */
     public Mission getIdleAtSettlementMission(AIUnit aiUnit) {
@@ -295,7 +295,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Gets a UnitSeekAndDestroyMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @param range A maximum range to search for a target within.
      * @return A new mission, or null if impossible.
      */
@@ -311,8 +311,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Gets a UnitSeekAndDestroyMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The target {@code Location}.
      * @return A new mission, or null if impossible.
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, Location loc) {
@@ -324,7 +324,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Gets a new UnitWanderHostileMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
     public Mission getWanderHostileMission(AIUnit aiUnit) {
@@ -338,9 +338,9 @@ public abstract class MissionAIPlayer extends AIPlayer {
     /**
      * Makes every unit perform their mission.
      *
-     * @param aiUnits A list of <code>AIUnit</code>s to perform missions.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of <code>AIUnit</code>s that have moves left.
+     * @param aiUnits A list of {@code AIUnit}s to perform missions.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of {@code AIUnit}s that have moves left.
      */
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
         lb.add("\n  Do Missions:");
@@ -363,8 +363,8 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * Adjusts the score of this proposed mission for this player type.
      * Subclasses should override and refine this.
      *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
+     * @param aiUnit The {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to the target of this mission.
      * @param value The proposed value.
      * @param type The mission type.
      * @return A score representing the desirability of this mission.

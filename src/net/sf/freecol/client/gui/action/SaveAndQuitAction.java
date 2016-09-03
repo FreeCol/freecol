@@ -33,7 +33,7 @@ public class SaveAndQuitAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>SaveAndQuitAction</code>.
+     * Creates a new {@code SaveAndQuitAction}.
      *
      * @param freeColClient The main controller object for the client.
      */

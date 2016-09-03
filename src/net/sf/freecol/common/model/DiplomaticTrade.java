@@ -34,7 +34,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
- * The class <code>DiplomaticTrade</code> represents an offer one
+ * The class {@code DiplomaticTrade} represents an offer one
  * player can make another.
  *
  * This has to be a FCGO so that it can be serialized, but instances are not
@@ -89,7 +89,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Simple constructor, used in FreeColGameObject.newInstance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The identifier (ignored).
      */
     public DiplomaticTrade(Game game, String id) {
@@ -97,12 +97,12 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
         
     /**
-     * Creates a new <code>DiplomaticTrade</code> instance.
+     * Creates a new {@code DiplomaticTrade} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param context The <code>TradeContext</code> for this agreement.
-     * @param sender The sending <code>Player</code>.
-     * @param recipient The recipient <code>Player</code>.
+     * @param game The enclosing {@code Game}.
+     * @param context The {@code TradeContext} for this agreement.
+     * @param sender The sending {@code Player}.
+     * @param recipient The recipient {@code Player}.
      * @param items A list of items to trade.
      * @param version The trade version number.
      */
@@ -141,7 +141,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Set the trade status.
      *
-     * @param status The new <code>TradeStatus</code> for this agreement.
+     * @param status The new {@code TradeStatus} for this agreement.
      */
     public void setStatus(TradeStatus status) {
         this.status = status;
@@ -150,7 +150,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the sending player.
      *
-     * @return The sending <code>Player</code>.
+     * @return The sending {@code Player}.
      */
     public final Player getSender() {
         return this.sender;
@@ -159,7 +159,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Set the sending player.
      *
-     * @param newSender The new sending <code>Player</code>.
+     * @param newSender The new sending {@code Player}.
      */
     public final void setSender(final Player newSender) {
         this.sender = newSender;
@@ -168,7 +168,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the recipient player.
      *
-     * @return The recipient <code>Player</code>.
+     * @return The recipient {@code Player}.
      */
     public final Player getRecipient() {
         return this.recipient;
@@ -177,7 +177,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Set the recieving player.
      *
-     * @param newRecipient The new recipient <code>Player</code>.
+     * @param newRecipient The new recipient {@code Player}.
      */
     public final void setRecipient(final Player newRecipient) {
         this.recipient = newRecipient;
@@ -186,7 +186,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the other player in a trade.
      *
-     * @param player The known <code>Player</code>.
+     * @param player The known {@code Player}.
      * @return The other player, not the supplied known one.
      */
     public Player getOtherPlayer(Player player) {
@@ -197,9 +197,9 @@ public class DiplomaticTrade extends FreeColGameObject {
      * Handy utility to get the message associated with sending this
      * agreement from a player to a settlement owner.
      *
-     * @param player The sending <code>Player</code>.
-     * @param settlement The <code>Settlement</code> to send to.
-     * @return A <code>StringTemplate</code> for the message.
+     * @param player The sending {@code Player}.
+     * @param settlement The {@code Settlement} to send to.
+     * @return A {@code StringTemplate} for the message.
      */
     public StringTemplate getSendMessage(Player player, Settlement settlement) {
         return StringTemplate.template("model.diplomaticTrade.send."
@@ -214,8 +214,8 @@ public class DiplomaticTrade extends FreeColGameObject {
      * Handy utility to get the message associated with sending this
      * agreement from a player to a settlement owner.
      *
-     * @param player The <code>Player</code> the offer came from.
-     * @return A <code>StringTemplate</code> for the message.
+     * @param player The {@code Player} the offer came from.
+     * @return A {@code StringTemplate} for the message.
      */
     public StringTemplate getReceiveMessage(Player player) {
         return StringTemplate.template("model.diplomaticTrade.receive."
@@ -226,7 +226,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Add to the DiplomaticTrade.
      *
-     * @param newItem The <code>TradeItem</code> to add.
+     * @param newItem The {@code TradeItem} to add.
      */
     public void add(TradeItem newItem) {
         if (newItem.isUnique()) removeType(newItem.getClass());
@@ -236,7 +236,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Remove a from the DiplomaticTrade.
      *
-     * @param newItem The <code>TradeItem</code> to remove.
+     * @param newItem The {@code TradeItem} to remove.
      */
     public void remove(TradeItem newItem) {
         this.items.remove(newItem);
@@ -245,7 +245,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Remove from the DiplomaticTrade.
      *
-     * @param index The index of the <code>TradeItem</code> to remove
+     * @param index The index of the {@code TradeItem} to remove
      */
     public void remove(int index) {
         this.items.remove(index);
@@ -254,8 +254,8 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Removes all trade items of the same class as the given argument.
      *
-     * @param itemClass The <code>Class</code> of
-     *     <code>TradeItem</code> to remove.
+     * @param itemClass The {@code Class} of
+     *     {@code TradeItem} to remove.
      */
     public void removeType(Class<? extends TradeItem> itemClass) {
         removeInPlace(this.items, matchKey(itemClass, TradeItem::getClass));
@@ -289,8 +289,8 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the items offered by a particular player.
      *
-     * @param player The <code>Player</code> to check.
-     * @return A list of <code>TradeItem</code>s offered by the player.
+     * @param player The {@code Player} to check.
+     * @return A list of {@code TradeItem}s offered by the player.
      */
     public List<TradeItem> getItemsGivenBy(Player player) {
         return transform(this.items, matchKey(player, TradeItem::getSource));
@@ -299,7 +299,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the stance being offered.
      *
-     * @return The <code>Stance</code> offered in this trade, or null if none.
+     * @return The {@code Stance} offered in this trade, or null if none.
      */
     public Stance getStance() {
         TradeItem ti = find(this.items, i -> i instanceof StanceTradeItem);
@@ -309,8 +309,8 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get a list of colonies offered in this trade.
      *
-     * @param player The <code>Player</code> offering the colonies.
-     * @return A list of <code>Colony</code>s offered in this trade.
+     * @param player The {@code Player} offering the colonies.
+     * @return A list of {@code Colony}s offered in this trade.
      */
     public List<Colony> getColoniesGivenBy(final Player player) {
         return transform(this.items,
@@ -322,7 +322,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the gold offered in this trade by a given player.
      *
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return The gold offered in this trade.
      */
     public int getGoldGivenBy(Player player) {
@@ -334,8 +334,8 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the goods being offered.
      *
-     * @param player The <code>Player</code> offering the goods.
-     * @return A list of <code>Goods</code> offered in this trade.
+     * @param player The {@code Player} offering the goods.
+     * @return A list of {@code Goods} offered in this trade.
      */
     public List<Goods> getGoodsGivenBy(Player player) {
         return transform(this.items,
@@ -347,7 +347,7 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get the player being incited against.
      *
-     * @return The <code>Player</code> to be incited against.
+     * @return The {@code Player} to be incited against.
      */
     public Player getVictim() {
         TradeItem ti = find(this.items, i -> i instanceof InciteTradeItem);
@@ -357,8 +357,8 @@ public class DiplomaticTrade extends FreeColGameObject {
     /**
      * Get a list of units offered in this trade.
      *
-     * @param player The <code>Player</code> offering the units.
-     * @return A list of <code>Unit</code>s offered in this trade.
+     * @param player The {@code Player} offering the units.
+     * @return A list of {@code Unit}s offered in this trade.
      */
     public List<Unit> getUnitsGivenBy(Player player) {
         return transform(this.items,

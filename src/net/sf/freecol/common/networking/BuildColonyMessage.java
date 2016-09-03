@@ -46,11 +46,11 @@ public class BuildColonyMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>BuildColonyMessage</code> with the supplied name
+     * Create a new {@code BuildColonyMessage} with the supplied name
      * and building unit.
      *
      * @param colonyName The name for the new colony.
-     * @param builder The <code>Unit</code> to do the building.
+     * @param builder The {@code Unit} to do the building.
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
         super(getTagName());
@@ -60,10 +60,10 @@ public class BuildColonyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>BuildColonyMessage</code> from a supplied element.
+     * Create a new {@code BuildColonyMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public BuildColonyMessage(Game game, Element element) {
         super(getTagName());
@@ -76,12 +76,12 @@ public class BuildColonyMessage extends DOMMessage {
     /**
      * Handle a "buildColony"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the request.
-     * @param player The <code>Player</code> building the colony.
-     * @param connection The <code>Connection</code> the message is from.
-     * @return An update <code>Element</code> defining the new colony
+     * @param server The {@code FreeColServer} handling the request.
+     * @param player The {@code Player} building the colony.
+     * @param connection The {@code Connection} the message is from.
+     * @return An update {@code Element} defining the new colony
      *     and updating its surrounding tiles, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

@@ -62,7 +62,7 @@ public abstract class Session {
      * last thing they should do is call this to remove reference to
      * this transaction.
      *
-     * @param cs A <code>ChangeSet</code> to update with changes that
+     * @param cs A {@code ChangeSet} to update with changes that
      *     occur when completing this session.
      */
     public void complete(ChangeSet cs) {
@@ -86,8 +86,8 @@ public abstract class Session {
      * Make a transaction session key given two game objects.
      *
      * @param type An identifier for the type of transaction.
-     * @param o1 A <code>FreeColGameObject</code> involved in the session.
-     * @param o2 Another <code>FreeColGameObject</code> involved in the session.
+     * @param o1 A {@code FreeColGameObject} involved in the session.
+     * @param o2 Another {@code FreeColGameObject} involved in the session.
      * @return A transaction session key.
      */
     protected static String makeSessionKey(Class type,
@@ -102,7 +102,7 @@ public abstract class Session {
     /**
      * Complete all transactions.  Useful at the end of turn.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public static void completeAll(ChangeSet cs) {
         for (Session ts : transform(allSessions.values(), s -> !s.completed)) {
@@ -123,8 +123,8 @@ public abstract class Session {
      *
      * @param <T> The actual session class found.
      * @param type The class of session.
-     * @param o1 The first <code>FreeColGameObject</code> in the session.
-     * @param o2 The second <code>FreeColGameObject</code> in the session.
+     * @param o1 The first {@code FreeColGameObject} in the session.
+     * @param o2 The second {@code FreeColGameObject} in the session.
      * @return A session of the specified type, or null if not found.
      */
     public static <T extends Session> T lookup(Class<T> type,

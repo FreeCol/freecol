@@ -43,7 +43,7 @@ public final class DummyConnection extends Connection {
      * Sets up a dummy connection using the specified {@link MessageHandler}s.
      *
      * @param name A name for this connection.
-     * @param incomingMessageHandler The <code>MessageHandler</code>
+     * @param incomingMessageHandler The {@code MessageHandler}
      *     to call for each message received.
      */
     public DummyConnection(String name, MessageHandler incomingMessageHandler) {
@@ -65,7 +65,7 @@ public final class DummyConnection extends Connection {
     /**
      * Sets the other connection for this dummy connection.
      *
-     * @param dc The <code>DummyConnection</code> to connect to.
+     * @param dc The {@code DummyConnection} to connect to.
      */
     public void setConnection(DummyConnection dc) {
         this.otherConnection = dc;
@@ -73,9 +73,9 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Gets the <code>DummyConnection</code> this object is connected to.
+     * Gets the {@code DummyConnection} this object is connected to.
      *
-     * @return The <code>DummyConnection</code> .
+     * @return The {@code DummyConnection} .
      */
     public DummyConnection getOtherConnection() {
         return otherConnection;
@@ -116,7 +116,7 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Sends the given message over this <code>Connection</code> and waits for
+     * Sends the given message over this {@code Connection} and waits for
      * confirmation of receival before returning.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that

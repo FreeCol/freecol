@@ -45,19 +45,19 @@ public class ImprovementMission extends AbstractMission {
 
 
     /**
-     * Creates a new <code>ImprovementMission</code> instance.
+     * Creates a new {@code ImprovementMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      */
     public ImprovementMission(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>ImprovementMission</code> instance.
+     * Creates a new {@code ImprovementMission} instance.
      *
-     * @param game a <code>Game</code> value
-     * @param xr a <code>FreeColXMLReader</code> value
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
      * @exception XMLStreamException if an error occurs
      */
     public ImprovementMission(Game game,
@@ -66,9 +66,9 @@ public class ImprovementMission extends AbstractMission {
     }
 
     /**
-     * Creates a new <code>ImprovementMission</code> instance.
+     * Creates a new {@code ImprovementMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      * @param id The object identifier.
      */
     public ImprovementMission(Game game, String id) {
@@ -77,16 +77,16 @@ public class ImprovementMission extends AbstractMission {
 
 
     /**
-     * Get the <code>Improvement</code> value.
+     * Get the {@code Improvement} value.
      *
-     * @return an <code>TileImprovement</code> value
+     * @return an {@code TileImprovement} value
      */
     public final TileImprovement getImprovement() {
         return improvement;
     }
 
     /**
-     * Set the <code>Improvement</code> value.
+     * Set the {@code Improvement} value.
      *
      * @param newImprovement The new Improvement value.
      */
@@ -113,7 +113,7 @@ public class ImprovementMission extends AbstractMission {
     /**
      * Returns true if the mission is still valid.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     @Override
     public boolean isValid() {
@@ -126,7 +126,7 @@ public class ImprovementMission extends AbstractMission {
      * Returns true if the given Unit is allowed to build at least one
      * TileImprovementType.
      *
-     * @param unit an <code>Unit</code> value
+     * @param unit an {@code Unit} value
      * @return false
      */
     public static boolean isValidFor(Unit unit) {

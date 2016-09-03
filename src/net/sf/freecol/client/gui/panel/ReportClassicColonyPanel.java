@@ -65,7 +65,7 @@ public final class ReportClassicColonyPanel extends ReportPanel
     /**
      * Creates a colony report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportClassicColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");

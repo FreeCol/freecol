@@ -77,10 +77,10 @@ public final class BuildingType extends BuildableType {
 
 
     /**
-     * Creates a new <code>BuildingType</code> instance.
+     * Creates a new {@code BuildingType} instance.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
@@ -160,7 +160,7 @@ public final class BuildingType extends BuildableType {
      * Gets the reason why a given unit type can not be added to a
      * building of this type.
      *
-     * @param unitType The <code>UnitType</code> to test.
+     * @param unitType The {@code UnitType} to test.
      * @return The reason why adding would fail.
      */
     public NoAddReason getNoAddReason(UnitType unitType) {
@@ -174,7 +174,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Can a unit of a given type be added to a Building of this type?
      *
-     * @param unitType The <code>UnitType</code> to check.
+     * @param unitType The {@code UnitType} to check.
      * @return True if the unit type can be added.
      */
     public boolean canAdd(UnitType unitType) {
@@ -194,7 +194,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Gets the BuildingType this BuildingType upgrades from.
      *
-     * @return The <code>BuildingType</code> that upgrades to this one.
+     * @return The {@code BuildingType} that upgrades to this one.
      */
     public BuildingType getUpgradesFrom() {
         return upgradesFrom;
@@ -203,7 +203,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Get the BuildingType this BuildingType upgrades to.
      *
-     * @return The <code>BuildingType</code> to upgrade to from this one.
+     * @return The {@code BuildingType} to upgrade to from this one.
      */
     public BuildingType getUpgradesTo() {
         return upgradesTo;
@@ -212,7 +212,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Gets the first level of this BuildingType.
      *
-     * @return The base <code>BuildingType</code>.
+     * @return The base {@code BuildingType}.
      */
     public BuildingType getFirstLevel() {
         BuildingType buildingType = this;
@@ -234,7 +234,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Add a production type to this building type.
      *
-     * @param productionType The <code>ProductionType</code> to add.
+     * @param productionType The {@code ProductionType} to add.
      */
     public void addProductionType(ProductionType productionType) {
         if (productionType != null) productionTypes.add(productionType);
@@ -245,7 +245,7 @@ public final class BuildingType extends BuildableType {
      * current difficulty level.
      *
      * @param unattended Whether the production is unattended.
-     * @return A list of <code>ProductionType</code>s.
+     * @return A list of {@code ProductionType}s.
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return getAvailableProductionTypes(unattended, null);
@@ -261,7 +261,7 @@ public final class BuildingType extends BuildableType {
      *
      * @param unattended Whether the production is unattended.
      * @param level The production level (NYI).
-     * @return A list of <code>ProductionType</code>s.
+     * @return A list of {@code ProductionType}s.
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
@@ -274,7 +274,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Get the type of goods consumed by this BuildingType.
      *
-     * @return The consumed <code>GoodsType</code>.
+     * @return The consumed {@code GoodsType}.
      */
     private GoodsType getConsumedGoodsType() {
         if (productionTypes.isEmpty()) return null;
@@ -286,7 +286,7 @@ public final class BuildingType extends BuildableType {
     /**
      * Gets the type of goods produced by this BuildingType.
      *
-     * @return The produced <code>GoodsType</code>.
+     * @return The produced {@code GoodsType}.
      */
     public GoodsType getProducedGoodsType() {
         if (productionTypes.isEmpty()) return null;
@@ -307,8 +307,8 @@ public final class BuildingType extends BuildableType {
     /**
      * Can a tile of this type produce a given goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return True if this tile type produces the goods.
      */
@@ -322,10 +322,10 @@ public final class BuildingType extends BuildableType {
      * Get the base production of a given goods type for an optional
      * unit type.
      *
-     * @param productionType An optional <code>ProductionType</code> to use,
+     * @param productionType An optional {@code ProductionType} to use,
      *     if null the best available one is used.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return The amount of goods produced.
      */
@@ -345,8 +345,8 @@ public final class BuildingType extends BuildableType {
      * Get the amount of goods of a given goods type the given unit
      * type could produce on a tile of this tile type.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return The amount of goods produced.
      */

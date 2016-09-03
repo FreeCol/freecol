@@ -54,12 +54,12 @@ public class GoodsForSaleMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>GoodsForSaleMessage</code> with the
+     * Create a new {@code GoodsForSaleMessage} with the
      * supplied name.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param sellGoods A list of <code>Goods</code> to be sold.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param sellGoods A list of {@code Goods} to be sold.
      */
     public GoodsForSaleMessage(Unit unit, Settlement settlement,
                                List<Goods> sellGoods) {
@@ -72,11 +72,11 @@ public class GoodsForSaleMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>GoodsForSaleMessage</code> from a
+     * Create a new {@code GoodsForSaleMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public GoodsForSaleMessage(Game game, Element element) {
         super(getTagName());
@@ -107,12 +107,12 @@ public class GoodsForSaleMessage extends DOMMessage {
     /**
      * Handle a "goodsForSale"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return This <code>GoodsForSaleMessage</code> with the goods
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
+     * @return This {@code GoodsForSaleMessage} with the goods
      *     for sale attached as children or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

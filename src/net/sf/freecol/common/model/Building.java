@@ -53,9 +53,9 @@ public class Building extends WorkLocation
     /**
      * Constructor for ServerBuilding.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param colony The <code>Colony</code> in which this building is located.
-     * @param type The <code>BuildingType</code> of building.
+     * @param game The enclosing {@code Game}.
+     * @param colony The {@code Colony} in which this building is located.
+     * @param type The {@code BuildingType} of building.
      */
     protected Building(Game game, Colony colony, BuildingType type) {
         super(game);
@@ -67,11 +67,11 @@ public class Building extends WorkLocation
     }
 
     /**
-     * Create a new <code>Building</code> with the given identifier.
+     * Create a new {@code Building} with the given identifier.
      * The object should later be initialized by calling
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Building(Game game, String id) {
@@ -96,7 +96,7 @@ public class Building extends WorkLocation
      *
      * @see #upgrade
      * @see #downgrade
-     * @param newBuildingType The new <code>BuildingType</code>.
+     * @param newBuildingType The new {@code BuildingType}.
      * @return A list of units present that need to be removed.
      */
     private List<Unit> setType(final BuildingType newBuildingType) {
@@ -141,8 +141,8 @@ public class Building extends WorkLocation
      * *multiplicative* modifiers, as this would capture the master blacksmith
      * doubling.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>UnitType</code> to produce them.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */
     public Stream<Modifier> getCompetenceModifiers(String id,
@@ -161,7 +161,7 @@ public class Building extends WorkLocation
     /**
      * Does this building have a higher level?
      *
-     * @return True if this <code>Building</code> can have a higher level.
+     * @return True if this {@code Building} can have a higher level.
      */
     public boolean canBuildNext() {
         return getColony().canBuild(getType().getUpgradesTo());
@@ -210,7 +210,7 @@ public class Building extends WorkLocation
     /**
      * Can a particular type of unit be added to this building?
      *
-     * @param unitType The <code>UnitType</code> to check.
+     * @param unitType The {@code UnitType} to check.
      * @return True if unit type can be added to this building.
      */
     public boolean canAddType(UnitType unitType) {
@@ -221,7 +221,7 @@ public class Building extends WorkLocation
      * Convenience function to extract a goods amount from a list of
      * available goods.
      *
-     * @param type The <code>GoodsType</code> to extract the amount for.
+     * @param type The {@code GoodsType} to extract the amount for.
      * @param available The list of available goods to query.
      * @return The goods amount, or zero if none found.
      */
@@ -376,7 +376,7 @@ public class Building extends WorkLocation
     /**
      * Evaluate this work location for a given player.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the player.
      */
     @Override

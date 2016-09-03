@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 
 /**
  * The networking server in which new clients can connect and methods
- * like <code>sendToAll</code> are kept.
+ * like {@code sendToAll} are kept.
  *
  * <br><br>
  *
@@ -69,7 +69,7 @@ public final class Server extends Thread {
      */
     private boolean running = true;
 
-    /** The owner of this <code>Server</code>. */
+    /** The owner of this {@code Server}. */
     private final FreeColServer freeColServer;
 
     /** The name of the host for the public socket. */
@@ -86,7 +86,7 @@ public final class Server extends Thread {
      * Creates a new network server. Use {@link #run server.start()} to start
      * listening for new connections.
      *
-     * @param freeColServer The owner of this <code>Server</code>.
+     * @param freeColServer The owner of this {@code Server}.
      * @param host The name of the host for the public socket.
      * @param port The TCP port to use for the public socket.
      * @throws IOException if the public socket cannot be created.
@@ -123,11 +123,11 @@ public final class Server extends Thread {
     }
 
     /**
-     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
+     * Gets a {@code Connection} identified by a <code>Socket</code>.
      *
-     * @param socket The <code>Socket</code> that identifies the
-     *               <code>Connection</code>
-     * @return The <code>Connection</code>.
+     * @param socket The {@code Socket} that identifies the
+     *               {@code Connection}
+     * @return The {@code Connection}.
      */
     public Connection getConnection(Socket socket) {
         return this.connections.get(socket);
@@ -163,9 +163,9 @@ public final class Server extends Thread {
     }
 
     /**
-     * Sets the specified <code>MessageHandler</code> to all connections.
+     * Sets the specified {@code MessageHandler} to all connections.
      *
-     * @param mh The <code>MessageHandler</code> to use.
+     * @param mh The {@code MessageHandler} to use.
      */
     public void setMessageHandlerToAllConnections(MessageHandler mh) {
         for (Connection c : this.connections.values()) {
@@ -176,8 +176,8 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections with an optional exception.
      *
-     * @param message The <code>DOMMessage</code> to send.
-     * @param exceptConnection An optional <code>Connection</code> not
+     * @param message The {@code DOMMessage} to send.
+     * @param exceptConnection An optional {@code Connection} not
      *     to send to.
      */
     public void sendToAll(DOMMessage message, Connection exceptConnection) {
@@ -200,7 +200,7 @@ public final class Server extends Thread {
     /**
      * Sends a network message to all connections.
      *
-     * @param message The <code>DOMMessage</code> to send.
+     * @param message The {@code DOMMessage} to send.
      */
     public void sendToAll(DOMMessage message) {
         sendToAll(message, null);

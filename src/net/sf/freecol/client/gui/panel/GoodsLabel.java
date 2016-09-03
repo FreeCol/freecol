@@ -53,8 +53,8 @@ public final class GoodsLabel extends AbstractGoodsLabel
     /**
      * Initializes this JLabel with the given goods data.
      *
-     * @param gui The <code>GUI</code> to display on.
-     * @param goods The <code>Goods</code> that this label will represent.
+     * @param gui The {@code GUI} to display on.
+     * @param goods The {@code Goods} that this label will represent.
      */
     public GoodsLabel(GUI gui, Goods goods) {
         super(gui.getImageLibrary(), goods);
@@ -68,10 +68,10 @@ public final class GoodsLabel extends AbstractGoodsLabel
      * Public routine to get a foreground color for a given goods type and
      * amount in a given location.
      *
-     * @param goodsType The <code>GoodsType</code> to use.
+     * @param goodsType The {@code GoodsType} to use.
      * @param amount The amount of goods.
-     * @param location The <code>Location</code> for the goods.
-     * @return A suitable <code>color</code>.
+     * @param location The {@code Location} for the goods.
+     * @return A suitable {@code color}.
      */
     public static Color getColor(GoodsType goodsType, int amount,
                                  Location location) {
@@ -123,7 +123,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
     /**
      * Get the goods being labelled.
      *
-     * @return The <code>Goods</code> we have labelled.
+     * @return The {@code Goods} we have labelled.
      */
     public Goods getGoods() {
         return (Goods)getAbstractGoods();

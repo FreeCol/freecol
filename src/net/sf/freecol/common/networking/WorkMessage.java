@@ -46,11 +46,11 @@ public class WorkMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>WorkMessage</code> for the supplied unit and
+     * Create a new {@code WorkMessage} for the supplied unit and
      * work location.
      *
-     * @param unit The <code>Unit</code> to change the work location of.
-     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @param unit The {@code Unit} to change the work location of.
+     * @param workLocation The {@code WorkLocation} to change to.
      */
     public WorkMessage(Unit unit, WorkLocation workLocation) {
         super(getTagName());
@@ -60,10 +60,10 @@ public class WorkMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>WorkMessage</code> from a supplied element.
+     * Create a new {@code WorkMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public WorkMessage(Game game, Element element) {
         super(getTagName());
@@ -76,11 +76,11 @@ public class WorkMessage extends DOMMessage {
     /**
      * Handle a "work"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message received on.
      * @return An update encapsulating the work location change or an
-     *     error <code>Element</code> on failure.
+     *     error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

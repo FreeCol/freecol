@@ -77,7 +77,7 @@ public final class CornerMapControls extends MapControls {
     /**
      * The basic constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public CornerMapControls(final FreeColClient freeColClient) {
         super(freeColClient, true);
@@ -154,7 +154,7 @@ public final class CornerMapControls extends MapControls {
     /**
      * Add a component to the canvas.
      *
-     * @param canvas The <code>Canvas</code> to add to.
+     * @param canvas The {@code Canvas} to add to.
      * @param component The component to add.
      */
     private void addToCanvas(Canvas canvas, Component component) {
@@ -173,7 +173,7 @@ public final class CornerMapControls extends MapControls {
     /**
      * Adds the map controls to the given canvas.
      *
-     * @param canvas The parent <code>Canvas</code>.
+     * @param canvas The parent {@code Canvas}.
      */
     @Override
     public void addToComponent(Canvas canvas) {
@@ -235,7 +235,7 @@ public final class CornerMapControls extends MapControls {
     /**
      * Removes the map controls from the parent canvas.
      *
-     * @param canvas The parent <code>Canvas</code>.
+     * @param canvas The parent {@code Canvas}.
      */
     @Override
     public void removeFromComponent(Canvas canvas) {

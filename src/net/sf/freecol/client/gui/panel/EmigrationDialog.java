@@ -45,9 +45,9 @@ public final class EmigrationDialog extends FreeColChoiceDialog<Integer> {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param europe The <code>Europe</code> where we can find the
+     * @param europe The {@code Europe} where we can find the
      *     units that are prepared to emigrate.
      * @param foy Is this emigration due to a fountain of youth?
      */

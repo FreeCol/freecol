@@ -44,7 +44,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
 
     /**
-     * Creates a new <code>ChoiceItem</code> with the
+     * Creates a new {@code ChoiceItem} with the
      * given object.
      *
      * @param text The text that should be used to represent this choice.
@@ -60,7 +60,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     }
 
     /**
-     * Creates a new <code>ChoiceItem</code> with the
+     * Creates a new {@code ChoiceItem} with the
      * given object.
      *
      * @param text The text that should be used to represent this choice.
@@ -71,7 +71,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     }
 
     /**
-     * Creates a new <code>ChoiceItem</code> with the
+     * Creates a new {@code ChoiceItem} with the
      * given object.
      *
      * @param object The object contained by this choice.
@@ -91,20 +91,20 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
 
     /**
-     * Gets the <code>Object</code> contained by this choice.
+     * Gets the {@code Object} contained by this choice.
      *
-     * @return The <code>Object</code>.
+     * @return The {@code Object}.
      */
     public T getObject() {
         return object;
     }
 
     /**
-     * Gets the choice as an <code>int</code>.
+     * Gets the choice as an {@code int}.
      *
      * @return The number representing this object.
      * @exception ClassCastException if the {@link #getObject object} is
-     *            not an <code>Integer</code>.
+     *            not an {@code Integer}.
      */
     public int getChoice() {
         return ((Integer) object);
@@ -139,7 +139,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
     /**
      * Add an icon to this choice.
      *
-     * @param icon The <code>ImageIcon</code> to add.
+     * @param icon The {@code ImageIcon} to add.
      * @return This choice.
      */
     public ChoiceItem<T> setIcon(ImageIcon icon) {

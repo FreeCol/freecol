@@ -118,7 +118,7 @@ public class Tension implements Named {
     /**
      * Get the current tension value.
      *
-     * @return The value of this <code>Tension</code>.
+     * @return The value of this {@code Tension}.
      */
     public final int getValue() {
         return this.value;

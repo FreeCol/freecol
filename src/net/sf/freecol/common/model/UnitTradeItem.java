@@ -37,12 +37,12 @@ public class UnitTradeItem extends TradeItem {
 
         
     /**
-     * Creates a new <code>UnitTradeItem</code> instance.
+     * Creates a new {@code UnitTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param unit The <code>Unit</code> to trade.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param unit The {@code Unit} to trade.
      */
     public UnitTradeItem(Game game, Player source, Player destination,
                          Unit unit) {
@@ -53,10 +53,10 @@ public class UnitTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new <code>UnitTradeItem</code> instance.
+     * Creates a new {@code UnitTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public UnitTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

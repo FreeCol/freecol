@@ -42,7 +42,7 @@ public class CachingFunction<T, R> implements Function<T, R> {
     /**
      * Create a new caching function.
      *
-     * @param wrapped The <code>Function</code> to be wrapped.
+     * @param wrapped The {@code Function} to be wrapped.
      */
     public CachingFunction(Function<T, R> wrapped) {
         this.wrapped = wrapped;

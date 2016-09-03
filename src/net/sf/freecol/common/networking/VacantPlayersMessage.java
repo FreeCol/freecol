@@ -44,7 +44,7 @@ public class VacantPlayersMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>VacantPlayersMessage</code>.
+     * Create a new {@code VacantPlayersMessage}.
      */
     public VacantPlayersMessage() {
         super(getTagName());
@@ -53,11 +53,11 @@ public class VacantPlayersMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>VacantPlayersMessage</code> from a
+     * Create a new {@code VacantPlayersMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public VacantPlayersMessage(Game game, Element element) {
         this();
@@ -83,10 +83,10 @@ public class VacantPlayersMessage extends DOMMessage {
     /**
      * Handle a "vacantPlayers"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      *
-     * @return An <code>Element</code> to update the originating player
+     * @return An {@code Element} to update the originating player
      *     with the result of the query.
      */
     public Element handle(FreeColServer server, Connection connection) {

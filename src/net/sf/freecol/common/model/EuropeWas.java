@@ -42,7 +42,7 @@ public class EuropeWas {
     /**
      * Create a new wrapper to remember the state of Europe.
      *
-     * @param europe The <code>Europe</code> to remember.
+     * @param europe The {@code Europe} to remember.
      */
     public EuropeWas(Europe europe) {
         this.europe = europe;
@@ -56,7 +56,7 @@ public class EuropeWas {
      * As long there is at least one new unit, pick the one with the
      * highest numeric id.
      *
-     * @return The newest <code>Unit</code> or null if none has been added.
+     * @return The newest {@code Unit} or null if none has been added.
      */
     public Unit getNewUnit() {
         return (europe.getUnitCount() <= this.unitCount) ? null

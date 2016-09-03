@@ -42,10 +42,10 @@ public class UpdateGameOptionsMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>UpdateGameOptionsMessage</code> with the
+     * Create a new {@code UpdateGameOptionsMessage} with the
      * supplied name.
      *
-     * @param options The game options <code>OptionGroup</code>.
+     * @param options The game options {@code OptionGroup}.
      */
     public UpdateGameOptionsMessage(OptionGroup options) {
         super(getTagName());
@@ -54,11 +54,11 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>UpdateGameOptionsMessage</code> from a
+     * Create a new {@code UpdateGameOptionsMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public UpdateGameOptionsMessage(Game game, Element element) {
         this(getChild(game, element, 0, OptionGroup.class));
@@ -80,10 +80,10 @@ public class UpdateGameOptionsMessage extends DOMMessage {
     /**
      * Handle a "updateGameOptions"-message.
      *
-     * @param freeColServer The <code>FreeColServer</code> handling
+     * @param freeColServer The {@code FreeColServer} handling
      *     the message.
-     * @param player The <code>Player</code> that sent the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param player The {@code Player} that sent the message.
+     * @param connection The {@code Connection} message was received on.
      * @return Null (although other players are updated on success) or
      *     an error message if the options do not update.
      */

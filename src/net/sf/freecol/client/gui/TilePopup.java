@@ -78,10 +78,10 @@ public final class TilePopup extends JPopupMenu {
     /**
      * The constructor that will insert the MenuItems.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param canvas The Canvas.
-     * @param tile The <code>Tile</code> to create a popup for.
-     *       The popup menu also appears near this <code>Tile</code>.
+     * @param tile The {@code Tile} to create a popup for.
+     *       The popup menu also appears near this {@code Tile}.
      */
     public TilePopup(final FreeColClient freeColClient, final Canvas canvas,
                      final Tile tile) {
@@ -242,8 +242,8 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Build the debug entries for the TilePopup.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param tile The <code>Tile</code> to build menu items for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param tile The {@code Tile} to build menu items for.
      */
     public void addDebugItems(final FreeColClient freeColClient, 
                               final Tile tile) {
@@ -376,12 +376,12 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * Adds a unit entry to this popup.
-     * @param menu a <code>Container</code> value
+     * @param menu a {@code Container} value
      * @param unit The unit that will be represented on the popup.
      * @param enabled The initial state for the menu item.
-     * @param indent Should be <code>true</code> if the text should be
+     * @param indent Should be {@code true} if the text should be
      *      indented on the menu.
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     private int addUnit(Container menu, final Unit unit, boolean enabled,
                         boolean indent) {
@@ -458,7 +458,7 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Adds an indian settlement entry to this popup.
      *
-     * @param is The <code>IndianSettlement</code> that will be
+     * @param is The {@code IndianSettlement} that will be
      *     represented on the popup.
      */
     private void addIndianSettlement(final IndianSettlement is) {

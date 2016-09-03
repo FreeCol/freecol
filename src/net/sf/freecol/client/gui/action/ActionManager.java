@@ -34,7 +34,7 @@ import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
- * Stores all <code>FreeColActions</code> and retrieves them by identifier.
+ * Stores all {@code FreeColActions} and retrieves them by identifier.
  */
 public class ActionManager extends OptionGroup {
 
@@ -45,9 +45,9 @@ public class ActionManager extends OptionGroup {
 
 
     /**
-     * Creates a new <code>ActionManager</code>.
+     * Creates a new {@code ActionManager}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ActionManager(FreeColClient freeColClient) {
         super("actionManager");
@@ -58,12 +58,12 @@ public class ActionManager extends OptionGroup {
 
     /**
      * This method adds all FreeColActions to the OptionGroup. If you
-     * implement a new <code>FreeColAction</code>, then you need to
+     * implement a new {@code FreeColAction}, then you need to
      * add it in this method.  Localization and a possible accelerator
      * need to be added to the strings file.
      *
-     * @param inGameController The client <code>InGameController</code>.
-     * @param connectController The client <code>ConnectController</code>.
+     * @param inGameController The client {@code InGameController}.
+     * @param connectController The client {@code ConnectController}.
      */
     public void initializeActions(InGameController inGameController,
                                   ConnectController connectController) {
@@ -161,11 +161,11 @@ public class ActionManager extends OptionGroup {
     }
 
     /**
-     * Adds the <code>FreeColActions</code> that are provided by the
-     * <code>Specification</code>.  At the moment, this includes only
-     * <code>TileImprovements</code>.
+     * Adds the {@code FreeColActions} that are provided by the
+     * {@code Specification}.  At the moment, this includes only
+     * {@code TileImprovements}.
      *
-     * @param spec The <code>Specification</code> to refer to.
+     * @param spec The {@code Specification} to refer to.
      */
     public void addSpecificationActions(Specification spec) {
         // Initialize ImprovementActions
@@ -178,18 +178,18 @@ public class ActionManager extends OptionGroup {
     }
 
     /**
-     * Gets the <code>FreeColAction</code> specified by the given
+     * Gets the {@code FreeColAction} specified by the given
      * identifier.
      *
      * @param id The object identifier.
-     * @return The <code>FreeColAction</code>.
+     * @return The {@code FreeColAction}.
      */
     public FreeColAction getFreeColAction(String id) {
         return (FreeColAction)super.getOption(id);
     }
 
     /**
-     * Updates every <code>FreeColAction</code> this object keeps.
+     * Updates every {@code FreeColAction} this object keeps.
      *
      * @see FreeColAction
      */

@@ -77,7 +77,7 @@ public abstract class MapControls extends FreeColClientHolder {
     /**
      * The basic constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param useSkin Use a skin or not in the info panel.
      */
     public MapControls(final FreeColClient freeColClient, boolean useSkin) {
@@ -150,7 +150,7 @@ public abstract class MapControls extends FreeColClientHolder {
     /**
      * Removes the map controls from the parent canvas component.
      *
-     * @param canvas <code>Canvas</code> parent
+     * @param canvas {@code Canvas} parent
      */
     public abstract void removeFromComponent(Canvas canvas);
 
@@ -169,7 +169,7 @@ public abstract class MapControls extends FreeColClientHolder {
     }
 
     /**
-     * Updates this <code>MapControls</code>.
+     * Updates this {@code MapControls}.
      */
     public void update() {
         final GUI gui = getGUI();
@@ -191,7 +191,7 @@ public abstract class MapControls extends FreeColClientHolder {
     }
 
     /**
-     * Updates this <code>InfoPanel</code>.
+     * Updates this {@code InfoPanel}.
      *
      * @param mapTransform The current MapTransform.
      */

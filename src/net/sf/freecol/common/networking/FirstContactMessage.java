@@ -60,11 +60,11 @@ public class FirstContactMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>FirstContactMessage</code>.
+     * Create a new {@code FirstContactMessage}.
      *
-     * @param player The <code>Player</code> making contact.
-     * @param other The <code>Player</code> being contacted.
-     * @param tile An optional <code>Tile</code> to offer.
+     * @param player The {@code Player} making contact.
+     * @param other The {@code Player} being contacted.
+     * @param tile An optional {@code Tile} to offer.
      */
     public FirstContactMessage(Player player, Player other, Tile tile) {
         super(getTagName());
@@ -78,11 +78,11 @@ public class FirstContactMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>FirstContactMessage</code> from a
+     * Create a new {@code FirstContactMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public FirstContactMessage(Game game, Element element) {
         super(getTagName());
@@ -129,10 +129,10 @@ public class FirstContactMessage extends DOMMessage {
     /**
      * Handle a "firstContact"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the firstContactd unit, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

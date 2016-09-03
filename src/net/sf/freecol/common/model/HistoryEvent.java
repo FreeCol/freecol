@@ -103,9 +103,9 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Create a new history event of given turn and type.
      *
-     * @param turn The <code>Turn</code> of the event.
-     * @param eventType The <code>EventType</code>.
-     * @param player An optional <code>Player</code> responsible for
+     * @param turn The {@code Turn} of the event.
+     * @param eventType The {@code EventType}.
+     * @param player An optional {@code Player} responsible for
      *     this event.
      */
     public HistoryEvent(Turn turn, HistoryEventType eventType, Player player) {
@@ -119,7 +119,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Create a new history event by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public HistoryEvent(FreeColXMLReader xr) throws XMLStreamException {
@@ -147,7 +147,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Given a new stance, get the appropriate event type.
      *
-     * @param stance The new <code>Stance</code>.
+     * @param stance The new {@code Stance}.
      * @return The corresponding event type.
      */
     public static final HistoryEventType getEventTypeFromStance(Stance stance) {
@@ -169,7 +169,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Get the id for the player that is credited with this event, if any.
      *
-     * @return The credited <code>Player</code> id.
+     * @return The credited {@code Player} id.
      */
     public final String getPlayerId() {
         return playerId;
@@ -178,7 +178,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Set the id for the player to credit for this event.
      *
-     * @param playerId The new credited <code>Player</code> id.
+     * @param playerId The new credited {@code Player} id.
      */
     public void setPlayerId(String playerId) {
         this.playerId = playerId;

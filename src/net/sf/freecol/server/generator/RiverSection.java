@@ -92,7 +92,7 @@ public class RiverSection {
     /**
      * Get the section tile.
      *
-     * @return The <code>Tile</code>.
+     * @return The {@code Tile}.
      */
     public final Tile getTile() {
         return tile;
@@ -109,7 +109,7 @@ public class RiverSection {
     /**
      * Sets the size of a branch
      *
-     * @param direction The <code>Direction</code> of the branch.
+     * @param direction The {@code Direction} of the branch.
      * @param size The size to set.
      */
     public final void setBranch(Direction direction, int size) {
@@ -122,7 +122,7 @@ public class RiverSection {
     /**
      * Gets the size of a branch
      *
-     * @param direction The <code>Direction</code> of the branch.
+     * @param direction The {@code Direction} of the branch.
      * @return The branch size.
      */
     public final int getBranch(Direction direction) {
@@ -136,7 +136,7 @@ public class RiverSection {
     /**
      * Removes a branch
      *
-     * @param direction The <code>Direction</code> of the branch.
+     * @param direction The {@code Direction} of the branch.
      */
     public final void removeBranch(Direction direction) {
         branches.remove(direction);
@@ -145,7 +145,7 @@ public class RiverSection {
     /**
      * Increases the size a branch
      *
-     * @param direction The <code>Direction</code> of the branch.
+     * @param direction The {@code Direction} of the branch.
      * @param increment The amount to add to the branch size.
      */
     public final void growBranch(Direction direction, int increment) {

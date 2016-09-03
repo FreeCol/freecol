@@ -38,10 +38,10 @@ import net.sf.freecol.common.option.RangeOption;
 public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
 
     /**
-     * Creates a new <code>RangeOptionUI</code> for the given
-     * <code>RangeOption</code>.
+     * Creates a new {@code RangeOptionUI} for the given
+     * {@code RangeOption}.
      *
-     * @param option The <code>RangeOption</code> to make a user interface for
+     * @param option The {@code RangeOption} to make a user interface for
      * @param editable boolean whether user can modify the setting
      */
     public RangeOptionUI(final RangeOption option, boolean editable) {

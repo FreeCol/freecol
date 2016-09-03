@@ -60,7 +60,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
     /**
      * Creates a dialog to set the options for loading a saved game.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public LoadingSavegameDialog(FreeColClient freeColClient, JFrame frame) {

@@ -33,7 +33,7 @@ public final class TrainPanel extends NewUnitPanel {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public TrainPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 3", "[sg]", ""),

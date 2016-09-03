@@ -39,10 +39,10 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
     private final JSlider slider = new JSlider();
 
     /**
-     * Creates a new <code>SliderOptionUI</code> for the given
-     * <code>IntegerOption</code>.
+     * Creates a new {@code SliderOptionUI} for the given
+     * {@code IntegerOption}.
      *
-     * @param option The <code>IntegerOption</code> to make a user
+     * @param option The {@code IntegerOption} to make a user
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */

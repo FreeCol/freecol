@@ -34,9 +34,9 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>MiniMapToggleFogAction</code>.
+     * Creates a new {@code MiniMapToggleFogAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MiniMapToggleFogOfWarAction(FreeColClient freeColClient) {
         super(freeColClient, id);
@@ -45,10 +45,10 @@ public class MiniMapToggleFogOfWarAction extends MapboardAction {
     }
 
     /**
-     * Creates a new <code>MiniMapToggleFogAction</code>.
+     * Creates a new {@code MiniMapToggleFogAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param b a <code>boolean</code> value
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param b a {@code boolean} value
      */
     public MiniMapToggleFogOfWarAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");

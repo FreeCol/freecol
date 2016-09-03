@@ -54,11 +54,11 @@ public final class ReportLabourDetailPanel extends ReportPanel
     /**
      * Creates the detail portion of a labour report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unitType The <code>UnitType</code> to display detail for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unitType The {@code UnitType} to display detail for.
      * @param data The location data.
      * @param unitCount The unit counts by type.
-     * @param colonies A list of <code>Colony</code>s for this player.
+     * @param colonies A list of {@code Colony}s for this player.
      */
     public ReportLabourDetailPanel(FreeColClient freeColClient,
                                    UnitType unitType,

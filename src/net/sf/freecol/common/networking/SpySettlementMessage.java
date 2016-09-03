@@ -57,11 +57,11 @@ public class SpySettlementMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>SpySettlementMessage</code> request with the
+     * Create a new {@code SpySettlementMessage} request with the
      * supplied unit and settlement
      *
-     * @param unit The <code>Unit</code> that is spying.
-     * @param settlement The <code>Settlement</code> the unit is looking at.
+     * @param unit The {@code Unit} that is spying.
+     * @param settlement The {@code Settlement} the unit is looking at.
      */
     public SpySettlementMessage(Unit unit, Settlement settlement) {
         super(getTagName());
@@ -72,11 +72,11 @@ public class SpySettlementMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>SpySettlementMessage</code> from a
+     * Create a new {@code SpySettlementMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public SpySettlementMessage(Game game, Element element) {
         super(getTagName());
@@ -105,13 +105,13 @@ public class SpySettlementMessage extends DOMMessage {
     /**
      * Handle a "spySettlement"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling
+     * @param server The {@code FreeColServer} that is handling
      *     the message.
-     * @param connection The <code>Connection</code> the message was
+     * @param connection The {@code Connection} the message was
      *     received on.
-     * @return An <code>Element</code> containing a representation of
+     * @return An {@code Element} containing a representation of
      *     the settlement being spied upon and any units at that
-     *     position, or an error <code>Element</code> on failure.
+     *     position, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

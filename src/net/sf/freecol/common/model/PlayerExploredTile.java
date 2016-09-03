@@ -37,7 +37,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  * player. For instance; a settlement that was built after the player last
  * viewed the tile.
  *
- * The <code>toXMLElement</code> of {@link Tile} uses information from
+ * The {@code toXMLElement} of {@link Tile} uses information from
  * this class to hide information that is not available.
  */
 public class PlayerExploredTile extends FreeColGameObject {
@@ -70,11 +70,11 @@ public class PlayerExploredTile extends FreeColGameObject {
 
 
     /**
-     * Creates a new <code>PlayerExploredTile</code>.
+     * Creates a new {@code PlayerExploredTile}.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param player The <code>Player</code> that owns this view.
-     * @param tile The <code>Tile</code> to view.
+     * @param game The enclosing {@code Game}.
+     * @param player The {@code Player} that owns this view.
+     * @param tile The {@code Tile} to view.
      */
     public PlayerExploredTile(Game game, Player player, Tile tile) {
         super(game);
@@ -85,7 +85,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * Create a new player explored tile.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public PlayerExploredTile(Game game, String id) {
@@ -96,7 +96,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * Get the tile items in this pet.
      *
-     * @return A list of <code>TileItems</code>.
+     * @return A list of {@code TileItems}.
      */
     private List<TileItem> getTileItems() {
         return (tileItems == null) ? Collections.<TileItem>emptyList()
@@ -106,7 +106,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * Add a tile item to this pet.
      *
-     * @param item The <code>TileItem</code> to add.
+     * @param item The {@code TileItem} to add.
      */
     private void addTileItem(TileItem item) {
         if (tileItems == null) tileItems = new ArrayList<>();

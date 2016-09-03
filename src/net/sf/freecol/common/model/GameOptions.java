@@ -207,21 +207,21 @@ public class GameOptions {
         = "gameOptions.victoryConditions";
 
     /**
-     * Victory condition: Should the <code>Player</code> who first
+     * Victory condition: Should the {@code Player} who first
      * defeats the Royal Expeditionary Force win the game?
      */
     public static final String VICTORY_DEFEAT_REF
         = "model.option.victoryDefeatREF";
 
     /**
-     * Victory condition: Should a <code>Player</code> who
+     * Victory condition: Should a {@code Player} who
      * defeats all other European players win the game?
      */
     public static final String VICTORY_DEFEAT_EUROPEANS
         = "model.option.victoryDefeatEuropeans";
 
     /**
-     * Victory condition: Should a <code>Player</code> who defeats all
+     * Victory condition: Should a {@code Player} who defeats all
      * other human players win the game?
      */
     public static final String VICTORY_DEFEAT_HUMANS

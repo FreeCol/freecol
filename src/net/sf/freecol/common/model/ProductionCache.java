@@ -31,7 +31,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * The <code>ProductionCache</code> is contains all relevant
+ * The {@code ProductionCache} is contains all relevant
  * information about the production and consumption of the
  * colony. This includes the production of all colony tiles and
  * buildings, as well as the consumption of all units, buildings and
@@ -66,9 +66,9 @@ public class ProductionCache {
 
 
     /**
-     * Creates a new <code>ProductionCache</code> instance.
+     * Creates a new {@code ProductionCache} instance.
      *
-     * @param colony a <code>Colony</code> value
+     * @param colony a {@code Colony} value
      */
     public ProductionCache(Colony colony) {
         this.colony = colony;
@@ -183,8 +183,8 @@ public class ProductionCache {
      * Returns the number of goods of the given type stored in the
      * colony.
      *
-     * @param type a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param type a {@code GoodsType} value
+     * @return an {@code int} value
      */
     private int getGoodsCount(GoodsType type) {
         return colony.getGoodsCount(type);
@@ -206,7 +206,7 @@ public class ProductionCache {
      * given GoodsType. This method needs to be called whenever goods
      * are added to or removed from the colony.
      *
-     * @param goodsType a <code>GoodsType</code> value
+     * @param goodsType a {@code GoodsType} value
      */
     public synchronized void invalidate(GoodsType goodsType) {
         if (goodsUsed.contains(goodsType)) {
@@ -217,7 +217,7 @@ public class ProductionCache {
     /**
      * Does this production cache contain production of a goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if there is a production entry for the given type.
      */
     public boolean isProducing(GoodsType goodsType) {
@@ -230,7 +230,7 @@ public class ProductionCache {
     /**
      * Does this production cache contain consumption of a goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if there is a consumption entry for the given type.
      */
     public boolean isConsuming(GoodsType goodsType) {
@@ -244,8 +244,8 @@ public class ProductionCache {
      * Returns the net production, that is the total production minus
      * the total consumption, of the given GoodsType.
      *
-     * @param type a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param type a {@code GoodsType} value
+     * @return an {@code int} value
      */
     public int getNetProductionOf(GoodsType type) {
         update();
@@ -253,11 +253,11 @@ public class ProductionCache {
     }
 
     /**
-     * Gets the <code>ProductionInfo</code> for the given
+     * Gets the {@code ProductionInfo} for the given
      * {@link WorkLocation} or {@link Consumer}.
      *
-     * @param object an <code>Object</code> value
-     * @return a <code>ProductionInfo</code> value
+     * @param object an {@code Object} value
+     * @return a {@code ProductionInfo} value
      */
     public ProductionInfo getProductionInfo(Object object) {
         update();

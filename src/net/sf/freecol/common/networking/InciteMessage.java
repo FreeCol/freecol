@@ -56,12 +56,12 @@ public class InciteMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>InciteMessage</code> with the
+     * Create a new {@code InciteMessage} with the
      * supplied name.
      *
-     * @param unit The inciting <code>Unit</code>.
-     * @param is The <code>IndianSettlement</code> to incite.
-     * @param enemy The enemy <code>Player</code>.
+     * @param unit The inciting {@code Unit}.
+     * @param is The {@code IndianSettlement} to incite.
+     * @param enemy The enemy {@code Player}.
      * @param gold The amount of gold in the bribe (negative for the
      *             initial inquiry).
      */
@@ -76,11 +76,11 @@ public class InciteMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>InciteMessage</code> from a
+     * Create a new {@code InciteMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public InciteMessage(Game game, Element element) {
         super(getTagName());
@@ -115,11 +115,11 @@ public class InciteMessage extends DOMMessage {
     /**
      * Handle a "incite"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An element containing the result of the incite, or an
-     *     error <code>Element</code> on failure.
+     *     error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

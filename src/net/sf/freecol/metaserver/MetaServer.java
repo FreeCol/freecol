@@ -68,7 +68,7 @@ public final class MetaServer extends Thread {
 
 
     /**
-     * Creates and starts a new <code>MetaServer</code>.
+     * Creates and starts a new {@code MetaServer}.
      * 
      * @param args The command-line options.
      */
@@ -145,7 +145,7 @@ public final class MetaServer extends Thread {
     /**
      * Gets the control object that handles the network requests.
      * 
-     * @return The <code>NetworkHandler</code>.
+     * @return The {@code NetworkHandler}.
      */
     public NetworkHandler getNetworkHandler() {
         return networkHandler;
@@ -163,7 +163,7 @@ public final class MetaServer extends Thread {
     /**
      * Gets an iterator of every connection to this server.
      * 
-     * @return The <code>Iterator</code>.
+     * @return The {@code Iterator}.
      * @see Connection
      */
     public Iterator<Connection> getConnectionIterator() {
@@ -188,11 +188,11 @@ public final class MetaServer extends Thread {
     }
 
     /**
-     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
+     * Gets a {@code Connection} identified by a <code>Socket</code>.
      * 
-     * @param socket The <code>Socket</code> that identifies the
-     *            <code>Connection</code>
-     * @return The <code>Connection</code>.
+     * @param socket The {@code Socket} that identifies the
+     *            {@code Connection}
+     * @return The {@code Connection}.
      */
     public Connection getConnection(Socket socket) {
         return connections.get(socket);

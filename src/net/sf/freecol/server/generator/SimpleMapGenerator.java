@@ -151,10 +151,10 @@ public class SimpleMapGenerator implements MapGenerator {
 
 
     /**
-     * Creates a <code>MapGenerator</code>
+     * Creates a {@code MapGenerator}
      *
-     * @param game The <code>Game</code> to generate for.
-     * @param random The <code>Random</code> number source to use.
+     * @param game The {@code Game} to generate for.
+     * @param random The {@code Random} number source to use.
      * @see #createMap
      */
     public SimpleMapGenerator(Game game, Random random) {
@@ -194,8 +194,8 @@ public class SimpleMapGenerator implements MapGenerator {
      *
      * The number of rumours depends on the map size.
      *
-     * @param map The <code>Map</code> to use.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param map The {@code Map} to use.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void makeLostCityRumours(Map map, LogBuilder lb) {
         final boolean importRumours
@@ -352,8 +352,8 @@ public class SimpleMapGenerator implements MapGenerator {
      * Make the native settlements, at least a capital for every
      * nation and random numbers of other settlements.
      *
-     * @param map The <code>Map</code> to place the indian settlements on.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param map The {@code Map} to place the indian settlements on.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void makeNativeSettlements(final Map map, LogBuilder lb) {
         final boolean importSettlements
@@ -619,7 +619,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * FIXME: degrade the second test to usability, but wait until the
      * natives-use-water situation is sorted.
      *
-     * @param tile The <code>Tile</code> to examine.
+     * @param tile The {@code Tile} to examine.
      * @return True if this tile is suitable.
      */
     private boolean suitableForNativeSettlement(Tile tile) {
@@ -635,8 +635,8 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Find a free neighbouring tile to a settlement from a list of choices.
      *
-     * @param is The <code>IndianSettlement</code> that might claim the tile.
-     * @param tiles A list of <code>Tile</code>s to start searching from.
+     * @param is The {@code IndianSettlement} that might claim the tile.
+     * @param tiles A list of {@code Tile}s to start searching from.
      * @return The first suitable tile found, or null if none present.
      */
     private Tile findFreeNeighbouringTile(IndianSettlement is,
@@ -658,9 +658,9 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Find the closest territory to a given tile from a list of choices.
      *
-     * @param tile The <code>Tile</code> to search from.
-     * @param territories The list of <code>Territory</code>s to choose from.
-     * @return The closest <code>Territory</code> found, or null if none.
+     * @param tile The {@code Tile} to search from.
+     * @param territories The list of {@code Territory}s to choose from.
+     * @return The closest {@code Territory} found, or null if none.
      */
     private Territory getClosestTerritory(final Tile tile,
                                           List<Territory> territories) {
@@ -673,12 +673,12 @@ public class SimpleMapGenerator implements MapGenerator {
     /**
      * Place a native capital in a territory.
      *
-     * @param map The <code>Map</code> to place the settlement in.
-     * @param territory The <code>Territory</code> within the map.
+     * @param map The {@code Map} to place the settlement in.
+     * @param territory The {@code Territory} within the map.
      * @param radius The settlement radius.
-     * @param tiles A list of <code>Tile</code>s to select from.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The <code>IndianSettlement</code> placed, or null if
+     * @param tiles A list of {@code Tile}s to select from.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The {@code IndianSettlement} placed, or null if
      *     none placed.
      */
     private IndianSettlement placeCapital(final Map map, Territory territory,
@@ -707,15 +707,15 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
-     * Builds a <code>IndianSettlement</code> at the given position.
+     * Builds a {@code IndianSettlement} at the given position.
      *
      * @param player The player owning the new settlement.
-     * @param capital <code>true</code> if the settlement should be a
+     * @param capital {@code true} if the settlement should be a
      *      {@link IndianSettlement#isCapital() capital}.
-     * @param tile The <code>Tile</code> to place the settlement.
+     * @param tile The {@code Tile} to place the settlement.
      * @param map The map that should get a new settlement.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The <code>IndianSettlement</code> just being placed
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The {@code IndianSettlement} just being placed
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player,
@@ -741,9 +741,9 @@ public class SimpleMapGenerator implements MapGenerator {
      * Generates a skill that could be taught from a settlement on the
      * given tile.
      *
-     * @param map The <code>Map</code>.
-     * @param tile The <code>Tile</code> where the settlement will be located.
-     * @param nationType The <code>NationType</code> to generate a skill for.
+     * @param map The {@code Map}.
+     * @param tile The {@code Tile} where the settlement will be located.
+     * @param nationType The {@code NationType} to generate a skill for.
      * @return A skill that can be taught to Europeans.
      */
     private UnitType generateSkillForLocation(Map map, Tile tile,
@@ -781,11 +781,11 @@ public class SimpleMapGenerator implements MapGenerator {
      * Create two ships, one with a colonist, for each player, and
      * select suitable starting positions.
      *
-     * @param map The <code>Map</code> to place the european units on.
-     * @param players The players to create <code>Settlement</code>s
+     * @param map The {@code Map} to place the european units on.
+     * @param players The players to create {@code Settlement}s
      *      and starting locations for. That is; both indian and
      *      european players.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void createEuropeanUnits(Map map, List<Player> players,
                                      LogBuilder lb) {

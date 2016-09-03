@@ -68,7 +68,7 @@ public class Rule {
     /**
      * Parses a string.
      *
-     * @param input a <code>String</code> value
+     * @param input a {@code String} value
      */
     public final void parse(String input) {
         StringTokenizer st = new StringTokenizer(input.toLowerCase(Locale.US), " .");

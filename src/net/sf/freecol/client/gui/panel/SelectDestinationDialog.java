@@ -112,9 +112,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         /**
          * Create a destination.
          *
-         * @param location The <code>Location</code> to go to.
+         * @param location The {@code Location} to go to.
          * @param turns The number of turns it takes to get to the location.
-         * @param unit The <code>Unit</code> that is moving.
+         * @param unit The {@code Unit} that is moving.
          * @param goodsTypes A list of goods types the unit is carrying.
          */
         public Destination(Location location, int turns, Unit unit,
@@ -158,8 +158,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
          * Collected extra annotations of interest to a unit proposing to
          * visit a location.
          *
-         * @param loc The <code>Location</code> to visit.
-         * @param unit The <code>Unit</code> proposing to visit.
+         * @param loc The {@code Location} to visit.
+         * @param unit The {@code Unit} proposing to visit.
          * @param goodsTypes A list of goods types the unit is carrying.
          * @return A string containing interesting annotations about the visit
          *         or an empty string if nothing is of interest.
@@ -266,8 +266,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         /**
          * Compare the names of two locations.
          *
-         * @param loc1 The first <code>Location</code>.
-         * @param loc2 The second <code>Location</code>.
+         * @param loc1 The first {@code Location}.
+         * @param loc2 The second {@code Location}.
          * @return The comparison result.
          */
         protected int compareNames(Location loc1, Location loc2) {
@@ -351,9 +351,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param unit The <code>Unit</code> to plan for.
+     * @param unit The {@code Unit} to plan for.
      */
     public SelectDestinationDialog(FreeColClient freeColClient, JFrame frame,
                                    Unit unit) {
@@ -431,8 +431,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /**
      * Load destinations for a given unit and carried goods types.
      *
-     * @param unit The <code>Unit</code> to select destinations for.
-     * @param goodsTypes A list of <code>GoodsType</code>s carried.
+     * @param unit The {@code Unit} to select destinations for.
+     * @param goodsTypes A list of {@code GoodsType}s carried.
      */
     private void loadDestinations(final Unit unit,
                                   List<GoodsType> goodsTypes) {
@@ -537,7 +537,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     /**
      * Show a destination on the map.
      *
-     * @param destination The <code>Destination</code> to display.
+     * @param destination The {@code Destination} to display.
      */
     private void recenter(Destination destination) {
         if (destination != null

@@ -46,7 +46,7 @@ import net.sf.freecol.common.model.TileImprovementType;
  * <br><br>
  *
  * The menu bar that is displayed on the top left corner of the
- * <code>Canvas</code>.
+ * {@code Canvas}.
  *
  * @see MapEditorMenuBar
  */
@@ -57,7 +57,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     
 
     /**
-     * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
+     * Creates a new {@code FreeColMenuBar}. This menu bar will include
      * all of the submenus and items.
      *
      * @param freeColClient The main controller.

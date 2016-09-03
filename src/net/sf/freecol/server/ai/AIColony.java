@@ -134,7 +134,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
-     * Creates a new uninitialized <code>AIColony</code>.
+     * Creates a new uninitialized {@code AIColony}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -147,7 +147,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Creates a new <code>AIColony</code>.
+     * Creates a new {@code AIColony}.
      *
      * @param aiMain The main AI-object.
      * @param colony The colony to make an {@link AIObject} for.
@@ -162,7 +162,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Creates a new <code>AIColony</code> from the given
+     * Creates a new {@code AIColony} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -181,9 +181,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
-     * Gets the <code>Colony</code> this <code>AIColony</code> controls.
+     * Gets the {@code Colony} this <code>AIColony</code> controls.
      *
-     * @return The <code>Colony</code>.
+     * @return The {@code Colony}.
      */
     public final Colony getColony() {
         return colony;
@@ -213,7 +213,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *   - tile improvements (might ignore freshly grabbed tiles)
      *   - wishes
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void update(LogBuilder lb) {
         lb.add("\n  ", colony.getName());
@@ -228,7 +228,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * FIXME: Detect military threats and boost defence.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void rearrangeColony(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
@@ -514,7 +514,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * just take the tile that best helps with the currently required
      * raw building materials, with a lesser interest in food.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void stealTiles(LogBuilder lb) {
         final Specification spec = getSpecification();
@@ -612,7 +612,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Called from BuildColonyMission to clear a colony tile that is about
      * to have a colony built on it.
      *
-     * @param wl The <code>WorkLocation</code> to stop using.
+     * @param wl The {@code WorkLocation} to stop using.
      */
     public void stopUsing(WorkLocation wl) {
         for (Unit u : wl.getUnitList()) {
@@ -646,7 +646,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Add to the export goods list, and resort.
      *
-     * @param aiGoods The <code>AIGoods</code> to add.
+     * @param aiGoods The {@code AIGoods} to add.
      */
     private void addExportGoods(AIGoods aiGoods) {
         synchronized (exportGoods) {
@@ -657,7 +657,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Set the export goods list.
      *
-     * @param aiGoods The new list of <code>AIGoods</code>.
+     * @param aiGoods The new list of {@code AIGoods}.
      */
     private void setExportGoods(List<AIGoods> aiGoods) {            
         clearExportGoods();
@@ -677,13 +677,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Removes the given <code>AIGoods</code> from the export goods
-     * for this colony.  The <code>AIGoods</code>-object is not
+     * Removes the given {@code AIGoods} from the export goods
+     * for this colony.  The {@code AIGoods}-object is not
      * disposed as part of this operation.  Use dropExportGoods
      * instead to remove the object completely (this method would then
      * be called indirectly).
      *
-     * @param ag The <code>AIGoods</code> to be removed.
+     * @param ag The {@code AIGoods} to be removed.
      * @see AIGoods#dispose()
      */
     public void removeExportGoods(AIGoods ag) {
@@ -695,7 +695,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Drops some goods from the goods list, and cancels any transport.
      *
-     * @param ag The <code>AIGoods</code> to drop.
+     * @param ag The {@code AIGoods} to drop.
      */
     private void dropExportGoods(AIGoods ag) {
         AIUnit transport = ag.getTransport();
@@ -708,9 +708,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Emits a standard message regarding the state of AIGoods.
      *
-     * @param ag The <code>AIGoods</code> to log.
+     * @param ag The {@code AIGoods} to log.
      * @param action The state of the goods.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void goodsLog(AIGoods ag, String action, LogBuilder lb) {
         Goods goods = (ag == null) ? null : ag.getGoods();
@@ -725,7 +725,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Creates a list of the goods which should be shipped out of this colony.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void updateExportGoods(LogBuilder lb) {
         if (colony.hasAbility(Ability.EXPORT)) {
@@ -816,9 +816,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
-     * Adds a <code>Wish</code> to the wishes list.
+     * Adds a {@code Wish} to the wishes list.
      *
-     * @param wish The <code>Wish</code> to be added.
+     * @param wish The {@code Wish} to be added.
      */
     public void addWish(Wish wish) {
         wishes.add(wish);
@@ -827,9 +827,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Tries to complete a supplied wish.
      *
-     * @param wish The <code>Wish</code> to complete.
+     * @param wish The {@code Wish} to complete.
      * @param reason A reason for wish completion.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if this wish was successfully completed.
      */
     public boolean completeWish(Wish wish, String reason, LogBuilder lb) {
@@ -847,8 +847,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Tries to complete any wishes for some goods that have just arrived.
      *
-     * @param goods Some <code>Goods</code> that are arriving in this colony.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param goods Some {@code Goods} that are arriving in this colony.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if a wish was successfully completed.
      */
     public boolean completeWish(Goods goods, LogBuilder lb) {
@@ -871,8 +871,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Tries to complete any wishes for a unit that has just arrived.
      *
-     * @param unit A <code>Unit</code> that is arriving in this colony.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param unit A {@code Unit} that is arriving in this colony.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if a wish was successfully completed.
      */
     public boolean completeWish(Unit unit, LogBuilder lb) {
@@ -895,8 +895,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Tries to complete any wishes for a transportable that has just arrived.
      *
-     * @param t The arriving <code>TransportableAIObject</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param t The arriving {@code TransportableAIObject}.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if a wish was successfully completed.
      */
     public boolean completeWish(TransportableAIObject t, LogBuilder lb) {
@@ -949,10 +949,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * takes precedence as it is more likely to be up to date.  The value
      * is treated as a minimum requirement.
      *
-     * @param type The <code>GoodsType</code> to wish for.
+     * @param type The {@code GoodsType} to wish for.
      * @param amount The amount of goods wished for.
      * @param value The urgency of the wish.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void requireGoodsWish(GoodsType type, int amount, int value,
                                  LogBuilder lb) {
@@ -973,10 +973,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * If a suitable wish is already present, the expert and value parameters
      * take precedence as they are more likely to be up to date.
      *
-     * @param type The <code>UnitType</code> to wish for.
+     * @param type The {@code UnitType} to wish for.
      * @param expertNeeded Is an expert unit required?
      * @param value The urgency of the wish.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void requireWorkerWish(UnitType type, boolean expertNeeded,
                                   int value, LogBuilder lb) {
@@ -993,9 +993,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Updates the wishes for the <code>Colony</code>.
+     * Updates the wishes for the {@code Colony}.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void updateWishes(LogBuilder lb) {
         updateWorkerWishes(lb);
@@ -1006,7 +1006,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Updates the worker wishes.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void updateWorkerWishes(LogBuilder lb) {
         final Specification spec = getSpecification();
@@ -1091,7 +1091,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Updates the goods wishes.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void updateGoodsWishes(LogBuilder lb) {
         final Specification spec = getSpecification();
@@ -1195,9 +1195,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Removes a <code>TileImprovementPlan</code> from the list
+     * Removes a {@code TileImprovementPlan} from the list
      *
-     * @param plan The <code>TileImprovementPlan</code> to remove.
+     * @param plan The {@code TileImprovementPlan} to remove.
      * @return True if it was successfully deleted, false otherwise
      */
     public boolean removeTileImprovementPlan(TileImprovementPlan plan) {
@@ -1208,8 +1208,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Gets the first plan for a specified tile from a list of tile
      * improvement plans.
      *
-     * @param tile The <code>Tile</code> to look for.
-     * @param plans A list of <code>TileImprovementPlan</code>s to search.
+     * @param tile The {@code Tile} to look for.
+     * @param plans A list of {@code TileImprovementPlan}s to search.
      * @return A matching plan, or null if not found.
      */
     private TileImprovementPlan getPlanFor(Tile tile,
@@ -1218,11 +1218,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Creates a list of the <code>Tile</code>-improvements which will
-     * increase the production by this <code>Colony</code>.
+     * Creates a list of the {@code Tile}-improvements which will
+     * increase the production by this {@code Colony}.
      *
      * @see TileImprovementPlan
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void updateTileImprovementPlans(LogBuilder lb) {
         List<TileImprovementPlan> newPlans = new ArrayList<>();
@@ -1289,7 +1289,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * Public for the test suite.
      *
-     * @return A list of planned <code>BuildableType</code>.
+     * @return A list of planned {@code BuildableType}.
      */
     public List<BuildableType> getPlannedBuildableTypes() {
         return (colonyPlan == null) ? Collections.<BuildableType>emptyList()
@@ -1319,7 +1319,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Handle REARRANGE_WORKERS property change events.
      *
-     * @param event The <code>PropertyChangeEvent</code>.
+     * @param event The {@code PropertyChangeEvent}.
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
@@ -1366,7 +1366,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // Override AIObject
 
     /**
-     * Disposes this <code>AIColony</code>.
+     * Disposes this {@code AIColony}.
      */
     @Override
     public void dispose() {

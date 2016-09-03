@@ -45,7 +45,7 @@ public class FreeColClientHolder {
     /**
      * Simple constructor.
      * 
-     * @param freeColClient The <code>FreeColClient</code> to hold.
+     * @param freeColClient The {@code FreeColClient} to hold.
      */
     protected FreeColClientHolder(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
@@ -55,7 +55,7 @@ public class FreeColClientHolder {
     /**
      * Meaningfully named access to the server API.
      *
-     * @return The <code>ServerAPI</code>.
+     * @return The {@code ServerAPI}.
      */
     public UserServerAPI askServer() {
         return this.freeColClient.askServer();
@@ -73,7 +73,7 @@ public class FreeColClientHolder {
     /**
      * Get the client options.
      *
-     * @return The <code>ClientOptions</code> held by the client.
+     * @return The {@code ClientOptions} held by the client.
      */
     protected ClientOptions getClientOptions() {
         return this.freeColClient.getClientOptions();
@@ -82,7 +82,7 @@ public class FreeColClientHolder {
     /**
      * Get the connect controller.
      *
-     * @return The <code>ConnectController</code> held by the client.
+     * @return The {@code ConnectController} held by the client.
      */
     protected ConnectController getConnectController() {
         return this.freeColClient.getConnectController();
@@ -91,7 +91,7 @@ public class FreeColClientHolder {
     /**
      * Get the main client object.
      * 
-     * @return The <code>FreeColClient</code> held by this object.
+     * @return The {@code FreeColClient} held by this object.
      */
     protected FreeColClient getFreeColClient() {
         return this.freeColClient;
@@ -100,7 +100,7 @@ public class FreeColClientHolder {
     /**
      * Get the server.
      *
-     * @return The <code>FreeColServer</code> held by the client.
+     * @return The {@code FreeColServer} held by the client.
      */
     protected FreeColServer getFreeColServer() {
         return this.freeColClient.getFreeColServer();
@@ -109,7 +109,7 @@ public class FreeColClientHolder {
     /**
      * Get the game.
      *
-     * @return The <code>Game</code> held by the client.
+     * @return The {@code Game} held by the client.
      */
     protected Game getGame() {
         return this.freeColClient.getGame();
@@ -118,7 +118,7 @@ public class FreeColClientHolder {
     /**
      * Get the GUI.
      *
-     * @return The <code>GUI</code> held by the client.
+     * @return The {@code GUI} held by the client.
      */
     protected GUI getGUI() {
         return this.freeColClient.getGUI();
@@ -127,7 +127,7 @@ public class FreeColClientHolder {
     /**
      * Get the client player.
      *
-     * @return The <code>Player</code> associated with the client.
+     * @return The {@code Player} associated with the client.
      */
     protected Player getMyPlayer() {
         return this.freeColClient.getMyPlayer();
@@ -145,7 +145,7 @@ public class FreeColClientHolder {
     /**
      * Get the specification.
      *
-     * @return The <code>Specification</code> held by the game.
+     * @return The {@code Specification} held by the game.
      */
     protected Specification getSpecification() {
         Game game = getGame();
@@ -155,7 +155,7 @@ public class FreeColClientHolder {
     /**
      * Get the in game controller.
      *
-     * @return The <code>InGameController</code> for the client.
+     * @return The {@code InGameController} for the client.
      */
     protected InGameController igc() {
         return this.freeColClient.getInGameController();

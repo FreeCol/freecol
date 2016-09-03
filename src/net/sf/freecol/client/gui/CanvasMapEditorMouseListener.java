@@ -55,7 +55,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     /**
      * The constructor to use.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param canvas The component this object gets created for.
      */
     public CanvasMapEditorMouseListener(FreeColClient freeColClient,
@@ -69,7 +69,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      *
      * There is no point executing mouse events if the map is not loaded.
      *
-     * @return The associated game <code>Map</code>.
+     * @return The associated game {@code Map}.
      */
     private Map getMap() {
         return (getGame() == null) ? null : getGame().getMap();
@@ -78,9 +78,9 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     /**
      * Draw a box on screen.
      *
-     * @param component The <code>JComponent</code> to draw on.
-     * @param startPoint The starting <code>Point</code>.
-     * @param endPoint The end <code>Point</code>.
+     * @param component The {@code JComponent} to draw on.
+     * @param startPoint The starting {@code Point}.
+     * @param endPoint The end {@code Point}.
      */
     private void drawBox(JComponent component,
                          Point startPoint, Point endPoint) {

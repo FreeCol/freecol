@@ -55,11 +55,11 @@ public class BuyPropositionMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>BuyPropositionMessage</code>.
+     * Create a new {@code BuyPropositionMessage}.
      *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param goods The <code>Goods</code> to buy.
+     * @param unit The {@code Unit} that is buying.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param goods The {@code Goods} to buy.
      * @param gold The price of the goods (negative if unknown).
      */
     public BuyPropositionMessage(Unit unit, Settlement settlement,
@@ -73,11 +73,11 @@ public class BuyPropositionMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>BuyPropositionMessage</code> from a
+     * Create a new {@code BuyPropositionMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public BuyPropositionMessage(Game game, Element element) {
         super(getTagName());
@@ -108,12 +108,12 @@ public class BuyPropositionMessage extends DOMMessage {
     /**
      * Handle a "buyProposition"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return This <code>BuyProposition</code> message as an
-     *     <code>Element</code> with updated gold value, or an error
-     *     <code>Element</code> on failure.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
+     * @return This {@code BuyProposition} message as an
+     *     {@code Element} with updated gold value, or an error
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

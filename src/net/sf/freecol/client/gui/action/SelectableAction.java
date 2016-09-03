@@ -41,7 +41,7 @@ public abstract class SelectableAction extends MapboardAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param id The object identifier.
      * @param optionId The identifier of a boolean client option.
      */

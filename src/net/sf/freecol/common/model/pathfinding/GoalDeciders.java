@@ -49,9 +49,9 @@ public final class GoalDeciders {
      *
      * @param all If true, all deciders must succeed (and-semantics),
      *     if false, any decide may succeed (or-semantics).
-     * @param gds A series (two minimum) of <code>GoalDecider</code>s
+     * @param gds A series (two minimum) of {@code GoalDecider}s
      *     to compose.
-     * @return A new <code>GoalDecider</code> composed of the argument
+     * @return A new {@code GoalDecider} composed of the argument
      *     goal deciders.
      */
     public static GoalDecider getComposedGoalDecider(final boolean all,
@@ -173,7 +173,7 @@ public final class GoalDeciders {
      * Build a simple goal decider to find the first high seas tile
      * without using the unit parameter.
      *
-     * @return A <code>GoalDecider</code> that finds the nearest high seas tile.
+     * @return A {@code GoalDecider} that finds the nearest high seas tile.
      */
     public static GoalDecider getSimpleHighSeasGoalDecider() {
         return new GoalDecider() {
@@ -199,8 +199,8 @@ public final class GoalDeciders {
     /**
      * Builds a simple goal decider to find a single target location.
      *
-     * @param target The target <code>Location</code>.
-     * @return A <code>GoalDecider</code> that only succeeds for the
+     * @param target The target {@code Location}.
+     * @return A {@code GoalDecider} that only succeeds for the
      *     target location.
      */
     public static GoalDecider getLocationGoalDecider(final Location target) {
@@ -230,8 +230,8 @@ public final class GoalDeciders {
     /**
      * Builds a goal decider to find an adjacent tile to a target location.
      *
-     * @param target The target <code>Location</code>.
-     * @return A <code>GoalDecider</code> that only succeeds for tiles
+     * @param target The target {@code Location}.
+     * @return A {@code GoalDecider} that only succeeds for tiles
      *     adjacent to the target location.
      */
     public static GoalDecider getAdjacentLocationGoalDecider(Location target) {
@@ -261,8 +261,8 @@ public final class GoalDeciders {
      * Get a goal decider that succeeds for settlements owned by one
      * of a given list of enemies.
      *
-     * @param enemies The list of enemy <code>Player</code>s.
-     * @return A suitable <code>GoalDecider</code>.
+     * @param enemies The list of enemy {@code Player}s.
+     * @return A suitable {@code GoalDecider}.
      **/
     public static GoalDecider getEnemySettlementGoalDecider(final Collection<Player> enemies) {
         return new GoalDecider() {
@@ -298,8 +298,8 @@ public final class GoalDeciders {
      * - Favour a short journey to the target
      * - Prioritize not landing next to a hostile fort/fortress.
      *
-     * @param target The target <code>Tile</code>.
-     * @return A suitable <code>GoalDecider</code>.
+     * @param target The target {@code Tile}.
+     * @return A suitable {@code GoalDecider}.
      */
     public static GoalDecider getDisembarkGoalDecider(final Tile target) {
         final double NO_DANGER_BONUS = 1000.0;
@@ -351,8 +351,8 @@ public final class GoalDeciders {
     /**
      * Get a goal decider to find tiles that an enemy player can not see.
      *
-     * @param enemy The enemy <code>Player</code> to avoid.
-     * @return A suitable <code>GoalDecider</code>.
+     * @param enemy The enemy {@code Player} to avoid.
+     * @return A suitable {@code GoalDecider}.
      */
     public static GoalDecider getStealthyGoalDecider(final Player enemy) {
         return new GoalDecider() {
@@ -377,8 +377,8 @@ public final class GoalDeciders {
      * high seas count than a unit currently has.  Useful for tunnelling
      * out of intermittantly blocked rivers.
      *
-     * @param unit The <code>Unit</code> to get the goal decider for.
-     * @return A suitable <code>GoalDecider</code>.
+     * @param unit The {@code Unit} to get the goal decider for.
+     * @return A suitable {@code GoalDecider}.
      */
     public static GoalDecider getReduceHighSeasCountGoalDecider(final Unit unit) {
         return new GoalDecider() {
@@ -450,7 +450,7 @@ public final class GoalDeciders {
         /**
          * Create a multiple decider.
          *
-         * @param locs The list of <code>Location</code>s to search for
+         * @param locs The list of {@code Location}s to search for
          *     paths to an adjacent location for.
          */
         public MultipleAdjacentDecider(final List<Location> locs) {

@@ -63,10 +63,10 @@ public class ColonyTile extends WorkLocation {
     /**
      * Constructor for ServerColonyTile.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param colony The <code>Colony</code> this object belongs to.
-     * @param workTile The tile in which this <code>ColonyTile</code>
-     *                 represents a <code>WorkLocation</code> for.
+     * @param game The enclosing {@code Game}.
+     * @param colony The {@code Colony} this object belongs to.
+     * @param workTile The tile in which this {@code ColonyTile}
+     *                 represents a {@code WorkLocation} for.
      */
     protected ColonyTile(Game game, Colony colony, Tile workTile) {
         super(game);
@@ -77,11 +77,11 @@ public class ColonyTile extends WorkLocation {
     }
 
     /**
-     * Create a new <code>ColonyTile</code> with the given identifier.
+     * Create a new {@code ColonyTile} with the given identifier.
      * The object should later be initialized by calling either
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public ColonyTile(Game game, String id) {
@@ -90,7 +90,7 @@ public class ColonyTile extends WorkLocation {
 
 
     /**
-     * Is this the tile where the <code>Colony</code> is located?
+     * Is this the tile where the {@code Colony} is located?
      *
      * @return True if this is the colony center tile.
      */
@@ -101,9 +101,9 @@ public class ColonyTile extends WorkLocation {
     /**
      * Gets the work tile, that is the actual tile being worked.
      *
-     * @return The <code>Tile</code> in which this
-     *     <code>ColonyTile</code> represents a
-     *     <code>WorkLocation</code> for.
+     * @return The {@code Tile} in which this
+     *     {@code ColonyTile} represents a
+     *     {@code WorkLocation} for.
      */
     public Tile getWorkTile() {
         return workTile;
@@ -113,7 +113,7 @@ public class ColonyTile extends WorkLocation {
      * Sets the work tile.  Needed to fix copied colonies.  Do not use
      * otherwise!
      *
-     * @param workTile The new work <code>Tile</code>.
+     * @param workTile The new work {@code Tile}.
      */
     public void setWorkTile(Tile workTile) {
         this.workTile = workTile;
@@ -122,7 +122,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * Gets a unit who is occupying the tile.
      *
-     * @return A <code>Unit</code> who is occupying the work tile, if any.
+     * @return A {@code Unit} who is occupying the work tile, if any.
      * @see #isOccupied()
      */
     public Unit getOccupyingUnit() {
@@ -186,7 +186,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * Would a given tile improvement be beneficial to this colony tile?
      *
-     * @param ti The <code>TileImprovementType</code> to assess.
+     * @param ti The {@code TileImprovementType} to assess.
      * @return A measure of improvement (negative is a bad idea).
      */
     public int improvedBy(TileImprovementType ti) {
@@ -260,7 +260,7 @@ public class ColonyTile extends WorkLocation {
     /**
      * Evaluate this work location for a given player.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the player.
      */
     @Override

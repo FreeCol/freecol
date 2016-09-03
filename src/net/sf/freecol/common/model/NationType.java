@@ -77,7 +77,7 @@ public abstract class NationType extends FreeColSpecObjectType {
      * Default nation type constructor.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public NationType(String id, Specification specification) {
         super(id, specification);
@@ -87,7 +87,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Get the settlement types.
      *
-     * @return A list of <code>SettlementType</code>s.
+     * @return A list of {@code SettlementType}s.
      */
     public final List<SettlementType> getSettlementTypes() {
         return (settlementTypes == null)
@@ -98,7 +98,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Add a settlement type.
      *
-     * @param settlementType The <code>SettlementType</code> to add.
+     * @param settlementType The {@code SettlementType} to add.
      */
     private void addSettlementType(SettlementType settlementType) {
         if (settlementTypes == null) settlementTypes = new ArrayList<>();
@@ -108,7 +108,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Add settlement types.
      *
-     * @param types A list of <code>SettlementType</code>s to add.
+     * @param types A list of {@code SettlementType}s to add.
      */
     private void addSettlementTypes(List<SettlementType> types) {
         if (settlementTypes == null) settlementTypes = new ArrayList<>();
@@ -118,7 +118,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Gets the settlement type for the national capital.
      *
-     * @return The capital <code>SettlementType</code>.
+     * @return The capital {@code SettlementType}.
      */
     public SettlementType getCapitalType() {
         return getSettlementType(true);
@@ -149,7 +149,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Get the national number of settlements.
      *
-     * @return The <code>SettlementNumber</code>.
+     * @return The {@code SettlementNumber}.
      */
     public final SettlementNumber getNumberOfSettlements() {
         return numberOfSettlements;
@@ -158,7 +158,7 @@ public abstract class NationType extends FreeColSpecObjectType {
     /**
      * Get the national aggression.
      *
-     * @return The national <code>AggressionLevel</code>.
+     * @return The national {@code AggressionLevel}.
      */
     public final AggressionLevel getAggression() {
         return aggression;

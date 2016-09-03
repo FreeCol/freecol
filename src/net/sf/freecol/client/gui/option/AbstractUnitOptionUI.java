@@ -78,10 +78,10 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
 
     /**
-     * Creates a new <code>AbstractUnitOptionUI</code> for the given
-     * <code>AbstractUnitOption</code>.
+     * Creates a new {@code AbstractUnitOptionUI} for the given
+     * {@code AbstractUnitOption}.
      *
-     * @param option The <code>AbstractUnitOption</code> to make a
+     * @param option The {@code AbstractUnitOption} to make a
      *     user interface for
      * @param editable boolean whether user can modify the setting
      */

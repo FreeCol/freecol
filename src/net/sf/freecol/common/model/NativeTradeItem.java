@@ -44,12 +44,12 @@ public class NativeTradeItem extends GoodsTradeItem {
     
 
     /**
-     * Creates a new <code>NativeTradeItem</code> instance.
+     * Creates a new {@code NativeTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param goods The <code>Goods</code> to trade.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param goods The {@code Goods} to trade.
      */
     public NativeTradeItem(Game game, Player source, Player destination,
                            Goods goods) {
@@ -60,9 +60,9 @@ public class NativeTradeItem extends GoodsTradeItem {
     }
 
     /**
-     * Copy a new <code>NativeTradeItem</code> instance.  Used by readList.
+     * Copy a new {@code NativeTradeItem} instance.  Used by readList.
      *
-     * @param nti The <code>NativeTradeItem</code> to copy.
+     * @param nti The {@code NativeTradeItem} to copy.
      */
     public NativeTradeItem(NativeTradeItem nti) {
         super(nti.getGoods().getGame(), nti.getSource(), nti.getDestination(),
@@ -73,10 +73,10 @@ public class NativeTradeItem extends GoodsTradeItem {
     }
 
     /**
-     * Creates a new <code>NativeTradeItem</code> instance.
+     * Creates a new {@code NativeTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public NativeTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

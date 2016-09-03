@@ -83,7 +83,7 @@ public class SimpleCombatModel extends CombatModel {
      *
      * @param attacker The attacker.
      * @param defender The defender.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return The combat odds.
      */
     private CombatOdds calculateCombatOdds(FreeColGameObject attacker,
@@ -123,8 +123,8 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Helper to log modifiers with.
      *
-     * @param lb The <code>LogBuilder</code> to log to.
-     * @param modSet A set of <code>Modifiers</code> to log.
+     * @param lb The {@code LogBuilder} to log to.
+     * @param modSet A set of {@code Modifiers} to log.
      */   
     private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
         lb.addCollection(" ", sort(modSet));
@@ -135,7 +135,7 @@ public class SimpleCombatModel extends CombatModel {
      *
      * @param attacker The attacker.
      * @param defender The defender.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return The offensive power.
      */
     private double getOffencePower(FreeColGameObject attacker,
@@ -190,7 +190,7 @@ public class SimpleCombatModel extends CombatModel {
      *
      * @param attacker The attacker.
      * @param defender The defender.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return The defensive power.
      */
     public double getDefencePower(FreeColGameObject attacker,
@@ -307,8 +307,8 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Add the popular support bonus to the result set if applicable.
      *
-     * @param colony The <code>Colony</code> under attack.
-     * @param attacker The attacking <code>Unit</code>.
+     * @param colony The {@code Colony} under attack.
+     * @param attacker The attacking {@code Unit}.
      * @param result The set of modifiers to add to.
      */
     private void addPopularSupportBonus(Colony colony, Unit attacker,
@@ -327,7 +327,7 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Add all the offensive modifiers that apply to a land attack.
      *
-     * @param attacker The attacker <code>Unit</code>.
+     * @param attacker The attacker {@code Unit}.
      * @param defender The defender.
      * @param result The set of modifiers to add to.
      */
@@ -479,7 +479,7 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Add all the defensive modifiers that apply to a naval attack.
      *
-     * @param defender The defender <code>Unit</code>.
+     * @param defender The defender {@code Unit}.
      * @param result The set of modifiers to add to.
      */
     private void addNavalDefensiveModifiers(Unit defender,
@@ -498,7 +498,7 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Does a given object provide a strong defence bonus?
      *
-     * @param fco The <code>FreeColObject</code> to check.
+     * @param fco The {@code FreeColObject} to check.
      * @return True if a strong defence bonus is present.
      */
     private boolean hasStrongDefenceModifier(FreeColObject fco) {
@@ -511,7 +511,7 @@ public class SimpleCombatModel extends CombatModel {
      * Add all the defensive modifiers that apply to a land attack.
      *
      * @param attacker The attacker.
-     * @param defender The defender <code>Unit</code>.
+     * @param defender The defender {@code Unit}.
      * @param result The set of modifiers to add to.
      */
     private void addLandDefensiveModifiers(FreeColGameObject attacker,
@@ -685,11 +685,11 @@ public class SimpleCombatModel extends CombatModel {
     /**
      * Resolve all the consequences of a normal attack.
      *
-     * @param winner The winning <code>Unit</code>.
-     * @param loser The losing <code>Unit</code>.
+     * @param winner The winning {@code Unit}.
+     * @param loser The losing {@code Unit}.
      * @param great True if this is a great win/loss.
      * @param r A "residual" random value (for convert/burn mission).
-     * @param crs A list of <code>CombatResult</code>s to add to.
+     * @param crs A list of {@code CombatResult}s to add to.
      */
     private void resolveAttack(Unit winner, Unit loser, boolean great,
                                double r, List<CombatResult> crs) {

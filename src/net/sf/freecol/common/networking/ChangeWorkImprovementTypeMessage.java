@@ -49,11 +49,11 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ChangeWorkImprovementTypeMessage</code> with the
+     * Create a new {@code ChangeWorkImprovementTypeMessage} with the
      * supplied unit and improvement type.
      *
-     * @param unit The <code>Unit</code> that is working.
-     * @param type The new <code>TileImprovementType</code>.
+     * @param unit The {@code Unit} that is working.
+     * @param type The new {@code TileImprovementType}.
      */
     public ChangeWorkImprovementTypeMessage(Unit unit,
                                             TileImprovementType type) {
@@ -64,11 +64,11 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ChangeWorkImprovementTypeMessage</code> from a
+     * Create a new {@code ChangeWorkImprovementTypeMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ChangeWorkImprovementTypeMessage(Game game, Element element) {
         super(getTagName());
@@ -81,11 +81,11 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
     /**
      * Handle a "changeWorkImprovementType"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the changed unit, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

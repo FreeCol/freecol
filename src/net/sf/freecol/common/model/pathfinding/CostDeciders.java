@@ -38,14 +38,14 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public final class CostDeciders {
 
     /**
-     * A <code>CostDecider</code> that costs unit moves normally.
+     * A {@code CostDecider} that costs unit moves normally.
      */
     private static final CostDecider avoidIllegalCostDecider
         = new BaseCostDecider();
 
 
     /**
-     * A trivial <code>CostDecider</code> that only considers the
+     * A trivial {@code CostDecider} that only considers the
      * number of locations visited when determining cost.  Totally ignores
      * the legality of the move.
      */
@@ -66,7 +66,7 @@ public final class CostDeciders {
 
 
     /**
-     * A <code>CostDecider</code> that only considers the number of
+     * A {@code CostDecider} that only considers the number of
      * tiles visited when determining the cost, but differs from the
      * trivialCostDecider in checking the legality of the move.
      */
@@ -88,7 +88,7 @@ public final class CostDeciders {
 
 
     /**
-     * A <code>CostDecider</code> that uses server-side knowledge of where
+     * A {@code CostDecider} that uses server-side knowledge of where
      * a player has explored to limit searches.
      */
     private static class ServerBaseCostDecider extends BaseCostDecider {
@@ -107,14 +107,14 @@ public final class CostDeciders {
         }
     };
     /**
-     * A server-side <code>CostDecider</code> that costs unit moves normally.
+     * A server-side {@code CostDecider} that costs unit moves normally.
      */
     private static final CostDecider
         serverAvoidIllegalCostDecider = new ServerBaseCostDecider();
 
 
     /**
-     * A <code>CostDecider</code> that costs unit moves normally while
+     * A {@code CostDecider} that costs unit moves normally while
      * avoiding other player settlements.
      */
     private static class AvoidSettlementsCostDecider extends BaseCostDecider {
@@ -140,7 +140,7 @@ public final class CostDeciders {
 
 
     /**
-     * A <code>CostDecider</code> that costs unit moves normally while
+     * A {@code CostDecider} that costs unit moves normally while
      * avoiding other player settlements and units, and does not explore
      * if it is trading.
      */
@@ -175,7 +175,7 @@ public final class CostDeciders {
 
 
     /**
-     * A <code>CostDecider</code> to avoid naval danger.
+     * A {@code CostDecider} to avoid naval danger.
      */
     private static class AvoidNavalDangerCostDecider
         extends AvoidSettlementsAndBlockingUnitsCostDecider {
@@ -218,9 +218,9 @@ public final class CostDeciders {
      * cost decider which returns the highest cost, with an
      * ILLEGAL_MOVE result dominating.
      *
-     * @param cds A series (two minimum) of <code>CostDecider</code>s
+     * @param cds A series (two minimum) of {@code CostDecider}s
      *     to compose.
-     * @return A new <code>CostDecider</code> composed of the argument
+     * @return A new {@code CostDecider} composed of the argument
      *     cost deciders.
      */
     public static CostDecider getComposedCostDecider(final CostDecider... cds) {
@@ -265,12 +265,12 @@ public final class CostDeciders {
     }
 
     /**
-     * Selects a default <code>CostDecider</code> for the given unit
+     * Selects a default {@code CostDecider} for the given unit
      * depending on the owner of the unit and if the unit can attack
      * other units.
      *
-     * @param unit The <code>Unit</code> to choose a CostDecider for.
-     * @return A suitable <code>CostDecider</code>.
+     * @param unit The {@code Unit} to choose a CostDecider for.
+     * @return A suitable {@code CostDecider}.
      */
     public static CostDecider defaultCostDeciderFor(final Unit unit) {
         return (unit == null)
@@ -283,74 +283,74 @@ public final class CostDeciders {
     }
 
     /**
-     * The trivial <code>CostDecider</code>.
+     * The trivial {@code CostDecider}.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider numberOfTiles() {
         return trivialCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> only considering the number of tiles
+     * A {@code CostDecider} only considering the number of tiles
      * visited when determining the cost.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider numberOfLegalTiles() {
         return tileCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> that returns the cost of moving
+     * A {@code CostDecider} that returns the cost of moving
      * across the terrain, excluding only illegal moves.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider avoidIllegal() {
         return avoidIllegalCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> that returns the cost of moving
+     * A {@code CostDecider} that returns the cost of moving
      * across the terrain, excluding only illegal moves, and works correctly
      * on the server side by refusing to consider locations unexplored by the
      * player.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider serverAvoidIllegal() {
         return serverAvoidIllegalCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> returning only the cost of moving
+     * A {@code CostDecider} returning only the cost of moving
      * across the terrain (no additional cost for blocking enemy units
      * etc) but excluding settlements.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider avoidSettlements() {
         return avoidSettlementsCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> for avoiding using locations which have
+     * A {@code CostDecider} for avoiding using locations which have
      * blocking enemy units on them. Paths containing an enemy
      * settlement are considered illegal, and so are paths where the
      * next move has an enemy unit on it.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider avoidSettlementsAndBlockingUnits() {
         return avoidSettlementsAndBlockingUnitsCostDecider;
     }
 
     /**
-     * A <code>CostDecider</code> for avoiding using locations which have
+     * A {@code CostDecider} for avoiding using locations which have
      * blocking enemy units or expose naval units to bombardment.
      *
-     * @return The <code>CostDecider</code>.
+     * @return The {@code CostDecider}.
      */
     public static CostDecider avoidNavalDanger() {
         return new AvoidNavalDangerCostDecider();

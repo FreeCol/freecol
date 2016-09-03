@@ -33,7 +33,7 @@ public final class PurchasePanel extends NewUnitPanel {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public PurchasePanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 2", "[sg]", ""),

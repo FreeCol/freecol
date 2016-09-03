@@ -39,8 +39,8 @@ public abstract class Number implements Selector {
     /**
      * Return the category the selector value belongs to.
      *
-     * @param selector a <code>double</code> value
-     * @return a <code>Category</code> value
+     * @param selector a {@code double} value
+     * @return a {@code Category} value
      */
     public abstract Category getCategory(double selector);
 
@@ -61,8 +61,8 @@ public abstract class Number implements Selector {
      * Return the key of the rule this selector matches. The key is the
      * string representation of the Category.
      *
-     * @param selector a <code>double</code> value
-     * @return a <code>String</code> value
+     * @param selector a {@code double} value
+     * @return a {@code String} value
      */
     public String getKey(double selector) {
         return getCategory(selector).toString();

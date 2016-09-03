@@ -52,7 +52,7 @@ public final class PreGameController extends Controller {
     /**
      * The constructor to use.
      *
-     * @param freeColServer The main <code>FreeColServer</code> object.
+     * @param freeColServer The main {@code FreeColServer} object.
      */
     public PreGameController(FreeColServer freeColServer) {
         super(freeColServer);

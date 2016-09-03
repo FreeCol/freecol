@@ -54,13 +54,13 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ScoutSpeakToChiefMessage</code> with the
+     * Create a new {@code ScoutSpeakToChiefMessage} with the
      * supplied unit, settlement and result.
      *
      * Result is null in a request.
      *
-     * @param unit The <code>Unit</code> that is learning.
-     * @param is The <code>IndianSettlement</code> to talk to.
+     * @param unit The {@code Unit} that is learning.
+     * @param is The {@code IndianSettlement} to talk to.
      * @param result The result of speaking.
      */
     public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement is,
@@ -73,11 +73,11 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ScoutSpeakToChiefMessage</code> from a
+     * Create a new {@code ScoutSpeakToChiefMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ScoutSpeakToChiefMessage(Game game, Element element) {
         super(getTagName());
@@ -107,11 +107,11 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
     /**
      * Handle a "scoutSpeakToChief"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An element containing the result of the scouting
-     *     action, or an error <code>Element</code> on failure.
+     *     action, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

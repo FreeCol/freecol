@@ -80,7 +80,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /**
      * The constructor that will initialize this component.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MiniMap(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
@@ -116,7 +116,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * Set tile size to the given value, or the minimum or maximum
      * bound of the tile size.
      *
-     * @param size an <code>int</code> value
+     * @param size an {@code int} value
      */
     public void setTileSize(int size) {
         tileSize = Math.max(Math.min(size, MAX_TILE_SIZE), MIN_TILE_SIZE);
@@ -127,7 +127,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /**
      * Return true if tile size can be decreased.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public boolean canZoomIn() {
         return (freeColClient.getGame() != null
@@ -138,7 +138,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /**
      * Return true if tile size can be increased.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public boolean canZoomOut() {
         return (freeColClient.getGame() != null
@@ -164,7 +164,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     
     /**
      * Paints this component.
-     * @param graphics The <code>Graphics</code> context in which
+     * @param graphics The {@code Graphics} context in which
      *                 to draw this component.
      */
     @Override
@@ -188,7 +188,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     /**
      * Paints a representation of the mapboard onto this component.
-     * @param graphics The <code>Graphics</code> context in which
+     * @param graphics The {@code Graphics} context in which
      *                 to draw this component.
      */
     public void paintMap(Graphics graphics) {
@@ -419,7 +419,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     /**
      * If the user clicks on the mini map, refocus the map
      * to center on the tile that he clicked on
-     * @param e a <code>MouseEvent</code> value
+     * @param e a {@code MouseEvent} value
      */
     @Override
     public void mousePressed(MouseEvent e) {

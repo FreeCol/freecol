@@ -157,7 +157,7 @@ public final class NewPanel extends FreeColPanel
     /**
      * Creates a new game panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public NewPanel(FreeColClient freeColClient) {
         this(freeColClient, null);
@@ -166,8 +166,8 @@ public final class NewPanel extends FreeColPanel
     /**
      * Creates a new game panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param specification An optional <code>Specification</code> value for
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param specification An optional {@code Specification} value for
      *     the new game.
      */
     public NewPanel(FreeColClient freeColClient, Specification specification) {
@@ -419,7 +419,7 @@ public final class NewPanel extends FreeColPanel
     /**
      * Gets the currently selected difficulty from the difficultyBox.
      *
-     * @return The difficulty <code>OptionGroup</code>.
+     * @return The difficulty {@code OptionGroup}.
      */
     private OptionGroup getSelectedDifficulty() {
         return (OptionGroup)this.difficultyBox.getSelectedItem();
@@ -482,7 +482,7 @@ public final class NewPanel extends FreeColPanel
     /**
      * Dis/Enable a group of components.
      *
-     * @param components The <code>Component</code>s to set.
+     * @param components The {@code Component}s to set.
      * @param enable Enable if true.
      */
     private void enableComponents(Component[] components, boolean enable) {
@@ -498,7 +498,7 @@ public final class NewPanel extends FreeColPanel
      * Get the specification.  Either the one set for this panel, or the
      * one implied by the currently selected TC.
      *
-     * @return The current <code>Specification</code>.
+     * @return The current {@code Specification}.
      */
     @Override
     public Specification getSpecification() {

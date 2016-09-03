@@ -36,7 +36,7 @@ public class SkipUnitAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public SkipUnitAction(FreeColClient freeColClient) {
         super(freeColClient, id);

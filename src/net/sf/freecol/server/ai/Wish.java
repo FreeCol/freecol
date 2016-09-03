@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Location;
 
 
 /**
- * Represents a need for something at a given <code>Location</code>.
+ * Represents a need for something at a given {@code Location}.
  */
 public abstract class Wish extends ValuedAIObject {
 
@@ -41,14 +41,14 @@ public abstract class Wish extends ValuedAIObject {
     protected Location destination;
 
     /**
-     * The <code>TransportableAIObject</code> which will realize the wish,
+     * The {@code TransportableAIObject} which will realize the wish,
      * or null if none has been assigned.
      */
     protected TransportableAIObject transportable;
 
 
     /**
-     * Creates a new uninitialized <code>Wish</code>.
+     * Creates a new uninitialized {@code Wish}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -61,7 +61,7 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Creates a new <code>Wish</code> from the given
+     * Creates a new {@code Wish} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -75,7 +75,7 @@ public abstract class Wish extends ValuedAIObject {
 
 
     /**
-     * Checks if this <code>Wish</code> needs to be stored in a savegame.
+     * Checks if this {@code Wish} needs to be stored in a savegame.
      *
      * @return True if it has been allocated a transportable.
      */
@@ -84,11 +84,11 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Gets the <code>TransportableAIObject</code> assigned to this wish.
+     * Gets the {@code TransportableAIObject} assigned to this wish.
      *
      * @see #setTransportable
      * @see net.sf.freecol.server.ai.mission.WishRealizationMission
-     * @return The <code>TransportableAIObject</code> which will
+     * @return The {@code TransportableAIObject} which will
      *     realize this wish, or null if none has been assigned.
      */
     public TransportableAIObject getTransportable() {
@@ -96,9 +96,9 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Assigns a <code>TransportableAIObject</code> to this <code>Wish</code>.
+     * Assigns a {@code TransportableAIObject} to this <code>Wish</code>.
      *
-     * @param transportable The <code>TransportableAIObject</code>
+     * @param transportable The {@code TransportableAIObject}
      *     which should realize this wish.
      * @see #getTransportable
      * @see net.sf.freecol.server.ai.mission.WishRealizationMission
@@ -108,11 +108,11 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Gets the destination of this <code>Wish</code>.
+     * Gets the destination of this {@code Wish}.
      *
-     * @return The <code>Location</code> in which the
+     * @return The {@code Location} in which the
      *     {@link #getTransportable transportable} assigned to
-     *     this <code>Wish</code> will have to reach.
+     *     this {@code Wish} will have to reach.
      */
     public Location getDestination() {
         return destination;
@@ -121,7 +121,7 @@ public abstract class Wish extends ValuedAIObject {
     /**
      * Gets the destination AI colony, if any.
      *
-     * @return The destination <code>AIColony</code>.
+     * @return The destination {@code AIColony}.
      */
     public AIColony getDestinationAIColony() {
         return (destination instanceof Colony)
@@ -133,7 +133,7 @@ public abstract class Wish extends ValuedAIObject {
     // Override AIObject
 
     /**
-     * Disposes of this <code>AIObject</code> by removing any references
+     * Disposes of this {@code AIObject} by removing any references
      * to this object.
      */
     @Override
@@ -144,7 +144,7 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Checks the integrity of a <code>Wish</code>.
+     * Checks the integrity of a {@code Wish}.
      * The destination must be neither null nor disposed, the
      * transportable may be null but must otherwise be intact.
      *

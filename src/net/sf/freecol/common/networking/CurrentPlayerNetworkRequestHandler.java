@@ -42,7 +42,7 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * Create a new current player request handler.
      *
-     * @param freeColServer The enclosing <code>FreeColServer</code>.
+     * @param freeColServer The enclosing {@code FreeColServer}.
      */
     public CurrentPlayerNetworkRequestHandler(FreeColServer freeColServer) {
         super(freeColServer);
@@ -52,7 +52,7 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * Check if a player is the current player.
      * 
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return true if a game is active and the player is the current one.
      */
     private boolean isCurrentPlayer(Player player) {
@@ -79,10 +79,10 @@ public abstract class CurrentPlayerNetworkRequestHandler
     /**
      * Handle a request for the current player.
      * 
-     * @param player The requesting <code>Player</code>.
-     * @param conn The <code>Connection</code> the request originates from.
-     * @param element The <code>Element</code> with the request.
-     * @return An answerering <code>Element</code>, which may be null.
+     * @param player The requesting {@code Player}.
+     * @param conn The {@code Connection} the request originates from.
+     * @param element The {@code Element} with the request.
+     * @return An answerering {@code Element}, which may be null.
      */
     protected abstract Element handle(Player player, Connection conn,
                                       Element element);

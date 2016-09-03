@@ -84,8 +84,8 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Creates a new AI player.
      *
-     * @param aiMain The <code>AIMain</code> the player exists within.
-     * @param player The <code>ServerPlayer</code> to associate this
+     * @param aiMain The {@code AIMain} the player exists within.
+     * @param player The {@code ServerPlayer} to associate this
      *            AI player with.
      */
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
@@ -99,7 +99,7 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Creates a new <code>AIPlayer</code> from the given
+     * Creates a new {@code AIPlayer} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -117,10 +117,10 @@ public abstract class AIPlayer extends AIObject {
 
 
     /**
-     * Gets the <code>Player</code> this <code>AIPlayer</code> is
+     * Gets the {@code Player} this <code>AIPlayer</code> is
      * controlling.
      *
-     * @return The <code>Player</code>.
+     * @return The {@code Player}.
      */
     public Player getPlayer() {
         return player;
@@ -130,7 +130,7 @@ public abstract class AIPlayer extends AIObject {
      * Sets the ServerPlayer this AIPlayer is controlling.
      * Used by implementing subclasses.
      *
-     * @param p The new <code>Player</code>.
+     * @param p The new {@code Player}.
     protected void setPlayer(ServerPlayer p) {
         player = p;
     }
@@ -139,7 +139,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Gets the PRNG to use for this player.
      *
-     * @return A <code>Random</code> to use for this player.
+     * @return A {@code Random} to use for this player.
      */
     public Random getAIRandom() {
         return aiRandom;
@@ -170,12 +170,12 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Sets the <code>Connection</code> to be used while communicating with
+     * Sets the {@code Connection} to be used while communicating with
      * the server.
      *
      * This method is only used for debugging.
      *
-     * @param debuggingConnection The <code>Connection</code> to be
+     * @param debuggingConnection The {@code Connection} to be
      *     used for debugging.
      */
     public void setDebuggingConnection(Connection debuggingConnection) {
@@ -185,7 +185,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Meaningfully named access to the server API.
      *
-     * @return The <code>AIServerAPI</code> wrapper.
+     * @return The {@code AIServerAPI} wrapper.
      */
     public AIServerAPI askServer() {
         return this.serverAPI;
@@ -194,7 +194,7 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Gets the AI colony corresponding to a given colony, if any.
      *
-     * @param colony The <code>Colony</code> to look up.
+     * @param colony The {@code Colony} to look up.
      * @return The corresponding AI colony or null if not found.
      */
     public AIColony getAIColony(Colony colony) {
@@ -216,14 +216,14 @@ public abstract class AIPlayer extends AIObject {
      * Remove an AI colony.
      * Do nothing here, but European player classes will be more active.
      *
-     * @param aic The <code>AIColony</code> to remove.
+     * @param aic The {@code AIColony} to remove.
      */
     public void removeAIColony(AIColony aic) {}
 
     /**
      * Gets the AI unit corresponding to a given unit, if any.
      *
-     * @param unit The <code>Unit</code> to look up.
+     * @param unit The {@code Unit} to look up.
      * @return The corresponding AI unit or null if not found.
      */
     protected AIUnit getAIUnit(Unit unit) {
@@ -260,15 +260,15 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Removes an AI unit owned by this player.
      *
-     * @param aiUnit The <code>AIUnit</code> to remove.
+     * @param aiUnit The {@code AIUnit} to remove.
      */
     public void removeAIUnit(AIUnit aiUnit) {}
 
     /**
      * Standard stance change determination.
      *
-     * @param other The <code>Player</code> wrt consider stance.
-     * @return The new <code>Stance</code>.
+     * @param other The {@code Player} wrt consider stance.
+     * @return The new {@code Stance}.
      */
     protected Stance determineStance(Player other) {
         return player.getStance(other)
@@ -295,8 +295,8 @@ public abstract class AIPlayer extends AIObject {
     // AI behaviour interface to be implemented by subclasses
 
     /**
-     * Tells this <code>AIPlayer</code> to make decisions. The
-     * <code>AIPlayer</code> is done doing work this turn when this method
+     * Tells this {@code AIPlayer} to make decisions. The
+     * {@code AIPlayer} is done doing work this turn when this method
      * returns.
      */
     public abstract void startWorking();
@@ -305,9 +305,9 @@ public abstract class AIPlayer extends AIObject {
      * Decide whether to accept an Indian demand, or not.  Or for native
      * players, return the result of the demand.
      *
-     * @param unit The <code>Unit</code> making demands.
-     * @param colony The <code>Colony</code> where demands are being made.
-     * @param type The <code>GoodsType</code> demanded.
+     * @param unit The {@code Unit} making demands.
+     * @param colony The {@code Colony} where demands are being made.
+     * @param type The {@code GoodsType} demanded.
      * @param amount The amount of gold demanded.
      * @param accept The acceptance state of the demand.
      * @return True if this player accepts the demand, false if the demand
@@ -321,8 +321,8 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Resolves a diplomatic trade offer.
      *
-     * @param agreement The proposed <code>DiplomaticTrade</code>.
-     * @return The <code>TradeStatus</code> to apply to the agreement.
+     * @param agreement The proposed {@code DiplomaticTrade}.
+     * @return The {@code TradeStatus} to apply to the agreement.
      *
      */
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
@@ -330,8 +330,8 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
-     * Called after another <code>Player</code> sends a
-     * <code>trade</code> message
+     * Called after another {@code Player} sends a
+     * {@code trade} message
      *
      * @param goods The goods which we are going to offer
      */
@@ -340,40 +340,40 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Handle a native trade request.
      *
-     * @param action The <code>NativeTradeAction</code> to perform.
-     * @param nt The <code>NativeTrade</code> to handle.
+     * @param action The {@code NativeTradeAction} to perform.
+     * @param nt The {@code NativeTrade} to handle.
      * @return The action in response.
      */
     public abstract NativeTradeAction handleTrade(NativeTradeAction action,
                                                   NativeTrade nt);
     
     /**
-     * Called when another <code>Player</code> proposes to buy.
+     * Called when another {@code Player} proposes to buy.
      *
      * Deprecating, this is being replaced by handleTrade.
      *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> is trading.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param unit The foreign {@code Unit} trying to trade.
+     * @param settlement The {@code Settlement} this player owns and
+     *            which the given {@code Unit} is trading.
+     * @param goods The goods the given {@code Unit} is trying to sell.
      * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
+     * @return The price this {@code AIPlayer} suggests or
      *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
      */
     public abstract int buyProposition(Unit unit, Settlement settlement,
                                        Goods goods, int gold);
 
     /**
-     * Called when another <code>Player</code> proposes a sale.
+     * Called when another {@code Player} proposes a sale.
      *
      * Deprecating, this is being replaced by handleTrade.
      *
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param unit The foreign {@code Unit} trying to trade.
+     * @param settlement The {@code Settlement} this player owns and
+     *            which the given {@code Unit} if trying to sell goods.
+     * @param goods The goods the given {@code Unit} is trying to sell.
      * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
+     * @return The price this {@code AIPlayer} suggests or
      *     {@link net.sf.freecol.common.model.Constants#NO_TRADE}.
      */
     public abstract int sellProposition(Unit unit, Settlement settlement,

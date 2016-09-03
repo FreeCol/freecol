@@ -65,7 +65,7 @@ public final class DeclarationPanel extends FreeColPanel {
     /**
      * Creates a DeclarationPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DeclarationPanel(FreeColClient freeColClient) {
         super(freeColClient, null);
@@ -164,7 +164,7 @@ public final class DeclarationPanel extends FreeColPanel {
          * @param name The name to be abbreviated
          * @return The abbreviated version of the given name.  The name
          *     is made small enough to fit within the bounds the
-         *     <code>DeclarationPanel</code>.
+         *     {@code DeclarationPanel}.
          */
         private String getAbbreviatedName(String name) {
             if (!isTooLarge(name)) return name;
@@ -203,7 +203,7 @@ public final class DeclarationPanel extends FreeColPanel {
          * panel.
          * 
          * @param name The string to be tested.
-         * @return <code>true</code> if the given string was to large to be
+         * @return {@code true} if the given string was to large to be
          *     fully displayed.
          */
         private boolean isTooLarge(String name) {
@@ -225,11 +225,11 @@ public final class DeclarationPanel extends FreeColPanel {
         }
 
         /**
-         * Adds an <code>ActionListener</code> to this
-         * <code>SignaturePanel</code>.  An event gets fired when the
+         * Adds an {@code ActionListener} to this
+         * {@code SignaturePanel}.  An event gets fired when the
          * animation is stopped.
          * 
-         * @param al The <code>ActionListener</code>.
+         * @param al The {@code ActionListener}.
          * @see #startAnimation()
          */
         public void addActionListener(ActionListener al) {
@@ -247,7 +247,7 @@ public final class DeclarationPanel extends FreeColPanel {
 
         /**
          * Starts the animation of the signature.  An
-         * <code>ActionEvent</code> gets sent to the registered
+         * {@code ActionEvent} gets sent to the registered
          * listeners when the animation has stopped.
          * 
          * @see #addActionListener(ActionListener)

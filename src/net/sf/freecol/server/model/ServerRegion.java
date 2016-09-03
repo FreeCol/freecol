@@ -58,7 +58,7 @@ public class ServerRegion extends Region {
     /**
      * Trivial constructor for serialization.
      *
-     * @param game The <code>Game</code> to create in.
+     * @param game The {@code Game} to create in.
      * @param id The object identifier.
      */
     public ServerRegion(Game game, String id) {
@@ -68,8 +68,8 @@ public class ServerRegion extends Region {
     /**
      * Constructor for copying in a new region from an imported game.
      *
-     * @param game The <code>Game</code> to create in.
-     * @param region A <code>Region</code> to copy.
+     * @param game The {@code Game} to create in.
+     * @param region A {@code Region} to copy.
      */
     public ServerRegion(Game game, Region region) {
         super(game);
@@ -88,8 +88,8 @@ public class ServerRegion extends Region {
     /**
      * Create a new discoverable server region of a given type.
      *
-     * @param game The <code>Game</code> to create in.
-     * @param type The <code>RegionType</code> to use.
+     * @param game The {@code Game} to create in.
+     * @param type The {@code RegionType} to use.
      */
     public ServerRegion(Game game, RegionType type) {
         this(game, null, type, null);
@@ -101,10 +101,10 @@ public class ServerRegion extends Region {
     /**
      * Create a new fixed server region.
      *
-     * @param map The <code>Map</code> to create in.
+     * @param map The {@code Map} to create in.
      * @param key The key for the region.
-     * @param type The <code>RegionType</code> to use.
-     * @param parent The <code>Region</code> to be the parent of this one.
+     * @param type The {@code RegionType} to use.
+     * @param parent The {@code Region} to be the parent of this one.
      */
     private ServerRegion(Map map, String key, RegionType type,
                          Region parent) {
@@ -116,10 +116,10 @@ public class ServerRegion extends Region {
     /**
      * Create a new fixed server region.
      *
-     * @param game The <code>Game</code> to create in.
+     * @param game The {@code Game} to create in.
      * @param key The key for the region.
-     * @param type The <code>RegionType</code> to use.
-     * @param parent The <code>Region</code> to be the parent of this one.
+     * @param type The {@code RegionType} to use.
+     * @param parent The {@code Region} to be the parent of this one.
      */
     private ServerRegion(Game game, String key, RegionType type,
                          Region parent) {
@@ -159,7 +159,7 @@ public class ServerRegion extends Region {
     /**
      * Get the bounding rectangle for this region.
      *
-     * @return The bounding <code>Rectangle</code>.
+     * @return The bounding {@code Rectangle}.
      */
     public final Rectangle getBounds() {
         return bounds;
@@ -187,7 +187,7 @@ public class ServerRegion extends Region {
     /**
      * Does this region contain the center of another?
      *
-     * @param other The other <code>ServerRegion</code> to check.
+     * @param other The other {@code ServerRegion} to check.
      * @return True if the center of the other region is within this one.
      */
     public boolean containsCenter(ServerRegion other) {
@@ -198,7 +198,7 @@ public class ServerRegion extends Region {
     /**
      * Add the given tile to this region.
      *
-     * @param tile A <code>Tile</code> to add.
+     * @param tile A {@code Tile} to add.
      */
     public void addTile(Tile tile) {
         tile.setRegion(this);
@@ -214,10 +214,10 @@ public class ServerRegion extends Region {
     /**
      * Discover this region.
      *
-     * @param player The discovering <code>Player</code>.
-     * @param turn The discovery <code>Turn</code>.
+     * @param player The discovering {@code Player}.
+     * @param turn The discovery {@code Turn}.
      * @param newName The name of the region.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csDiscover(Player player, Turn turn, String newName,
                            ChangeSet cs) {
@@ -239,8 +239,8 @@ public class ServerRegion extends Region {
     /**
      * Make the fixed regions if they do not exist in a given map.
      *
-     * @param map The <code>Map</code> to check.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param map The {@code Map} to check.
+     * @param lb A {@code LogBuilder} to log to.
      * @return A list of fixed server regions.
      */     
     public static List<ServerRegion> requireFixedRegions(Map map, LogBuilder lb) {
@@ -499,10 +499,10 @@ public class ServerRegion extends Region {
     /**
      * Flood fill ocean regions.
      *
-     * @param map The <code>Map</code> to fill in.
-     * @param tile A valid starting <code>Tile</code>.
-     * @param region A <code>ServerRegion</code> to fill with.
-     * @param bounds A <code>Rectangle</code> that bounds the filling.
+     * @param map The {@code Map} to fill in.
+     * @param tile A valid starting {@code Tile}.
+     * @param region A {@code ServerRegion} to fill with.
+     * @param bounds A {@code Rectangle} that bounds the filling.
      * @return The number of tiles filled.
      */
     private static int fillOcean(Map map, Tile tile, ServerRegion region,

@@ -75,9 +75,9 @@ public class Message {
      * Constructs a new Message with data from the given InputStream. The
      * constructor to use if this is an INCOMING message.
      * 
-     * @param inputStream The <code>InputStream</code> to get the XML-data
+     * @param inputStream The {@code InputStream} to get the XML-data
      *            from.
-     * @exception IOException if thrown by the <code>InputStream</code>.
+     * @exception IOException if thrown by the {@code InputStream}.
      * @exception SAXException if thrown during parsing.
      */
     public Message(InputStream inputStream) throws SAXException, IOException {
@@ -88,9 +88,9 @@ public class Message {
      * Constructs a new Message with data from the given InputSource. The
      * constructor to use if this is an INCOMING message.
      * 
-     * @param inputSource The <code>InputSource</code> to get the XML-data
+     * @param inputSource The {@code InputSource} to get the XML-data
      *            from.
-     * @exception IOException if thrown by the <code>InputSource</code>.
+     * @exception IOException if thrown by the {@code InputSource}.
      * @exception SAXException if thrown during parsing.
      */
     private Message(InputSource inputSource) throws SAXException, IOException {
@@ -144,9 +144,9 @@ public class Message {
 
 
     /**
-     * Gets the <code>Document</code> holding the message data.
+     * Gets the {@code Document} holding the message data.
      * 
-     * @return The <code>Document</code> holding the message data.
+     * @return The {@code Document} holding the message data.
      */
     public Document getDocument() {
         return document;
@@ -187,7 +187,7 @@ public class Message {
      * Checks if an attribute is set on the root element.
      * 
      * @param attribute The attribute in which to verify the existence of.
-     * @return <code>true</code> if the root element has the given attribute.
+     * @return {@code true} if the root element has the given attribute.
      */
     public boolean hasAttribute(String attribute) {
         return document.getDocumentElement().hasAttribute(attribute);

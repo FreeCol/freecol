@@ -33,9 +33,9 @@ public class MiniMapZoomOutAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>MiniMapZoomOutAction</code>.
+     * Creates a new {@code MiniMapZoomOutAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MiniMapZoomOutAction(FreeColClient freeColClient) {
         super(freeColClient, id);
@@ -44,9 +44,9 @@ public class MiniMapZoomOutAction extends MapboardAction {
     }
 
     /**
-     * Creates a new <code>MiniMapZoomOutAction</code>.
+     * Creates a new {@code MiniMapZoomOutAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param b A boolean.
      */
     public MiniMapZoomOutAction(FreeColClient freeColClient, boolean b) {

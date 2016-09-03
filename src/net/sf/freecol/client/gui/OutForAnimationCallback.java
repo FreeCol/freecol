@@ -31,7 +31,7 @@ public interface OutForAnimationCallback {
     /**
      * The code to be executed when a unit is out for animation.
      *
-     * @param unitLabel A <code>JLabel</code> with an image of
+     * @param unitLabel A {@code JLabel} with an image of
      *      the unit to animate.
      */
     void executeWithUnitOutForAnimation(JLabel unitLabel);

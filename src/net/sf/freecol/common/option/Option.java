@@ -45,14 +45,14 @@ public interface Option<T> extends Cloneable, ObjectWithId {
     /**
      * Gets the value of this option.
      *
-     * @return The value of this <code>Option</code>.
+     * @return The value of this {@code Option}.
      */
     public T getValue();
 
     /**
      * Sets the value of this option.
      *
-     * @param value The new value of this <code>Option</code>.
+     * @param value The new value of this {@code Option}.
      */
     public void setValue(T value);
 
@@ -67,7 +67,7 @@ public interface Option<T> extends Cloneable, ObjectWithId {
     /**
      * Makes an XML-representation of this object.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @throws XMLStreamException if there are any problems writing the stream.
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException;

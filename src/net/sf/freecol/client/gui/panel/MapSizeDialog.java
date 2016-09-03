@@ -48,7 +48,7 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
     /**
      * Creates a dialog to choose the map size.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public MapSizeDialog(FreeColClient freeColClient, JFrame frame) {

@@ -34,9 +34,9 @@ public class PercentageOption extends IntegerOption {
 
 
     /**
-     * Creates a new <code>PercentageOption</code>.
+     * Creates a new {@code PercentageOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public PercentageOption(Specification specification) {
         super(specification);

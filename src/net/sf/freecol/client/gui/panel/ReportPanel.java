@@ -61,7 +61,7 @@ public class ReportPanel extends FreeColPanel {
     /**
      * Creates the basic FreeCol report panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param key A key for the title.
      */
     public ReportPanel(FreeColClient freeColClient, String key) {

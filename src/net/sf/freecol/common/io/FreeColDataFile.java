@@ -119,7 +119,7 @@ public class FreeColDataFile {
      *
      * @param prefix The file name prefix.
      * @param suffix The file name suffix.
-     * @param locale The <code>Locale</code> to generate file names for.
+     * @param locale The {@code Locale} to generate file names for.
      * @return A list of candidate file names.
      */
     public static List<String> getFileNames(String prefix, String suffix,
@@ -158,7 +158,7 @@ public class FreeColDataFile {
      * Get a URI to access a resource through.
      *
      * @param name A name with special prefixes to convert to the URI.
-     * @return A <code>URI</code>, or null if none found.
+     * @return A {@code URI}, or null if none found.
      */
     protected URI getURI(String name) {
         try {
@@ -191,7 +191,7 @@ public class FreeColDataFile {
      *     then the provided filename should be relative towards the
      *     path of the directory.  In case of a compressed archive it
      *     should be the path within the archive.
-     * @return An <code>InputStream</code> to read the resource with.
+     * @return An {@code InputStream} to read the resource with.
      * @exception IOException if an error occurs
      */
     public BufferedInputStream getInputStream(String filename) throws IOException {
@@ -202,10 +202,10 @@ public class FreeColDataFile {
     }
 
     /**
-     * Creates a <code>ResourceMapping</code> from the available
+     * Creates a {@code ResourceMapping} from the available
      * resource files.
      *
-     * @return A <code>ResourceMapping</code> or <code>null</code>
+     * @return A {@code ResourceMapping} or <code>null</code>
      *     there is no resource mapping file.
      */
     public ResourceMapping getResourceMapping() {
@@ -307,7 +307,7 @@ public class FreeColDataFile {
     /**
      * Check a file is some sort of FreeColDataFile.
      *
-     * @param f The <code>File</code> to test.
+     * @param f The {@code File} to test.
      * @param requiredFile If non-null, the filter will accept a directory
      *     containing this file.
      * @param endings If the file has one of these suffixes it is acceptable.

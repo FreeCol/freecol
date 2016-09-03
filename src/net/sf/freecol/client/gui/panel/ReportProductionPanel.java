@@ -65,7 +65,7 @@ public final class ReportProductionPanel extends ReportPanel {
      *
      * FIXME: can we extend this to cover farmed goods?
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportProductionPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportProductionAction");

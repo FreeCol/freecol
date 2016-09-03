@@ -68,7 +68,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
     /**
      * Create a new save game file from a given file.
      *
-     * @param file The base <code>File</code>.
+     * @param file The base {@code File}.
      * @exception IOException if the file can not be read.
      */
     public FreeColSavegameFile(File file) throws IOException {
@@ -98,7 +98,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      *
      * Only still needed by the validator.
      *
-     * @return An <code>InputStream</code> to the file
+     * @return An {@code InputStream} to the file
      *      "savegame.xml" within this data file.
      * @exception IOException if there is a problem opening the input stream.
      */
@@ -133,7 +133,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * Helper to filter suitable file candidates to be made into
      * FreeColSaveGameFiles.
      *
-     * @param The <code>File</code> to examine.
+     * @param The {@code File} to examine.
      * @return True if the file is suitable.
      */
     public static boolean fileFilter(File f) {

@@ -87,7 +87,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Protected constructor for the subclass panels.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     protected FreeColDialog(FreeColClient freeColClient, JFrame frame) {
@@ -103,9 +103,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * Much of this was extracted from the source for
      * JOptionPane.createDialog.  We needed a way to control modality.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param type The <code>DialogType</code> to create.
+     * @param type The {@code DialogType} to create.
      * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
@@ -154,7 +154,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      * to construct a non-trivial object to display in the JOptionPane.
      *
      * @param frame The owner frame.
-     * @param type The <code>DialogType</code> to create.
+     * @param type The {@code DialogType} to create.
      * @param modal Should this dialog be modal?
      * @param obj The main object that explains the choice for the user,
      *     usually just a string, but may be more complex.
@@ -296,7 +296,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the FreeColClient.
      *
-     * @return The <code>FreeColClient</code>.
+     * @return The {@code FreeColClient}.
      */
     protected FreeColClient getFreeColClient() {
         return freeColClient;
@@ -305,7 +305,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the GUI.
      *
-     * @return The <code>GUI</code>.
+     * @return The {@code GUI}.
      */
     protected SwingGUI getGUI() {
         return (SwingGUI)freeColClient.getGUI();
@@ -314,7 +314,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the client controller.
      *
-     * @return The client <code>InGameController</code>.
+     * @return The client {@code InGameController}.
      */
     protected InGameController igc() {
         return freeColClient.getInGameController();
@@ -323,7 +323,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the Image library.
      *
-     * @return The <code>ImageLibrary</code>.
+     * @return The {@code ImageLibrary}.
      */
     protected ImageLibrary getImageLibrary() {
         return getGUI().getImageLibrary();
@@ -332,7 +332,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the game.
      *
-     * @return The <code>Game</code>.
+     * @return The {@code Game}.
      */
     protected Game getGame() {
         return freeColClient.getGame();
@@ -351,7 +351,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
     /**
      * Get the player.
      *
-     * @return The current <code>Player</code>.
+     * @return The current {@code Player}.
      */
     protected Player getMyPlayer() {
         return freeColClient.getMyPlayer();

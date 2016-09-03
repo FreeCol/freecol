@@ -629,7 +629,7 @@ public final class InGameInputHandler extends ServerInputHandler {
     /**
      * Handles a "logout"-message.
      * 
-     * @param connection The <code>Connection</code> the message was received
+     * @param connection The {@code Connection} the message was received
      *            on.
      * @param logoutElement The element (root element in a DOM-parsed XML tree)
      *            that holds all the information.

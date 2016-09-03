@@ -33,7 +33,7 @@ import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
- * Represents the need for a worker within a <code>Colony</code>.
+ * Represents the need for a worker within a {@code Colony}.
  */
 public class WorkerWish extends Wish {
 
@@ -48,7 +48,7 @@ public class WorkerWish extends Wish {
 
 
     /**
-     * Creates a new uninitialized <code>WorkerWish</code> from the given
+     * Creates a new uninitialized {@code WorkerWish} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -62,17 +62,17 @@ public class WorkerWish extends Wish {
     }
 
     /**
-     * Creates a new <code>WorkerWish</code>.
+     * Creates a new {@code WorkerWish}.
      *
      * @param aiMain The main AI-object.
-     * @param destination The <code>Location</code> in which the
+     * @param destination The {@code Location} in which the
      *       {@link Wish#getTransportable transportable} assigned to
-     *       this <code>WorkerWish</code> will have to reach.
+     *       this {@code WorkerWish} will have to reach.
      * @param value The value identifying the importance of
-     *       this <code>Wish</code>.
+     *       this {@code Wish}.
      * @param unitType The type of unit needed for releasing this wish
      *       completely.
-     * @param expertNeeded Determines wether the <code>unitType</code> is
+     * @param expertNeeded Determines wether the {@code unitType} is
      *       required or not.
      */
     public WorkerWish(AIMain aiMain, Location destination, int value,
@@ -91,7 +91,7 @@ public class WorkerWish extends Wish {
     }
 
     /**
-     * Creates a new <code>WorkerWish</code> from the given
+     * Creates a new {@code WorkerWish} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -108,9 +108,9 @@ public class WorkerWish extends Wish {
 
 
     /**
-     * Updates this <code>WorkerWish</code> with the given attributes.
+     * Updates this {@code WorkerWish} with the given attributes.
      *
-     * @param unitType The <code>UnitType</code> to wish for.
+     * @param unitType The {@code UnitType} to wish for.
      * @param expertNeeded Is an expert unit required?
      * @param value The urgency of the wish.
      */
@@ -133,7 +133,7 @@ public class WorkerWish extends Wish {
     /**
      * Does a specified unit satisfy this wish?
      *
-     * @param unit The <code>Unit</code> to test.
+     * @param unit The {@code Unit} to test.
      * @return True if the unit either matches exactly if expertRequired,
      *     or at least matches in a land/naval sense if not.
      */

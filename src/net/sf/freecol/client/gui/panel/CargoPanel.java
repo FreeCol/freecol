@@ -53,7 +53,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * Creates this CargoPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param withTitle Should the panel have a title?
      */
     public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
@@ -140,7 +140,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * Get the carrier unit.
      *
-     * @return The carrier <code>Unit</code>.
+     * @return The carrier {@code Unit}.
      */
     public Unit getCarrier() {
         return carrier;
@@ -149,7 +149,7 @@ public class CargoPanel extends FreeColPanel
     /**
      * Set the carrier unit.
      *
-     * @param newCarrier The new carrier <code>Unit</code>.
+     * @param newCarrier The new carrier {@code Unit}.
      */
     public void setCarrier(final Unit newCarrier) {
         if (newCarrier != carrier) {

@@ -34,7 +34,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * The <code>Feature</code> class encapsulates a bonus or penalty
+ * The {@code Feature} class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
  */
@@ -70,7 +70,7 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Deliberately trivial constructor.
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     public Feature(Specification specification) {
         super(specification);
@@ -80,7 +80,7 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Copy another Feature.
      *
-     * @param other The other <code>Feature</code> to copy.
+     * @param other The other {@code Feature} to copy.
      */
     protected void copyFrom(Feature other) {
         setId(other.getId());
@@ -195,7 +195,7 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Does this feature apply to a given object type?
      *
-     * @param objectType The <code>FreeColSpecObjectType</code> to test.
+     * @param objectType The {@code FreeColSpecObjectType} to test.
      * @return True if there are no scopes, or at least one scope is
      *     applicable to the object.
      */
@@ -207,7 +207,7 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Does this feature apply to a given turn?
      *
-     * @param turn The <code>Turn</code> to test.
+     * @param turn The {@code Turn} to test.
      * @return True if the turn is null or not outside a valid time limit.
      */
     protected boolean appliesTo(final Turn turn) {
@@ -219,8 +219,8 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Does this feature apply to a given object type and turn.
      *
-     * @param objectType The <code>FreeColSpecObjectType</code> to test.
-     * @param turn The <code>Turn</code> to test.
+     * @param objectType The {@code FreeColSpecObjectType} to test.
+     * @param turn The {@code Turn} to test.
      * @return True if the feature applies.
      */
     protected boolean appliesTo(final FreeColSpecObjectType objectType,
@@ -231,7 +231,7 @@ public abstract class Feature extends FreeColSpecObject
     /**
      * Is this feature out of date with respect to a given turn?
      *
-     * @param turn The <code>Turn</code> to compare to.
+     * @param turn The {@code Turn} to compare to.
      * @return True if the Feature has an lastTurn turn smaller than the
      *     given turn.
      */

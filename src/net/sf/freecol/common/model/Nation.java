@@ -115,7 +115,7 @@ public class Nation extends FreeColSpecObjectType {
      * Create a new nation.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public Nation(String id, Specification specification) {
         super(id, specification);
@@ -143,7 +143,7 @@ public class Nation extends FreeColSpecObjectType {
     /**
      * Set the nation type.  Needed to when "no advantages" is selected.
      *
-     * @param type The new <code>NationType</code>.
+     * @param type The new {@code NationType}.
      */
     public final void setType(NationType type) {
         this.type = type;
@@ -161,7 +161,7 @@ public class Nation extends FreeColSpecObjectType {
     /**
      * Get the REF nation to oppose this nation.
      *
-     * @return The REF <code>Nation</code>, or null if not applicable.
+     * @return The REF {@code Nation}, or null if not applicable.
      */
     public final Nation getREFNation() {
         return refNation;
@@ -170,7 +170,7 @@ public class Nation extends FreeColSpecObjectType {
     /**
      * Get the rebel nation to oppose this REF nation.
      *
-     * @return The rebel <code>Nation</code>, or null if not applicable.
+     * @return The rebel {@code Nation}, or null if not applicable.
      */
     public final Nation getRebelNation() {
         return find(getSpecification().getEuropeanNations(),
@@ -248,7 +248,7 @@ public class Nation extends FreeColSpecObjectType {
     /**
      * Get a random player name key that is not in use by an active player.
      *
-     * @param game The current <code>Game</code>.
+     * @param game The current {@code Game}.
      * @param random A pseudo-random number source.
      * @return A player name key, or an empty string on failure.
      */

@@ -114,10 +114,10 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
     /**
      * Creates a new CaptureGoodsDialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param winner The <code>Unit</code> that is looting.
-     * @param loot The <code>Goods</code> to loot.
+     * @param winner The {@code Unit} that is looting.
+     * @param loot The {@code Goods} to loot.
      */
     public CaptureGoodsDialog(FreeColClient freeColClient, JFrame frame,
             Unit winner, List<Goods> loot) {

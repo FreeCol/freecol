@@ -30,9 +30,9 @@ public class Video {
     private final URL url;
     
     /**
-     * Create a <code>Video</code>.
+     * Create a {@code Video}.
      *
-     * @param url The <code>URL</code> to create the video from. 
+     * @param url The {@code URL} to create the video from.
      */
     public Video(URL url) {
         this.url = url;

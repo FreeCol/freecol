@@ -38,10 +38,10 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
 
     /**
-     * Creates a new <code>LanguageOptionUI</code> for the given
-     * <code>LanguageOption</code>.
+     * Creates a new {@code LanguageOptionUI} for the given
+     * {@code LanguageOption}.
      *
-     * @param option The <code>LanguageOption</code> to make a user
+     * @param option The {@code LanguageOption} to make a user
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */

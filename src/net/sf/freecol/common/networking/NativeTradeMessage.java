@@ -47,24 +47,24 @@ public class NativeTradeMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>NativeTradeMessage</code> request with the
+     * Create a new {@code NativeTradeMessage} request with the
      * supplied unit and settlement.
      *
-     * @param unit The <code>Unit</code> performing the trade.
-     * @param is The <code>IndianSettlement</code> where the
+     * @param unit The {@code Unit} performing the trade.
+     * @param is The {@code IndianSettlement} where the
      *     trade occurs.
-     * @param action The <code>NativeTradeAction</code> to use.
+     * @param action The {@code NativeTradeAction} to use.
      */
     public NativeTradeMessage(Unit unit, IndianSettlement is) {
         this(NativeTradeAction.OPEN, new NativeTrade(unit, is));
     }
 
     /**
-     * Create a new <code>NativetradeMessage</code> with the
+     * Create a new {@code NativetradeMessage} with the
      * supplied unit and native settlement.
      *
-     * @param unit The <code>Unit</code> performing the session.
-     * @param is The <code>IndianSettlement</code> where the
+     * @param unit The {@code Unit} performing the session.
+     * @param is The {@code IndianSettlement} where the
      *     session occurs.
      */
     public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
@@ -75,11 +75,11 @@ public class NativeTradeMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>NativeTradeMessage</code> from a
+     * Create a new {@code NativeTradeMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public NativeTradeMessage(Game game, Element element) {
         super(getTagName());
@@ -104,10 +104,10 @@ public class NativeTradeMessage extends DOMMessage {
     /**
      * Handle a "nativeTrade"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      * @return A reply encapsulating the possibilities for this
-     *     trade, or an error <code>Element</code> on failure.
+     *     trade, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

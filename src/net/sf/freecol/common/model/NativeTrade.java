@@ -115,7 +115,7 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Simple constructor, used in FreeColGameObject.newInstance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The identifier (ignored).
      */
     public NativeTrade(Game game, String id) {
@@ -125,8 +125,8 @@ public class NativeTrade extends FreeColGameObject {
     /**
      * Create a new trade session.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> to trade with.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} to trade with.
      */
     public NativeTrade(Unit unit, IndianSettlement is) {
         this(unit.getGame(), ""); // Identifier not needed

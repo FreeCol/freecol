@@ -81,8 +81,8 @@ public final class ReportTurnPanel extends ReportPanel {
     /**
      * Creates the turn report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param messages The <code>ModelMessages</code> to display in the report.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param messages The {@code ModelMessages} to display in the report.
      */
     public ReportTurnPanel(FreeColClient freeColClient,
                            List<ModelMessage> messages) {
@@ -98,7 +98,7 @@ public final class ReportTurnPanel extends ReportPanel {
     /**
      * Set the messages being displayed by this report.
      *
-     * @param messages The <code>ModelMessages</code> to display in the report.
+     * @param messages The {@code ModelMessages} to display in the report.
      */
     public void setMessages(List<ModelMessage> messages) {
         this.messages = messages;

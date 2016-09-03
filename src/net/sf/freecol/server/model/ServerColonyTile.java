@@ -47,7 +47,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
      */
     public ServerColonyTile(Game game, String id) {
@@ -57,10 +57,10 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
     /**
      * Creates at new ServerColonyTile.
      *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param colony The <code>Colony</code> this object belongs to.
-     * @param workTile The tile in which this <code>ColonyTile</code>
-     *                 represents a <code>WorkLocation</code> for.
+     * @param game The {@code Game} this object belongs to.
+     * @param colony The {@code Colony} this object belongs to.
+     * @param workTile The tile in which this {@code ColonyTile}
+     *                 represents a {@code WorkLocation} for.
      */
     public ServerColonyTile(Game game, Colony colony, Tile workTile) {
         super(game, colony, workTile);
@@ -70,9 +70,9 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
     /**
      * New turn for this colony tile.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -102,13 +102,13 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
 
     /**
      * This method is called only when a new turn is beginning.  It
-     * will reduce the quantity of the bonus <code>Resource</code>
+     * will reduce the quantity of the bonus {@code Resource}
      * that is on the given tile, if any and if applicable.
      *
-     * @param tile The <code>Tile</code> to check for a resource.
-     * @param goodsType The <code>GoodsType</code> the goods type to expend.
-     * @param unitType The <code>UnitType</code> doing the production.
-     * @return The <code>Resource</code> if it is exhausted by this
+     * @param tile The {@code Tile} to check for a resource.
+     * @param goodsType The {@code GoodsType} the goods type to expend.
+     * @param unitType The {@code UnitType} doing the production.
+     * @return The {@code Resource} if it is exhausted by this
      *     call (so it can be used in a message), otherwise null.
      */
     private Resource expendResource(Tile tile, GoodsType goodsType,

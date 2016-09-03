@@ -97,8 +97,8 @@ public final class UnitLabel extends JLabel
     /**
      * Creates a JLabel to display a unit.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> to display.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} to display.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit) {
         this(freeColClient, unit, false);
@@ -107,9 +107,9 @@ public final class UnitLabel extends JLabel
     /**
      * Creates a JLabel to display a unit.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> to display.
-     * @param isSmall The image will be smaller if set to <code>true</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} to display.
+     * @param isSmall The image will be smaller if set to {@code true}.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit, boolean isSmall) {
         this(freeColClient, unit, isSmall, false);
@@ -118,11 +118,11 @@ public final class UnitLabel extends JLabel
     /**
      * Creates a JLabel to display a unit.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> to display.
-     * @param isSmall The image will be smaller if set to <code>true</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} to display.
+     * @param isSmall The image will be smaller if set to {@code true}.
      * @param ignoreLocation The image will not include production or state
-     *            information if set to <code>true</code>.
+     *            information if set to {@code true}.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation) {
@@ -133,11 +133,11 @@ public final class UnitLabel extends JLabel
     /**
      * Creates a JLabel to display a unit.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> to display.
-     * @param isSmall The image will be smaller if set to <code>true</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} to display.
+     * @param isSmall The image will be smaller if set to {@code true}.
      * @param ignoreLocation The image will not include production or state
-     *            information if set to <code>true</code>.
+     *            information if set to {@code true}.
      * @param useTileImageLibrary If false use ImageLibrary in GUI.
      *              If true use tileImageLibrary in SwingGUI.
      */
@@ -189,7 +189,7 @@ public final class UnitLabel extends JLabel
     /**
      * Makes a smaller version.
      *
-     * @param isSmall The image will be smaller if set to <code>true</code>.
+     * @param isSmall The image will be smaller if set to {@code true}.
      */
     public void setSmall(boolean isSmall) {
         final ImageLibrary lib = useTileImageLibrary
@@ -341,7 +341,7 @@ public final class UnitLabel extends JLabel
      * Gets a string corresponding to the UnitAction to work at a work
      * location.
      *
-     * @param wl The <code>WorkLocation</code> to use.
+     * @param wl The {@code WorkLocation} to use.
      * @return The unit action as a string.
      */
     public static String getWorkLabel(WorkLocation wl) {

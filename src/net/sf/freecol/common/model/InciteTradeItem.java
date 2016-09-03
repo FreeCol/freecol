@@ -38,12 +38,12 @@ public class InciteTradeItem extends TradeItem {
 
 
     /**
-     * Creates a new <code>InciteTradeItem</code> inincite.
+     * Creates a new {@code InciteTradeItem} inincite.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param victim The <code>Player</code> to incite against.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param victim The {@code Player} to incite against.
      */
     public InciteTradeItem(Game game, Player source, Player destination,
                            Player victim) {
@@ -54,10 +54,10 @@ public class InciteTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new <code>InciteTradeItem</code> inincite.
+     * Creates a new {@code InciteTradeItem} inincite.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr A <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr A {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public InciteTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

@@ -41,8 +41,8 @@ public class ImprovementAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param improvement The <code>TileImprovementType</code> to make.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param improvement The {@code TileImprovementType} to make.
      */
     public ImprovementAction(FreeColClient freeColClient,
                              TileImprovementType improvement) {

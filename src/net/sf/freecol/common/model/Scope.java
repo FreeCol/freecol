@@ -28,29 +28,29 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * The <code>Scope</code> class determines whether a given
- * <code>FreeColSpecObjectType</code> fulfills certain requirements.
+ * The {@code Scope} class determines whether a given
+ * {@code FreeColSpecObjectType} fulfills certain requirements.
  */
 public class Scope extends FreeColObject {
 
     /** 
-     * The identifier of a <code>FreeColSpecObjectType</code>, or
-     * <code>Option</code>.
+     * The identifier of a {@code FreeColSpecObjectType}, or
+     * {@code Option}.
      */
     private String type = null;
 
-    /** The object identifier of an <code>Ability</code>. */
+    /** The object identifier of an {@code Ability}. */
     private String abilityId = null;
 
-    /** The value of an <code>Ability</code>. */
+    /** The value of an {@code Ability}. */
     private boolean abilityValue = true;
 
-    /** The name of an <code>Method</code>. */
+    /** The name of an {@code Method}. */
     private String methodName = null;
 
     /**
-     * The <code>String</code> representation of the value of an
-     * <code>Method</code>.
+     * The {@code String} representation of the value of an
+     * {@code Method}.
      */
     private String methodValue = null;
 
@@ -67,9 +67,9 @@ public class Scope extends FreeColObject {
     public Scope() {}
 
     /**
-     * Creates a new <code>Scope</code> instance from a stream.
+     * Creates a new {@code Scope} instance from a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public Scope(FreeColXMLReader xr) throws XMLStreamException {
@@ -184,7 +184,7 @@ public class Scope extends FreeColObject {
     /**
      * Does this scope apply to a given object?
      *
-     * @param object The <code>FreeColSpecObjectType</code> to test.
+     * @param object The {@code FreeColSpecObjectType} to test.
      * @return True if the scope is applicable.
      */
     public boolean appliesTo(FreeColObject object) {

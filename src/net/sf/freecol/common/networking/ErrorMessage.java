@@ -45,10 +45,10 @@ public class ErrorMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ErrorMessage</code> with the given template
+     * Create a new {@code ErrorMessage} with the given template
      * and optional message.
      *
-     * @param template The <code>StringTemplate</code> to send.
+     * @param template The {@code StringTemplate} to send.
      * @param message An optional non-i18n message.
      */
     public ErrorMessage(StringTemplate template, String message) {
@@ -59,16 +59,16 @@ public class ErrorMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ErrorMessage</code> with the given template
+     * Create a new {@code ErrorMessage} with the given template
      *
-     * @param template The <code>StringTemplate</code> to send.
+     * @param template The {@code StringTemplate} to send.
      */
     public ErrorMessage(StringTemplate template) {
         this(template, null);
     }
 
     /**
-     * Create a new <code>ErrorMessage</code> with the standard client
+     * Create a new {@code ErrorMessage} with the standard client
      * error template and given message.
      *
      * @param message The message.
@@ -78,21 +78,21 @@ public class ErrorMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ErrorMessage</code> from an exception with
+     * Create a new {@code ErrorMessage} from an exception with
      * the standard client error template as the fallback.
      *
-     * @param ex The <code>Exception</code> to use.
+     * @param ex The {@code Exception} to use.
      */
     public ErrorMessage(Exception ex) {
         this(FreeCol.errorFromException(ex, "server.reject"));
     }
 
     /**
-     * Create a new <code>ErrorMessage</code> from a
+     * Create a new {@code ErrorMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ErrorMessage(Game game, Element element) {
         super(getTagName());
@@ -136,9 +136,9 @@ public class ErrorMessage extends DOMMessage {
     /**
      * Handle a "error"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
      * @return Null.
      */

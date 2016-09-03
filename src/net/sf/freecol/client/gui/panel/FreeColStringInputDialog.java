@@ -40,7 +40,7 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
     /**
      * Creates a dialog to input a string field.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param modal True if this dialog should be modal.
      * @param text Text that explains the action to the user.

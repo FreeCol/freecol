@@ -79,10 +79,10 @@ public class MarketData extends FreeColGameObject {
 
 
     /**
-     * Creates a new <code>MarketData</code> instance.
+     * Creates a new {@code MarketData} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param goodsType The <code>GoodsType</code> this market data describes.
+     * @param game The enclosing {@code Game}.
+     * @param goodsType The {@code GoodsType} this market data describes.
      */
     public MarketData(Game game, GoodsType goodsType) {
         super(game);
@@ -101,11 +101,11 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Creates a new <code>MarketData</code> with the given identifier.
+     * Creates a new {@code MarketData} with the given identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public MarketData(Game game, String id) {
@@ -114,7 +114,7 @@ public class MarketData extends FreeColGameObject {
 
 
     /**
-     * Get the type of goods of this <code>MarketData</code>.
+     * Get the type of goods of this {@code MarketData}.
      *
      * @return The goods type for this data.
      */
@@ -285,7 +285,7 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Has there been trading in this <code>MarketData</code>?
+     * Has there been trading in this {@code MarketData}?
      *
      * @return True if trading has occurred.
      **/
@@ -294,7 +294,7 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Set the trading status of this <code>MarketData</code>.
+     * Set the trading status of this {@code MarketData}.
      *
      * @param traded The trade status to set.
      **/

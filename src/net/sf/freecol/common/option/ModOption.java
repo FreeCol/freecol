@@ -45,9 +45,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
 
 
     /**
-     * Creates a new <code>ModOption</code>.
+     * Creates a new {@code ModOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ModOption(Specification specification) {
         super(specification);
@@ -57,7 +57,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * Get the choices available for this option.
      *
-     * @return A list of <code>FreeColModFile</code>s.
+     * @return A list of {@code FreeColModFile}s.
      */
     public final List<FreeColModFile> getChoices() {
         return new ArrayList<>(Mods.getAllMods());
@@ -78,7 +78,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     }
 
     /**
-     * Gets the current value of this <code>ModOption</code>.
+     * Gets the current value of this {@code ModOption}.
      *
      * @return The value.
      */

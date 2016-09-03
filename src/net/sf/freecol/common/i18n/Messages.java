@@ -53,7 +53,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * Represents a collection of messages in a particular locale.
  *
  * The individual messages are read from property files in the
- * <code>data/strings</code> directory. The property files are called
+ * {@code data/strings} directory. The property files are called
  * "FreeColMessages[_LANGUAGE[_COUNTRY[_VARIANT]]].properties", where
  * LANGUAGE should be an ISO 639-2 or ISO 639-3 language code, COUNTRY
  * should be an ISO 3166-2 country code, and VARIANT is an arbitrary
@@ -125,7 +125,7 @@ public class Messages {
      * Gets the Selector with the given tag.
      *
      * @param tag The tag to check.
-     * @return A suitable <code>Selector</code>.
+     * @return A suitable {@code Selector}.
      */
     private static Selector getSelector(String tag) {
         return tagMap.get(tag.toLowerCase(Locale.US));
@@ -134,7 +134,7 @@ public class Messages {
     /**
      * Set the grammatical number rule.
      *
-     * @param number a <code>Number</code> value
+     * @param number a {@code Number} value
      */
     public static void setGrammaticalNumber(Number number) {
         tagMap.put("plural", number);
@@ -143,7 +143,7 @@ public class Messages {
     /**
      * Get a list of candidate message file names for a given locale.
      *
-     * @param locale The <code>Locale</code> to generate file names for.
+     * @param locale The {@code Locale} to generate file names for.
      * @return A list of message file names.
      */
     private static List<String> getMessageFileNames(Locale locale) {
@@ -154,7 +154,7 @@ public class Messages {
     /**
      * Get a list of candidate mod message file names for a given locale.
      *
-     * @param locale The <code>Locale</code> to generate file names for.
+     * @param locale The {@code Locale} to generate file names for.
      * @return A list of mod message file names.
      */
     private static List<String> getModMessageFileNames(Locale locale) {
@@ -168,7 +168,7 @@ public class Messages {
      * Error messages have to go to System.err as this routine is called
      * before logging is enabled.
      *
-     * @param locale The <code>Locale</code> to set resources for.
+     * @param locale The {@code Locale} to set resources for.
      */
     public static void loadMessageBundle(Locale locale) {
         messageBundle.clear(); // Reset the message bundle.
@@ -217,7 +217,7 @@ public class Messages {
      *
      * Public for the test suite.
      *
-     * @param is The <code>InputStream</code> to read from.
+     * @param is The {@code InputStream} to read from.
      * @throws IOException on failure to read from the stream.
      */
     public static void loadMessages(InputStream is) throws IOException {
@@ -257,7 +257,7 @@ public class Messages {
      * loaded.  So this routine is called separately when the mods are
      * finally loaded.
      *
-     * @param locale The <code>Locale</code> to load resources for.
+     * @param locale The {@code Locale} to load resources for.
      */
     public static void loadModMessageBundle(Locale locale) {
         List<FreeColModFile> allMods = new ArrayList<>();
@@ -281,8 +281,8 @@ public class Messages {
      *
      * Called when the spec is updated with the selected mods.
      *
-     * @param mods The list of <code>FreeColModFile</code> for the active mods.
-     * @param locale The <code>Locale</code> to load resources for.
+     * @param mods The list of {@code FreeColModFile} for the active mods.
+     * @param locale The {@code Locale} to load resources for.
      */
     public static void loadActiveModMessageBundle(List<FreeColModFile> mods,
                                                   Locale locale) {
@@ -299,13 +299,13 @@ public class Messages {
     }
     
     /**
-     * Get the <code>Locale</code> corresponding to a given language name.
+     * Get the {@code Locale} corresponding to a given language name.
      *
      * Public as this is needed for language option processing and the
      * initial locale setting.
      *
      * @param languageID An underscore separated language/country/variant tuple.
-     * @return The <code>Locale</code> for the specified language.
+     * @return The {@code Locale} for the specified language.
      */
     public static Locale getLocale(String languageID) {
         String language, country = "", variant = "";
@@ -393,7 +393,7 @@ public class Messages {
     /**
      * Does the message bundle contain the given key?
      *
-     * @param key The key <code>String</code> to check.
+     * @param key The key {@code String} to check.
      * @return True if there is a message present with the given key.
      */
     public static boolean containsKey(String key) {
@@ -405,9 +405,9 @@ public class Messages {
      * bundle and the default key otherwise. This should be used to
      * select the most specific message key available.
      *
-     * @param preferredKey a <code>String</code> value
-     * @param defaultKey a <code>String</code> value
-     * @return a <code>String</code> value
+     * @param preferredKey a {@code String} value
+     * @param defaultKey a {@code String} value
+     * @return a {@code String} value
      */
     public static String getKey(String preferredKey, String defaultKey) {
         if (containsKey(preferredKey)) {
@@ -433,7 +433,7 @@ public class Messages {
      * Favour the .name form, but degrade gracefully if it is not present.
      * If .name is present, also look for a description.
      *
-     * @param named The <code>Named</code> to look up.
+     * @param named The {@code Named} to look up.
      * @return A 2-element array of name and description found.
      */
     public static String[] getBestNameAndDescription(Named named) {
@@ -468,7 +468,7 @@ public class Messages {
     /**
      * A predicate maker to match by message name.
      *
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static final Predicate<String> matchesName(String key) {
         return matchKeyEquals(key, (String k) -> Messages.getName(k));
@@ -477,7 +477,7 @@ public class Messages {
     /**
      * A predicate maker to match named types.
      *
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static final Predicate<Named> matchesNamed(String key) {
         return matchKeyEquals(key, (Named k) -> Messages.getName(k));
@@ -496,7 +496,7 @@ public class Messages {
      * @param nationId An optional nation identifier.
      * @param roleId The unit role identifier.
      * @param extra An optional extra annotation.
-     * @return A <code>StringTemplate</code> to describe the given unit.
+     * @return A {@code StringTemplate} to describe the given unit.
      */
     public static StringTemplate getUnitLabel(String name, String typeId,
                                               int number, String nationId,
@@ -721,7 +721,7 @@ public class Messages {
     /**
      * Localizes a StringTemplate.
      *
-     * @param template The <code>StringTemplate</code> to localize.
+     * @param template The {@code StringTemplate} to localize.
      * @return The localized string.
      */
     public static String message(StringTemplate template) {
@@ -782,9 +782,9 @@ public class Messages {
      * separated by an assignment character. Example:
      * "{{tag:selector|key1=val1|key2=val2}}".
      *
-     * @param input a <code>String</code> value
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>String</code> value
+     * @param input a {@code String} value
+     * @param template a {@code StringTemplate} value
+     * @return a {@code String} value
      */
     private static String replaceChoices(String input, StringTemplate template) {
         int openChoice = 0;
@@ -917,9 +917,9 @@ public class Messages {
      * Return the choice tagged with the given key, or null, if the
      * given input string does not contain the key.
      *
-     * @param input a <code>String</code> value
-     * @param key a <code>String</code> value
-     * @return a <code>String</code> value
+     * @param input a {@code String} value
+     * @param key a {@code String} value
+     * @return a {@code String} value
      */
     private static String getChoice(String input, String key) {
         int keyIndex = input.indexOf(key);
@@ -944,9 +944,9 @@ public class Messages {
      * Return the index of the matching pair of brackets, or -1 if
      * none is found.
      *
-     * @param input a <code>String</code> value
-     * @param start an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param input a {@code String} value
+     * @param start an {@code int} value
+     * @return an {@code int} value
      */
     private static int findMatchingBracket(String input, int start) {
         char last = 0;

@@ -64,22 +64,22 @@ public class MissionaryMission extends Mission {
 
 
     /**
-     * Creates a missionary mission for the given <code>AIUnit</code>.
+     * Creates a missionary mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code> for this mission.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location} for this mission.
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);
     }
 
     /**
-     * Creates a new <code>MissionaryMission</code> and reads
+     * Creates a new {@code MissionaryMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -96,8 +96,8 @@ public class MissionaryMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from,
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
@@ -119,8 +119,8 @@ public class MissionaryMission extends Mission {
      * Evaluate a potential cashin mission for a given unit and
      * path.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -133,9 +133,9 @@ public class MissionaryMission extends Mission {
     /**
      * Makes a goal decider that checks for potential missions.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a mission with.
+     * @param aiUnit The {@code AIUnit} to find a mission with.
      * @param deferOK Enable deferring to a fallback colony.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
@@ -169,7 +169,7 @@ public class MissionaryMission extends Mission {
     /**
      * Find a suitable mission location for this unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
@@ -191,7 +191,7 @@ public class MissionaryMission extends Mission {
      * Finds a suitable mission target for the supplied unit.
      * Falls back to the best colony if a path is not found.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
@@ -205,7 +205,7 @@ public class MissionaryMission extends Mission {
     /**
      * Prepare a unit for a Missionary mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @param aiUnit The {@code AIUnit} to prepare.
      * @return A reason why the unit can not perform this mission, or null
      *     if none.
      */
@@ -228,7 +228,7 @@ public class MissionaryMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason to not perform the mission, or null if none.
      */
     private static String invalidMissionReason(AIUnit aiUnit) {
@@ -250,8 +250,8 @@ public class MissionaryMission extends Mission {
     /**
      * Why would a MissionaryMission be invalid with the given Colony?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The <code>Colony</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The {@code Colony} to check.
      * @return A reason to not perform the mission, or null if none.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
@@ -262,8 +262,8 @@ public class MissionaryMission extends Mission {
      * Why would a MissionaryMission be invalid with the given
      * IndianSettlement?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param is The <code>IndianSettlement</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param is The {@code IndianSettlement} to check.
      * @return A reason to not perform the mission, or null if none.
      */
     private static String invalidIndianSettlementReason(AIUnit aiUnit,
@@ -283,7 +283,7 @@ public class MissionaryMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -293,8 +293,8 @@ public class MissionaryMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

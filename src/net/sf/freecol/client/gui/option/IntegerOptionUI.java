@@ -36,8 +36,8 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
     private final JSpinner spinner = new JSpinner();
 
     /**
-     * Creates a new <code>IntegerOptionUI</code> for the given <code>IntegerOption</code>.
-     * @param option The <code>IntegerOption</code> to make a user interface for.
+     * Creates a new {@code IntegerOptionUI} for the given <code>IntegerOption</code>.
+     * @param option The {@code IntegerOption} to make a user interface for.
      * @param editable boolean whether user can modify the setting
      */
     public IntegerOptionUI(final IntegerOption option, boolean editable) {

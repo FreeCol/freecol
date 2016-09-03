@@ -55,10 +55,10 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
 
 
     /**
-     * Creates a new <code>UnitTypeOptionUI</code> for the given
-     * <code>UnitTypeOption</code>.
+     * Creates a new {@code UnitTypeOptionUI} for the given
+     * {@code UnitTypeOption}.
      *
-     * @param option The <code>UnitTypeOption</code> to make a user
+     * @param option The {@code UnitTypeOption} to make a user
      *     interface for.
      * @param editable boolean whether user can modify the setting
      */

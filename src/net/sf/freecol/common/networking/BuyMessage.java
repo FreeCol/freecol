@@ -54,11 +54,11 @@ public class BuyMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>BuyMessage</code>.
+     * Create a new {@code BuyMessage}.
      *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @param goods The <code>Goods</code> to buy.
+     * @param unit The {@code Unit} that is buying.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @param goods The {@code Goods} to buy.
      * @param gold The price of the goods.
      */
     public BuyMessage(Unit unit, IndianSettlement is, Goods goods,
@@ -72,11 +72,11 @@ public class BuyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>BuyMessage</code> from a
+     * Create a new {@code BuyMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public BuyMessage(Game game, Element element) {
         super(getTagName());
@@ -107,11 +107,11 @@ public class BuyMessage extends DOMMessage {
     /**
      * Handle a "buy"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update following the purchase, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

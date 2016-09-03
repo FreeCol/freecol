@@ -35,7 +35,7 @@ public class NewAction extends FreeColAction {
     /**
      * Creates this action
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public NewAction(FreeColClient freeColClient) {
         super(freeColClient, id);

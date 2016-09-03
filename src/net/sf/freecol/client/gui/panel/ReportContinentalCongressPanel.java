@@ -57,7 +57,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
     /**
      * Creates the continental congress report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportContinentalCongressPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportCongressAction");

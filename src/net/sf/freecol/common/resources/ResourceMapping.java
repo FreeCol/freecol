@@ -50,7 +50,7 @@ public final class ResourceMapping {
 
 
     /**
-     * Creates a new empty <code>ResourceMapping</code>.
+     * Creates a new empty {@code ResourceMapping}.
      */
     public ResourceMapping() {
         colorResources = new HashMap<>();
@@ -69,10 +69,10 @@ public final class ResourceMapping {
 
     /**
      * Adds a mapping between the given object identifier and a
-     * <code>Resource</code>.
+     * {@code Resource}.
      *
      * @param key The identifier for the given resource in the mapping.
-     * @param value The <code>Resource</code> identified by the
+     * @param value The {@code Resource} identified by the
      *     identifier in the mapping,.
      * @return true on success
      */
@@ -188,10 +188,10 @@ public final class ResourceMapping {
     }
 
     /**
-     * Adds all mappings from the given <code>ResourceMapping</code> to
+     * Adds all mappings from the given {@code ResourceMapping} to
      * this object.
      *
-     * @param rc The <code>ResourceMapping</code>.
+     * @param rc The {@code ResourceMapping}.
      */
     public void addAll(ResourceMapping rc) {
         if (rc != null) {
@@ -207,10 +207,10 @@ public final class ResourceMapping {
     }
 
     /**
-     * Returns all the mappings between IDs and <code>Resource</code>s
+     * Returns all the mappings between IDs and {@code Resource}s
      * that are kept by this object.
      *
-     * @return An unmodifiable <code>Map</code>.
+     * @return An unmodifiable {@code Map}.
      */
     public Map<String, Resource> getResources() {
         HashMap<String, Resource> result = new HashMap<>();
@@ -249,10 +249,10 @@ public final class ResourceMapping {
     }
 
     /**
-     * Gets the <code>Resource</code> by identifier.
+     * Gets the {@code Resource} by identifier.
      *
      * @param key The resource identifier.
-     * @return The <code>Resource</code>.
+     * @return The {@code Resource}.
      */
     public ColorResource getColorResource(String key) {
         return colorResources.get(key);

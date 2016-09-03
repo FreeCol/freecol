@@ -48,7 +48,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Create an empty trade route stop.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public TradeRouteStop(Game game) {
         super(game, ""); // Identifier not required
@@ -57,8 +57,8 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Create a stop for the given location from a stream.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param location The <code>Location</code> of this stop.
+     * @param game The enclosing {@code Game}.
+     * @param location The {@code Location} of this stop.
      */
     public TradeRouteStop(Game game, Location location) {
         this(game);
@@ -70,7 +70,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Copy constructor.  Creates a stop based on the given one.
      *
-     * @param other The other <code>TradeRouteStop</code>.
+     * @param other The other {@code TradeRouteStop}.
      */
     public TradeRouteStop(TradeRouteStop other) {
         this(other.getGame(), other.location);
@@ -79,10 +79,10 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     }
 
     /**
-     * Create a new <code>TradeRouteStop</code> from a stream.
+     * Create a new {@code TradeRouteStop} from a stream.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeRouteStop(Game game, FreeColXMLReader xr) throws XMLStreamException {
@@ -95,7 +95,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Get the location of this stop.
      *
-     * @return The <code>Location</code> of this stop.
+     * @return The {@code Location} of this stop.
      */
     public final Location getLocation() {
         return location;
@@ -104,7 +104,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Get the location of this stop as a TradeLocation.
      *
-     * @return The <code>TradeLocation</code> for this stop.
+     * @return The {@code TradeLocation} for this stop.
      */
     public TradeLocation getTradeLocation() {
         return (TradeLocation)location;
@@ -113,7 +113,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Is this stop valid?
      *
-     * @param player The <code>Player</code> that owns this route.
+     * @param player The {@code Player} that owns this route.
      * @return True if the stop is valid.
      */
     public boolean isValid(Player player) {
@@ -126,7 +126,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Get the current cargo for this stop.
      *
-     * @return A list of cargo <code>GoodsType</code>s.
+     * @return A list of cargo {@code GoodsType}s.
      */
     public final List<GoodsType> getCargo() {
         return cargo;
@@ -135,7 +135,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Set the cargo value.
      *
-     * @param newCargo A list of <code>GoodsType</code> defining the cargo.
+     * @param newCargo A list of {@code GoodsType} defining the cargo.
      */
     public final void setCargo(List<GoodsType> newCargo) {
         cargo.clear();
@@ -145,7 +145,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Add cargo to this stop.
      *
-     * @param newCargo The <code>GoodsType</code> to add.
+     * @param newCargo The {@code GoodsType} to add.
      */
     public void addCargo(GoodsType newCargo) {
         cargo.add(newCargo);
@@ -157,7 +157,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      * normally with amount equal to one CARGO_SIZE, but with
      * duplicates removed and amounts accumulated.
      *
-     * @return A list of <code>AbstractGoods</code> to load.
+     * @return A list of {@code AbstractGoods} to load.
      */
     public List<AbstractGoods> getCompactCargo() {
         List<AbstractGoods> result = new ArrayList<>();
@@ -176,8 +176,8 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      * Create a template for this trade route stop.
      *
      * @param key A message key.
-     * @param player The <code>Player</code> who will see the message.
-     * @return A <code>StringTemplate</code> for this stop.
+     * @param player The {@code Player} who will see the message.
+     * @return A {@code StringTemplate} for this stop.
      */
     public StringTemplate getLabelFor(String key, Player player) {
         return StringTemplate.template(key)
@@ -188,8 +188,8 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Create an invalid trade route stop label.
      *
-     * @param player The <code>Player</code> who will see the message.
-     * @return A <code>StringTemplate</code> for this stop.
+     * @param player The {@code Player} who will see the message.
+     * @return A {@code StringTemplate} for this stop.
      */
     public StringTemplate invalidStopLabel(Player player) {
         return getLabelFor("model.tradeRoute.invalidStop", player);
@@ -198,7 +198,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     /**
      * Is there work for a unit to do at this stop?
      *
-     * @param unit The <code>Unit</code> to test.
+     * @param unit The {@code Unit} to test.
      * @param turns Account for production from this many turns.
      * @return True if this unit should load or unload cargo at the stop.
      */

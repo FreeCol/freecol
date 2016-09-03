@@ -34,7 +34,7 @@ public abstract class InPortPanel extends UnitPanel {
     /**
      * Create an InPortPanel.
      *
-     * @param portPanel The <code>PortPanel</code> to enclose.
+     * @param portPanel The {@code PortPanel} to enclose.
      * @param name An optional name for the panel.
      * @param editable Is this panel editable?
      */

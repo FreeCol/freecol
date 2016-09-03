@@ -82,7 +82,7 @@ public final class PlayersTable extends JTable {
         /**
          * Internal constructor.
          *
-         * @param box The <code>JComboBox</code> to edit.
+         * @param box The {@code JComboBox} to edit.
          */
         private AdvantageCellEditor(JComboBox<EuropeanNationType> box) {
             super(box);
@@ -93,7 +93,7 @@ public final class PlayersTable extends JTable {
         /**
          * A standard constructor.
          *
-         * @param nationTypes The list of <code>EuropeanNationType</code>s.
+         * @param nationTypes The list of {@code EuropeanNationType}s.
          */
         public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
             this(new JComboBox<>(nationTypes
@@ -124,7 +124,7 @@ public final class PlayersTable extends JTable {
         /**
          * The default constructor.
          *
-         * @param advantages The type of national <code>Advantages</code>.
+         * @param advantages The type of national {@code Advantages}.
          */
         public AdvantageCellRenderer(Advantages advantages) {
             this.advantages = advantages;
@@ -434,10 +434,10 @@ public final class PlayersTable extends JTable {
         /**
          * Create a new PlayersTableModel.
          *
-         * @param preGameController The <code>PreGameController</code>
+         * @param preGameController The {@code PreGameController}
          *     to use notify of updates.
-         * @param nationOptions The current <code>NationOptions</code>.
-         * @param thisPlayer The <code>Player</code> that owns the client.
+         * @param nationOptions The current {@code NationOptions}.
+         * @param thisPlayer The {@code Player} that owns the client.
          */
         public PlayersTableModel(PreGameController preGameController,
                                  NationOptions nationOptions,
@@ -469,7 +469,7 @@ public final class PlayersTable extends JTable {
          * Gets the class of the objects in the given column.
          *
          * @param column The column to return the class of.
-         * @return The <code>Class</code> of the objects in the given column.
+         * @return The {@code Class} of the objects in the given column.
          */
         @Override
         public Class<?> getColumnClass(int column) {
@@ -645,9 +645,9 @@ public final class PlayersTable extends JTable {
     /**
      * Creates a players table.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param nationOptions The <code>NationOptions</code> for this game.
-     * @param myPlayer The client <code>Player</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param nationOptions The {@code NationOptions} for this game.
+     * @param myPlayer The client {@code Player}.
      */
     public PlayersTable(final FreeColClient freeColClient,
                         NationOptions nationOptions, Player myPlayer) {

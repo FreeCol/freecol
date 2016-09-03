@@ -83,25 +83,25 @@ public class PioneeringMission extends Mission {
 
 
     /**
-     * Creates a pioneering mission for the given <code>AIUnit</code>.
+     * Creates a pioneering mission for the given {@code AIUnit}.
      * Note that PioneeringMission.isValid(aiUnit) should be called
      * before this, to guarantee that
      * findTileImprovementPlan/findColonyWithTools succeed.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location}.
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);
     }
 
     /**
-     * Creates a new <code>PioneeringMission</code> and reads the
+     * Creates a new {@code PioneeringMission} and reads the
      * given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -118,8 +118,8 @@ public class PioneeringMission extends Mission {
     /**
      * Get the best improvement associated with a tile.
      *
-     * @param tile The <code>Tile</code> to get a plan for.
-     * @return The <code>TileImprovementPlan</code>, or null if not found.
+     * @param tile The {@code Tile} to get a plan for.
+     * @return The {@code TileImprovementPlan}, or null if not found.
      */
     private TileImprovementPlan getBestPlan(Tile tile) {
         return getEuropeanAIPlayer().getBestPlan(tile);
@@ -130,28 +130,28 @@ public class PioneeringMission extends Mission {
      * Take care to first check if the unit has a plan already, if so,
      * return that.
      *
-     * @param aiUnit The <code>AIUnit</code> to get a plan for.
-     * @param tile The <code>Tile</code> to get a plan for.
-     * @return The <code>TileImprovementPlan</code>, or null if not found.
+     * @param aiUnit The {@code AIUnit} to get a plan for.
+     * @param tile The {@code Tile} to get a plan for.
+     * @return The {@code TileImprovementPlan}, or null if not found.
      */
     private static TileImprovementPlan getBestPlan(AIUnit aiUnit, Tile tile) {
         return ((EuropeanAIPlayer)aiUnit.getAIOwner()).getBestPlan(tile);
     }
 
     /**
-     * Gets the <code>TileImprovementPlan</code> for this mission.
+     * Gets the {@code TileImprovementPlan} for this mission.
      *
-     * @return The <code>TileImprovementPlan</code>.
+     * @return The {@code TileImprovementPlan}.
      */
     public TileImprovementPlan getTileImprovementPlan() {
         return tileImprovementPlan;
     }
 
     /**
-     * Sets the <code>TileImprovementPlan</code> which should
+     * Sets the {@code TileImprovementPlan} which should
      * be the next target.
      *
-     * @param tip The <code>TileImprovementPlan</code>.
+     * @param tip The {@code TileImprovementPlan}.
      */
     public void setTileImprovementPlan(TileImprovementPlan tip) {
         TileImprovementPlan old = tileImprovementPlan;
@@ -192,7 +192,7 @@ public class PioneeringMission extends Mission {
     /**
      * Does a supplied unit have tools?
      *
-     * @param aiUnit The pioneer <code>AIUnit</code> to check.
+     * @param aiUnit The pioneer {@code AIUnit} to check.
      * @return True if the pioneer has tools.
      */
     private static boolean hasTools(AIUnit aiUnit) {
@@ -211,8 +211,8 @@ public class PioneeringMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from.
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from.
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
@@ -230,8 +230,8 @@ public class PioneeringMission extends Mission {
      * Evaluate a potential pioneering mission for a given unit and
      * path.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -253,10 +253,10 @@ public class PioneeringMission extends Mission {
     /**
      * Makes a goal decider that checks pioneering sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to search with.
+     * @param aiUnit The {@code AIUnit} to search with.
      * @param deferOK Keep track of the nearest colonies to use as a
      *     fallback destination.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
@@ -287,7 +287,7 @@ public class PioneeringMission extends Mission {
     /**
      * Finds a suitable pioneering target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
@@ -309,7 +309,7 @@ public class PioneeringMission extends Mission {
     /**
      * Gets the Colony that most needs a pioneer.
      *
-     * @param aiUnit The pioneer <code>AIUnit</code>.
+     * @param aiUnit The pioneer {@code AIUnit}.
      * @return The colony with the most outstanding tile improvement plans.
      */
     private static Colony getBestPioneeringColony(AIUnit aiUnit) {
@@ -332,7 +332,7 @@ public class PioneeringMission extends Mission {
      * Finds a suitable pioneering target for the supplied unit.
      * Falls back to the best settlement if the unit is not on the map.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A target for this mission.
@@ -350,7 +350,7 @@ public class PioneeringMission extends Mission {
     /**
      * Prepare a unit for this mission.
      *
-     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @param aiUnit The {@code AIUnit} to prepare.
      * @return A reason why the unit can not perform this mission, or null
      *     if none.
      */
@@ -370,7 +370,7 @@ public class PioneeringMission extends Mission {
     /**
      * Why would a PioneeringMission be invalid with the given unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -384,8 +384,8 @@ public class PioneeringMission extends Mission {
     /**
      * Why would a PioneeringMission be invalid with the given unit and colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The <code>Colony</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The {@code Colony} to check.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -403,9 +403,9 @@ public class PioneeringMission extends Mission {
     /**
      * Gets the existing tile improvement plan for a unit and tile.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param tile The <code>Tile</code> to check.
-     * @return The associated <code>TileImprovementPlan</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param tile The {@code Tile} to check.
+     * @return The associated {@code TileImprovementPlan}.
      */
     private static TileImprovementPlan getPlan(AIUnit aiUnit, Tile tile) {
         PioneeringMission pm = aiUnit.getMission(PioneeringMission.class);
@@ -419,8 +419,8 @@ public class PioneeringMission extends Mission {
     /**
      * Why would a PioneeringMission be invalid with the given unit and tile.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param tile The <code>Tile</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param tile The {@code Tile} to check.
      * @return A reason why the mission would be invalid, or null if
      *      none found.
      */
@@ -441,7 +441,7 @@ public class PioneeringMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -451,8 +451,8 @@ public class PioneeringMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

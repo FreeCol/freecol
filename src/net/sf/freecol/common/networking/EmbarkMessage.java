@@ -53,11 +53,11 @@ public class EmbarkMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>EmbarkMessage</code> with the
+     * Create a new {@code EmbarkMessage} with the
      * supplied unit, carrier and optional direction.
      *
-     * @param unit The <code>Unit</code> to embark.
-     * @param carrier The carrier <code>Unit</code> to embark on.
+     * @param unit The {@code Unit} to embark.
+     * @param carrier The carrier {@code Unit} to embark on.
      * @param direction An option direction to embark in.
      */
     public EmbarkMessage(Unit unit, Unit carrier, Direction direction) {
@@ -70,11 +70,11 @@ public class EmbarkMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>EmbarkMessage</code> from a
+     * Create a new {@code EmbarkMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public EmbarkMessage(Game game, Element element) {
         super(getTagName());
@@ -88,11 +88,11 @@ public class EmbarkMessage extends DOMMessage {
     /**
      * Handle a "embark"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the embarked unit, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

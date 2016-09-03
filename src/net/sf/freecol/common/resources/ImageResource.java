@@ -42,7 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * A <code>Resource</code> wrapping an <code>Image</code>.
+ * A {@code Resource} wrapping an <code>Image</code>.
  * @see Resource
  */
 public class ImageResource extends Resource
@@ -62,7 +62,7 @@ public class ImageResource extends Resource
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
     public ImageResource(URI resourceLocator) {
@@ -73,7 +73,7 @@ public class ImageResource extends Resource
      * Adds another URI for loading a differently sized version of the image.
      * Only use before preload got called!
      *
-     * @param resourceLocator The <code>URI</code> used when loading.
+     * @param resourceLocator The {@code URI} used when loading.
      */
     public void addAlternativeResourceLocator(URI resourceLocator) {
         alternativeLocators.add(resourceLocator);
@@ -126,7 +126,7 @@ public class ImageResource extends Resource
     }
 
     /**
-     * Gets the <code>Image</code> represented by this resource.
+     * Gets the {@code Image} represented by this resource.
      *
      * @return The image in it's original size.
      */
@@ -143,7 +143,7 @@ public class ImageResource extends Resource
      * 
      * @param scale The size of the requested image (with 1 being
      *     normal size, 2 twice the size, 0.5 half the size etc).
-     * @return The scaled <code>BufferedImage</code>.
+     * @return The scaled {@code BufferedImage}.
      */
     public BufferedImage getImage(float scale) {
         final BufferedImage im = getImage();
@@ -156,9 +156,9 @@ public class ImageResource extends Resource
     /**
      * Gets the image using the specified dimension.
      * 
-     * @param d The <code>Dimension</code> of the requested
+     * @param d The {@code Dimension} of the requested
      *      image.  Rescaling will be performed if necessary.
-     * @return The <code>BufferedImage</code> with the required dimension.
+     * @return The {@code BufferedImage} with the required dimension.
      */
     public BufferedImage getImage(Dimension d) {
         BufferedImage im = getImage();
@@ -229,7 +229,7 @@ public class ImageResource extends Resource
      * Gets a grayscale version of the image of the given size.
      * 
      * @param d The requested size.
-     * @return The <code>BufferedImage</code>.
+     * @return The {@code BufferedImage}.
      */
     public BufferedImage getGrayscaleImage(Dimension d) {
         final BufferedImage cached = grayscaleImages.get(d);
@@ -258,7 +258,7 @@ public class ImageResource extends Resource
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The <code>BufferedImage</code>.
+     * @return The {@code BufferedImage}.
      */
     public BufferedImage getGrayscaleImage(float scale) {
         final BufferedImage im = getImage();

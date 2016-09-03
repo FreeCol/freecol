@@ -44,11 +44,11 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
 
 
     /**
-     * Creates a new <code>FileOptionUI</code> for the given
-     * <code>FileOption</code>.
+     * Creates a new {@code FileOptionUI} for the given
+     * {@code FileOption}.
      *
-     * @param gui The <code>GUI</code> to create a change dialog on.
-     * @param option The <code>FileOption</code> to make a user interface for.
+     * @param gui The {@code GUI} to create a change dialog on.
+     * @param option The {@code FileOption} to make a user interface for.
      * @param editable boolean whether user can modify the setting
      */
     public FileOptionUI(final GUI gui, final FileOption option,
@@ -107,7 +107,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     /**
      * Sets the value of this UI's component.
      *
-     * @param f The new <code>File</code> value.
+     * @param f The new {@code File} value.
      */
     public void setValue(File f) {
         getOption().setValue(f);

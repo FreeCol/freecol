@@ -48,19 +48,19 @@ public class StringOption extends AbstractOption<String> {
 
 
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new {@code StringOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public StringOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new {@code StringOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public StringOption(String id, Specification specification) {
         super(id, specification);

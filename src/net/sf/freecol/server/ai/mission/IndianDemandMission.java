@@ -89,11 +89,11 @@ public class IndianDemandMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The <code>Colony</code> receiving the gift.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The {@code Colony} receiving the gift.
      */
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit, target);
@@ -102,11 +102,11 @@ public class IndianDemandMission extends Mission {
     }
 
     /**
-     * Creates a new <code>IndianDemandMission</code> and reads the given
+     * Creates a new {@code IndianDemandMission} and reads the given
      * element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
@@ -131,7 +131,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Checks if a unit is carrying a tribute.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return True if the unit is carrying goods.
      */
     private static boolean hasTribute(AIUnit aiUnit) {
@@ -150,7 +150,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Selects the most desirable goods from the colony.
      *
-     * @param target The target <code>Colony</code>.
+     * @param target The target {@code Colony}.
      * @return The goods to demand.
      */
     public Goods selectGoods(Colony target) {
@@ -216,7 +216,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -234,8 +234,8 @@ public class IndianDemandMission extends Mission {
      * Why would an IndianDemandMission be invalid with the given
      * unit and colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param colony The <code>Colony</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param colony The {@code Colony} to test.
      * @return A reason why the mission would be invalid with the unit
      *     and colony or null if none found.
      */
@@ -261,7 +261,7 @@ public class IndianDemandMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -271,8 +271,8 @@ public class IndianDemandMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

@@ -37,9 +37,9 @@ public class RandomUtils {
     /**
      * Convenience to aid logging uses of Randoms.
      *
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
-     * @param random A pseudo-<code>Random</code> number source.
+     * @param random A pseudo-{@code Random} number source.
      * @param range The exclusive maximum integer to return.
      * @return A pseudo-random integer r, 0 &le; r &lt; range.
      */
@@ -55,9 +55,9 @@ public class RandomUtils {
     /**
      * Convenience to aid logging uses of Randoms.
      *
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
-     * @param random A pseudo-<code>Random</code> number source.
+     * @param random A pseudo-{@code Random} number source.
      * @param range The exclusive maximum integer to return.
      * @param n The number of randoms.
      * @return A vector of pseudo-random integers r, 0 &le; r &lt; range.
@@ -79,9 +79,9 @@ public class RandomUtils {
     /**
      * Convenience to aid logging uses of Randoms.
      *
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
-     * @param random A pseudo-<code>Random</code> number source.
+     * @param random A pseudo-{@code Random} number source.
      * @return A pseudo-random double r, 0 &le; r &lt; 1.0.
      */
     public static float randomFloat(Logger logger, String logMe,
@@ -96,9 +96,9 @@ public class RandomUtils {
     /**
      * Convenience to aid logging uses of Randoms.
      *
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
-     * @param random A pseudo-<code>Random</code> number source.
+     * @param random A pseudo-{@code Random} number source.
      * @return A pseudo-random double r, 0 &le; r &lt; 1.0.
      */
     public static double randomDouble(Logger logger, String logMe,
@@ -114,7 +114,7 @@ public class RandomUtils {
      * Gets a random member of a list.
      *
      * @param <T> The list member type.
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
      * @param list The list.
      * @param random A random number source.
@@ -137,9 +137,9 @@ public class RandomUtils {
      * Gets a random member of a stream.
      *
      * @param <T> The list member type.
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
-     * @param stream The <code>Stream</code> to pick from.
+     * @param stream The {@code Stream} to pick from.
      * @param random A random number source.
      * @return A random member from the stream.
      */
@@ -153,7 +153,7 @@ public class RandomUtils {
     /**
      * Shuffle a list.
      *
-     * @param logger The <code>Logger</code> to log to.
+     * @param logger The {@code Logger} to log to.
      * @param logMe A string to log with the result.
      * @param list The list.
      * @param random A random number source.

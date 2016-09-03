@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
  * Represents all pieces that can be moved on the map-board. This includes:
  * colonists, ships, wagon trains e.t.c.
  *
- * Every <code>Unit</code> is owned by a {@link Player} and has a
+ * Every {@code Unit} is owned by a {@link Player} and has a
  * {@link Location}.
  */
 public class Unit extends GoodsLocation
@@ -225,7 +225,7 @@ public class Unit extends GoodsLocation
     /**
      * Constructor for ServerUnit.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     protected Unit(Game game) {
         super(game);
@@ -234,7 +234,7 @@ public class Unit extends GoodsLocation
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param e An XML-element that will be used to initialize this object.
      */
     public Unit(Game game, Element e) {
@@ -244,11 +244,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Creates a new <code>Unit</code> with the given
+     * Creates a new {@code Unit} with the given
      * identifier.  The object should later be initialized by calling
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Unit(Game game, String id) {
@@ -280,7 +280,7 @@ public class Unit extends GoodsLocation
      * Get the name of the apparent owner of this Unit,
      * (like getOwner().getNationAsString() but handles pirates).
      *
-     * @return The name of the apparent owner of this <code>Unit</code>.
+     * @return The name of the apparent owner of this {@code Unit}.
      */
     public StringTemplate getApparentOwnerName() {
         Player own = (hasAbility(Ability.PIRACY)) ? getGame().getUnknownEnemy()
@@ -298,7 +298,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a plain string template for a unit.
      *
-     * @return The <code>StringTemplate</code> to describe the given unit.
+     * @return The {@code StringTemplate} to describe the given unit.
      */
     public StringTemplate getLabel() {
         return getLabel(UnitLabelType.PLAIN);
@@ -315,7 +315,7 @@ public class Unit extends GoodsLocation
      * The FULL template adds equipment annotations
      *
      * @param ult The type of label to get.
-     * @return The <code>StringTemplate</code> to describe the given unit.
+     * @return The {@code StringTemplate} to describe the given unit.
      */
     public StringTemplate getLabel(UnitLabelType ult) {
         final UnitType type = getType();
@@ -389,7 +389,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the basic i18n description for this unit.
      *
-     * @return A <code>String</code> describing this unit.
+     * @return A {@code String} describing this unit.
      */
     public String getDescription() {
         return Messages.message(getLabel());
@@ -399,7 +399,7 @@ public class Unit extends GoodsLocation
      * Get the basic i18n description for this unit.
      *
      * @param ult The label type required.
-     * @return A <code>String</code> describing this unit.
+     * @return A {@code String} describing this unit.
      */
     public String getDescription(UnitLabelType ult) {
         return Messages.message(getLabel(ult));
@@ -408,7 +408,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a label for the chance of success in a potential combat.
      *
-     * @param tile The <code>Tile</code> to attack into.
+     * @param tile The {@code Tile} to attack into.
      * @return A suitable label.
      */
     public StringTemplate getCombatLabel(Tile tile) {
@@ -426,7 +426,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a destination label for this unit.
      *
-     * @return A <code>StringTemplate</code> describing where this unit
+     * @return A {@code StringTemplate} describing where this unit
      *     is going.
      */
     public StringTemplate getDestinationLabel() {
@@ -441,9 +441,9 @@ public class Unit extends GoodsLocation
      * Get a destination label for a given unit tag, destination and player.
      *
      * @param tag The unit tag for the "goingTo" message.
-     * @param destination The destination <code>Location</code>.
-     * @param player The <code>Player</code> viewpoint.
-     * @return A <code>StringTemplate</code> describing the unit movement.
+     * @param destination The destination {@code Location}.
+     * @param player The {@code Player} viewpoint.
+     * @return A {@code StringTemplate} describing the unit movement.
      */
     public static StringTemplate getDestinationLabel(String tag,
         Location destination, Player player) {
@@ -464,9 +464,9 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get the <code>UnitType</code> value.
+     * Get the {@code UnitType} value.
      *
-     * @return The current <code>UnitType</code>.
+     * @return The current {@code UnitType}.
      */
     public final UnitType getType() {
         return this.unitType;
@@ -518,9 +518,9 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this <code>Unit</code> is naval.
+     * Checks if this {@code Unit} is naval.
      *
-     * @return True if this is a naval <code>Unit</code>.
+     * @return True if this is a naval {@code Unit}.
      */
     public boolean isNaval() {
         return (this.unitType == null) ? false : this.unitType.isNaval();
@@ -538,7 +538,7 @@ public class Unit extends GoodsLocation
     /**
      * Can this unit carry treasure (like a treasure train)?
      *
-     * @return True if this <code>Unit</code> can carry treasure.
+     * @return True if this {@code Unit} can carry treasure.
      */
     public boolean canCarryTreasure() {
         return hasAbility(Ability.CARRY_TREASURE);
@@ -547,14 +547,14 @@ public class Unit extends GoodsLocation
     /**
      * Can this unit capture enemy goods?
      *
-     * @return True if this <code>Unit</code> is capable of capturing goods.
+     * @return True if this {@code Unit} is capable of capturing goods.
      */
     public boolean canCaptureGoods() {
         return hasAbility(Ability.CAPTURE_GOODS);
     }
 
     /**
-     * Checks if this is a trading <code>Unit</code>, meaning that it
+     * Checks if this is a trading {@code Unit}, meaning that it
      * can trade with settlements.
      *
      * @return True if this is a trading unit.
@@ -564,8 +564,8 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this <code>Unit</code> is a `colonist'.  A unit is a
-     * colonist if it is European and can build a new <code>Colony</code>.
+     * Checks if this {@code Unit} is a `colonist'.  A unit is a
+     * colonist if it is European and can build a new {@code Colony}.
      *
      * @return True if this unit is a colonist.
      */
@@ -575,7 +575,7 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
+     * Checks if this {@code Unit} is able to carry {@link Locatable}s.
      *
      * @return True if this unit can carry goods or other units.
      */
@@ -607,20 +607,20 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the state of this <code>Unit</code>.
+     * Gets the state of this {@code Unit}.
      *
-     * @return The state of this <code>Unit</code>.
+     * @return The state of this {@code Unit}.
      */
     public UnitState getState() {
         return state;
     }
 
     /**
-     * Checks if a <code>Unit</code> can get the given state set.
+     * Checks if a {@code Unit} can get the given state set.
      *
      * @param s The new state for this Unit.  Should be one of
      *     {UnitState.ACTIVE, FORTIFIED, ...}.
-     * @return True if the <code>Unit</code> state can be changed to
+     * @return True if the {@code Unit} state can be changed to
      *     the new value.
      */
     public boolean checkSetState(UnitState s) {
@@ -676,7 +676,7 @@ public class Unit extends GoodsLocation
     /**
      * Actually set the unit state.
      *
-     * @param s The new <code>UnitState</code>.
+     * @param s The new {@code UnitState}.
      */
     protected void setStateUnchecked(UnitState s) {
         // FIXME: move to the server.
@@ -740,7 +740,7 @@ public class Unit extends GoodsLocation
     /**
      * Sets the given state to all the units that are carried.
      *
-     * @param state The <code>UnitState</code> to set..
+     * @param state The {@code UnitState} to set..
      */
     public void setStateToAllChildren(UnitState state) {
         if (canCarryUnits()) {
@@ -755,7 +755,7 @@ public class Unit extends GoodsLocation
      * implications.  Ideally it should be in ServerUnit but we keep
      * it here for the benefit of the test suite.
      *
-     * @param owner The new owner <code>Player</code>.
+     * @param owner The new owner {@code Player}.
      */
     public void changeOwner(Player owner) {
         final Player oldOwner = this.owner;
@@ -791,16 +791,16 @@ public class Unit extends GoodsLocation
     /**
      * Gets the unit role.
      *
-     * @return The <code>Role</code> of this <code>Unit</code>.
+     * @return The {@code Role} of this <code>Unit</code>.
      */
     public Role getRole() {
         return role;
     }
 
     /**
-     * Sets the <code>Role</code> of this <code>Unit</code>.
+     * Sets the {@code Role} of this <code>Unit</code>.
      *
-     * @param role The new <code>Role</code>.
+     * @param role The new {@code Role}.
      */
     public void setRole(Role role) {
         this.role = role;
@@ -827,7 +827,7 @@ public class Unit extends GoodsLocation
     /**
      * Does this unit have the default role?
      *
-     * @return True if the unit has the default <code>Role</code>.
+     * @return True if the unit has the default {@code Role}.
      */
     public boolean hasDefaultRole() {
         return role.isDefaultRole();
@@ -846,7 +846,7 @@ public class Unit extends GoodsLocation
     /**
      * Change the current role of this unit.
      *
-     * @param role The new <code>Role</code>.
+     * @param role The new {@code Role}.
      * @param roleCount The new role count.
      */
     public void changeRole(Role role, int roleCount) {
@@ -874,7 +874,7 @@ public class Unit extends GoodsLocation
     /**
      * Is a role available to this unit?
      *
-     * @param role The <code>Role</code> to test.
+     * @param role The {@code Role} to test.
      * @return True if the role is available to this unit.
      */
     public boolean roleIsAvailable(Role role) {
@@ -884,9 +884,9 @@ public class Unit extends GoodsLocation
     /**
      * Filter a list of roles to return only those available to this unit.
      *
-     * @param roles The list of <code>Role</code>s to filter, if null all
+     * @param roles The list of {@code Role}s to filter, if null all
      *     available roles are used.
-     * @return A list of available <code>Role</code>s.
+     * @return A list of available {@code Role}s.
      */
     public List<Role> getAvailableRolesList(List<Role> roles) {
         if (roles == null) roles = getSpecification().getRolesList();
@@ -897,9 +897,9 @@ public class Unit extends GoodsLocation
      * Filter a list of roles to return only those available to this unit,
      * returning a stream.
      *
-     * @param roles The list of <code>Role</code>s to filter, if null all
+     * @param roles The list of {@code Role}s to filter, if null all
      *     available roles are used.
-     * @return A stream of available <code>Role</code>s.
+     * @return A stream of available {@code Role}s.
      */
     public Stream<Role> getAvailableRoles(List<Role> roles) {
         return getAvailableRolesList(roles).stream();
@@ -908,7 +908,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a military role for this unit.
      *
-     * @return A military <code>Role</code>, or null if none found.
+     * @return A military {@code Role}, or null if none found.
      */
     public Role getMilitaryRole() {
         return first(transform(getSpecification().getMilitaryRoles(),
@@ -918,9 +918,9 @@ public class Unit extends GoodsLocation
     /**
      * Get the change in goods required to change to a new role/count.
      *
-     * @param role The new <code>Role</code> to change to.
+     * @param role The new {@code Role} to change to.
      * @param roleCount The new role count.
-     * @return A list of <code>AbstractGoods</code> defining the change
+     * @return A list of {@code AbstractGoods} defining the change
      *     in goods required.
      */
     public List<AbstractGoods> getGoodsDifference(Role role, int roleCount) {
@@ -935,7 +935,7 @@ public class Unit extends GoodsLocation
      *
      * -vis: This routine changes player visibility.
      *
-     * @param newLocation The new <code>Location</code>.
+     * @param newLocation The new {@code Location}.
      */
     public void setLocationNoUpdate(Location newLocation) {
         this.location = newLocation;
@@ -965,7 +965,7 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks whether this <code>Unit</code> is at sea off the map, or
+     * Checks whether this {@code Unit} is at sea off the map, or
      * on board of a carrier that is.
      *
      * @return True if at sea.
@@ -1011,7 +1011,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the work location this unit is working in.
      *
-     * @return The current <code>WorkLocation</code>, or null if none.
+     * @return The current {@code WorkLocation}, or null if none.
      */
     public WorkLocation getWorkLocation() {
         return (isInColony()) ? (WorkLocation)getLocation() : null;
@@ -1020,7 +1020,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the work tile this unit is working in, if any.
      *
-     * @return The current work <code>Tile</code>, if any.
+     * @return The current work {@code Tile}, if any.
      */
     public Tile getWorkTile() {
         return (getLocation() instanceof WorkLocation)
@@ -1032,7 +1032,7 @@ public class Unit extends GoodsLocation
      * Gets the entry location for this unit to use when returning from
      * {@link Europe}.
      *
-     * @return The entry <code>Location</code>.
+     * @return The entry {@code Location}.
      */
     public Location getEntryLocation() {
         if (entryLocation == null) {
@@ -1045,7 +1045,7 @@ public class Unit extends GoodsLocation
      * Sets the entry location in which this unit will be put when
      * returning from {@link Europe}.
      *
-     * @param entryLocation The new entry <code>Location</code>.
+     * @param entryLocation The new entry {@code Location}.
      * @see #getEntryLocation
      */
     public void setEntryLocation(Location entryLocation) {
@@ -1059,7 +1059,7 @@ public class Unit extends GoodsLocation
      * Gets the entry tile for this unit, or if null the default
      * entry location for the owning player.
      *
-     * @return The entry <code>Tile</code>.
+     * @return The entry {@code Tile}.
      */
     public Tile getFullEntryLocation() {
         return (entryLocation != null) ? (Tile) entryLocation
@@ -1070,7 +1070,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the moves left this turn.
      *
-     * @return The number of moves this <code>Unit</code> has left.
+     * @return The number of moves this {@code Unit} has left.
      */
     @Override
     public int getMovesLeft() {
@@ -1080,7 +1080,7 @@ public class Unit extends GoodsLocation
     /**
      * Sets the moves left this turn.
      *
-     * @param moves The new amount of moves left this <code>Unit</code>
+     * @param moves The new amount of moves left this {@code Unit}
      *     should have.
      */
     public void setMovesLeft(int moves) {
@@ -1100,7 +1100,7 @@ public class Unit extends GoodsLocation
      * Set the type of goods this unit is producing in its current
      * occupation.
      *
-     * @param type The <code>GoodsType</code> to produce.
+     * @param type The {@code GoodsType} to produce.
      */
     public void setWorkType(GoodsType type) {
         this.workType = type;
@@ -1111,7 +1111,7 @@ public class Unit extends GoodsLocation
      * occupation.  Updates the work location production and the unit
      * experience type if necessary.
      *
-     * @param type The <code>GoodsType</code> to produce.
+     * @param type The {@code GoodsType} to produce.
      */
     public void changeWorkType(GoodsType type) {
         setWorkType(type);
@@ -1130,10 +1130,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the experience of this <code>Unit</code> at its current
+     * Gets the experience of this {@code Unit} at its current
      * experienceType.
      *
-     * @return The experience of this <code>Unit</code> at its current
+     * @return The experience of this {@code Unit} at its current
      *     experienceType.
      * @see #modifyExperience
      */
@@ -1142,10 +1142,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Sets the experience of this <code>Unit</code> at its current
+     * Sets the experience of this {@code Unit} at its current
      * experienceType.
      *
-     * @param experience The new experience of this <code>Unit</code>
+     * @param experience The new experience of this {@code Unit}
      *     at its current experienceType.
      * @see #modifyExperience
      */
@@ -1155,11 +1155,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Modifies the experience of this <code>Unit</code> at its current
+     * Modifies the experience of this {@code Unit} at its current
      * experienceType.
      *
      * @param value The value by which to modify the experience of this
-     *     <code>Unit</code>.
+     *     {@code Unit}.
      * @see #getExperience
      */
     public void modifyExperience(int value) {
@@ -1199,7 +1199,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the TileImprovement that this pioneer is contributing to.
      *
-     * @return The <code>TileImprovement</code> the pioneer is working on.
+     * @return The {@code TileImprovement} the pioneer is working on.
      */
     public TileImprovement getWorkImprovement() {
         return workImprovement;
@@ -1208,7 +1208,7 @@ public class Unit extends GoodsLocation
     /**
      * Sets the TileImprovement that this pioneer is contributing to.
      *
-     * @param imp The new <code>TileImprovement</code> the pioneer is to
+     * @param imp The new {@code TileImprovement} the pioneer is to
      *     work on.
      */
     public void setWorkImprovement(TileImprovement imp) {
@@ -1218,7 +1218,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the unit being taught.
      *
-     * @return A student <code>Unit</code> if any.
+     * @return A student {@code Unit} if any.
      */
     public final Unit getStudent() {
         return student;
@@ -1227,7 +1227,7 @@ public class Unit extends GoodsLocation
     /**
      * Set the student unit.
      *
-     * @param newStudent The new student <code>Unit</code>.
+     * @param newStudent The new student {@code Unit}.
      */
     public final void setStudent(final Unit newStudent) {
         Unit oldStudent = this.student;
@@ -1255,7 +1255,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the unit teaching this one.
      *
-     * @return A teacher <code>Unit</code>.
+     * @return A teacher {@code Unit}.
      */
     public final Unit getTeacher() {
         return teacher;
@@ -1264,7 +1264,7 @@ public class Unit extends GoodsLocation
     /**
      * Set the teacher for this unit.
      *
-     * @param newTeacher The new teacher <code>Unit</code>.
+     * @param newTeacher The new teacher {@code Unit}.
      */
     public final void setTeacher(final Unit newTeacher) {
         Unit oldTeacher = this.teacher;
@@ -1295,7 +1295,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the number of turns this unit has been training.
      *
-     * @return The number of turns of training this <code>Unit</code> has
+     * @return The number of turns of training this {@code Unit} has
      *     given.
      * @see #setTurnsOfTraining
      * @see #getNeededTurnsOfTraining
@@ -1308,7 +1308,7 @@ public class Unit extends GoodsLocation
      * Sets the number of turns this unit has been training.
      *
      * @param turnsOfTraining The number of turns of training this
-     *     <code>Unit</code> has given.
+     *     {@code Unit} has given.
      * @see #getNeededTurnsOfTraining
      */
     public void setTurnsOfTraining(int turnsOfTraining) {
@@ -1341,7 +1341,7 @@ public class Unit extends GoodsLocation
      * Get a unit change for this unit.
      *
      * @param id The identifier for the required change type.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(String change) {
@@ -1352,8 +1352,8 @@ public class Unit extends GoodsLocation
      * Get a unit change for this unit.
      *
      * @param id The identifier for the required change type.
-     * @param toType A <code>UnitType</code> to change to.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @param toType A {@code UnitType} to change to.
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(String change, UnitType toType) {
@@ -1369,9 +1369,9 @@ public class Unit extends GoodsLocation
      * Get a unit change for this unit, including the ownership check.
      *
      * @param id The identifier for the required change type.
-     * @param toType A <code>UnitType</code> to change to.
-     * @param player The expected <code>Player</code> that will own the unit.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @param toType A {@code UnitType} to change to.
+     * @param player The expected {@code Player} that will own the unit.
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(String change, UnitType toType,
@@ -1396,8 +1396,8 @@ public class Unit extends GoodsLocation
     /**
      * Get the skill another unit type can teach this unit.
      *
-     * @param teacherType The <code>UnitType</code> to teach this unit.
-     * @return The <code>UnitType</code> (skill) this unit can learn.
+     * @param teacherType The {@code UnitType} to teach this unit.
+     * @return The {@code UnitType} (skill) this unit can learn.
      */
     public UnitType getTeachingType(UnitType teacherType) {
         UnitType ret = (getSpecification()
@@ -1410,8 +1410,8 @@ public class Unit extends GoodsLocation
     /**
      * Get the skill another unit can teach this unit.
      *
-     * @param teacher The <code>Unit</code> to teach this unit.
-     * @return The <code>UnitType</code> (skill) this unit can learn.
+     * @param teacher The {@code Unit} to teach this unit.
+     * @return The {@code UnitType} (skill) this unit can learn.
      */
     public UnitType getTeachingType(Unit teacher) {
         return getTeachingType(teacher.getType());
@@ -1420,7 +1420,7 @@ public class Unit extends GoodsLocation
     /**
      * Can this unit be a student of a teacher unit?
      *
-     * @param teacher The teacher <code>Unit</code> which is trying to
+     * @param teacher The teacher {@code Unit} which is trying to
      *     teach it.
      * @return True if the unit can be taught by the teacher.
      */
@@ -1506,19 +1506,19 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the <code>IndianSettlement</code> home for this unit.
+     * Gets the {@code IndianSettlement} home for this unit.
      *
-     * @return The home <code>IndianSettlement</code> of this unit.
+     * @return The home {@code IndianSettlement} of this unit.
      */
     public IndianSettlement getHomeIndianSettlement() {
         return indianSettlement;
     }
 
     /**
-     * Sets the home <code>IndianSettlement</code> for this unit.
+     * Sets the home {@code IndianSettlement} for this unit.
      *
-     * @param indianSettlement The <code>IndianSettlement</code> that should
-     *     now own this <code>Unit</code>.
+     * @param indianSettlement The {@code IndianSettlement} that should
+     *     now own this {@code Unit}.
      */
     public void setHomeIndianSettlement(IndianSettlement indianSettlement) {
         if (this.indianSettlement != null) {
@@ -1538,7 +1538,7 @@ public class Unit extends GoodsLocation
      * This is currently only used for damaged ships, but might get an
      * extended use later.
      *
-     * @return The hit points this <code>Unit</code> has.
+     * @return The hit points this {@code Unit} has.
      * @see UnitType#getHitPoints
      */
     public int getHitPoints() {
@@ -1575,7 +1575,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the destination of this unit.
      *
-     * @return The destination <code>Location</code> of this <code>Unit</code>.
+     * @return The destination {@code Location} of this <code>Unit</code>.
      */
     public Location getDestination() {
         return destination;
@@ -1584,7 +1584,7 @@ public class Unit extends GoodsLocation
     /**
      * Sets the destination of this unit.
      *
-     * @param newDestination The new destination <code>Location</code>.
+     * @param newDestination The new destination {@code Location}.
      */
     public void setDestination(Location newDestination) {
         this.destination = newDestination;
@@ -1593,7 +1593,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the unit trade route, if any.
      *
-     * @return The <code>TradeRoute</code>, or null if none.
+     * @return The {@code TradeRoute}, or null if none.
      */
     public final TradeRoute getTradeRoute() {
         return tradeRoute;
@@ -1602,7 +1602,7 @@ public class Unit extends GoodsLocation
     /**
      * Set the unit trade route.
      *
-     * @param newTradeRoute The new <code>TradeRoute</code> value.
+     * @param newTradeRoute The new {@code TradeRoute} value.
      */
     public final void setTradeRoute(final TradeRoute newTradeRoute) {
         this.tradeRoute = newTradeRoute;
@@ -1611,7 +1611,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the stop the unit is heading for or at.
      *
-     * @return The target <code>Stop</code>.
+     * @return The target {@code Stop}.
      */
     public TradeRouteStop getStop() {
         return (validateCurrentStop() < 0) ? null
@@ -1621,7 +1621,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the stop the unit is heading for or at.
      *
-     * @return The target <code>Stop</code>.
+     * @return The target {@code Stop}.
      */
     public List<TradeRouteStop> getCurrentStops() {
         if (validateCurrentStop() < 0) return null;
@@ -1675,7 +1675,7 @@ public class Unit extends GoodsLocation
     /**
      * Convenience function to check if a unit is at a stop.
      *
-     * @param stop The <code>TradeRouteStop</code> to check.
+     * @param stop The {@code TradeRouteStop} to check.
      * @return True if the unit is at the given stop.
      */
     public boolean atStop(TradeRouteStop stop) {
@@ -1685,7 +1685,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the current trade location.
      *
-     * @return The <code>TradeLocation</code> for this unit.
+     * @return The {@code TradeLocation} for this unit.
      */
     public TradeLocation getTradeLocation() {
         Colony colony;
@@ -1743,7 +1743,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the visible amount of goods that is carried by this unit.
      *
-     * @return The visible amount of goods carried by this <code>Unit</code>.
+     * @return The visible amount of goods carried by this {@code Unit}.
      */
     public int getVisibleGoodsCount() {
         return (visibleGoodsCount >= 0) ? visibleGoodsCount
@@ -1762,7 +1762,7 @@ public class Unit extends GoodsLocation
      * for unarmed colonists inside colonies where there are muskets
      * available.  Natives can also auto-arm.
      *
-     * @return A <code>Role</code> that can be automatically assumed
+     * @return A {@code Role} that can be automatically assumed
      *     by this unit, or null if none.
      */
     public Role getAutomaticRole() {
@@ -1785,8 +1785,8 @@ public class Unit extends GoodsLocation
      * After winning a battle, can this unit capture the loser's role
      * equipment?
      *
-     * @param role The loser unit <code>Role</code>.
-     * @return The <code>Role</code> available to this unit as a result
+     * @param role The loser unit {@code Role}.
+     * @return The {@code Role} available to this unit as a result
      *     of capturing the loser equipment.
      */
     public Role canCaptureEquipment(Role role) {
@@ -1848,7 +1848,7 @@ public class Unit extends GoodsLocation
     /**
      * Would this unit be beached if it was on a particular tile?
      *
-     * @param tile The <code>Tile</code> to check.
+     * @param tile The {@code Tile} to check.
      * @return True if the unit is a beached ship.
      */
     public boolean isBeached(Tile tile) {
@@ -1858,7 +1858,7 @@ public class Unit extends GoodsLocation
 
     /**
      * Checks if this is an defensive unit. That is: a unit which can
-     * be used to defend a <code>Settlement</code>.
+     * be used to defend a {@code Settlement}.
      *
      * Note! As this method is used by the AI it really means that the
      * unit can defend as is. To be specific an unarmed colonist is
@@ -1869,7 +1869,7 @@ public class Unit extends GoodsLocation
      * A settlement is lost when there are no more defensive units.
      *
      * @return True if this is a defensive unit meaning it can be used
-     *     to defend a <code>Colony</code>.  This would normally mean
+     *     to defend a {@code Colony}.  This would normally mean
      *     that a defensive unit also will be offensive.
      */
     public boolean isDefensiveUnit() {
@@ -1894,9 +1894,9 @@ public class Unit extends GoodsLocation
      * does not replace a defensive unit defender with a non-defensive
      * unit.
      *
-     * @param defender The current defender <code>Unit</code>.
+     * @param defender The current defender {@code Unit}.
      * @param defenderPower Its defence power.
-     * @param other An alternate <code>Unit</code>.
+     * @param other An alternate {@code Unit}.
      * @param otherPower Its defence power.
      * @return True if the other unit should be preferred.
      */
@@ -1920,10 +1920,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Finds the closest <code>Location</code> to this tile where
+     * Finds the closest {@code Location} to this tile where
      * this ship can be repaired, excluding the current colony.
      *
-     * @return The closest <code>Location</code> where a ship can be
+     * @return The closest {@code Location} where a ship can be
      *     repaired.
      */
     public Location getRepairLocation() {
@@ -2013,32 +2013,32 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the cost of moving this <code>Unit</code> onto the given
-     * <code>Tile</code>. A call to {@link #getMoveType(Tile)} will return
-     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
+     * Gets the cost of moving this {@code Unit} onto the given
+     * {@code Tile}. A call to {@link #getMoveType(Tile)} will return
+     * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param target The <code>Tile</code> this <code>Unit</code> will move
+     * @param target The {@code Tile} this <code>Unit</code> will move
      *            onto.
-     * @return The cost of moving this unit onto the given <code>Tile</code>.
+     * @return The cost of moving this unit onto the given {@code Tile}.
      */
     public int getMoveCost(Tile target) {
         return getMoveCost(getTile(), target, getMovesLeft());
     }
 
     /**
-     * Gets the cost of moving this <code>Unit</code> from the given
-     * <code>Tile</code> onto the given <code>Tile</code>. A call to
+     * Gets the cost of moving this {@code Unit} from the given
+     * {@code Tile} onto the given <code>Tile</code>. A call to
      * {@link #getMoveType(Tile, Tile, int)} will return
-     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
+     * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param from The <code>Tile</code> this <code>Unit</code> will
+     * @param from The {@code Tile} this <code>Unit</code> will
      *     move from.
-     * @param target The <code>Tile</code> this <code>Unit</code> will
+     * @param target The {@code Tile} this <code>Unit</code> will
      *     move onto.
      * @param ml The amount of moves this Unit has left.
-     * @return The cost of moving this unit onto the given <code>Tile</code>.
+     * @return The cost of moving this unit onto the given {@code Tile}.
      */
     public int getMoveCost(Tile from, Tile target, int ml) {
         // Remember to also change map.findPath(...) if you change anything
@@ -2069,7 +2069,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the type of a move made in a specified direction.
      *
-     * @param direction The <code>Direction</code> of the move.
+     * @param direction The {@code Direction} of the move.
      * @return The move type.
      */
     public MoveType getMoveType(Direction direction) {
@@ -2085,7 +2085,7 @@ public class Unit extends GoodsLocation
      * Gets the type of a move that is made when moving from one tile
      * to another.
      *
-     * @param target The target <code>Tile</code> of the move.
+     * @param target The target {@code Tile} of the move.
      * @return The move type.
      */
     public MoveType getMoveType(Tile target) {
@@ -2098,8 +2098,8 @@ public class Unit extends GoodsLocation
      * Gets the type of a move that is made when moving from one tile
      * to another.
      *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
+     * @param from The origin {@code Tile} of the move.
+     * @param target The target {@code Tile} of the move.
      * @param ml The amount of moves this unit has left.
      * @return The move type.
      */
@@ -2130,8 +2130,8 @@ public class Unit extends GoodsLocation
      * to another, without checking if the unit has moves left or
      * logging errors.
      *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
+     * @param from The origin {@code Tile} of the move.
+     * @param target The target {@code Tile} of the move.
      * @return The move type, which will be one of the extended illegal move
      *         types on failure.
      */
@@ -2145,7 +2145,7 @@ public class Unit extends GoodsLocation
      * to another, without checking if the unit has moves left or
      * logging errors.
      *
-     * @param target The target <code>Tile</code> of the move.
+     * @param target The target {@code Tile} of the move.
      * @return The move type, which will be one of the extended illegal move
      *         types on failure.
      */
@@ -2174,8 +2174,8 @@ public class Unit extends GoodsLocation
      * Gets the type of a move that is made when moving a naval unit
      * from one tile to another.
      *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
+     * @param from The origin {@code Tile} of the move.
+     * @param target The target {@code Tile} of the move.
      * @return The move type.
      */
     private MoveType getNavalMoveType(@SuppressWarnings("unused") Tile from,
@@ -2216,8 +2216,8 @@ public class Unit extends GoodsLocation
      * Gets the type of a move that is made when moving a land unit to
      * from one tile to another.
      *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
+     * @param from The origin {@code Tile} of the move.
+     * @param target The target {@code Tile} of the move.
      * @return The move type.
      */
     private MoveType getLandMoveType(Tile from, Tile target) {
@@ -2287,11 +2287,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get the <code>MoveType</code> when moving a trading unit to a
+     * Get the {@code MoveType} when moving a trading unit to a
      * settlement.
      *
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
+     * @param settlement The {@code Settlement} to move to.
+     * @return The appropriate {@code MoveType}.
      */
     private MoveType getTradeMoveType(Settlement settlement) {
         if (settlement instanceof Colony) {
@@ -2314,11 +2314,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get the <code>MoveType</code> when moving a colonist to a settlement.
+     * Get the {@code MoveType} when moving a colonist to a settlement.
      *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
+     * @param from The {@code Tile} to move from.
+     * @param settlement The {@code Settlement} to move to.
+     * @return The appropriate {@code MoveType}.
      */
     private MoveType getLearnMoveType(Tile from, Settlement settlement) {
         if (settlement instanceof Colony) {
@@ -2337,11 +2337,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get the <code>MoveType</code> when moving a missionary to a settlement.
+     * Get the {@code MoveType} when moving a missionary to a settlement.
      *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
+     * @param from The {@code Tile} to move from.
+     * @param settlement The {@code Settlement} to move to.
+     * @return The appropriate {@code MoveType}.
      */
     private MoveType getMissionaryMoveType(Tile from, Settlement settlement) {
         if (settlement instanceof Colony) {
@@ -2363,7 +2363,7 @@ public class Unit extends GoodsLocation
      * Is this unit allowed to move from a source tile?
      * Implements the restrictions on moving from water.
      *
-     * @param from The <code>Tile</code> to consider.
+     * @param from The {@code Tile} to consider.
      * @return True if the move is allowed.
      */
     private boolean allowMoveFrom(Tile from) {
@@ -2375,7 +2375,7 @@ public class Unit extends GoodsLocation
     /**
      * Is this unit allowed to contact a settlement?
      *
-     * @param settlement The <code>Settlement</code> to consider.
+     * @param settlement The {@code Settlement} to consider.
      * @return True if the contact is allowed.
      */
     private boolean allowContact(Settlement settlement) {
@@ -2385,7 +2385,7 @@ public class Unit extends GoodsLocation
     /**
      * Does a basic check whether a unit can ever expect to move to a tile.
      *
-     * @param tile The code <code>Tile</code> to check.
+     * @param tile The code {@code Tile} to check.
      * @return True if some sort of legal move to the tile exists, including
      *     special cases where there is an interaction but the unit does not
      *     actually move, such as trade.
@@ -2441,7 +2441,7 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this <code>Unit</code> can be moved to the high seas
+     * Checks if this {@code Unit} can be moved to the high seas
      * from its current location.
      *
      * @return True if this unit can move immediately to the high seas.
@@ -2473,7 +2473,7 @@ public class Unit extends GoodsLocation
      * the tile where the unit is located is suitable,
      * @see Player#canClaimToFoundSettlement(Tile)
      *
-     * @return <code>true</code> if this unit can build a colony.
+     * @return {@code true} if this unit can build a colony.
      */
     public boolean canBuildColony() {
         final Specification spec = getSpecification();
@@ -2485,7 +2485,7 @@ public class Unit extends GoodsLocation
     /**
      * Is this unit at a specified location?
      *
-     * @param loc The <code>Location</code> to test.
+     * @param loc The {@code Location} to test.
      * @return True if the locations are the same, or on the same tile.
      */
     public boolean isAtLocation(Location loc) {
@@ -2499,7 +2499,7 @@ public class Unit extends GoodsLocation
      * Gets the best (closest) entry location for this unit to reach a
      * given tile.
      *
-     * @param tile The target <code>Tile</code>.
+     * @param tile The target {@code Tile}.
      * @return The best entry location tile to arrive on the map at, or null
      *     if none found.
      */
@@ -2686,7 +2686,7 @@ public class Unit extends GoodsLocation
      * AND
      *   - there is no path OR the path uses an existing carrier
      *
-     * @param loc The <code>Location</code> to go to.
+     * @param loc The {@code Location} to go to.
      * @return True if the unit should use transport.
      */
     public boolean shouldTakeTransportTo(Location loc) {
@@ -2735,10 +2735,10 @@ public class Unit extends GoodsLocation
      * Get a comparator to rank locations by proximity to a start location,
      * using this unit+optional carrier and cost decider.
      *
-     * @param start The starting <code>Location</code>.
-     * @param carrier An optional carrier <code>Unit</code>.
-     * @param costDecider An option <code>CostDecider</code>.
-     * @return A suitable <code>Comparator</code>.
+     * @param start The starting {@code Location}.
+     * @param carrier An optional carrier {@code Unit}.
+     * @param costDecider An option {@code CostDecider}.
+     * @return A suitable {@code Comparator}.
      */
     public Comparator<Tile> getPathComparator(final Location start,
                                               final Unit carrier,
@@ -2754,8 +2754,8 @@ public class Unit extends GoodsLocation
      * specified one.  No carrier is provided, and the default cost
      * decider for this unit is used.
      *
-     * @param end The <code>Location</code> in which the path ends.
-     * @return A <code>PathNode</code> from the current location to the
+     * @param end The {@code Location} in which the path ends.
+     * @return A {@code PathNode} from the current location to the
      *     end location, or null if none found.
      */
     public PathNode findPath(Location end) {
@@ -2766,13 +2766,13 @@ public class Unit extends GoodsLocation
      * Finds a quickest path between specified locations, optionally
      * using a carrier and special purpose cost decider.
      *
-     * @param start The <code>Location</code> to start at.
-     * @param end The <code>Location</code> to end at.
-     * @param carrier An optional carrier <code>Unit</code> to carry the unit.
-     * @param costDecider An optional <code>CostDecider</code> for
+     * @param start The {@code Location} to start at.
+     * @param end The {@code Location} to end at.
+     * @param carrier An optional carrier {@code Unit} to carry the unit.
+     * @param costDecider An optional {@code CostDecider} for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
-     * @return A <code>PathNode</code>, or null if no path is found.
+     * @return A {@code PathNode}, or null if no path is found.
      */
     public PathNode findPath(Location start, Location end, Unit carrier,
                              CostDecider costDecider) {
@@ -2784,13 +2784,13 @@ public class Unit extends GoodsLocation
      * Finds a quickest path to a neighbouring tile to a specified target
      * tile, optionally using a carrier and special purpose cost decider.
      *
-     * @param start The <code>Location</code> to start at.
-     * @param end The <code>Tile</code> to end at a neighbour of.
-     * @param carrier An optional carrier <code>Unit</code> to carry the unit.
-     * @param costDecider An optional <code>CostDecider</code> for
+     * @param start The {@code Location} to start at.
+     * @param end The {@code Tile} to end at a neighbour of.
+     * @param carrier An optional carrier {@code Unit} to carry the unit.
+     * @param costDecider An optional {@code CostDecider} for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
-     * @return A <code>PathNode</code>, or null if no path is found.
+     * @return A {@code PathNode}, or null if no path is found.
      */
     public PathNode findPathToNeighbour(Location start, Tile end, Unit carrier,
                                         CostDecider costDecider) {
@@ -2810,9 +2810,9 @@ public class Unit extends GoodsLocation
      * destination location from its current position.  If the unit is
      * currently on a carrier, it will be used.
      *
-     * @param end The destination <code>Location</code>.
+     * @param end The destination {@code Location}.
      * @return The number of turns it will take to reach the destination,
-     *         or <code>MANY_TURNS</code> if no path can be found.
+     *         or {@code MANY_TURNS} if no path can be found.
      */
     public int getTurnsToReach(Location end) {
         return getTurnsToReach(getLocation(), end);
@@ -2823,10 +2823,10 @@ public class Unit extends GoodsLocation
      * destination location from a starting location.  If the unit is
      * currently on a carrier, it will be used.
      *
-     * @param start The <code>Location</code> to start the search from.
-     * @param end The destination <code>Location</code>.
-     * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>MANY_TURNS</code> if no path can be found.
+     * @param start The {@code Location} to start the search from.
+     * @param end The destination {@code Location}.
+     * @return The number of turns it will take to reach the {@code end},
+     *         or {@code MANY_TURNS} if no path can be found.
      */
     public int getTurnsToReach(Location start, Location end) {
         return getTurnsToReach(start, end, getCarrier(),
@@ -2838,13 +2838,13 @@ public class Unit extends GoodsLocation
      * destination location from a starting location, using an optional
      * carrier and cost decider.
      *
-     * @param start The <code>Location</code> to start the search from.
-     * @param end The destination <code>Location</code>.
-     * @param carrier An optional carrier <code>Unit</code> to use.
-     * @param costDecider An optional <code>CostDecider</code> to
+     * @param start The {@code Location} to start the search from.
+     * @param end The destination {@code Location}.
+     * @param carrier An optional carrier {@code Unit} to use.
+     * @param costDecider An optional {@code CostDecider} to
      *     score the path with.
-     * @return The number of turns it will take to reach the <code>end</code>,
-     *         or <code>MANY_TURNS</code> if no path can be found.
+     * @return The number of turns it will take to reach the {@code end},
+     *         or {@code MANY_TURNS} if no path can be found.
      */
     public int getTurnsToReach(Location start, Location end, Unit carrier,
                                CostDecider costDecider) {
@@ -2856,8 +2856,8 @@ public class Unit extends GoodsLocation
      * Get the colony that can be reached by this unit in the least number
      * of turns.
      *
-     * @param colonies A list of <code>Colony</code>s.
-     * @return The nearest <code>Colony</code>, or null if none found.
+     * @param colonies A list of {@code Colony}s.
+     * @return The nearest {@code Colony}, or null if none found.
      */
     public Colony getClosestColony(List<Colony> colonies) {
         return getClosestColony(colonies.stream());
@@ -2867,8 +2867,8 @@ public class Unit extends GoodsLocation
      * Get the colony that can be reached by this unit in the least number
      * of turns.
      *
-     * @param colonies A stream of <code>Colony</code>s.
-     * @return The nearest <code>Colony</code>, or null if none found.
+     * @param colonies A stream of {@code Colony}s.
+     * @return The nearest {@code Colony}, or null if none found.
      */
     public Colony getClosestColony(Stream<Colony> colonies) {
         final Comparator<Colony> comp = cachingIntComparator(col ->
@@ -2898,7 +2898,7 @@ public class Unit extends GoodsLocation
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
      *
-     * @param startTile The <code>Tile</code> to start searching from.
+     * @param startTile The {@code Tile} to start searching from.
      * @param excludeStart If true, ignore any settlement the unit is
      *     currently in.
      * @param range An upper bound on the number of moves.
@@ -2979,7 +2979,7 @@ public class Unit extends GoodsLocation
      * Used to find where to deliver goods to/from inland colonies,
      * or when blocked.
      *
-     * @param dst The destination <code>Location</code>.
+     * @param dst The destination {@code Location}.
      * @return A path to the port, or null if none found.
      */
     public PathNode findIntermediatePort(Location dst) {
@@ -3073,15 +3073,15 @@ public class Unit extends GoodsLocation
      * Convenience wrapper for the
      * {@link net.sf.freecol.common.model.Map#search} function.
      *
-     * @param start The <code>Location</code> to start the search from.
+     * @param start The {@code Location} to start the search from.
      * @param gd The object responsible for determining whether a
-     *     given <code>PathNode</code> is a goal or not.
-     * @param cd An optional <code>CostDecider</code>
+     *     given {@code PathNode} is a goal or not.
+     * @param cd An optional {@code CostDecider}
      *     responsible for determining the path cost.
      * @param maxTurns The maximum number of turns the given
-     *     <code>Unit</code> is allowed to move. This is the
+     *     {@code Unit} is allowed to move. This is the
      *     maximum search range for a goal.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @param carrier An optional naval carrier {@code Unit} to use.
      * @return The path to a goal, or null if none can be found.
      */
     public PathNode search(Location start, GoalDecider gd,
@@ -3099,7 +3099,7 @@ public class Unit extends GoodsLocation
      * Otherwise naval units can only fight at sea, land units
      * only on land.
      *
-     * @param defender The defending <code>Unit</code>.
+     * @param defender The defending {@code Unit}.
      * @return True if this unit can attack.
      */
     public boolean canAttack(Unit defender) {
@@ -3186,10 +3186,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the line of sight of this <code>Unit</code>.  That is the
-     * distance this <code>Unit</code> can sight new tiles.
+     * Gets the line of sight of this {@code Unit}.  That is the
+     * distance this {@code Unit} can sight new tiles.
      *
-     * @return The line of sight of this <code>Unit</code>.
+     * @return The line of sight of this {@code Unit}.
      */
     public int getLineOfSight() {
         final Turn turn = getGame().getTurn();
@@ -3204,7 +3204,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the tiles visible to this unit.
      *
-     * @return A set of visible <code>Tile</code>s.
+     * @return A set of visible {@code Tile}s.
      */
     public Set<Tile> getVisibleTiles() {
         final Tile tile = getTile();
@@ -3218,7 +3218,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the goods carried by this unit.
      *
-     * @return A list of <code>Goods</code>.
+     * @return A list of {@code Goods}.
      */
     public List<Goods> getGoodsList() {
         return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
@@ -3228,7 +3228,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a compact version of the goods carried by this unit.
      *
-     * @return A compact list of <code>Goods</code>.
+     * @return A compact list of {@code Goods}.
      */
     public List<Goods> getCompactGoodsList() {
         return (getGoodsContainer() == null) ? Collections.<Goods>emptyList()
@@ -3248,7 +3248,7 @@ public class Unit extends GoodsLocation
      * Could this unit carry a specified one?
      * This ignores the current load.
      *
-     * @param u The potential cargo <code>Unit</code>.
+     * @param u The potential cargo {@code Unit}.
      * @return True if this unit can carry the cargo.
      */
     public boolean couldCarry(Unit u) {
@@ -3269,7 +3269,7 @@ public class Unit extends GoodsLocation
      * Could this unit carry some specified goods?
      * This ignores the current load.
      *
-     * @param g The potential cargo <code>Goods</code>.
+     * @param g The potential cargo {@code Goods}.
      * @return True if this unit can carry the cargo.
      */
     public boolean couldCarry(Goods g) {
@@ -3360,7 +3360,7 @@ public class Unit extends GoodsLocation
      * spare space in a slot partially filled with the specified
      * goods.
      *
-     * @param type The <code>GoodsType</code> to examine.
+     * @param type The {@code GoodsType} to examine.
      * @return The amount of goods that could be loaded onto this unit.
      */
     public int getLoadableAmount(GoodsType type) {
@@ -3377,10 +3377,10 @@ public class Unit extends GoodsLocation
     /**
      * Get a label for the current unit occupation.
      *
-     * @param player The <code>Player</code> viewing the unit, as the
+     * @param player The {@code Player} viewing the unit, as the
      *     owner has access to more information.
      * @param full If true, return a more detailed result.
-     * @return A <code>StringTemplate</code> for the unit occupation.
+     * @return A {@code StringTemplate} for the unit occupation.
      */
     public StringTemplate getOccupationLabel(Player player, boolean full) {
         final TradeRoute tradeRoute = getTradeRoute();
@@ -3456,9 +3456,9 @@ public class Unit extends GoodsLocation
 
     /**
      * Checks if the treasure train can be cashed in at it's current
-     * <code>Location</code>.
+     * {@code Location}.
      *
-     * @return <code>true</code> if the treasure train can be cashed in.
+     * @return {@code true} if the treasure train can be cashed in.
      * @exception IllegalStateException if this unit is not a treasure train.
      */
     public boolean canCashInTreasureTrain() {
@@ -3467,10 +3467,10 @@ public class Unit extends GoodsLocation
 
     /**
      * Checks if the treasure train can be cashed in at the given
-     * <code>Location</code>.
+     * {@code Location}.
      *
-     * @param loc The <code>Location</code>.
-     * @return <code>true</code> if the treasure train can be cashed in.
+     * @param loc The {@code Location}.
+     * @return {@code true} if the treasure train can be cashed in.
      * @exception IllegalStateException if this unit is not a treasure train.
      */
     public boolean canCashInTreasureTrain(Location loc) {
@@ -3524,9 +3524,9 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the skill level of the given type of <code>Unit</code>.
+     * Gets the skill level of the given type of {@code Unit}.
      *
-     * @param unitType The type of <code>Unit</code>.
+     * @param unitType The type of {@code Unit}.
      * @return The level of skill for the given unit.  A higher value
      *     signals a more advanced type of units.
      */
@@ -3552,22 +3552,22 @@ public class Unit extends GoodsLocation
 
     /**
      * Adds a feature to the Unit.  This method always throws an
-     * <code>UnsupportedOperationException</code>, since features can
+     * {@code UnsupportedOperationException}, since features can
      * not be added to Units directly.
      *
-     * @param feature The <code>Feature</code> to add.
+     * @param feature The {@code Feature} to add.
      */
     public void addFeature(Feature feature) {
         throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
     }
 
     /**
-     * Gets the <code>ProductionInfo</code> for this unit.
+     * Gets the {@code ProductionInfo} for this unit.
      *
      * FIXME: the input parameter is ignored! Fix?
      *
-     * @param input A list of input <code>AbstractGoods</code>.
-     * @return The <code>ProductionInfo</code> for this unit.
+     * @param input A list of input {@code AbstractGoods}.
+     * @return The {@code ProductionInfo} for this unit.
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
@@ -3620,7 +3620,7 @@ public class Unit extends GoodsLocation
     /**
      * Evaluate this unit for trade purposes.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value of this unit.
      */
     public int evaluateFor(Player player) {
@@ -3640,10 +3640,10 @@ public class Unit extends GoodsLocation
      * values.
      *
      * @param id The identifier to get combat modifiers for.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return The set of <code>Modifier</code>s found.
+     * @param turn An optional applicable {@code Turn}.
+     * @return The set of {@code Modifier}s found.
      */
     public Set<Modifier> getCombatModifiers(String id,
         FreeColSpecObjectType fcgot, Turn turn) {
@@ -3679,7 +3679,7 @@ public class Unit extends GoodsLocation
      * Gets the tile in a given direction.
      *
      * @param directionString The direction.
-     * @return The <code>Tile</code> in the given direction.
+     * @return The {@code Tile} in the given direction.
      * @throws IllegalStateException if there is trouble.
      */
     public Tile getNeighbourTile(String directionString) {
@@ -3703,7 +3703,7 @@ public class Unit extends GoodsLocation
      * be trusted.
      *
      * @param settlementId The identifier of the
-     *     <code>Settlement</code> to be found.
+     *     {@code Settlement} to be found.
      * @return The settlement corresponding to the settlementId argument.
      */
     public <T extends Settlement> T getAdjacentSettlement(String settlementId,
@@ -3784,7 +3784,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the location of this unit.
      *
-     * @return The location of this <code>Unit</code>.
+     * @return The location of this {@code Unit}.
      */
     @Override
     public Location getLocation() {
@@ -3798,7 +3798,7 @@ public class Unit extends GoodsLocation
      * -til: While units do not contribute to tile appearance as such, if
      *     they move in/out of a colony the visible colony size changes.
      *
-     * @param newLocation The new <code>Location</code>.
+     * @param newLocation The new {@code Location}.
      * @return True if the location change succeeds.
      */
     @Override
@@ -3869,10 +3869,10 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Checks if this <code>Unit</code> is located in Europe.  That
+     * Checks if this {@code Unit} is located in Europe.  That
      * is; either directly or onboard a carrier which is in Europe.
      *
-     * @return True if in <code>Europe</code>.
+     * @return True if in {@code Europe}.
      */
     @Override
     public boolean isInEurope() {
@@ -4194,7 +4194,7 @@ public class Unit extends GoodsLocation
      *
      * @param id The identifier to check.
      * @param turn The turn that applies.
-     * @return A stream of <code>Ability</code>s found.
+     * @return A stream of {@code Ability}s found.
      */
     private Stream<Ability> getLocationAbilities(String id, Turn turn) {
         final UnitType unitType = getType();
@@ -4623,7 +4623,7 @@ public class Unit extends GoodsLocation
      * Gets a string representation of this unit.
      *
      * @param prefix A prefix (e.g. "AIUnit")
-     * @return A string representation of this <code>Unit</code>.
+     * @return A string representation of this {@code Unit}.
      */
     public String toString(String prefix) {
         StringBuilder sb = new StringBuilder(64);

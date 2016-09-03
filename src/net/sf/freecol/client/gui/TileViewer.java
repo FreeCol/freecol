@@ -130,7 +130,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public TileViewer(FreeColClient freeColClient) {
         super(freeColClient);
@@ -140,7 +140,7 @@ public final class TileViewer extends FreeColClientHolder {
 
 
     /**
-     * Gets the contained <code>ImageLibrary</code>.
+     * Gets the contained {@code ImageLibrary}.
      * 
      * @return The image library;
      */
@@ -197,7 +197,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
+     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
      * Draws the terrain and improvements.
      *
      * @param tile The Tile to draw.
@@ -225,9 +225,9 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
+     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
      *
-     * @param tile The <code>Tile</code> to draw.
+     * @param tile The {@code Tile} to draw.
      * @return The image.
      */
     BufferedImage createTileImage(Tile tile) {
@@ -249,15 +249,15 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a <code>BufferedImage</code> and draw a <code>Tile</code> on it.
-     * The visualization of the <code>Tile</code> also includes information
-     * from the corresponding <code>ColonyTile</code> of the given
-     * <code>Colony</code>.
+     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
+     * The visualization of the {@code Tile} also includes information
+     * from the corresponding {@code ColonyTile} of the given
+     * {@code Colony}.
      *
-     * @param tile The <code>Tile</code> to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> for. This object is also used to
-     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
+     * @param tile The {@code Tile} to draw.
+     * @param colony The {@code Colony} to create the visualization
+     *      of the {@code Tile} for. This object is also used to
+     *      get the {@code ColonyTile} for the given <code>Tile</code>.
      * @return The image.
      */
     BufferedImage createColonyTileImage(Tile tile, Colony colony) {
@@ -281,11 +281,11 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Displays the 3x3 tiles for the TilesPanel in ColonyPanel.
      * 
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *      the <code>Tile</code>.
-     * @param tiles The array containing the <code>Tile</code> objects to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> objects for.
+     * @param g The {@code Graphics2D} object on which to draw
+     *      the {@code Tile}.
+     * @param tiles The array containing the {@code Tile} objects to draw.
+     * @param colony The {@code Colony} to create the visualization
+     *      of the {@code Tile} objects for.
      */
     void displayColonyTiles(Graphics2D g, Tile[][] tiles, Colony colony) {
         Set<String> overlayCache = ImageLibrary.createOverlayCache();
@@ -307,15 +307,15 @@ public final class TileViewer extends FreeColClientHolder {
 
     /**
      * Displays the given colony tile.
-     * The visualization of the <code>Tile</code> also includes information
-     * from the corresponding <code>ColonyTile</code> from the given
-     * <code>Colony</code>.
+     * The visualization of the {@code Tile} also includes information
+     * from the corresponding {@code ColonyTile} from the given
+     * {@code Colony}.
      *
-     * @param g The <code>Graphics2D</code> on which to draw.
-     * @param tile The <code>Tile</code> to draw.
-     * @param colony The <code>Colony</code> to create the visualization
-     *      of the <code>Tile</code> for. This object is also used to
-     *      get the <code>ColonyTile</code> for the given <code>Tile</code>.
+     * @param g The {@code Graphics2D} on which to draw.
+     * @param tile The {@code Tile} to draw.
+     * @param colony The {@code Colony} to create the visualization
+     *      of the {@code Tile} for. This object is also used to
+     *      get the {@code ColonyTile} for the given <code>Tile</code>.
      * @param overlayImage The BufferedImage of the tile overlay.
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,
@@ -353,10 +353,10 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Displays the given <code>Tile</code>.
+     * Displays the given {@code Tile}.
      *
-     * @param g The Graphics2D on which to draw the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to draw.
+     * @param g The Graphics2D on which to draw the {@code Tile}.
+     * @param tile The {@code Tile} to draw.
      * @param overlayImage The BufferedImage for the tile overlay.
      */
     private void displayTile(Graphics2D g, Tile tile, BufferedImage overlayImage) {
@@ -373,7 +373,7 @@ public final class TileViewer extends FreeColClientHolder {
      * Sets the ImageLibrary and calculates various items that depend
      * on tile size.
      *
-     * @param lib an <code>ImageLibrary</code> value
+     * @param lib an {@code ImageLibrary} value
      */
     void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
@@ -396,7 +396,7 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Centers the given Image on the tile.
      *
-     * @param g a <code>Graphics2D</code>
+     * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
     void displayCenteredImage(Graphics2D g, BufferedImage image) {
@@ -410,7 +410,7 @@ public final class TileViewer extends FreeColClientHolder {
      * Centers the given Image on the tile, ensuring it is not drawing
      * over tiles south of it.
      *
-     * @param g a <code>Graphics2D</code>
+     * @param g a {@code Graphics2D}
      * @param image the BufferedImage
      */
     void displayLargeCenteredImage(Graphics2D g, BufferedImage image) {
@@ -508,9 +508,9 @@ public final class TileViewer extends FreeColClientHolder {
      * location specified by the coordinates.  Fog of war will be
      * drawn.
      *
-     * @param g The <code>Graphics2D</code> object on which to draw
-     *     the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to draw.
+     * @param g The {@code Graphics2D} object on which to draw
+     *     the {@code Tile}.
+     * @param tile The {@code Tile} to draw.
      */
     void displayFogOfWar(Graphics2D g, Tile tile) {
         if (getGame() != null
@@ -735,9 +735,9 @@ public final class TileViewer extends FreeColClientHolder {
     /**
      * Draws the given TileItem on the given Tile.
      *
-     * @param g The <code>Graphics</code> to draw to.
-     * @param tile The <code>Tile</code> to draw from.
-     * @param item The <code>TileItem</code> to draw.
+     * @param g The {@code Graphics} to draw to.
+     * @param tile The {@code Tile} to draw from.
+     * @param item The {@code TileItem} to draw.
      */
     private void displayTileItem(Graphics2D g, Tile tile, TileItem item) {
         if (item instanceof TileImprovement) {

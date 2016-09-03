@@ -52,7 +52,7 @@ import net.sf.freecol.server.model.ServerRegion;
 
 
 /**
- * Class for making a <code>Map</code> based upon a land map.
+ * Class for making a {@code Map} based upon a land map.
  *
  * FIXME: dynamic lakes, mountains and hills
  */
@@ -91,11 +91,11 @@ public class TerrainGenerator {
 
 
     /**
-     * Creates a new <code>TerrainGenerator</code>.
+     * Creates a new {@code TerrainGenerator}.
      *
-     * @param game The <code>Game</code> to generate for.
-     * @param importGame A <code>Game</code> to selectively import from.
-     * @param random A <code>Random</code> number source.
+     * @param game The {@code Game} to generate for.
+     * @param importGame A {@code Game} to selectively import from.
+     * @param random A {@code Random} number source.
      * @see #createMap
      */
     public TerrainGenerator(Game game, Game importGame, Random random) {
@@ -180,10 +180,10 @@ public class TerrainGenerator {
      *
      * FIXME: Can be used for mountains and rivers too.
      *
-     * @param candidates A list of <code>TileType</code>s to use for
+     * @param candidates A list of {@code TileType}s to use for
      *     calculations.
      * @param latitude The tile latitude.
-     * @return A suitable <code>TileType</code>.
+     * @return A suitable {@code TileType}.
      */
     private TileType getRandomTileType(List<TileType> candidates,
                                        int latitude) {
@@ -320,14 +320,14 @@ public class TerrainGenerator {
      * Creates land map regions in the given Map.
      *
      * First, the arctic/antarctic regions are defined, based on
-     * <code>Map.POLAR_HEIGHT</code>.
+     * {@code Map.POLAR_HEIGHT}.
      *
      * For the remaining land tiles, one region per contiguous
      * landmass is created.
      *
-     * @param map The <code>Map</code> to work on.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of created <code>ServerRegion</code>s.
+     * @param map The {@code Map} to work on.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createLandRegions(Map map, LogBuilder lb) {
         // Create "explorable" land regions
@@ -464,8 +464,8 @@ public class TerrainGenerator {
     /**
      * Pick a good tile to put elevated terrain on.
      *
-     * @param map A <code>Map</code> to choose from.
-     * @return A suitable <code>Tile</code>, or null if none found.
+     * @param map A {@code Map} to choose from.
+     * @return A suitable {@code Tile}, or null if none found.
      */
     private Tile getGoodMountainTile(Map map) {
         final TileType hills = spec.getTileType("model.tile.hills");
@@ -494,8 +494,8 @@ public class TerrainGenerator {
      * of mountain ranges depends on the map size.
      *
      * @param map The map to use.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of created <code>ServerRegion</code>s.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createMountains(Map map, LogBuilder lb) {
         List<ServerRegion> result = new ArrayList<>();
@@ -585,9 +585,9 @@ public class TerrainGenerator {
      * Creates rivers on the given map. The number of rivers depends
      * on the map size.
      *
-     * @param map The <code>Map</code> to create rivers on.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of created <code>ServerRegion</code>s.
+     * @param map The {@code Map} to create rivers on.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createRivers(Map map, LogBuilder lb) {
         List<ServerRegion> result = new ArrayList<>();
@@ -642,9 +642,9 @@ public class TerrainGenerator {
     /**
      * Finds all the lake regions.
      *
-     * @param map The <code>Map</code> to work on.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of created <code>ServerRegion</code>s.
+     * @param map The {@code Map} to work on.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of created {@code ServerRegion}s.
      */
     private List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
         // Create the water map, and find any tiles that are water but
@@ -675,9 +675,9 @@ public class TerrainGenerator {
      * // Public/static to allow Map to remediate missing lake regions
      * // end @compat 0.10.x
      *
-     * @param map The <code>Map</code> to add to.
-     * @param lakes A list of lake <code>Tile</code>s.
-     * @return A list of new <code>ServerRegion</code>s.
+     * @param map The {@code Map} to add to.
+     * @param lakes A list of lake {@code Tile}s.
+     * @return A list of new {@code ServerRegion}s.
      */
     public static List<ServerRegion> makeLakes(Map map, List<Tile> lakes) {
         Game game = map.getGame();
@@ -718,9 +718,9 @@ public class TerrainGenerator {
 
     /**
      * Adds a terrain bonus with a probability determined by the
-     * <code>MapGeneratorOptions</code>.
+     * {@code MapGeneratorOptions}.
      *
-     * @param t The <code>Tile</code> to add bonuses to.
+     * @param t The {@code Tile} to add bonuses to.
      * @param generateBonus Generate the bonus or not.
      */
     private void perhapsAddBonus(Tile t, boolean generateBonus) {
@@ -782,7 +782,7 @@ public class TerrainGenerator {
     /**
      * Create a random resource on a tile.
      *
-     * @param tile The <code>Tile</code> to create the resource on.
+     * @param tile The {@code Tile} to create the resource on.
      * @return The created resource, or null if it is not possible.
      */
     private Resource createResource(Tile tile) {
@@ -807,7 +807,7 @@ public class TerrainGenerator {
      * Only relevant to water tiles for now.
      * Public because it is used in the river generator.
      *
-     * @param tile The <code>Tile</code> to set the style of.
+     * @param tile The {@code Tile} to set the style of.
      */
     public static void encodeStyle(Tile tile) {
         EnumMap<Direction, Boolean> connections
@@ -846,11 +846,11 @@ public class TerrainGenerator {
     // Main functionality, create the map.
 
     /**
-     * Creates a <code>Map</code>.
+     * Creates a {@code Map}.
      *
-     * @param landMap The <code>LandMap</code> to use as a template.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The new <code>Map</code>.
+     * @param landMap The {@code LandMap} to use as a template.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The new {@code Map}.
      */
     public Map createMap(LandMap landMap, LogBuilder lb) {
         final int width = landMap.getWidth();

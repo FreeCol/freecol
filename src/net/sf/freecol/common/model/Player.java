@@ -120,7 +120,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     
     /**
-     * An <code>Iterator</code> of {@link Unit}s that can be made active.
+     * An {@code Iterator} of {@link Unit}s that can be made active.
      */
     public static class UnitIterator implements Iterator<Unit> {
 
@@ -132,13 +132,13 @@ public class Player extends FreeColGameObject implements Nameable {
 
 
         /**
-         * Creates a new <code>UnitIterator</code>.
+         * Creates a new {@code UnitIterator}.
          *
-         * @param owner The <code>Player</code> that needs an iterator
+         * @param owner The {@code Player} that needs an iterator
          *     of it's units.
-         * @param predicate A <code>Predicate</code> for deciding
-         *     whether a <code>Unit</code> should be included in the
-         *     <code>Iterator</code> or not.
+         * @param predicate A {@code Predicate} for deciding
+         *     whether a {@code Unit} should be included in the
+         *     {@code Iterator} or not.
          */
         public UnitIterator(Player owner, Predicate<Unit> predicate) {
             this.owner = owner;
@@ -160,7 +160,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * Set the next valid unit.
          *
-         * @param unit The <code>Unit</code> to put at the front of the list.
+         * @param unit The {@code Unit} to put at the front of the list.
          * @return True if the operation succeeds.
          */
         public boolean setNext(Unit unit) {
@@ -182,7 +182,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * Removes a specific unit from this unit iterator.
          *
-         * @param u The <code>Unit</code> to remove.
+         * @param u The {@code Unit} to remove.
          * @return True if the unit was removed.
          */
         public boolean remove(Unit u) {
@@ -431,17 +431,17 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Constructor for ServerPlayer.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     protected Player(Game game) {
         super(game);
     }
 
     /**
-     * Initiates a new <code>Player</code> from an <code>Element</code> and
-     * registers this <code>Player</code> at the specified game.
+     * Initiates a new {@code Player} from an <code>Element</code> and
+     * registers this {@code Player} at the specified game.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param e An XML-element that will be used to initialize this object.
      */
     public Player(Game game, Element e) {
@@ -451,11 +451,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Creates a new <code>Player</code> with the given id.
+     * Creates a new {@code Player} with the given id.
      *
      * The object should be initialized later.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
      */
     public Player(Game game, String id) {
@@ -490,7 +490,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a label for this player.
      *
-     * @return A suitable <code>StringTemplate</code>.
+     * @return A suitable {@code StringTemplate}.
      */
     public StringTemplate getLabel() {
         return StringTemplate.label("")
@@ -530,7 +530,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the name this player has chosen for the new world.
      *
-     * @return The name of the new world as chosen by the <code>Player</code>,
+     * @return The name of the new world as chosen by the {@code Player},
      *     or null if none chosen yet.
      */
     public String getNewLandName() {
@@ -549,7 +549,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the name this player uses for the new world.
      *
-     * @param newLandName This <code>Player</code>'s name for the new world.
+     * @param newLandName This {@code Player}'s name for the new world.
      */
     public void setNewLandName(String newLandName) {
         this.newLandName = newLandName;
@@ -610,7 +610,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a label indicating for the national forces.
      *
-     * @return A suitable <code>StringTemplate</code>.
+     * @return A suitable {@code StringTemplate}.
      */
     public StringTemplate getForcesLabel() {
         return StringTemplate.template("model.player.forces")
@@ -620,7 +620,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a label indicating that we are waiting for this player.
      *
-     * @return A suitable <code>StringTemplate</code>.
+     * @return A suitable {@code StringTemplate}.
      */
     public StringTemplate getWaitingLabel() {
         return StringTemplate.template("model.player.waitingFor")
@@ -659,7 +659,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Following a declaration of independence we are assumed to trade
      * broadly with any European market rather than a specific port.
      *
-     * @return A <code>StringTemplate</code> for the player market.
+     * @return A {@code StringTemplate} for the player market.
      */
     public StringTemplate getMarketName() {
         return (getEurope() == null)
@@ -699,7 +699,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a name for a region.
      *
-     * @param region The <code>Region</code> to name.
+     * @param region The {@code Region} to name.
      * @return A suitable name.
      */
     public String getNameForRegion(Region region) {
@@ -709,7 +709,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets a new name for a unit.
      *
-     * @param type The <code>UnitType</code> to choose a name for.
+     * @param type The {@code UnitType} to choose a name for.
      * @param random A pseudo-random number source.
      * @return A name for the unit, or null if not available.
      */
@@ -828,7 +828,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Is this player currently on good terms with a given player, and thus
      * a suitable candidate for a random monarch war declaration?
      *
-     * @param player The <code>Player</code> to possibly declare war on.
+     * @param player The {@code Player} to possibly declare war on.
      * @return True if this player is a potential enemy.
      */
     public boolean isPotentialEnemy(Player player) {
@@ -846,7 +846,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Is this player currently on bad terms with a given player, and thus
      * a suitable candidate for a random monarch peace declaration?
      *
-     * @param player The <code>Player</code> to possibly declare peace with.
+     * @param player The {@code Player} to possibly declare peace with.
      * @return True if this player is a potential friend.
      */
     public boolean isPotentialFriend(Player player) {
@@ -862,7 +862,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the nation type of this player.
      *
-     * @return The <code>NationType</code> of this player.
+     * @return The {@code NationType} of this player.
      */
     public NationType getNationType() {
         return nationType;
@@ -871,7 +871,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the nation type of this player.
      *
-     * @param newNationType The new <code>NationType</code>.
+     * @param newNationType The new {@code NationType}.
      */
     public void setNationType(NationType newNationType) {
         nationType = newNationType;
@@ -880,7 +880,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Changes the nation type of this player, handling the features.
      *
-     * @param newNationType The new <code>NationType</code>.
+     * @param newNationType The new {@code NationType}.
      */
     public void changeNationType(NationType newNationType) {
         if (nationType != null) removeFeatures(nationType);
@@ -918,7 +918,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets this Player's nation.
      *
-     * @return The player <code>Nation</code>.
+     * @return The player {@code Nation}.
      */
     public Nation getNation() {
         return getSpecification().getNation(nationId);
@@ -927,7 +927,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the nation for this player.
      *
-     * @param newNation The new <code>Nation</code>.
+     * @param newNation The new {@code Nation}.
      */
     public void setNation(Nation newNation) {
         Nation oldNation = getNation();
@@ -968,7 +968,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Is this player ready to start the game?
      *
-     * @return True if this <code>Player</code> is ready to start the game.
+     * @return True if this {@code Player} is ready to start the game.
      */
     public boolean isReady() {
         return ready;
@@ -984,10 +984,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if this player is dead.  A <code>Player</code> dies when it
+     * Checks if this player is dead.  A {@code Player} dies when it
      * loses the game.
      *
-     * @return True if this <code>Player</code> is dead.
+     * @return True if this {@code Player} is dead.
      */
     public boolean isDead() {
         return dead;
@@ -998,7 +998,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * This is indeed identical to isDead(), but is needed for partial
      * updates to complement the setDead() function.
      *
-     * @return True if this <code>Player</code> is dead.
+     * @return True if this {@code Player} is dead.
      */
     public boolean getDead() {
         return dead;
@@ -1056,10 +1056,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the <code>Player</code> controlling the "Royal Expeditionary
+     * Gets the {@code Player} controlling the "Royal Expeditionary
      * Force" for this player.
      *
-     * @return The player, or <code>null</code> if this player does not have a
+     * @return The player, or {@code null} if this player does not have a
      *         royal expeditionary force.
      */
     public Player getREFPlayer() {
@@ -1070,7 +1070,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the player nation color.
      *
-     * @return The <code>Color</code>.
+     * @return The {@code Color}.
      */
     public Color getNationColor() {
         final Nation nation = getNation();
@@ -1274,8 +1274,8 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Updates the amount of immigration needed to emigrate a <code>Unit</code>
-     * from <code>Europe</code>.
+     * Updates the amount of immigration needed to emigrate a {@code Unit}
+     * from {@code Europe}.
      */
     public void updateImmigrationRequired() {
         if (!isColonial()) return;
@@ -1325,8 +1325,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a message for a newly migrating unit.
      *
-     * @param unit The <code>Unit</code> that is migrating.
-     * @return A suitable <code>ModelMessage</code>.
+     * @param unit The {@code Unit} that is migrating.
+     * @return A suitable {@code ModelMessage}.
      */
     public ModelMessage getEmigrationMessage(Unit unit) {
         return new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -1394,8 +1394,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets how much liberty will be produced next turn if no colonies
      * are lost and nothing unexpected happens.
      *
-     * @return The total amount of liberty this <code>Player</code>'s
-     *     <code>Colony</code>s will make next turn.
+     * @return The total amount of liberty this {@code Player}'s
+     *     {@code Colony}s will make next turn.
      */
     public int getLibertyProductionNextTurn() {
         final Specification spec = getSpecification();
@@ -1420,7 +1420,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the founding fathers in this player's congress.
      *
-     * @return A set of <code>FoundingFather</code>s in congress.
+     * @return A set of {@code FoundingFather}s in congress.
      */
     public Set<FoundingFather> getFathers() {
         return foundingFathers;
@@ -1429,7 +1429,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Does this player have a certain Founding father.
      *
-     * @param someFather The <code>FoundingFather</code> to check.
+     * @param someFather The {@code FoundingFather} to check.
      * @return Whether this player has this Founding father
      * @see FoundingFather
      */
@@ -1450,7 +1450,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Add a founding father to the congress.
      *
-     * @param father The <code>FoundingFather</code> to add.
+     * @param father The {@code FoundingFather} to add.
      */
     public void addFather(FoundingFather father) {
         foundingFathers.add(father);
@@ -1462,7 +1462,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the {@link FoundingFather founding father} this player is working
      * towards.
      *
-     * @return The current <code>FoundingFather</code>, or null if
+     * @return The current {@code FoundingFather}, or null if
      *     there is none.
      * @see #setCurrentFather
      * @see FoundingFather
@@ -1474,7 +1474,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the current founding father to recruit.
      *
-     * @param someFather The <code>FoundingFather</code> to recruit.
+     * @param someFather The {@code FoundingFather} to recruit.
      * @see FoundingFather
      */
     public void setCurrentFather(FoundingFather someFather) {
@@ -1484,7 +1484,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the offered fathers for this player.
      *
-     * @return A list of the current offered <code>FoundingFather</code>s.
+     * @return A list of the current offered {@code FoundingFather}s.
      */
     public List<FoundingFather> getOfferedFathers() {
         return offeredFathers;
@@ -1500,7 +1500,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the set of offered fathers.
      *
-     * @param fathers A list of <code>FoundingFather</code>s to offer.
+     * @param fathers A list of {@code FoundingFather}s to offer.
      */
     public void setOfferedFathers(List<FoundingFather> fathers) {
         clearOfferedFathers();
@@ -1511,8 +1511,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the number of liberty points needed to recruit the next
      * founding father.
      *
-     * @return How many more liberty points the <code>Player</code>
-     *     needs in order to recruit the next <code>FoundingFather</code>.
+     * @return How many more liberty points the {@code Player}
+     *     needs in order to recruit the next {@code FoundingFather}.
      */
     public int getRemainingFoundingFatherCost() {
         return getTotalFoundingFatherCost() - getLiberty();
@@ -1524,8 +1524,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * https://sourceforge.net/p/freecol/bugs/2623 where the Col1
      * numbers were checked.
      *
-     * @return Total number of liberty points the <code>Player</code>
-     *     needs to recruit the next <code>FoundingFather</code>.
+     * @return Total number of liberty points the {@code Player}
+     *     needs to recruit the next {@code FoundingFather}.
      */
     public int getTotalFoundingFatherCost() {
         final Specification spec = getSpecification();
@@ -1535,10 +1535,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the <code>Turn</code>s during which FoundingFathers were
+     * Gets the {@code Turn}s during which FoundingFathers were
      * elected to the Continental Congress
      *
-     * @return A map of father id to <code>Turn</code>s.
+     * @return A map of father id to {@code Turn}s.
      */
     public java.util.Map<String, Turn> getElectionTurns() {
         return transform(getHistory(),
@@ -1553,7 +1553,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Check whether this player can declare independence.
      *
      * @return Null if there is no barrier to declaration, otherwise
-     *     a <code>StringTemplate</code> explaining the problem.
+     *     a {@code StringTemplate} explaining the problem.
      */
     public StringTemplate checkDeclareIndependence() {
         if (getPlayerType() != PlayerType.COLONIAL)
@@ -1595,7 +1595,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a list of abstract REF units for this player.
      *
-     * @return A list of <code>AbstractUnit</code>s defining the REF,
+     * @return A list of {@code AbstractUnit}s defining the REF,
      *     or null if not available.
      */
     public List<AbstractUnit> getREFUnits() {
@@ -1607,7 +1607,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a list of the military units for this player.
      *
-     * @return A list of military <code>AbstractUnit</code>s.
+     * @return A list of military {@code AbstractUnit}s.
      */
     public List<AbstractUnit> getMilitaryUnits() {
         final UnitType defaultType = getSpecification().getDefaultUnitType(this);
@@ -1662,7 +1662,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get this player's Market.
      *
-     * @return The <code>Market</code>.
+     * @return The {@code Market}.
      */
     public Market getMarket() {
         return market;
@@ -1678,10 +1678,10 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the current sales data for a location and goods type.
      *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
+     * @param where The {@code Location} of the sale.
+     * @param what The {@code GoodsType} sold.
      *
-     * @return An appropriate <code>LastSaleData</code> record, or
+     * @return An appropriate {@code LastSaleData} record, or
      *     null if no appropriate sale can be found.
      */
     public LastSale getLastSale(Location where, GoodsType what) {
@@ -1692,7 +1692,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Saves a record of a sale.
      *
-     * @param sale The <code>LastSale</code> to save.
+     * @param sale The {@code LastSale} to save.
      */
     public void addLastSale(LastSale sale) {
         if (lastSales == null) lastSales = new HashMap<>();
@@ -1702,8 +1702,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the last sale price for a location and goods type as a string.
      *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
+     * @param where The {@code Location} of the sale.
+     * @param what The {@code GoodsType} sold.
      * @return An abbreviation for the sale price, or null if none found.
      */
     public String getLastSaleString(Location where, GoodsType what) {
@@ -1714,9 +1714,9 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a template for the last sale price for a location and goods type.
      *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
-     * @return A <code>StringTemplate</code> for the sale, or null if
+     * @param where The {@code Location} of the sale.
+     * @param what The {@code GoodsType} sold.
+     * @return A {@code StringTemplate} for the sale, or null if
      *     none found.
      */
     public StringTemplate getLastSaleTip(Location where, GoodsType what) {
@@ -1731,7 +1731,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the arrears due for a type of goods.
      *
-     * @param type The <code>GoodsType</code> to check.
+     * @param type The {@code GoodsType} to check.
      * @return The arrears due for this type of goods.
      */
     public int getArrears(GoodsType type) {
@@ -1741,7 +1741,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Can a type of goods can be traded in Europe?
      *
-     * @param type The <code>GoodsType</code> to check.
+     * @param type The {@code GoodsType} to check.
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(GoodsType type) {
@@ -1751,7 +1751,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Can a type of goods can be traded at a specified place?
      *
-     * @param type The <code>GoodsType</code> to check.
+     * @param type The {@code GoodsType} to check.
      * @param access The way the goods are traded (Europe OR Custom)
      * @return True if type of goods can be traded.
      */
@@ -1768,7 +1768,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the current sales of a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to query.
+     * @param goodsType The {@code GoodsType} to query.
      * @return The current sales.
      */
     public int getSales(GoodsType goodsType) {
@@ -1778,7 +1778,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Modifies the current sales.
      *
-     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param goodsType The {@code GoodsType} to modify.
      * @param amount The new sales.
      */
     public void modifySales(GoodsType goodsType, int amount) {
@@ -1788,7 +1788,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Has a type of goods been traded?
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return Whether these goods have been traded.
      */
     public boolean hasTraded(GoodsType goodsType) {
@@ -1819,7 +1819,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the current incomeBeforeTaxes.
      *
-     * @param goodsType The <code>GoodsType</code> to query.
+     * @param goodsType The {@code GoodsType} to query.
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
@@ -1829,7 +1829,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Modifies the current incomeBeforeTaxes.
      *
-     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param goodsType The {@code GoodsType} to modify.
      * @param amount The new incomeBeforeTaxes.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
@@ -1839,7 +1839,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the current incomeAfterTaxes.
      *
-     * @param goodsType The <code>GoodsType</code> to query.
+     * @param goodsType The {@code GoodsType} to query.
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
@@ -1849,7 +1849,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Modifies the current incomeAfterTaxes.
      *
-     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param goodsType The {@code GoodsType} to modify.
      * @param amount The new incomeAfterTaxes.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
@@ -1874,7 +1874,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Set the Europe object for a player.
      *
-     * @param europe The new <code>Europe</code> object.
+     * @param europe The new {@code Europe} object.
      */
     public void setEurope(Europe europe) {
         this.europe = europe;
@@ -1883,7 +1883,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player can move units to Europe.
      *
-     * @return True if this player has an instance of <code>Europe</code>.
+     * @return True if this player has an instance of {@code Europe}.
      */
     public boolean canMoveToEurope() {
         return getEurope() != null;
@@ -1902,7 +1902,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the price to this player to purchase a unit in Europe.
      *
-     * @param au The proposed <code>AbstractUnit</code>.
+     * @param au The proposed {@code AbstractUnit}.
      * @return The price for the unit.
      */
     public int getPrice(AbstractUnit au) {
@@ -1917,7 +1917,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the monarch object this player has.
      *
-     * @return The <code>Monarch</code> object this player has, or null
+     * @return The {@code Monarch} object this player has, or null
      *     if there is no monarch.
      */
     public Monarch getMonarch() {
@@ -1927,7 +1927,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the monarch object this player has.
      *
-     * @param monarch The new <code>Monarch</code> object.
+     * @param monarch The new {@code Monarch} object.
      */
     public void setMonarch(Monarch monarch) {
         this.monarch = monarch;
@@ -1941,7 +1941,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Does this player's units list contain the given unit?
      *
-     * @param unit The <code>Unit</code> to test.
+     * @param unit The {@code Unit} to test.
      * @return True if the player has the unit.
      */
     public boolean hasUnit(Unit unit) {
@@ -1956,7 +1956,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Have to serialize the copy created by getUnitList, otherwise
      * concurrent modification exceptions show up.
      *
-     * @return A stream of the player <code>Unit</code>s.
+     * @return A stream of the player {@code Unit}s.
      */
     public Stream<Unit> getUnits() {
         return getUnitList().stream();
@@ -1965,7 +1965,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a copy of the players units.
      *
-     * @return A list of the player <code>Unit</code>s.
+     * @return A list of the player {@code Unit}s.
      */
     public List<Unit> getUnitList() {
         synchronized (this.units) {
@@ -2000,7 +2000,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Add a unit to this player.
      *
-     * @param newUnit The new <code>Unit</code> value.
+     * @param newUnit The new {@code Unit} value.
      * @return True if the units container changed.
      */
     public final boolean addUnit(final Unit newUnit) {
@@ -2022,7 +2022,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Remove a unit from this player.
      *
-     * @param oldUnit The <code>Unit</code> to remove.
+     * @param oldUnit The {@code Unit} to remove.
      * @return True if the units container changed.
      */
     public boolean removeUnit(final Unit oldUnit) {
@@ -2039,7 +2039,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the carrier units that can carry the supplied unit, if one exists.
      *
-     * @param unit The <code>Unit</code> to carry.
+     * @param unit The {@code Unit} to carry.
      * @return A list of suitable carriers.
      */
     public List<Unit> getCarriersForUnit(Unit unit) {
@@ -2080,7 +2080,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets a new active unit.
      *
-     * @return A <code>Unit</code> that can be made active.
+     * @return A {@code Unit} that can be made active.
      */
     public Unit getNextActiveUnit() {
         return nextActiveUnitIterator.next();
@@ -2089,7 +2089,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets a new active unit.
      *
-     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @param unit A {@code Unit} to make the next one to be active.
      * @return True if the operation succeeded.
      */
     public boolean setNextActiveUnit(Unit unit) {
@@ -2108,7 +2108,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets a new going-to unit.
      *
-     * @return A <code>Unit</code> that can be made active.
+     * @return A {@code Unit} that can be made active.
      */
     public Unit getNextGoingToUnit() {
         return nextGoingToUnitIterator.next();
@@ -2117,7 +2117,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets a new going-to unit.
      *
-     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @param unit A {@code Unit} to make the next one to be active.
      * @return True if the operation succeeded.
      */
     public boolean setNextGoingToUnit(Unit unit) {
@@ -2144,7 +2144,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the trade routes defined for this player.
      *
-     * @return A copy of the list of <code>TradeRoute</code>s for this player.
+     * @return A copy of the list of {@code TradeRoute}s for this player.
      */
     public final List<TradeRoute> getTradeRoutes() {
         synchronized (this.tradeRoutes) {
@@ -2168,7 +2168,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Relies on trade routes *always* being added at the end of the list.
      *
-     * @return The most recently defined <code>TradeRoute</code>.
+     * @return The most recently defined {@code TradeRoute}.
      */
     public final TradeRoute getNewestTradeRoute() {
         synchronized (this.tradeRoutes) {
@@ -2180,7 +2180,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Add a new trade route.
      *
-     * @param tradeRoute The <code>TradeRoute</code> to add.
+     * @param tradeRoute The {@code TradeRoute} to add.
      */
     public final void addTradeRoute(TradeRoute tradeRoute) {
         String name;
@@ -2196,8 +2196,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Get a trade route by name.
      *
      * @param name The trade route name.
-     * @param exclude An optional <code>TradeRoute</code> to exclude.
-     * @return The <code>TradeRoute</code> found.
+     * @param exclude An optional {@code TradeRoute} to exclude.
+     * @return The {@code TradeRoute} found.
      */
     public final TradeRoute getTradeRouteByName(final String name,
         final TradeRoute exclude) {
@@ -2210,7 +2210,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Remove a trade route.
      *
-     * @param tradeRoute The <code>TradeRoute</code> to remove.
+     * @param tradeRoute The {@code TradeRoute} to remove.
      * @return A list of units that were formally assigned to the trade route.
      */
     public final List<Unit> removeTradeRoute(TradeRoute tradeRoute) {
@@ -2246,7 +2246,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add an ownable to a caching container.  Not all ownables are
      * cached.
      *
-     * @param o The <code>Ownable</code> to add.
+     * @param o The {@code Ownable} to add.
      * @return True if the container changed.
      */
     public boolean addOwnable(Ownable o) {
@@ -2259,7 +2259,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Remove an ownable from a caching container.  Not all ownables
      * are cached.
      *
-     * @param o The <code>Ownable</code> to remove.
+     * @param o The {@code Ownable} to remove.
      * @return True if the container changed.
      */
     public boolean removeOwnable(Ownable o) {
@@ -2276,7 +2276,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets a the settlements this player owns.
      *
-     * @return The list of <code>Settlements</code> this player owns.
+     * @return The list of {@code Settlements} this player owns.
      */
     public List<Settlement> getSettlementList() {
         synchronized (this.settlements) {
@@ -2287,7 +2287,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a stream of the settlements this player owns.
      *
-     * @return The strean of <code>Settlements</code> this player owns.
+     * @return The strean of {@code Settlements} this player owns.
      */
     public Stream<Settlement> getSettlements() {
         return getSettlementList().stream();
@@ -2328,7 +2328,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the port settlements.
      *
-     * @return A list of port <code>Colony</code>s.
+     * @return A list of port {@code Colony}s.
      */
     public List<Colony> getPorts() {
         return (!isEuropean())
@@ -2339,9 +2339,9 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Does this player own a given settlement.
      *
-     * @param settlement The <code>Settlement</code> to check.
-     * @return True if this <code>Player</code> owns the given
-     *     <code>Settlement</code>.
+     * @param settlement The {@code Settlement} to check.
+     * @return True if this {@code Player} owns the given
+     *     {@code Settlement}.
      */
     public boolean hasSettlement(Settlement settlement) {
         synchronized (this.settlements) {
@@ -2352,7 +2352,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds a given settlement to this player's list of settlements.
      *
-     * @param settlement The <code>Settlement</code> to add.
+     * @param settlement The {@code Settlement} to add.
      * @return True if the settlements container changed.
      */
     public boolean addSettlement(Settlement settlement) {
@@ -2370,7 +2370,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Removes the given settlement from this player's list of settlements.
      *
-     * @param settlement The <code>Settlement</code> to remove.
+     * @param settlement The {@code Settlement} to remove.
      * @return True if the settlements container changed.
      */
     public boolean removeSettlement(Settlement settlement) {
@@ -2390,10 +2390,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the <code>Colony</code> with the given name.
+     * Gets the {@code Colony} with the given name.
      *
-     * @param name The name of the <code>Colony</code>.
-     * @return The <code>Colony</code> with the given name, or null if
+     * @param name The name of the {@code Colony}.
+     * @return The {@code Colony} with the given name, or null if
      *     not found.
      */
     public Colony getColonyByName(String name) {
@@ -2401,10 +2401,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the <code>IndianSettlement</code> with the given name.
+     * Gets the {@code IndianSettlement} with the given name.
      *
-     * @param name The name of the <code>IndianSettlement</code>.
-     * @return The <code>IndianSettlement</code> with the given name,
+     * @param name The name of the {@code IndianSettlement}.
+     * @return The {@code IndianSettlement} with the given name,
      *     or null if not found.
      */
     public IndianSettlement getIndianSettlementByName(String name) {
@@ -2415,7 +2415,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a stream of all colonies this player owns.
      *
-     * @return A stream of the <code>Colony</code>s this player owns.
+     * @return A stream of the {@code Colony}s this player owns.
      */
     public Stream<Colony> getColonies() {
         return getColonyList().stream();
@@ -2424,7 +2424,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a fresh list of all colonies this player owns.
      *
-     * @return A list of the <code>Colony</code>s this player owns.
+     * @return A list of the {@code Colony}s this player owns.
      */
     public List<Colony> getColonyList() {
         return transform(getSettlements(), s -> s instanceof Colony,
@@ -2434,8 +2434,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a sorted list of all colonies this player owns.
      *
-     * @param comp A <code>Comparator</code> to operate on the colony list.
-     * @return A fresh list of the <code>Colony</code>s this player owns.
+     * @param comp A {@code Comparator} to operate on the colony list.
+     * @return A fresh list of the {@code Colony}s this player owns.
      */
     public List<Colony> getSortedColonies(Comparator<Colony> comp) {
         return transform(getSettlements(), s -> s instanceof Colony,
@@ -2445,7 +2445,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a stream of all the indian settlements this player owns.
      *
-     * @return A stream of the <code>IndianSettlement</code>s this player owns.
+     * @return A stream of the {@code IndianSettlement}s this player owns.
      */
     public Stream<IndianSettlement> getIndianSettlements() {
         return getIndianSettlementList().stream();
@@ -2454,7 +2454,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get a list of all the IndianSettlements this player owns.
      *
-     * @return A list of the <code>IndianSettlement</code>s this player owns.
+     * @return A list of the {@code IndianSettlement}s this player owns.
      */
     public List<IndianSettlement> getIndianSettlementList() {
         return transform(getSettlements(), s -> s instanceof IndianSettlement,
@@ -2465,7 +2465,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Get a list of all indian settlements owned by this player with
      * a missionary from a given player.
      *
-     * @param p The <code>Player</code>.
+     * @param p The {@code Player}.
      * @return A list of the <code>IndianSettlement<code>s with a matching
      *     missionary.
      */
@@ -2480,7 +2480,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Get a stream of all indian settlements owned by this player with
      * a missionary from a given player.
      *
-     * @param p The <code>Player</code>.
+     * @param p The {@code Player}.
      * @return A stream of the <code>IndianSettlement<code>s with a matching
      *     missionary.
      */
@@ -2489,10 +2489,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }            
         
     /**
-     * Find a <code>Settlement</code> by name.
+     * Find a {@code Settlement} by name.
      *
-     * @param name The name of the <code>Settlement</code>.
-     * @return The <code>Settlement</code>, or <code>null</code> if not found.
+     * @param name The name of the {@code Settlement}.
+     * @return The {@code Settlement}, or <code>null</code> if not found.
      **/
     public Settlement getSettlementByName(String name) {
         return (isIndian()) ? getIndianSettlementByName(name)
@@ -2518,8 +2518,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets all the model messages for this player.
      *
-     * @return A copy of the <code>ModelMessage</code>s for this
-     *     <code>Player</code>.
+     * @return A copy of the {@code ModelMessage}s for this
+     *     {@code Player}.
      */
     public List<ModelMessage> getModelMessages() {
         synchronized (this.modelMessages) {
@@ -2530,8 +2530,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets all new messages for this player.
      *
-     * @return all The new <code>ModelMessage</code>s for this
-     *     <code>Player</code>.
+     * @return all The new {@code ModelMessage}s for this
+     *     {@code Player}.
      */
     public List<ModelMessage> getNewModelMessages() {
         synchronized (this.modelMessages) {
@@ -2542,7 +2542,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds a message for this player.
      *
-     * @param modelMessage The <code>ModelMessage</code> to add.
+     * @param modelMessage The {@code ModelMessage} to add.
      */
     public void addModelMessage(ModelMessage modelMessage) {
         synchronized (this.modelMessages) {
@@ -2554,7 +2554,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Refilters the current model messages, removing the ones that
      * are no longer valid.
      *
-     * @param options The <code>OptionGroup</code> for message display
+     * @param options The {@code OptionGroup} for message display
      *     to enforce.
      */
     public void refilterModelMessages(OptionGroup options) {
@@ -2623,7 +2623,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the history events for this player.
      *
-     * @return A copy of the <code>HistoryEvent</code>s for this player.
+     * @return A copy of the {@code HistoryEvent}s for this player.
      */
     public final List<HistoryEvent> getHistory() {
         synchronized (this.history) {
@@ -2634,7 +2634,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Add a history event to this player.
      *
-     * @param event The <code>HistoryEvent</code> to add.
+     * @param event The {@code HistoryEvent} to add.
      */
     public void addHistory(HistoryEvent event) {
         synchronized (this.history) {
@@ -2660,7 +2660,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the default initial location where the units arriving from
      * {@link Europe} appear on the map.
      *
-     * @return The entry <code>Location</code>.
+     * @return The entry {@code Location}.
      * @see Unit#getEntryLocation
      */
     public Location getEntryLocation() {
@@ -2671,7 +2671,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Sets the default initial location where the units arriving from
      * {@link Europe} appear on the map.
      *
-     * @param entryLocation The new entry <code>Location</code>.
+     * @param entryLocation The new entry {@code Location}.
      * @see #getEntryLocation
      */
     public void setEntryLocation(Location entryLocation) {
@@ -2684,7 +2684,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Favour the first settlement, followed by the entry tile.
      * 
-     * @return A suitable <code>Tile</code>.
+     * @return A suitable {@code Tile}.
      */
     public Tile getFallbackTile() {
         Settlement settlement = first(getSettlements());
@@ -2695,7 +2695,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Get the players high seas.
      *
-     * @return The <code>HighSeas</code> for this player.
+     * @return The {@code HighSeas} for this player.
      */
     public final HighSeas getHighSeas() {
         return highSeas;
@@ -2718,8 +2718,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * The tile can be seen if it is in a unit or settlement's line of sight.
      *
-     * @param tile The <code>Tile</code> to check.
-     * @return True if this player can see the given <code>Tile</code>.
+     * @param tile The {@code Tile} to check.
+     * @return True if this player can see the given {@code Tile}.
      */
     public boolean canSee(Tile tile) {
         if (tile == null) return false;
@@ -2735,10 +2735,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Forces an update of the <code>canSeeTiles</code>.
+     * Forces an update of the {@code canSeeTiles}.
      *
      * This method should be used to invalidate the current
-     * <code>canSeeTiles</code> when something significant changes.
+     * {@code canSeeTiles} when something significant changes.
      * The method {@link #resetCanSeeTiles} will be called whenever it
      * is needed.
      *
@@ -2805,8 +2805,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player has explored the given tile.
      *
-     * @param tile The <code>Tile</code> to check.
-     * @return True if the <code>Tile</code> has been explored.
+     * @param tile The {@code Tile} to check.
+     * @return True if the {@code Tile} has been explored.
      */
     public boolean hasExplored(Tile tile) {
         return tile.isExplored();
@@ -2822,7 +2822,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * avoid nasty surprises due to asynchronous disappearance of
      * members of either.  FIXME: see if this can be relaxed.
      *
-     * @param map The <code>Map</code> to use.
+     * @param map The {@code Map} to use.
      * @return A canSeeTiles array.
      */
     private boolean[][] makeCanSeeTiles(Map map) {
@@ -2891,7 +2891,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the hostility this player has against the given player.
      *
-     * @param player The other <code>Player</code>.
+     * @param player The other {@code Player}.
      * @return An object representing the tension level.
      */
     public Tension getTension(Player player) {
@@ -2907,8 +2907,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the tension with respect to a given player.
      *
-     * @param player The other <code>Player</code>.
-     * @param newTension The new <code>Tension</code>.
+     * @param player The other {@code Player}.
+     * @param newTension The new {@code Tension}.
      */
     public void setTension(Player player, Tension newTension) {
         if (player == this || player == null) return;
@@ -2919,7 +2919,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Removes all tension with respect to a given player.  Used when a
      * player leaves the game.
      *
-     * @param player The <code>Player</code> to remove tension for.
+     * @param player The {@code Player} to remove tension for.
      */
     public void removeTension(Player player) {
         if (player != null) tension.remove(player);
@@ -2928,7 +2928,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Does this player ban missions from another player?
      *
-     * @param player The other <code>Player</code> to test.
+     * @param player The other {@code Player} to test.
      * @return True if the given player is banned.
      */
     public boolean missionsBanned(Player player) {
@@ -2938,7 +2938,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Ban a player from establishing missions to this player.
      *
-     * @param player The <code>Player</code> to ban.
+     * @param player The {@code Player} to ban.
      */
     public void addMissionBan(Player player) {
         if (bannedMissions == null) bannedMissions = new HashSet<>();
@@ -2948,7 +2948,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Remove a mission ban from a player.
      *
-     * @param player The <code>Player</code> to clear the ban for.
+     * @param player The {@code Player} to clear the ban for.
      */
     public void removeMissionBan(Player player) {
         if (bannedMissions != null) bannedMissions.remove(player);
@@ -2957,7 +2957,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the stance towards a given player.
      *
-     * @param player The other <code>Player</code> to check.
+     * @param player The other {@code Player} to check.
      * @return The stance.
      */
     public Stance getStance(Player player) {
@@ -2969,9 +2969,9 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the stance towards a given player.
      *
-     * @param player The <code>Player</code> to set the
-     *     <code>Stance</code> for.
-     * @param newStance The new <code>Stance</code>.
+     * @param player The {@code Player} to set the
+     *     {@code Stance} for.
+     * @param newStance The new {@code Stance}.
      * @return True if the stance change was valid.
      * @throws IllegalArgumentException if player is null or this.
      */
@@ -3001,7 +3001,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Is this player at war with the specified one.
      *
-     * @param player The other <code>Player</code> to check.
+     * @param player The other {@code Player} to check.
      * @return True if the players are at war.
      */
     public boolean atWarWith(Player player) {
@@ -3020,8 +3020,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Has this player met contacted the given one?
      *
-     * @param player The other <code>Player</code> to check.
-     * @return True if this <code>Player</code> has contacted the other.
+     * @param player The other {@code Player} to check.
+     * @return True if this {@code Player} has contacted the other.
      */
     public boolean hasContacted(Player player) {
         return getStance(player) != Stance.UNCONTACTED;
@@ -3030,7 +3030,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Has this player has met with any Europeans at all?
      *
-     * @return True if this <code>Player</code> has contacted any Europeans.
+     * @return True if this {@code Player} has contacted any Europeans.
      */
     public boolean hasContactedEuropeans() {
         return any(getGame().getLiveEuropeanPlayers(this),
@@ -3040,7 +3040,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Has this player met any natives at all?
      *
-     * @return True if this <code>Player</code> has contacted any natives.
+     * @return True if this {@code Player} has contacted any natives.
      */
     public boolean hasContactedIndians() {
         return any(getGame().getLiveNativePlayers(this),
@@ -3051,8 +3051,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Set this player as having made initial contact with another player.
      * Always start with PEACE, which can go downhill fast.
      *
-     * @param player1 One <code>Player</code> to check.
-     * @param player2 The other <code>Player</code> to check.
+     * @param player1 One {@code Player} to check.
+     * @param player2 The other {@code Player} to check.
      */
     public static void makeContact(Player player1, Player player2) {
         player1.stance.put(player2.getId(), Stance.PEACE);
@@ -3064,7 +3064,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the price of the given land.
      *
-     * @param tile The <code>Tile</code> to get the price for.
+     * @param tile The {@code Tile} to get the price for.
      * @return The price of the land if it is for sale, zero if it is
      *     already ours, unclaimed or unwanted, negative if it is not
      *     for sale.
@@ -3098,8 +3098,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Access the nation cache.
      *
-     * @param player The <code>Player</code> to get the summary for.
-     * @return The current <code>NationSummary</code> for a player.
+     * @param player The {@code Player} to get the summary for.
+     * @return The current {@code NationSummary} for a player.
      */
     public NationSummary getNationSummary(Player player) {
         return nationCache.get(player);
@@ -3108,8 +3108,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Update the nation cache.
      *
-     * @param player The <code>Player</code> to get the summary for.
-     * @param ns The new <code>NationSummary</code> for the player.
+     * @param player The {@code Player} to get the summary for.
+     * @param ns The new {@code NationSummary} for the player.
      */
     public void putNationSummary(Player player, NationSummary ns) {
         nationCache.put(player, ns);
@@ -3128,7 +3128,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * This relies on an up-to-date nation cache value for the target
      * player.
      *
-     * @param other The other <code>Player</code>.
+     * @param other The other {@code Player}.
      * @param naval If true, get the naval strength, else the land strength.
      * @return The strength ratio (strength/sum(strengths)), or negative
      *     on error.
@@ -3197,7 +3197,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Can a tile be owned by this player?
      *
-     * @param tile The <code>Tile</code> to consider.
+     * @param tile The {@code Tile} to consider.
      * @return True if the tile can be owned by this player.
      */
     public boolean canOwnTile(Tile tile) {
@@ -3209,7 +3209,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * This is a test of basic practicality and does not consider
      * the full complexity of tile ownership issues.
      *
-     * @param tile The <code>Tile</code> to consider.
+     * @param tile The {@code Tile} to consider.
      * @return The reason why/not the tile can be owned by this player.
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
@@ -3228,7 +3228,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if a tile can be claimed for use by a settlement.
      *
-     * @param tile The <code>Tile</code> to try to claim.
+     * @param tile The {@code Tile} to try to claim.
      * @return True if the tile can be claimed to found a settlement.
      */
     public boolean canClaimForSettlement(Tile tile) {
@@ -3245,7 +3245,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * another settlement that is using the tile, or owned by someone
      * else who does not want anything for it.  Got that?
      *
-     * @param tile The <code>Tile</code> to try to claim.
+     * @param tile The {@code Tile} to try to claim.
      * @return The reason why/not the tile can be claimed.
      */
     public NoClaimReason canClaimForSettlementReason(Tile tile) {
@@ -3265,7 +3265,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Can a tile be claimed to found a settlement on?
      *
-     * @param tile The <code>Tile</code> to try to claim.
+     * @param tile The {@code Tile} to try to claim.
      * @return True if the tile can be claimed to found a settlement.
      */
     public boolean canClaimToFoundSettlement(Tile tile) {
@@ -3278,7 +3278,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * requirement that the tile be of a settleable type, and some
      * relaxations that allow free center tile acquisition
      *
-     * @param tile The <code>Tile</code> to try to claim.
+     * @param tile The {@code Tile} to try to claim.
      * @return The reason why/not the tile can be claimed.
      */
     public NoClaimReason canClaimToFoundSettlementReason(Tile tile) {
@@ -3295,7 +3295,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Is this tile claimable for a colony center tile under the
      * special provisions of the model.option.buildOnNativeLand option.
      *
-     * @param tile The <code>Tile</code> to try to claim.
+     * @param tile The {@code Tile} to try to claim.
      * @return True if the tile can be claimed.
      */
     private boolean canClaimFreeCenterTile(Tile tile) {
@@ -3339,7 +3339,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * success (natives may want to be paid), but just that success is
      * possible.
      *
-     * @param tile The <code>Tile</code> to consider.
+     * @param tile The {@code Tile} to consider.
      *
      * @return True if the tile ownership can be claimed.
      */
@@ -3353,7 +3353,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Slightly weakens canClaimForImprovement to allow for purchase
      * and/or stealing.
      *
-     * @param tile The <code>Tile</code> to consider.
+     * @param tile The {@code Tile} to consider.
      * @return True if the tile ownership can be claimed.
      */
     public boolean canAcquireForImprovement(Tile tile) {
@@ -3368,7 +3368,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * (e.g. Aztecs owning tiles on nearby islands).  So we have to
      * only allow tiles that are adjacent to a known connected tile.
      *
-     * @param centerTile The intended settlement center <code>Tile</code>.
+     * @param centerTile The intended settlement center {@code Tile}.
      * @param radius The radius of the settlement.
      * @return A list of potentially claimable tiles.
      */
@@ -3473,12 +3473,12 @@ public class Player extends FreeColGameObject implements Nameable {
     */
 
     /**
-     * Gets a list of values for building a <code>Colony</code> on the
-     * given tile for each <code>ColonyValueCategory</code>.
+     * Gets a list of values for building a {@code Colony} on the
+     * given tile for each {@code ColonyValueCategory}.
      *
      * FIXME: tune magic numbers and expose more to the spec.
      *
-     * @param tile The <code>Tile</code>
+     * @param tile The {@code Tile}
      * @return A list of values.
      */
     public List<Double> getAllColonyValues(Tile tile) {
@@ -3752,12 +3752,12 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the value for building a <code>Colony</code> on
+     * Gets the value for building a {@code Colony} on
      * the given tile.
      *
      * FIXME: tune magic numbers and expose more to the spec.
      *
-     * @param tile The <code>Tile</code>
+     * @param tile The {@code Tile}
      * @return A score for the tile.
      */
     public int getColonyValue(Tile tile) {
@@ -3804,15 +3804,15 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Does this player own something?
      *
-     * @param ownable The <code>Ownable</code> to check.
-     * @return True if the <code>Ownable</code> is ours.
+     * @param ownable The {@code Ownable} to check.
+     * @return True if the {@code Ownable} is ours.
      */
     public boolean owns(Ownable ownable) {
         return (ownable == null) ? false : this.equals(ownable.getOwner());
     }
 
     /**
-     * Get a <code>FreeColGameObject</code> with the specified
+     * Get a {@code FreeColGameObject} with the specified
      * identifier and class, owned by this player.
      *
      * Used mainly in message decoding.

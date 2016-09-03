@@ -33,9 +33,9 @@ public class QuitAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>QuitAction</code>.
+     * Creates a new {@code QuitAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public QuitAction(FreeColClient freeColClient) {
         super(freeColClient, id);

@@ -66,11 +66,11 @@ public class IndianBringGiftMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The <code>Colony</code> receiving the gift.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The {@code Colony} receiving the gift.
      */
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit, target);
@@ -79,11 +79,11 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * Creates a new <code>IndianBringGiftMission</code> and reads the given
+     * Creates a new {@code IndianBringGiftMission} and reads the given
      * element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
@@ -110,7 +110,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -129,8 +129,8 @@ public class IndianBringGiftMission extends Mission {
      * Why would an IndianBringGiftMission be invalid with the given
      * unit and colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param colony The <code>Colony</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param colony The {@code Colony} to test.
      * @return A reason why the mission would be invalid with the unit
      *     and colony or null if none found.
      */
@@ -155,7 +155,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -165,8 +165,8 @@ public class IndianBringGiftMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

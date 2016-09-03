@@ -303,7 +303,7 @@ public class OggVorbisDecoderFactory {
         /**
          * Refills the conversion buffer.
          *
-         * @param is The <code>InputStream</code> to read from.
+         * @param is The {@code InputStream} to read from.
          * @return The number of bytes waiting in the convBuf.
          */
         public int getBody(InputStream is) {
@@ -378,7 +378,7 @@ public class OggVorbisDecoderFactory {
         /**
          * Create a new player.
          *
-         * @param os The <code>OggStream</code> to read from.
+         * @param os The {@code OggStream} to read from.
          * @exception IOException if unable to open the stream.
          */
         public OggVorbisAudioInputStream(OggStream os) throws IOException {
@@ -451,8 +451,8 @@ public class OggVorbisDecoderFactory {
      * Gets a new audio input stream to decode Ogg/Vorbis Audio from
      * an input stream.
      *
-     * @param file The <code>File</code> containing the content.
-     * @return A new <code>AudioInputStream</code> to decode the input.
+     * @param file The {@code File} containing the content.
+     * @return A new {@code AudioInputStream} to decode the input.
      * @exception IOException if unable to open the stream.
      */
     public AudioInputStream getOggStream(File file) throws IOException {

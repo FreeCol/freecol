@@ -48,7 +48,7 @@ public class FSGConverter {
     
     
     /**
-     * Creates an instance of <code>FSGConverter</code>
+     * Creates an instance of {@code FSGConverter}
      */
     private FSGConverter() {
         // Nothing to initialize;

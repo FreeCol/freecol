@@ -50,11 +50,11 @@ public class EquipForRoleMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>EquipForRoleMessage</code> for the supplied
+     * Create a new {@code EquipForRoleMessage} for the supplied
      * Unit and Role.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
      */
     public EquipForRoleMessage(Unit unit, Role role, int roleCount) {
@@ -66,10 +66,10 @@ public class EquipForRoleMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>EquipForRoleMessage</code> from a supplied element.
+     * Create a new {@code EquipForRoleMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public EquipForRoleMessage(Game game, Element element) {
         super(getTagName());
@@ -83,11 +83,11 @@ public class EquipForRoleMessage extends DOMMessage {
     /**
      * Handle a "equipForRole"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message received on.
      * @return An update encapsulating the equipForRole location change
-     *     or an error <code>Element</code> on failure.
+     *     or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

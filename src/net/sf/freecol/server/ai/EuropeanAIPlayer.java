@@ -246,19 +246,19 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     /**
      * Current estimate of the number of new
-     * <code>BuildColonyMission</code>s to create.
+     * {@code BuildColonyMission}s to create.
      */
     private int nBuilders = 0;
 
     /**
      * Current estimate of the number of new
-     * <code>PioneeringMission</code>s to create.
+     * {@code PioneeringMission}s to create.
      */
     private int nPioneers = 0;
 
     /**
      * Current estimate of the number of new
-     * <code>ScoutingMission</code>s to create.
+     * {@code ScoutingMission}s to create.
      */
     private int nScouts = 0;
 
@@ -267,11 +267,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
 
     /**
-     * Creates a new <code>EuropeanAIPlayer</code>.
+     * Creates a new {@code EuropeanAIPlayer}.
      *
      * @param aiMain The main AI-class.
      * @param player The player that should be associated with this
-     *            <code>AIPlayer</code>.
+     *            {@code AIPlayer}.
      */
     public EuropeanAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
@@ -280,7 +280,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Creates a new <code>AIPlayer</code>.
+     * Creates a new {@code AIPlayer}.
      *
      * @param aiMain The main AI-object.
      * @param xr The input stream containing the XML.
@@ -298,7 +298,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Initialize the static fields that would be final but for
      * needing the specification.
      *
-     * @param spec The <code>Specification</code> to initialize from.
+     * @param spec The {@code Specification} to initialize from.
      */
     public static synchronized void initializeFromSpecification(Specification spec) {
         if (pioneerRole != null) return;
@@ -323,7 +323,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Get the list of badly defended colonies.
      *
-     * @return A list of <code>AIColony</code>s that were badly
+     * @return A list of {@code AIColony}s that were badly
      *     defended at the start of this turn.
      */
     protected List<AIColony> getBadlyDefended() {
@@ -334,7 +334,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void initializeMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
@@ -394,7 +394,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Cheat by adding gold to guarantee the player has a minimum amount.
      *
      * @param amount The minimum amount of gold required.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void cheatGold(int amount, LogBuilder lb) {
         final Player player = getPlayer();
@@ -412,7 +412,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * FIXME: Remove when the AI is good enough.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void cheat(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
@@ -628,8 +628,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param rc A list of random choices to choose from.
      * @param what A description of the unit.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The <code>AIUnit</code> built.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The {@code AIUnit} built.
      */
     private AIUnit cheatUnit(List<RandomChoice<UnitType>> rc, String what,
                              LogBuilder lb) {
@@ -643,10 +643,10 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Cheat-build a unit in Europe.
      *
-     * @param unitType The <code>UnitType</code> to build.
+     * @param unitType The {@code UnitType} to build.
      * @param what A description of the unit.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The <code>AIUnit</code> built.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The {@code AIUnit} built.
      */
     private AIUnit cheatUnit(UnitType unitType, String what, LogBuilder lb) {
         final Player player = getPlayer();
@@ -667,11 +667,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * These supply driven assignments supplement the demand driven
      * calls inside TransportMission.
      *
-     * @param transportables A list of <code>TransportableAIObject</code>s to
+     * @param transportables A list of {@code TransportableAIObject}s to
      *     allocated transport for.
-     * @param missions A list of <code>TransportMission</code>s to potentially
+     * @param missions A list of {@code TransportMission}s to potentially
      *     assign more transportables to.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void allocateTransportables(List<TransportableAIObject> transportables,
                                         List<TransportMission> missions,
@@ -743,7 +743,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * might be folded into a trade mission, since European gifts are
      * just a special case of trading.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void bringGifts(LogBuilder lb) {
         return;
@@ -754,7 +754,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * FIXME: European players can also demand tribute!
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void demandTribute(LogBuilder lb) {
         return;
@@ -769,7 +769,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Called by startWorking at the start of every turn.
      * Public for the test suite.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void buildTipMap(LogBuilder lb) {
         tipMap.clear();
@@ -807,7 +807,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Update the tip map with tips from a new colony.
      *
-     * @param aic The new <code>AIColony</code>.
+     * @param aic The new {@code AIColony}.
      */
     private void updateTipMap(AIColony aic) {
         for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
@@ -818,7 +818,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets the best plan for a tile from the tipMap.
      *
-     * @param tile The <code>Tile</code> to lookup.
+     * @param tile The {@code Tile} to lookup.
      * @return The best plan for a tile.
      */
     public TileImprovementPlan getBestPlan(Tile tile) {
@@ -828,7 +828,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets the best plan for a colony from the tipMap.
      *
-     * @param colony The <code>Colony</code> to check.
+     * @param colony The {@code Colony} to check.
      * @return The tile with the best plan for a colony, or null if none found.
      */
     public Tile getBestPlanTile(Colony colony) {
@@ -843,9 +843,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Remove a <code>TileImprovementPlan</code> from the relevant colony.
+     * Remove a {@code TileImprovementPlan} from the relevant colony.
      *
-     * @param plan The <code>TileImprovementPlan</code> to remove.
+     * @param plan The {@code TileImprovementPlan} to remove.
      */
     public void removeTileImprovementPlan(TileImprovementPlan plan) {
         if (plan == null) return;
@@ -866,9 +866,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * - dump boarded transport with no target
      * - requeue all boarded transport unless the target is the same
      *
-     * @param aiu The <code>AIUnit</code> to check.
-     * @param oldTarget The old target <code>Location</code>.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param aiu The {@code AIUnit} to check.
+     * @param oldTarget The old target {@code Location}.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
         final AIUnit aiCarrier = aiu.getTransport();
@@ -893,7 +893,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Checks if a transportable needs transport.
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return True if no transport is already present or the
      *     transportable is already aboard a carrier, and there is a
      *     well defined source and destination location.
@@ -909,7 +909,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Checks that the carrier assigned to a transportable is has a
      * transport mission and the transport is queued thereon.
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return True if all is well.
      */
     private boolean checkTransport(TransportableAIObject t) {
@@ -924,7 +924,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets the needed wagons for a tile/contiguity.
      *
-     * @param tile The <code>Tile</code> to derive the contiguity from.
+     * @param tile The {@code Tile} to derive the contiguity from.
      * @return The number of wagons needed.
      */
     public int getNeededWagons(Tile tile) {
@@ -944,7 +944,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * port is available, and thus that the map should be initialized
      * for that contiguity.
      *
-     * @param tile The <code>Tile</code> to derive the contiguity from.
+     * @param tile The {@code Tile} to derive the contiguity from.
      * @param amount The change to make.
      */
     private void changeNeedWagon(Tile tile, int amount) {
@@ -964,7 +964,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Rebuild the transport maps.
      * Count the number of transports requiring naval/land carriers.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void buildTransportMaps(LogBuilder lb) {
         transportDemand.clear();
@@ -1060,7 +1060,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Allows a TransportMission to signal that it has taken responsibility
      * for a TransportableAIObject.
      *
-     * @param t The <code>TransportableAIObject</code> being claimed.
+     * @param t The {@code TransportableAIObject} being claimed.
      * @return True if the transportable was claimed from the supply map.
      */
     public boolean claimTransportable(TransportableAIObject t) {
@@ -1070,7 +1070,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Rearrange colonies.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void rearrangeColonies(LogBuilder lb) {
         for (AIColony aic : getAIColonies()) aic.rearrangeColony(lb);
@@ -1083,8 +1083,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Suppress European trade in a goods type.  A goods party and
      * boycott is incoming.
      *
-     * @param type The <code>GoodsType</code> to suppress.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param type The {@code GoodsType} to suppress.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void suppressEuropeanTrade(GoodsType type, LogBuilder lb) {
         final Player player = getPlayer();
@@ -1130,9 +1130,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a list of the wishes at a given location for a unit type.
      *
-     * @param loc The <code>Location</code> to look for wishes at.
-     * @param type The <code>UnitType</code> to look for.
-     * @return A list of <code>WorkerWish</code>es.
+     * @param loc The {@code Location} to look for wishes at.
+     * @param type The {@code UnitType} to look for.
+     * @return A list of {@code WorkerWish}es.
      */
     public List<WorkerWish> getWorkerWishesAt(Location loc, UnitType type) {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
@@ -1146,9 +1146,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a list of the wishes at a given location for a goods type.
      *
-     * @param loc The <code>Location</code> to look for wishes at.
-     * @param type The <code>GoodsType</code> to look for.
-     * @return A list of <code>GoodsWish</code>es.
+     * @param loc The {@code Location} to look for wishes at.
+     * @param type The {@code GoodsType} to look for.
+     * @return A list of {@code GoodsWish}es.
      */
     public List<GoodsWish> getGoodsWishesAt(Location loc, GoodsType type) {
         List<Wish> demand = transportDemand.get(Location.upLoc(loc));
@@ -1162,8 +1162,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets the best worker wish for a carrier unit.
      *
-     * @param aiUnit The carrier <code>AIUnit</code>.
-     * @param unitType The <code>UnitType</code> to find a wish for.
+     * @param aiUnit The carrier {@code AIUnit}.
+     * @param unitType The {@code UnitType} to find a wish for.
      * @return The best worker wish for the unit.
      */
     public WorkerWish getBestWorkerWish(AIUnit aiUnit, UnitType unitType) {
@@ -1194,9 +1194,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets the best goods wish for a carrier unit.
      *
-     * @param aiUnit The carrier <code>AIUnit</code>.
-     * @param goodsType The <code>GoodsType</code> to wish for.
-     * @return The best <code>GoodsWish</code> for the unit.
+     * @param aiUnit The carrier {@code AIUnit}.
+     * @param goodsType The {@code GoodsType} to wish for.
+     * @return The best {@code GoodsWish} for the unit.
      */
     public GoodsWish getBestGoodsWish(AIUnit aiUnit, GoodsType goodsType) {
         final Unit carrier = aiUnit.getUnit();
@@ -1218,7 +1218,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Rebuilds the goods and worker wishes maps.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void buildWishMaps(LogBuilder lb) {
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
@@ -1285,7 +1285,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Notify that a wish has been completed.  Called from AIColony.
      *
-     * @param w The <code>Wish</code> to complete.
+     * @param w The {@code Wish} to complete.
      */
     @Override
     public void completeWish(Wish w) {
@@ -1305,8 +1305,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Consume a WorkerWish, yielding a WishRealizationMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param ww The <code>WorkerWish</code> to consume.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param ww The {@code WorkerWish} to consume.
      */
     public void consumeWorkerWish(AIUnit aiUnit, WorkerWish ww) {
         final Unit unit = aiUnit.getUnit();
@@ -1320,8 +1320,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Consume a GoodsWish.
      *
-     * @param aig The <code>AIGoods</code> to use.
-     * @param gw The <code>GoodsWish</code> to consume.
+     * @param aig The {@code AIGoods} to use.
+     * @param gw The {@code GoodsWish} to consume.
      */
     public void consumeGoodsWish(AIGoods aig, GoodsWish gw) {
         final Goods goods = aig.getGoods();
@@ -1434,7 +1434,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * FIXME: Move this to a specialized Handler class (AIEurope?)
      * FIXME: Give protected access?
      *
-     * @param unitType The <code>UnitType</code> to train.
+     * @param unitType The {@code UnitType} to train.
      * @return the new AIUnit created by this action. May be null.
      */
     public AIUnit trainAIUnitInEurope(UnitType unitType) {
@@ -1472,7 +1472,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Determines the stances towards each player.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void determineStances(LogBuilder lb) {
         final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
@@ -1497,7 +1497,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * See if a recent peace treaty still has force.
      *
-     * @param p The <code>Player</code> to check for a peace treaty with.
+     * @param p The {@code Player} to check for a peace treaty with.
      * @return True if peace gets another chance.
      */
     private boolean peaceHolds(Player p) {
@@ -1537,8 +1537,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Get a nation summary for another player.
      *
-     * @param other The other <code>Player</code> to get the summary for.
-     * @return The current <code>NationSummary</code> for a player.
+     * @param other The other {@code Player} to get the summary for.
+     * @return The current {@code NationSummary} for a player.
      */
     protected NationSummary getNationSummary(Player other) {
         final Player player = getPlayer();
@@ -1552,7 +1552,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Get the land force strength ratio of this player with respect
      * to another.
      *
-     * @param other The other <code>Player</code>.
+     * @param other The other {@code Player}.
      * @return The strength ratio (strength/sum(strengths)).
      */
     protected double getStrengthRatio(Player other) {
@@ -1592,9 +1592,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * Reject a trade agreement, except if a Franklin-derived stance
      * is supplied.
      *
-     * @param stance A stance <code>TradeItem</code>.
-     * @param agreement The <code>DiplomaticTrade</code> to reset.
-     * @return The <code>TradeStatus</code> for the agreement.
+     * @param stance A stance {@code TradeItem}.
+     * @param agreement The {@code DiplomaticTrade} to reset.
+     * @return The {@code TradeStatus} for the agreement.
      */
     private TradeStatus rejectAgreement(TradeItem stance,
                                         DiplomaticTrade agreement) {
@@ -1611,7 +1611,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Ensures all units have a mission.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     protected void giveNormalMissions(LogBuilder lb) {
         final AIMain aiMain = getAIMain();
@@ -1899,8 +1899,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Choose a mission for an AIUnit.
      *
-     * @param aiUnit The <code>AIUnit</code> to choose for.
-     * @return A suitable <code>Mission</code>, or null if none found.
+     * @param aiUnit The {@code AIUnit} to choose for.
+     * @return A suitable {@code Mission}, or null if none found.
      */
     public Mission getSimpleMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
@@ -1985,8 +1985,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new BuildColonyMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param target An optional target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param target An optional target {@code Location}.
      * @return A new mission, or null if impossible.
      */
     public Mission getBuildColonyMission(AIUnit aiUnit, Location target) {
@@ -2004,7 +2004,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new CashInTreasureTrainMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
     public Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
@@ -2020,7 +2020,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new DefendSettlementMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @param relaxed Use a relaxed cost decider to choose the target.
      * @return A new mission, or null if impossible.
      */
@@ -2055,7 +2055,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new MissionaryMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
     public Mission getMissionaryMission(AIUnit aiUnit) {
@@ -2074,8 +2074,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * FIXME: pioneers to make roads between colonies
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param target An optional target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param target An optional target {@code Location}.
      * @return A new mission, or null if impossible.
      */
     public Mission getPioneeringMission(AIUnit aiUnit, Location target) {
@@ -2097,8 +2097,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new PrivateerMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param target An optional target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param target An optional target {@code Location}.
      * @return A new mission, or null if impossible.
      */
     public Mission getPrivateerMission(AIUnit aiUnit, Location target) {
@@ -2113,7 +2113,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new ScoutingMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
     public Mission getScoutingMission(AIUnit aiUnit) {
@@ -2132,7 +2132,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new TransportMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A new mission, or null if impossible.
      */
     public Mission getTransportMission(AIUnit aiUnit) {
@@ -2143,8 +2143,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a new WishRealizationMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param wish An optional <code>WorkerWish</code> to realize.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param wish An optional {@code WorkerWish} to realize.
      * @return A new mission, or null if impossible.
      */
     public Mission getWishRealizationMission(AIUnit aiUnit, WorkerWish wish) {
@@ -2161,8 +2161,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     /**
      * Gets a WorkInsideColonyMission for a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param aiColony An optional <code>AIColony</code> to work at.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param aiColony An optional {@code AIColony} to work at.
      * @return A new mission, or null if impossible.
      */
     public Mission getWorkInsideColonyMission(AIUnit aiUnit,

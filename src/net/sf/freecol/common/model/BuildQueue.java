@@ -76,7 +76,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * Create a new build queue.
      *
-     * @param colony The <code>Colony</code> to build for.
+     * @param colony The {@code Colony} to build for.
      * @param action The action on build completion.
      * @param priority The build priority.
      */
@@ -138,7 +138,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * Sets the current type of buildable to be built and if it is a building
      * insist that there is only one in the queue.
      *
-     * @param buildable The <code>T</code> to build.
+     * @param buildable The {@code T} to build.
      */
     public void setCurrentlyBuilding(T buildable) {
         if (buildable == null) {
@@ -153,10 +153,10 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
     /**
-     * Get the <code>ProductionInfo</code> for this BuildQueue.
+     * Get the {@code ProductionInfo} for this BuildQueue.
      *
-     * @param input A list of input <code>AbstractGoods</code>.
-     * @return The <code>ProductionInfo</code> for this BuildQueue.
+     * @param input A list of input {@code AbstractGoods}.
+     * @return The {@code ProductionInfo} for this BuildQueue.
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();

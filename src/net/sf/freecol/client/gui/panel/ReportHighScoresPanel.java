@@ -43,9 +43,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
     /**
      * Creates the high scores report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param prefix An optional message to add at the top of the panel.
-     * @param highScores The list of <code>HighScore</code>s.
+     * @param highScores The list of {@code HighScore}s.
      */
     public ReportHighScoresPanel(FreeColClient freeColClient, String prefix,
                                  List<HighScore> highScores) {

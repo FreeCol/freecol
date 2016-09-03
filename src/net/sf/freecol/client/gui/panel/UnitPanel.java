@@ -48,7 +48,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Create a unit panel.
      *
-     * @param portPanel A <code>PortPanel</code> to supply units.
+     * @param portPanel A {@code PortPanel} to supply units.
      * @param name An optional name for the panel.
      * @param editable True if the panel can be edited.
      */
@@ -126,7 +126,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Get the port panel that supplies units to this panel.
      *
-     * @return The <code>PortPanel</code>.
+     * @return The {@code PortPanel}.
      */
     public PortPanel getPortPanel() {
         return portPanel;
@@ -144,7 +144,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Can this panel accepts the given Unit.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return True if the unit can be added.
      */
     public abstract boolean accepts(Unit unit);
@@ -159,7 +159,7 @@ public abstract class UnitPanel extends MigPanel
     /**
      * Select a given unit.
      *
-     * @param unit The <code>Unit</code> to select.
+     * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
     public boolean setSelectedUnit(Unit unit) {

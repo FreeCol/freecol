@@ -43,12 +43,12 @@ public class ColonyTradeItem extends TradeItem {
 
 
     /**
-     * Creates a new <code>ColonyTradeItem</code> instance.
+     * Creates a new {@code ColonyTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param colony The <code>Colony</code> to trade.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param colony The {@code Colony} to trade.
      */
     public ColonyTradeItem(Game game, Player source, Player destination,
                            Colony colony) {
@@ -67,10 +67,10 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new <code>ColonyTradeItem</code> instance.
+     * Creates a new {@code ColonyTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public ColonyTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

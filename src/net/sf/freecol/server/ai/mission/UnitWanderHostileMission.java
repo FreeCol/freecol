@@ -46,21 +46,21 @@ public class UnitWanderHostileMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public UnitWanderHostileMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit, null);
     }
 
     /**
-     * Creates a new <code>UnitWanderHostileMission</code> and reads
+     * Creates a new {@code UnitWanderHostileMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -77,7 +77,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -91,7 +91,7 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -104,8 +104,8 @@ public class UnitWanderHostileMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit,

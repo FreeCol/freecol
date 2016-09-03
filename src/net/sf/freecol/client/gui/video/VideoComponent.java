@@ -48,7 +48,7 @@ public class VideoComponent extends JPanel {
 
     /**
      * Creates a component for displaying the given video.
-     * @param video The <code>Video</code> to be displayed.
+     * @param video The {@code Video} to be displayed.
      *
      * @param mute boolean silence
      */

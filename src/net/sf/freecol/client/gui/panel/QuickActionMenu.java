@@ -95,8 +95,8 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a standard empty menu
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param freeColPanel The parent <code>FreeColPanel</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param freeColPanel The parent {@code FreeColPanel}.
      */
     public QuickActionMenu(FreeColClient freeColClient,
                            FreeColPanel freeColPanel) {
@@ -109,8 +109,8 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Add specific menu items for a given component.
      *
-     * @param comp The specific <code>JComponent</code>.
-     * @return This <code>QuickActionMenu</code>.
+     * @param comp The specific {@code JComponent}.
+     * @return This {@code QuickActionMenu}.
      */
     public QuickActionMenu addMenuItems(JComponent comp) {
         if (comp instanceof UnitLabel) {
@@ -134,7 +134,7 @@ public final class QuickActionMenu extends JPopupMenu {
      *
      * The amount is returned through the parameter amount.
      *
-     * @param ag The <code>AbstractGoods</code> to query.
+     * @param ag The {@code AbstractGoods} to query.
      */
     private void promptForGoods(AbstractGoods ag) {
         int ret = gui.showSelectAmountDialog(ag.getType(),
@@ -146,7 +146,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a popup menu for a Unit.
      *
-     * @param unitLabel The <code>UnitLabel</code> to create items for.
+     * @param unitLabel The {@code UnitLabel} to create items for.
      */
     private void createUnitMenu(final UnitLabel unitLabel) {
         final Unit unit = unitLabel.getUnit();
@@ -563,10 +563,10 @@ public final class QuickActionMenu extends JPopupMenu {
      * equipment types.  However, its time to release, and we should avoid
      * string changes.  Get rid of this post 0.11.0-release.
      *
-     * @param unitLabel The <code>UnitLabel</code> to create items for.
-     * @param from The starting <code>Role</code>.
+     * @param unitLabel The {@code UnitLabel} to create items for.
+     * @param from The starting {@code Role}.
      * @param fromCount The starting role count.
-     * @param to The new <code>Role</code>.
+     * @param to The new {@code Role}.
      * @param toCount The new role count.
      * @param price An optional price to charge for the change.
      * @return A suitable menu item.
@@ -626,7 +626,7 @@ public final class QuickActionMenu extends JPopupMenu {
      * Note "clear speciality" is here too to keep it well separated from
      * other items.
      *
-     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
+     * @param unitLabel The {@code UnitLabel} specifying the unit.
      * @return True if menu items were added and a separator is now needed.
      */
     private boolean addRoleItems(final UnitLabel unitLabel) {
@@ -684,7 +684,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a menu for some goods.
      *
-     * @param goodsLabel The <code>GoodsLabel</code> to create items for.
+     * @param goodsLabel The {@code GoodsLabel} to create items for.
      */
     private void createGoodsMenu(final GoodsLabel goodsLabel) {
         final InGameController igc = freeColClient.getInGameController();
@@ -763,7 +763,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Add an item to pay arrears on the given goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to pay arrears on.
+     * @param goodsType The {@code GoodsType} to pay arrears on.
      */
     private void addPayArrears(final GoodsType goodsType) {
         final InGameController igc = freeColClient.getInGameController();
@@ -785,7 +785,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates menu items for some goods in a market.
      *
-     * @param marketLabel The <code>MarketLabel</code> to create entries for.
+     * @param marketLabel The {@code MarketLabel} to create entries for.
      */
     private void createMarketMenu(MarketLabel marketLabel) {
         final AbstractGoods ag = marketLabel.getAbstractGoods();
@@ -836,7 +836,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Creates a menu for a tile.
      * 
-     * @param singleTilePanel The <code>ASingleTilePanel</code> to create with.
+     * @param singleTilePanel The {@code ASingleTilePanel} to create with.
      */
     private void createTileMenu(final ASingleTilePanel singleTilePanel) {
         if (singleTilePanel.getColonyTile() != null
@@ -848,7 +848,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Add a menu item for the tile a unit is working.
      *
-     * @param unitLabel The <code>UnitLabel</code> specifying the unit.
+     * @param unitLabel The {@code UnitLabel} specifying the unit.
      * @return True if an item was added.
      */
     private boolean addTileItem(final UnitLabel unitLabel) {
@@ -864,7 +864,7 @@ public final class QuickActionMenu extends JPopupMenu {
     /**
      * Add a menu item to show the tile panel for a tile.
      *
-     * @param tile The <code>Tile</code> to use.
+     * @param tile The {@code Tile} to use.
      */
     private void addTileItem(final Tile tile) {
         if (tile != null) {

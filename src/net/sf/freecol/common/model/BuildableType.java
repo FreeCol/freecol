@@ -65,7 +65,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      * Creates a new buildable type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public BuildableType(String id, Specification specification) {
         super(id, specification);
@@ -132,7 +132,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Is this buildable available to a given FreeColObject?
      *
-     * @param fco The <code>FreeColObject</code>s to check.
+     * @param fco The {@code FreeColObject}s to check.
      * @return True if the buildable is available.
      */
     public boolean isAvailableTo(FreeColObject... fco) {
@@ -168,10 +168,10 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     /**
-     * Get the amount required of a given <code>GoodsType</code> to build
+     * Get the amount required of a given {@code GoodsType} to build
      * an instance of this buildable.
      *
-     * @param type The <code>GoodsType</code> to check.
+     * @param type The {@code GoodsType} to check.
      * @return The amount of goods required.
      */
     public int getRequiredAmountOf(GoodsType type) {
@@ -181,7 +181,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Add a new goods requirement.
      *
-     * @param ag The required <code>AbstractGoods</code> to add.
+     * @param ag The required {@code AbstractGoods} to add.
      */
     private void addRequiredGoods(AbstractGoods ag) {
         if (this.requiredGoods == null) this.requiredGoods = new ArrayList<>();
@@ -200,7 +200,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Get the limits on this buildable.
      *
-     * @return A list of <code>Limit</code>s.
+     * @return A list of {@code Limit}s.
      */
     public List<Limit> getLimits() {
         return (limits == null) ? Collections.<Limit>emptyList() : limits;
@@ -209,7 +209,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Set the limits on this buildable.
      *
-     * @param newLimits The new <code>Limits</code> value.
+     * @param newLimits The new {@code Limits} value.
      */
     public void setLimits(List<Limit> newLimits) {
         limits = newLimits;
@@ -218,7 +218,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     /**
      * Add a new limit.
      *
-     * @param limit The <code>Limit</code> to add.
+     * @param limit The {@code Limit} to add.
      */
     private void addLimit(Limit limit) {
         if (limits == null) limits = new ArrayList<>();

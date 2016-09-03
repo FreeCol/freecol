@@ -59,7 +59,7 @@ public class Force extends FreeColSpecObject {
     /**
      * Basic constructor.
      *
-     * @param specification The <code>Specification</code> for this object.
+     * @param specification The {@code Specification} for this object.
      */
     public Force(Specification specification) {
         super(specification);
@@ -68,8 +68,8 @@ public class Force extends FreeColSpecObject {
     /**
      * Create a new Force.
      *
-     * @param specification The <code>Specification</code> for this object.
-     * @param units A list of <code>AbstractUnit</code>s defining the force.
+     * @param specification The {@code Specification} for this object.
+     * @param units A list of {@code AbstractUnit}s defining the force.
      * @param ability An optional ability name required of the units
      *     in the force.
      */
@@ -176,7 +176,7 @@ public class Force extends FreeColSpecObject {
     /**
      * Add abstract units to this Force.
      *
-     * @param au The addition to this <code>Force</code>.
+     * @param au The addition to this {@code Force}.
      */
     public void add(AbstractUnit au) {
         final Specification spec = getSpecification();

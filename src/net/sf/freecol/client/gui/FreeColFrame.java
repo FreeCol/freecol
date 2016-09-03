@@ -59,8 +59,8 @@ public class FreeColFrame extends JFrame {
     /**
      * Create a new main frame.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param gd The <code>GraphicsDevice</code> to use.
+     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param gd The {@code GraphicsDevice} to use.
      * @param menuBar The menu bar to add to the frame.
      * @param canvas The Canvas to add to the frame.
      * @param windowed If the frame should be windowed.

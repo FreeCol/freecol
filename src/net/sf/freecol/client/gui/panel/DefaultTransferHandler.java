@@ -73,7 +73,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     /**
      * This is the default drag handler for drag and drop operations that
-     * use the <code>TransferHandler</code>.
+     * use the {@code TransferHandler}.
      */
     private static class FreeColDragHandler
         implements DragGestureListener, DragSourceListener {
@@ -245,7 +245,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
      * Creates the default FreeCol transfer handler.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param parentPanel The layered pane that holds all kinds of information.
      */
     public DefaultTransferHandler(FreeColClient freeColClient,
@@ -512,7 +512,7 @@ public final class DefaultTransferHandler extends TransferHandler {
      * Displays an input dialog box where the user should specify a
      * goods transfer amount.
      *
-     * @param goodsType The <code>GoodsType</code> to transfer.
+     * @param goodsType The {@code GoodsType} to transfer.
      * @param available The amount of goods available.
      * @param defaultAmount The default amount of goods to offer.
      * @param needToPay If true limit by available funds.

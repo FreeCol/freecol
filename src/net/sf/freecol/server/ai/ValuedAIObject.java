@@ -47,18 +47,18 @@ public abstract class ValuedAIObject extends AIObject {
 
 
     /**
-     * Creates a new <code>ValuedAIObject</code> instance.
+     * Creates a new {@code ValuedAIObject} instance.
      *
-     * @param aiMain an <code>AIMain</code> value
+     * @param aiMain an {@code AIMain} value
      */
     public ValuedAIObject(AIMain aiMain) {
         super(aiMain);
     }
 
     /**
-     * Creates a new uninitialized <code>ValuedAIObject</code> instance.
+     * Creates a new uninitialized {@code ValuedAIObject} instance.
      *
-     * @param aiMain an <code>AIMain</code> value
+     * @param aiMain an {@code AIMain} value
      * @param id The object identifier.
      */
     public ValuedAIObject(AIMain aiMain, String id) {
@@ -68,7 +68,7 @@ public abstract class ValuedAIObject extends AIObject {
     }
 
     /**
-     * Creates a new <code>ValuedAIObject</code> from the given
+     * Creates a new {@code ValuedAIObject} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -83,16 +83,16 @@ public abstract class ValuedAIObject extends AIObject {
 
 
     /**
-     * Get the <code>Value</code> value.
+     * Get the {@code Value} value.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public final int getValue() {
         return value;
     }
 
     /**
-     * Set the <code>Value</code> value.
+     * Set the {@code Value} value.
      *
      * @param newValue The new Value value.
      */

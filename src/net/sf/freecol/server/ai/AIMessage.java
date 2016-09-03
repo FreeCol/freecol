@@ -52,8 +52,8 @@ public class AIMessage {
     /**
      * An AIUnit attacks in the given direction.
      *
-     * @param aiUnit The <code>AIUnit</code> to attack with.
-     * @param direction The <code>Direction</code> to attack in.
+     * @param aiUnit The {@code AIUnit} to attack with.
+     * @param direction The {@code Direction} to attack in.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askAttack(AIUnit aiUnit, Direction direction) {
@@ -64,7 +64,7 @@ public class AIMessage {
     /**
      * An AIUnit builds a colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to build the colony.
+     * @param aiUnit The {@code AIUnit} to build the colony.
      * @param name The name of the colony.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -76,7 +76,7 @@ public class AIMessage {
     /**
      * An AIUnit cashes in.
      *
-     * @param aiUnit The <code>AIUnit</code> cashing in.
+     * @param aiUnit The {@code AIUnit} cashing in.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askCashInTreasureTrain(AIUnit aiUnit) {
@@ -87,8 +87,8 @@ public class AIMessage {
     /**
      * An AIUnit changes state.
      *
-     * @param aiUnit The <code>AIUnit</code> to change the state of.
-     * @param state The new <code>UnitState</code>.
+     * @param aiUnit The {@code AIUnit} to change the state of.
+     * @param state The new {@code UnitState}.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeState(AIUnit aiUnit, UnitState state) {
@@ -99,8 +99,8 @@ public class AIMessage {
     /**
      * An AIUnit changes its work type.
      *
-     * @param aiUnit The <code>AIUnit</code> to change the work type of.
-     * @param type The <code>GoodsType</code> to produce.
+     * @param aiUnit The {@code AIUnit} to change the work type of.
+     * @param type The {@code GoodsType} to produce.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkType(AIUnit aiUnit, GoodsType type) {
@@ -111,8 +111,8 @@ public class AIMessage {
    /**
      * An AIUnit changes its work improvement type.
      *
-     * @param aiUnit The <code>AIUnit</code> to change the work type of.
-     * @param type The <code>TileImprovementType</code> to produce.
+     * @param aiUnit The {@code AIUnit} to change the work type of.
+     * @param type The {@code TileImprovementType} to produce.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askChangeWorkImprovementType(AIUnit aiUnit,
@@ -124,8 +124,8 @@ public class AIMessage {
     /**
      * Claims a tile for a colony.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param aic The <code>AIColony</code> that is claiming.
+     * @param tile The {@code Tile} to claim.
+     * @param aic The {@code AIColony} that is claiming.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -137,8 +137,8 @@ public class AIMessage {
     /**
      * Claims a tile.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param aiUnit The <code>AIUnit</code> that is claiming.
+     * @param tile The {@code Tile} to claim.
+     * @param aiUnit The {@code AIUnit} that is claiming.
      * @param price The price to pay.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -150,7 +150,7 @@ public class AIMessage {
     /**
      * Clears the speciality of a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to clear.
+     * @param aiUnit The {@code AIUnit} to clear.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askClearSpeciality(AIUnit aiUnit) {
@@ -161,7 +161,7 @@ public class AIMessage {
     /**
      * An AIUnit disbands.
      *
-     * @param aiUnit The <code>AIUnit</code> to disband.
+     * @param aiUnit The {@code AIUnit} to disband.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisband(AIUnit aiUnit) {
@@ -172,7 +172,7 @@ public class AIMessage {
     /**
      * An AIUnit disembarks.
      *
-     * @param aiUnit The <code>AIUnit</code> disembarking.
+     * @param aiUnit The {@code AIUnit} disembarking.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisembark(AIUnit aiUnit) {
@@ -183,9 +183,9 @@ public class AIMessage {
     /**
      * An AIUnit embarks.
      *
-     * @param aiUnit The <code>AIUnit</code> carrier.
-     * @param unit The <code>Unit</code> that is embarking.
-     * @param direction The <code>Direction</code> to embark in (may be null).
+     * @param aiUnit The {@code AIUnit} carrier.
+     * @param unit The {@code Unit} that is embarking.
+     * @param direction The {@code Direction} to embark in (may be null).
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askEmbark(AIUnit aiUnit, Unit unit,
@@ -197,7 +197,7 @@ public class AIMessage {
     /**
      * A unit in Europe emigrates.
      *
-     * @param aiPlayer The <code>AIPlayer</code> requiring emigration.
+     * @param aiPlayer The {@code AIPlayer} requiring emigration.
      * @param slot The slot to emigrate from.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -209,7 +209,7 @@ public class AIMessage {
     /**
      * Ends the player turn.
      *
-     * @param aiPlayer The <code>AIPlayer</code> ending the turn.
+     * @param aiPlayer The {@code AIPlayer} ending the turn.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askEndTurn(AIPlayer aiPlayer) {
@@ -220,8 +220,8 @@ public class AIMessage {
     /**
      * Change the role of a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param aiUnit The {@code AIUnit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -234,8 +234,8 @@ public class AIMessage {
     /**
      * Establishes a mission in the given direction.
      *
-     * @param aiUnit The <code>AIUnit</code> establishing the mission.
-     * @param direction The <code>Direction</code> to move the unit.
+     * @param aiUnit The {@code AIUnit} establishing the mission.
+     * @param direction The {@code Direction} to move the unit.
      * @param denounce Is this a denunciation?
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -249,9 +249,9 @@ public class AIMessage {
     /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
      *
-     * @param aiUnit The <code>AIUnit</code> that is demanding.
-     * @param colony The <code>Colony</code> to demand of.
-     * @param type The <code>GoodsType</code> to demand.
+     * @param aiUnit The {@code AIUnit} that is demanding.
+     * @param colony The {@code Colony} to demand of.
+     * @param type The {@code GoodsType} to demand.
      * @param amount The amount of goods to demand.
      * @return True if the message was sent, a non-error reply returned, and
      *     the demand was accepted.
@@ -265,10 +265,10 @@ public class AIMessage {
     /**
      * An AI unit loads some cargo.
      *
-     * @param loc The <code>Location</code> where the goods are.
-     * @param type The <code>GoodsType</code> to load.
+     * @param loc The {@code Location} where the goods are.
+     * @param type The {@code GoodsType} to load.
      * @param amount The amount of goods to load.
-     * @param aiUnit The <code>AIUnit</code> that is loading.
+     * @param aiUnit The {@code AIUnit} that is loading.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askLoadGoods(Location loc, GoodsType type,
@@ -280,9 +280,9 @@ public class AIMessage {
     /**
      * An AI unit loots some cargo.
      *
-     * @param aiUnit The <code>AIUnit</code> that is looting.
+     * @param aiUnit The {@code AIUnit} that is looting.
      * @param defenderId The object identifier of the defending unit.
-     * @param goods A list of <code>Goods</code> to loot.
+     * @param goods A list of {@code Goods} to loot.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askLoot(AIUnit aiUnit, String defenderId,
@@ -294,8 +294,8 @@ public class AIMessage {
     /**
      * Moves an AIUnit in the given direction.
      *
-     * @param aiUnit The <code>AIUnit</code> to move.
-     * @param direction The <code>Direction</code> to move the unit.
+     * @param aiUnit The {@code AIUnit} to move.
+     * @param direction The {@code Direction} to move the unit.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMove(AIUnit aiUnit, Direction direction) {
@@ -306,8 +306,8 @@ public class AIMessage {
     /**
      * Moves an AIUnit across the high seas.
      *
-     * @param aiUnit The <code>AIUnit</code> to move.
-     * @param destination The <code>Location</code> to move to.
+     * @param aiUnit The {@code AIUnit} to move.
+     * @param destination The {@code Location} to move to.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askMoveTo(AIUnit aiUnit, Location destination) {
@@ -318,8 +318,8 @@ public class AIMessage {
     /**
      * Gets a nation summary for a player.
      *
-     * @param owner The <code>AIPlayer</code> making the inquiry.
-     * @param player The <code>Player</code> to summarize.
+     * @param owner The {@code AIPlayer} making the inquiry.
+     * @param player The {@code Player} to summarize.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askNationSummary(AIPlayer owner, Player player) {
@@ -330,8 +330,8 @@ public class AIMessage {
     /**
      * A native AIUnit delivers a gift to a colony.
      *
-     * @param aiUnit The <code>AIUnit</code> delivering the gift.
-     * @param colony The <code>Colony</code> to give to.
+     * @param aiUnit The {@code AIUnit} delivering the gift.
+     * @param colony The {@code Colony} to give to.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askNativeGift(AIUnit aiUnit, Colony colony) {
@@ -342,7 +342,7 @@ public class AIMessage {
     /**
      * An AIUnit is put outside a colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to put out.
+     * @param aiUnit The {@code AIUnit} to put out.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askPutOutsideColony(AIUnit aiUnit) {
@@ -353,9 +353,9 @@ public class AIMessage {
     /**
      * Rearrange an AI colony.
      *
-     * @param aiColony The <code>AIColony</code> to rearrange.
-     * @param workers A list of worker <code>Unit</code>s that may change.
-     * @param scratch A copy of the underlying <code>Colony</code> with the
+     * @param aiColony The {@code AIColony} to rearrange.
+     * @param workers A list of worker {@code Unit}s that may change.
+     * @param scratch A copy of the underlying {@code Colony} with the
      *     workers arranged as required.
      * @return True if the message was sent, and a non-error reply returned.
      */
@@ -369,8 +369,8 @@ public class AIMessage {
     /**
      * An AI unit speaks to the chief of a native settlement.
      *
-     * @param aiUnit The <code>AIUnit</code> that is scouting.
-     * @param is The <code>IndianSettlement</code> to scout.
+     * @param aiUnit The {@code AIUnit} that is scouting.
+     * @param is The {@code IndianSettlement} to scout.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askScoutSpeakToChief(AIUnit aiUnit,
@@ -382,8 +382,8 @@ public class AIMessage {
     /**
      * Set the build queue in a colony.
      *
-     * @param aiColony The <code>AIColony</code> that is building.
-     * @param queue The list of <code>BuildableType</code>s to build.
+     * @param aiColony The {@code AIColony} that is building.
+     * @param queue The list of {@code BuildableType}s to build.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askSetBuildQueue(AIColony aiColony,
@@ -395,8 +395,8 @@ public class AIMessage {
     /**
      * Train unit in Europe.
      *
-     * @param aiPlayer The <code>AIPlayer</code> requiring training.
-     * @param type The <code>UnitType</code> to train.
+     * @param aiPlayer The {@code AIPlayer} requiring training.
+     * @param type The {@code UnitType} to train.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askTrainUnitInEurope(AIPlayer aiPlayer,
@@ -409,9 +409,9 @@ public class AIMessage {
     /**
      * An AI unit unloads some cargo.
      *
-     * @param type The <code>GoodsType</code> to unload.
+     * @param type The {@code GoodsType} to unload.
      * @param amount The amount of goods to unload.
-     * @param aiUnit The <code>AIUnit</code> that is unloading.
+     * @param aiUnit The {@code AIUnit} that is unloading.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askUnloadGoods(GoodsType type, int amount,
@@ -423,8 +423,8 @@ public class AIMessage {
     /**
      * Set a unit to work in a work location.
      *
-     * @param aiUnit The <code>AIUnit</code> to work.
-     * @param workLocation The <code>WorkLocation</code> to work in.
+     * @param aiUnit The {@code AIUnit} to work.
+     * @param workLocation The {@code WorkLocation} to work in.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askWork(AIUnit aiUnit, WorkLocation workLocation) {

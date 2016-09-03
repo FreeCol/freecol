@@ -52,7 +52,7 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public PreGameController(FreeColClient freeColClient) {
         super(freeColClient);
@@ -98,8 +98,8 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Sets a nation's state.
      *
-     * @param nation The <code>Nation</code> to set.
-     * @param state The <code>NationState</code> value to set.
+     * @param nation The {@code Nation} to set.
+     * @param state The {@code NationState} value to set.
      */
     public void setAvailable(Nation nation, NationState state) {
         getGame().getNationOptions().getNations().put(nation, state);
@@ -110,8 +110,8 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Sets a nation's colour.
      *
-     * @param nation The <code>Nation</code> to set the color for.
-     * @param color The <code>Color</code> to set.
+     * @param nation The {@code Nation} to set the color for.
+     * @param color The {@code Color} to set.
      */
     public void setColor(Nation nation, Color color) {
         nation.setColor(color);
@@ -122,7 +122,7 @@ public final class PreGameController extends FreeColClientHolder {
     /**
      * Sets this client's player's nation.
      *
-     * @param nation Which <code>Nation</code> this player wishes to set.
+     * @param nation Which {@code Nation} this player wishes to set.
      */
     public void setNation(Nation nation) {
         getMyPlayer().setNation(nation);

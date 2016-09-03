@@ -86,7 +86,7 @@ public final class CompactLabourReport extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public CompactLabourReport(FreeColClient freeColClient) {
         this(freeColClient, null);
@@ -97,8 +97,8 @@ public final class CompactLabourReport extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param data The <code>UnitData</code> to display in this report.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param data The {@code UnitData} to display in this report.
      */
     public CompactLabourReport(FreeColClient freeColClient,
                                LabourData.UnitData data) {
@@ -245,8 +245,8 @@ public final class CompactLabourReport extends ReportPanel {
     /**
      * Add unit data for a given location.
      *
-     * @param data The <code>LocationData</code> to add to.
-     * @param colony The enclosing <code>Colony</code>.
+     * @param data The {@code LocationData} to add to.
+     * @param colony The enclosing {@code Colony}.
      * @param row The starting row.
      * @return The finishing row.
      */

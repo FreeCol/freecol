@@ -105,7 +105,7 @@ public final class FeatureContainer {
      * Is the given set of abilities non-empty and contains no
      * false-valued members?
      *
-     * @param abilities A stream of <code>Ability</code>s to check.
+     * @param abilities A stream of {@code Ability}s to check.
      * @return True if the abilities are `satisfied'.
      */
     public static boolean hasAbility(Stream<Ability> abilities) {
@@ -122,9 +122,9 @@ public final class FeatureContainer {
      * false-valued members?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return True if the ability is present.
      */
     public boolean hasAbility(String id, FreeColSpecObjectType fcgot,
@@ -147,9 +147,9 @@ public final class FeatureContainer {
      * container.
      *
      * @param id The object identifier (null matches all).
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return A stream of abilities.
      */
     public Stream<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
@@ -174,8 +174,8 @@ public final class FeatureContainer {
     /**
      * Add the given ability to a container.
      *
-     * @param ability An <code>Ability</code> to add.
-     * @return True if the <code>Ability</code> was added.
+     * @param ability An {@code Ability} to add.
+     * @return True if the {@code Ability} was added.
      */
     public boolean addAbility(Ability ability) {
         if (ability == null) return false;
@@ -194,7 +194,7 @@ public final class FeatureContainer {
     /**
      * Remove the given ability from a container.
      *
-     * @param ability An <code>Ability</code> to remove.
+     * @param ability An {@code Ability} to remove.
      * @return The ability removed or null on failure.
      */
     public Ability removeAbility(Ability ability) {
@@ -227,10 +227,10 @@ public final class FeatureContainer {
      * container.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A stream of <code>Modifier</code>s.
+     * @param turn An optional applicable {@code Turn}.
+     * @return A stream of {@code Modifier}s.
      */
     public Stream<Modifier> getModifiers(String id,
                                          FreeColSpecObjectType fcgot,
@@ -254,9 +254,9 @@ public final class FeatureContainer {
      * given number.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
      * @return The modified number.
      */
@@ -269,8 +269,8 @@ public final class FeatureContainer {
      * Applies a collection of modifiers to the given float value.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
@@ -283,8 +283,8 @@ public final class FeatureContainer {
      * Applies a stream of modifiers to the given float value.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
     public static float applyModifiers(float number, Turn turn,
@@ -297,8 +297,8 @@ public final class FeatureContainer {
      * Implement applyModifiers.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
     private static float applyModifiers_internal(float number, Turn turn,
@@ -317,7 +317,7 @@ public final class FeatureContainer {
     /**
      * Adds a modifier to a container.
      *
-     * @param modifier The <code>Modifier</code> to add.
+     * @param modifier The {@code Modifier} to add.
      * @return True if the modifier was added.
      */
     public boolean addModifier(Modifier modifier) {
@@ -337,7 +337,7 @@ public final class FeatureContainer {
     /**
      * Removes a modifier from a container.
      *
-     * @param modifier The <code>Modifier</code> to remove.
+     * @param modifier The {@code Modifier} to remove.
      * @return The modifier removed.
      */
     public Modifier removeModifier(Modifier modifier) {
@@ -367,7 +367,7 @@ public final class FeatureContainer {
     /**
      * Adds all the features in an object to this object.
      *
-     * @param fco The <code>FreeColObject</code> to add features from.
+     * @param fco The {@code FreeColObject} to add features from.
      */
     public void addFeatures(FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
@@ -413,7 +413,7 @@ public final class FeatureContainer {
     /**
      * Removes all the features in an object from a container.
      *
-     * @param fco The <code>FreeColObject</code> to find features to remove
+     * @param fco The {@code FreeColObject} to find features to remove
      *     in.
      */
     public void removeFeatures(FreeColObject fco) {
@@ -473,8 +473,8 @@ public final class FeatureContainer {
      * Replaces the source field. This is necessary because objects
      * may inherit Features from other abstract objects.
      *
-     * @param oldSource The old source <code>FreeColSpecObjectType</code>.
-     * @param newSource The new source <code>FreeColSpecObjectType</code>.
+     * @param oldSource The old source {@code FreeColSpecObjectType}.
+     * @param newSource The new source {@code FreeColSpecObjectType}.
      */
     public void replaceSource(FreeColSpecObjectType oldSource,
                               FreeColSpecObjectType newSource) {

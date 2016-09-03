@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * Represents a plan to improve a <code>Tile</code> in some way.
+ * Represents a plan to improve a {@code Tile} in some way.
  * For instance by plowing or by building a road.
  *
  * @see Tile
@@ -48,18 +48,18 @@ public class TileImprovementPlan extends ValuedAIObject {
     /** The type of improvement, from TileImprovementTypes. */
     private TileImprovementType type;
 
-    /** The <code>Tile</code> to be improved. */
+    /** The {@code Tile} to be improved. */
     private Tile target;
 
     /**
      * The pioneer which should make the improvement (if a
-     * <code>Unit</code> has been assigned).
+     * {@code Unit} has been assigned).
      */
     private AIUnit pioneer = null;
 
 
     /**
-     * Creates a new uninitialized <code>TileImprovementPlan</code>
+     * Creates a new uninitialized {@code TileImprovementPlan}
      * from the given XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -77,13 +77,13 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Creates a new <code>TileImprovementPlan</code>.
+     * Creates a new {@code TileImprovementPlan}.
      *
      * @param aiMain The main AI-object.
-     * @param target The target <code>Tile</code> for the improvement.
+     * @param target The target {@code Tile} for the improvement.
      * @param type The type of improvement.
      * @param value The value identifying the importance of
-     *     this <code>TileImprovementPlan</code> - a higher value
+     *     this {@code TileImprovementPlan} - a higher value
      *     signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
@@ -98,7 +98,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Creates a new <code>TileImprovementPlan</code> from the given
+     * Creates a new {@code TileImprovementPlan} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -119,8 +119,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * improvement described by this object.
      *
      * @return The pioneer which should make the improvement, if
-     *     such a <code>AIUnit</code> has been assigned, and
-     *     <code>null</code> if nobody has been assigned this
+     *     such a {@code AIUnit} has been assigned, and
+     *     {@code null} if nobody has been assigned this
      *     mission.
      */
     public final AIUnit getPioneer() {
@@ -132,8 +132,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * improvement described by this object.
      *
      * @param pioneer The pioneer which should make the improvement, if
-     *     such a <code>Unit</code> has been assigned, and
-     *     <code>null</code> if nobody has been assigned this
+     *     such a {@code Unit} has been assigned, and
+     *     {@code null} if nobody has been assigned this
      *     mission.
      */
     public final void setPioneer(AIUnit pioneer) {
@@ -141,7 +141,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Gets the <code>TileImprovementType</code> of this plan.
+     * Gets the {@code TileImprovementType} of this plan.
      *
      * @return The type of the improvement.
      */
@@ -150,9 +150,9 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Sets the type of this <code>TileImprovementPlan</code>.
+     * Sets the type of this {@code TileImprovementPlan}.
      *
-     * @param type The <code>TileImprovementType</code>.
+     * @param type The {@code TileImprovementType}.
      * @see #getType
      */
     public final void setType(TileImprovementType type) {
@@ -160,9 +160,9 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
-     * Gets the target of this <code>TileImprovementPlan</code>.
+     * Gets the target of this {@code TileImprovementPlan}.
      *
-     * @return The <code>Tile</code> where
+     * @return The {@code Tile} where
      *     {@link #getPioneer pioneer} should make the
      *     given {@link #getType improvement}.
      */
@@ -175,9 +175,9 @@ public class TileImprovementPlan extends ValuedAIObject {
      * given tile and goods type.  Useful for AI in deciding the
      * improvements to prioritize.
      *
-     * @param tile The <code>Tile</code> that will be improved.
-     * @param goodsType The <code>GoodsType</code> to be prioritized.
-     * @return The best <code>TileImprovementType</code> available to be done.
+     * @param tile The {@code Tile} that will be improved.
+     * @param goodsType The {@code GoodsType} to be prioritized.
+     * @return The best {@code TileImprovementType} available to be done.
      */
     public static TileImprovementType getBestTileImprovementType(Tile tile,
         GoodsType goodsType) {
@@ -205,7 +205,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * Updates this tile improvement plan to the best available for its
      * tile and the specified goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to be prioritized.
+     * @param goodsType The {@code GoodsType} to be prioritized.
      * @return True if the plan is still viable.
      */
     public boolean update(GoodsType goodsType) {
@@ -254,7 +254,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     // Override AIObject
 
     /**
-     * Disposes this <code>TileImprovementPlan</code>.
+     * Disposes this {@code TileImprovementPlan}.
      *
      * If a pioneer has been assigned to making this improvement, then
      * abort its mission.

@@ -44,7 +44,7 @@ public final class ReportEducationPanel extends ReportPanel {
     /**
      * Creates the education report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportEducationPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportEducationAction");

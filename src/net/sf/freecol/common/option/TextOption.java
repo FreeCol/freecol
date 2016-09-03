@@ -41,19 +41,19 @@ public class TextOption extends AbstractOption<String> {
 
 
     /**
-     * Creates a new <code>TextOption</code>.
+     * Creates a new {@code TextOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public TextOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>TextOption</code>.
+     * Creates a new {@code TextOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public TextOption(String id, Specification specification) {
         super(id, specification);

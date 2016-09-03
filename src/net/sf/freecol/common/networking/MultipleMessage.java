@@ -43,9 +43,9 @@ public class MultipleMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>MultipleMessage</code>.
+     * Create a new {@code MultipleMessage}.
      *
-     * @param elements A list of sub-<code>Element</code>s.
+     * @param elements A list of sub-{@code Element}s.
      */
     public MultipleMessage(List<Element> elements) {
         super(getTagName());
@@ -55,20 +55,20 @@ public class MultipleMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>MultipleMessage</code>.
+     * Create a new {@code MultipleMessage}.
      *
-     * @param element An element containing the sub-<code>Element</code>s.
+     * @param element An element containing the sub-{@code Element}s.
      */
     public MultipleMessage(Element element) {
         this(mapChildren(element, Function.identity()));
     }
 
     /**
-     * Create a new <code>MultipleMessage</code> from a
+     * Create a new {@code MultipleMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public MultipleMessage(Game game, Element element) {
         this((List<Element>)null);
@@ -83,7 +83,7 @@ public class MultipleMessage extends DOMMessage {
      * Extract an element chosen by tag from the elements list.
      *
      * @param tag The message tag to choose.
-     * @return The chosen <code>Element</code> if found, or null if not.
+     * @return The chosen {@code Element} if found, or null if not.
      */
     public Element extract(String tag) {
         for (Element e : this.elements) {
@@ -98,8 +98,8 @@ public class MultipleMessage extends DOMMessage {
     /**
      * Apply a handler to this message.
      *
-     * @param handler A <code>MessageHandler</code> to apply.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param handler A {@code MessageHandler} to apply.
+     * @param connection The {@code Connection} message was received on.
      * @return A collapsed resolution of the submessages.
      */
     public Element applyHandler(MessageHandler handler,
@@ -111,9 +111,9 @@ public class MultipleMessage extends DOMMessage {
     /**
      * Handle a "multiple"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return A collapsed resolution of the submessages.
      */
     public Element handle(FreeColServer server, Player player,

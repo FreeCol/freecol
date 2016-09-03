@@ -70,7 +70,7 @@ import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
  *
  * The method {@link #doMission(LogBuilder)} is called once each turn,
  * by {@link AIPlayer#startWorking()}, to perform the assigned
- * <code>Mission</code>.  Most of the methods in this class just
+ * {@code Mission}.  Most of the methods in this class just
  * delegates the call to that mission.
  *
  * @see Mission
@@ -90,7 +90,7 @@ public class AIUnit extends TransportableAIObject {
 
 
     /**
-     * Creates a new uninitialized <code>AIUnit</code>.
+     * Creates a new uninitialized {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -104,7 +104,7 @@ public class AIUnit extends TransportableAIObject {
     }
 
     /**
-     * Creates a new <code>AIUnit</code>.
+     * Creates a new {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
      * @param unit The unit to make an {@link AIObject} for.
@@ -120,7 +120,7 @@ public class AIUnit extends TransportableAIObject {
     }
 
     /**
-     * Creates a new <code>AIUnit</code> from the given
+     * Creates a new {@code AIUnit} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -137,9 +137,9 @@ public class AIUnit extends TransportableAIObject {
 
 
     /**
-     * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
+     * Gets the {@code Unit} this <code>AIUnit</code> controls.
      *
-     * @return The <code>Unit</code>.
+     * @return The {@code Unit}.
      */
     public final Unit getUnit() {
         return this.unit;
@@ -157,7 +157,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Gets the mission this unit has been assigned.
      *
-     * @return The <code>Mission</code>.
+     * @return The {@code Mission}.
      */
     public final Mission getMission() {
         return this.mission;
@@ -166,7 +166,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Assigns a mission to unit. 
      *
-     * @param mission The new <code>Mission</code>.
+     * @param mission The new {@code Mission}.
      */
     public final void setMission(Mission mission) {
         this.mission = mission;
@@ -184,7 +184,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Sets the goal of this AI unit.
      *
-     * @param goal The new <code>Goal</code>.
+     * @param goal The new {@code Goal}.
      */
     public final void setGoal(Goal goal) {
         this.goal = goal;
@@ -243,7 +243,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Gets the PRNG to use with this unit.
      *
-     * @return A <code>Random</code> instance.
+     * @return A {@code Random} instance.
      */
     public Random getAIRandom() {
         return (unit == null) ? null : getAIOwner().getAIRandom();
@@ -273,7 +273,7 @@ public class AIUnit extends TransportableAIObject {
      * Does this unit have a particular class of mission?
      *
      * @param <T> The type of the mission.
-     * @param returnClass The <code>Class</code> of mission to check.
+     * @param returnClass The {@code Class} of mission to check.
      * @return True if the mission is of the given class.
      */
     public <T extends Mission> boolean hasMission(Class<T> returnClass) {
@@ -284,8 +284,8 @@ public class AIUnit extends TransportableAIObject {
      * Get the unit mission if it is of a given class.
      *
      * @param <T> The type of the mission.
-     * @param returnClass The <code>Class</code> of the mission.
-     * @return The <code>Mission</code>, or null if it is not of the
+     * @param returnClass The {@code Class} of the mission.
+     * @return The {@code Mission}, or null if it is not of the
      *     given class.
      */
     public <T extends Mission> T getMission(Class<T> returnClass) {
@@ -302,7 +302,7 @@ public class AIUnit extends TransportableAIObject {
      * Do *not* check mission validity.  The mission itself does that,
      * and has special case error handling.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void doMission(LogBuilder lb) {
         if (this.mission != null) this.mission.doMission(lb);
@@ -311,8 +311,8 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Change the mission of a unit.
      *
-     * @param mission The new <code>Mission</code>.
-     * @return The new current <code>Mission</code>.
+     * @param mission The new {@code Mission}.
+     * @return The new current {@code Mission}.
      */
     public Mission changeMission(Mission mission) {
         if (this.mission == mission) return this.mission;
@@ -454,7 +454,7 @@ public class AIUnit extends TransportableAIObject {
     /**
      * Moves this AI unit.
      *
-     * @param direction The <code>Direction</code> to move.
+     * @param direction The {@code Direction} to move.
      * @return True if the move succeeded.
      */
     public boolean move(Direction direction) {
@@ -471,7 +471,7 @@ public class AIUnit extends TransportableAIObject {
      * (possibly requiring a purchase, which may fail due to lack of gold
      * or boycotts in effect).
      *
-     * @param role The <code>Role</code> to equip for identifier.
+     * @param role The {@code Role} to equip for identifier.
      * @return True if the role change was successful.
      */
     public boolean equipForRole(Role role) {

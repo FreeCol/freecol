@@ -49,7 +49,7 @@ final class ReceivingThread extends Thread {
      * This is just an input stream that signals end-of-stream when a
      * given token {@link Connection#END_OF_STREAM} is encountered.
      * In order to continue receiving data, the method {@link #enable}
-     * has to be called.  Calls to <code>close()</code> have no
+     * has to be called.  Calls to {@code close()} have no
      * effect, the underlying input stream has to be closed directly.
      */
     private static class FreeColNetworkInputStream extends InputStream {
@@ -70,7 +70,7 @@ final class ReceivingThread extends Thread {
 
 
         /**
-         * Creates a new <code>FreeColNetworkInputStream</code>.
+         * Creates a new {@code FreeColNetworkInputStream}.
          * 
          * @param in The input stream in which this object should get the data
          *            from.
@@ -82,8 +82,8 @@ final class ReceivingThread extends Thread {
         /**
          * Prepares the input stream for a new message.
          *
-         * Makes the subsequent calls to <code>read</code> return the data
-         * instead of <code>EOS_RESULT</code>.
+         * Makes the subsequent calls to {@code read} return the data
+         * instead of {@code EOS_RESULT}.
          */
         public void enable() {
             this.wait = false;
@@ -177,8 +177,8 @@ final class ReceivingThread extends Thread {
     /**
      * The constructor to use.
      * 
-     * @param connection The <code>Connection</code> this
-     *            <code>ReceivingThread</code> belongs to.
+     * @param connection The {@code Connection} this
+     *            {@code ReceivingThread} belongs to.
      * @param in The stream to read from.
      * @param threadName The base name for the thread.
      */
@@ -203,12 +203,12 @@ final class ReceivingThread extends Thread {
     }
 
     /**
-     * Creates and registers a new <code>NetworkReplyObject</code> with the
+     * Creates and registers a new {@code NetworkReplyObject} with the
      * specified object identifier.
      * 
      * @param networkReplyId The identifier of the message the calling
      *     thread should wait for.
-     * @return The <code>NetworkReplyObject</code> containing the network
+     * @return The {@code NetworkReplyObject} containing the network
      *     message.
      */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {

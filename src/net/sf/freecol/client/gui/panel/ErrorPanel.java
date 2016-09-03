@@ -54,7 +54,7 @@ public final class ErrorPanel extends FreeColPanel {
     /**
      * Creates a panel to display the given error message.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param message The error message to display in this error panel.
      */
     public ErrorPanel(FreeColClient freeColClient, String message) {
@@ -74,7 +74,7 @@ public final class ErrorPanel extends FreeColPanel {
     /**
      * Creates an error panel containing the log file.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ErrorPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout());

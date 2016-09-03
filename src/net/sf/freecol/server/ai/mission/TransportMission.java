@@ -83,7 +83,7 @@ public class TransportMission extends Mission {
 
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
-    /** A list of <code>Cargo</code>s to work on. */
+    /** A list of {@code Cargo}s to work on. */
     private final List<Cargo> cargoes = new ArrayList<>();
 
     /** The current target location to travel to. */
@@ -91,21 +91,21 @@ public class TransportMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit, aiUnit.getTrivialTarget());
     }
 
     /**
-     * Creates a new <code>TransportMission</code> and reads the given
+     * Creates a new {@code TransportMission} and reads the given
      * element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
@@ -119,7 +119,7 @@ public class TransportMission extends Mission {
 
 
     /**
-     * Disposes of this <code>Mission</code>.
+     * Disposes of this {@code Mission}.
      */
     @Override
     public void dispose() {
@@ -134,9 +134,9 @@ public class TransportMission extends Mission {
 
     /**
      * Checks if the carrier using this mission is carrying the given
-     * <code>TransportableAIObject</code>.
+     * {@code TransportableAIObject}.
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return True if the carrier is carrying the transportable.
      */
     private boolean isCarrying(TransportableAIObject t) {
@@ -146,7 +146,7 @@ public class TransportMission extends Mission {
     /**
      * Is a transportable waiting for delivery on the cargoes list?
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return True if the transportable is queued in this mission.
      */
     public boolean isTransporting(TransportableAIObject t) {
@@ -159,7 +159,7 @@ public class TransportMission extends Mission {
      *
      * FIXME: magic numbers to the spec.
      *
-     * @param other The other <code>Unit</code> to attack.
+     * @param other The other {@code Unit} to attack.
      * @return True if the attack should proceed.
      */
     private boolean shouldAttack(Unit other) {
@@ -235,11 +235,11 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Find a <code>Cargo</code> with the given
-     * <code>TransportableAIObject</code>.
+     * Find a {@code Cargo} with the given
+     * {@code TransportableAIObject}.
      *
-     * @param t The <code>TransportableAIObject</code> to look for.
-     * @return The <code>Cargo</code> found, or null if none found.
+     * @param t The {@code TransportableAIObject} to look for.
+     * @return The {@code Cargo} found, or null if none found.
      */
     private Cargo tFind(TransportableAIObject t) {
         synchronized (cargoes) {
@@ -261,7 +261,7 @@ public class TransportMission extends Mission {
     /**
      * Adds a cargo to the cargoes list.
      *
-     * @param cargo The <code>Cargo</code> to add.
+     * @param cargo The {@code Cargo} to add.
      * @param index The position to add it.
      * @return True if the addition succeeded or the cargo was already present.
      */
@@ -285,7 +285,7 @@ public class TransportMission extends Mission {
     /**
      * Remove a cargo from the cargoes list.
      *
-     * @param cargo The <code>Cargo</code> to remove.
+     * @param cargo The {@code Cargo} to remove.
      * @return True if the remove succeeded.
      */
     private boolean tRemove(Cargo cargo) {
@@ -366,7 +366,7 @@ public class TransportMission extends Mission {
     /**
      * If this carrier is the current carrier of a transportable, drop it.
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      */
     private void dropTransportable(TransportableAIObject t) {
         AIUnit carrier = getAIUnit();
@@ -377,7 +377,7 @@ public class TransportMission extends Mission {
      * If this carrier is the not the current carrier of a
      * transportable, make it so.
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      */
     private void takeTransportable(TransportableAIObject t) {
         AIUnit carrier = getAIUnit();
@@ -390,8 +390,8 @@ public class TransportMission extends Mission {
      * Public so that mobile transportables (units) can move to the
      * collection point.
      *
-     * @param t The <code>TransportableAIObject</code> to collect.
-     * @return The collection <code>Location</code>, or null if not found.
+     * @param t The {@code TransportableAIObject} to collect.
+     * @return The collection {@code Location}, or null if not found.
      */
     public Location getTransportTarget(TransportableAIObject t) {
         if (isCarrying(t)) return null;
@@ -406,7 +406,7 @@ public class TransportMission extends Mission {
      * transport if they find themselves better able to get there
      * themselves.
      *
-     * @param t The <code>TransportableAIObject</code> to collect.
+     * @param t The {@code TransportableAIObject} to collect.
      * @return The expected transport turns.
      */
     public int getTransportTurns(TransportableAIObject t) {
@@ -435,7 +435,7 @@ public class TransportMission extends Mission {
     /**
      * Unwrap a wrapped list of cargoes.
      *
-     * @param ts The list of <code>Cargo</code>s to unwrap.
+     * @param ts The list of {@code Cargo}s to unwrap.
      * @return The unwrapped list of cargoes.
      */
     private List<Cargo> unwrapCargoes(List<Cargo> ts) {
@@ -478,15 +478,15 @@ public class TransportMission extends Mission {
     /**
      * For a given transportable, work out where the carrier has to go to
      * advance the cargo (target), and what to do there (mode), allowing
-     * a new <code>Cargo</code> to be defined.
+     * a new {@code Cargo} to be defined.
      *
      * AIUnit cargo is harder than AIGoods, because AIUnits might have their
      * own inland paths, and thus we need to consider drop nodes.
      *
-     * @param t The <code>TransportableAIObject</code> to consider.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A new <code>Cargo</code> defining the action to take
-     *     with the <code>TransportableAIObject</code>, or null if impossible.
+     * @param t The {@code TransportableAIObject} to consider.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A new {@code Cargo} defining the action to take
+     *     with the {@code TransportableAIObject}, or null if impossible.
      */
     public Cargo makeCargo(TransportableAIObject t, LogBuilder lb) {
         final Unit carrier = getUnit();
@@ -535,9 +535,9 @@ public class TransportMission extends Mission {
     /**
      * Add the given Cargo to the cargoes list.
      *
-     * @param cargo The <code>Cargo</code> to add.
+     * @param cargo The {@code Cargo} to add.
      * @param index The index of where to add the cargo.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the cargo was added.
      */
     private boolean addCargo(Cargo cargo, int index, LogBuilder lb) {
@@ -556,7 +556,7 @@ public class TransportMission extends Mission {
     /**
      * Removes the given Cargo from the cargoes list.
      *
-     * @param cargo The <code>Cargo</code> to remove.
+     * @param cargo The {@code Cargo} to remove.
      */
     private void removeCargo(Cargo cargo) {
         if (!tRemove(cargo)) {
@@ -568,7 +568,7 @@ public class TransportMission extends Mission {
     /**
      * Is there space available for a new cargo?
      *
-     * @param cargo The <code>Cargo</code> to check.
+     * @param cargo The {@code Cargo} to check.
      * @return True if there is space available for this cargo.
      */
     public boolean spaceAvailable(Cargo cargo) {
@@ -578,7 +578,7 @@ public class TransportMission extends Mission {
     /**
      * Is there space available for a new cargo?
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return True if there is space available for this transportable.
      */
     public boolean spaceAvailable(TransportableAIObject t) {
@@ -600,9 +600,9 @@ public class TransportMission extends Mission {
      * the same target, but do not break the space restrictions.  If
      * this does not work, it has to go at the end.
      *
-     * @param cargo The new <code>Cargo</code> to add.
+     * @param cargo The new {@code Cargo} to add.
      * @param requireMatch Fail if an existing destination is not matched.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the cargo was queued.
      */
     private boolean queueCargo(Cargo cargo, boolean requireMatch,
@@ -640,8 +640,8 @@ public class TransportMission extends Mission {
     /**
      * Dump a currently carried cargo.
      *
-     * @param cargo The <code>Cargo</code> to dump.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param cargo The {@code Cargo} to dump.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the cargo is no longer on board and not on the
      *     transport list, or is on board but is scheduled to be dumped.
      */
@@ -664,8 +664,8 @@ public class TransportMission extends Mission {
     /**
      * Requeue an existing cargo.  Typically done when the target changes.
      *
-     * @param cargo The <code>Cargo</code> to requeue.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param cargo The {@code Cargo} to requeue.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the queuing succeeded.
      */
     public boolean requeueCargo(Cargo cargo, LogBuilder lb) {
@@ -697,7 +697,7 @@ public class TransportMission extends Mission {
      * cargo on board should be on the cargoes list but the list is
      * not necessarily going to be in a sensible order.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void checkCargoes(LogBuilder lb) {
         final Unit carrier = getUnit();
@@ -817,12 +817,12 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Check a <code>Cargo</code> for continued validity and
+     * Check a {@code Cargo} for continued validity and
      * whether action is needed at the current location.
      *
-     * @param cargo The <code>Cargo</code> to check.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return TCONTINUE if the <code>Cargo</code> should continue,
+     * @param cargo The {@code Cargo} to check.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return TCONTINUE if the {@code Cargo} should continue,
      *     TDONE if it has completed,
      *     TFAIL if it has failed,
      *     TNEXT if it has progressed to the next stage,
@@ -952,7 +952,7 @@ public class TransportMission extends Mission {
      * Perform the transport load/unload operations on arrival at the
      * target for the top cargo.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void doTransport(LogBuilder lb) {
         final Unit unit = getUnit();
@@ -1063,7 +1063,7 @@ public class TransportMission extends Mission {
 
     /**
      * Calculates a score for a proposed list of
-     * <code>Cargo</code>s using the current unit.  Disallows
+     * {@code Cargo}s using the current unit.  Disallows
      * routes that would overfill the carrier.
      *
      * Useful for comparing proposed cargo delivery routes.  The
@@ -1071,8 +1071,8 @@ public class TransportMission extends Mission {
      * to break ties we also consider the hold*turn product to reduce
      * the risk of losses due to enemy action.
      *
-     * @param initialLocation The initial <code>Location</code>.
-     * @param order An ordering of <code>Cargo</code>s.
+     * @param initialLocation The initial {@code Location}.
+     * @param order An ordering of {@code Cargo}s.
      * @return A score for the cargo ordering.
      */
     private float scoreCargoOrder(Location initialLocation, List<Cargo> order) {
@@ -1103,7 +1103,7 @@ public class TransportMission extends Mission {
      * Leaves the cargoes in the order they are expected to
      * execute, with valid spaceLeft values.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void optimizeCargoes(LogBuilder lb) {
         lb.add(", optimize");
@@ -1144,8 +1144,8 @@ public class TransportMission extends Mission {
     /**
      * What is the best transportable for a carrier to collect?
      *
-     * @param carrier The carrier <code>Unit</code> to consider.
-     * @return The best available new <code>Cargo</code>, or null if
+     * @param carrier The carrier {@code Unit} to consider.
+     * @return The best available new {@code Cargo}, or null if
      *     none found.
      */
     private Cargo getBestCargo(Unit carrier) {
@@ -1183,7 +1183,7 @@ public class TransportMission extends Mission {
     /**
      * Why would an TransportMission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -1204,7 +1204,7 @@ public class TransportMission extends Mission {
      *   - step is disposed
      *   - step is a captured settlement
      *
-     * @param cargo The <code>Cargo</code> to test.
+     * @param cargo The {@code Cargo} to test.
      * @return A reason why the mission would be invalid,
      *     or null if none found.
      */
@@ -1219,8 +1219,8 @@ public class TransportMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
@@ -1237,7 +1237,7 @@ public class TransportMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -1249,10 +1249,10 @@ public class TransportMission extends Mission {
     // Publically accessible routines to manipulate a TransportableAIObject.
 
     /**
-     * Removes the given <code>TransportableAIObject</code> from the
+     * Removes the given {@code TransportableAIObject} from the
      * cargo list.
      *
-     * @param t The <code>TransportableAIObject</code> to remove.
+     * @param t The {@code TransportableAIObject} to remove.
      * @return True if the removal succeeded.
      */
     public boolean removeTransportable(TransportableAIObject t) {
@@ -1263,8 +1263,8 @@ public class TransportMission extends Mission {
     /**
      * Retargets a transportable that should already be on board the carrier.
      *
-     * @param t The <code>TransportableAIObject</code> to retarget.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param t The {@code TransportableAIObject} to retarget.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the retargeting succeeded.
      */
     public boolean requeueTransportable(TransportableAIObject t,
@@ -1279,9 +1279,9 @@ public class TransportMission extends Mission {
      * Public for the benefit of EuropeanAIPlayer.allocateTransportables
      * and CashInTreasureTrain.doMission.
      *
-     * @param t The <code>TransportableAIObject</code> to add.
+     * @param t The {@code TransportableAIObject} to add.
      * @param requireMatch Fail if an existing destination is not matched.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the transportable was queued.
      */
     public boolean queueTransportable(TransportableAIObject t,
@@ -1293,8 +1293,8 @@ public class TransportMission extends Mission {
     /**
      * Dump a transportable.
      *
-     * @param t The <code>TransportableAIObject</code> to dump.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param t The {@code TransportableAIObject} to dump.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the transportable is no longer on board, queued, or
      *     was reset to be dumped at the next stop.
      */
@@ -1314,8 +1314,8 @@ public class TransportMission extends Mission {
      * collect this unit.  Useful for prioritizing treasure
      * collection.
      *
-     * @param aiu The <code>AIUnit</code> to collect.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param aiu The {@code AIUnit} to collect.
+     * @param lb A {@code LogBuilder} to log to.
      * @return True if the unit was queued.
      */
     public boolean forceCollection(AIUnit aiu, LogBuilder lb) {
@@ -1329,8 +1329,8 @@ public class TransportMission extends Mission {
      * Suppress European trade in a type of goods which is about to be
      * boycotted.
      *
-     * @param type The <code>GoodsType</code> to suppress.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param type The {@code GoodsType} to suppress.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void suppressEuropeanTrade(GoodsType type, LogBuilder lb) {
         for (Cargo c : tCopy()) {

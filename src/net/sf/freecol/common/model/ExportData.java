@@ -62,9 +62,9 @@ public class ExportData extends FreeColObject {
     public ExportData() {}
 
     /**
-     * Creates a new <code>ExportData</code> instance with default settings.
+     * Creates a new {@code ExportData} instance with default settings.
      *
-     * @param goodsType The <code>GoodsType</code> this data refers to.
+     * @param goodsType The {@code GoodsType} this data refers to.
      * @param importLevel The import level to use.
      */
     public ExportData(GoodsType goodsType, int importLevel) {
@@ -73,9 +73,9 @@ public class ExportData extends FreeColObject {
     }
 
     /**
-     * Create a new <code>ExportData</code> by reading a stream.
+     * Create a new {@code ExportData} by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read.
+     * @param xr The {@code FreeColXMLReader} to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public ExportData(FreeColXMLReader xr) throws XMLStreamException {

@@ -44,10 +44,10 @@ public class FAFile {
 
 
     /**
-     * Reads data from the given <code>InputStream</code> and
+     * Reads data from the given {@code InputStream} and
      * creates an object to represent this data.
      * 
-     * @param is The <code>InputStream</code>
+     * @param is The {@code InputStream}
      * @throws IOException gets thrown if the data is invalid. 
      */
     public FAFile(InputStream is) throws IOException {
@@ -56,11 +56,11 @@ public class FAFile {
 
     
     /**
-     * Gets the <code>Dimension</code> of the given
-     * <code>String</code> when rendered.
+     * Gets the {@code Dimension} of the given
+     * {@code String} when rendered.
      * 
-     * @param text The <code>String</code>.
-     * @return The <code>Dimension</code>.
+     * @param text The {@code String}.
+     * @return The {@code Dimension}.
      */
     public Dimension getDimension(String text) {
         FAName fn = getFAName(text);

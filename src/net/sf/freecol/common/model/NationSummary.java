@@ -69,8 +69,8 @@ public class NationSummary extends FreeColObject {
     /**
      * Creates a nation summary for the specified player.
      *
-     * @param player The <code>Player</code> to create the summary for.
-     * @param requester The <code>Player</code> making the request.
+     * @param player The {@code Player} to create the summary for.
+     * @param requester The {@code Player} making the request.
      */
     public NationSummary(Player player, Player requester) {
         this();

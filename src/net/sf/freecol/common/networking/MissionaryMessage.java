@@ -54,11 +54,11 @@ public class MissionaryMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>MissionaryMessage</code> with the
+     * Create a new {@code MissionaryMessage} with the
      * supplied name.
      *
-     * @param unit The missionary <code>Unit</code>.
-     * @param direction The <code>Direction</code> to the settlement.
+     * @param unit The missionary {@code Unit}.
+     * @param direction The {@code Direction} to the settlement.
      * @param denounce True if this is a denunciation.
      */
     public MissionaryMessage(Unit unit, Direction direction,
@@ -71,11 +71,11 @@ public class MissionaryMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>MissionaryMessage</code> from a
+     * Create a new {@code MissionaryMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public MissionaryMessage(Game game, Element element) {
         super(getTagName());
@@ -89,11 +89,11 @@ public class MissionaryMessage extends DOMMessage {
     /**
      * Handle a "missionary"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An element containing the result of the mission
-     *     operation, or an error <code>Element</code> on failure.
+     *     operation, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

@@ -84,7 +84,7 @@ public class SettlementType extends FreeColSpecObjectType {
      * Creates a new settlement type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public SettlementType(String id, Specification specification) {
         super(id, specification);
@@ -93,8 +93,8 @@ public class SettlementType extends FreeColSpecObjectType {
     /**
      * Creates a new settlement type.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is problem reading the stream.
      */
     public SettlementType(FreeColXMLReader xr,
@@ -209,7 +209,7 @@ public class SettlementType extends FreeColSpecObjectType {
     /**
      * Gets the plunder range available for the supplied unit.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunderRange(Unit unit) {
@@ -221,7 +221,7 @@ public class SettlementType extends FreeColSpecObjectType {
     /**
      * Get the range of gifts available to a unit.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return A range of gifts, or null if none applicable.
      */
     public final RandomRange getGifts(Unit unit) {
@@ -241,7 +241,7 @@ public class SettlementType extends FreeColSpecObjectType {
     /**
      * Add a plunder.
      *
-     * @param pt The <code>PlunderType</code> to add.
+     * @param pt The {@code PlunderType} to add.
      */
     private void addPlunder(PlunderType pt) {
         if (plunder == null) plunder = new ArrayList<>();

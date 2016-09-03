@@ -160,10 +160,10 @@ public final class Utility {
      * Return a button suitable for linking to another panel
      * (e.g. ColopediaPanel).
      *
-     * @param text a <code>String</code> value
-     * @param icon an <code>Icon</code> value
-     * @param action a <code>String</code> value
-     * @return a <code>JButton</code> value
+     * @param text a {@code String} value
+     * @param icon an {@code Icon} value
+     * @param action a {@code String} value
+     * @return a {@code JButton} value
      */
     public static JButton getLinkButton(String text, Icon icon, String action) {
         JButton button = new JButton(text, icon);
@@ -186,9 +186,9 @@ public final class Utility {
      *
      * @param key The message key to make a link for.
      * @param val The text for the link.
-     * @param player The <code>Player</code> to make a link for.
-     * @param source The message source <code>FreeColGameObject</code>.
-     * @return A <code>JButton</code> for the link, or null if no good
+     * @param player The {@code Player} to make a link for.
+     * @param source The message source {@code FreeColGameObject}.
+     * @return A {@code JButton} for the link, or null if no good
      *     choice found.
      */
     public static JButton getMessageButton(String key, String val,
@@ -275,9 +275,9 @@ public final class Utility {
     }
 
     /**
-     * Get a <code>JTextPane</code> with default styles.
+     * Get a {@code JTextPane} with default styles.
      *
-     * @return The default <code>JTextPane</code> to use.
+     * @return The default {@code JTextPane} to use.
      */
     public static JTextPane getDefaultTextPane() {
         DefaultStyledDocument document
@@ -291,10 +291,10 @@ public final class Utility {
     }
 
     /**
-     * Get a <code>JTextPane</code> with default styles and given text.
+     * Get a {@code JTextPane} with default styles and given text.
      *
      * @param text The text to display.
-     * @return A suitable <code>JTextPane</code>.
+     * @return A suitable {@code JTextPane}.
      */
     public static JTextPane getDefaultTextPane(String text) {
         JTextPane textPane = getDefaultTextPane();
@@ -325,8 +325,8 @@ public final class Utility {
     /**
      * Localize the a titled border.
      *
-     * @param component The <code>JComponent</code> to localize.
-     * @param template The <code>StringTemplate</code> to use.
+     * @param component The {@code JComponent} to localize.
+     * @param template The {@code StringTemplate} to use.
      */
     public static void localizeBorder(JComponent component,
                                       StringTemplate template) {
@@ -337,8 +337,8 @@ public final class Utility {
     /**
      * Get a titled border for a Named object.
      *
-     * @param named The <code>Named</code> to use.
-     * @return The <code>TitledBorder</code>.
+     * @param named The {@code Named} to use.
+     * @return The {@code TitledBorder}.
      */
     public static TitledBorder localizedBorder(Named named) {
         return localizedBorder(named.getNameKey());
@@ -348,7 +348,7 @@ public final class Utility {
      * Get a titled border with Messages.message(key) as text.
      *
      * @param key The key to use.
-     * @return The <code>TitledBorder</code>.
+     * @return The {@code TitledBorder}.
      */
     public static TitledBorder localizedBorder(String key) {
         return BorderFactory.createTitledBorder(BorderFactory
@@ -361,7 +361,7 @@ public final class Utility {
      *
      * @param key The key to use.
      * @param color The color to use.
-     * @return The <code>TitledBorder</code>.
+     * @return The {@code TitledBorder}.
      */
     public static TitledBorder localizedBorder(String key, Color color) {
         return BorderFactory.createTitledBorder(BorderFactory
@@ -372,7 +372,7 @@ public final class Utility {
      * Get a JButton with Messages.message(key) as text.
      *
      * @param key The key to use.
-     * @return The <code>JButton</code>.
+     * @return The {@code JButton}.
      */
     public static JButton localizedButton(String key) {
         return new JButton(Messages.message(key));
@@ -381,8 +381,8 @@ public final class Utility {
     /**
      * Get a JButton with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The <code>JButton</code>.
+     * @param template The {@code StringTemplate} to use.
+     * @return The {@code JButton}.
      */
     public static JButton localizedButton(StringTemplate template) {
         return new JButton(Messages.message(template));
@@ -393,7 +393,7 @@ public final class Utility {
      *
      * @param key The key to use.
      * @param value The initial value.
-     * @return The <code>JCheckBoxMenuItem</code>.
+     * @return The {@code JCheckBoxMenuItem}.
      */
     public static JCheckBoxMenuItem localizedCheckBoxMenuItem(String key,
                                                               boolean value) {
@@ -405,7 +405,7 @@ public final class Utility {
      *
      * @param key The message key to use.
      * @param small If true, use a smaller font.
-     * @return A suitable <code>JLabel</code>.
+     * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeader(String key, boolean small) {
         JLabel header = localizedHeaderLabel(key, SwingConstants.CENTER,
@@ -420,7 +420,7 @@ public final class Utility {
      * @param key The message key to use.
      * @param alignment The alignment.
      * @param size The font size.
-     * @return A suitable <code>JLabel</code>.
+     * @return A suitable {@code JLabel}.
      */
     public static JLabel localizedHeaderLabel(String key, int alignment,
                                               FontLibrary.FontSize size) {
@@ -452,8 +452,8 @@ public final class Utility {
     /**
      * Get a JLabel for a FreeColSpecObjectType.
      *
-     * @param fcgot The <code>FreeColSpecObjectType</code> to use.
-     * @return The <code>JLabel</code>.
+     * @param fcgot The {@code FreeColSpecObjectType} to use.
+     * @return The {@code JLabel}.
      */
     public static JLabel localizedLabel(FreeColSpecObjectType fcgot) {
         return localizedLabel(fcgot.getNameKey());
@@ -463,7 +463,7 @@ public final class Utility {
      * Get a JLabel with Messages.message(key) as text.
      *
      * @param key The key to use.
-     * @return The <code>JLabel</code>.
+     * @return The {@code JLabel}.
      */
     public static JLabel localizedLabel(String key) {
         return localizedLabel(StringTemplate.key(key));
@@ -472,8 +472,8 @@ public final class Utility {
     /**
      * Get a JLabel with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The <code>JLabel</code>.
+     * @param template The {@code StringTemplate} to use.
+     * @return The {@code JLabel}.
      */
     public static JLabel localizedLabel(StringTemplate template) {
         JLabel label = new JLabel(Messages.message(template));
@@ -484,10 +484,10 @@ public final class Utility {
     /**
      * Get a JLabel with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
+     * @param template The {@code StringTemplate} to use.
      * @param icon The icon to use.
      * @param alignment The alignment.
-     * @return The <code>JLabel</code>.
+     * @return The {@code JLabel}.
      */
     public static JLabel localizedLabel(StringTemplate template, Icon icon,
                                         int alignment) {
@@ -500,7 +500,7 @@ public final class Utility {
      * Get a JMenu with Messages.message(key) as text.
      *
      * @param key The key to use.
-     * @return The <code>JMenu</code>.
+     * @return The {@code JMenu}.
      */
     public static JMenu localizedMenu(String key) {
         return new JMenu(Messages.message(key));
@@ -509,8 +509,8 @@ public final class Utility {
     /**
      * Get a JMenu with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The <code>JMenu</code>.
+     * @param template The {@code StringTemplate} to use.
+     * @return The {@code JMenu}.
      */
     public static JMenu localizedMenu(StringTemplate template) {
         return new JMenu(Messages.message(template));
@@ -520,7 +520,7 @@ public final class Utility {
      * Get a JMenuItem with Messages.message(key) as text.
      *
      * @param key The key to use.
-     * @return The <code>JMenuItem</code>.
+     * @return The {@code JMenuItem}.
      */
     public static JMenuItem localizedMenuItem(String key) {
         return localizedMenuItem(key, null);
@@ -531,7 +531,7 @@ public final class Utility {
      *
      * @param key The key to use.
      * @param icon The icon to use.
-     * @return The <code>JMenuItem</code>.
+     * @return The {@code JMenuItem}.
      */
     public static JMenuItem localizedMenuItem(String key, Icon icon) {
         return new JMenuItem(Messages.message(key), icon);
@@ -540,8 +540,8 @@ public final class Utility {
     /**
      * Get a JMenuItem with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The <code>JMenuItem</code>.
+     * @param template The {@code StringTemplate} to use.
+     * @return The {@code JMenuItem}.
      */
     public static JMenuItem localizedMenuItem(StringTemplate template) {
         return localizedMenuItem(template, null);
@@ -550,9 +550,9 @@ public final class Utility {
     /**
      * Get a JMenuItem with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to use.
+     * @param template The {@code StringTemplate} to use.
      * @param icon The icon to use.
-     * @return The <code>JMenuItem</code>.
+     * @return The {@code JMenuItem}.
      */
     public static JMenuItem localizedMenuItem(StringTemplate template,
                                               Icon icon) {
@@ -562,9 +562,9 @@ public final class Utility {
     /**
      * Get a JRadioButtonMenuItem with Messages.message(template) as text.
      *
-     * @param template The <code>StringTemplate</code> to generate the text.
+     * @param template The {@code StringTemplate} to generate the text.
      * @param value The initial value.
-     * @return The <code>JRadioButtonMenuItem</code>.
+     * @return The {@code JRadioButtonMenuItem}.
      */
     public static JRadioButtonMenuItem localizedRadioButtonMenuItem(StringTemplate template,
                                                                     boolean value) {
@@ -575,7 +575,7 @@ public final class Utility {
      * Get a text area containing a localized message.
      *
      * @param key The message key.
-     * @return A suitable <code>JTextArea</code>.
+     * @return A suitable {@code JTextArea}.
      */
     public static JTextArea localizedTextArea(String key) {
         return localizedTextArea(StringTemplate.key(key));
@@ -586,7 +586,7 @@ public final class Utility {
      *
      * @param key The message key.
      * @param columns The em-width number of columns to display the text in.
-     * @return A suitable <code>JTextArea</code>.
+     * @return A suitable {@code JTextArea}.
      */
     public static JTextArea localizedTextArea(String key, int columns) {
         return localizedTextArea(StringTemplate.key(key), columns);
@@ -595,8 +595,8 @@ public final class Utility {
     /**
      * Get a text area containing a localized message.
      *
-     * @param template The <code>StringTemplate</code> to use.
-     * @return A suitable <code>JTextArea</code>.
+     * @param template The {@code StringTemplate} to use.
+     * @return A suitable {@code JTextArea}.
      */
     public static JTextArea localizedTextArea(StringTemplate template) {
         return localizedTextArea(template, DEFAULT_TEXT_COLUMNS);
@@ -605,9 +605,9 @@ public final class Utility {
     /**
      * Get a text area containing a localized message.
      *
-     * @param template The <code>StringTemplate</code> to use.
+     * @param template The {@code StringTemplate} to use.
      * @param columns The em-width number of columns to display the text in.
-     * @return A suitable <code>JTextArea</code>.
+     * @return A suitable {@code JTextArea}.
      */
     public static JTextArea localizedTextArea(StringTemplate template,
                                               int columns) {
@@ -617,9 +617,9 @@ public final class Utility {
     /**
      * Localize the tool tip message for a JComponent.
      *
-     * @param comp The <code>JComponent</code> to localize.
+     * @param comp The {@code JComponent} to localize.
      * @param key The key to use.
-     * @return The original <code>JComponent</code>.
+     * @return The original {@code JComponent}.
      */
     public static JComponent localizeToolTip(JComponent comp, String key) {
         comp.setToolTipText(Messages.message(key));
@@ -629,9 +629,9 @@ public final class Utility {
     /**
      * Localize the tool tip message for a JComponent.
      *
-     * @param comp The <code>JComponent</code> to localize.
-     * @param template The <code>StringTemplate</code> to use.
-     * @return The original <code>JComponent</code>.
+     * @param comp The {@code JComponent} to localize.
+     * @param template The {@code StringTemplate} to use.
+     * @return The original {@code JComponent}.
      */
     public static JComponent localizeToolTip(JComponent comp,
                                              StringTemplate template) {

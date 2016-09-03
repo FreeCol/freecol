@@ -40,7 +40,7 @@ public final class VictoryDialog extends FreeColConfirmDialog {
     /**
      * Create a Victory dialog.
      * 
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public VictoryDialog(FreeColClient freeColClient, JFrame frame) {

@@ -46,10 +46,10 @@ public class NewLandNameMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>NewLandNameMessage</code> with the
+     * Create a new {@code NewLandNameMessage} with the
      * supplied name.
      *
-     * @param unit The <code>Unit</code> that has come ashore.
+     * @param unit The {@code Unit} that has come ashore.
      * @param newLandName The new land name.
      */
     public NewLandNameMessage(Unit unit, String newLandName) {
@@ -60,11 +60,11 @@ public class NewLandNameMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>NewLandNameMessage</code> from a
+     * Create a new {@code NewLandNameMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public NewLandNameMessage(Game game, Element element) {
         super(getTagName());
@@ -79,8 +79,8 @@ public class NewLandNameMessage extends DOMMessage {
     /**
      * Public accessor for the unit.
      *
-     * @param player The <code>Player</code> who owns the unit.
-     * @return The <code>Unit</code> of this message.
+     * @param player The {@code Player} who owns the unit.
+     * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
         return player.getOurFreeColGameObject(unitId, Unit.class);
@@ -99,11 +99,11 @@ public class NewLandNameMessage extends DOMMessage {
     /**
      * Handle a "newLandName"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update setting the new land name, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

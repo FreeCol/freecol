@@ -71,14 +71,14 @@ public class Role extends BuildableType {
 
     /**
      * The Role to downgrade to after losing a battle. Defaults to
-     * <code>null</code>. Note that some UnitTypes and Roles may be
+     * {@code null}. Note that some UnitTypes and Roles may be
      * disposed instead of downgraded when losing a battle.
      */
     private Role downgrade;
 
     /**
      * The maximum multiple of required goods this Role may
-     * carry.  Defaults to <code>1</code>.
+     * carry.  Defaults to {@code 1}.
      */
     private int maximumCount = 1;
 
@@ -93,10 +93,10 @@ public class Role extends BuildableType {
 
 
     /**
-     * Creates a new <code>Role</code> instance.
+     * Creates a new {@code Role} instance.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public Role(String id, Specification specification) {
         super(id, specification);
@@ -240,7 +240,7 @@ public class Role extends BuildableType {
     /**
      * Get the price of the required goods in a given market.
      *
-     * @param market The <code>Market</code> to evaluate in.
+     * @param market The {@code Market} to evaluate in.
      * @return The price of the goods for this role.
      */
     public int getRequiredGoodsPrice(Market market) {
@@ -252,7 +252,7 @@ public class Role extends BuildableType {
     /**
      * Get the role changes that can allow a unit to assume this role.
      *
-     * @return A list of <code>RoleChange</code>s.
+     * @return A list of {@code RoleChange}s.
      */
     public final List<RoleChange> getRoleChanges() {
         return (roleChanges == null) ? Collections.<RoleChange>emptyList()
@@ -309,7 +309,7 @@ public class Role extends BuildableType {
     /**
      * Is this role compatible with another?
      *
-     * @param other The other <code>Role</code> to compare with.
+     * @param other The other {@code Role} to compare with.
      * @return True if the other role is compatible.
      */
     public boolean isCompatibleWith(Role other) {
@@ -319,8 +319,8 @@ public class Role extends BuildableType {
     /**
      * Are two roles compatible.
      *
-     * @param role1 A <code>Role</code> to compare.
-     * @param role2 The other <code>Role</code> to compare.
+     * @param role1 A {@code Role} to compare.
+     * @param role2 The other {@code Role} to compare.
      * @return True if the roles are compatible.
      */
     public static boolean isCompatibleWith(Role role1, Role role2) {
@@ -337,16 +337,16 @@ public class Role extends BuildableType {
 
     /**
      * Gets a list of goods required to change from the first role to
-     * the second.  The first role may be <code>null</code> implying
+     * the second.  The first role may be {@code null} implying
      * the default role, the second must not.  Note that excess goods
      * that are left over after the change will appear on the list
      * with negative amounts.
      *
-     * @param from The current <code>Role</code>.
+     * @param from The current {@code Role}.
      * @param fromCount The role count for the current role.
-     * @param to The new <code>Role</code> to assume.
+     * @param to The new {@code Role} to assume.
      * @param toCount The role count for the new role.
-     * @return A list of <code>AbstractGoods</code> required to
+     * @return A list of {@code AbstractGoods} required to
      *     make the change.
      */
     public static List<AbstractGoods> getGoodsDifference(Role from,
@@ -384,10 +384,10 @@ public class Role extends BuildableType {
     /**
      * Filter a list of proposed roles by availability.
      *
-     * @param player The <code>Player</code> to own the unit.
-     * @param type The <code>UnitType</code> to check.
-     * @param roles A list of proposed <code>Role</code>s.
-     * @return A list of available <code>Role</code>s.
+     * @param player The {@code Player} to own the unit.
+     * @param type The {@code UnitType} to check.
+     * @param roles A list of proposed {@code Role}s.
+     * @return A list of available {@code Role}s.
      */
     public static List<Role> getAvailableRoles(Player player, UnitType type,
                                                List<Role> roles) {

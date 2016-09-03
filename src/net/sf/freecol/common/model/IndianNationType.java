@@ -52,7 +52,7 @@ public class IndianNationType extends NationType {
      * Create a new native nation type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public IndianNationType(String id, Specification specification) {
         super(id, specification);
@@ -122,8 +122,8 @@ public class IndianNationType extends NationType {
     /**
      * Can this Nation can settle the given Tile?
      *
-     * @param tile a <code>Tile</code> value
-     * @return a <code>boolean</code> value
+     * @param tile a {@code Tile} value
+     * @return a {@code boolean} value
      */
     /*
     public boolean canSettleTile(Tile tile) {
@@ -137,8 +137,8 @@ public class IndianNationType extends NationType {
     /**
      * Can this Nation can settle the given Region?
      *
-     * @param region a <code>Region</code> value
-     * @return a <code>boolean</code> value
+     * @param region a {@code Region} value
+     * @return a {@code boolean} value
      */
     /*
     public boolean canSettleRegion(Region region) {
@@ -168,7 +168,7 @@ public class IndianNationType extends NationType {
     /**
      * Add a skill.
      *
-     * @param unitType The <code>UnitType</code> skill taught.
+     * @param unitType The {@code UnitType} skill taught.
      * @param probability The probability of the skill.
      */
     private void addSkill(UnitType unitType, int probability) {
@@ -180,7 +180,7 @@ public class IndianNationType extends NationType {
      * Generates choices for skill that could be taught from a settlement on
      * a given Tile.
      *
-     * @param tile The <code>Tile</code> where the settlement will be located.
+     * @param tile The {@code Tile} where the settlement will be located.
      * @return A random choice set of skills.
      */
     public List<RandomChoice<UnitType>> generateSkillsForTile(Tile tile) {

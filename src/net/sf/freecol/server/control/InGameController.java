@@ -177,8 +177,8 @@ public final class InGameController extends Controller {
     /**
      * Asks a question of a player with a timeout.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
-     * @param request The <code>DOMMessage</code> question.
+     * @param serverPlayer The {@code ServerPlayer} to ask.
+     * @param request The {@code DOMMessage} question.
      * @return The response to the question, or null if none.
      */
     private DOMMessage askTimeout(ServerPlayer serverPlayer,
@@ -215,9 +215,9 @@ public final class InGameController extends Controller {
     /**
      * Sets a monarch action to debug/test.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose monarch
+     * @param serverPlayer The {@code ServerPlayer} whose monarch
      *     should act.
-     * @param action The <code>MonarchAction</code> to be taken.
+     * @param action The {@code MonarchAction} to be taken.
      */
     public void setMonarchAction(ServerPlayer serverPlayer,
                                  MonarchAction action) {
@@ -240,8 +240,8 @@ public final class InGameController extends Controller {
      * Public version of csAddFoundingFather so it can be used in the
      * test code and DebugMenu.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> who gains a father.
-     * @param father The <code>FoundingFather</code> to add.
+     * @param serverPlayer The {@code ServerPlayer} who gains a father.
+     * @param father The {@code FoundingFather} to add.
      */
     public void addFoundingFather(ServerPlayer serverPlayer,
                                   FoundingFather father) {
@@ -256,9 +256,9 @@ public final class InGameController extends Controller {
      * Public change stance and inform all routine.  Mostly used in the
      * test suite, but the AIs also call it.
      *
-     * @param serverPlayer The originating <code>ServerPlayer</code>.
-     * @param stance The new <code>Stance</code>.
-     * @param other The <code>ServerPlayer</code> wrt which the
+     * @param serverPlayer The originating {@code ServerPlayer}.
+     * @param stance The new {@code Stance}.
+     * @param other The {@code ServerPlayer} wrt which the
      *     stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
      */
@@ -273,8 +273,8 @@ public final class InGameController extends Controller {
     /**
      * Change colony owner.  Public for DebugUtils.
      *
-     * @param colony The <code>ServerColony</code> to change.
-     * @param serverPlayer The <code>ServerPlayer</code> to change to.
+     * @param colony The {@code ServerColony} to change.
+     * @param serverPlayer The {@code ServerPlayer} to change to.
      */
     public void debugChangeOwner(ServerColony colony,
                                  ServerPlayer serverPlayer) {
@@ -289,8 +289,8 @@ public final class InGameController extends Controller {
     /**
      * Change unit owner.  Public for DebugUtils.
      *
-     * @param unit The <code>ServerUnit</code> to change.
-     * @param serverPlayer The <code>ServerPlayer</code> to change to.
+     * @param unit The {@code ServerUnit} to change.
+     * @param serverPlayer The {@code ServerPlayer} to change to.
      */
     public void debugChangeOwner(ServerUnit unit, ServerPlayer serverPlayer) {
         ChangeSet cs = new ChangeSet();
@@ -306,8 +306,8 @@ public final class InGameController extends Controller {
     /**
      * Apply a disaster to a colony.  Public for DebugUtils.
      *
-     * @param colony The <code>Colony</code> to apply the disaster to.
-     * @param disaster The <code>Disaster</code> to apply.
+     * @param colony The {@code Colony} to apply the disaster to.
+     * @param disaster The {@code Disaster} to apply.
      * @return The number of messages generated.
      */
     public int debugApplyDisaster(ServerColony colony, Disaster disaster) {
@@ -340,7 +340,7 @@ public final class InGameController extends Controller {
      *
      * FIXME: this should eventually generate changes for the REF player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> about to rebel.
+     * @param serverPlayer The {@code ServerPlayer} about to rebel.
      * @return The REF player.
      */
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
@@ -386,10 +386,10 @@ public final class InGameController extends Controller {
     /**
      * Move goods from one location to another.
      *
-     * @param src The source <code>GoodsLocation</code>.
-     * @param goodsType The <code>GoodsType</code> to move.
+     * @param src The source {@code GoodsLocation}.
+     * @param goodsType The {@code GoodsType} to move.
      * @param amount The amount of goods to move.
-     * @param dst The new <code>GoodsLocation</code>.
+     * @param dst The new {@code GoodsLocation}.
      */
     private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
                            GoodsLocation dst) {
@@ -409,13 +409,13 @@ public final class InGameController extends Controller {
      * settlementActionsContactChief game option is enabled.  It is
      * still unclear what Col1 did here.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is contacting
+     * @param serverPlayer The {@code ServerPlayer} that is contacting
      *     the settlement.
-     * @param is The <code>IndianSettlement</code> to contact.
+     * @param is The {@code IndianSettlement} to contact.
      * @param scout Positive if this contact is due to a scout asking to
      *     speak to the chief, zero if it is another unit, negative if
      *     this is from the greeting dialog generation.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
                          int scout, ChangeSet cs) {
@@ -433,9 +433,9 @@ public final class InGameController extends Controller {
     /**
      * Launch the REF.
      *
-     * @param serverPlayer The REF <code>ServerPlayer</code>.
+     * @param serverPlayer The REF {@code ServerPlayer}.
      * @param teleport If true, teleport the REF in.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csLaunchREF(ServerPlayer serverPlayer, boolean teleport,
                              ChangeSet cs) {
@@ -478,9 +478,9 @@ public final class InGameController extends Controller {
      * most of the changes happen to the newly independent player.
      * hence the special handling.
      *
-     * @param serverPlayer The REF <code>ServerPlayer</code> that is granting.
-     * @param independent The newly independent <code>ServerPlayer</code>.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param serverPlayer The REF {@code ServerPlayer} that is granting.
+     * @param independent The newly independent {@code ServerPlayer}.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csGiveIndependence(ServerPlayer serverPlayer,
                                     ServerPlayer independent, ChangeSet cs) {
@@ -557,9 +557,9 @@ public final class InGameController extends Controller {
     /**
      * Resolves a tax raise.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose tax is rising.
+     * @param serverPlayer The {@code ServerPlayer} whose tax is rising.
      * @param taxRaise The amount of tax raise.
-     * @param goods The <code>Goods</code> for a goods party.
+     * @param goods The {@code Goods} for a goods party.
      * @param result Whether the tax was accepted or not.
      */
     private void raiseTax(ServerPlayer serverPlayer, int taxRaise, Goods goods,
@@ -576,9 +576,9 @@ public final class InGameController extends Controller {
      * setting the current player, so that it is the players turn when
      * they respond to a monarch action.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> being acted upon.
+     * @param serverPlayer The {@code ServerPlayer} being acted upon.
      * @param action The monarch action.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csMonarchAction(final ServerPlayer serverPlayer,
                                  MonarchAction action, ChangeSet cs) {
@@ -747,9 +747,9 @@ public final class InGameController extends Controller {
      * but this is ok because first contact trade can only include stance
      * and gold trade items.
      *
-     * @param agreement The <code>DiplomacyTrade</code> agreement.
-     * @param session The <code>DiplomacySession</code> in scope.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param agreement The {@code DiplomacyTrade} agreement.
+     * @param session The {@code DiplomacySession} in scope.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the trade was valid.
      */
     private boolean csAcceptTrade(DiplomaticTrade agreement,
@@ -924,12 +924,12 @@ public final class InGameController extends Controller {
     /**
      * Process a European diplomacy session according to an agreement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> in the session.
-     * @param otherPlayer The other <code>ServerPlayer</code> in the session.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @param session The <code>DiplomacySession</code> underway.
-     * @param message A <code>DiplomacyMessage</code> to send.
-     * @param cs A <code>ChangeSet</code> to contain the trade changes
+     * @param serverPlayer The {@code ServerPlayer} in the session.
+     * @param otherPlayer The other {@code ServerPlayer} in the session.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @param session The {@code DiplomacySession} underway.
+     * @param message A {@code DiplomacyMessage} to send.
+     * @param cs A {@code ChangeSet} to contain the trade changes
      *     if accepted.
      * @return True if a new DiplomacyMessage reply needs to be sent.
      */
@@ -1011,9 +1011,9 @@ public final class InGameController extends Controller {
     /**
      * Abandon a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is abandoning.
-     * @param settlement The <code>Settlement</code> to abandon.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is abandoning.
+     * @param settlement The {@code Settlement} to abandon.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet abandonSettlement(ServerPlayer serverPlayer,
                                        Settlement settlement) {
@@ -1040,10 +1040,10 @@ public final class InGameController extends Controller {
     /**
      * Ask about learning a skill at a native settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is learning.
-     * @param unit The <code>Unit</code> that is learning.
-     * @param is The <code>IndianSettlement</code> to learn from.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is learning.
+     * @param unit The {@code Unit} that is learning.
+     * @param is The {@code IndianSettlement} to learn from.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet askLearnSkill(ServerPlayer serverPlayer, Unit unit,
                                    IndianSettlement is) {
@@ -1064,10 +1064,10 @@ public final class InGameController extends Controller {
     /**
      * Assign a student to a teacher.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param student The student <code>Unit</code>.
-     * @param teacher The teacher <code>Unit</code>.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param student The student {@code Unit}.
+     * @param teacher The teacher {@code Unit}.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet assignTeacher(ServerPlayer serverPlayer, Unit student,
                                    Unit teacher) {
@@ -1095,10 +1095,10 @@ public final class InGameController extends Controller {
     /**
      * Assign a trade route to a unit.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The unit <code>Unit</code> to assign to.
-     * @param tradeRoute The <code>TradeRoute</code> to assign.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The unit {@code Unit} to assign to.
+     * @param tradeRoute The {@code TradeRoute} to assign.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
                                       TradeRoute tradeRoute) {
@@ -1134,10 +1134,10 @@ public final class InGameController extends Controller {
      *
      * +til: Resolves many tile appearance changes.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is building.
-     * @param unit The <code>Unit</code> that is building.
+     * @param serverPlayer The {@code ServerPlayer} that is building.
+     * @param unit The {@code Unit} that is building.
      * @param name The new settlement name.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet buildSettlement(ServerPlayer serverPlayer, Unit unit,
                                      String name) {
@@ -1227,12 +1227,12 @@ public final class InGameController extends Controller {
     /**
      * Buy from a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param unit The <code>Unit</code> that will carry the goods.
-     * @param is The <code>IndianSettlement</code> to buy from.
-     * @param goods The <code>Goods</code> to buy.
+     * @param serverPlayer The {@code ServerPlayer} that is buying.
+     * @param unit The {@code Unit} that will carry the goods.
+     * @param is The {@code IndianSettlement} to buy from.
+     * @param goods The {@code Goods} to buy.
      * @param amount How much gold to pay.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet buyFromSettlement(ServerPlayer serverPlayer, Unit unit,
                                        IndianSettlement is,
@@ -1290,11 +1290,11 @@ public final class InGameController extends Controller {
     /**
      * Buy goods in Europe.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param type The <code>GoodsType</code> to buy.
+     * @param serverPlayer The {@code ServerPlayer} that is buying.
+     * @param type The {@code GoodsType} to buy.
      * @param amount The amount of goods to buy.
-     * @param carrier The <code>Unit</code> to carry the goods.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param carrier The {@code Unit} to carry the goods.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet buyGoods(ServerPlayer serverPlayer, GoodsType type,
                               int amount, Unit carrier) {
@@ -1327,12 +1327,12 @@ public final class InGameController extends Controller {
     /**
      * Price some goods for sale from a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param goods The <code>Goods</code> to buy.
+     * @param serverPlayer The {@code ServerPlayer} that is buying.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param goods The {@code Goods} to buy.
      * @param price The buyers proposed price for the goods.
-     * @return A <code>BuyPropositionMessage</code> encapsulating this action,
+     * @return A {@code BuyPropositionMessage} encapsulating this action,
      *     or an error message on failure.
      */
     public DOMMessage buyProposition(ServerPlayer serverPlayer,
@@ -1363,9 +1363,9 @@ public final class InGameController extends Controller {
     /**
      * Cash in a treasure train.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is cashing in.
-     * @param unit The treasure train <code>Unit</code> to cash in.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is cashing in.
+     * @param unit The treasure train {@code Unit} to cash in.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet cashInTreasureTrain(ServerPlayer serverPlayer, Unit unit) {
         ChangeSet cs = new ChangeSet();
@@ -1416,10 +1416,10 @@ public final class InGameController extends Controller {
     /**
      * Change a units state.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to change the state of.
-     * @param state The new <code>UnitState</code>.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to change the state of.
+     * @param state The new {@code UnitState}.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet changeState(ServerPlayer serverPlayer, Unit unit,
                                  UnitState state) {
@@ -1462,10 +1462,10 @@ public final class InGameController extends Controller {
     /**
      * Change improvement work type.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to change the work type of.
-     * @param type The new <code>TileImprovementType</code> to produce.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to change the work type of.
+     * @param type The new {@code TileImprovementType} to produce.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet changeWorkImprovementType(ServerPlayer serverPlayer,
                                                Unit unit,
@@ -1488,10 +1488,10 @@ public final class InGameController extends Controller {
     /**
      * Change work type.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to change the work type of.
-     * @param type The new <code>GoodsType</code> to produce.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to change the work type of.
+     * @param type The new {@code GoodsType} to produce.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet changeWorkType(ServerPlayer serverPlayer, Unit unit,
                                     GoodsType type) {
@@ -1508,7 +1508,7 @@ public final class InGameController extends Controller {
     /**
      * Chat.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is chatting.
+     * @param serverPlayer The {@code ServerPlayer} that is chatting.
      * @param message The chat message.
      * @param pri A privacy setting, currently a noop.
      */
@@ -1523,12 +1523,12 @@ public final class InGameController extends Controller {
     /**
      * Claim land.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> claiming.
-     * @param tile The <code>Tile</code> to claim.
-     * @param settlement The <code>Settlement</code> to claim for.
+     * @param serverPlayer The {@code ServerPlayer} claiming.
+     * @param tile The {@code Tile} to claim.
+     * @param settlement The {@code Settlement} to claim for.
      * @param price The price to pay for the land, which must agree
      *     with the owner valuation, unless negative which denotes stealing.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet claimLand(ServerPlayer serverPlayer, Tile tile,
                                Settlement settlement, int price) {
@@ -1559,8 +1559,8 @@ public final class InGameController extends Controller {
      * If we implement this remember to fix the visibility.
      *
      * @param serverPlayer The owner of the unit.
-     * @param unit The <code>Unit</code> to clear the speciality of.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param unit The {@code Unit} to clear the speciality of.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
         UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
@@ -1590,11 +1590,11 @@ public final class InGameController extends Controller {
     /**
      * Combat.  Public for the test suite.
      *
-     * @param attackerPlayer The <code>ServerPlayer</code> who is attacking.
-     * @param attacker The <code>FreeColGameObject</code> that is attacking.
-     * @param defender The <code>FreeColGameObject</code> that is defending.
-     * @param crs A list of <code>CombatResult</code>s defining the result.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param attackerPlayer The {@code ServerPlayer} who is attacking.
+     * @param attacker The {@code FreeColGameObject} that is attacking.
+     * @param defender The {@code FreeColGameObject} that is defending.
+     * @param crs A list of {@code CombatResult}s defining the result.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet combat(ServerPlayer attackerPlayer,
                             FreeColGameObject attacker,
@@ -1615,7 +1615,7 @@ public final class InGameController extends Controller {
     /**
      * Continue playing after winning.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that plays on.
+     * @param serverPlayer The {@code ServerPlayer} that plays on.
      */
     public void continuePlaying(ServerPlayer serverPlayer) {
         final ServerGame game = getGame();
@@ -1643,10 +1643,10 @@ public final class InGameController extends Controller {
     /**
      * Declare independence.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is declaring.
+     * @param serverPlayer The {@code ServerPlayer} that is declaring.
      * @param nationName The new name for the independent nation.
      * @param countryName The new name for its residents.
-     * @return A <code>ChangeSet</code> containing the response.
+     * @return A {@code ChangeSet} containing the response.
      */
     public ChangeSet declareIndependence(final ServerPlayer serverPlayer,
                                          String nationName, String countryName) {
@@ -1854,9 +1854,9 @@ public final class InGameController extends Controller {
     /**
      * Decline to investigate strange mounds.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param tile The <code>Tile</code> where the mounds are.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param tile The {@code Tile} where the mounds are.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet declineMounds(ServerPlayer serverPlayer, Tile tile) {
         tile.cacheUnseen();//+til
@@ -1873,10 +1873,10 @@ public final class InGameController extends Controller {
     /**
      * Delete a trade route.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to delete a trade
+     * @param serverPlayer The {@code ServerPlayer} to delete a trade
      *     route for.
-     * @param tradeRoute The <code>TradeRoute</code> to delete.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param tradeRoute The {@code TradeRoute} to delete.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet deleteTradeRoute(ServerPlayer serverPlayer,
                                       TradeRoute tradeRoute) {
@@ -1894,11 +1894,11 @@ public final class InGameController extends Controller {
      * Deliver gift to settlement.
      * Note that this includes both European and native gifts.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
-     * @param unit The <code>Unit</code> that is delivering.
-     * @param settlement The <code>Settlement</code> to deliver to.
-     * @param goods The <code>Goods</code> to deliver.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is delivering.
+     * @param unit The {@code Unit} that is delivering.
+     * @param settlement The {@code Settlement} to deliver to.
+     * @param goods The {@code Goods} to deliver.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet deliverGiftToSettlement(ServerPlayer serverPlayer,
                                              Unit unit, Settlement settlement,
@@ -1957,10 +1957,10 @@ public final class InGameController extends Controller {
      *
      * FIXME: Move TURNS_PER_TRIBUTE magic number to the spec.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> demanding the tribute.
-     * @param unit The <code>Unit</code> that is demanding the tribute.
-     * @param is The <code>IndianSettlement</code> demanded of.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} demanding the tribute.
+     * @param unit The {@code Unit} that is demanding the tribute.
+     * @param is The {@code IndianSettlement} demanded of.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet demandTribute(ServerPlayer serverPlayer, Unit unit,
                                    IndianSettlement is) {
@@ -2025,11 +2025,11 @@ public final class InGameController extends Controller {
     /**
      * Denounce an existing mission.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is denouncing.
-     * @param unit The <code>Unit</code> denouncing.
-     * @param is The <code>IndianSettlement</code> containing the mission
+     * @param serverPlayer The {@code ServerPlayer} that is denouncing.
+     * @param unit The {@code Unit} denouncing.
+     * @param is The {@code IndianSettlement} containing the mission
      *     to denounce.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet denounceMission(ServerPlayer serverPlayer, Unit unit,
                                      IndianSettlement is) {
@@ -2087,11 +2087,11 @@ public final class InGameController extends Controller {
     /**
      * Diplomacy.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param ourUnit The <code>Unit</code> that is trading.
-     * @param otherColony The <code>Colony</code> to trade with.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is trading.
+     * @param ourUnit The {@code Unit} that is trading.
+     * @param otherColony The {@code Colony} to trade with.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet diplomacy(ServerPlayer serverPlayer, Unit ourUnit,
                                Colony otherColony, DiplomaticTrade agreement) {
@@ -2121,11 +2121,11 @@ public final class InGameController extends Controller {
     /**
      * Diplomacy.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param ourColony Our <code>Colony</code>.
-     * @param otherUnit The other <code>Unit</code> that is trading.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is trading.
+     * @param ourColony Our {@code Colony}.
+     * @param otherUnit The other {@code Unit} that is trading.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet diplomacy(ServerPlayer serverPlayer, Colony ourColony,
                                Unit otherUnit, DiplomaticTrade agreement) {
@@ -2152,8 +2152,8 @@ public final class InGameController extends Controller {
      * Disband a unit.
      *
      * @param serverPlayer The owner of the unit.
-     * @param unit The <code>Unit</code> to disband.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param unit The {@code Unit} to disband.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet disbandUnit(ServerPlayer serverPlayer, Unit unit) {
         ChangeSet cs = new ChangeSet();
@@ -2175,10 +2175,10 @@ public final class InGameController extends Controller {
     /**
      * Disembark unit from a carrier.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose unit is
+     * @param serverPlayer The {@code ServerPlayer} whose unit is
      *                     embarking.
-     * @param serverUnit The <code>ServerUnit</code> that is disembarking.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverUnit The {@code ServerUnit} that is disembarking.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet disembarkUnit(ServerPlayer serverPlayer,
                                    ServerUnit serverUnit) {
@@ -2215,10 +2215,10 @@ public final class InGameController extends Controller {
      * Embark a unit onto a carrier.
      * Checking that the locations are appropriate is not done here.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> embarking.
-     * @param serverUnit The <code>ServerUnit</code> that is embarking.
-     * @param carrier The <code>Unit</code> to embark onto.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} embarking.
+     * @param serverUnit The {@code ServerUnit} that is embarking.
+     * @param carrier The {@code Unit} to embark onto.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet embarkUnit(ServerPlayer serverPlayer,
                                 ServerUnit serverUnit, Unit carrier) {
@@ -2244,10 +2244,10 @@ public final class InGameController extends Controller {
     /**
      * A unit migrates from Europe.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose unit it will be.
-     * @param slot The slot within <code>Europe</code> to select the unit from.
+     * @param serverPlayer The {@code ServerPlayer} whose unit it will be.
+     * @param slot The slot within {@code Europe} to select the unit from.
      * @param type The type of migration occurring.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet emigrate(ServerPlayer serverPlayer, int slot,
                               MigrationType type) {
@@ -2264,8 +2264,8 @@ public final class InGameController extends Controller {
      *
      * Note: sends messages to other players.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to end the turn of.
-     * @return A <code>ChangeSet</code> encapsulating the end of turn changes.
+     * @param serverPlayer The {@code ServerPlayer} to end the turn of.
+     * @return A {@code ChangeSet} encapsulating the end of turn changes.
      */
     public ChangeSet endTurn(ServerPlayer serverPlayer) {
         final FreeColServer freeColServer = getFreeColServer();
@@ -2435,8 +2435,8 @@ public final class InGameController extends Controller {
     /**
      * Enters revenge mode against those evil AIs.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> entering revenge mode.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} entering revenge mode.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet enterRevengeMode(ServerPlayer serverPlayer) {
         if (!getFreeColServer().getSinglePlayer()) {
@@ -2502,11 +2502,11 @@ public final class InGameController extends Controller {
      * Might one day allow the unit to be on a tile co-located with
      * an equipment-bearing wagon.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet equipForRole(ServerPlayer serverPlayer, Unit unit,
                                   Role role, int roleCount) {
@@ -2546,10 +2546,10 @@ public final class InGameController extends Controller {
     /**
      * Establish a new mission.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is establishing.
-     * @param unit The missionary <code>Unit</code>.
-     * @param is The <code>IndianSettlement</code> to establish at.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is establishing.
+     * @param unit The missionary {@code Unit}.
+     * @param is The {@code IndianSettlement} to establish at.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet establishMission(ServerPlayer serverPlayer, Unit unit,
                                       IndianSettlement is) {
@@ -2598,11 +2598,11 @@ public final class InGameController extends Controller {
     /**
      * Handle first contact between European players.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making contact.
-     * @param ourUnit Our <code>Unit</code>.
-     * @param otherUnit The other <code>unit</code>.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} making contact.
+     * @param ourUnit Our {@code Unit}.
+     * @param otherUnit The other {@code unit}.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
                                           Unit ourUnit, Unit otherUnit,
@@ -2638,11 +2638,11 @@ public final class InGameController extends Controller {
     /**
      * Handle first contact between European players.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making contact.
-     * @param ourUnit Our <code>Unit</code>.
-     * @param otherColony The other <code>Colony</code>.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} making contact.
+     * @param ourUnit Our {@code Unit}.
+     * @param otherColony The other {@code Colony}.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
                                           Unit ourUnit, Colony otherColony,
@@ -2674,11 +2674,11 @@ public final class InGameController extends Controller {
     /**
      * Handle first contact between European players.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making contact.
-     * @param ourColony Our <code>Colony</code>.
-     * @param otherUnit The other <code>Unit</code>.
-     * @param agreement The <code>DiplomaticTrade</code> to consider.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} making contact.
+     * @param ourColony Our {@code Colony}.
+     * @param otherUnit The other {@code Unit}.
+     * @param agreement The {@code DiplomaticTrade} to consider.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet europeanFirstContact(ServerPlayer serverPlayer,
                                           Colony ourColony, Unit otherUnit,
@@ -2706,10 +2706,10 @@ public final class InGameController extends Controller {
     /**
      * Get the goods for sale in a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is enquiring.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return A <code>GoodsForSaleMessage</code> encapsulating this action,
+     * @param serverPlayer The {@code ServerPlayer} that is enquiring.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @return A {@code GoodsForSaleMessage} encapsulating this action,
      *     or an error message on failure.
      */
     public DOMMessage getGoodsForSale(ServerPlayer serverPlayer,
@@ -2740,7 +2740,7 @@ public final class InGameController extends Controller {
     /**
      * Gets the list of high scores.
      *
-     * @return A list of <code>HighScore</code>.
+     * @return A list of {@code HighScore}.
      */
     public List<HighScore> getHighScores() {
         return HighScore.loadHighScores();
@@ -2750,12 +2750,12 @@ public final class InGameController extends Controller {
     /**
      * Incite a settlement against an enemy.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is inciting.
-     * @param unit The missionary <code>Unit</code> inciting.
-     * @param is The <code>IndianSettlement</code> to incite.
-     * @param enemy The <code>ServerPlayer</code> to be incited against.
+     * @param serverPlayer The {@code ServerPlayer} that is inciting.
+     * @param unit The missionary {@code Unit} inciting.
+     * @param is The {@code IndianSettlement} to incite.
+     * @param enemy The {@code ServerPlayer} to be incited against.
      * @param gold The amount of gold in the bribe.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet incite(ServerPlayer serverPlayer, Unit unit,
         IndianSettlement is, ServerPlayer enemy, int gold) {
@@ -2822,13 +2822,13 @@ public final class InGameController extends Controller {
     /**
      * Indians making demands of a colony.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
-     * @param unit The <code>Unit</code> making the demands.
-     * @param colony The <code>Colony</code> that is demanded of.
-     * @param type The <code>GoodsType</code> being demanded, null
+     * @param serverPlayer The {@code ServerPlayer} that is demanding.
+     * @param unit The {@code Unit} making the demands.
+     * @param colony The {@code Colony} that is demanded of.
+     * @param type The {@code GoodsType} being demanded, null
      *     implies gold.
      * @param amount The amount of goods/gold being demanded.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet indianDemand(final ServerPlayer serverPlayer, Unit unit,
                                   Colony colony, GoodsType type, int amount) {
@@ -2884,10 +2884,10 @@ public final class InGameController extends Controller {
     /**
      * Join a colony.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> that is joining.
-     * @param colony The <code>Colony</code> to join.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} that is joining.
+     * @param colony The {@code Colony} to join.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet joinColony(ServerPlayer serverPlayer, Unit unit,
                                 Colony colony) {
@@ -2919,10 +2919,10 @@ public final class InGameController extends Controller {
     /**
      * Learn a skill at an IndianSettlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is learning.
-     * @param unit The <code>Unit</code> that is learning.
-     * @param is The <code>IndianSettlement</code> to learn from.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is learning.
+     * @param unit The {@code Unit} that is learning.
+     * @param is The {@code IndianSettlement} to learn from.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet learnFromIndianSettlement(ServerPlayer serverPlayer,
                                                Unit unit, IndianSettlement is) {
@@ -2980,12 +2980,12 @@ public final class InGameController extends Controller {
     /**
      * Load goods.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is loading.
-     * @param loc The <code>Location</code> where the goods are.
-     * @param goodsType The <code>GoodsType</code> to load.
+     * @param serverPlayer The {@code ServerPlayer} that is loading.
+     * @param loc The {@code Location} where the goods are.
+     * @param goodsType The {@code GoodsType} to load.
      * @param amount The amount of goods to load.
-     * @param carrier The <code>Unit</code> to load.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param carrier The {@code Unit} to load.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet loadGoods(ServerPlayer serverPlayer, Location loc,
                                GoodsType goodsType, int amount, Unit carrier) {
@@ -3036,12 +3036,12 @@ public final class InGameController extends Controller {
      * Note loser is passed by identifier, as by the time we get here
      * the unit may have been sunk.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the winner.
-     * @param winner The <code>Unit</code> that looting.
-     * @param loserId The object identifier of the <code>Unit</code>
+     * @param serverPlayer The {@code ServerPlayer} that owns the winner.
+     * @param winner The {@code Unit} that looting.
+     * @param loserId The object identifier of the {@code Unit}
      *     that is looted.
-     * @param loot The <code>Goods</code> to loot.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param loot The {@code Goods} to loot.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet lootCargo(ServerPlayer serverPlayer, Unit winner,
                                String loserId, List<Goods> loot) {
@@ -3084,10 +3084,10 @@ public final class InGameController extends Controller {
     /**
      * Respond to a monarch action.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is to respond.
-     * @param action The <code>MonarchAction</code> to respond to.
+     * @param serverPlayer The {@code ServerPlayer} that is to respond.
+     * @param action The {@code MonarchAction} to respond to.
      * @param result The player response.
-     * @return A <code>ChangeSet</code> containing the response.
+     * @return A {@code ChangeSet} containing the response.
      */
     public ChangeSet monarchAction(ServerPlayer serverPlayer,
                                    MonarchAction action, boolean result) {
@@ -3109,10 +3109,10 @@ public final class InGameController extends Controller {
     /**
      * Move a unit.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is moving.
-     * @param unit The <code>ServerUnit</code> to move.
-     * @param newTile The <code>Tile</code> to move to.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is moving.
+     * @param unit The {@code ServerUnit} to move.
+     * @param newTile The {@code Tile} to move to.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet move(ServerPlayer serverPlayer, ServerUnit unit,
                           Tile newTile) {
@@ -3126,10 +3126,10 @@ public final class InGameController extends Controller {
     /**
      * Move a unit across the high seas.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to move.
-     * @param destination The <code>Location</code> to move to.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to move.
+     * @param destination The {@code Location} to move to.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet moveTo(ServerPlayer serverPlayer, Unit unit,
                             Location destination) {
@@ -3233,11 +3233,11 @@ public final class InGameController extends Controller {
      * in the case of tile!=null as that is the only possibility for
      * some benefit.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making contact.
-     * @param other The native <code>ServerPlayer</code> to contact.
-     * @param tile A <code>Tile</code> on offer at first landing.
+     * @param serverPlayer The {@code ServerPlayer} making contact.
+     * @param other The native {@code ServerPlayer} to contact.
+     * @param tile A {@code Tile} on offer at first landing.
      * @param result Whether the initial peace treaty was accepted.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nativeFirstContact(ServerPlayer serverPlayer,
                                         ServerPlayer other, Tile tile,
@@ -3272,10 +3272,10 @@ public final class InGameController extends Controller {
     /**
      * A native unit delivers its gift to a colony.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is delivering.
-     * @param unit The <code>Unit</code> that is delivering.
-     * @param colony The <code>Colony</code> to deliver to.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is delivering.
+     * @param unit The {@code Unit} that is delivering.
+     * @param colony The {@code Colony} to deliver to.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nativeGift(ServerPlayer serverPlayer,
                                 Unit unit, Colony colony) {
@@ -3312,10 +3312,10 @@ public final class InGameController extends Controller {
     /**
      * Handle native trade sessions.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is trading.
-     * @param action The <code>NativeTradeAction</code> to perform.
-     * @param nt The <code>NativeTrade</code> underway.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is trading.
+     * @param action The {@code NativeTradeAction} to perform.
+     * @param nt The {@code NativeTrade} underway.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet nativeTrade(ServerPlayer serverPlayer,
                                  NativeTradeAction action, NativeTrade nt) {
@@ -3398,9 +3398,9 @@ public final class InGameController extends Controller {
     /**
      * Pay arrears.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param type The <code>GoodsType</code> to pay the arrears for.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param type The {@code GoodsType} to pay the arrears for.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet payArrears(ServerPlayer serverPlayer, GoodsType type) {
         int arrears = serverPlayer.getArrears(type);
@@ -3426,10 +3426,10 @@ public final class InGameController extends Controller {
     /**
      * Pay for a building.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the
+     * @param serverPlayer The {@code ServerPlayer} that owns the
      *     colony.
-     * @param colony The <code>Colony</code> that is building.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param colony The {@code Colony} that is building.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet payForBuilding(ServerPlayer serverPlayer, Colony colony) {
         if (!getGame().getSpecification()
@@ -3485,9 +3485,9 @@ public final class InGameController extends Controller {
     /**
      * Put outside colony.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to be put out.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to be put out.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
         Tile tile = unit.getTile();
@@ -3507,10 +3507,10 @@ public final class InGameController extends Controller {
     /**
      * Rearrange a colony.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
-     * @param colony The <code>Colony</code> to rearrange.
-     * @param arrangements A list of <code>Arrangement</code>s to apply.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is querying.
+     * @param colony The {@code Colony} to rearrange.
+     * @param arrangements A list of {@code Arrangement}s to apply.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet rearrangeColony(ServerPlayer serverPlayer, Colony colony,
                                      List<Arrangement> arrangements) {
@@ -3573,10 +3573,10 @@ public final class InGameController extends Controller {
     /**
      * Rename an object.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is naming.
-     * @param object The <code>Nameable</code> to rename.
+     * @param serverPlayer The {@code ServerPlayer} that is naming.
+     * @param object The {@code Nameable} to rename.
      * @param newName The new name.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet renameObject(ServerPlayer serverPlayer, Nameable object,
                                   String newName) {
@@ -3598,8 +3598,8 @@ public final class InGameController extends Controller {
     /**
      * Handle a player retiring.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is retiring.
-     * @return A <code>ChangeSet</code> containing the response.
+     * @param serverPlayer The {@code ServerPlayer} that is retiring.
+     * @return A {@code ChangeSet} containing the response.
      */
     public ChangeSet retire(ServerPlayer serverPlayer) {
         boolean highScore = HighScore.newHighScore(serverPlayer);
@@ -3616,10 +3616,10 @@ public final class InGameController extends Controller {
      * Scout a native settlement, that is, the contacting action
      * that generates the greeting dialog.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
-     * @param unit The scout <code>Unit</code>.
-     * @param is The <code>IndianSettlement</code> to scout.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is scouting.
+     * @param unit The scout {@code Unit}.
+     * @param is The {@code IndianSettlement} to scout.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet scoutIndianSettlement(ServerPlayer serverPlayer,
                                            Unit unit, IndianSettlement is) {
@@ -3642,10 +3642,10 @@ public final class InGameController extends Controller {
     /**
      * Speak to the chief at a native settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
-     * @param unit The scout <code>Unit</code>.
-     * @param is The <code>IndianSettlement</code> to scout.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is scouting.
+     * @param unit The scout {@code Unit}.
+     * @param is The {@code IndianSettlement} to scout.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet scoutSpeakToChief(ServerPlayer serverPlayer,
                                        Unit unit, IndianSettlement is) {
@@ -3741,11 +3741,11 @@ public final class InGameController extends Controller {
     /**
      * Sell goods in Europe.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
-     * @param type The <code>GoodsType</code> to sell.
+     * @param serverPlayer The {@code ServerPlayer} that is selling.
+     * @param type The {@code GoodsType} to sell.
      * @param amount The amount of goods to sell.
-     * @param carrier The <code>Unit</code> carrying the goods.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param carrier The {@code Unit} carrying the goods.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet sellGoods(ServerPlayer serverPlayer, GoodsType type,
                                int amount, Unit carrier) {
@@ -3781,12 +3781,12 @@ public final class InGameController extends Controller {
     /**
      * Price some goods for sale to a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is buying.
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param goods The <code>Goods</code> to sell.
+     * @param serverPlayer The {@code ServerPlayer} that is buying.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param goods The {@code Goods} to sell.
      * @param price The sellers proposed price for the goods.
-     * @return A <code>SellPropositionMessage</code> encapsulating this action
+     * @return A {@code SellPropositionMessage} encapsulating this action
      *     or an error message on failure.
      */
     public DOMMessage sellProposition(ServerPlayer serverPlayer,
@@ -3817,12 +3817,12 @@ public final class InGameController extends Controller {
     /**
      * Sell to a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is selling.
-     * @param unit The <code>Unit</code> carrying the goods.
-     * @param is The <code>IndianSettlement</code> to sell to.
-     * @param goods The <code>Goods</code> to sell.
+     * @param serverPlayer The {@code ServerPlayer} that is selling.
+     * @param unit The {@code Unit} carrying the goods.
+     * @param is The {@code IndianSettlement} to sell to.
+     * @param goods The {@code Goods} to sell.
      * @param amount How much gold to expect.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet sellToSettlement(ServerPlayer serverPlayer, Unit unit,
                                       IndianSettlement is,
@@ -3876,10 +3876,10 @@ public final class InGameController extends Controller {
     /**
      * Set build queue.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
-     * @param colony The <code>Colony</code> to set the queue of.
+     * @param serverPlayer The {@code ServerPlayer} that owns the colony.
+     * @param colony The {@code Colony} to set the queue of.
      * @param queue The new build queue.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setBuildQueue(ServerPlayer serverPlayer, Colony colony,
                                    List<BuildableType> queue) {
@@ -3905,10 +3905,10 @@ public final class InGameController extends Controller {
     /**
      * Set a unit stop.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to set the destination for.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to set the destination for.
      * @param index The stop index.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setCurrentStop(ServerPlayer serverPlayer, Unit unit,
                                     int index) {
@@ -3930,10 +3930,10 @@ public final class InGameController extends Controller {
     /**
      * Set a unit destination.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to set the destination for.
-     * @param destination The <code>Location</code> to set as destination.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to set the destination for.
+     * @param destination The {@code Location} to set as destination.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setDestination(ServerPlayer serverPlayer, Unit unit,
                                     Location destination) {
@@ -3954,10 +3954,10 @@ public final class InGameController extends Controller {
     /**
      * Set goods levels.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the colony.
-     * @param colony The <code>Colony</code> to set the goods levels in.
-     * @param exportData The new <code>ExportData</code>.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the colony.
+     * @param colony The {@code Colony} to set the goods levels in.
+     * @param exportData The new {@code ExportData}.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setGoodsLevels(ServerPlayer serverPlayer, Colony colony,
                                     ExportData exportData) {
@@ -3969,10 +3969,10 @@ public final class InGameController extends Controller {
     /**
      * Set land name.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> who landed.
-     * @param unit The <code>Unit</code> that has come ashore.
+     * @param serverPlayer The {@code ServerPlayer} who landed.
+     * @param unit The {@code Unit} that has come ashore.
      * @param name The new land name.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setNewLandName(ServerPlayer serverPlayer, Unit unit,
                                     String name) {
@@ -3997,11 +3997,11 @@ public final class InGameController extends Controller {
     /**
      * Set region name.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> discovering.
-     * @param unit The <code>Unit</code> that is discovering.
-     * @param region The <code>Region</code> to discover.
+     * @param serverPlayer The {@code ServerPlayer} discovering.
+     * @param unit The {@code Unit} that is discovering.
+     * @param region The {@code Region} to discover.
      * @param name The new region name.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet setNewRegionName(ServerPlayer serverPlayer, Unit unit,
                                       Region region, String name) {
@@ -4025,10 +4025,10 @@ public final class InGameController extends Controller {
     /**
      * Spy on a settlement.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is spying.
-     * @param unit The <code>Unit</code> that is spying.
-     * @param settlement The <code>Settlement</code> to spy on.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is spying.
+     * @param unit The {@code Unit} that is spying.
+     * @param settlement The {@code Settlement} to spy on.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet spySettlement(ServerPlayer serverPlayer, Unit unit,
                                    Settlement settlement) {
@@ -4044,9 +4044,9 @@ public final class InGameController extends Controller {
     /**
      * Train a unit in Europe.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is demanding.
-     * @param type The <code>UnitType</code> to train.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that is demanding.
+     * @param type The {@code UnitType} to train.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet trainUnitInEurope(ServerPlayer serverPlayer,
                                        UnitType type) {
@@ -4086,11 +4086,11 @@ public final class InGameController extends Controller {
     /**
      * Unload goods.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that is unloading.
-     * @param goodsType The <code>GoodsType</code> to unload.
+     * @param serverPlayer The {@code ServerPlayer} that is unloading.
+     * @param goodsType The {@code GoodsType} to unload.
      * @param amount The amount of goods to unload.
-     * @param carrier The <code>Unit</code> to unload.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param carrier The {@code Unit} to unload.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet unloadGoods(ServerPlayer serverPlayer, GoodsType goodsType,
                                  int amount, Unit carrier) {
@@ -4129,10 +4129,10 @@ public final class InGameController extends Controller {
     /**
      * Update a trade route for a player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to set trade
+     * @param serverPlayer The {@code ServerPlayer} to set trade
      *     routes for.
-     * @param tradeRoute An uninterned <code>TradeRoute</code> to update.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param tradeRoute An uninterned {@code TradeRoute} to update.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet updateTradeRoute(ServerPlayer serverPlayer,
                                       TradeRoute tradeRoute) {
@@ -4160,10 +4160,10 @@ public final class InGameController extends Controller {
     /**
      * Change work location.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
-     * @param unit The <code>Unit</code> to change the work location of.
-     * @param workLocation The <code>WorkLocation</code> to change to.
-     * @return A <code>ChangeSet</code> encapsulating this action.
+     * @param serverPlayer The {@code ServerPlayer} that owns the unit.
+     * @param unit The {@code Unit} to change the work location of.
+     * @param workLocation The {@code WorkLocation} to change to.
+     * @return A {@code ChangeSet} encapsulating this action.
      */
     public ChangeSet work(ServerPlayer serverPlayer, Unit unit,
                           WorkLocation workLocation) {

@@ -110,11 +110,11 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
 
     /**
-     * Creates a new <code>AIPlayer</code>.
+     * Creates a new {@code AIPlayer}.
      *
      * @param aiMain The main AI-class.
      * @param player The player that should be associated with this
-     *            <code>AIPlayer</code>.
+     *            {@code AIPlayer}.
      */
     public NativeAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
@@ -123,7 +123,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
     }
 
     /**
-     * Creates a new <code>AIPlayer</code>.
+     * Creates a new {@code AIPlayer}.
      *
      * @param aiMain The main AI-object.
      * @param xr The input stream containing the XML.
@@ -141,7 +141,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Simple initialization of AI missions given that we know the starting
      * conditions.
      *
-     * @param lb A <code>LogBuilder</code>  to log to.
+     * @param lb A {@code LogBuilder}  to log to.
      */
     private void initializeMissions(LogBuilder lb) {
         final Player player = getPlayer();
@@ -169,7 +169,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Determines the stances towards each player.
      * That is: should we declare war?
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void determineStances(LogBuilder lb) {
         final ServerPlayer serverPlayer = (ServerPlayer)getPlayer();
@@ -193,7 +193,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * units new missions.
      *
      * @param randoms An array of random settlement indexes.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void secureSettlements(int[] randoms, LogBuilder lb) {
         int randomIdx = 0;
@@ -220,8 +220,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Greedily equips braves with horses and muskets.
      * Public for the test suite.
      *
-     * @param is The <code>IndianSettlement</code> where the equipping occurs.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param is The {@code IndianSettlement} where the equipping occurs.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void equipBraves(IndianSettlement is, LogBuilder lb) {
         // Prioritize promoting partially equipped units to full dragoon
@@ -242,8 +242,8 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Takes the necessary actions to secure an indian settlement
      * Public for the test suite.
      *
-     * @param is The <code>IndianSettlement</code> to secure.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param is The {@code IndianSettlement} to secure.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void secureIndianSettlement(final IndianSettlement is,
                                        LogBuilder lb) {
@@ -382,7 +382,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
     /**
      * Gives a mission to all units.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void giveNormalMissions(LogBuilder lb) {
         final Player player = getPlayer();
@@ -465,7 +465,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Brings gifts to nice players with nearby colonies.
      *
      * @param randoms An array of random percentages.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void bringGifts(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
@@ -565,7 +565,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
      * Demands tribute from nasty players with nearby colonies.
      *
      * @param randoms An array of random percentages.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      */
     private void demandTribute(int[] randoms, LogBuilder lb) {
         final Player player = getPlayer();
@@ -703,9 +703,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
     /**
      * Decides whether to accept an Indian demand, or not.
      *
-     * @param unit The <code>Unit</code> making demands.
-     * @param colony The <code>Colony</code> where demands are being made.
-     * @param type The <code>GoodsType</code> demanded.
+     * @param unit The {@code Unit} making demands.
+     * @param colony The {@code Colony} where demands are being made.
+     * @param type The {@code GoodsType} demanded.
      * @param amount The amount of gold demanded.
      * @param accept The acceptance state of the demand.
      * @return True if this player accepts the demand, false if rejected,

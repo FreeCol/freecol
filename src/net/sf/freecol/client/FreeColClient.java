@@ -139,7 +139,7 @@ public final class FreeColClient {
     }
 
     /**
-     * Creates a new <code>FreeColClient</code>.  Creates the control
+     * Creates a new {@code FreeColClient}.  Creates the control
      * objects.
      *
      * @param splashStream A stream to read the splash image from.
@@ -238,7 +238,7 @@ public final class FreeColClient {
      * existing panels.     
      *
      * @param userMsg A message to the user.
-     * @return A <code>Runnable</code> for the main panel.
+     * @return A {@code Runnable} for the main panel.
      */
     public Runnable invokeMainPanel(final String userMsg) {
         return () -> SwingUtilities.invokeLater(() -> {
@@ -247,14 +247,14 @@ public final class FreeColClient {
     }
 
     /**
-     * Starts the new <code>FreeColClient</code>, including the GUI.
+     * Starts the new {@code FreeColClient}, including the GUI.
      *
      * @param size An optional window size.
      * @param userMsg An optional message key to be displayed early.
      * @param sound True if sounds should be played
      * @param showOpeningVideo Display the opening video.
      * @param savedGame An optional saved game.
-     * @param spec If non-null, a <code>Specification</code> to use to start
+     * @param spec If non-null, a {@code Specification} to use to start
      *     a new game immediately.
      */
     public void startClient(final Dimension size,
@@ -342,9 +342,9 @@ public final class FreeColClient {
      * out of date (i.e. options can be in the wrong group, or no longer
      * exist), so they must be merged cautiously.
      *
-     * @param savedGameFile An optional saved game <code>File</code>
+     * @param savedGameFile An optional saved game {@code File}
      *     to load options from.
-     * @return The loaded <code>ClientOptions</code>.
+     * @return The loaded {@code ClientOptions}.
      */
     private ClientOptions loadClientOptions(File savedGameFile) {
         ClientOptions clop = new ClientOptions();
@@ -397,7 +397,7 @@ public final class FreeColClient {
      * Gets the controller responsible for starting a server and
      * connecting to it.
      *
-     * @return The <code>ConnectController</code>.
+     * @return The {@code ConnectController}.
      */
     public ConnectController getConnectController() {
         return connectController;
@@ -406,7 +406,7 @@ public final class FreeColClient {
     /**
      * Gets the controller that will be used before the game has been started.
      *
-     * @return The <code>PreGameController</code>.
+     * @return The {@code PreGameController}.
      */
     public PreGameController getPreGameController() {
         return preGameController;
@@ -416,7 +416,7 @@ public final class FreeColClient {
      * Gets the input handler that will be used before the game has been
      * started.
      *
-     * @return The <code>PreGameInputHandler</code>.
+     * @return The {@code PreGameInputHandler}.
      */
     public PreGameInputHandler getPreGameInputHandler() {
         return preGameInputHandler;
@@ -425,7 +425,7 @@ public final class FreeColClient {
     /**
      * Gets the controller that will be used when the game has been started.
      *
-     * @return The <code>InGameController</code>.
+     * @return The {@code InGameController}.
      */
     public InGameController getInGameController() {
         return inGameController;
@@ -434,7 +434,7 @@ public final class FreeColClient {
     /**
      * Gets the input handler that will be used when the game has been started.
      *
-     * @return The <code>InGameInputHandler</code>.
+     * @return The {@code InGameInputHandler}.
      */
     public InGameInputHandler getInGameInputHandler() {
         return inGameInputHandler;
@@ -459,9 +459,9 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the <code>FreeColServer</code> started by the client.
+     * Gets the {@code FreeColServer} started by the client.
      *
-     * @return The <code>FreeColServer</code> or <code>null</code> if no
+     * @return The {@code FreeColServer} or <code>null</code> if no
      *     server has been started.
      */
     public FreeColServer getFreeColServer() {
@@ -469,10 +469,10 @@ public final class FreeColClient {
     }
 
     /**
-     * Sets the <code>FreeColServer</code> which has been started by the
+     * Sets the {@code FreeColServer} which has been started by the
      * client gui.
      *
-     * @param freeColServer The <code>FreeColServer</code>.
+     * @param freeColServer The {@code FreeColServer}.
      * @see #getFreeColServer()
      */
     public void setFreeColServer(FreeColServer freeColServer) {
@@ -482,7 +482,7 @@ public final class FreeColClient {
     /**
      * Meaningfully named access to the ServerAPI.
      *
-     * @return The user wrapper for the <code>ServerAPI</code>.
+     * @return The user wrapper for the {@code ServerAPI}.
      */
     public UserServerAPI askServer() {
         return this.userServerAPI;
@@ -491,7 +491,7 @@ public final class FreeColClient {
     /**
      * Gets the GUI attached to this client.
      *
-     * @return The current <code>GUI</code>.
+     * @return The current {@code GUI}.
      */
     public GUI getGUI() {
         return gui;
@@ -507,9 +507,9 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the <code>Game</code> that we are currently playing.
+     * Gets the {@code Game} that we are currently playing.
      *
-     * @return The current <code>Game</code>.
+     * @return The current {@code Game}.
      * @see #setGame
      */
     public Game getGame() {
@@ -517,9 +517,9 @@ public final class FreeColClient {
     }
 
     /**
-     * Sets the <code>Game</code> that we are currently playing.
+     * Sets the {@code Game} that we are currently playing.
      *
-     * @param game The new <code>Game</code>.
+     * @param game The new {@code Game}.
      * @see #getGame
      */
     public void setGame(Game game) {
@@ -527,9 +527,9 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the <code>Player</code> that uses this client.
+     * Gets the {@code Player} that uses this client.
      *
-     * @return The <code>Player</code> made to represent this clients user.
+     * @return The {@code Player} made to represent this clients user.
      * @see #setMyPlayer(Player)
      */
     public Player getMyPlayer() {
@@ -537,9 +537,9 @@ public final class FreeColClient {
     }
 
     /**
-     * Sets the <code>Player</code> that uses this client.
+     * Sets the {@code Player} that uses this client.
      *
-     * @param player The <code>Player</code> made to represent this clients
+     * @param player The {@code Player} made to represent this clients
      *            user.
      * @see #getMyPlayer()
      */
@@ -550,8 +550,8 @@ public final class FreeColClient {
     /**
      * Gets the object keeping the current client options.
      *
-     * @return The <code>ClientOptions</code> attached to this
-     *     <code>FreeColClient</code>.
+     * @return The {@code ClientOptions} attached to this
+     *     {@code FreeColClient}.
      */
     public ClientOptions getClientOptions() {
         return clientOptions;
@@ -644,7 +644,7 @@ public final class FreeColClient {
     /**
      * Is the game in headless mode?
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public boolean isHeadless() {
         return headless;
@@ -657,7 +657,7 @@ public final class FreeColClient {
      * Set a message handler to handle messages from the server.
      * Used when switching from pre-game to in-game.
      *
-     * @param messageHandler The new <code>MessageHandler</code>.
+     * @param messageHandler The new {@code MessageHandler}.
      */
     public void setMessageHandler(MessageHandler messageHandler) {
         askServer().setMessageHandler(messageHandler);
@@ -674,7 +674,7 @@ public final class FreeColClient {
     /**
      * Sets the actions derived from the specification.
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     public void addSpecificationActions(Specification specification) {
         actionManager.addSpecificationActions(specification);
@@ -719,7 +719,7 @@ public final class FreeColClient {
     /**
      * Common utility routine to retrieve animation speed.
      *
-     * @param player The <code>Player</code> to be animated.
+     * @param player The {@code Player} to be animated.
      * @return The animation speed.
      */
     public int getAnimationSpeed(Player player) {
@@ -743,7 +743,7 @@ public final class FreeColClient {
     /**
      * Give the worker some work.
      *
-     * @param runnable The <code>Runnable</code> to do.
+     * @param runnable The {@code Runnable} to do.
      */
     public void setWork(Runnable runnable) {
         worker.schedule(runnable);

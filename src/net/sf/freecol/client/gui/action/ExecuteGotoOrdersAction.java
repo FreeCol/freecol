@@ -33,9 +33,9 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>ExecuteGotoOrdersAction</code>.
+     * Creates a new {@code ExecuteGotoOrdersAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ExecuteGotoOrdersAction(FreeColClient freeColClient) {
         super(freeColClient, id);

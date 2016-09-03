@@ -138,7 +138,7 @@ public class SwingGUI extends GUI {
     /**
      * Create the GUI.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param scaleFactor The scale factor for the GUI.
      */
     public SwingGUI(FreeColClient freeColClient, float scaleFactor) {
@@ -592,7 +592,7 @@ public class SwingGUI extends GUI {
     /**
      * Require the given tile to be in the onScreen()-area.
      *
-     * @param tile The <code>Tile</code> to check.
+     * @param tile The {@code Tile} to check.
      * @return True if the focus was set.
      */
     public boolean requireFocus(Tile tile) {
@@ -903,7 +903,7 @@ public class SwingGUI extends GUI {
      *
      * TODO: Improve OO.
      *
-     * @param fco The <code>FreeColObject</code> to display.
+     * @param fco The {@code FreeColObject} to display.
      */
     public void displayObject(FreeColObject fco) {
         if (fco instanceof Colony) {

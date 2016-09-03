@@ -70,7 +70,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     /**
      * Creates this BuildingPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param building The building to display information from.
      */
     public BuildingPanel(FreeColClient freeColClient, Building building) {
@@ -179,7 +179,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     /**
      * Get the building this panel displays.
      *
-     * @return The displayed <code>Building</code>.
+     * @return The displayed {@code Building}.
      */
     public Building getBuilding() {
         return building;
@@ -188,7 +188,7 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     /**
      * Get any unit labels for the units present.
      *
-     * @return A list of <code>UnitLabel</code>s.
+     * @return A list of {@code UnitLabel}s.
      */
     public List<UnitLabel> getUnitLabels() {
         return unitLabels;

@@ -80,7 +80,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      * Create a new Founding Father.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public FoundingFather(String id, Specification specification) {
         super(id, specification);
@@ -101,7 +101,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * Public for the test suite.
      *
-     * @param type A new <code>FoundingFatherType</code>.
+     * @param type A new {@code FoundingFatherType}.
      */
     public void setType(FoundingFatherType type) {
         this.type = type;
@@ -119,7 +119,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Get a message key for the type of a FoundingFather.
      *
-     * @param type The <code>FoundingFatherType</code> to make a key for.
+     * @param type The {@code FoundingFatherType} to make a key for.
      * @return The message key.
      */
     public static String getTypeKey(FoundingFatherType type) {
@@ -140,7 +140,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Get the events this father triggers.
      *
-     * @return A list of <code>Event</code>s.
+     * @return A list of {@code Event}s.
      */
     public final List<Event> getEvents() {
         return (events == null) ? Collections.<Event>emptyList()
@@ -161,7 +161,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Add an event.
      *
-     * @param event The <code>Event</code> to add.
+     * @param event The {@code Event} to add.
      */
     private void addEvent(Event event) {
         if (events == null) events = new ArrayList<>();
@@ -171,7 +171,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Get the upgrades triggered by this Founding Father.
      *
-     * @return A map of old to new <code>UnitType</code>s.
+     * @return A map of old to new {@code UnitType}s.
      */
     public final Map<UnitType, UnitType> getUpgrades() {
         return (upgrades == null) ? Collections.<UnitType, UnitType>emptyMap()
@@ -192,8 +192,8 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Add an upgrade.
      *
-     * @param fromType The initial <code>UnitType</code>.
-     * @param toType The upgraded <code>UnitType</code>.
+     * @param fromType The initial {@code UnitType}.
+     * @param toType The upgraded {@code UnitType}.
      */
     private void addUpgrade(UnitType fromType, UnitType toType) {
         if (upgrades == null) upgrades = new HashMap<>();
@@ -203,7 +203,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Get the units this father supplies.
      *
-     * @return A list of <code>AbstractUnit</code>s.
+     * @return A list of {@code AbstractUnit}s.
      */
     public final List<AbstractUnit> getUnitList() {
         return (units == null) ? Collections.<AbstractUnit>emptyList()
@@ -224,7 +224,7 @@ public class FoundingFather extends FreeColSpecObjectType {
     /**
      * Add a unit.
      *
-     * @param unit The <code>AbstractUnit</code> to add.
+     * @param unit The {@code AbstractUnit} to add.
      */
     private void addUnit(AbstractUnit unit) {
         if (units == null) units = new ArrayList<>();
@@ -236,7 +236,7 @@ public class FoundingFather extends FreeColSpecObjectType {
      *
      * Note that this does not cover restrictions due to the Age.
      *
-     * @param player The <code>Player</code> to test.
+     * @param player The {@code Player} to test.
      * @return True if the father is available.
      */
     public boolean isAvailableTo(Player player) {

@@ -113,8 +113,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
         /**
          * Simple constructor for a unit change.
          *
-         * @param from The <code>UnitType</code> to change from.
-         * @param to The <code>UnitType</code> to change to.
+         * @param from The {@code UnitType} to change from.
+         * @param to The {@code UnitType} to change to.
          * @param probability The percentage chance of the change occuring.
          * @param turns The number of turns the change takes if not immediate.
          */
@@ -129,7 +129,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
          * Helper to check if a change is available to a player.
          * This is useful when the change involves a transfer of ownership.
          *
-         * @param player The <code>Player</code> to test.
+         * @param player The {@code Player} to test.
          * @return True if the player can use the to-unit-type.
          */
         public boolean isAvailableTo(Player player) {
@@ -161,7 +161,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
      * Trivial constructor.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     public UnitChangeType(String id, Specification specification) {
         super(id, specification);
@@ -181,8 +181,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     /**
      * Add a new change for the given parameters.
      *
-     * @param from The <code>UnitType</code> that can change.
-     * @param to The <code>UnitType</code> to change to.
+     * @param from The {@code UnitType} that can change.
+     * @param to The {@code UnitType} to change to.
      * @param prob The percentage chance of the change occurring.
      * @param turns The number of turns the change will take, if not
      *     immediate.
@@ -197,8 +197,8 @@ public class UnitChangeType extends FreeColSpecObjectType {
     /**
      * Get the unit changes possible from a given unit type.
      *
-     * @param from The source <code>UnitType</code>.
-     * @return A list of <code>UnitChange</code>s.
+     * @param from The source {@code UnitType}.
+     * @return A list of {@code UnitChange}s.
      */
     public List<UnitChange> getUnitChanges(UnitType from) {
         List<UnitChange> ret = this.changes.get(from);
@@ -210,9 +210,9 @@ public class UnitChangeType extends FreeColSpecObjectType {
      * source unit type to change, and an optional destination unit type.
      *
      * @param id The identifier for the required change type.
-     * @param fromType The <code>UnitType</code> to change from.
-     * @param toType An optional <code>UnitType</code> to change to.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @param fromType The {@code UnitType} to change from.
+     * @param toType An optional {@code UnitType} to change to.
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(UnitType fromType, final UnitType toType) {

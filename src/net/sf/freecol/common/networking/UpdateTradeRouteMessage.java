@@ -39,10 +39,10 @@ public class UpdateTradeRouteMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>UpdateTradeRouteMessage</code> with the
+     * Create a new {@code UpdateTradeRouteMessage} with the
      * supplied trade route.
      *
-     * @param tradeRoute The <code>TradeRoute</code> to update.
+     * @param tradeRoute The {@code TradeRoute} to update.
      */
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
         super(getTagName());
@@ -51,11 +51,11 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>UpdateTradeRouteMessage</code> from a
+     * Create a new {@code UpdateTradeRouteMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public UpdateTradeRouteMessage(Game game, Element element) {
         super(getTagName());
@@ -67,8 +67,8 @@ public class UpdateTradeRouteMessage extends DOMMessage {
     /**
      * Handle a "updateTradeRoute"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      * @return Null, or an error message on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {

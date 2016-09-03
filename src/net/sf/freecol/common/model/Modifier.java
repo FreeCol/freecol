@@ -32,10 +32,10 @@ import org.w3c.dom.Element;
 
 
 /**
- * The <code>Modifier</code> class encapsulates a bonus or penalty
+ * The {@code Modifier} class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat. The Modifier may be applicable only to certain Objects
- * specified by means of <code>Scope</code> objects.
+ * specified by means of {@code Scope} objects.
  */
 public class Modifier extends Feature {
 
@@ -177,19 +177,19 @@ public class Modifier extends Feature {
     /**
      * Deliberately empty constructor.
      *
-     * @param specification The defining <code>Specification</code>.
+     * @param specification The defining {@code Specification}.
      */
     protected Modifier(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new {@code Modifier} instance.
      *
      * @param id The object identifier.
      * @param value The modifier value.
      * @param type The type of the modifier.
-     * @param source The source <code>FreeColObject</code>.
+     * @param source The source {@code FreeColObject}.
      * @param modifierIndex The modifier index.
      */
     public Modifier(String id, float value, ModifierType type,
@@ -204,12 +204,12 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new {@code Modifier} instance.
      *
      * @param id The object identifier.
      * @param value The modifier value.
      * @param type The type of the modifier.
-     * @param source The source <code>FreeColObject</code>.
+     * @param source The source {@code FreeColObject}.
      */
     public Modifier(String id, float value, ModifierType type,
                     FreeColObject source) {
@@ -217,7 +217,7 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new {@code Modifier} instance.
      *
      * @param id The object identifier.
      * @param value The modifier value.
@@ -228,9 +228,9 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance from another.
+     * Creates a new {@code Modifier} instance from another.
      *
-     * @param template A <code>Modifier</code> to copy.
+     * @param template A {@code Modifier} to copy.
      */
     public Modifier(Modifier template) {
         this(template.getSpecification());
@@ -244,11 +244,11 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance from another with
+     * Creates a new {@code Modifier} instance from another with
      * an identifier override.
      *
      * @param id The object identifier.
-     * @param template A <code>Modifier</code> to copy.
+     * @param template A {@code Modifier} to copy.
      */
     public Modifier(String id, Modifier template) {
         this(template);
@@ -256,10 +256,10 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new {@code Modifier} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is an error reading the
      *     stream.
      */
@@ -270,10 +270,10 @@ public class Modifier extends Feature {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new {@code Modifier} instance.
      *
-     * @param e The <code>Element</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param e The {@code Element} to read from.
+     * @param specification The {@code Specification} to refer to.
      */
     public Modifier(Element e, Specification specification) {
         this(specification);
@@ -291,8 +291,8 @@ public class Modifier extends Feature {
      * "model.modifier.colonyGoodsParty".
      *
      * @param id The id for the new modifier.
-     * @param template A template <code>Modifier</code> with increment.
-     * @param start The starting <code>Turn</code>.
+     * @param template A template {@code Modifier} with increment.
+     * @param start The starting {@code Turn}.
      * @return A new timed modifier.
      */
     public static Modifier makeTimedModifier(String id, Modifier template,
@@ -313,7 +313,7 @@ public class Modifier extends Feature {
     /**
      * Get the modifier type.
      *
-     * @return The <code>ModifierType</code>.
+     * @return The {@code ModifierType}.
      */
     public final ModifierType getType() {
         return modifierType;
@@ -322,7 +322,7 @@ public class Modifier extends Feature {
     /**
      * Set the modifier type.
      *
-     * @param modifierType The new <code>ModifierType</code> value.
+     * @param modifierType The new {@code ModifierType} value.
      * @return This modifier.
      */
     public final Modifier setType(final ModifierType modifierType) {
@@ -342,7 +342,7 @@ public class Modifier extends Feature {
     /**
      * Get the value the modifier during the given Turn.
      *
-     * @param turn The <code>Turn</code> to check.
+     * @param turn The {@code Turn} to check.
      * @return The turn-dependent modifier value.
      */
     public final float getValue(Turn turn) {
@@ -382,7 +382,7 @@ public class Modifier extends Feature {
     /**
      * Get the increment type.
      *
-     * @return The increment <code>ModifierType</code>.
+     * @return The increment {@code ModifierType}.
      */
     public final ModifierType getIncrementType() {
         return incrementType;
@@ -391,7 +391,7 @@ public class Modifier extends Feature {
     /**
      * Set the increment type.
      *
-     * @param incrementType The new increment <code>ModifierType</code>.
+     * @param incrementType The new increment {@code ModifierType}.
      * @return This modifier.
      */
     public final Modifier setIncrementType(final ModifierType incrementType) {
@@ -422,11 +422,11 @@ public class Modifier extends Feature {
     /**
      * Set the whole increment.
      *
-     * @param incrementType The new <code>ModifierType</code>.
+     * @param incrementType The new {@code ModifierType}.
      * @param increment The new increment value.
-     * @param firstTurn The first <code>Turn</code> the increment is
+     * @param firstTurn The first {@code Turn} the increment is
      *     active.
-     * @param lastTurn The last <code>Turn</code> the increment is
+     * @param lastTurn The last {@code Turn} the increment is
      *     active.
      * @return This modifier.
      */
@@ -467,9 +467,9 @@ public class Modifier extends Feature {
      * Applies the given value to the given base value, depending on
      * the type of this Modifier.
      *
-     * @param base a <code>float</code> value
-     * @param value a <code>float</code> value
-     * @return a <code>float</code> value
+     * @param base a {@code float} value
+     * @param value a {@code float} value
+     * @return a {@code float} value
      */
     public float apply(float base, float value) {
         return apply(base, value, getType());
@@ -481,7 +481,7 @@ public class Modifier extends Feature {
      *
      * @param base The base value.
      * @param value The modifier value.
-     * @param type The <code>ModifierType</code>.
+     * @param type The {@code ModifierType}.
      * @return The result of applying the value to the base.
      */
     private float apply(float base, float value, ModifierType type) {
@@ -501,8 +501,8 @@ public class Modifier extends Feature {
      * Applies this Modifier to a number. This method does not take
      * scopes, increments or time limits into account.
      *
-     * @param number a <code>float</code> value
-     * @return a <code>float</code> value
+     * @param number a {@code float} value
+     * @return a {@code float} value
      */
     public float applyTo(float number) {
         return apply(number, value);
@@ -513,7 +513,7 @@ public class Modifier extends Feature {
      * increments into account.
      *
      * @param number The number to modify.
-     * @param turn The <code>Turn</code> to evaluate increments in.
+     * @param turn The {@code Turn} to evaluate increments in.
      * @return The modified number.
      */
     public float applyTo(float number, Turn turn) {

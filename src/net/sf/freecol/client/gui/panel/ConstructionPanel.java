@@ -73,8 +73,8 @@ public class ConstructionPanel extends MigPanel
     /**
      * Creates a ConstructionPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colony The <code>Colony</code> whose construction is to be
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colony The {@code Colony} whose construction is to be
      *     modified.
      * @param openBuildQueue True if the build queue should be immediately
      *     shown.

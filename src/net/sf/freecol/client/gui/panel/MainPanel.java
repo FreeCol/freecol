@@ -54,7 +54,7 @@ public final class MainPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MainPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1, insets n n 20 n",

@@ -49,13 +49,13 @@ public abstract class Settlement extends GoodsLocation
 
     public static final int FOOD_PER_COLONIST = 200;
 
-    /** The <code>Player</code> owning this <code>Settlement</code>. */
+    /** The {@code Player} owning this <code>Settlement</code>. */
     protected Player owner;
 
     /** The name of the Settlement. */
     private String name;
 
-    /** The <code>Tile</code> where this <code>Settlement</code> is located. */
+    /** The {@code Tile} where this <code>Settlement</code> is located. */
     protected Tile tile;
 
     /** The type of settlement. */
@@ -69,12 +69,12 @@ public abstract class Settlement extends GoodsLocation
 
 
     /**
-     * Create a new <code>Settlement</code>.
+     * Create a new {@code Settlement}.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param owner The owning <code>Player</code>.
+     * @param game The enclosing {@code Game}.
+     * @param owner The owning {@code Player}.
      * @param name The settlement name.
-     * @param tile The containing <code>Tile</code>.
+     * @param tile The containing {@code Tile}.
      */
     public Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
@@ -86,11 +86,11 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Initiates a new <code>Settlement</code> with the given identifier.
+     * Initiates a new {@code Settlement} with the given identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Settlement(Game game, String id) {
@@ -110,7 +110,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Set the settlement type.
      *
-     * @param newType The new <code>SettlementType</code>.
+     * @param newType The new {@code SettlementType}.
      */
     public void setType(final SettlementType newType) {
         this.type = newType;
@@ -128,7 +128,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Change the settlement type, setting the consequent features.
      *
-     * @param newType The new <code>SettlementType</code>.
+     * @param newType The new {@code SettlementType}.
      */
     private final void changeType(final SettlementType newType) {
         if (type != null) removeFeatures(type);
@@ -169,7 +169,7 @@ public abstract class Settlement extends GoodsLocation
      * the map definition.  So we just accumulate and defend against
      * duplicates.
      *
-     * @param tile The <code>Tile</code> to add.
+     * @param tile The {@code Tile} to add.
      */
     public void addTile(Tile tile) {
         if (!ownedTiles.contains(tile)) ownedTiles.add(tile);
@@ -178,14 +178,14 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Removes a tile from this settlement.
      *
-     * @param tile The <code>Tile</code> to remove.
+     * @param tile The {@code Tile} to remove.
      */
     public void removeTile(Tile tile) {
         ownedTiles.remove(tile);
     }
 
     /**
-     * Gets the radius of what the <code>Settlement</code> considers
+     * Gets the radius of what the {@code Settlement} considers
      * as it's own land.
      *
      * @return Settlement radius
@@ -207,7 +207,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Gets an amount of plunder when this settlement is taken.
      *
-     * @param attacker The <code>Unit</code> that takes the settlement.
+     * @param attacker The {@code Unit} that takes the settlement.
      * @param random A pseudo-random number source.
      * @return An amount of gold plundered.
      */
@@ -279,15 +279,15 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Change the owner of this <code>Settlement</code>.
+     * Change the owner of this {@code Settlement}.
      *
      * Does not fix up the units!  That is handled in the server.
      *
      * -vis: Changes visibility.
      * -til: Changes tile appearance.
      *
-     * @param newOwner The <code>Player</code> that shall own this
-     *            <code>Settlement</code>.
+     * @param newOwner The {@code Player} that shall own this
+     *            {@code Settlement}.
      * @see #getOwner
      */
     public void changeOwner(Player newOwner) {
@@ -334,8 +334,8 @@ public abstract class Settlement extends GoodsLocation
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param goodsType a {@code GoodsType} value
+     * @return an {@code int} value
      */
     public int getConsumptionOf(GoodsType goodsType) {
         return Math.max(0, sum(getUnits(),
@@ -346,8 +346,8 @@ public abstract class Settlement extends GoodsLocation
      * Returns the number of goods of all given types used by the
      * settlement each turn.
      *
-     * @param goodsTypes <code>GoodsType</code> values
-     * @return an <code>int</code> value
+     * @param goodsTypes {@code GoodsType} values
+     * @return an {@code int} value
      */
     public int getConsumptionOf(List<GoodsType> goodsTypes) {
         return (goodsTypes == null) ? 0
@@ -368,7 +368,7 @@ public abstract class Settlement extends GoodsLocation
      * equipment.  Unlike priceGoods, this takes goods "reserved" for
      * other purposes into account (e.g. breeding).
      *
-     * @param goods A list of <code>AbstractGoods</code>
+     * @param goods A list of {@code AbstractGoods}
      * @return True if the settlement can provide the equipment.
      */
     public boolean canProvideGoods(List<AbstractGoods> goods) {
@@ -408,8 +408,8 @@ public abstract class Settlement extends GoodsLocation
      * Can this settlement provide the goods to improve a given unit's
      * role?
      *
-     * @param unit The <code>Unit</code> to check.
-     * @return The <code>Role</code> that this settlement could provide.
+     * @param unit The {@code Unit} to check.
+     * @return The {@code Role} that this settlement could provide.
      */
     public Role canImproveUnitMilitaryRole(Unit unit) {
         final Specification spec = getSpecification();
@@ -430,7 +430,7 @@ public abstract class Settlement extends GoodsLocation
      * Get all the units present here.  That is, not just the units in the
      * settlement but also the units on the tile.
      *
-     * @return A list of <code>Unit</code>s.
+     * @return A list of {@code Unit}s.
      */
     public List<Unit> getAllUnitsList() {
         List<Unit> units = getUnitList();
@@ -481,7 +481,7 @@ public abstract class Settlement extends GoodsLocation
     // Interface Nameable
 
     /**
-     * Get the name of this <code>Settlement</code>.
+     * Get the name of this {@code Settlement}.
      *
      * @return The settlement name.
      */
@@ -491,7 +491,7 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Sets the name of this <code>Settlement</code>.
+     * Sets the name of this {@code Settlement}.
      *
      * -til: Changes the tile appearance.
      *
@@ -645,13 +645,13 @@ public abstract class Settlement extends GoodsLocation
     public abstract String getImageKey();
 
     /**
-     * Gets the <code>Unit</code> that is currently defending this
-     * <code>Settlement</code>.
+     * Gets the {@code Unit} that is currently defending this
+     * {@code Settlement}.
      *
-     * @param attacker The <code>Unit</code> that is attacking this
-     *     <code>Settlement</code>.
-     * @return The <code>Unit</code> that has been chosen to defend
-     *     this <code>Settlement</code>.
+     * @param attacker The {@code Unit} that is attacking this
+     *     {@code Settlement}.
+     * @return The {@code Unit} that has been chosen to defend
+     *     this {@code Settlement}.
      */
     public abstract Unit getDefendingUnit(Unit attacker);
 
@@ -673,8 +673,8 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Gets the range of gold plunderable when this settlement is captured.
      *
-     * @param attacker The <code>Unit</code> that takes the settlement.
-     * @return A <code>RandomRange</code> encapsulating the range of plunder
+     * @param attacker The {@code Unit} that takes the settlement.
+     * @return A {@code RandomRange} encapsulating the range of plunder
      *     available.
      */
     public abstract RandomRange getPlunderRange(Unit attacker);
@@ -708,7 +708,7 @@ public abstract class Settlement extends GoodsLocation
      * Allow player == null as this is true in the map editor where
      * the user player is moot.
      *
-     * @param player The other <code>Player</code> to check.
+     * @param player The other {@code Player} to check.
      * @return True if the settlement has contacted the player.
      */
     public abstract boolean hasContacted(Player player);
@@ -717,8 +717,8 @@ public abstract class Settlement extends GoodsLocation
      * Gets a label indicating the alarm level at this settlement with
      * respect to another player.
      *
-     * @param player The other <code>Player</code>.
-     * @return A <code>StringTemplate</code> describing the alarm.
+     * @param player The other {@code Player}.
+     * @return A {@code StringTemplate} describing the alarm.
      */
     public abstract StringTemplate getAlarmLevelLabel(Player player);
 

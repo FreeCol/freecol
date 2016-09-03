@@ -43,9 +43,9 @@ public class UpdateMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>UpdateMessage</code>.
+     * Create a new {@code UpdateMessage}.
      *
-     * @param fcgos The list of <code>FreeColGameObject</code>s to add.
+     * @param fcgos The list of {@code FreeColGameObject}s to add.
      */
     public UpdateMessage(List<FreeColGameObject> fcgos) {
         super(getTagName());
@@ -55,11 +55,11 @@ public class UpdateMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>UpdateMessage</code> from a supplied
+     * Create a new {@code UpdateMessage} from a supplied
      * element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public UpdateMessage(Game game, Element element) {
         this(null);
@@ -76,7 +76,7 @@ public class UpdateMessage extends DOMMessage {
     /**
      * Get the objects attached to this message.
      *
-     * @return The list of <code>FreeColGameObject</code>s.
+     * @return The list of {@code FreeColGameObject}s.
      */
     public List<FreeColGameObject> getObjects() {
         return this.fcgos;
@@ -86,9 +86,9 @@ public class UpdateMessage extends DOMMessage {
     /**
      * Handle a "update"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
     public Element handle(FreeColServer server, Player player,

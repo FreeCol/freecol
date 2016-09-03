@@ -51,7 +51,7 @@ public final class DragListener extends MouseAdapter {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param parentPanel The layered pane that contains the
      *     components to which a DragListener might be attached.
      */

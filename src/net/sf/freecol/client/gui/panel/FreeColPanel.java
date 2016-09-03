@@ -71,7 +71,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public FreeColPanel(FreeColClient freeColClient) {
         this(freeColClient, new FlowLayout());
@@ -80,8 +80,8 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Default constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param layout The <code>LayoutManager</code> to be used.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param layout The {@code LayoutManager} to be used.
      */
     public FreeColPanel(FreeColClient freeColClient, LayoutManager layout) {
         super(layout);
@@ -99,7 +99,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the FreeColClient.
      *
-     * @return The current <code>FreeColClient</code>.
+     * @return The current {@code FreeColClient}.
      */
     protected FreeColClient getFreeColClient() {
         return freeColClient;
@@ -117,7 +117,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the game.
      *
-     * @return The current <code>Game</code>.
+     * @return The current {@code Game}.
      */
     protected Game getGame() {
         return freeColClient.getGame();
@@ -126,7 +126,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the GUI.
      *
-     * @return The current <code>GUI</code>.
+     * @return The current {@code GUI}.
      */
     protected SwingGUI getGUI() {
         return (SwingGUI)freeColClient.getGUI();
@@ -135,7 +135,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the image library.
      *
-     * @return The <code>ImageLibrary</code>.
+     * @return The {@code ImageLibrary}.
      */
     protected ImageLibrary getImageLibrary() {
         return getGUI().getImageLibrary();
@@ -144,7 +144,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the game specification.
      *
-     * @return The <code>Specification</code>.
+     * @return The {@code Specification}.
      */
     protected Specification getSpecification() {
         return freeColClient.getGame().getSpecification();
@@ -153,7 +153,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the player.
      *
-     * @return The client <code>Player</code>.
+     * @return The client {@code Player}.
      */
     protected Player getMyPlayer() {
         return freeColClient.getMyPlayer();
@@ -162,7 +162,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the client options.
      *
-     * @return The <code>ClientOptions</code>.
+     * @return The {@code ClientOptions}.
      */
     protected ClientOptions getClientOptions() {
         return (freeColClient == null) ? null
@@ -172,7 +172,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Get the client controller.
      *
-     * @return The client <code>InGameController</code>.
+     * @return The client {@code InGameController}.
      */
     protected InGameController igc() {
         return freeColClient.getInGameController();
@@ -181,7 +181,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Create a button for a colony.
      *
-     * @param colony The <code>Colony</code> to create a button for.
+     * @param colony The {@code Colony} to create a button for.
      * @return The new button.
      */
     public JButton createColonyButton(Colony colony) {
@@ -194,7 +194,7 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
     /**
      * Make the given button the CANCEL button.
      *
-     * @param cancelButton an <code>AbstractButton</code> value
+     * @param cancelButton an {@code AbstractButton} value
      */
     public final void setCancelComponent(AbstractButton cancelButton) {
         if (cancelButton == null) throw new NullPointerException();

@@ -68,11 +68,11 @@ public class NumberRules {
 
 
     /**
-     * Creates a new <code>NumberRules</code> instance from the given
+     * Creates a new {@code NumberRules} instance from the given
      * input stream, which must contain an XML representation of the
      * CLDR plural rules.
      *
-     * @param in an <code>InputStream</code> value
+     * @param in an {@code InputStream} value
      */
     public NumberRules(InputStream in) {
         load(in);
@@ -83,8 +83,8 @@ public class NumberRules {
      * Returns a rule appropriate for the given language, or the
      * OTHER_NUMBER_RULE if none has been defined.
      *
-     * @param lang a <code>String</code> value
-     * @return a <code>Number</code> value
+     * @param lang a {@code String} value
+     * @return a {@code Number} value
      */
     public static Number getNumberForLanguage(String lang) {
         Number number = numberMap.get(lang);

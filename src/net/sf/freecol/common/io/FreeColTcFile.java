@@ -84,7 +84,7 @@ public class FreeColTcFile extends FreeColModFile {
      * Helper to filter suitable file candidates to be made into
      * FreeColTcFiles with {@see FreeColTcFile::make}
      *
-     * @param f The <code>File</code> to examine.
+     * @param f The {@code File} to examine.
      * @return True if the file is suitable.
      */
     public static boolean fileFilter(File f) {
@@ -94,8 +94,8 @@ public class FreeColTcFile extends FreeColModFile {
     /**
      * Helper to make a TC file from a given file, logging the exception.
      *
-     * @param f The <code>File</code> to try to make the TC from.
-     * @return A new <code>FreeColTcFile</code>, or null on error.
+     * @param f The {@code File} to try to make the TC from.
+     * @return A new {@code FreeColTcFile}, or null on error.
      */
     public static FreeColTcFile make(File f) {
         try {

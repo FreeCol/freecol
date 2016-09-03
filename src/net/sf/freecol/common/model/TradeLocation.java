@@ -30,7 +30,7 @@ public interface TradeLocation {
     /**
      * Get the amount of a given goods type at this trade location.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return The amount of goods present.
      */
     public int getGoodsCount(GoodsType goodsType);
@@ -39,7 +39,7 @@ public interface TradeLocation {
      * Gets the amount of a given goods type that can be exported from
      * this trade location after a given number of turns.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @param turns The number of turns before the goods is required.
      * @return The amount of goods to export.
      */
@@ -49,7 +49,7 @@ public interface TradeLocation {
      * Gets the amount of a given goods type that can be imported to
      * this trade location after a given number of turns.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @param turns The number of turns before the goods will arrive.
      * @return The amount of goods to import.
      */

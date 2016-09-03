@@ -46,11 +46,11 @@ public class AssignTradeRouteMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AssignTradeRouteMessage</code> with the
+     * Create a new {@code AssignTradeRouteMessage} with the
      * supplied unit and route.
      *
-     * @param unit The <code>Unit</code> to assign a trade route to.
-     * @param tradeRoute The <code>TradeRoute</code> to assign.
+     * @param unit The {@code Unit} to assign a trade route to.
+     * @param tradeRoute The {@code TradeRoute} to assign.
      */
     public AssignTradeRouteMessage(Unit unit, TradeRoute tradeRoute) {
         super(getTagName());
@@ -60,11 +60,11 @@ public class AssignTradeRouteMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AssignTradeRouteMessage</code> from a
+     * Create a new {@code AssignTradeRouteMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AssignTradeRouteMessage(Game game, Element element) {
         super(getTagName());
@@ -77,10 +77,10 @@ public class AssignTradeRouteMessage extends DOMMessage {
     /**
      * Handle a "assignTradeRoute"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> that sent the message.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return An <code>Element</code> to update the originating
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} that sent the message.
+     * @param connection The {@code Connection} message was received on.
+     * @return An {@code Element} to update the originating
      *     player with the result of the demand.
      */
     public Element handle(FreeColServer server, Player player,

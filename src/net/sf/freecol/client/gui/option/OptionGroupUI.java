@@ -71,8 +71,8 @@ public final class OptionGroupUI extends MigPanel
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param gui The enclosing <code>GUI</code>.
-     * @param group The <code>OptionGroup</code> encapsulate.
+     * @param gui The enclosing {@code GUI}.
+     * @param group The {@code OptionGroup} encapsulate.
      * @param editable Is the group editable.
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
@@ -126,7 +126,7 @@ public final class OptionGroupUI extends MigPanel
      * Builds the JTree which represents the navigation menu and then
      * returns it
      *
-     * @param group The <code>OptionGroup</code> to build from.
+     * @param group The {@code OptionGroup} to build from.
      * @param parent The tree to build onto.
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
@@ -168,10 +168,10 @@ public final class OptionGroupUI extends MigPanel
     }
 
     /**
-     * Removes the given <code>KeyStroke</code> from all of this
-     * <code>OptionGroupUI</code>'s children.
+     * Removes the given {@code KeyStroke} from all of this
+     * {@code OptionGroupUI}'s children.
      *
-     * @param keyStroke The <code>KeyStroke</code> to be removed.
+     * @param keyStroke The {@code KeyStroke} to be removed.
      */
     public void removeKeyStroke(KeyStroke keyStroke) {
         for (OptionUpdater optionUpdater : optionUpdaters) {

@@ -50,11 +50,11 @@ public class SetBuildQueueMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>SetBuildQueueMessage</code> for the
+     * Create a new {@code SetBuildQueueMessage} for the
      * supplied colony and queue.
      *
-     * @param colony The <code>Colony</code> where the queue is.
-     * @param queue A list of <code>BuildableType</code>s to build.
+     * @param colony The {@code Colony} where the queue is.
+     * @param queue A list of {@code BuildableType}s to build.
      */
     public SetBuildQueueMessage(Colony colony, List<BuildableType> queue) {
         super(getTagName());
@@ -65,11 +65,11 @@ public class SetBuildQueueMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>SetBuildQueueMessage</code> from a
+     * Create a new {@code SetBuildQueueMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public SetBuildQueueMessage(Game game, Element element) {
         super(getTagName());
@@ -97,12 +97,12 @@ public class SetBuildQueueMessage extends DOMMessage {
     /**
      * Handle a "setBuildQueue"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
      * @return An update containing the new queue
-     *         or an error <code>Element</code> on failure.
+     *         or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

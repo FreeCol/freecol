@@ -79,8 +79,8 @@ public class SoundPlayer {
     /**
      * Gets an audio input stream given a file, hopefully containing audio data.
      *
-     * @param file The <code>File</code> to test.
-     * @return An <code>AudioInputStream</code>, or null on failure.
+     * @param file The {@code File} to test.
+     * @return An {@code AudioInputStream}, or null on failure.
      * @throws Exception if the file does not contain valid audio.
      */
     public static AudioInputStream getAudioInputStream(File file)
@@ -133,7 +133,7 @@ public class SoundPlayer {
     /**
      * Plays a file once.
      *
-     * @param file The <code>File</code> to be played.
+     * @param file The {@code File} to be played.
      */
     public void playOnce(File file) {
         if (getMixer() == null) return; // Fail faster.
@@ -296,7 +296,7 @@ public class SoundPlayer {
         /**
          * Play a sound.
          *
-         * @param in The <code>AudioInputStream</code> to play.
+         * @param in The {@code AudioInputStream} to play.
          * @return True if the stream was played without incident.
          * @exception IOException if unable to read or write the sound data.
          */

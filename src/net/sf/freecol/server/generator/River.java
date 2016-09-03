@@ -135,7 +135,7 @@ public class River {
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
      * @param region The region for this river.
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      */
     public River(Map map, java.util.Map<Tile, River> riverMap,
                  ServerRegion region, Random random) {
@@ -168,16 +168,16 @@ public class River {
     }
 
     /**
-     * Get the <code>ServerRegion</code> value.
+     * Get the {@code ServerRegion} value.
      *
-     * @return a <code>ServerRegion</code> value
+     * @return a {@code ServerRegion} value
      */
     public final ServerRegion getRegion() {
         return region;
     }
 
     /**
-     * Set the <code>ServerRegion</code> value.
+     * Set the {@code ServerRegion} value.
      *
      * @param newServerRegion The new ServerRegion value.
      */
@@ -188,8 +188,8 @@ public class River {
     /**
      * Adds a new section to this river.
      *
-     * @param tile The <code>Tile</code> where this section is located.
-     * @param direction The <code>Direction</code> the river is flowing in.
+     * @param tile The {@code Tile} where this section is located.
+     * @param direction The {@code Direction} the river is flowing in.
      */
     public void add(Tile tile, Direction direction) {
         this.sections.add(new RiverSection(tile, direction));
@@ -199,7 +199,7 @@ public class River {
      * Increases the size of this river.
      *
      * @param lastSection The last section of the river flowing into this one.
-     * @param tile The <code>Tile</code> of the confluence.
+     * @param tile The {@code Tile} of the confluence.
      */
     public void grow(RiverSection lastSection, Tile tile) {
 
@@ -261,7 +261,7 @@ public class River {
     /**
      * Creates a river flowing from the given tile if possible.
      *
-     * @param tile An origin map <code>Tile</code>.
+     * @param tile An origin map {@code Tile}.
      * @return True if a river was created, false otherwise.
      */
     public boolean flowFromSource(Tile tile) {
@@ -398,7 +398,7 @@ public class River {
     /**
      * Draws the completed river to the map.
      *
-     * @param sections A list of <code>RiverSection</code>s to draw.
+     * @param sections A list of {@code RiverSection}s to draw.
      */
     private void drawToMap(List<RiverSection> sections) {
         RiverSection oldSection = null;

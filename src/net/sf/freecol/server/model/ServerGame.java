@@ -91,7 +91,7 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Creates a new game model.
      *
-     * @param specification The <code>Specification</code> to use in this game.
+     * @param specification The {@code Specification} to use in this game.
      * @see net.sf.freecol.server.FreeColServer
      */
     public ServerGame(Specification specification) {
@@ -102,11 +102,11 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
     /**
-     * Initiate a new <code>ServerGame</code> with information from a
+     * Initiate a new {@code ServerGame} with information from a
      * saved game.
      *
      * @param xr The input stream containing the XML.
-     * @param specification The <code>Specification</code> to use in this game.
+     * @param specification The {@code Specification} to use in this game.
      * @exception XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
@@ -123,7 +123,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * Get a list of connected server players, optionally excluding
      * supplied ones.
      *
-     * @param serverPlayers The <code>ServerPlayer</code>s to exclude.
+     * @param serverPlayers The {@code ServerPlayer}s to exclude.
      * @return A list of all connected server players, with exclusions.
      */
     public List<ServerPlayer> getConnectedPlayers(ServerPlayer... serverPlayers) {
@@ -136,8 +136,8 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Send a change set to all live players, and optional extras.
      *
-     * @param cs The <code>ChangeSet</code> to send.
-     * @param serverPlayers Optional extra <code>ServerPlayer</code>s
+     * @param cs The {@code ChangeSet} to send.
+     * @param serverPlayers Optional extra {@code ServerPlayer}s
      *     to include (useful when a player dies).
      */
     public void sendToAll(ChangeSet cs, ServerPlayer... serverPlayers) {
@@ -147,8 +147,8 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Send a change set to all players, optionally excluding one.
      *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
-     * @param cs The <code>ChangeSet</code> encapsulating the update.
+     * @param serverPlayer A {@code ServerPlayer} to exclude.
+     * @param cs The {@code ChangeSet} encapsulating the update.
      */
     public void sendToOthers(ServerPlayer serverPlayer, ChangeSet cs) {
         sendToList(getConnectedPlayers(serverPlayer), cs);
@@ -157,8 +157,8 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Send a change set to a list of players.
      *
-     * @param serverPlayers The list of <code>ServerPlayer</code>s to send to.
-     * @param cs The <code>ChangeSet</code> to send.
+     * @param serverPlayers The list of {@code ServerPlayer}s to send to.
+     * @param cs The {@code ChangeSet} to send.
      */
     public void sendToList(List<ServerPlayer> serverPlayers, ChangeSet cs) {
         for (ServerPlayer s : serverPlayers) sendTo(s, cs);
@@ -167,8 +167,8 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Send a change set to one player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to send to.
-     * @param cs The <code>ChangeSet</code> to send.
+     * @param serverPlayer The {@code ServerPlayer} to send to.
+     * @param cs The {@code ChangeSet} to send.
      */
     public void sendTo(ServerPlayer serverPlayer, ChangeSet cs) {
         serverPlayer.send(cs);
@@ -177,9 +177,9 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Asks a question of a player with a timeout.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to ask.
+     * @param serverPlayer The {@code ServerPlayer} to ask.
      * @param timeout The timeout, in seconds.
-     * @param request The <code>DOMMessage</code> question.
+     * @param request The {@code DOMMessage} question.
      * @return The response to the question, or null if none.
      */
     public DOMMessage askTimeout(final ServerPlayer serverPlayer, int timeout,
@@ -244,7 +244,7 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Update the players.
      *
-     * @param players A list of new <code>ServerPlayer</code>s.
+     * @param players A list of new {@code ServerPlayer}s.
      */
     public void updatePlayers(List<ServerPlayer> players) {
         ChangeSet cs = new ChangeSet();
@@ -253,7 +253,7 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
     /**
-     * Get a unique identifier to identify a <code>FreeColGameObject</code>.
+     * Get a unique identifier to identify a {@code FreeColGameObject}.
      * 
      * @return A unique identifier.
      */
@@ -276,7 +276,7 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Checks if anybody has won this game.
      *
-     * @return The <code>Player</code> who has won the game or null if none.
+     * @return The {@code Player} who has won the game or null if none.
      */
     public Player checkForWinner() {
         final Specification spec = getSpecification();
@@ -314,7 +314,7 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Change to the next turn for this game.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csNextTurn(ChangeSet cs) {
         String duration = null;
@@ -334,9 +334,9 @@ public class ServerGame extends Game implements ServerModelObject {
     /**
      * Build the updates for a new turn for all the players in this game.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -361,10 +361,10 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * Visibility changes for the winner, loser is killed/irrelevant.
      *
-     * @param cs A <code>ChangeSet</code> to update.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param event The Spanish Succession <code>Event</code>.
-     * @return The <code>ServerPlayer</code> that is eliminated if
+     * @param cs A {@code ChangeSet} to update.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param event The Spanish Succession {@code Event}.
+     * @return The {@code ServerPlayer} that is eliminated if
      *     any, or null if none found.
      */
     private ServerPlayer csSpanishSuccession(ChangeSet cs, LogBuilder lb,

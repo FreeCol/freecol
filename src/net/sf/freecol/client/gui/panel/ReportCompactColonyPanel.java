@@ -185,8 +185,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
         /**
          * Create the colony summary.
          *
-         * @param colony The <code>Colony</code> to summarize.
-         * @param goodsTypes A list of <code>GoodsType</code>s to include
+         * @param colony The {@code Colony} to summarize.
+         * @param goodsTypes A list of {@code GoodsType}s to include
          *     in the summary.
          */
         public ColonySummary(Colony colony, List<GoodsType> goodsTypes) {
@@ -271,7 +271,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
         /**
          * Set the production map values for the given goods type.
          *
-         * @param goodsType The <code>GoodsType</code> to use.
+         * @param goodsType The {@code GoodsType} to use.
          */
         private void produce(GoodsType goodsType) {
             final ExportData exportData = colony.getExportData(goodsType);
@@ -372,7 +372,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     /**
      * Creates a compact colony report.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportCompactColonyPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportColonyAction");
@@ -475,7 +475,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     /**
      * Update a single colony.
      *
-     * @param s The <code>ColonySummary</code> to update from.
+     * @param s The {@code ColonySummary} to update from.
      */
     private void updateColony(ColonySummary s) {
         final String cac = s.colony.getId();
@@ -881,7 +881,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     /**
      * Update several colonies.
      *
-     * @param summaries A list of <code>ColonySummary</code>s to update from.
+     * @param summaries A list of {@code ColonySummary}s to update from.
      */
     private void updateCombinedColonies(List<ColonySummary> summaries) {
         JLabel l;
@@ -1050,7 +1050,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
     /**
      * Display the header area for the concise panel.
      *
-     * @param market A <code>Market</code> to check goods arrears
+     * @param market A {@code Market} to check goods arrears
      *     status with.
      */
     private void conciseHeaders(Market market) {

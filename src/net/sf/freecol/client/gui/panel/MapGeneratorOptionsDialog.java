@@ -66,7 +66,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     /**
      * Creates a dialog to set the map generator options.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param editable Whether the options may be edited.
      */
@@ -128,7 +128,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * map, because the text field is under mapGeneratorOptions.import.
      * Hence the null tests against the OptionUIs.
      *
-     * @param file The new map <code>File</code>.
+     * @param file The new map {@code File}.
      */
     private void updateFile(File file) {
         final OptionGroup mgo = getGroup();
@@ -174,8 +174,8 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
     /**
      * Make a map button for a given map file.
      *
-     * @param file The map <code>File</code>.
-     * @return A <code>JButton</code> if the map is readable, or null
+     * @param file The map {@code File}.
+     * @return A {@code JButton} if the map is readable, or null
      *     on failure.
      */
     private JButton makeMapButton(File file) {

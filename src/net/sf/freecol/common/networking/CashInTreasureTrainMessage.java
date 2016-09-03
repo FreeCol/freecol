@@ -41,10 +41,10 @@ public class CashInTreasureTrainMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>CashInTreasureTrainMessage</code> with the
+     * Create a new {@code CashInTreasureTrainMessage} with the
      * supplied name.
      *
-     * @param unit The <code>Unit</code> to cash in.
+     * @param unit The {@code Unit} to cash in.
      */
     public CashInTreasureTrainMessage(Unit unit) {
         super(getTagName());
@@ -53,11 +53,11 @@ public class CashInTreasureTrainMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>CashInTreasureTrainMessage</code> from a
+     * Create a new {@code CashInTreasureTrainMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public CashInTreasureTrainMessage(Game game, Element element) {
         super(getTagName());
@@ -69,11 +69,11 @@ public class CashInTreasureTrainMessage extends DOMMessage {
     /**
      * Handle a "cashInTreasureTrain"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update resulting from cashing in the treasure train,
-     *     or an error <code>Element</code> on failure.
+     *     or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

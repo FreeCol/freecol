@@ -22,23 +22,23 @@ package net.sf.freecol.common.model;
 
 
 /**
- * Interface for objects which can be owned by a <code>Player</code>.
+ * Interface for objects which can be owned by a {@code Player}.
  * @see Player
  */
 public interface Ownable {
 
     /**
-     * Gets the owner of this <code>Ownable</code>.
+     * Gets the owner of this {@code Ownable}.
      *
-     * @return The <code>Player</code> controlling this <code>Ownable</code>.
+     * @return The {@code Player} controlling this <code>Ownable</code>.
      */
     public Player getOwner();
 
     /**
-     * Sets the owner of this <code>Ownable</code>.
+     * Sets the owner of this {@code Ownable}.
      *
-     * @param p The <code>Player</code> that should take ownership
-     *     of this <code>Ownable</code>.
+     * @param p The {@code Player} that should take ownership
+     *     of this {@code Ownable}.
      * @exception UnsupportedOperationException if not implemented.
      */
     public void setOwner(Player p);

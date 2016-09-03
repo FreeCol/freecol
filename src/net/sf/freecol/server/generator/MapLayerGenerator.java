@@ -31,15 +31,15 @@ public interface MapLayerGenerator {
      * Generates the layer in the map of the given game. Returns true
      * if the layer was generated, and false otherwise.
      *
-     * @param game a <code>Game</code> value
-     * @return a <code>boolean</code> value
+     * @param game a {@code Game} value
+     * @return a {@code boolean} value
      */
     public boolean generateLayer(Game game);
 
     /**
      * Returns the Layer this MapLayerGenerator is able to generate.
      *
-     * @return a <code>Layer</code> value
+     * @return a {@code Layer} value
      */
     public Layer getLayer();
 

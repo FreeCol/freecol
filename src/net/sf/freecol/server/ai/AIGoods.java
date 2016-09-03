@@ -56,7 +56,7 @@ public class AIGoods extends TransportableAIObject {
 
 
     /**
-     * Creates a new uninitialized <code>AIGoods</code>.
+     * Creates a new uninitialized {@code AIGoods}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -69,14 +69,14 @@ public class AIGoods extends TransportableAIObject {
     }
 
     /**
-     * Creates a new <code>AIGoods</code>.
+     * Creates a new {@code AIGoods}.
      *
      * @param aiMain The main AI-object.
      * @param location The location of the goods.
      * @param type The type of goods.
      * @param amount The amount of goods.
      * @param destination The destination of the goods. This is the
-     *      <code>Location</code> to which the goods should be transported.
+     *      {@code Location} to which the goods should be transported.
      */
     public AIGoods(AIMain aiMain, Location location, GoodsType type,
                    int amount, Location destination) {
@@ -89,7 +89,7 @@ public class AIGoods extends TransportableAIObject {
     }
 
     /**
-     * Creates a new <code>AIGoods</code> from the given
+     * Creates a new {@code AIGoods} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -106,34 +106,34 @@ public class AIGoods extends TransportableAIObject {
 
 
     /**
-     * Gets the goods this <code>AIGoods</code> is controlling.
+     * Gets the goods this {@code AIGoods} is controlling.
      *
-     * @return The <code>Goods</code>.
+     * @return The {@code Goods}.
      */
     public final Goods getGoods() {
         return goods;
     }
 
     /**
-     * Sets the goods this <code>AIGoods</code> is controlling.
+     * Sets the goods this {@code AIGoods} is controlling.
      *
-     * @param goods The new <code>Goods</code>.
+     * @param goods The new {@code Goods}.
      */
     public final void setGoods(Goods goods) {
         this.goods = goods;
     }
 
     /**
-     * Gets the type of goods this <code>AIGoods</code> is controlling.
+     * Gets the type of goods this {@code AIGoods} is controlling.
      *
-     * @return The <code>GoodsType</code>.
+     * @return The {@code GoodsType}.
      */
     public final GoodsType getGoodsType() {
         return goods.getType();
     }
 
     /**
-     * Gets the amount of goods this <code>AIGoods</code> is controlling.
+     * Gets the amount of goods this {@code AIGoods} is controlling.
      *
      * @return The amount of goods.
      */
@@ -142,7 +142,7 @@ public class AIGoods extends TransportableAIObject {
     }
 
     /**
-     * Sets the amount of goods this <code>AIGoods</code> is controlling.
+     * Sets the amount of goods this {@code AIGoods} is controlling.
      *
      * @param amount The new amount of goods.
      */

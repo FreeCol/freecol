@@ -45,7 +45,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 
 /**
  * The menu bar that is displayed on the top left corner of the
- * <code>Canvas</code>.
+ * {@code Canvas}.
  */
 public abstract class FreeColMenuBar extends JMenuBar {
 
@@ -57,7 +57,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
 
     /**
-     * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
+     * Creates a new {@code FreeColMenuBar}. This menu bar will include
      * all of the submenus and items.
      *
      * @param f The main controller.
@@ -131,9 +131,9 @@ public abstract class FreeColMenuBar extends JMenuBar {
      *
      * @param actionId The identifier given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
-     * @param actionListener An <code>ActionListener</code> that will be
+     * @param actionListener An {@code ActionListener} that will be
      *      added to the menu item.
-     * @return The menu item with the <code>ActionListener</code> added.
+     * @return The menu item with the {@code ActionListener} added.
      */
     protected JMenuItem getMenuItem(String actionId,
                                     ActionListener actionListener) {
@@ -145,7 +145,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
     }
 
     /**
-     * Creates a default FreeCol <code>JCheckBoxMenuItem</code>.
+     * Creates a default FreeCol {@code JCheckBoxMenuItem}.
      *
      * @param actionId The identifier given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
@@ -170,11 +170,11 @@ public abstract class FreeColMenuBar extends JMenuBar {
     }
 
     /**
-     * Creates a default FreeCol <code>JRadioButtonMenuItem</code>.
+     * Creates a default FreeCol {@code JRadioButtonMenuItem}.
      *
      * @param actionId The identifier given to the
      *      {@link ActionManager#getFreeColAction(String) action manager}.
-     * @param group The <code>ButtonGroup</code> to add this item to
+     * @param group The {@code ButtonGroup} to add this item to
      * @return The menu item.
      */
     protected JRadioButtonMenuItem getRadioButtonMenuItem(String actionId,
@@ -198,14 +198,14 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
 
     /**
-     * Updates this <code>FreeColMenuBar</code>.
+     * Updates this {@code FreeColMenuBar}.
      */
     public void update() {
         repaint();
     }
 
     /**
-     * When a <code>FreeColMenuBar</code> is disabled, it does not show the
+     * When a {@code FreeColMenuBar} is disabled, it does not show the
      * "in game options".
      */
     @Override

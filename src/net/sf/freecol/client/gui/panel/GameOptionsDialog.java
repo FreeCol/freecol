@@ -37,7 +37,7 @@ public final class GameOptionsDialog extends OptionsDialog {
     /**
      * Creates a game options dialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param editable Whether the game options can be modified.
      * @param custom Whether to load custom options.

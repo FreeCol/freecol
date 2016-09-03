@@ -58,7 +58,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * Fundamental constructor.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     private Goods(Game game) {
         if (game == null) throw new RuntimeException("Null game");
@@ -66,12 +66,12 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
     
     /**
-     * Creates a standard <code>Goods</code>-instance given the place where
+     * Creates a standard {@code Goods}-instance given the place where
      * the goods is.
      *
      * Used by FreeColGameObject.newInstance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The identifier (ignored, type gives identifier here).
      */
     public Goods(Game game, @SuppressWarnings("unused") String id) {
@@ -79,16 +79,16 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
     
     /**
-     * Creates a standard <code>Goods</code>-instance given the place
+     * Creates a standard {@code Goods}-instance given the place
      * where the goods is.
      *
      * This constructor only asserts that the game and that the
      * location (if given) can store goods. The goods will not be
      * added to the location (use Location.add for this).
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param location The <code>Location</code> of the goods (may be null).
-     * @param type The <code>GoodsType</code> for the goods.
+     * @param game The enclosing {@code Game}.
+     * @param location The {@code Location} of the goods (may be null).
+     * @param type The {@code GoodsType} for the goods.
      * @param amount The amount of the goods.
      */
     public Goods(Game game, Location location, GoodsType type, int amount) {
@@ -107,10 +107,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
 
     /**
-     * Creates a new <code>Goods</code> instance.
+     * Creates a new {@code Goods} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if an error occurs
      */
     public Goods(Game game, FreeColXMLReader xr) throws XMLStreamException {

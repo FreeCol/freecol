@@ -67,11 +67,11 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
 
     /**
-     * Creates a new <code>ListOptionUI</code> for the given
-     * <code>ListOption</code>.
+     * Creates a new {@code ListOptionUI} for the given
+     * {@code ListOption}.
      *
-     * @param gui The <code>GUI</code> to display on.
-     * @param option The <code>ListOption</code> to display.
+     * @param gui The {@code GUI} to display on.
+     * @param option The {@code ListOption} to display.
      * @param editable boolean whether user can modify the setting
      */
     public ListOptionUI(final GUI gui, final ListOption<T> option,

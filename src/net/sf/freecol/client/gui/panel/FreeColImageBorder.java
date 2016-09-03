@@ -68,7 +68,7 @@ public class FreeColImageBorder extends AbstractBorder {
 
     /**
      * Creates a border with the given set of images.
-     * Needs <code>BufferedImage</code> objects, because the images will
+     * Needs {@code BufferedImage} objects, because the images will
      * be used as Textures for the border.
      *
      * @param topLeftCornerImage NW-corner
@@ -101,8 +101,8 @@ public class FreeColImageBorder extends AbstractBorder {
     /**
      * Gets the insets of this border around the given component.
      *
-     * @param c The <code>Component</code> having the border.
-     * @return The <code>Insets</code>.
+     * @param c The {@code Component} having the border.
+     * @return The {@code Insets}.
      */    
     @Override
     public Insets getBorderInsets(Component c) {
@@ -112,10 +112,10 @@ public class FreeColImageBorder extends AbstractBorder {
     /**
      * Gets the insets of this border around the given component.
      *
-     * @param c The <code>Component</code> having the border.
-     * @param insets An instance of <code>Insets</code> to be updated.
-     * @return The given instance of <code>Insets</code> if not
-     *      <code>null</code>, or a new instance otherwise.
+     * @param c The {@code Component} having the border.
+     * @param insets An instance of {@code Insets} to be updated.
+     * @return The given instance of {@code Insets} if not
+     *      {@code null}, or a new instance otherwise.
      */
     @Override
     public Insets getBorderInsets(Component c, Insets insets) {        
@@ -151,8 +151,8 @@ public class FreeColImageBorder extends AbstractBorder {
     /**
      * Paints the border on the given component.
      *
-     * @param c The <code>Component</code> to draw the border on.
-     * @param g The <code>Graphics</code> used for painting the border.
+     * @param c The {@code Component} to draw the border on.
+     * @param g The {@code Graphics} used for painting the border.
      * @param x The x-component of the offset.
      * @param y The y-component of the offset.
      * @param width The width of the border.

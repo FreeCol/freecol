@@ -49,11 +49,11 @@ public class AskSkillMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AskSkillMessage</code> with the
+     * Create a new {@code AskSkillMessage} with the
      * supplied unit and direction.
      *
-     * @param unit The <code>Unit</code> that is asking.
-     * @param direction The <code>Direction</code> the unit is looking.
+     * @param unit The {@code Unit} that is asking.
+     * @param direction The {@code Direction} the unit is looking.
      */
     public AskSkillMessage(Unit unit, Direction direction) {
         super(getTagName());
@@ -63,11 +63,11 @@ public class AskSkillMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AskSkillMessage</code> from a
+     * Create a new {@code AskSkillMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AskSkillMessage(Game game, Element element) {
         super(getTagName());
@@ -80,11 +80,11 @@ public class AskSkillMessage extends DOMMessage {
     /**
      * Handle a "askSkill"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
-     * @return An <code>Element</code> to update the originating player
+     * @return An {@code Element} to update the originating player
      *         with the result of the query.
      */
     public Element handle(FreeColServer server, Player player,

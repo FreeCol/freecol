@@ -66,11 +66,11 @@ public class CashInTreasureTrainMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code> for this mission.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location} for this mission.
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
                                       Location target) {
@@ -78,11 +78,11 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Creates a new <code>CashInTreasureTrainMission</code> and reads
+     * Creates a new {@code CashInTreasureTrainMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -98,8 +98,8 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Assign a carrier for this treasure.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A suitable carrier <code>AIUnit</code>, to which this unit
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A suitable carrier {@code AIUnit}, to which this unit
      *     has been queued for transport.
      */
     private AIUnit assignCarrier(LogBuilder lb) {
@@ -135,8 +135,8 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from,
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
@@ -155,8 +155,8 @@ public class CashInTreasureTrainMission extends Mission {
      * Evaluate a potential cashin mission for a given unit and
      * path.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -172,10 +172,10 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Makes a goal decider that checks cash in sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to search with.
+     * @param aiUnit The {@code AIUnit} to search with.
      * @param deferOK Keep track of the nearest colonies to use as a
      *     fallback destination.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
@@ -212,10 +212,10 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Find a suitable cash in location for this unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range The maximum number of moves to search.
      * @param deferOK Enables deferring to a fallback colony.
-     * @return A <code>PathNode</code> to the target, or null if not found
+     * @return A {@code PathNode} to the target, or null if not found
      *     which includes the case when Europe should be preferred (because
      *     the unit can not get there by itself).
      */
@@ -247,10 +247,10 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Finds a suitable cashin target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @param range The maximum number of moves to search.
      * @param deferOK Enables deferring to a fallback colony.
-     * @return A <code>PathNode</code> to the target, or null if none found.
+     * @return A {@code PathNode} to the target, or null if none found.
      */
     public static Location findTarget(AIUnit aiUnit, int range, 
                                       boolean deferOK) {
@@ -263,7 +263,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -280,8 +280,8 @@ public class CashInTreasureTrainMission extends Mission {
      * Why is this mission invalid with a given colony target, given that
      * intermediate colonies are excluded.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The potential target <code>Colony</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The potential target {@code Colony}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidFullColonyReason(AIUnit aiUnit,
@@ -299,8 +299,8 @@ public class CashInTreasureTrainMission extends Mission {
      * Why is this mission invalid with a given colony target, given that
      * intermediate colonies are included.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The potential target <code>Colony</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The potential target {@code Colony}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
@@ -310,8 +310,8 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Why is this mission invalid with a given Europe target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param europe The potential target <code>Europe</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param europe The potential target {@code Europe}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidEuropeReason(AIUnit aiUnit, Europe europe) {
@@ -321,8 +321,8 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
@@ -339,7 +339,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {

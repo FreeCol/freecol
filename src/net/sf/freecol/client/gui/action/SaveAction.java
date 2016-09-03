@@ -33,7 +33,7 @@ public class SaveAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>SaveAction</code>.
+     * Creates a new {@code SaveAction}.
      *
      * @param freeColClient The main controller object for the client.
      */

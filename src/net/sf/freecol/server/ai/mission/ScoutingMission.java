@@ -67,21 +67,21 @@ public class ScoutingMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location}.
      */
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);
     }
 
     /**
-     * Creates a new <code>ScoutingMission</code> and reads the given element.
+     * Creates a new {@code ScoutingMission} and reads the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
@@ -97,7 +97,7 @@ public class ScoutingMission extends Mission {
     /**
      * Does a supplied unit have horses?
      *
-     * @param aiUnit The scout <code>AIUnit</code> to check.
+     * @param aiUnit The scout {@code AIUnit} to check.
      * @return True if the scout has horses.
      */
     private static boolean canScoutNatives(AIUnit aiUnit) {
@@ -108,8 +108,8 @@ public class ScoutingMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from,
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
@@ -128,8 +128,8 @@ public class ScoutingMission extends Mission {
      * Evaluate a potential scouting mission for a given unit and
      * path.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -146,12 +146,12 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for finding the best colony
-     * <code>Tile</code>, optionally falling back to the nearest colony.
+     * Gets a {@code GoalDecider} for finding the best colony
+     * {@code Tile}, optionally falling back to the nearest colony.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param aiUnit The {@code AIUnit} that is searching.
      * @param deferOK Enable colony fallback.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
@@ -186,7 +186,7 @@ public class ScoutingMission extends Mission {
     /**
      * Finds a suitable scouting target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
@@ -209,10 +209,10 @@ public class ScoutingMission extends Mission {
      * Finds a suitable scouting target for the supplied unit.
      * Falls back to the best settlement if a path is not found.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
-     * @return A <code>PathNode</code> to the target, or null if none found.
+     * @return A {@code PathNode} to the target, or null if none found.
      */
     public static Location findTarget(AIUnit aiUnit, int range,
                                       boolean deferOK) {
@@ -228,7 +228,7 @@ public class ScoutingMission extends Mission {
      * Prepare a unit for this mission.  Allow even experts to proceed
      * even if not mounted.
      *
-     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @param aiUnit The {@code AIUnit} to prepare.
      * @return A reason why the unit can not perform this mission, or null
      *     if none.
      */
@@ -245,7 +245,7 @@ public class ScoutingMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -259,8 +259,8 @@ public class ScoutingMission extends Mission {
     /**
      * Why is this mission invalid with a given colony target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The potential target <code>Colony</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The potential target {@code Colony}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
@@ -270,8 +270,8 @@ public class ScoutingMission extends Mission {
     /**
      * Why is this mission invalid with a given native settlement target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param is The potential target <code>IndianSettlement</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param is The potential target {@code IndianSettlement}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidIndianSettlementReason(AIUnit aiUnit,
@@ -293,8 +293,8 @@ public class ScoutingMission extends Mission {
      * Is this a valid scouting target because it is a suitable native
      * settlement or an intermediate colony.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param settlement The <code>Settlement</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param settlement The {@code Settlement} to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
     private static String invalidSettlementReason(AIUnit aiUnit,
@@ -309,8 +309,8 @@ public class ScoutingMission extends Mission {
     /**
      * Is this a valid scouting target because it is a suitable tile.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param tile The <code>Tile</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
+     * @param tile The {@code Tile} to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
@@ -323,7 +323,7 @@ public class ScoutingMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -333,8 +333,8 @@ public class ScoutingMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

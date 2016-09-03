@@ -52,9 +52,9 @@ public class InformationPanel extends FreeColPanel {
      * Creates an information panel that shows the given texts and
      * images, and an "OK" button.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param text The text to be displayed in the panel.
-     * @param fco A source <code>FreeColObject</code>.
+     * @param fco A source {@code FreeColObject}.
      * @param image The image to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient,
@@ -67,9 +67,9 @@ public class InformationPanel extends FreeColPanel {
      * Creates an information panel that shows the given
      * texts and images, and an "OK" button.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param texts The texts to be displayed in the panel.
-     * @param fcos The source <code>FreeColObject</code>s for the text.
+     * @param fcos The source {@code FreeColObject}s for the text.
      * @param images The images to be displayed in the panel.
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
@@ -133,8 +133,8 @@ public class InformationPanel extends FreeColPanel {
     /**
      * A label for an FCO that can meaningfully be displayed.
      *
-     * @param fco The <code>FreeColObject</code> to check.
-     * @return A <code>StringTemplate</code> label, or null if nothing found.
+     * @param fco The {@code FreeColObject} to check.
+     * @return A {@code StringTemplate} label, or null if nothing found.
      */
     private StringTemplate displayLabel(FreeColObject fco) {
         return (fco instanceof Tile && ((Tile)fco).hasSettlement())

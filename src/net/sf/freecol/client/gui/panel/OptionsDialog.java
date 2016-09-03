@@ -73,10 +73,10 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param editable Whether the dialog is editable.
-     * @param group The <code>OptionGroup</code> to display.
+     * @param group The {@code OptionGroup} to display.
      * @param headerKey The message identifier for the header.
      * @param defaultFileName The name of the default file to back
      *     this dialog with.
@@ -108,7 +108,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Get the option group being displayed by this dialog.
      *
-     * @return The <code>OptionGroup</code>.
+     * @return The {@code OptionGroup}.
      */
     protected OptionGroup getGroup() {
         return this.group;
@@ -117,14 +117,14 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Get the option group UI controlling this dialog.
      *
-     * @return The <code>OptionGroupUI</code>.
+     * @return The {@code OptionGroupUI}.
      */
     protected OptionGroupUI getOptionUI() {
         return this.ui;
     }
 
     /**
-     * Get the default name of the file to save the <code>OptionGroup</code>.
+     * Get the default name of the file to save the {@code OptionGroup}.
      *
      * @return A default file name.
      */
@@ -133,7 +133,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     }
 
     /**
-     * Get the identifier of the <code>OptionGroup</code>.
+     * Get the identifier of the {@code OptionGroup}.
      *
      * @return The option group identifier.
      */
@@ -145,7 +145,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * Load the panel.
      *
      * @param headerKey A message key for the panel title.
-     * @param ui The <code>OptionGroupUI</code> to encapsulate.
+     * @param ui The {@code OptionGroupUI} to encapsulate.
      */
     private void preparePanel(String headerKey, OptionGroupUI ui) {
         this.optionPanel = new MigPanel("ReportPanelUI");
@@ -183,7 +183,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Set the group for this panel.
      *
-     * @param group The new <code>OptionGroup</code>.
+     * @param group The new {@code OptionGroup}.
      */
     protected void set(OptionGroup group) {
         this.group = group;
@@ -205,7 +205,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Load an option group from given File.
      *
-     * @param file A <code>File</code> to load from.
+     * @param file A {@code File} to load from.
      * @return True if the load succeeded.
      */
     protected boolean load(File file) {
@@ -219,7 +219,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
     /**
      * Save an option group to a given File.
      *
-     * @param file The <code>File</code> to save to.
+     * @param file The {@code File} to save to.
      * @return True if the save succeeded.
      */
     protected boolean save(File file) {

@@ -36,7 +36,7 @@ public class BuildColonyAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public BuildColonyAction(FreeColClient freeColClient) {
         super(freeColClient, id);

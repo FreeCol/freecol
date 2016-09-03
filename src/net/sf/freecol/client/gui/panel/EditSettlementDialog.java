@@ -86,9 +86,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     /**
      * Create an EditSettlementDialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param is The <code>IndianSettlement</code> to edit.
+     * @param is The {@code IndianSettlement} to edit.
      */
     public EditSettlementDialog(FreeColClient freeColClient, JFrame frame,
                                 final IndianSettlement is) {

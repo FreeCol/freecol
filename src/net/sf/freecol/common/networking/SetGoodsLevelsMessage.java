@@ -45,11 +45,11 @@ public class SetGoodsLevelsMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>SetGoodsLevelsMessage</code> with the
+     * Create a new {@code SetGoodsLevelsMessage} with the
      * supplied colony and data.
      *
-     * @param colony The <code>Colony</code> where the goods leves are set.
-     * @param data The new <code>ExportData</code>.
+     * @param colony The {@code Colony} where the goods leves are set.
+     * @param data The new {@code ExportData}.
      */
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
         super(getTagName());
@@ -59,11 +59,11 @@ public class SetGoodsLevelsMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>SetGoodsLevelsMessage</code> from a
+     * Create a new {@code SetGoodsLevelsMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
         super(getTagName());
@@ -76,11 +76,11 @@ public class SetGoodsLevelsMessage extends DOMMessage {
     /**
      * Handle a "setGoodsLevels"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
-     * @return An update <code>Element</code> updating the colony.
+     * @return An update {@code Element} updating the colony.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

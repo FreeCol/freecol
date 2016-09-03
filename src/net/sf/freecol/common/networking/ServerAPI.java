@@ -81,7 +81,7 @@ public abstract class ServerAPI {
 
 
     /**
-     * Creates a new <code>ServerAPI</code>.
+     * Creates a new {@code ServerAPI}.
      */
     public ServerAPI() {}
 
@@ -89,14 +89,14 @@ public abstract class ServerAPI {
     /**
      * Do local client processing for a reply.
      *
-     * @param reply The reply <code>Element</code>.
+     * @param reply The reply {@code Element}.
      */
     protected abstract void doClientProcessingFor(Element reply);
 
     /**
      * Get the connection to communicate with the server.
      *
-     * @return The <code>Connection</code> to the server.
+     * @return The {@code Connection} to the server.
      */
     protected abstract Connection getConnection();
 
@@ -106,7 +106,7 @@ public abstract class ServerAPI {
     /**
      * Sends a DOMMessage to the server.
      *
-     * @param message The <code>DOMMessage</code> to send.
+     * @param message The {@code DOMMessage} to send.
      * @return True if the send succeeded.
      */
     private boolean send(DOMMessage message) {
@@ -123,7 +123,7 @@ public abstract class ServerAPI {
     /**
      * Sends a DOMMessage to the server and waits for a reply.
      *
-     * @param message The <code>DOMMessage</code> to send.
+     * @param message The {@code DOMMessage} to send.
      * @return True if the send succeeded.
      */
     private boolean sendAndWait(DOMMessage message) {
@@ -140,7 +140,7 @@ public abstract class ServerAPI {
     /**
      * Sends a DOMMessage query the server and waits for a reply.
      *
-     * @param message The <code>DOMMessage</code> to send.
+     * @param message The {@code DOMMessage} to send.
      * @return The reply, or null if there was a problem.
      */
     private Element ask(DOMMessage message) {
@@ -158,7 +158,7 @@ public abstract class ServerAPI {
      * Loop sending requests and handling replies from the server until
      * they reduce to null.
      *
-     * @param e The initial request <code>Element</code>.
+     * @param e The initial request {@code Element}.
      */
     private void resolve(Element e) {
         final Connection c = getConnection();
@@ -176,7 +176,7 @@ public abstract class ServerAPI {
     /**
      * Handle an element.
      *
-     * @param e The <code>Element</code> to handle.
+     * @param e The {@code Element} to handle.
      * @return The resulting element.
      */
     private Element handle(Element e) {
@@ -207,11 +207,11 @@ public abstract class ServerAPI {
      * request was allowed (e.g. a move may result in the death of a
      * unit rather than actually moving).
      *
-     * @param game The current <code>Game</code>.
-     * @param message A <code>DOMMessage</code> to send.
+     * @param game The current {@code Game}.
+     * @param message A {@code DOMMessage} to send.
      * @param tag The expected tag.
      * @return The answer from the server if it has the specified tag,
-     *     otherwise <code>null</code>.
+     *     otherwise {@code null}.
      */
     private Element askExpecting(Game game, DOMMessage message, String tag) {
         Element reply = ask(message);
@@ -248,8 +248,8 @@ public abstract class ServerAPI {
     /**
      * Extends askExpecting to also handle returns from the server.
      *
-     * @param game The current <code>Game</code>.
-     * @param message A <code>DOMMessage</code> to send.
+     * @param game The current {@code Game}.
+     * @param message A {@code DOMMessage} to send.
      * @param tag The expected tag
      * @return True if the server interaction succeeded and an element
      *     with the expected tag was found in the reply, else false.
@@ -266,7 +266,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to abandon a colony.
      *
-     * @param colony The <code>Colony</code> to abandon.
+     * @param colony The {@code Colony} to abandon.
      * @return True if the server interaction succeeded.
      */
     public boolean abandonColony(Colony colony) {
@@ -277,7 +277,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to respond to a monarch offer.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @param action The monarch action responded to.
      * @param accept Accept or reject the offer.
      * @return True if the server interaction succeeded.
@@ -291,7 +291,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for finding out the skill taught at a settlement.
      *
-     * @param unit The <code>Unit</code> that is asking.
+     * @param unit The {@code Unit} that is asking.
      * @param direction The direction to a settlement to ask.
      * @return True if the server interaction succeeded.
      */
@@ -303,8 +303,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for assigning a teacher.
      *
-     * @param student The student <code>Unit</code>.
-     * @param teacher The teacher <code>Unit</code>.
+     * @param student The student {@code Unit}.
+     * @param teacher The teacher {@code Unit}.
      * @return True if the server interaction succeeded.
      */
     public boolean assignTeacher(Unit student, Unit teacher) {
@@ -315,8 +315,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for assigning a trade route to a unit.
      *
-     * @param unit The <code>Unit</code> to assign a trade route to.
-     * @param tradeRoute The <code>TradeRoute</code> to assign.
+     * @param unit The {@code Unit} to assign a trade route to.
+     * @param tradeRoute The {@code TradeRoute} to assign.
      * @return True if the server interaction succeeded.
      */
     public boolean assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
@@ -327,7 +327,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for attacking.
      *
-     * @param unit The <code>Unit</code> to perform the attack.
+     * @param unit The {@code Unit} to perform the attack.
      * @param direction The direction in which to attack.
      * @return True if the server interaction succeeded.
      */
@@ -340,7 +340,7 @@ public abstract class ServerAPI {
      * Server query-response for building a colony.
      *
      * @param name The name for the colony.
-     * @param unit The <code>Unit</code> that will build.
+     * @param unit The {@code Unit} that will build.
      * @return True if the server interaction succeeded.
      */
     public boolean buildColony(String name, Unit unit) {
@@ -351,9 +351,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response to buy the given goods from the natives.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @param goods The <code>Goods</code> to buy.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @param goods The {@code Goods} to buy.
      * @param gold The agreed price.
      * @return True if the server interaction succeeded.
      */
@@ -366,9 +366,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response to ask the natives if a purchase is acceptable.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param goods The <code>Goods</code> to trade.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param goods The {@code Goods} to trade.
      * @param gold The proposed price (including query on negative).
      * @return The price of the goods.
      */
@@ -386,7 +386,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to cash in a treasure train.
      *
-     * @param unit The treasure train <code>Unit</code> to cash in.
+     * @param unit The treasure train {@code Unit} to cash in.
      * @return True if the server interaction succeeded.
      */
     public boolean cashInTreasureTrain(Unit unit) {
@@ -397,8 +397,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for changing unit state.
      *
-     * @param unit The <code>Unit</code> to change the state of.
-     * @param state The new <code>UnitState</code>.
+     * @param unit The {@code Unit} to change the state of.
+     * @param state The new {@code UnitState}.
      * @return boolean <b>true</b> if the server interaction succeeded.
      */
     public boolean changeState(Unit unit, UnitState state) {
@@ -409,8 +409,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for changing work improvement type.
      *
-     * @param unit The <code>Unit</code> to change the work type of.
-     * @param type The new <code>TileImprovementType</code> to work on.
+     * @param unit The {@code Unit} to change the work type of.
+     * @param type The new {@code TileImprovementType} to work on.
      * @return True if the server interaction succeeded.
      */
     public boolean changeWorkImprovementType(Unit unit,
@@ -422,8 +422,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for changing work type.
      *
-     * @param unit The <code>Unit</code> to change the work type of.
-     * @param workType The new <code>GoodsType</code> to produce.
+     * @param unit The {@code Unit} to change the work type of.
+     * @param workType The new {@code GoodsType} to produce.
      * @return True if the server interaction succeeded.
      */
     public boolean changeWorkType(Unit unit, GoodsType workType) {
@@ -434,7 +434,7 @@ public abstract class ServerAPI {
     /**
      * Send a chat message (pre and in-game).
      *
-     * @param player The <code>Player</code> to chat to.
+     * @param player The {@code Player} to chat to.
      * @param chat The text of the message.
      * @return True if the send succeeded.
      */
@@ -445,8 +445,8 @@ public abstract class ServerAPI {
     /**
      * Send a chooseFoundingFather message.
      *
-     * @param ffs A list of <code>FoundingFather</code>s to choose from.
-     * @param ff The chosen <code>FoundingFather</code> (may be null).
+     * @param ffs A list of {@code FoundingFather}s to choose from.
+     * @param ff The chosen {@code FoundingFather} (may be null).
      * @return True if the send succeeded.
      */
     public boolean chooseFoundingFather(List<FoundingFather> ffs,
@@ -457,8 +457,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to claim a tile.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param claimant The <code>Unit</code> or <code>Settlement</code> that is
+     * @param tile The {@code Tile} to claim.
+     * @param claimant The {@code Unit} or <code>Settlement</code> that is
      *     claiming the tile.
      * @param price The amount to pay.
      * @return True if the server interaction succeeded.
@@ -471,7 +471,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for clearing a unit speciality.
      *
-     * @param unit The <code>Unit</code> to operate on.
+     * @param unit The {@code Unit} to operate on.
      * @return True if the server interaction succeeded.
      */
     public boolean clearSpeciality(Unit unit) {
@@ -491,7 +491,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for declaring independence.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @param nation The name for the new nation.
      * @param country The name for the new country.
      * @return True if the server interaction succeeded.
@@ -506,8 +506,8 @@ public abstract class ServerAPI {
      * explore a rumour but then declining not to investigate the
      * strange mounds.
      *
-     * @param unit The <code>Unit</code> that is exploring.
-     * @param direction The <code>Direction</code> to move.
+     * @param unit The {@code Unit} that is exploring.
+     * @param direction The {@code Direction} to move.
      * @return True if the server interaction succeeded.
      */
     public boolean declineMounds(Unit unit, Direction direction) {
@@ -518,7 +518,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for deleting a trade route.
      *
-     * @param tradeRoute The <code>TradeRoute</code> to delete.
+     * @param tradeRoute The {@code TradeRoute} to delete.
      * @return True if the server interaction succeeded.
      */
     public boolean deleteTradeRoute(TradeRoute tradeRoute) {
@@ -529,9 +529,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response to give the given goods to the natives.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @param goods The <code>Goods</code> to give.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @param goods The {@code Goods} to give.
      * @return True if the server interaction succeeded.
      */
     public boolean deliverGiftToSettlement(Unit unit, IndianSettlement is,
@@ -544,7 +544,7 @@ public abstract class ServerAPI {
      * Server query-response for demanding a tribute from a native
      * settlement.
      *
-     * @param unit The <code>Unit</code> that demands.
+     * @param unit The {@code Unit} that demands.
      * @param direction The direction to demand in.
      * @return True if the server interaction succeeded.
      */
@@ -556,9 +556,9 @@ public abstract class ServerAPI {
     /**
      * Handler server query-response for diplomatic messages.
      *
-     * @param ourUnit Our <code>Unit</code> conducting the diplomacy.
-     * @param otherColony The other <code>Colony</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @param ourUnit Our {@code Unit} conducting the diplomacy.
+     * @param otherColony The other {@code Colony} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
     public DiplomaticTrade diplomacy(Unit ourUnit, Colony otherColony, 
@@ -581,9 +581,9 @@ public abstract class ServerAPI {
     /**
      * Handler server query-response for diplomatic messages.
      *
-     * @param ourUnit Out <code>Unit</code> conducting the diplomacy.
-     * @param otherUnit The other <code>Unit</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @param ourUnit Out {@code Unit} conducting the diplomacy.
+     * @param otherUnit The other {@code Unit} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
     public DiplomaticTrade diplomacy(Unit ourUnit, Unit otherUnit, 
@@ -604,9 +604,9 @@ public abstract class ServerAPI {
     /**
      * Handler server query-response for diplomatic messages.
      *
-     * @param ourColony Out <code>Colony</code> conducting the diplomacy.
-     * @param otherUnit The other <code>Unit</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @param ourColony Out {@code Colony} conducting the diplomacy.
+     * @param otherUnit The other {@code Unit} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
     public DiplomaticTrade diplomacy(Colony ourColony, Unit otherUnit, 
@@ -627,7 +627,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for disbanding a unit.
      *
-     * @param unit The <code>Unit</code> to operate on.
+     * @param unit The {@code Unit} to operate on.
      * @return True if the server interaction succeeded.
      */
     public boolean disbandUnit(Unit unit) {
@@ -638,7 +638,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for disembarking from a carrier.
      *
-     * @param unit The <code>Unit</code> that is disembarking.
+     * @param unit The {@code Unit} that is disembarking.
      * @return True if the server interaction succeeded.
      */
     public boolean disembark(Unit unit) {
@@ -649,8 +649,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for boarding a carrier.
      *
-     * @param unit The <code>Unit</code> that is boarding.
-     * @param carrier The carrier <code>Unit</code>.
+     * @param unit The {@code Unit} that is boarding.
+     * @param carrier The carrier {@code Unit}.
      * @param direction An optional direction if the unit is boarding from
      *        an adjacent tile, or null if from the same tile.
      * @return True if the server interaction succeeded.
@@ -663,7 +663,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for emigration.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @param slot The slot from which the unit migrates, 1-3 selects
      *             a specific one, otherwise the server will choose one.
      * @return True if the client-server interaction succeeded.
@@ -675,8 +675,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to close a session for a trade.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
      * @return True if the server interaction succeeded.
      */
     public boolean endNativeTradeSession(NativeTrade nt) {
@@ -688,7 +688,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking for the turn to end.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
     public boolean endTurn(Game game) {
@@ -699,7 +699,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking to enter revenge mode (post-game).
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
     public boolean enterRevengeMode(Game game) {
@@ -710,8 +710,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for equipping a unit for a role.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to assume.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to assume.
      * @param roleCount The role count.
      * @return True if the server interaction succeeded.
      */
@@ -723,9 +723,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response for responding to a first contact message.
      *
-     * @param player The <code>Player</code> making contact.
-     * @param other The native <code>Player</code> being contacted.
-     * @param tile An optional <code>Tile</code> to offer the player if
+     * @param player The {@code Player} making contact.
+     * @param other The native {@code Player} being contacted.
+     * @param tile An optional {@code Tile} to offer the player if
      *     they have made a first landing.
      * @param result Whether the initial peace treaty was accepted.
      * @return True if the server interaction succeeded.
@@ -740,8 +740,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to get a list of goods for sale from a settlement.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
      * @return True if the server interaction succeeded.
      */
     public boolean getGoodsForSaleInSettlement(Unit unit,
@@ -754,7 +754,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking for the high scores list.
      *
-     * @param game The <code>Game</code> to extract scores from.
+     * @param game The {@code Game} to extract scores from.
      * @param key The high score key to query.
      * @return True if the server interaction succeeded.
      */
@@ -766,8 +766,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for asking for the nation summary of a player.
      *
-     * @param self The <code>Player</code> requesting the summary.
-     * @param player The <code>Player</code> to summarize.
+     * @param self The {@code Player} requesting the summary.
+     * @param player The {@code Player} to summarize.
      * @return True if the server interaction succeeded.
      */
     public boolean nationSummary(Player self, Player player) {
@@ -779,9 +779,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response for inciting the natives.
      *
-     * @param unit The missionary <code>Unit</code>.
-     * @param is The <code>IndianSettlement</code> to incite.
-     * @param enemy An enemy <code>Player</code>.
+     * @param unit The missionary {@code Unit}.
+     * @param is The {@code IndianSettlement} to incite.
+     * @param enemy An enemy {@code Player}.
      * @param gold The amount of bribe, negative to enquire.
      * @return True if the server interaction succeeded.
      */
@@ -795,9 +795,9 @@ public abstract class ServerAPI {
     /**
      * Makes demands to a colony.  One and only one of goods or gold is valid.
      *
-     * @param unit The <code>Unit</code> that is demanding.
-     * @param colony The <code>Colony</code> to demand of.
-     * @param type The <code>GoodsType</code> to demand.
+     * @param unit The {@code Unit} that is demanding.
+     * @param colony The {@code Colony} to demand of.
+     * @param type The {@code GoodsType} to demand.
      * @param amount The amount of goods to demand.
      * @return True if the server interaction succeeded.
      */
@@ -810,8 +810,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for joining a colony.
      *
-     * @param unit The <code>Unit</code> that will join.
-     * @param colony The <code>Colony</code> to join.
+     * @param unit The {@code Unit} that will join.
+     * @param colony The {@code Colony} to join.
      * @return True if the server interaction succeeded.
      */
     public boolean joinColony(Unit unit, Colony colony) {
@@ -822,7 +822,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for learning the skill taught at a settlement.
      *
-     * @param unit The <code>Unit</code> that is asking.
+     * @param unit The {@code Unit} that is asking.
      * @param direction The direction to a settlement to ask.
      * @return True if the server interaction succeeded.
      */
@@ -834,10 +834,10 @@ public abstract class ServerAPI {
     /**
      * Server query-response for loading goods.
      *
-     * @param loc The <code>Location</code> where the goods are.
-     * @param type The <code>GoodsType</code> to load.
+     * @param loc The {@code Location} where the goods are.
+     * @param type The {@code GoodsType} to load.
      * @param amount The amount of goods to load.
-     * @param carrier The <code>Unit</code> to load onto.
+     * @param carrier The {@code Unit} to load onto.
      * @return True if the server interaction succeeded.
      */
     public boolean loadGoods(Location loc, GoodsType type, int amount,
@@ -872,9 +872,9 @@ public abstract class ServerAPI {
      * Server query-response for looting.  Handles both an initial query and
      * the actual looting.
      *
-     * @param winner The <code>Unit</code> that is looting.
+     * @param winner The {@code Unit} that is looting.
      * @param defenderId The identifier of the defender unit (it may have sunk).
-     * @param goods A list of <code>Goods</code>, if empty this is a query
+     * @param goods A list of {@code Goods}, if empty this is a query
      *     as to what is to be looted which is filled into the list,
      *     if non-empty, then the list of goods to loot.
      * @return True if the server interaction succeeded.
@@ -887,7 +887,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for establishing/denouncing a mission.
      *
-     * @param unit The missionary <code>Unit</code>.
+     * @param unit The missionary {@code Unit}.
      * @param direction The direction to a settlement to establish with.
      * @param denounce True if this is a denouncement.
      * @return True if the server interaction succeeded.
@@ -901,7 +901,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for moving a unit.
      *
-     * @param unit The <code>Unit</code> to move.
+     * @param unit The {@code Unit} to move.
      * @param direction The direction to move in.
      * @return True if the server interaction succeeded.
      */
@@ -913,8 +913,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for moving to across the high seas.
      *
-     * @param unit The <code>Unit</code> to move.
-     * @param destination The <code>Location</code> to move to.
+     * @param unit The {@code Unit} to move.
+     * @param destination The {@code Location} to move to.
      * @return True if the server interaction succeeded.
      */
     public boolean moveTo(Unit unit, Location destination) {
@@ -925,8 +925,8 @@ public abstract class ServerAPI {
     /**
      * A native Unit delivers the gift it is carrying to a colony.
      *
-     * @param unit The <code>Unit</code> delivering the gift.
-     * @param colony The <code>Colony</code> to give to.
+     * @param unit The {@code Unit} delivering the gift.
+     * @param colony The {@code Colony} to give to.
      * @return True if the server interaction succeeded.
      */
     public boolean nativeGift(Unit unit, Colony colony) {
@@ -937,7 +937,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for naming a new land.
      *
-     * @param unit The <code>Unit</code> that has come ashore.
+     * @param unit The {@code Unit} that has come ashore.
      * @param name The new land name.
      * @return True if the server interaction succeeded.
      */
@@ -949,8 +949,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to get the session for a trade.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
      * @return True if the server interaction succeeded.
      */
     public boolean newNativeTradeSession(Unit unit, IndianSettlement is) {
@@ -961,9 +961,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response for naming a new region.
      *
-     * @param region The <code>Region</code> that is being discovered.
-     * @param tile The <code>Tile</code> where the region is discovered.
-     * @param unit The <code>Unit</code> discovering the region.
+     * @param region The {@code Region} that is being discovered.
+     * @param tile The {@code Tile} where the region is discovered.
+     * @param unit The {@code Unit} discovering the region.
      * @param name The new region name.
      * @return True if the server interaction succeeded.
      */
@@ -976,7 +976,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for creating a new trade route.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
     public boolean newTradeRoute(Game game) {
@@ -987,8 +987,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for tax paying arrears.
      *
-     * @param game The current <code>Game</code>.
-     * @param type The <code>GoodsType</code> to pay the arrears for.
+     * @param game The current {@code Game}.
+     * @param type The {@code GoodsType} to pay the arrears for.
      * @return True if the server interaction succeeded.
      */
     public boolean payArrears(Game game, GoodsType type) {
@@ -999,7 +999,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for paying for a building.
      *
-     * @param colony The <code>Colony</code> that is building.
+     * @param colony The {@code Colony} that is building.
      * @return True if the server interaction succeeded.
      */
     public boolean payForBuilding(Colony colony) {
@@ -1010,7 +1010,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for putting a unit outside a colony.
      *
-     * @param unit The <code>Unit</code> to put out.
+     * @param unit The {@code Unit} to put out.
      * @return True if the server interaction succeeded.
      */
     public boolean putOutsideColony(Unit unit) {
@@ -1021,9 +1021,9 @@ public abstract class ServerAPI {
     /**
      * Rearrange a colony.
      *
-     * @param colony The <code>Colony</code> to rearrange.
-     * @param workers A list of worker <code>Unit</code>s that may change.
-     * @param scratch A copy of the underlying <code>Colony</code> with the
+     * @param colony The {@code Colony} to rearrange.
+     * @param workers A list of worker {@code Unit}s that may change.
+     * @param scratch A copy of the underlying {@code Colony} with the
      *     workers arranged as required.
      * @return True if the server interaction succeeds.
      */
@@ -1038,7 +1038,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response for renaming an object.
      *
-     * @param object A <code>FreeColGameObject</code> to rename.
+     * @param object A {@code FreeColGameObject} to rename.
      * @param name The name to apply.
      * @return True if the server interaction succeeded.
      */
@@ -1059,7 +1059,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to retire the player from the game.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
+     * @param game The {@code Game} to construct a reply message in.
      * @return True if the server interaction succeeded.
      */
     public boolean retire(Game game) {
@@ -1072,7 +1072,7 @@ public abstract class ServerAPI {
      * settlement, *before* choosing to speak to the chief, attack, et
      * al.
      *
-     * @param unit The <code>Unit</code> that is speaking.
+     * @param unit The {@code Unit} that is speaking.
      * @param direction The direction to a settlement to ask.
      * @return True if the server interaction succeeded.
      */
@@ -1085,8 +1085,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for speaking with a native chief.
      *
-     * @param unit The <code>Unit</code> that is speaking.
-     * @param is The <code>IndianSettlement</code> to ask.
+     * @param unit The {@code Unit} that is speaking.
+     * @param is The {@code IndianSettlement} to ask.
      * @return True if the server interaction succeeded.
      */
     public boolean scoutSpeakToChief(Unit unit, IndianSettlement is) {
@@ -1098,9 +1098,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response to ask the natives if a sale is acceptable.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @param goods The <code>Goods</code> to trade.
+     * @param unit The {@code Unit} that is trading.
+     * @param settlement The {@code Settlement} that is trading.
+     * @param goods The {@code Goods} to trade.
      * @param gold The proposed price (including query on negative).
      * @return The selling price for the goods.
      */
@@ -1118,9 +1118,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response to sell the given goods to the natives.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @param goods The <code>Goods</code> to sell.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @param goods The {@code Goods} to sell.
      * @param gold The agreed price.
      * @return True if the server interaction succeeded.
      */
@@ -1133,8 +1133,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to set a nation's availablility (pre-game).
      *
-     * @param nation The <code>Nation</code> to whose availability is to be set.
-     * @param state The <code>NationState</code> defining the availability.
+     * @param nation The {@code Nation} to whose availability is to be set.
+     * @param state The {@code NationState} defining the availability.
      * @return True if the server interaction succeeded.
      */
     public boolean setAvailable(Nation nation, NationState state) {
@@ -1160,8 +1160,8 @@ public abstract class ServerAPI {
      * Server query-response to set a nation colour
      * (pre-game).
      *
-     * @param nation The <code>Nation</code> to set the color for.
-     * @param color The <code>Color</code> selected.
+     * @param nation The {@code Nation} to set the color for.
+     * @param color The {@code Color} selected.
      * @return True if the server interaction succeeded.
      */
     public boolean setColor(Nation nation, Color color) {
@@ -1173,7 +1173,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to set the current stop.
      *
-     * @param unit The <code>Unit</code> whose stop is to be updated.
+     * @param unit The {@code Unit} whose stop is to be updated.
      * @param index The stop index.
      * @return True if the query-response succeeds.
      */
@@ -1185,8 +1185,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response to set the destination of the given unit.
      *
-     * @param unit The <code>Unit</code> to direct.
-     * @param destination The destination <code>Location</code>.
+     * @param unit The {@code Unit} to direct.
+     * @param destination The destination {@code Location}.
      * @return True if the server interaction succeeded.
      * @see Unit#setDestination(Location)
      */
@@ -1198,8 +1198,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for setting goods levels.
      *
-     * @param colony The <code>Colony</code> where the levels are set.
-     * @param data The <code>ExportData</code> setting.
+     * @param colony The {@code Colony} where the levels are set.
+     * @param data The {@code ExportData} setting.
      * @return True if the server interaction succeeded.
      */
     public boolean setGoodsLevels(Colony colony, ExportData data) {
@@ -1211,7 +1211,7 @@ public abstract class ServerAPI {
      * Server query-response to show which nation a player has selected
      * (pre-game).
      *
-     * @param nation The <code>Nation</code> selected.
+     * @param nation The {@code Nation} selected.
      * @return True if the server interaction succeeded.
      */
     public boolean setNation(Nation nation) {
@@ -1223,7 +1223,7 @@ public abstract class ServerAPI {
      * Server query-response to show which nation type a player has selected
      * (pre-game).
      *
-     * @param nationType The <code>NationType</code> selected.
+     * @param nationType The {@code NationType} selected.
      * @return True if the server interaction succeeded.
      */
     public boolean setNationType(NationType nationType) {
@@ -1245,8 +1245,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for spying on a colony.
      *
-     * @param unit The <code>Unit</code> that is spying.
-     * @param settlement The <code>Settlement</code> to spy on.
+     * @param unit The {@code Unit} that is spying.
+     * @param settlement The {@code Settlement} to spy on.
      * @return True if the client/server interaction succeeded.
      */
     public boolean spy(Unit unit, Settlement settlement) {
@@ -1266,8 +1266,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for training a unit in Europe.
      *
-     * @param game The <code>Game</code> to construct a reply message in.
-     * @param type The <code>UnitType</code> to train.
+     * @param game The {@code Game} to construct a reply message in.
+     * @param type The {@code UnitType} to train.
      * @return True if the server interaction succeeded.
      */
     public boolean trainUnitInEurope(Game game, UnitType type) {
@@ -1278,9 +1278,9 @@ public abstract class ServerAPI {
     /**
      * Server query-response for unloading goods.
      *
-     * @param type The <code>GoodsType</code> to unload.
+     * @param type The {@code GoodsType} to unload.
      * @param amount The amount of goods to unload.
-     * @param carrier The <code>Unit</code> to unload from.
+     * @param carrier The {@code Unit} to unload from.
      * @return True if the query-response succeeds.
      */
     public boolean unloadGoods(GoodsType type, int amount, Unit carrier) {
@@ -1292,7 +1292,7 @@ public abstract class ServerAPI {
      * Server query-response to update the game options
      * (pre-game).
      *
-     * @param gameOptions The <code>OptionGroup</code> containing the
+     * @param gameOptions The {@code OptionGroup} containing the
      *     game options.
      * @return True if the server interaction succeeded.
      */
@@ -1304,7 +1304,7 @@ public abstract class ServerAPI {
      * Server query-response to update the map generator options
      * (pre-game).
      *
-     * @param mapOptions The <code>OptionGroup</code> containing the
+     * @param mapOptions The {@code OptionGroup} containing the
      *     map generator options.
      * @return True if the server interaction succeeded.
      */
@@ -1326,8 +1326,8 @@ public abstract class ServerAPI {
     /**
      * Server query-response for changing a work location.
      *
-     * @param unit The <code>Unit</code> to change the workLocation of.
-     * @param workLocation The <code>WorkLocation</code> to change to.
+     * @param unit The {@code Unit} to change the workLocation of.
+     * @param workLocation The {@code WorkLocation} to change to.
      * @return True if the server interaction succeeded.
      */
     public boolean work(Unit unit, WorkLocation workLocation) {

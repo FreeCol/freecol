@@ -38,10 +38,10 @@ class ColopediaTreeItem {
      * The default constructor for a ColopediaTreeItem that
      * corresponds to a leaf node.
      *
-     * @param detailPanel A <code>ColopediaDetailPanel</code> value.
+     * @param detailPanel A {@code ColopediaDetailPanel} value.
      * @param id The object identifier.
-     * @param text a <code>String</code> value
-     * @param icon an <code>ImageIcon</code> value
+     * @param text a {@code String} value
+     * @param icon an {@code ImageIcon} value
      */
     ColopediaTreeItem(ColopediaDetailPanel detailPanel, String id, String text,
                       ImageIcon icon) {

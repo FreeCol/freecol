@@ -38,10 +38,10 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
 
 
     /**
-     * Creates a new <code>SelectOptionUI</code> for the given
-     * <code>SelectOption</code>.
+     * Creates a new {@code SelectOptionUI} for the given
+     * {@code SelectOption}.
      *
-     * @param option The <code>SelectOption</code> to make a user
+     * @param option The {@code SelectOption} to make a user
      *     interface for.
      * @param editable Whether user can modify the setting.
      */

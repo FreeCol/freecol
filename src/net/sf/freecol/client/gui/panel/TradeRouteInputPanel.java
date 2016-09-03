@@ -516,8 +516,8 @@ public final class TradeRouteInputPanel extends FreeColPanel
     /**
      * Create a panel to define trade route cargos.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param newRoute The <code>TradeRoute</code> to operate on.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param newRoute The {@code TradeRoute} to operate on.
      */
     public TradeRouteInputPanel(FreeColClient freeColClient,
                                 TradeRoute newRoute) {

@@ -54,7 +54,7 @@ public class LogBuilder {
     /**
      * Convert a simple object to a string suitable for a log buffer.
      *
-     * @param o The <code>Object</code> to convert.
+     * @param o The {@code Object} to convert.
      * @return The simple string result.
      */
     private static String o2s(Object o) {
@@ -68,7 +68,7 @@ public class LogBuilder {
     /**
      * Add objects to a string builder.
      *
-     * @param sb The <code>StringBuilder</code> to add to.
+     * @param sb The {@code StringBuilder} to add to.
      * @param objects The objects to add.
      */
     private static void add(StringBuilder sb, Object... objects) {
@@ -97,7 +97,7 @@ public class LogBuilder {
      *
      * @param <T> The collection member type.
      * @param delim An internal delimiter.
-     * @param c The <code>Collection</code> of objects to add.
+     * @param c The {@code Collection} of objects to add.
      */
     public <T> void addCollection(String delim, Collection<T> c) {
         if (sb != null) {
@@ -135,7 +135,7 @@ public class LogBuilder {
      * Check if a buffer has grown since marked, and optionally insert
      * text at that point.
      *
-     * @param objects Optional <code>Object</code>s to insert if the buffer has
+     * @param objects Optional {@code Object}s to insert if the buffer has
      *     grown.
      * @return True if the buffer grew (before inserting).
      */
@@ -165,8 +165,8 @@ public class LogBuilder {
     /**
      * Output to a logger.
      *
-     * @param logger The <code>Logger</code> to write to.
-     * @param level The logging <code>Level</code>.
+     * @param logger The {@code Logger} to write to.
+     * @param level The logging {@code Level}.
      */
     public void log(Logger logger, Level level) {
         if (sb != null && logger != null && level != null
@@ -188,7 +188,7 @@ public class LogBuilder {
      * Add a group of objects to the buffer at a particular width
      *
      * @param size The width to set.
-     * @param objects The <code>Object</code>s to add.
+     * @param objects The {@code Object}s to add.
      * @return The widened string.
      */
     public static String wide(int size, Object... objects) {

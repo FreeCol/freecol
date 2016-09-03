@@ -32,7 +32,7 @@ import net.sf.freecol.common.model.Unit;
  * net.sf.freecol.common.model.Map#search} until:
  * 
  * <ol>
- *   <li>The method returns <code>true</code> and there is 
+ *   <li>The method returns {@code true} and there is
  *       {@link #hasSubGoals() no sub goals}.</li>
  *   <li>The maximum distance of the search has been reached.</li>
  * </ol>
@@ -42,37 +42,37 @@ import net.sf.freecol.common.model.Unit;
 public interface GoalDecider {
 
     /**
-     * Gets the <code>PathNode</code> containing the goal.
+     * Gets the {@code PathNode} containing the goal.
      *
-     * @return The <code>PathNode</code> where the <code>Tile</code>
-     *     returned by <code>pathNode.getTile()</code> is the goal.
+     * @return The {@code PathNode} where the <code>Tile</code>
+     *     returned by {@code pathNode.getTile()} is the goal.
      */
     public PathNode getGoal();
     
     /**
-     * Determines whether this <code>GoalDecider</code> has any
+     * Determines whether this {@code GoalDecider} has any
      * sub goals.
      * 
-     * @return <code>true</code> if there are any sub goals
-     *     and <code>false</code> otherwise.
+     * @return {@code true} if there are any sub goals
+     *     and {@code false} otherwise.
      */
     public boolean hasSubGoals();
     
     /**
-     * Checks whether the given <code>PathNode</code> is a 
+     * Checks whether the given {@code PathNode} is a
      * goal/sub-goal.
      * 
-     * @param u The <code>Unit</code> which we are trying 
+     * @param u The {@code Unit} which we are trying
      *     to find a path for.
-     * @param pathNode The <code>PathNode</code> where the
-     *     <code>Tile</code> returned by
-     *     <code>pathNode.getTile()</code> is the tile to be checked.
-     * @return <code>true</code> if the <code>PathNode</code> was
-     *     either a goal or a sub goal and <code>false</code>
+     * @param pathNode The {@code PathNode} where the
+     *     {@code Tile} returned by
+     *     {@code pathNode.getTile()} is the tile to be checked.
+     * @return {@code true} if the <code>PathNode</code> was
+     *     either a goal or a sub goal and {@code false}
      *     otherwise. The goal should be returned by {@link #getGoal()}
      *     right after a call to this method, if this method returns
-     *     <code>true</code> and {@link #hasSubGoals()} returns
-     *     <code>false</code>.
+     *     {@code true} and {@link #hasSubGoals()} returns
+     *     {@code false}.
      */
     public boolean check(Unit u, PathNode pathNode);
 }

@@ -43,7 +43,7 @@ public class Turn {
 
 
     /**
-     * Creates a new <code>Turn</code> instance.
+     * Creates a new {@code Turn} instance.
      *
      * @param turn The numeric value of the turn.
      */
@@ -127,7 +127,7 @@ public class Turn {
     /**
      * Get the next turn, with a turn number one greater.
      *
-     * @return The new <code>Turn</code>.
+     * @return The new {@code Turn}.
      */
     public Turn next() {
         return new Turn(turn + 1);
@@ -189,7 +189,7 @@ public class Turn {
     /**
      * Gets a localization template for this turn.
      *
-     * @return A <code>StringTemplate</code> describing the turn.
+     * @return A {@code StringTemplate} describing the turn.
      */
     public StringTemplate getLabel() {
         return getLabel(turn);
@@ -199,7 +199,7 @@ public class Turn {
      * Gets a localization template for a given turn.
      *
      * @param turn The integer value of the turn to describe.
-     * @return A <code>StringTemplate</code> describing the turn.
+     * @return A {@code StringTemplate} describing the turn.
      */
     public static StringTemplate getLabel(int turn) {
         int season = getSeason(turn);

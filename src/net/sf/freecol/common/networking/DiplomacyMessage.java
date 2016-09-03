@@ -64,11 +64,11 @@ public class DiplomacyMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>DiplomacyMessage</code>.
+     * Create a new {@code DiplomacyMessage}.
      *
-     * @param our Our <code>FreeColGameObject</code> that is negotiating.
-     * @param other The other <code>FreeColGameObject</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> to make.
+     * @param our Our {@code FreeColGameObject} that is negotiating.
+     * @param other The other {@code FreeColGameObject} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} to make.
      */
     public DiplomacyMessage(FreeColGameObject our, FreeColGameObject other,
                             DiplomaticTrade agreement) {
@@ -81,11 +81,11 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DiplomacyMessage</code>.
+     * Create a new {@code DiplomacyMessage}.
      *
-     * @param unit The <code>Unit</code> that is negotiating.
-     * @param otherUnit The other <code>Unit</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> to make.
+     * @param unit The {@code Unit} that is negotiating.
+     * @param otherUnit The other {@code Unit} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} to make.
      */
     public DiplomacyMessage(Unit unit, Unit otherUnit,
                             DiplomaticTrade agreement) {
@@ -93,11 +93,11 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DiplomacyMessage</code>.
+     * Create a new {@code DiplomacyMessage}.
      *
-     * @param unit The <code>Unit</code> that is negotiating.
-     * @param colony The <code>Colony</code> to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> to make.
+     * @param unit The {@code Unit} that is negotiating.
+     * @param colony The {@code Colony} to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} to make.
      */
     public DiplomacyMessage(Unit unit, Colony colony,
                             DiplomaticTrade agreement) {
@@ -105,11 +105,11 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DiplomacyMessage</code>.
+     * Create a new {@code DiplomacyMessage}.
      *
-     * @param colony The <code>Colony</code> that is negotiating.
-     * @param unit The <code>Unit</code> that to negotiate with.
-     * @param agreement The <code>DiplomaticTrade</code> to make.
+     * @param colony The {@code Colony} that is negotiating.
+     * @param unit The {@code Unit} that to negotiate with.
+     * @param agreement The {@code DiplomaticTrade} to make.
      */
     public DiplomacyMessage(Colony colony, Unit unit,
                             DiplomaticTrade agreement) {
@@ -117,12 +117,12 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DiplomacyMessage</code> from a
+     * Create a new {@code DiplomacyMessage} from a
      * supplied element.  The unit is supplied in case it was hidden in
      * some way, such as aboard a ship.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public DiplomacyMessage(Game game, Element element) {
         super(getTagName());
@@ -137,9 +137,9 @@ public class DiplomacyMessage extends DOMMessage {
     // Public interface
 
     /**
-     * Get the extra <code>Unit</code>.
+     * Get the extra {@code Unit}.
      *
-     * @return The extra <code>Unit</code>, or null if none.
+     * @return The extra {@code Unit}, or null if none.
      */
     public Unit getExtraUnit() {
         return this.extraUnit;
@@ -148,8 +148,8 @@ public class DiplomacyMessage extends DOMMessage {
     /**
      * Get our FCGO.
      *
-     * @param game The <code>Game</code> to extract the FCGO from.
-     * @return Our <code>FreeColGameObject</code>.
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return Our {@code FreeColGameObject}.
      */
     public FreeColGameObject getOurFCGO(Game game) {
         return game.getFreeColGameObject(this.ourId);
@@ -158,15 +158,15 @@ public class DiplomacyMessage extends DOMMessage {
     /**
      * Get the other FCGO.
      *
-     * @param game The <code>Game</code> to extract the FCGO from.
-     * @return The other <code>FreeColGameObject</code>.
+     * @param game The {@code Game} to extract the FCGO from.
+     * @return The other {@code FreeColGameObject}.
      */
     public FreeColGameObject getOtherFCGO(Game game) {
         return game.getFreeColGameObject(this.otherId);
     }
 
     /**
-     * Get the agreement (a <code>DiplomaticTrade</code>) in this message.
+     * Get the agreement (a {@code DiplomaticTrade}) in this message.
      *
      * @return The agreement in this message.
      */
@@ -175,9 +175,9 @@ public class DiplomacyMessage extends DOMMessage {
     }
 
     /**
-     * Set the agreement (a <code>DiplomaticTrade</code>) in this message.
+     * Set the agreement (a {@code DiplomaticTrade}) in this message.
      *
-     * @param agreement The <code>DiplomaticTrade</code> to set.
+     * @param agreement The {@code DiplomaticTrade} to set.
      * @return This message.
      */
     public DiplomacyMessage setAgreement(DiplomaticTrade agreement) {
@@ -189,11 +189,11 @@ public class DiplomacyMessage extends DOMMessage {
     /**
      * Handle a "diplomacy"-message.
      *
-     * @param server The <code>FreeColServer</code> that handles the message.
-     * @param connection The <code>Connection</code> the message is from.
-     * @return An <code>Element</code> describing the trade with
+     * @param server The {@code FreeColServer} that handles the message.
+     * @param connection The {@code Connection} the message is from.
+     * @return An {@code Element} describing the trade with
      *     either "accept" or "reject" status, null on trade failure,
-     *     or an error <code>Element</code> on outright error.
+     *     or an error {@code Element} on outright error.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

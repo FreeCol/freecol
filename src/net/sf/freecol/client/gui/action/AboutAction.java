@@ -34,9 +34,9 @@ public class AboutAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>AboutAction</code>.
+     * Creates a new {@code AboutAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public AboutAction(FreeColClient freeColClient) {
         super(freeColClient, id);

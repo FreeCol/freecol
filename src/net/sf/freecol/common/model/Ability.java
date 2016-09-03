@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The <code>Ability</code> class encapsulates a bonus or penalty
+ * The {@code Ability} class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
  */
@@ -413,17 +413,17 @@ public final class Ability extends Feature {
     /**
      * Deliberately trivial constructor.
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     protected Ability(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
      * @param id The object identifier.
-     * @param source The source <code>FreeColSpecObjectType</code>.
+     * @param source The source {@code FreeColSpecObjectType}.
      * @param value The ability value.
      */
     public Ability(String id, FreeColSpecObjectType source, boolean value) {
@@ -435,7 +435,7 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
      * @param id The object identifier.
      */
@@ -444,7 +444,7 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
      * @param id The object identifier.
      * @param value The ability value.
@@ -454,9 +454,9 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
-     * @param template An <code>Ability</code> to copy from.
+     * @param template An {@code Ability} to copy from.
      */
     public Ability(Ability template) {
         this((Specification)null);
@@ -466,10 +466,10 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification A <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification A {@code Specification} to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public Ability(FreeColXMLReader xr,
@@ -480,10 +480,10 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Creates a new <code>Ability</code> instance.
+     * Creates a new {@code Ability} instance.
      *
-     * @param e The <code>Element</code> to read from.
-     * @param specification A <code>Specification</code> to refer to.
+     * @param e The {@code Element} to read from.
+     * @param specification A {@code Specification} to refer to.
      */
     public Ability(Element e, Specification specification) {
         this(specification);

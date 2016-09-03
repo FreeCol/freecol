@@ -103,7 +103,7 @@ public class FreeColDebugger {
     /**
      * Is a particular debug mode enabled in this game?
      *
-     * @param mode The <code>DebugMode</code> to test.
+     * @param mode The {@code DebugMode} to test.
      * @return True if the specified mode is enabled.
      */
     public static boolean isInDebugMode(DebugMode mode) {
@@ -122,7 +122,7 @@ public class FreeColDebugger {
     /**
      * Enables a particular debug mode.
      *
-     * @param mode The <code>DebugMode</code> to enable.
+     * @param mode The {@code DebugMode} to enable.
      */
     public static void enableDebugMode(DebugMode mode) {
         FreeColDebugger.debugMode |= 1 << mode.ordinal();
@@ -235,7 +235,7 @@ public class FreeColDebugger {
     /**
      * Try to complete a debug run if one is happening.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param force Force early completion of a run.
      * @return True if a debug run was completed.
      */
@@ -288,7 +288,7 @@ public class FreeColDebugger {
     /**
      * Should the map viewer display colony values for a player?
      *
-     * @return The <code>Player</code> to display colony values for,
+     * @return The {@code Player} to display colony values for,
      *     or null if not to display.
      */
     public static Player debugDisplayColonyValuePlayer() {
@@ -298,7 +298,7 @@ public class FreeColDebugger {
     /**
      * Set the player to display colony values for.
      *
-     * @param display The new <code>Player</code> to display for.
+     * @param display The new {@code Player} to display for.
      */
     public static void setDebugDisplayColonyValuePlayer(Player display) {
         displayColonyValuePlayer = display;
@@ -388,7 +388,7 @@ public class FreeColDebugger {
     /**
      * Helper that adds a stack trace to a log builder.
      *
-     * @param lb The <code>LogBuilder</code> to add to.
+     * @param lb The {@code LogBuilder} to add to.
      */
     public static void addStackTrace(LogBuilder lb) {
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {

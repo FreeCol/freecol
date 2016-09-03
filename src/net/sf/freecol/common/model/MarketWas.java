@@ -49,7 +49,7 @@ public class MarketWas {
     /**
      * Make a new MarketWas instance for the given player.
      *
-     * @param player The <code>Player</code> to find a market for.
+     * @param player The {@code Player} to find a market for.
      */
     public MarketWas(Player player) {
         this.market = player.getMarket();
@@ -64,7 +64,7 @@ public class MarketWas {
     /**
      * Fire any property changes resulting from actions in Market.
      *
-     * @param req A list of <code>AbstractGoods</code> that changed hands.
+     * @param req A list of {@code AbstractGoods} that changed hands.
      */
     public void fireChanges(List<AbstractGoods> req) {
         for (AbstractGoods ag : req) fireChanges(ag.getType(), ag.getAmount());
@@ -73,7 +73,7 @@ public class MarketWas {
     /**
      * Fire any property changes resulting from actions in Market.
      *
-     * @param type A <code>GoodsType</code> that changed hands.
+     * @param type A {@code GoodsType} that changed hands.
      * @param amount The amount of goods that changed hands.
      */
     public void fireChanges(GoodsType type, int amount) {

@@ -169,8 +169,8 @@ public class NameCache {
     /**
      * Make a key for a player and region type.
      *
-     * @param player The <code>Player</code> to install region names for.
-     * @param type The <code>RegionType</code> to get names of.
+     * @param player The {@code Player} to install region names for.
+     * @param type The {@code RegionType} to get names of.
      * @return A key for the player and region type.
      */
     private static String makeRegionKey(Player player, RegionType type) {
@@ -181,8 +181,8 @@ public class NameCache {
     /**
      * Initialize the region names for a player.
      *
-     * @param player The <code>Player</code> to install region names for.
-     * @param type The <code>RegionType</code> to get names of.
+     * @param player The {@code Player} to install region names for.
+     * @param type The {@code RegionType} to get names of.
      */
     private static void requireRegionNames(Player player, RegionType type) {
         synchronized (regionNameLock) {
@@ -265,7 +265,7 @@ public class NameCache {
     /**
      * Initialize the settlement names for a player.
      *
-     * @param player The <code>Player</code> to install names for.
+     * @param player The {@code Player} to install names for.
      * @param random A pseudo-random number source.
      */
     private static void requireSettlementNames(Player player, Random random) {
@@ -306,7 +306,7 @@ public class NameCache {
     /**
      * Initialize the shipNames for a player.
      *
-     * @param player The <code>Player</code> to install names for.
+     * @param player The {@code Player} to install names for.
      * @param random A pseudo-random number source.
      */
     private static void requireShipNames(Player player, Random random) {
@@ -402,7 +402,7 @@ public class NameCache {
     /**
      * Get the new land name for a player.
      *
-     * @param player The <code>Player</code> to query.
+     * @param player The {@code Player} to query.
      * @return The new land name of a player.
      */
     public static String getNewLandName(Player player) {
@@ -415,8 +415,8 @@ public class NameCache {
      * Creates a unique region name for a player by fetching a new
      * name from the list of default names if possible.
      *
-     * @param player The <code>Player</code> to find a region name for.
-     * @param region The <code>Region</code> to name.
+     * @param player The {@code Player} to find a region name for.
+     * @param region The {@code Region} to name.
      * @return A suitable name.
      */
     public static String getRegionName(Player player, Region region) {
@@ -485,7 +485,7 @@ public class NameCache {
     /**
      * Get a fallback settlement name for a player.
      *
-     * @param player The <code>Player</code> to get a fallback
+     * @param player The {@code Player} to get a fallback
      *     settlement name for.
      * @return A unique fallback settlement name for the player.
      */
@@ -498,7 +498,7 @@ public class NameCache {
     /**
      * Get the name of this players capital.  Only meaningful to natives.
      *
-     * @param player The <code>Player</code> to get a capital name for.
+     * @param player The {@code Player} to get a capital name for.
      * @param random An optional pseudo-random number source.
      * @return The name of this players capital.
      */
@@ -512,7 +512,7 @@ public class NameCache {
     /**
      * Get a settlement name suitable for a player.
      *
-     * @param player The <code>Player</code> to get a settlement name for.
+     * @param player The {@code Player} to get a settlement name for.
      * @param random An optional pseudo-random number source.
      * @return A new settlement name.
      */
@@ -538,7 +538,7 @@ public class NameCache {
     /**
      * Puts a suggested settlement name back into the pool.
      *
-     * @param player The <code>Player</code> returning the settlement name.
+     * @param player The {@code Player} returning the settlement name.
      * @param name A formerly suggested settlement name.
      */
     public static void putSettlementName(Player player, String name) {
@@ -554,7 +554,7 @@ public class NameCache {
     /**
      * Get a new default trade route name for a player.
      *
-     * @param player The <code>Player</code> to get the name for.
+     * @param player The {@code Player} to get the name for.
      * @return A new trade route name.
      */
     public static String getTradeRouteName(Player player) {
@@ -572,8 +572,8 @@ public class NameCache {
      * Currently only names naval units, not specific to type.
      * FIXME: specific names for types.
      *
-     * @param player The <code>Player</code> who will own the unit.
-     * @param type The <code>UnitType</code> to choose a name for.
+     * @param player The {@code Player} who will own the unit.
+     * @param type The {@code UnitType} to choose a name for.
      * @param random A pseudo-random number source.
      * @return A name for the unit, or null if not available.
      */

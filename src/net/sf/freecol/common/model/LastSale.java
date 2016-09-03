@@ -47,9 +47,9 @@ public final class LastSale extends FreeColObject {
     /**
      * Make a new LastSale record.
      *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
-     * @param when In which <code>Turn</code> the sale occurred.
+     * @param where The {@code Location} of the sale.
+     * @param what The {@code GoodsType} sold.
+     * @param when In which {@code Turn} the sale occurred.
      * @param price The per-unit price of the sale.
      */
     public LastSale(Location where, GoodsType what,
@@ -61,7 +61,7 @@ public final class LastSale extends FreeColObject {
      * Make a new LastSale record.
      *
      * @param id The object identifier.
-     * @param when In which <code>Turn</code> the sale occurred.
+     * @param when In which {@code Turn} the sale occurred.
      * @param price The per-unit price of the sale.
      */
     public LastSale(String id, Turn when, int price) {
@@ -73,7 +73,7 @@ public final class LastSale extends FreeColObject {
     /**
      * Create a new last sale by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public LastSale(FreeColXMLReader xr) throws XMLStreamException {
@@ -82,9 +82,9 @@ public final class LastSale extends FreeColObject {
 
 
     /**
-     * Get the <code>Turn</code> when the sale was made.
+     * Get the {@code Turn} when the sale was made.
      *
-     * @return The <code>Turn</code> when the sale was made.
+     * @return The {@code Turn} when the sale was made.
      */
     public Turn getWhen() {
         return when;
@@ -102,8 +102,8 @@ public final class LastSale extends FreeColObject {
     /**
      * Make a String to be used as a key for looking up sales.
      *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
+     * @param where The {@code Location} of the sale.
+     * @param what The {@code GoodsType} sold.
      *
      * @return A key string.
      */

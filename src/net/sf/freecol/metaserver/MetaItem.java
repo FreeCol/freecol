@@ -47,7 +47,7 @@ public class MetaItem extends ServerInfo {
      * Gets the last time this object was updated.
      *
      * @return The timestamp of the last time this object was updated,
-     *     as returned by <code>System.currentTimeMillis()</code>.
+     *     as returned by {@code System.currentTimeMillis()}.
      */
     public long getLastUpdated() {
         return this.lastUpdated;

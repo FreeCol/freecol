@@ -49,11 +49,11 @@ public class MoveMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>MoveMessage</code> for the supplied unit and
+     * Create a new {@code MoveMessage} for the supplied unit and
      * direction.
      *
-     * @param unit The <code>Unit</code> to move.
-     * @param direction The <code>Direction</code> to move in.
+     * @param unit The {@code Unit} to move.
+     * @param direction The {@code Direction} to move in.
      */
     public MoveMessage(Unit unit, Direction direction) {
         super(getTagName());
@@ -63,11 +63,11 @@ public class MoveMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>MoveMessage</code> from a
+     * Create a new {@code MoveMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public MoveMessage(Game game, Element element) {
         super(getTagName());
@@ -80,11 +80,11 @@ public class MoveMessage extends DOMMessage {
     /**
      * Handle a "move"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the moved unit, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

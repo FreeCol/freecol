@@ -56,9 +56,9 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
     /**
      * Creates a dialog to display the warehouse.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param colony The <code>Colony</code> containing the warehouse.
+     * @param colony The {@code Colony} containing the warehouse.
      */
     public WarehouseDialog(FreeColClient freeColClient, JFrame frame,
             Colony colony) {

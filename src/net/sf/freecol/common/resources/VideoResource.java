@@ -24,7 +24,7 @@ import java.net.URI;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>Video</code>.
+ * A {@code Resource} wrapping a <code>Video</code>.
  * 
  * @see Resource
  * @see Video
@@ -37,7 +37,7 @@ public class VideoResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if the URI is malformed.
      */
@@ -49,9 +49,9 @@ public class VideoResource extends Resource {
 
 
     /**
-     * Gets the <code>Video</code> represented by this resource.
+     * Gets the {@code Video} represented by this resource.
      *
-     * @return The <code>Video</code> in its original size.
+     * @return The {@code Video} in its original size.
      */
     public Video getVideo() {
         return this.video;

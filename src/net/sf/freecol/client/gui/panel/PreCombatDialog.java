@@ -56,11 +56,11 @@ public class PreCombatDialog extends FreeColConfirmDialog {
     /**
      * Create a new pre-combat dialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param attacker The attacker <code>Unit</code>.
-     * @param defender The defender (either a <code>Unit</code> or
-     *     a <code>Settlement</code>).
+     * @param attacker The attacker {@code Unit}.
+     * @param defender The defender (either a {@code Unit} or
+     *     a {@code Settlement}).
      */
     public PreCombatDialog(FreeColClient freeColClient, JFrame frame,
             Unit attacker, FreeColGameObject defender) {

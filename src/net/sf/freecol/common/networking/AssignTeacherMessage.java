@@ -45,11 +45,11 @@ public class AssignTeacherMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AssignTeacherMessage</code> with the
+     * Create a new {@code AssignTeacherMessage} with the
      * supplied student and teacher.
      *
-     * @param student The student <code>Unit</code>.
-     * @param teacher The teacher <code>Unit</code>.
+     * @param student The student {@code Unit}.
+     * @param teacher The teacher {@code Unit}.
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
         super(getTagName());
@@ -59,11 +59,11 @@ public class AssignTeacherMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AssignTeacherMessage</code> from a
+     * Create a new {@code AssignTeacherMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AssignTeacherMessage(Game game, Element element) {
         super(getTagName());
@@ -76,11 +76,11 @@ public class AssignTeacherMessage extends DOMMessage {
     /**
      * Handle a "assignTeacher"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the student-teacher assignment or
-     *     an error <code>Element</code> on failure.
+     *     an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

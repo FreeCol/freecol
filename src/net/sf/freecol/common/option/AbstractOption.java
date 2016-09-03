@@ -52,10 +52,10 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
 
 
     /**
-     * Creates a new <code>AbstractOption</code>.
+     * Creates a new {@code AbstractOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public AbstractOption(String id, Specification specification) {
         super(specification);
@@ -64,7 +64,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     }
 
     /**
-     * Creates a new <code>AbstractOption</code>.
+     * Creates a new {@code AbstractOption}.
      *
      * @param id The object identifier.
      */
@@ -73,9 +73,9 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     }
 
     /**
-     * Creates a new <code>AbstractOption</code>.
+     * Creates a new {@code AbstractOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
@@ -84,7 +84,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
 
     /**
      * Gets the string prefix that identifies the group of this
-     * <code>Option</code>.
+     * {@code Option}.
      *
      * @return The string prefix provided by the OptionGroup.
      */
@@ -104,7 +104,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     /**
      * Sets the values from another option.
      *
-     * @param source The other <code>AbstractOption</code>.
+     * @param source The other {@code AbstractOption}.
      */
     protected void setValues(AbstractOption<T> source) {
         setId(source.getId());
@@ -121,9 +121,9 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
      * a suitable string representation.
      *
      * @param valueString The string representation of the value of
-     *     this <code>Option</code>.
+     *     this {@code Option}.
      * @param defaultValueString The string representation of the
-     *     default value of this <code>Option</code>.
+     *     default value of this {@code Option}.
      * @exception XMLStreamException if the value is invalid.
      */
     protected void setValue(String valueString, String defaultValueString)
@@ -163,7 +163,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     /**
      * Gets the value of this option.
      *
-     * @return The value of this <code>Option</code>.
+     * @return The value of this {@code Option}.
      */
     @Override
     public abstract T getValue();
@@ -171,7 +171,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     /**
      * Sets the value of this option.
      *
-     * @param value The new value of this <code>Option</code>.
+     * @param value The new value of this {@code Option}.
      */
     @Override
     public abstract void setValue(T value);
@@ -211,7 +211,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     /**
      * General option reader routine.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @return An option.
      * @exception XMLStreamException on stream errors.
      */

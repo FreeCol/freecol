@@ -99,20 +99,20 @@ public class LostCityRumour extends TileItem {
 
 
     /**
-     * Creates a new <code>LostCityRumour</code> instance.
+     * Creates a new {@code LostCityRumour} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> where the LCR is.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} where the LCR is.
      */
     public LostCityRumour(Game game, Tile tile) {
         super(game, tile);
     }
 
     /**
-     * Creates a new <code>LostCityRumour</code> instance.
+     * Creates a new {@code LostCityRumour} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> where the LCR is.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} where the LCR is.
      * @param type The type of rumour.
      * @param name The name of the rumour.
      */
@@ -124,9 +124,9 @@ public class LostCityRumour extends TileItem {
     }
 
     /**
-     * Creates a new <code>LostCityRumour</code> instance.
+     * Creates a new {@code LostCityRumour} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public LostCityRumour(Game game, String id) {
@@ -137,7 +137,7 @@ public class LostCityRumour extends TileItem {
     /**
      * Get the type of rumour.
      *
-     * @return The <code>RumourType</code>.
+     * @return The {@code RumourType}.
      */
     public final RumourType getType() {
         return type;
@@ -175,7 +175,7 @@ public class LostCityRumour extends TileItem {
      * The scouting outcome is based on three factors: good/bad percent
      * rumour difficulty option, expert scout or not, DeSoto or not.
      *
-     * @param unit The <code>Unit</code> exploring (optional).
+     * @param unit The {@code Unit} exploring (optional).
      * @param random A random number source.
      * @return The type of rumour.
      *
@@ -264,10 +264,10 @@ public class LostCityRumour extends TileItem {
     /**
      * Get the message for a "nothing" rumour.
      *
-     * @param player The <code>Player</code> to generate the message for.
+     * @param player The {@code Player} to generate the message for.
      * @param mounds Is this rumour a result of exploring "strange mounds"?
      * @param random A pseudo-random number source.
-     * @return A suitable <code>ModelMessage</code>.
+     * @return A suitable {@code ModelMessage}.
      */
     public ModelMessage getNothingMessage(Player player, boolean mounds,
                                           Random random) {

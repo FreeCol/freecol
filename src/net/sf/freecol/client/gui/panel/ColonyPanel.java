@@ -143,7 +143,7 @@ public final class ColonyPanel extends PortPanel
     private JButton setGoodsButton = null;
     private JButton traceWorkButton = null;
 
-    /** The <code>Colony</code> this panel is displaying. */
+    /** The {@code Colony} this panel is displaying. */
     private Colony colony = null;
 
     // inherit PortPanel.pressListener
@@ -183,8 +183,8 @@ public final class ColonyPanel extends PortPanel
     /**
      * The constructor for the panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colony The <code>Colony</code> to display in this panel.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colony The {@code Colony} to display in this panel.
      */
     public ColonyPanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient,
@@ -377,7 +377,7 @@ public final class ColonyPanel extends PortPanel
      * or when an existing colony panel is changed via the colony name
      * menu in the nameBox.
      *
-     * @param colony The <code>Colony</code> to be displayed.
+     * @param colony The {@code Colony} to be displayed.
      */
     private void initialize(Colony colony) {
         cleanup();
@@ -731,8 +731,8 @@ public final class ColonyPanel extends PortPanel
     /**
      * Try to assign a unit to work in a colony work location.
      *
-     * @param unit The <code>Unit</code> that is to work.
-     * @param wl The <code>WorkLocation</code> to work in.
+     * @param unit The {@code Unit} that is to work.
+     * @param wl The {@code WorkLocation} to work in.
      * @return True if the unit is now in the work location.
      */
     private boolean tryWork(Unit unit, WorkLocation wl) {
@@ -759,31 +759,31 @@ public final class ColonyPanel extends PortPanel
     // Public base accessors and mutators
 
     /**
-     * Gets the <code>Colony</code> in use.
+     * Gets the {@code Colony} in use.
      *
      * Try to use this at the top of all the routines that need the colony,
      * to get a stable value.  There have been nasty races when the colony
      * changes out from underneath us, and more may be lurking.
      *
-     * @return The <code>Colony</code>.
+     * @return The {@code Colony}.
      */
     public synchronized final Colony getColony() {
         return colony;
     }
 
     /**
-     * Gets the <code>TilesPanel</code>-object in use.
+     * Gets the {@code TilesPanel}-object in use.
      *
-     * @return The <code>TilesPanel</code>.
+     * @return The {@code TilesPanel}.
      */
     public final TilesPanel getTilesPanel() {
         return tilesPanel;
     }
 
     /**
-     * Gets the <code>WarehousePanel</code>-object in use.
+     * Gets the {@code WarehousePanel}-object in use.
      *
-     * @return The <code>WarehousePanel</code>.
+     * @return The {@code WarehousePanel}.
      */
     public final WarehousePanel getWarehousePanel() {
         return warehousePanel;
@@ -878,7 +878,7 @@ public final class ColonyPanel extends PortPanel
 
 
     /**
-     * Close this <code>ColonyPanel</code>.
+     * Close this {@code ColonyPanel}.
      */
     public void closeColonyPanel() {
         final Colony colony = getColony();
@@ -1131,7 +1131,7 @@ public final class ColonyPanel extends PortPanel
         /**
          * Create this colony cargo panel.
          *
-         * @param freeColClient The <code>FreeColClient</code> for the game.
+         * @param freeColClient The {@code FreeColClient} for the game.
          */
         public ColonyCargoPanel(FreeColClient freeColClient) {
             super(freeColClient, true);
@@ -1757,7 +1757,7 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * This panel is a single line (one building) in the
-         * <code>BuildingsPanel</code>.
+         * {@code BuildingsPanel}.
          */
         public final class ASingleBuildingPanel extends BuildingPanel
             implements DropTarget  {
@@ -1774,7 +1774,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * Creates this ASingleBuildingPanel.
              *
-             * @param building The <code>Building</code> to display
+             * @param building The {@code Building} to display
              *     information from.
              */
             public ASingleBuildingPanel(Building building) {
@@ -1829,7 +1829,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * Try to assign a unit to work this building.
              *
-             * @param unit The <code>Unit</code> to try.
+             * @param unit The {@code Unit} to try.
              * @return True if the work begins.
              */
             private boolean tryWork(Unit unit) {
@@ -1993,7 +1993,7 @@ public final class ColonyPanel extends PortPanel
         }
 
         /**
-         * Panel for visualizing a <code>ColonyTile</code>.  The
+         * Panel for visualizing a {@code ColonyTile}.  The
          * component itself is not visible, however the content of the
          * component is (i.e. the people working and the production)
          */
@@ -2007,7 +2007,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * Create a new single tile panel.
              *
-             * @param colonyTile The <code>ColonyTile</code> to monitor.
+             * @param colonyTile The {@code ColonyTile} to monitor.
              * @param x The x offset.
              * @param y The y offset.
              */
@@ -2116,7 +2116,7 @@ public final class ColonyPanel extends PortPanel
              *
              * If a unit is on it update the tooltip of it instead.
              *
-             * @param unitLabel The <code>UnitLabel</code> to update.
+             * @param unitLabel The {@code UnitLabel} to update.
              */
             private void updateDescriptionLabel(UnitLabel unitLabel) {
                 String tileMsg = Messages.message(colonyTile.getLabel());
@@ -2133,7 +2133,7 @@ public final class ColonyPanel extends PortPanel
             /**
              * Try to work this tile with a specified unit.
              *
-             * @param unit The <code>Unit</code> to work the tile.
+             * @param unit The {@code Unit} to work the tile.
              * @return True if the unit succeeds.
              */
             private boolean tryWork(Unit unit) {
@@ -2260,7 +2260,7 @@ public final class ColonyPanel extends PortPanel
             // Override JComponent
 
             /**
-             * Checks if this <code>JComponent</code> contains the given
+             * Checks if this {@code JComponent} contains the given
              * coordinate.
              *
              * @param px The x coordinate to check.

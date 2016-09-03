@@ -46,7 +46,7 @@ public final class SaveDialog extends FreeColDialog<File> {
     /**
      * Creates a dialog to choose a file to load.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param directory The directory to display when choosing the file.
      * @param fileFilters The available file filters in the dialog.

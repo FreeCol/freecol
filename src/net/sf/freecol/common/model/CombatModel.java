@@ -187,7 +187,7 @@ public abstract class CombatModel {
      * Get a comparator to order units by relative military strength
      * with respect to this combat model.
      *
-     * @return A suitable unit <code>Comparator</code>.
+     * @return A suitable unit {@code Comparator}.
      */
     public final Comparator<Unit> getMilitaryStrengthComparator() {
         return (u1, u2) -> Double.compare(calculateCombatOdds(u1, u2).win,
@@ -199,7 +199,7 @@ public abstract class CombatModel {
      *
      * @param attacker The attacker.
      * @param defender The defender.
-     * @return The <code>CombatOdds</code>.
+     * @return The {@code CombatOdds}.
      */
     public abstract CombatOdds calculateCombatOdds(FreeColGameObject attacker,
                                                    FreeColGameObject defender);

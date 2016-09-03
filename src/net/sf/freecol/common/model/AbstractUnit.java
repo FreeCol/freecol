@@ -73,9 +73,9 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>AbstractUnit</code> instance.
+     * Creates a new {@code AbstractUnit} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if an error occurs
      */
     public AbstractUnit(FreeColXMLReader xr) throws XMLStreamException {
@@ -122,7 +122,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Gets a template describing this abstract unit.
      *
-     * @return A <code>StringTemplate</code> describing the abstract unit.
+     * @return A {@code StringTemplate} describing the abstract unit.
      */
     public StringTemplate getLabel() {
         StringTemplate tmpl = Messages.getUnitLabel(null, getId(), getNumber(),
@@ -135,7 +135,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Get a description of this abstract unit.
      *
-     * @return A <code>String</code> describing this abstract unit.
+     * @return A {@code String} describing this abstract unit.
      */
     public String getDescription() {
         return Messages.message(getLabel());
@@ -144,8 +144,8 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Convenience accessor for the role.
      *
-     * @param spec A <code>Specification</code> to look up the role in.
-     * @return The <code>Role</code> of this abstract unit.
+     * @param spec A {@code Specification} to look up the role in.
+     * @return The {@code Role} of this abstract unit.
      */
     public Role getRole(Specification spec) {
         return spec.getRole(getRoleId());
@@ -154,8 +154,8 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Convenience accessor for the unit type.
      *
-     * @param spec A <code>Specification</code> to look up the type in.
-     * @return The <code>UnitType</code> of this abstract unit.
+     * @param spec A {@code Specification} to look up the type in.
+     * @return The {@code UnitType} of this abstract unit.
      */
     public UnitType getType(Specification spec) {
         return spec.getUnitType(getId());
@@ -165,7 +165,7 @@ public class AbstractUnit extends FreeColObject {
      * Get the approximate offence power that an instantiated unit
      * corresponding to this abstract form would have.
      *
-     * @param spec A <code>Specification</code> to look up.
+     * @param spec A {@code Specification} to look up.
      * @return The approximate offence power.
      */
     public double getOffence(Specification spec) {
@@ -178,8 +178,8 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Calculate the approximate offence power of a list of units.
      *
-     * @param spec A <code>Specification</code> to look up the type in.
-     * @param units A list of <code>AbstractUnit</code>s.
+     * @param spec A {@code Specification} to look up the type in.
+     * @param units A list of {@code AbstractUnit}s.
      * @return The approximate offence power.
      */
     public static double calculateStrength(Specification spec,
@@ -190,8 +190,8 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Get a deep copy of a list of abstract units.
      *
-     * @param units The list of <code>AbstractUnit</code>s to copy.
-     * @return A list of <code>AbstractUnit</code>s.
+     * @param units The list of {@code AbstractUnit}s to copy.
+     * @return A list of {@code AbstractUnit}s.
      */
     public static List<AbstractUnit> deepCopy(List<AbstractUnit> units) {
         return transform(units, alwaysTrue(), au ->
@@ -202,8 +202,8 @@ public class AbstractUnit extends FreeColObject {
      * Get a template for a list of abstract units.
      *
      * @param base The label template base.
-     * @param units The list of <code>AbstractUnit</code>s to use.
-     * @return A suitable <code>StringTemplate</code>.
+     * @param units The list of {@code AbstractUnit}s to use.
+     * @return A suitable {@code StringTemplate}.
      */
     public static StringTemplate getListLabel(String base,
                                               List<AbstractUnit> units) {

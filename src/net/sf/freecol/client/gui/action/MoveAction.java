@@ -37,10 +37,10 @@ public class MoveAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>MoveAction</code>.
+     * Creates a new {@code MoveAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param direction The <code>Direction</code> to move.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param direction The {@code Direction} to move.
      */
     public MoveAction(FreeColClient freeColClient, Direction direction) {
         super(freeColClient, id + direction);
@@ -49,11 +49,11 @@ public class MoveAction extends MapboardAction {
     }
 
     /**
-     * Creates a new <code>MoveAction</code>.
+     * Creates a new {@code MoveAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param direction The <code>Direction</code> to move in.
-     * @param secondary a <code>boolean</code> value
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param direction The {@code Direction} to move in.
+     * @param secondary a {@code boolean} value
      */
     public MoveAction(FreeColClient freeColClient, Direction direction,
                       boolean secondary) {

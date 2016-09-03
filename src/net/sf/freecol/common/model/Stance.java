@@ -62,8 +62,8 @@ public enum Stance implements Named {
      * thresholds, add in Tension.DELTA to provide a bit of
      * hysteresis to dampen ringing.
      *
-     * @param tension The <code>Tension</code> to check.
-     * @return The <code>Stance</code> appropriate to the tension level.
+     * @param tension The {@code Tension} to check.
+     * @return The {@code Stance} appropriate to the tension level.
      */
     public Stance getStanceFromTension(Tension tension) {
         int value = tension.getValue();
@@ -95,7 +95,7 @@ public enum Stance implements Named {
      * A stance change is about to happen.  Get the appropriate tension
      * modifier.
      *
-     * @param newStance The new <code>Stance</code>.
+     * @param newStance The new {@code Stance}.
      * @return A modifier to the current tension.
      */
     public int getTensionModifier(Stance newStance) {

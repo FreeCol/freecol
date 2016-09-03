@@ -129,7 +129,7 @@ public final class ReportLabourPanel extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      */
     public ReportLabourPanel(FreeColClient freeColClient) {
         super(freeColClient, "reportLabourAction");

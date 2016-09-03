@@ -51,9 +51,9 @@ public final class SelectTributeAmountDialog
     /**
      * The constructor to use.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param frame The owner frame.
-     * @param question A <code>StringTemplate</code> describing the
+     * @param question A {@code StringTemplate} describing the
      *     input required.
      * @param maximum The inclusive maximum integer input value.
      */

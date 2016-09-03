@@ -46,19 +46,19 @@ public class GoToMission extends AbstractMission {
 
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new {@code GoToMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      */
     public GoToMission(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new {@code GoToMission} instance.
      *
-     * @param game a <code>Game</code> value
-     * @param xr a <code>FreeColXMLReader</code> value
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
      * @exception XMLStreamException if an error occurs
      */
     public GoToMission(Game game,
@@ -67,9 +67,9 @@ public class GoToMission extends AbstractMission {
     }
 
     /**
-     * Creates a new <code>GoToMission</code> instance.
+     * Creates a new {@code GoToMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      * @param id The object identifier.
      */
     public GoToMission(Game game, String id) {
@@ -78,16 +78,16 @@ public class GoToMission extends AbstractMission {
 
 
     /**
-     * Get the <code>Destination</code> value.
+     * Get the {@code Destination} value.
      *
-     * @return an <code>Location</code> value
+     * @return an {@code Location} value
      */
     public final Location getDestination() {
         return destination;
     }
 
     /**
-     * Set the <code>Destination</code> value.
+     * Set the {@code Destination} value.
      *
      * @param newDestination The new Destination value.
      */
@@ -96,16 +96,16 @@ public class GoToMission extends AbstractMission {
     }
 
     /**
-     * Get the <code>BlockedCount</code> value.
+     * Get the {@code BlockedCount} value.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public final int getBlockedCount() {
         return blockedCount;
     }
 
     /**
-     * Set the <code>BlockedCount</code> value.
+     * Set the {@code BlockedCount} value.
      *
      * @param newBlockedCount The new BlockedCount value.
      */
@@ -127,7 +127,7 @@ public class GoToMission extends AbstractMission {
     /**
      * Returns true if the mission is still valid.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     @Override
     public boolean isValid() {
@@ -141,7 +141,7 @@ public class GoToMission extends AbstractMission {
      * Returns true if the given Unit has movement points. At the
      * moment, this is true for all units.
      *
-     * @param unit an <code>Unit</code> value
+     * @param unit an {@code Unit} value
      * @return false
      */
     public static boolean isValidFor(Unit unit) {

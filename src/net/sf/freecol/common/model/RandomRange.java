@@ -54,7 +54,7 @@ public class RandomRange {
 
 
     /**
-     * Creates a new <code>RandomRange</code> instance.
+     * Creates a new {@code RandomRange} instance.
      *
      * @param probability The probability of this result.
      * @param minimum The range inclusive minimum.
@@ -77,9 +77,9 @@ public class RandomRange {
     }
 
     /**
-     * Read a new <code>RandomRange</code> instance from a stream.
+     * Read a new {@code RandomRange} instance from a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the
      *     stream.
      */
@@ -131,7 +131,7 @@ public class RandomRange {
      * @param random A pseudo-random number source.
      * @param continuous Choose a continuous or discrete result.
      * @return A random amount of plunder as defined by this
-     *     <code>RandomRange</code>.
+     *     {@code RandomRange}.
      */
     public int getAmount(String prefix, Random random, boolean continuous) {
         if (probability >= 100
@@ -166,7 +166,7 @@ public class RandomRange {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */

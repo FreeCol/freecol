@@ -294,8 +294,8 @@ public class LabourData {
         /**
          * Get the labour data (create on demand).
          *
-         * @param colony The <code>Colony</code> to query.
-         * @return The <code>LocationData</code> found.
+         * @param colony The {@code Colony} to query.
+         * @return The {@code LocationData} found.
          */
         private LocationData getLocationData(Colony colony) {
             LocationData colonyData = details.get(colony);

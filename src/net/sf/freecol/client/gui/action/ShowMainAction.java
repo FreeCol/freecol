@@ -25,7 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 
 
 /**
- * Returns to the <code>MainPanel</code>.
+ * Returns to the {@code MainPanel}.
  * All in-game components are removed.
  *
  * @see net.sf.freecol.client.gui.panel.MainPanel
@@ -38,7 +38,7 @@ public class ShowMainAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ShowMainAction(FreeColClient freeColClient) {
         super(freeColClient, id);

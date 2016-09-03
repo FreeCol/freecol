@@ -44,10 +44,10 @@ public class NationSummaryMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>NationSummaryMessage</code> for the
+     * Create a new {@code NationSummaryMessage} for the
      * specified player.
      *
-     * @param player The <code>Player</code> to summarize.
+     * @param player The {@code Player} to summarize.
      */
     public NationSummaryMessage(Player player) {
         super(getTagName());
@@ -57,11 +57,11 @@ public class NationSummaryMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>NationSummaryMessage</code> from a supplied
+     * Create a new {@code NationSummaryMessage} from a supplied
      * element.
      *
-     * @param game The <code>Game</code> containing the nation to summarize.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} containing the nation to summarize.
+     * @param element The {@code Element} to use to create the message.
      */
     public NationSummaryMessage(Game game, Element element) {
         super(getTagName());
@@ -76,7 +76,7 @@ public class NationSummaryMessage extends DOMMessage {
     /**
      * Client side helper to get the player.
      *
-     * @param game The <code>Game</code> to look for a player within.
+     * @param game The {@code Game} to look for a player within.
      * @return The player.
      */
     public Player getPlayer(Game game) {
@@ -95,7 +95,7 @@ public class NationSummaryMessage extends DOMMessage {
     /**
      * Set the nation summary.
      *
-     * @param ns The new <code>NationSummary</code>.
+     * @param ns The new {@code NationSummary}.
      * @return This message.
      */
     public NationSummaryMessage setNationSummary(NationSummary ns) {
@@ -107,11 +107,11 @@ public class NationSummaryMessage extends DOMMessage {
     /**
      * Handle a "nationSummary"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} message was received on.
      *
      * @return An update containing the nation summaries, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

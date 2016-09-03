@@ -35,10 +35,10 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
 
 
     /**
-     * Creates a new <code>TextOptionUI</code> for the given
-     * <code>TextOption</code>.
+     * Creates a new {@code TextOptionUI} for the given
+     * {@code TextOption}.
      *
-     * @param option The <code>TextOption</code> to make a user interface for.
+     * @param option The {@code TextOption} to make a user interface for.
      * @param editable boolean whether user can modify the setting.
      */
     public TextOptionUI(final TextOption option, boolean editable) {

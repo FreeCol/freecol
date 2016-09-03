@@ -40,7 +40,7 @@ public class TerrainCursor implements ActionListener  {
 
 
     /**
-     * Creates a new <code>TerrainCursor</code> instance.
+     * Creates a new {@code TerrainCursor} instance.
      */
     public TerrainCursor() {
         active = true;
@@ -55,7 +55,7 @@ public class TerrainCursor implements ActionListener  {
     /**
      * Returns whether this TerrainCursor is active.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public boolean isActive() {
         return active;
@@ -64,7 +64,7 @@ public class TerrainCursor implements ActionListener  {
     /**
      * Sets the active state of the TerrainCursor.
      *
-     * @param newState a <code>boolean</code> value
+     * @param newState a {@code boolean} value
      */
     public void setActive(boolean newState) {
         active = newState;

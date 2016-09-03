@@ -32,7 +32,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * The <code>StringTemplate</code> represents a non-localized string
+ * The {@code StringTemplate} represents a non-localized string
  * that can be localized by looking up its value in a message bundle
  * or similar Map. The StringTemplate may contain variables (keys)
  * delimited by the '%' character, such as "%amount%" that will be
@@ -81,7 +81,7 @@ public class StringTemplate extends FreeColObject {
      * Copy an existing template, but with a new identifier.
      *
      * @param id The object identifier.
-     * @param template A <code>StringTemplate</code> to copy.
+     * @param template A {@code StringTemplate} to copy.
      */
     protected StringTemplate(String id, StringTemplate template) {
         setId(id);
@@ -92,11 +92,11 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>StringTemplate</code> instance.
+     * Creates a new {@code StringTemplate} instance.
      *
      * @param id The object identifier.
      * @param defaultId The default identifier.
-     * @param templateType The <code>TemplateType</code> for this template.
+     * @param templateType The {@code TemplateType} for this template.
      */
     protected StringTemplate(String id, String defaultId,
                              TemplateType templateType) {
@@ -108,9 +108,9 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Create a new <code>StringTemplate</code> by reading a stream.
+     * Create a new {@code StringTemplate} by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read.
+     * @param xr The {@code FreeColXMLReader} to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public StringTemplate(FreeColXMLReader xr) throws XMLStreamException {
@@ -241,7 +241,7 @@ public class StringTemplate extends FreeColObject {
     /**
      * Add a replacement.
      *
-     * @param replacement The <code>StringTemplate</code> replacement to add.
+     * @param replacement The {@code StringTemplate} replacement to add.
      */
     private void addReplacement(StringTemplate replacement) {
         if (this.replacements == null) this.replacements = new ArrayList<>();
@@ -272,7 +272,7 @@ public class StringTemplate extends FreeColObject {
      *
      * @param <T> The actual return type.
      * @param key The optional key.
-     * @param value The replacement <code>StringTemplate</code>.
+     * @param value The replacement {@code StringTemplate}.
      * @return This object, cast back to its original class.
      */
     @SuppressWarnings("unchecked")
@@ -343,7 +343,7 @@ public class StringTemplate extends FreeColObject {
      *
      * @param <T> The actual return type.
      * @param key The key to add.
-     * @param object The replacement <code>FreeColObject</code>.
+     * @param object The replacement {@code FreeColObject}.
      * @return This.
      */
     public <T extends StringTemplate> T addName(String key, FreeColObject object) {
@@ -376,7 +376,7 @@ public class StringTemplate extends FreeColObject {
      *
      * @param <T> The actual return type.
      * @param key The key to add.
-     * @param named The <code>Named</code> to add.
+     * @param named The {@code Named} to add.
      * @return This.
      */
     public <T extends StringTemplate> T addNamed(String key, Named named) {
@@ -387,7 +387,7 @@ public class StringTemplate extends FreeColObject {
      * Add named object without key to this template.
      *
      * @param <T> The actual return type.
-     * @param named The <code>Named</code> to add.
+     * @param named The {@code Named} to add.
      * @return This.
      */
     public <T extends StringTemplate> T addNamed(Named named) {
@@ -399,7 +399,7 @@ public class StringTemplate extends FreeColObject {
      *
      * @param <T> The actual return type.
      * @param key The key to add.
-     * @param amount The <code>Number</code> value to add.
+     * @param amount The {@code Number} value to add.
      * @return This.
      */
     public <T extends StringTemplate> T addAmount(String key, Number amount) {
@@ -413,7 +413,7 @@ public class StringTemplate extends FreeColObject {
      *
      * @param <T> The actual return type.
      * @param key The key to add.
-     * @param template The <code>StringTemplate</code> value.
+     * @param template The {@code StringTemplate} value.
      * @return This.
      */
     public <T extends StringTemplate> T addStringTemplate(String key,
@@ -431,7 +431,7 @@ public class StringTemplate extends FreeColObject {
      * This is only possible if the StringTemplate is of type LABEL.
      *
      * @param <T> The actual return type.
-     * @param template The replacement <code>StringTemplate</code>.
+     * @param template The replacement {@code StringTemplate}.
      * @return This.
      */
     public <T extends StringTemplate> T addStringTemplate(StringTemplate template) {

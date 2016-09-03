@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Unit;
  * This {@link CostDecider} is used as a default by
  * {@link net.sf.freecol.common.model.Map#findPath} and 
  * {@link net.sf.freecol.common.model.Map#search} 
- * if no other <code>CostDecider</code> has been specified.
+ * if no other {@code CostDecider} has been specified.
  */
 class BaseCostDecider implements CostDecider {
 
@@ -45,12 +45,12 @@ class BaseCostDecider implements CostDecider {
     /**
      * Determines the cost of a single move.
      * 
-     * @param unit The <code>Unit</code> making the move.
-     * @param oldLocation The <code>Location</code> we are moving from.
-     * @param newLocation The <code>Location</code> we are moving to.
+     * @param unit The {@code Unit} making the move.
+     * @param oldLocation The {@code Location} we are moving from.
+     * @param newLocation The {@code Location} we are moving to.
      * @param movesLeftBefore The moves left before making the move.
      * @return The cost of moving the given unit from the
-     *      <code>oldLocation</code> to the <code>newLocation</code>.
+     *      {@code oldLocation} to the <code>newLocation</code>.
      */    
     @Override
     public int getCost(final Unit unit, final Location oldLocation,

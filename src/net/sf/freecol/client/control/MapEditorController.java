@@ -64,23 +64,23 @@ public final class MapEditorController extends FreeColClientHolder {
 
         /**
          * Applies this transformation to the given tile.
-         * @param t The <code>Tile</code> to be transformed,
+         * @param t The {@code Tile} to be transformed,
          */
         public abstract void transform(Tile t);
 
     }
 
     /**
-     * The transform that should be applied to a <code>Tile</code>
+     * The transform that should be applied to a {@code Tile}
      * that is clicked on the map.
      */
     private IMapTransform currentMapTransform = null;
 
 
     /**
-     * Creates a new <code>MapEditorController</code>.
+     * Creates a new {@code MapEditorController}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MapEditorController(FreeColClient freeColClient) {
         super(freeColClient);
@@ -121,7 +121,7 @@ public final class MapEditorController extends FreeColClientHolder {
     /**
      * Get the default specification from the default TC.
      *
-     * @return A <code>Specification</code> to use in the map editor.
+     * @return A {@code Specification} to use in the map editor.
      * @throws IOException on failure to find the spec.
      */
     public Specification getDefaultSpecification() throws IOException {
@@ -130,9 +130,9 @@ public final class MapEditorController extends FreeColClientHolder {
     }
         
     /**
-     * Sets the currently chosen <code>MapTransform</code>.
+     * Sets the currently chosen {@code MapTransform}.
      * @param mt The transform that should be applied to a
-     *      <code>Tile</code> that is clicked on the map.
+     *      {@code Tile} that is clicked on the map.
      */
     public void setMapTransform(IMapTransform mt) {
         currentMapTransform = mt;
@@ -140,19 +140,19 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Gets the current <code>MapTransform</code>.
+     * Gets the current {@code MapTransform}.
      * @return The transform that should be applied to a
-     *      <code>Tile</code> that is clicked on the map.
+     *      {@code Tile} that is clicked on the map.
      */
     public IMapTransform getMapTransform() {
         return currentMapTransform;
     }
 
     /**
-     * Transforms the given <code>Tile</code> using the
-     * {@link #getMapTransform()} current <code>MapTransform</code>.
+     * Transforms the given {@code Tile} using the
+     * {@link #getMapTransform()} current {@code MapTransform}.
      *
-     * @param t The <code>Tile</code> to be modified.
+     * @param t The {@code Tile} to be modified.
      */
     public void transform(Tile t) {
         if (currentMapTransform != null) {
@@ -161,8 +161,8 @@ public final class MapEditorController extends FreeColClientHolder {
     }
 
     /**
-     * Creates a new map using a <code>MapGenerator</code>. A panel
-     * with the <code>MapGeneratorOptions</code> is first displayed.
+     * Creates a new map using a {@code MapGenerator}. A panel
+     * with the {@code MapGeneratorOptions} is first displayed.
      *
      * @see MapGenerator
      * @see MapGeneratorOptions
@@ -194,7 +194,7 @@ public final class MapEditorController extends FreeColClientHolder {
     /**
      * Saves the game to the given file.
      *
-     * @param file The <code>File</code>.
+     * @param file The {@code File}.
      */
     public void saveMapEditorGame(final File file) {
         final GUI gui = getGUI();
@@ -239,7 +239,7 @@ public final class MapEditorController extends FreeColClientHolder {
     /**
      * Require all native nation players to be present in a game.
      *
-     * @param game The <code>Game</code> to add native nations to.
+     * @param game The {@code Game} to add native nations to.
      */
     public void requireNativeNations(Game game) {
         final Specification spec = game.getSpecification();
@@ -255,7 +255,7 @@ public final class MapEditorController extends FreeColClientHolder {
     /**
      * Loads a game from the given file.
      *
-     * @param file The <code>File</code>.
+     * @param file The {@code File}.
      */
     public void loadGame(File file) {
         final File theFile = file;

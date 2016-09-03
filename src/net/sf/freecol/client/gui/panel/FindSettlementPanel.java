@@ -99,7 +99,7 @@ public final class FindSettlementPanel extends FreeColPanel
     /**
      * Create a new panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public FindSettlementPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "[align center]",

@@ -35,7 +35,7 @@ public class ReportForeignAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportForeignAction(FreeColClient freeColClient) {
         super(freeColClient, id);

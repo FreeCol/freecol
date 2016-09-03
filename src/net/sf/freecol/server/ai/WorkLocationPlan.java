@@ -42,13 +42,13 @@ public class WorkLocationPlan extends AIObject {
 
 
     /**
-     * Creates a new <code>WorkLocationPlan</code>.
+     * Creates a new {@code WorkLocationPlan}.
      *
      * @param aiMain The main AI-object.
-     * @param workLocation The <code>WorkLocation</code> to create
+     * @param workLocation The {@code WorkLocation} to create
      *      a plan for.
      * @param goodsType The goodsType to be produced on the
-     *      <code>workLocation</code> using this plan.
+     *      {@code workLocation} using this plan.
      */
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation,
                             GoodsType goodsType) {
@@ -62,10 +62,10 @@ public class WorkLocationPlan extends AIObject {
 
 
     /**
-     * Gets the <code>WorkLocation</code> this
-     * <code>WorkLocationPlan</code> controls.
+     * Gets the {@code WorkLocation} this
+     * {@code WorkLocationPlan} controls.
      *
-     * @return The <code>WorkLocation</code>.
+     * @return The {@code WorkLocation}.
      */
     public WorkLocation getWorkLocation() {
         return workLocation;
@@ -73,7 +73,7 @@ public class WorkLocationPlan extends AIObject {
 
     /**
      * Gets the type of goods which should be produced at the
-     * <code>WorkLocation</code>.
+     * {@code WorkLocation}.
      *
      * @return The type of goods.
      * @see net.sf.freecol.common.model.Goods
@@ -84,7 +84,7 @@ public class WorkLocationPlan extends AIObject {
     }
 
     /**
-     * Sets the type of goods to be produced at the <code>WorkLocation</code>.
+     * Sets the type of goods to be produced at the {@code WorkLocation}.
      *
      * @param goodsType The type of goods.
      * @see net.sf.freecol.common.model.Goods

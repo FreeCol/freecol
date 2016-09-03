@@ -49,8 +49,8 @@ public final class UnitImageAnimation {
      * Constructor
      *
      * @param gui The gui.
-     * @param unit The <code>Unit</code> to be animated. 
-     * @param tile The <code>Tile</code> where the animation occurs.
+     * @param unit The {@code Unit} to be animated.
+     * @param tile The {@code Tile} where the animation occurs.
      * @param animation The animation to show.
      * @param mirror Mirror image the base animation.
      */

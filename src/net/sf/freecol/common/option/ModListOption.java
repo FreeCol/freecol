@@ -30,9 +30,9 @@ import net.sf.freecol.common.model.Specification;
 public class ModListOption extends ListOption<FreeColModFile> {
 
     /**
-     * Creates a new <code>ModListOption</code>.
+     * Creates a new {@code ModListOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ModListOption(Specification specification) {
         super(specification);
@@ -41,10 +41,10 @@ public class ModListOption extends ListOption<FreeColModFile> {
     }
 
     /**
-     * Creates a new <code>ModListOption</code>.
+     * Creates a new {@code ModListOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ModListOption(String id, Specification specification) {
         super(id, specification);

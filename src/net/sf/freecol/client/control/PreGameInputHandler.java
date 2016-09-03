@@ -64,7 +64,7 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public PreGameInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
@@ -211,10 +211,10 @@ public final class PreGameInputHandler extends ClientInputHandler {
     /**
      * Handle all the children of this element.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
+     * @param connection The {@code Connection} the element arrived on.
      * @param element The element (root element in a DOM-parsed XML
      *     tree) that holds all the information.
-     * @return The result of handling the last <code>Element</code>.
+     * @return The result of handling the last {@code Element}.
      */
     public Element multiple(Connection connection, Element element) {
         return new MultipleMessage(element).applyHandler(this, connection);

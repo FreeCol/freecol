@@ -48,7 +48,7 @@ public class Disaster extends FreeColSpecObjectType {
     /** Whether this disaster is natural.  Defaults to false. */
     private boolean natural = false;
 
-    /** The number of effects of this disaster. Defaults to <code>ONE</code>. */
+    /** The number of effects of this disaster. Defaults to {@code ONE}. */
     private Effects numberOfEffects = Effects.ONE;
 
     /** The effects of this disaster. */
@@ -59,7 +59,7 @@ public class Disaster extends FreeColSpecObjectType {
      * Create a new disaster.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public Disaster(String id, Specification specification) {
         super(id, specification);
@@ -78,7 +78,7 @@ public class Disaster extends FreeColSpecObjectType {
     /**
      * Get the number of effects.
      *
-     * @return The <code>Effects</code> to apply.
+     * @return The {@code Effects} to apply.
      */
     public final Effects getNumberOfEffects() {
         return numberOfEffects;
@@ -87,7 +87,7 @@ public class Disaster extends FreeColSpecObjectType {
     /**
      * Get the random choice list of effects.
      *
-     * @return A list of random <code>Effect</code> choices.
+     * @return A list of random {@code Effect} choices.
      */
     public final List<RandomChoice<Effect>> getEffects() {
         return (effects == null)
@@ -98,7 +98,7 @@ public class Disaster extends FreeColSpecObjectType {
     /**
      * Add an effect.
      *
-     * @param effect The <code>Effect</code> to add.
+     * @param effect The {@code Effect} to add.
      */
     private void addEffect(Effect effect) {
         if (effects == null) effects = new ArrayList<>();

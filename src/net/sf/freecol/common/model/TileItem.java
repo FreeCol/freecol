@@ -30,7 +30,7 @@ import net.sf.freecol.common.model.Map.Layer;
 
 
 /**
- * Represents a <code>TileItem</code> item on a <code>Tile</code>.
+ * Represents a {@code TileItem} item on a <code>Tile</code>.
  */
 public abstract class TileItem extends FreeColGameObject
     implements Locatable, Named {
@@ -42,10 +42,10 @@ public abstract class TileItem extends FreeColGameObject
 
 
     /**
-     * Creates a new <code>TileItem</code>.
+     * Creates a new {@code TileItem}.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The location of this <code>TileItem</code>.
+     * @param game The enclosing {@code Game}.
+     * @param tile The location of this {@code TileItem}.
      */
     public TileItem(Game game, Tile tile) {
         super(game);
@@ -57,9 +57,9 @@ public abstract class TileItem extends FreeColGameObject
     }
 
     /**
-     * Creates a new <code>TileItem</code> from an XML stream.
+     * Creates a new {@code TileItem} from an XML stream.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
@@ -69,11 +69,11 @@ public abstract class TileItem extends FreeColGameObject
     }
 
     /**
-     * Initiates a new <code>TileItem</code> with the given
+     * Initiates a new {@code TileItem} with the given
      * identifier.  The object should later be initialized by calling
      * either {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public TileItem(Game game, String id) {
@@ -84,7 +84,7 @@ public abstract class TileItem extends FreeColGameObject
     // Routines to be implemented by subclasses.
 
     /**
-     * Get the <code>ZIndex</code> value.
+     * Get the {@code ZIndex} value.
      *
      * @return The z-index.
      */
@@ -93,7 +93,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * Is a tile type compatible with this tile item?
      *
-     * @param tileType The <code>TileType</code> to check.
+     * @param tileType The {@code TileType} to check.
      * @return True if the tile type is compatible.
      */
     public abstract boolean isTileTypeAllowed(TileType tileType);
@@ -102,8 +102,8 @@ public abstract class TileItem extends FreeColGameObject
      * Applies the production bonus for the given goods type and unit
      * type to the given potential production.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>UnitType</code> that is to work.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The {@code UnitType} that is to work.
      * @param potential The base potential production.
      * @return The production with resource bonuses.
      */
@@ -114,8 +114,8 @@ public abstract class TileItem extends FreeColGameObject
      * Does this tile item allow its enclosing tile to produce a given
      * goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>unitType</code> to produce with.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code unitType} to produce with.
      * @return True if this tile item produces the goods.
      */
     public abstract boolean canProduce(GoodsType goodsType,
@@ -124,8 +124,8 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * Gets the production modifiers for the given type of goods and unit.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>unitType</code> to produce them.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code unitType} to produce them.
      * @return A stream of the applicable modifiers.
      */
     public abstract Stream<Modifier> getProductionModifiers(GoodsType goodsType,
@@ -134,7 +134,7 @@ public abstract class TileItem extends FreeColGameObject
     /**
      * Is this a natural TileItem?
      *
-     * @return True if this is a natural <code>TileItem</code>.
+     * @return True if this is a natural {@code TileItem}.
      */
     public abstract boolean isNatural();
 

@@ -49,8 +49,8 @@ public abstract class PortPanel extends FreeColPanel {
     /**
      * Create a new port panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param layout The <code>LayoutManager</code> to be used.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param layout The {@code LayoutManager} to be used.
      */
     public PortPanel(FreeColClient freeColClient, LayoutManager layout) {
         super(freeColClient, layout);
@@ -81,7 +81,7 @@ public abstract class PortPanel extends FreeColPanel {
     /**
      * Select a given unit.
      *
-     * @param unit The <code>Unit</code> to select.
+     * @param unit The {@code Unit} to select.
      * @return True if the selection succeeds.
      */
     public boolean setSelectedUnit(Unit unit) {
@@ -128,7 +128,7 @@ public abstract class PortPanel extends FreeColPanel {
     /**
      * Get the units present in this port.
      *
-     * @return A list of <code>Unit</code>s.
+     * @return A list of {@code Unit}s.
      */
     public abstract List<Unit> getUnitList();
 

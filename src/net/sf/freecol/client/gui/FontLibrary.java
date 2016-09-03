@@ -25,16 +25,16 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
- * Wraps anything <code>Font</code> related and contains a scale factor.
+ * Wraps anything {@code Font} related and contains a scale factor.
  * 
- * Should be used for getting a <code>Font</code> everywhere it is needed.
+ * Should be used for getting a {@code Font} everywhere it is needed.
  */
 public class FontLibrary {
 
     private static final Logger logger = Logger.getLogger(FontLibrary.class.getName());
 
     /**
-     * FontType is used for choosing the typeface of the <code>Font</code>.
+     * FontType is used for choosing the typeface of the {@code Font}.
      * 
      * Choices are:
      * <ul>
@@ -50,7 +50,7 @@ public class FontLibrary {
     }
 
     /**
-     * FontSize allows for choosing the relative size of the <code>Font</code>.
+     * FontSize allows for choosing the relative size of the {@code Font}.
      * 
      * Choices are:
      * <ul>
@@ -80,7 +80,7 @@ public class FontLibrary {
     private final float scaleFactor;
 
     /**
-     * Create a <code>FontLibrary</code> without scaling.
+     * Create a {@code FontLibrary} without scaling.
      * Probably not worth using, as you could just use the static methods.
      */
     public FontLibrary() {
@@ -88,7 +88,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a <code>FontLibrary</code> with scaling.
+     * Create a {@code FontLibrary} with scaling.
      * Useful if you need many different fonts.
      * 
      * @param scaleFactor How much scaling should be applied.
@@ -99,12 +99,12 @@ public class FontLibrary {
     }
 
     /**
-     * Create a default <code>Font</code> set on initialization of the GUI.
+     * Create a default {@code Font} set on initialization of the GUI.
      * 
      * @param fontName Can be used to choose a different font from a
      *     user-provided name.
      * @param scaleFactor The applied scale factor.
-     * @return The new <code>Font</code>.
+     * @return The new {@code Font}.
      */
     static Font createMainFont(String fontName, float scaleFactor) {
         final float defaultSize = 12f * scaleFactor;
@@ -122,7 +122,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a scaled <code>Font</code>.
+     * Create a scaled {@code Font}.
      * 
      * @param fontType How the font should look like.
      * @param fontSize Its relative size.
@@ -151,7 +151,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a <code>Font</code> in rare case one is needed without scaling.
+     * Create a {@code Font} in rare case one is needed without scaling.
      * Do not use this for normal text, as it leaves out the scaling factor
      * you should get from the appropriate ImageLibrary (there are 3 in use)!
      * Exceptions are currently big headers and things where gui elements are
@@ -190,7 +190,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a scaled <code>Font</code> where the scale factor is provided
+     * Create a scaled {@code Font} where the scale factor is provided
      * explicitly in the parameter.
      * The equivalent of regular text, which would only complicate the
      * source code and slow down the game if used, would be:
@@ -215,7 +215,7 @@ public class FontLibrary {
     }
 
     /**
-     * Create a scaled <code>Font</code> which can display all characters
+     * Create a scaled {@code Font} which can display all characters
      * inside the given text string.
      * This is mostly necessary for the header font. Thats because the currently
      * used ShadowedBlack is missing support for CJK and others. Even some

@@ -148,9 +148,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Constructor.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param player The <code>Player</code> to create the
-     *     <code>Monarch</code> for.
+     * @param game The enclosing {@code Game}.
+     * @param player The {@code Player} to create the
+     *     {@code Monarch} for.
      */
     public Monarch(Game game, Player player) {
         super(game);
@@ -166,11 +166,11 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Initiates a new <code>Monarch</code> with the given identifier.
+     * Initiates a new {@code Monarch} with the given identifier.
      * The object should later be initialized by calling
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Monarch(Game game, String id) {
@@ -185,7 +185,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Get the force describing the REF.
      *
-     * @return The REF <code>Force</code>.
+     * @return The REF {@code Force}.
      */
     public Force getExpeditionaryForce() {
         if (expeditionaryForce == null) {
@@ -199,7 +199,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Get the force describing the Intervention Force.
      *
-     * @return The intervention <code>Force</code>.
+     * @return The intervention {@code Force}.
      */
     public Force getInterventionForce() {
         if (interventionForce == null) {
@@ -215,7 +215,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * This is never updated, and directly derived from the spec.
      *
-     * @return The mercenary <code>Force</code>.
+     * @return The mercenary {@code Force}.
      */
     public Force getMercenaryForce() {
         final Specification spec = getSpecification();
@@ -228,7 +228,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * This is never updated, and directly derived from the spec.
      *
-     * @return The war support <code>Force</code>.
+     * @return The war support {@code Force}.
      */
     public Force getWarSupportForce() {
         final Specification spec = getSpecification();
@@ -334,7 +334,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Collects a list of potential enemies for this player.
      *
-     * @return A list of potential enemy <code>Player</code>s.
+     * @return A list of potential enemy {@code Player}s.
      */
     public List<Player> collectPotentialEnemies() {
         // Benjamin Franklin puts an end to the monarch's interference
@@ -349,7 +349,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * Do not apply Franklin, he stops wars, not peace.
      *
-     * @return A list of potential friendly <code>Player</code>s.
+     * @return A list of potential friendly {@code Player}s.
      */
     public List<Player> collectPotentialFriends() {
         return transform(getGame().getLiveEuropeanPlayers(player),
@@ -359,7 +359,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Checks if a specified action is valid at present.
      *
-     * @param action The <code>MonarchAction</code> to check.
+     * @param action The {@code MonarchAction} to check.
      * @return True if the action is valid.
      */
     public boolean actionIsValid(MonarchAction action) {
@@ -445,7 +445,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * it to a choice list with a given weight.
      *
      * @param choices The list of choices.
-     * @param action The <code>MonarchAction</code> to check.
+     * @param action The {@code MonarchAction} to check.
      * @param weight The weight to add the action with if valid.
      */
     private void addIfValid(List<RandomChoice<MonarchAction>> choices,
@@ -458,7 +458,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Calculates a tax raise.
      *
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      * @return The new tax rate.
      */
     public int raiseTax(Random random) {
@@ -474,7 +474,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Calculates a tax reduction.
      *
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      * @return The new tax rate.
      */
     public int lowerTax(Random random) {
@@ -501,7 +501,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Gets units to be added to the Royal Expeditionary Force.
      *
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
     public AbstractUnit chooseForREF(Random random) {
@@ -572,7 +572,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Gets a additions to the colonial forces.
      *
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      * @param naval If the addition should be a naval unit.
      * @return An addition to the colonial forces.
      */
@@ -642,9 +642,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Check if the monarch provides support for a war.
      *
-     * @param enemy The enemy <code>Player</code>.
+     * @param enemy The enemy {@code Player}.
      * @param random A pseudo-random number source.
-     * @return A list of <code>AbstractUnit</code>s provided as support.
+     * @return A list of {@code AbstractUnit}s provided as support.
      */
     public List<AbstractUnit> getWarSupport(Player enemy, Random random) {
         final Specification spec = getSpecification();
@@ -707,7 +707,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Gets some units available as mercenaries.
      *
-     * @param random The <code>Random</code> number source to use.
+     * @param random The {@code Random} number source to use.
      * @return A troop of mercenaries.
      */
     public List<AbstractUnit> getMercenaries(Random random) {

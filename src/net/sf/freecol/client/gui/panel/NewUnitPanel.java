@@ -65,10 +65,10 @@ public class NewUnitPanel extends FreeColPanel {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param layout The <code>LayoutManager</code> to use.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param layout The {@code LayoutManager} to use.
      * @param label The label for the panel.
-     * @param units A list of <code>UnitType</code>s to offer.
+     * @param units A list of {@code UnitType}s to offer.
      */
     public NewUnitPanel(FreeColClient freeColClient, LayoutManager layout,
                         String label, List<UnitType> units) {

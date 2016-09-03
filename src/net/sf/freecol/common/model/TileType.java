@@ -93,16 +93,16 @@ public final class TileType extends FreeColSpecObjectType {
      * Create a new tile type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public TileType(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Creates a new <code>TileType</code> instance. This constructor
-     * is used to create the "virtual" tile types <code>LAND</code>
-     * and <code>WATER</code>, which are intended to simplify map
+     * Creates a new {@code TileType} instance. This constructor
+     * is used to create the "virtual" tile types {@code LAND}
+     * and {@code WATER}, which are intended to simplify map
      * loading.
      *
      * @param id The object identifier.
@@ -193,7 +193,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Is this tile type suitable for a given range type value.
      *
-     * @param rangeType The <code>RangeType</code> to test.
+     * @param rangeType The {@code RangeType} to test.
      * @param value The value to check.
      * @return True if the tile type meets the range limits.
      */
@@ -225,7 +225,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Gets the resource types that can be found on this tile type.
      *
-     * @return A list of <code>ResourceType</code>s.
+     * @return A list of {@code ResourceType}s.
      */
     public List<ResourceType> getResourceTypes() {
         return (resourceTypes == null) ? Collections.<ResourceType>emptyList()
@@ -235,7 +235,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Add a resource type.
      *
-     * @param type The <code>ResourceType</code> to add.
+     * @param type The {@code ResourceType} to add.
      * @param prob The percentage probability of the resource being
      *     present.
      */
@@ -247,8 +247,8 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Can this tile type contain a specified resource type?
      *
-     * @param resourceType The <code>ResourceType</code> to test.
-     * @return True if the <code>ResourceType</code> is compatible.
+     * @param resourceType The {@code ResourceType} to test.
+     * @return True if the {@code ResourceType} is compatible.
      */
     public boolean canHaveResourceType(ResourceType resourceType) {
         return getResourceTypes().contains(resourceType);
@@ -257,7 +257,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Gets the natural disasters than can strike this tile type.
      *
-     * @return A stream of <code>Disaster</code> choices.
+     * @return A stream of {@code Disaster} choices.
      */
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return (this.disasters == null)
@@ -268,7 +268,7 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Add a disaster.
      *
-     * @param disaster The <code>Disaster</code> to add.
+     * @param disaster The {@code Disaster} to add.
      * @param probability The probability of the disaster.
      */
     private void addDisaster(Disaster disaster, int probability) {
@@ -281,7 +281,7 @@ public final class TileType extends FreeColSpecObjectType {
      * level.
      *
      * @param unattended Whether the production is unattended.
-     * @return A list of <code>ProductionType</code>s.
+     * @return A list of {@code ProductionType}s.
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return getAvailableProductionTypes(unattended,
@@ -295,7 +295,7 @@ public final class TileType extends FreeColSpecObjectType {
      *
      * @param unattended Whether the production is unattended.
      * @param level The production level.
-     * @return A list of <code>ProductionType</code>s.
+     * @return A list of {@code ProductionType}s.
      */
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
@@ -318,8 +318,8 @@ public final class TileType extends FreeColSpecObjectType {
     /**
      * Can a tile of this type produce a given goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return True if this tile type produces the goods.
      */
@@ -333,10 +333,10 @@ public final class TileType extends FreeColSpecObjectType {
      * Get the base production of a given goods type for an optional
      * unit type.
      * 
-     * @param productionType An optional <code>ProductionType</code> to use,
+     * @param productionType An optional {@code ProductionType} to use,
      *     if null the best available one is used.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return The amount of goods produced.
      */
@@ -356,8 +356,8 @@ public final class TileType extends FreeColSpecObjectType {
      * Get the amount of goods of given goods type the given unit type
      * could produce on a tile of this tile type.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> that is to do
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} that is to do
      *     the work, if null the unattended production is considered.
      * @return The amount of goods produced.
      */
@@ -378,7 +378,7 @@ public final class TileType extends FreeColSpecObjectType {
      * {@link #getPotentialProduction(GoodsType, UnitType)}
      *
      * @param unattended Select unattended production.
-     * @return A stream of produced <code>AbstractGoods</code>.
+     * @return A stream of produced {@code AbstractGoods}.
      */
     public Stream<AbstractGoods> getPossibleProduction(boolean unattended) {
         return flatten(getAvailableProductionTypes(unattended),

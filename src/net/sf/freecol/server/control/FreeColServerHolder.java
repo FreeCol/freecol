@@ -54,7 +54,7 @@ public class FreeColServerHolder {
     /**
      * Returns the Game.
      *
-     * @return a <code>Game</code> value
+     * @return a {@code Game} value
      */
     protected ServerGame getGame() {
         return freeColServer.getGame();

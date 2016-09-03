@@ -57,7 +57,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     /**
      * Returns the Unit this mission was assigned to.
      *
-     * @return an <code>Unit</code> value
+     * @return an {@code Unit} value
      */
     @Override
     public final Unit getUnit() {
@@ -65,19 +65,19 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Creates a new <code>AbstractMission</code> instance.
+     * Creates a new {@code AbstractMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      */
     public AbstractMission(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>AbstractMission</code> instance.
+     * Creates a new {@code AbstractMission} instance.
      *
-     * @param game a <code>Game</code> value
-     * @param xr a <code>FreeColXMLReader</code> value
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
      * @exception XMLStreamException if an error occurs
      */
     public AbstractMission(Game game,
@@ -86,9 +86,9 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Creates a new <code>AbstractMission</code> instance.
+     * Creates a new {@code AbstractMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      * @param id The object identifier.
      */
     public AbstractMission(Game game, String id) {
@@ -97,7 +97,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
 
     /**
-     * Set the <code>Unit</code> value.
+     * Set the {@code Unit} value.
      *
      * @param newUnit The new Unit value.
      */
@@ -106,16 +106,16 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Get the <code>RepeatCount</code> value.
+     * Get the {@code RepeatCount} value.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public final int getRepeatCount() {
         return repeatCount;
     }
 
     /**
-     * Set the <code>RepeatCount</code> value.
+     * Set the {@code RepeatCount} value.
      *
      * @param newRepeatCount The new RepeatCount value.
      */
@@ -124,16 +124,16 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
     /**
-     * Get the <code>TurnCount</code> value.
+     * Get the {@code TurnCount} value.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public final int getTurnCount() {
         return turnCount;
     }
 
     /**
-     * Set the <code>TurnCount</code> value.
+     * Set the {@code TurnCount} value.
      *
      * @param newTurnCount The new TurnCount value.
      */
@@ -146,7 +146,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * neither null nor has been disposed, and the repeat count of the
      * mission is greater than zero.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     @Override
     public boolean isValid() {
@@ -160,7 +160,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * Unit. This method always returns false and needs to be
      * overridden.
      *
-     * @param unit an <code>Unit</code> value
+     * @param unit an {@code Unit} value
      * @return false
      */
     public static boolean isValidFor(@SuppressWarnings("unusued") Unit unit) {

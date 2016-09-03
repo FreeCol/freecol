@@ -43,7 +43,7 @@ import net.sf.freecol.client.gui.panel.Utility;
 
 /**
  * User interface for displaying/changing a keyboard accelerator for a
- * <code>FreeColAction</code>.
+ * {@code FreeColAction}.
  */
 public final class FreeColActionUI extends OptionUI<FreeColAction>
     implements ActionListener {
@@ -57,10 +57,10 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
 
     /**
-     * Creates a new <code>FreeColActionUI</code> for the
-     * given <code>FreeColAction</code>.
+     * Creates a new {@code FreeColActionUI} for the
+     * given {@code FreeColAction}.
      *
-     * @param option The <code>FreeColAction</code> to make a user
+     * @param option The {@code FreeColAction} to make a user
      *       interface for.
      * @param editable boolean whether user can modify the setting
      */
@@ -88,8 +88,8 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     }
 
     /**
-    * Creates an icon for symbolizing the recording of a <code>KeyStroke</code>.
-    * @return The <code>ImageIcon</code>.
+    * Creates an icon for symbolizing the recording of a {@code KeyStroke}.
+    * @return The {@code ImageIcon}.
     */
     public static ImageIcon getRecordImage() {
         BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
@@ -105,7 +105,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
     /**
     * Creates an icon to be used on the button that removes a keyboard accelerator.
-    * @return The <code>ImageIcon</code>.
+    * @return The {@code ImageIcon}.
     */
     public static ImageIcon getRemoveImage() {
         BufferedImage bi = new BufferedImage(9, 9, BufferedImage.TYPE_INT_ARGB);
@@ -124,9 +124,9 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
     }
 
     /**
-    * Gets a string to represent the given <code>KeyStroke</code> to the user.
+    * Gets a string to represent the given {@code KeyStroke} to the user.
     *
-    * @param keyStroke <code>java.awt.event.KeyStroke</code>
+    * @param keyStroke {@code java.awt.event.KeyStroke}
     * @return String
     */
     public static String getHumanKeyStrokeText(KeyStroke keyStroke) {
@@ -141,12 +141,12 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
 
     /**
-    * Removes the given <code>KeyStroke</code>. That is:
-    * This action's <code>KeyStroke</code> is set to
-    * <code>null</code> if it is the same as the given
-    * <code>KeyStroke</code>.
+    * Removes the given {@code KeyStroke}. That is:
+    * This action's {@code KeyStroke} is set to
+    * {@code null} if it is the same as the given
+    * {@code KeyStroke}.
     *
-    * @param k The <code>KeyStroke</code> to be removed.
+    * @param k The {@code KeyStroke} to be removed.
     */
     public void removeKeyStroke(KeyStroke k) {
         if (k != null && keyStroke != null
@@ -181,7 +181,7 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
 
     /**
-     * Label for displaying a <code>KeyStroke</code>.
+     * Label for displaying a {@code KeyStroke}.
      */
     class BlinkingLabel extends JLabel implements ActionListener, KeyListener, MouseListener {
 

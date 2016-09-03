@@ -29,7 +29,7 @@ import java.util.Date;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
- * ChatDisplay manages use of <code>GUIMessage</code>.
+ * ChatDisplay manages use of {@code GUIMessage}.
  */
 public class ChatDisplay {
 

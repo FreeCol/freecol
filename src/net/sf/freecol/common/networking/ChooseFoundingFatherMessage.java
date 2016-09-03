@@ -57,11 +57,11 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ChooseFoundingFatherMessage</code> with the specified
+     * Create a new {@code ChooseFoundingFatherMessage} with the specified
      * fathers.
      *
-     * @param fathers The <code>FoundingFather</code>s to choose from.
-     * @param ff The <code>FoundingFather</code> to select.
+     * @param fathers The {@code FoundingFather}s to choose from.
+     * @param ff The {@code FoundingFather} to select.
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
@@ -73,11 +73,11 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ChooseFoundingFatherMessage</code> from a
+     * Create a new {@code ChooseFoundingFatherMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ChooseFoundingFatherMessage(Game game, Element element) {
         super(getTagName());
@@ -96,8 +96,8 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     /**
      * Get the chosen father.
      *
-     * @param game The <code>Game</code> to lookup the father in.
-     * @return The chosen <code>FoundingFather</code>, or null if none set.
+     * @param game The {@code Game} to lookup the father in.
+     * @return The chosen {@code FoundingFather}, or null if none set.
      */
     public final FoundingFather getFather(Game game) {
         return (this.foundingFatherId == null) ? null
@@ -107,7 +107,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     /**
      * Sets the chosen father.
      *
-     * @param ff The <code>FoundingFather</code> to choose.
+     * @param ff The {@code FoundingFather} to choose.
      * @return This message.
      */
     public final ChooseFoundingFatherMessage setFather(FoundingFather ff) {
@@ -118,7 +118,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
     /**
      * Get the list of offered fathers.
      *
-     * @return The offered <code>FoundingFather</code>s.
+     * @return The offered {@code FoundingFather}s.
      */
     public final List<FoundingFather> getFathers() {
         return this.fathers;
@@ -129,9 +129,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * Handle a "chooseFoundingFather"-message.
      * The server does not need to handle this message type.
      *
-     * @param server The <code>FreeColServer</code> handling the request.
-     * @param player The <code>Player</code> abandoning the colony.
-     * @param connection The <code>Connection</code> the message is from.
+     * @param server The {@code FreeColServer} handling the request.
+     * @param player The {@code Player} abandoning the colony.
+     * @param connection The {@code Connection} the message is from.
      *
      * @return Null.
      */

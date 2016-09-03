@@ -57,12 +57,12 @@ public class LoadGoodsMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>LoadGoodsMessage</code>.
+     * Create a new {@code LoadGoodsMessage}.
      *
-     * @param loc The <code>Location</code> of the goods.
-     * @param type The <code>GoodsType</code> to load.
+     * @param loc The {@code Location} of the goods.
+     * @param type The {@code GoodsType} to load.
      * @param amount The amount of goods to load.
-     * @param carrier The <code>Unit</code> to load the goods onto.
+     * @param carrier The {@code Unit} to load the goods onto.
      */
     public LoadGoodsMessage(Location loc, GoodsType type, int amount,
                             Unit carrier) {
@@ -75,11 +75,11 @@ public class LoadGoodsMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>LoadGoodsMessage</code> from a
+     * Create a new {@code LoadGoodsMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public LoadGoodsMessage(Game game, Element element) {
         super(getTagName());
@@ -94,11 +94,11 @@ public class LoadGoodsMessage extends DOMMessage {
     /**
      * Handle a "loadGoods"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the carrier, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

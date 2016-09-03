@@ -51,10 +51,10 @@ final class UnitMoveAnimation extends FreeColClientHolder {
     /**
      * Constructor
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param unit The <code>Unit</code> to be animated.
-     * @param sourceTile The <code>Tile</code> the unit is moving from.
-     * @param destinationTile The <code>Tile</code> the unit is moving to.
+     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param unit The {@code Unit} to be animated.
+     * @param sourceTile The {@code Tile} the unit is moving from.
+     * @param destinationTile The {@code Tile} the unit is moving to.
      */
     public UnitMoveAnimation(FreeColClient freeColClient, Unit unit,
                              Tile sourceTile, Tile destinationTile) {

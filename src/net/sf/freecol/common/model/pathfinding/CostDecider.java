@@ -36,14 +36,14 @@ public interface CostDecider {
     /**
      * Determines the cost of a single move.
      * 
-     * @param unit The <code>Unit</code> that will be used when
+     * @param unit The {@code Unit} that will be used when
      *      determining the cost. This should be the same type
      *      of unit as the one following the path.
-     * @param oldLocation The <code>Location</code> we are moving from.
-     * @param newLocation The <code>Location</code> we are moving to.
+     * @param oldLocation The {@code Location} we are moving from.
+     * @param newLocation The {@code Location} we are moving to.
      * @param movesLeftBefore The moves left to the unit prior to moving.
      * @return The cost of moving the given unit from the
-     *     <code>oldLocation</code> to the <code>newLocation</code>.
+     *     {@code oldLocation} to the <code>newLocation</code>.
      */
     public int getCost(Unit unit, Location oldLocation, Location newLocation,
                        int movesLeftBefore);

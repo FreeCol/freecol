@@ -79,16 +79,16 @@ public class TileImprovement extends TileItem implements Named {
 
 
     /**
-     * Creates a standard <code>TileImprovement</code>-instance.
+     * Creates a standard {@code TileImprovement}-instance.
      *
      * This constructor asserts that the game, tile and type are valid.
      * Does not set the style.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> on which this object sits.
-     * @param type The <code>TileImprovementType</code> of this
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} on which this object sits.
+     * @param type The {@code TileImprovementType} of this
      *     improvement.
-     * @param style The <code>TileImprovementStyle</code> of this improvement.
+     * @param style The {@code TileImprovementStyle} of this improvement.
      */
     public TileImprovement(Game game, Tile tile, TileImprovementType type,
                            TileImprovementStyle style) {
@@ -109,9 +109,9 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Create an new TileImprovement from an existing one.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> where the improvement resides.
-     * @param template The <code>TileImprovement</code> to copy.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} where the improvement resides.
+     * @param template The {@code TileImprovement} to copy.
      */
     public TileImprovement(Game game, Tile tile, TileImprovement template) {
         super(game, tile);
@@ -125,11 +125,11 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Create a new <code>TileImprovement</code> with the given identifier.
+     * Create a new {@code TileImprovement} with the given identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public TileImprovement(Game game, String id) {
@@ -248,7 +248,7 @@ public class TileImprovement extends TileItem implements Named {
      * Is this tile improvement connected to a similar improvement on
      * a neighbouring tile?
      *
-     * @param direction The <code>Direction</code> to check.
+     * @param direction The {@code Direction} to check.
      * @return True if this improvement is connected.
      */
     public boolean isConnectedTo(Direction direction) {
@@ -258,7 +258,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Sets the connection status in a given direction.
      *
-     * @param direction The <code>Direction</code> to set.
+     * @param direction The {@code Direction} to set.
      * @param value The new status for the connection.
      */
     public void setConnected(Direction direction, boolean value) {
@@ -304,8 +304,8 @@ public class TileImprovement extends TileItem implements Named {
      * Gets a Modifier for the production bonus this improvement provides
      * for a given type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to test.
-     * @return A production <code>Modifier</code>, or null if none applicable.
+     * @param goodsType The {@code GoodsType} to test.
+     * @return A production {@code Modifier}, or null if none applicable.
      */
     public Modifier getProductionModifier(GoodsType goodsType) {
         return (isComplete()) ? type.getProductionModifier(goodsType) : null;
@@ -315,7 +315,7 @@ public class TileImprovement extends TileItem implements Named {
      * Calculates the movement cost on the basis of connected tile
      * improvements.
      *
-     * @param direction The <code>Direction</code> to move.
+     * @param direction The {@code Direction} to move.
      * @param moveCost The original movement cost.
      * @return The movement cost with this improvement.
      */
@@ -328,8 +328,8 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * What type of tile does this improvement change a given type to?
      *
-     * @param tileType The original <code>TileType</code>.
-     * @return The <code>TileType</code> that results from completing this
+     * @param tileType The original {@code TileType}.
+     * @return The {@code TileType} that results from completing this
      *     improvement, or null if nothing changes.
      */
     public TileType getChange(TileType tileType) {
@@ -339,7 +339,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Can a unit build this improvement?
      *
-     * @param unit A <code>Unit</code> to do the building.
+     * @param unit A {@code Unit} to do the building.
      * @return True if the supplied unit can build this improvement.
      */
     public boolean isWorkerAllowed(Unit unit) {
@@ -426,7 +426,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Get the disaster choices available for this tile improvement.
      *
-     * @return A stream of <code>Disaster</code> choices.
+     * @return A stream of {@code Disaster} choices.
      */
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return (this.type == null)

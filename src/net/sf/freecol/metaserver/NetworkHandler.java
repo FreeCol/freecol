@@ -46,8 +46,8 @@ public final class NetworkHandler implements MessageHandler {
     /**
     * The constructor to use.
     * 
-    * @param metaServer The <code>MetaServer</code> this
-    *       <code>NetworkHandler</code> has been created
+    * @param metaServer The {@code MetaServer} this
+    *       {@code NetworkHandler} has been created
     *       for.
     * @param metaRegister An object containing a list
     *       of all the servers.
@@ -61,7 +61,7 @@ public final class NetworkHandler implements MessageHandler {
     /**
     * Handles a network message.
     *
-    * @param connection The <code>Connection</code> the message came from.
+    * @param connection The {@code Connection} the message came from.
     * @param element The message to be processed.
     */
     @Override
@@ -97,7 +97,7 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message was received on.
      * @param element The element containing the request.
-     * @return The reply: <code>null</code>.
+     * @return The reply: {@code null}.
      */
     private Element register(Connection connection, Element element) {
         String name = element.getAttribute("name");
@@ -124,7 +124,7 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: <code>null</code>.
+     * @return The reply: {@code null}.
      */
     private Element update(Connection connection, Element element) {
         String name = element.getAttribute("name");
@@ -149,7 +149,7 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: <code>null</code>.
+     * @return The reply: {@code null}.
      */
     private Element remove(Connection connection, Element element) {
         String address = connection.getSocket().getInetAddress().getHostAddress();
@@ -166,7 +166,7 @@ public final class NetworkHandler implements MessageHandler {
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
-     * @return The reply: <code>null</code>.
+     * @return The reply: {@code null}.
      */
     private Element disconnect(Connection connection, Element element) {
         connection.reallyClose();

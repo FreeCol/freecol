@@ -162,18 +162,18 @@ public class Region extends FreeColGameObject implements Nameable {
 
 
     /**
-     * Creates a new <code>Region</code> instance.
+     * Creates a new {@code Region} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public Region(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>Region</code> instance.
+     * Creates a new {@code Region} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Region(Game game, String id) {
@@ -274,7 +274,7 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Add a child region to this region.
      *
-     * @param child The child <code>Region</code> to add.
+     * @param child The child {@code Region} to add.
      */
     public void addChild(Region child) {
         if (this.children == null) this.children = new ArrayList<>();
@@ -380,7 +380,7 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Gets the player that discovered the region.
      *
-     * @return The discovering <code>Player</code>.
+     * @return The discovering {@code Player}.
      */
     public final Player getDiscoveredBy() {
         return this.discoveredBy;
@@ -416,9 +416,9 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Discover this region (and its children).
      *
-     * @param player The discovering <code>Player</code>.
-     * @param turn The <code>Turn</code> of discovery.
-     * @return A list of discovered <code>Region</code>s.
+     * @param player The discovering {@code Player}.
+     * @param turn The {@code Turn} of discovery.
+     * @return A list of discovered {@code Region}s.
      */
     public List<Region> discover(Player player, Turn turn) {
         List<Region> result = new ArrayList<>();

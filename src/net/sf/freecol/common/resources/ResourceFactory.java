@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A factory class for creating <code>Resource</code> instances.
+ * A factory class for creating {@code Resource} instances.
  * @see Resource
  */
 public class ResourceFactory {
@@ -52,9 +52,9 @@ public class ResourceFactory {
     }
 
     /**
-     * <code>WeakHashMap</code>s to ensure that only one
-     * <code>Resource</code> is created given the same
-     * <code>URI</code>.
+     * {@code WeakHashMap}s to ensure that only one
+     * {@code Resource} is created given the same
+     * {@code URI}.
      */
     private static final Map<URI, WeakReference<ColorResource>> colorResources
         = new WeakHashMap<>();
@@ -76,9 +76,9 @@ public class ResourceFactory {
     /**
      * Check for previously created resources.
      *
-     * @param uri The <code>URI</code> used when creating the instance.
-     * @param output Where a previously created instance of <code>Resource</code>
-     *      with the given <code>URI</code> is put if such an object has
+     * @param uri The {@code URI} used when creating the instance.
+     * @param output Where a previously created instance of {@code Resource}
+     *      with the given {@code URI} is put if such an object has
      *      already been created.
      * @return If a Resource is found.
      */
@@ -151,13 +151,13 @@ public class ResourceFactory {
     }
 
     /**
-     * Returns an instance of <code>Resource</code> with the
-     * given <code>URI</code> as the parameter.
+     * Returns an instance of {@code Resource} with the
+     * given {@code URI} as the parameter.
      *
-     * @param uri The <code>URI</code> used when creating the
+     * @param uri The {@code URI} used when creating the
      *      instance.
-     * @param output Where a previously created instance of <code>Resource</code>
-     *      with the given <code>URI</code> is put if such an object has
+     * @param output Where a previously created instance of {@code Resource}
+     *      with the given {@code URI} is put if such an object has
      *      already been created, or a new instance if not.
      */
     public static void createResource(URI uri, ResourceSink output) {

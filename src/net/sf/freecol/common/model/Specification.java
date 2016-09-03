@@ -335,9 +335,9 @@ public final class Specification {
 
     /**
      * Creates a new Specification object by loading it from the
-     * given <code>FreeColXMLReader</code>.
+     * given {@code FreeColXMLReader}.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      */
     public Specification(FreeColXMLReader xr) {
         this();
@@ -352,7 +352,7 @@ public final class Specification {
     /**
      * Load a specification or fragment from a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      */
     private void load(FreeColXMLReader xr) {
         try {
@@ -364,9 +364,9 @@ public final class Specification {
 
     /**
      * Creates a new Specification object by loading it from the
-     * given <code>InputStream</code>.
+     * given {@code InputStream}.
      *
-     * @param in The <code>InputStream</code> to read from.
+     * @param in The {@code InputStream} to read from.
      */
     public Specification(InputStream in) {
         this();
@@ -380,7 +380,7 @@ public final class Specification {
     /**
      * Load a specification or fragment from a stream.
      *
-     * @param in The <code>InputStream</code> to read from.
+     * @param in The {@code InputStream} to read from.
      */
     private void load(InputStream in) {
         try (
@@ -396,7 +396,7 @@ public final class Specification {
     /**
      * Prepare a specification with given advantages and difficulty level.
      *
-     * @param advantages An optional <code>Advantages</code> setting.
+     * @param advantages An optional {@code Advantages} setting.
      * @param difficulty An optional identifier for the difficulty level.
      */
     public void prepare(Advantages advantages, String difficulty) {
@@ -407,8 +407,8 @@ public final class Specification {
     /**
      * Prepare a specification with given advantages and difficulty level.
      *
-     * @param advantages An optional <code>Advantages</code> setting.
-     * @param difficulty An optional difficulty level <code>OptionGroup</code>.
+     * @param advantages An optional {@code Advantages} setting.
+     * @param difficulty An optional difficulty level {@code OptionGroup}.
      */
     public void prepare(Advantages advantages, OptionGroup difficulty) {
         applyFixes();
@@ -424,7 +424,7 @@ public final class Specification {
     /**
      * Load mods into this specification.
      *
-     * @param mods A list of <code>FreeColModFile</code>s for the active mods.
+     * @param mods A list of {@code FreeColModFile}s for the active mods.
      * @return True if any mod was loaded.
      */
     public boolean loadMods(List<FreeColModFile> mods) {
@@ -455,9 +455,9 @@ public final class Specification {
     /**
      * Merge an option group into the spec.
      *
-     * @param group The <code>OptionGroup</code> to merge.
-     * @return The merged <code>OptionGroup</code> from this
-     *     <code>Specification</code>.
+     * @param group The {@code OptionGroup} to merge.
+     * @return The merged {@code OptionGroup} from this
+     *     {@code Specification}.
      */
     public OptionGroup mergeGroup(OptionGroup group) {
         OptionGroup realGroup = allOptionGroups.get(group.getId());
@@ -727,7 +727,7 @@ public final class Specification {
     /**
      * Merge in a new set of game options.
      *
-     * @param newGameOptions The new game options <code>OptionGroup</code>
+     * @param newGameOptions The new game options {@code OptionGroup}
      *     to merge.
      * @param who Where are we, client or server?
      * @return True if the merge succeeded.
@@ -744,7 +744,7 @@ public final class Specification {
      * Merge in a new set of map options.
      *
      * @param newMapGeneratorOptions The new game options
-     *     <code>OptionGroup</code> to merge.
+     *     {@code OptionGroup} to merge.
      * @param who Where are we, client or server?
      * @return True if the merge succeeded.
      */
@@ -896,7 +896,7 @@ public final class Specification {
     /**
      * Registers an Ability as defined.
      *
-     * @param ability an <code>Ability</code> value
+     * @param ability an {@code Ability} value
      */
     public void addAbility(Ability ability) {
         String id = ability.getId();
@@ -921,7 +921,7 @@ public final class Specification {
      * Get all the Abilities with the given identifier.
      *
      * @param id The object identifier to look for.
-     * @return A stream of <code>Ability</code>s.
+     * @return A stream of {@code Ability}s.
      */
     public Stream<Ability> getAbilities(String id) {
         List<Ability> result = allAbilities.get(id);
@@ -931,7 +931,7 @@ public final class Specification {
     /**
      * Add a modifier.
      *
-     * @param modifier The <code>Modifier</code> to add.
+     * @param modifier The {@code Modifier} to add.
      */
     public void addModifier(Modifier modifier) {
         String id = modifier.getId();
@@ -945,7 +945,7 @@ public final class Specification {
      * Get all the Modifiers with the given identifier.
      *
      * @param id The object identifier to look for.
-     * @return A stream of <code>Modifier</code>s.
+     * @return A stream of {@code Modifier}s.
      */
     public Stream<Modifier> getModifiers(String id) {
         List<Modifier> result = allModifiers.get(id);
@@ -969,10 +969,10 @@ public final class Specification {
     }
 
     /**
-     * Get the <code>AbstractOption</code> with the given identifier.
+     * Get the {@code AbstractOption} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>AbstractOption</code> found.
+     * @return The {@code AbstractOption} found.
      */
     public AbstractOption getOption(String id) {
         if (id == null) {
@@ -985,10 +985,10 @@ public final class Specification {
     }
 
     /**
-     * Get the <code>OptionGroup</code> with the given identifier.
+     * Get the {@code OptionGroup} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>OptionGroup</code> found.
+     * @return The {@code OptionGroup} found.
      * @exception IllegalArgumentException if the identifier is null
      *     or not present.
      */
@@ -1003,9 +1003,9 @@ public final class Specification {
     }
 
     /**
-     * Adds an <code>OptionGroup</code> to this specification.
+     * Adds an {@code OptionGroup} to this specification.
      *
-     * @param optionGroup The <code>OptionGroup</code> to add.
+     * @param optionGroup The {@code OptionGroup} to add.
      * @param recursive If true, add recursively to subgroups.
      */
     public void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
@@ -1023,9 +1023,9 @@ public final class Specification {
     }
 
     /**
-     * Adds an <code>AbstractOption</code> to this specification.
+     * Adds an {@code AbstractOption} to this specification.
      *
-     * @param abstractOption The <code>AbstractOption</code> to add.
+     * @param abstractOption The {@code AbstractOption} to add.
      */
     private void addAbstractOption(AbstractOption abstractOption) {
         // Add the option
@@ -1033,40 +1033,40 @@ public final class Specification {
     }
 
     /**
-     * Get the <code>IntegerOption</code> with the given identifier.
+     * Get the {@code IntegerOption} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>IntegerOption</code> found.
+     * @return The {@code IntegerOption} found.
      */
     public IntegerOption getIntegerOption(String id) {
         return (IntegerOption)getOption(id);
     }
 
     /**
-     * Get the <code>RangeOption</code> with the given identifier.
+     * Get the {@code RangeOption} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>RangeOption</code> found.
+     * @return The {@code RangeOption} found.
      */
     public RangeOption getRangeOption(String id) {
         return (RangeOption)getOption(id);
     }
 
     /**
-     * Get the <code>BooleanOption</code> with the given identifier.
+     * Get the {@code BooleanOption} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>BooleanOption</code> found.
+     * @return The {@code BooleanOption} found.
      */
     public BooleanOption getBooleanOption(String id) {
         return (BooleanOption)getOption(id);
     }
 
     /**
-     * Get the <code>StringOption</code> with the given identifier.
+     * Get the {@code StringOption} with the given identifier.
      *
      * @param id The object identifier.
-     * @return The <code>StringOption</code> found.
+     * @return The {@code StringOption} found.
      */
     public StringOption getStringOption(String id) {
         return (StringOption) getOption(id);
@@ -1080,7 +1080,7 @@ public final class Specification {
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public boolean getBoolean(String id) {
         try {
@@ -1098,7 +1098,7 @@ public final class Specification {
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public int getInteger(String id) {
         try {
@@ -1116,7 +1116,7 @@ public final class Specification {
      * @exception IllegalArgumentException If there is no string
      *     value associated with the specified option.
      * @exception NullPointerException if the given
-     *     <code>Option</code> does not exist.
+     *     {@code Option} does not exist.
      */
     public String getString(String id) {
         try {
@@ -1137,7 +1137,7 @@ public final class Specification {
      * Get a building type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>BuildingType</code> found.
+     * @return The {@code BuildingType} found.
      */
     public BuildingType getBuildingType(String id) {
         return getType(id, BuildingType.class);
@@ -1196,7 +1196,7 @@ public final class Specification {
      * Get the initial <em>minimum</em> price of the given goods
      * type. The initial price in a particular Market may be higher.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return The minimum price.
      */
     public int getInitialPrice(GoodsType goodsType) {
@@ -1212,7 +1212,7 @@ public final class Specification {
      * Get a goods type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>GoodsType</code> found.
+     * @return The {@code GoodsType} found.
      */
     public GoodsType getGoodsType(String id) {
         return getType(id, GoodsType.class);
@@ -1228,7 +1228,7 @@ public final class Specification {
      * Get a resource type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>ResourceType</code> found.
+     * @return The {@code ResourceType} found.
      */
     public ResourceType getResourceType(String id) {
         return getType(id, ResourceType.class);
@@ -1244,7 +1244,7 @@ public final class Specification {
      * Get a tile type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>TileType</code> found.
+     * @return The {@code TileType} found.
      */
     public TileType getTileType(String id) {
         return getType(id, TileType.class);
@@ -1260,7 +1260,7 @@ public final class Specification {
      * Get a tile improvement type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>TileImprovementType</code> found.
+     * @return The {@code TileImprovementType} found.
      */
     public TileImprovementType getTileImprovementType(String id) {
         return getType(id, TileImprovementType.class);
@@ -1283,7 +1283,7 @@ public final class Specification {
      * Suitable indexing constants are in UnitChangeType.
      *
      * @param id The identifier for the required change type.
-     * @return The <code>UnitChangeType</code> found, or null if none present.
+     * @return The {@code UnitChangeType} found, or null if none present.
      */
     public UnitChangeType getUnitChangeType(String id) {
         return find(unitChangeTypeList,
@@ -1297,8 +1297,8 @@ public final class Specification {
      * Suitable indexing constants are in UnitChangeType.
      *
      * @param id The identifier for the required change type.
-     * @param fromType The <code>UnitType</code> to change.
-     * @return A list of <code>UnitChange</code>s.
+     * @param fromType The {@code UnitType} to change.
+     * @return A list of {@code UnitChange}s.
      */
     public List<UnitChange> getUnitChanges(String id, UnitType fromType) {
         UnitChangeType uct = getUnitChangeType(id);
@@ -1313,8 +1313,8 @@ public final class Specification {
      * Suitable indexing constants are in UnitChangeType.
      *
      * @param id The identifier for the required change type.
-     * @param fromType The <code>UnitType</code> to change from.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @param fromType The {@code UnitType} to change from.
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(String id, UnitType fromType) {
@@ -1328,9 +1328,9 @@ public final class Specification {
      * Suitable indexing constants are in UnitChangeType.
      *
      * @param id The identifier for the required change type.
-     * @param fromType The <code>UnitType</code> to change from.
-     * @param toType The <code>UnitType</code> to change to.
-     * @return The <code>UnitChange</code> found, or null if the
+     * @param fromType The {@code UnitType} to change from.
+     * @param toType The {@code UnitType} to change to.
+     * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
     public UnitChange getUnitChange(String id, UnitType fromType,
@@ -1344,8 +1344,8 @@ public final class Specification {
      * Gets the number of turns a unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
      *
-     * @param typeTeacher The teacher <code>UnitType</code>.
-     * @param typeStudent the student <code>UnitType</code>.
+     * @param typeTeacher The teacher {@code UnitType}.
+     * @param typeStudent the student {@code UnitType}.
      * @return The turns of training needed.
      */
     public int getNeededTurnsOfTraining(UnitType typeTeacher,
@@ -1363,8 +1363,8 @@ public final class Specification {
      *
      * Needed by the test suite.
      *
-     * @param from The <code>UnitType</code> that can change.
-     * @param to The <code>UnitType</code> to change to.
+     * @param from The {@code UnitType} that can change.
+     * @param to The {@code UnitType} to change to.
      * @param prob The percentage chance of the change occurring.
      * @param turns The number of turns the change will take, if not
      *     immediate.
@@ -1388,7 +1388,7 @@ public final class Specification {
     /**
      * Get the most vanilla unit type for a given player.
      *
-     * @param player The <code>Player</code> to find the default
+     * @param player The {@code Player} to find the default
      *     unit type for, or null indicating a normal player nation
      *     (i.e. non-REF European).
      * @return The default unit type.
@@ -1404,7 +1404,7 @@ public final class Specification {
      * Provides a type to use to make a neutral comparison of the
      * productivity of work locations.
      *
-     * @param nationType The <code>NationType</code> to find the default
+     * @param nationType The {@code NationType} to find the default
      *     unit type for, or null indicating a normal player nation
      *     (i.e. non-REF European).
      * @return The free colonist unit type.
@@ -1445,8 +1445,8 @@ public final class Specification {
     /**
      * Get the unit type that is the expert for producing a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The expert <code>UnitType</code>, or null if none.
+     * @param goodsType The {@code GoodsType} to check.
+     * @return The expert {@code UnitType}, or null if none.
      */
     public UnitType getExpertForProducing(GoodsType goodsType) {
         return experts.get(goodsType);
@@ -1456,7 +1456,7 @@ public final class Specification {
      * Get the unit types which have any of the given abilities
      *
      * @param abilities The abilities for the search
-     * @return A list of <code>UnitType</code>s with the abilities.
+     * @return A list of {@code UnitType}s with the abilities.
      */
     public List<UnitType> getUnitTypesWithAbility(String... abilities) {
         return getTypesWithAbility(UnitType.class, abilities);
@@ -1466,7 +1466,7 @@ public final class Specification {
      * Get the unit types which have none of the given abilities
      *
      * @param abilities The abilities for the search
-     * @return A list of <code>UnitType</code>s without the abilities.
+     * @return A list of {@code UnitType}s without the abilities.
      */
     public List<UnitType> getUnitTypesWithoutAbility(String... abilities) {
         return getTypesWithoutAbility(UnitType.class, abilities);
@@ -1475,7 +1475,7 @@ public final class Specification {
     /**
      * Gets the unit types that can be trained in Europe.
      *
-     * @return A list of Europe-trainable <code>UnitType</code>s.
+     * @return A list of Europe-trainable {@code UnitType}s.
      */
     public List<UnitType> getUnitTypesTrainedInEurope() {
         return unitTypesTrainedInEurope;
@@ -1484,7 +1484,7 @@ public final class Specification {
     /**
      * Get the unit types that can be purchased in Europe.
      *
-     * @return A list of Europe-purchasable <code>UnitType</code>s.
+     * @return A list of Europe-purchasable {@code UnitType}s.
      */
     public List<UnitType> getUnitTypesPurchasedInEurope() {
         return unitTypesPurchasedInEurope;
@@ -1512,7 +1512,7 @@ public final class Specification {
      * Gets the REF unit types.
      *
      * @param naval If true, choose naval units, if not, land units.
-     * @return A list of <code>UnitType</code>s allowed for the REF.
+     * @return A list of {@code UnitType}s allowed for the REF.
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
         return transform(getUnitTypesWithAbility(Ability.REF_UNIT),
@@ -1523,7 +1523,7 @@ public final class Specification {
      * Get a unit type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>UnitType</code> found.
+     * @return The {@code UnitType} found.
      */
     public UnitType getUnitType(String id) {
         return getType(id, UnitType.class);
@@ -1539,7 +1539,7 @@ public final class Specification {
      * Get a founding father type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>FoundingFather</code> found.
+     * @return The {@code FoundingFather} found.
      */
     public FoundingFather getFoundingFather(String id) {
         return getType(id, FoundingFather.class);
@@ -1567,7 +1567,7 @@ public final class Specification {
      * Get a nation type by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>NationType</code> found.
+     * @return The {@code NationType} found.
      */
     public NationType getNationType(String id) {
         return getType(id, NationType.class);
@@ -1600,7 +1600,7 @@ public final class Specification {
      * Get a nation by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>Nation</code> found.
+     * @return The {@code Nation} found.
      */
     public Nation getNation(String id) {
         return getType(id, Nation.class);
@@ -1620,7 +1620,7 @@ public final class Specification {
     /**
      * Get all the available roles.
      *
-     * @return A list of available <code>Role</code>s.
+     * @return A list of available {@code Role}s.
      */
     public List<Role> getRolesList() {
         return this.roles;
@@ -1629,7 +1629,7 @@ public final class Specification {
     /**
      * Get all the available roles as a stream.
      *
-     * @return A stream of available <code>Role</code>s.
+     * @return A stream of available {@code Role}s.
      */
     public Stream<Role> getRoles() {
         return getRolesList().stream();
@@ -1639,7 +1639,7 @@ public final class Specification {
      * Get a role by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>Role</code> found.
+     * @return The {@code Role} found.
      */
     public Role getRole(String id) {
         return getType(id, Role.class);
@@ -1648,7 +1648,7 @@ public final class Specification {
     /**
      * Get the default role.
      *
-     * @return The default <code>Role</code>.
+     * @return The default {@code Role}.
      */
     public Role getDefaultRole() {
         return getRole(DEFAULT_ROLE_ID);
@@ -1658,7 +1658,7 @@ public final class Specification {
      * Get the military roles in this specification, in decreasing order
      * of effectiveness.
      *
-     * @return An unmodifiable list of military <code>Role</code>s.
+     * @return An unmodifiable list of military {@code Role}s.
      */
     public List<Role> getMilitaryRolesList() {
         if (this.militaryRoles == null) {
@@ -1672,7 +1672,7 @@ public final class Specification {
     /**
      * Get the available military roles as a stream.
      *
-     * @return A stream of military <code>Role</code>s.
+     * @return A stream of military {@code Role}s.
      */
     public Stream<Role> getMilitaryRoles() {
         return getMilitaryRolesList().stream();
@@ -1682,7 +1682,7 @@ public final class Specification {
      * Gets the roles suitable for a REF unit.
      *
      * @param naval If true, choose roles for naval units, if not, land units.
-     * @return A list of <code>Role</code>s suitable for REF units.
+     * @return A list of {@code Role}s suitable for REF units.
      */
     public List<Role> getREFRolesList(boolean naval) {
         return transform(((naval) ? Stream.of(getDefaultRole())
@@ -1694,7 +1694,7 @@ public final class Specification {
      * Gets the roles suitable for a REF unit as a stream.
      *
      * @param naval If true, choose roles for naval units, if not, land units.
-     * @return A stream of <code>Role</code>s suitable for REF units.
+     * @return A stream of {@code Role}s suitable for REF units.
      */
     public Stream<Role> getREFRoles(boolean naval) {
         return getREFRolesList(naval).stream();
@@ -1704,9 +1704,9 @@ public final class Specification {
      * Get a role with an ability.
      *
      * @param id The ability identifier to look for.
-     * @param roles An optional list of <code>Role</code>s to look in,
+     * @param roles An optional list of {@code Role}s to look in,
      *     if null all roles are used.
-     * @return The first <code>Role</code> found with the required
+     * @return The first {@code Role} found with the required
      *     ability, or null if none found.
      */
     public Role getRoleWithAbility(String id, List<Role> roles) {
@@ -1716,7 +1716,7 @@ public final class Specification {
     /**
      * Get the missionary role.
      *
-     * @return The missionary <code>Role</code>.
+     * @return The missionary {@code Role}.
      */
     public Role getMissionaryRole() {
         return getRoleWithAbility(Ability.ESTABLISH_MISSION, null);
@@ -1725,7 +1725,7 @@ public final class Specification {
     /**
      * Get the pioneer role.
      *
-     * @return The pioneer <code>Role</code>.
+     * @return The pioneer {@code Role}.
      */
     public Role getPioneerRole() {
         return getRoleWithAbility(Ability.IMPROVE_TERRAIN, null);
@@ -1734,7 +1734,7 @@ public final class Specification {
     /**
      * Get the scout role.
      *
-     * @return The scout <code>Role</code>.
+     * @return The scout {@code Role}.
      */
     public Role getScoutRole() {
         return getRoleWithAbility(Ability.SPEAK_WITH_CHIEF, null);
@@ -1747,7 +1747,7 @@ public final class Specification {
      * Still needed by backward compatibility code in Unit.readChild.
      *
      * @param id The object identifier.
-     * @return The <code>EquipmentType</code> found.
+     * @return The {@code EquipmentType} found.
      */
     public EquipmentType getEquipmentType(String id) {
         return getType(id, EquipmentType.class);
@@ -1781,7 +1781,7 @@ public final class Specification {
     /**
      * Gets the current difficulty level options.
      *
-     * @return The current difficulty level <code>OptionGroup</code>.
+     * @return The current difficulty level {@code OptionGroup}.
      */
     public OptionGroup getDifficultyOptionGroup() {
         return getDifficultyOptionGroup(this.difficultyLevel);
@@ -1791,7 +1791,7 @@ public final class Specification {
      * Gets difficulty level options by id.
      *
      * @param id The difficulty level identifier to look for.
-     * @return The corresponding difficulty level <code>OptionGroup</code>,
+     * @return The corresponding difficulty level {@code OptionGroup},
      *     if any.
      */
     public OptionGroup getDifficultyOptionGroup(String id) {
@@ -1802,7 +1802,7 @@ public final class Specification {
     /**
      * Add/overwrite a difficulty option group.
      *
-     * @param difficulty The <code>OptionGroup</code> to add.
+     * @param difficulty The {@code OptionGroup} to add.
      */
     private void setDifficultyOptionGroup(OptionGroup difficulty) {
         OptionGroup group = allOptionGroups.get(DIFFICULTY_LEVELS);
@@ -1824,7 +1824,7 @@ public final class Specification {
      * Applies the given difficulty level to the current
      * specification.
      *
-     * @param level The difficulty level <code>OptionGroup</code> to apply.
+     * @param level The difficulty level {@code OptionGroup} to apply.
      */
     public void applyDifficultyLevel(OptionGroup level) {
         if (level == null) {
@@ -1865,7 +1865,7 @@ public final class Specification {
      * Get an event by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>Event</code> found.
+     * @return The {@code Event} found.
      */
     public Event getEvent(String id) {
         return getType(id, Event.class);
@@ -1881,7 +1881,7 @@ public final class Specification {
      * Get a disaster by identifier.
      *
      * @param id The object identifier.
-     * @return The <code>Disaster</code> found.
+     * @return The {@code Disaster} found.
      */
     public Disaster getDisaster(String id) {
         return getType(id, Disaster.class);
@@ -1892,7 +1892,7 @@ public final class Specification {
     /**
      * Gets the age corresponding to a given turn.
      *
-     * @param turn The <code>Turn</code> to check.
+     * @param turn The {@code Turn} to check.
      * @return The age of the given turn.
      */
     public int getAge(Turn turn) {
@@ -1907,12 +1907,12 @@ public final class Specification {
     // General type retrieval
 
     /**
-     * Get the <code>FreeColSpecObjectType</code> with the given identifier.
+     * Get the {@code FreeColSpecObjectType} with the given identifier.
      *
      * @param <T> The actual return type.
      * @param id The object identifier to look for.
-     * @param returnClass The expected <code>Class</code>.
-     * @return The <code>FreeColSpecObjectType</code> found.
+     * @param returnClass The expected {@code Class}.
+     * @return The {@code FreeColSpecObjectType} found.
      */
     public <T extends FreeColSpecObjectType> T getType(String id,
                                                        Class<T> returnClass) {
@@ -1938,10 +1938,10 @@ public final class Specification {
     }
 
     /**
-     * Find a <code>FreeColSpecObjectType</code> by id.
+     * Find a {@code FreeColSpecObjectType} by id.
      *
      * @param id The identifier to look for, which must not be null.
-     * @return The <code>FreeColSpecObjectType</code> found if any.
+     * @return The {@code FreeColSpecObjectType} found if any.
      */
     public FreeColSpecObjectType findType(String id) {
         if (id == null) {
@@ -1960,7 +1960,7 @@ public final class Specification {
      *
      * @param id The object identifier.
      * @param value The ability value to check.
-     * @return A list of <code>FreeColSpecObjectType</code>s that
+     * @return A list of {@code FreeColSpecObjectType}s that
      *     provide the required ability.
      */
     public List<FreeColSpecObjectType> getTypesProviding(String id,
@@ -1977,7 +1977,7 @@ public final class Specification {
      * @param <T> The actual return type.
      * @param resultType The expected result type.
      * @param abilities The abilities for the search.
-     * @return A list of <code>FreeColSpecObjectType</code>s with at
+     * @return A list of {@code FreeColSpecObjectType}s with at
      *     least one of the given abilities.
      */
     public <T extends FreeColSpecObjectType> List<T>
@@ -1995,7 +1995,7 @@ public final class Specification {
      * @param <T> The actual return type.
      * @param resultType The expected result type.
      * @param abilities The abilities for the search
-     * @return A list of <code>FreeColSpecObjectType</code>s without the
+     * @return A list of {@code FreeColSpecObjectType}s without the
      *     given abilities.
      */
     public <T extends FreeColSpecObjectType> List<T>
@@ -2888,7 +2888,7 @@ public final class Specification {
     /**
      * Write an XML-representation of this object to the given stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
@@ -2947,7 +2947,7 @@ public final class Specification {
     /**
      * Initializes this object from its XML-representation.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there are any problems reading
      *     the stream.
      */

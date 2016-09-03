@@ -65,7 +65,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
         /**
          * Create a new wrapped image animation.
          *
-         * @param image The <code>BufferedImage</code> to wrap.
+         * @param image The {@code BufferedImage} to wrap.
          * @param durationInMs The animation duration in ms.
          */
         private ImageAnimationEventImpl(final BufferedImage image,
@@ -79,7 +79,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
          * Create a scaled version of this image animation.
          *
          * @param scale The scale factor to apply.
-         * @return The scaled <code>AnimationEvent</code>.
+         * @return The scaled {@code AnimationEvent}.
          */
         private AnimationEvent createScaledVersion(float scale) {
             final int width = (int)(getWidth() * scale);
@@ -153,7 +153,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Creates a new animation from an input stream.
      * 
-     * @param stream An <code>InputStream</code> to a zip-file. 
+     * @param stream An {@code InputStream} to a zip-file.
      * @exception IOException if the file cannot be opened, or is invalid.
      */
     public SimpleZippedAnimation(final InputStream stream) throws IOException {
@@ -163,7 +163,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Create an animation from a zip input stream.
      *
-     * @param zipStream An <code>ZipInputStream</code> to a zip-file. 
+     * @param zipStream An {@code ZipInputStream} to a zip-file.
      * @exception IOException if the file cannot be opened, or is invalid.
      */
     private SimpleZippedAnimation(final ZipInputStream zipStream)
@@ -174,7 +174,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Create an animation from a list of animation events.
      *
-     * @param evl The list of <code>AnimationEvent</code>s.
+     * @param evl The list of {@code AnimationEvent}s.
      */
     private SimpleZippedAnimation(final List<AnimationEvent> evl) {
         this(evl, max(evl, isIAEI, ifIAEIWidth), max(evl, isIAEI, ifIAEIHeight));
@@ -183,7 +183,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Create an animation from a given list of events and dimensions.
      *
-     * @param events The list of <code>AnimationEvent</code>s.
+     * @param events The list of {@code AnimationEvent}s.
      * @param width The width of the animation.
      * @param height The height of the animation.
      */
@@ -198,8 +198,8 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Load animation events from a zip stream.
      *
-     * @param zipStream An <code>ZipInputStream</code> to a zip-file. 
-     * @return A list of <code>AnimationEvent</code>s.
+     * @param zipStream An {@code ZipInputStream} to a zip-file.
+     * @return A list of {@code AnimationEvent}s.
      * @exception IOException if there is an error with the stream.
      */
     private static List<AnimationEvent> loadEvents(ZipInputStream zipStream)
@@ -295,7 +295,7 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
     /**
      * Make this animation iterable.
      *
-     * @return An <code>Iterator</code> with all the images and other
+     * @return An {@code Iterator} with all the images and other
      *     resources (support for sound may be added later).
      */
     @Override

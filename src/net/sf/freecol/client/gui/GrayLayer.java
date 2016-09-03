@@ -59,7 +59,7 @@ public class GrayLayer extends Component {
     /** The client for this FreeCol game */
     private final FreeColClient freeColClient;
     
-    /** Player object or <code>null</code> */
+    /** Player object or {@code null} */
     private Player player;
 
 
@@ -77,7 +77,7 @@ public class GrayLayer extends Component {
      * Executes painting.  The method shadows the background image, and
      * paints the message with icon (if available) and text.
      *
-     * @param g The <code>Graphics</code> to paint on.
+     * @param g The {@code Graphics} to paint on.
      */
     @Override
     public void paint(Graphics g) {
@@ -154,7 +154,7 @@ public class GrayLayer extends Component {
      * Set the player for which we paint.  If the player is already
      * set, then nothing happens, otherwise a repaint event is sent.
      *
-     * @param player The <code>Player</code> for status information.
+     * @param player The {@code Player} for status information.
      */
     public void setPlayer(Player player) {
         if (this.player == player) return;

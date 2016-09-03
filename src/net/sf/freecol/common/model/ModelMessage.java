@@ -103,14 +103,14 @@ public class ModelMessage extends StringTemplate {
     public ModelMessage() {}
         
     /**
-     * Creates a new <code>ModelMessage</code>.
+     * Creates a new {@code ModelMessage}.
      *
      * @param messageType The type of this model message.
      * @param id The object identifier.
      * @param defaultId The default identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
-     * @param display The <code>FreeColObject</code> to display.
+     * @param display The {@code FreeColObject} to display.
      */
     public ModelMessage(MessageType messageType, String id, String defaultId,
                         FreeColGameObject source, FreeColObject display) {
@@ -122,13 +122,13 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
-     * Creates a new <code>ModelMessage</code>.
+     * Creates a new {@code ModelMessage}.
      *
      * @param messageType The type of this model message.
      * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
-     * @param display The <code>FreeColObject</code> to display.
+     * @param display The {@code FreeColObject} to display.
      */
     public ModelMessage(MessageType messageType, String id,
                         FreeColGameObject source, FreeColObject display) {
@@ -136,7 +136,7 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
-     * Creates a new <code>ModelMessage</code>.
+     * Creates a new {@code ModelMessage}.
      *
      * @param messageType The type of this model message.
      * @param id The object identifier.
@@ -151,7 +151,7 @@ public class ModelMessage extends StringTemplate {
     /**
      * Creates a new model message by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public ModelMessage(FreeColXMLReader xr) throws XMLStreamException {
@@ -247,7 +247,7 @@ public class ModelMessage extends StringTemplate {
      * Set a default identifier.
      *
      * @param id The new default identifier.
-     * @return This <code>ModelMessage</code>.
+     * @return This {@code ModelMessage}.
      */
     public ModelMessage addDefaultId(String id) {
         return super.setDefaultId(id, ModelMessage.class);
@@ -328,7 +328,7 @@ public class ModelMessage extends StringTemplate {
     /**
      * Split a message into a list of text and link objects.
      *
-     * @param player The <code>Player</code> who will see the result.
+     * @param player The {@code Player} who will see the result.
      * @return A list of strings and buttons.
      */
     public List<Object> splitLinks(Player player) {

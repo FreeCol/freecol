@@ -44,7 +44,7 @@ public class ChangeAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ChangeAction(FreeColClient freeColClient) {
         super(freeColClient, id);

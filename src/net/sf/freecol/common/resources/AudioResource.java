@@ -26,7 +26,7 @@ import net.sf.freecol.common.sound.SoundPlayer;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>File</code> containing sounds.
+ * A {@code Resource} wrapping a <code>File</code> containing sounds.
  *
  * @see Resource
  */
@@ -41,7 +41,7 @@ public class AudioResource extends Resource {
 
     /**
      * Do not use directly.
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      * @throws Exception of assorted types from the underlying audio components
      */
@@ -55,7 +55,7 @@ public class AudioResource extends Resource {
     /**
      * Gets the file represented by this resource.
      *
-     * @return The <code>File</code> for this resource.
+     * @return The {@code File} for this resource.
      */
     public File getAudio() {
         return file;

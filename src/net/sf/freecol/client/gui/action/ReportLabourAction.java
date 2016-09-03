@@ -36,7 +36,7 @@ public class ReportLabourAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportLabourAction(FreeColClient freeColClient) {
         super(freeColClient, id);

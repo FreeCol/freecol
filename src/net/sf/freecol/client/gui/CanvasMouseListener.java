@@ -57,7 +57,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
     /**
      * Create a new canvas mouse listener.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param canvas The component this object gets created for.
      */
     public CanvasMouseListener(FreeColClient freeColClient, Canvas canvas) {

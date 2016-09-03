@@ -67,11 +67,11 @@ public final class DifficultyDialog extends OptionsDialog
      * Use this constructor to display the difficulty level of the
      * current game read-only.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param specification The <code>Specification</code> to base the
+     * @param specification The {@code Specification} to base the
      *     difficulty on.
-     * @param level An <code>OptionGroup</code> encapsulating the difficulty
+     * @param level An {@code OptionGroup} encapsulating the difficulty
      *     level to display.
      * @param editable Is the dialog editable?
      */
@@ -107,9 +107,9 @@ public final class DifficultyDialog extends OptionsDialog
 
 
     /**
-     * Gets this dialog's instance of the <code>Specification</code>.
+     * Gets this dialog's instance of the {@code Specification}.
      *
-     * @return The <code>Specification</code>.
+     * @return The {@code Specification}.
      */
     @Override
     public Specification getSpecification() {
@@ -122,7 +122,7 @@ public final class DifficultyDialog extends OptionsDialog
     /**
      * Add a reset action to a button.
      *
-     * @param button The <code>JButton</code> to add the action to.
+     * @param button The {@code JButton} to add the action to.
      */
     private void addResetAction(JButton button) {
         button.addActionListener((ActionEvent ae) -> {
@@ -133,7 +133,7 @@ public final class DifficultyDialog extends OptionsDialog
     /**
      * Add a load action to a button.
      *
-     * @param button The <code>JButton</code> to add the action to.
+     * @param button The {@code JButton} to add the action to.
      */
     private void addLoadAction(JButton button) {
         initializeFilters();
@@ -151,7 +151,7 @@ public final class DifficultyDialog extends OptionsDialog
     /**
      * Add a save action to a button.
      *
-     * @param button The <code>JButton</code> to add the action to.
+     * @param button The {@code JButton} to add the action to.
      */
     private void addSaveAction(JButton button) {
         initializeFilters();

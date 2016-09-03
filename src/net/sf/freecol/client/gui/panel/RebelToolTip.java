@@ -50,8 +50,8 @@ public class RebelToolTip extends JToolTip {
     /**
      * Creates a RebelToolTip.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colony The <code>Colony</code> for which to display information.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colony The {@code Colony} for which to display information.
      */
     public RebelToolTip(FreeColClient freeColClient, Colony colony) {
         final Specification spec = colony.getSpecification();

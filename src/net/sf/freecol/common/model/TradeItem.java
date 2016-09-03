@@ -40,12 +40,12 @@ public abstract class TradeItem extends FreeColGameObject {
 
 
     /**
-     * Creates a new <code>TradeItem</code> instance.
+     * Creates a new {@code TradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
         super(game, id);
@@ -55,10 +55,10 @@ public abstract class TradeItem extends FreeColGameObject {
     }
 
     /**
-     * Creates a new <code>TradeItem</code> instance.
+     * Creates a new {@code TradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
@@ -71,7 +71,7 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Get the source player.
      *
-     * @return The source <code>Player</code>.
+     * @return The source {@code Player}.
      */
     public final Player getSource() {
         return this.source;
@@ -80,7 +80,7 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Set the source player.
      *
-     * @param newSource The new source <code>Player</code>.
+     * @param newSource The new source {@code Player}.
      */
     public final void setSource(final Player newSource) {
         this.source = newSource;
@@ -89,7 +89,7 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Get the destination player.
      *
-     * @return The destination <code>Player</code>.
+     * @return The destination {@code Player}.
      */
     public final Player getDestination() {
         return this.destination;
@@ -98,7 +98,7 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Set the destination player.
      *
-     * @param newDestination The new destination <code>Player</code>.
+     * @param newDestination The new destination {@code Player}.
      */
     public final void setDestination(final Player newDestination) {
         this.destination = newDestination;
@@ -107,8 +107,8 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Get the other player for this trade item.
      *
-     * @param player The <code>Player</code> we do not want.
-     * @return The <code>Player</code> we want.
+     * @param player The {@code Player} we do not want.
+     * @return The {@code Player} we want.
      */
     public final Player getOther(Player player) {
         return (player == this.source) ? this.destination : this.source;
@@ -136,29 +136,29 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Get a label for this item.
      *
-     * @return A <code>StringTemplate</code> describing this item.
+     * @return A {@code StringTemplate} describing this item.
      */
     public abstract StringTemplate getLabel();
 
     /**
      * Get the colony to trade.
      *
-     * @param game A <code>Game</code> to look for the colony in.
-     * @return The <code>Colony</code> to trade.
+     * @param game A {@code Game} to look for the colony in.
+     * @return The {@code Colony} to trade.
      */
     public Colony getColony(Game game) { return null; }
 
     /**
      * Get the goods to trade.
      *
-     * @return The <code>Goods</code> to trade.
+     * @return The {@code Goods} to trade.
      */
     public Goods getGoods() { return null; }
 
     /**
      * Set the goods to trade.
      *
-     * @param goods The new <code>Goods</code> to trade.
+     * @param goods The new {@code Goods} to trade.
      */
     public void setGoods(Goods goods) {}
 
@@ -179,42 +179,42 @@ public abstract class TradeItem extends FreeColGameObject {
     /**
      * Get the victim player to incite war against.
      *
-     * @return The <code>Player</code> to trade.
+     * @return The {@code Player} to trade.
      */
     public Player getVictim() { return null; }
 
     /**
      * Get the stance to trade.
      *
-     * @return The <code>Stance</code> to trade.
+     * @return The {@code Stance} to trade.
      */
     public Stance getStance() { return null; }
 
     /**
      * Set the stance to trade.
      *
-     * @param stance The new <code>Stance</code> to trade.
+     * @param stance The new {@code Stance} to trade.
      */
     public void setStance(Stance stance) {}
 
     /**
      * Get the unit to trade.
      *
-     * @return The <code>Unit</code> to trade.
+     * @return The {@code Unit} to trade.
      */
     public Unit getUnit() { return null; }
 
     /**
      * Set the unit to trade.
      *
-     * @param unit The new <code>Unit</code> to trade.
+     * @param unit The new {@code Unit} to trade.
      */
     public void setUnit(Unit unit) {}
 
     /**
      * Evaluate this trade item for a given player.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the player, MIN_VALUE for invalid.
      */
     public abstract int evaluateFor(Player player);

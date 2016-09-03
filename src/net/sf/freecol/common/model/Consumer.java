@@ -63,7 +63,7 @@ public interface Consumer {
     /**
      * Returns a list of GoodsTypes this Consumer consumes.
      *
-     * @return a <code>List</code> value
+     * @return a {@code List} value
      */
     public List<AbstractGoods> getConsumedGoods();
 
@@ -72,7 +72,7 @@ public interface Consumer {
      * earlier will the Consumer be allowed to consume the goods it
      * requires.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public int getPriority();
 
@@ -97,7 +97,7 @@ public interface Consumer {
      * by the country and stables).
      *
      * @param id The object identifier.
-     * @return The stream of <code>Modifier</code>s found.
+     * @return The stream of {@code Modifier}s found.
      */
     public Stream<Modifier> getModifiers(String id);
 }

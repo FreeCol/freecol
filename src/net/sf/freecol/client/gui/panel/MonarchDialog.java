@@ -53,10 +53,10 @@ public final class MonarchDialog extends FreeColDialog<Boolean> {
     /**
      * Creates a dialog to handle monarch interactions.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param action The <code>MonarchAction</code> the monarch is performing.
-     * @param template The <code>StringTemplate</code> describing the action.
+     * @param action The {@code MonarchAction} the monarch is performing.
+     * @param template The {@code StringTemplate} describing the action.
      * @param monarchKey The resource key for the monarch image.
      */
     public MonarchDialog(FreeColClient freeColClient, JFrame frame,

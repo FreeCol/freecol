@@ -69,7 +69,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
     /**
      * Creates a new instance of this colopedia subpanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param colopediaPanel The parent ColopediaPanel.
      */
     public UnitDetailPanel(FreeColClient freeColClient,

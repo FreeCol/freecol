@@ -98,7 +98,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Create a new tile improvement type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public TileImprovementType(String id, Specification specification) {
         super(id, specification);
@@ -144,7 +144,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * Get the role required to perform this improvement, if any.
      *
-     * @return The required <code>Role</code>.
+     * @return The required {@code Role}.
      */
     public Role getRequiredRole() {
         return requiredRole;
@@ -174,7 +174,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Get a weighted list of natural disasters than can strike this
      * tile improvement type.
      *
-     * @return A stream of <code>Disaster</code> choices.
+     * @return A stream of {@code Disaster} choices.
      */
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return (disasters == null)
@@ -185,7 +185,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * Add a disaster.
      *
-     * @param disaster The <code>Disaster</code> to add.
+     * @param disaster The {@code Disaster} to add.
      * @param probability The probability of the disaster.
      */
     private void addDisaster(Disaster disaster, int probability) {
@@ -226,8 +226,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * Is a particular unit type allowed to build this improvement?
      *
-     * @param unitType The <code>UnitType</code> to check.
-     * @return True if the <code>UnitType</code> can build this improvement.
+     * @param unitType The {@code UnitType} to check.
+     * @return True if the {@code UnitType} can build this improvement.
      */
     public boolean isWorkerTypeAllowed(UnitType unitType) {
         return allowedWorkers == null || allowedWorkers.isEmpty()
@@ -239,8 +239,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      *
      * Checks both the unit type and the available equipment.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @return True if the <code>Unit</code> can build this improvement.
+     * @param unit The {@code Unit} to check.
+     * @return True if the {@code Unit} can build this improvement.
      */
     public boolean isWorkerAllowed(Unit unit) {
         return isWorkerTypeAllowed(unit.getType())
@@ -255,7 +255,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * If you want to find out if an improvement is allowed for a tile, call
      * {@link Tile#isImprovementAllowed(TileImprovement)}.
      *
-     * @param tileType The <code>TileType</code> to check.
+     * @param tileType The {@code TileType} to check.
      * @return True if improvement is possible.
      */
     public boolean isTileTypeAllowed(TileType tileType) {
@@ -288,8 +288,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Gets the goods produced by applying this TileImprovementType
      * to a Tile with the given TileType.
      *
-     * @param from The original <code>TileType</code>.
-     * @return The <code>AbstractGoods</code> produced.
+     * @param from The original {@code TileType}.
+     * @return The {@code AbstractGoods} produced.
      */
     public AbstractGoods getProduction(TileType from) {
         if (tileTypeChanges == null) return null;
@@ -300,8 +300,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * Gets the destination type of a tile type change (or null).
      *
-     * @param tileType The <code>TileType</code> that is to change.
-     * @return The resulting <code>TileType</code>.
+     * @param tileType The {@code TileType} that is to change.
+     * @return The resulting {@code TileType}.
      */
     public TileType getChange(TileType tileType) {
         if (tileTypeChanges == null) return null;
@@ -313,8 +313,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Can this tile improvement type change a tile type to the given
      * tile type.
      *
-     * @param tileType The required <code>TileType</code>.
-     * @return True if the required <code>TileType</code> can be changed to.
+     * @param tileType The required {@code TileType}.
+     * @return True if the required {@code TileType} can be changed to.
      */
     public boolean changeContainsTarget(TileType tileType) {
         return (tileTypeChanges == null) ? false
@@ -325,7 +325,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     /**
      * Add a tile type change.
      *
-     * @param change The <code>TileTypeChange</code> to add.
+     * @param change The {@code TileTypeChange} to add.
      */
     private void addChange(TileTypeChange change) {
         if (tileTypeChanges == null) tileTypeChanges = new HashMap<>();
@@ -353,8 +353,8 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      * Gets the increase in production of the given GoodsType
      * this tile improvement type would yield at a specified tile.
      *
-     * @param tile The <code>Tile</code> to be considered.
-     * @param goodsType An optional preferred <code>GoodsType</code>.
+     * @param tile The {@code Tile} to be considered.
+     * @param goodsType An optional preferred {@code GoodsType}.
      * @return The increase in production
      */
     public int getImprovementValue(Tile tile, GoodsType goodsType) {

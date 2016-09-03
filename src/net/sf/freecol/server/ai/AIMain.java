@@ -64,15 +64,15 @@ public class AIMain extends FreeColObject
     private int nextId = 1;
 
     /**
-     * Contains mappings between <code>FreeColGameObject</code>s
-     * and <code>AIObject</code>s.
+     * Contains mappings between {@code FreeColGameObject}s
+     * and {@code AIObject}s.
      */
     private final Map<String, AIObject> aiObjects = new HashMap<>();
 
 
     /**
-     * Creates a new <code>AIMain</code> and searches the current
-     * game for <code>FreeColGameObject</code>s.
+     * Creates a new {@code AIMain} and searches the current
+     * game for {@code FreeColGameObject}s.
      *
      * @param freeColServer The main controller object for the server.
      */
@@ -81,7 +81,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Creates a new <code>AIMain</code> and reads the given element.
+     * Creates a new {@code AIMain} and reads the given element.
      *
      * @param freeColServer The main controller object for the
      *     server.
@@ -101,7 +101,7 @@ public class AIMain extends FreeColObject
     /**
      * Gets the main controller object for the server.
      *
-     * @return The <code>FreeColServer</code>-object.
+     * @return The {@code FreeColServer}-object.
      */
     public FreeColServer getFreeColServer() {
         return freeColServer;
@@ -110,14 +110,14 @@ public class AIMain extends FreeColObject
     /**
      * Convenience accessor for the Game.
      *
-     * @return The <code>Game</code> this AI is operating in.
+     * @return The {@code Game} this AI is operating in.
      */
     public Game getGame() {
         return freeColServer.getGame();
     }
 
     /**
-     * Gets a unique identifier for an <code>AIObject</code>.
+     * Gets a unique identifier for an {@code AIObject}.
      *
      * @return A unique identifier.
      */
@@ -140,7 +140,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Should a <code>FreeColGameObject</code> have a corresponding AI
+     * Should a {@code FreeColGameObject} have a corresponding AI
      * object?
      *
      * Strictly true only for AI players and their units and colonies
@@ -149,7 +149,7 @@ public class AIMain extends FreeColObject
      * which means we can not yet use the Colony or Unit owner fields.
      * So the actual test implemented here is somewhat sloppy.
      *
-     * @param fcgo The <code>FreeColGameObject</code> to test.
+     * @param fcgo The {@code FreeColGameObject} to test.
      * @return True if a corresponding AI object is needed.
      */
     private boolean shouldHaveAIObject(FreeColGameObject fcgo) {
@@ -163,7 +163,7 @@ public class AIMain extends FreeColObject
      * Searches for new {@link FreeColGameObject FreeColGameObjects}.
      * An AI-object is created for each new object.
      *
-     * @param overwrite Determines wether any old <code>AIObject</code>
+     * @param overwrite Determines wether any old {@code AIObject}
      *     should be overwritten or not.
      */
     public void findNewObjects(boolean overwrite) {
@@ -177,24 +177,24 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>AIObject</code> for the given
-     * <code>FreeColGameObject</code>.
+     * Gets the {@code AIObject} for the given
+     * {@code FreeColGameObject}.
      *
-     * @param fcgo The <code>FreeColGameObject</code> to find the
-     *     <code>AIObject</code> for.
+     * @param fcgo The {@code FreeColGameObject} to find the
+     *     {@code AIObject} for.
      * @see #getAIObject(String)
-     * @return The <code>AIObject</code>.
+     * @return The {@code AIObject}.
      */
     public AIObject getAIObject(FreeColGameObject fcgo) {
         return getAIObject(fcgo.getId());
     }
 
     /**
-     * Gets the <code>AIObject</code> for a given object identifier.
+     * Gets the {@code AIObject} for a given object identifier.
      *
      * @param id The object identifier.
      * @see #getAIObject(FreeColGameObject)
-     * @return The <code>AIObject</code>.
+     * @return The {@code AIObject}.
      */
     public AIObject getAIObject(String id) {
         synchronized (aiObjects) {
@@ -203,10 +203,10 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Adds a reference to the given <code>AIObject</code>.
+     * Adds a reference to the given {@code AIObject}.
      *
      * @param id The object identifier.
-     * @param aiObject The <code>AIObject</code> to store a reference
+     * @param aiObject The {@code AIObject} to store a reference
      *        for.
      */
     public void addAIObject(String id, AIObject aiObject) {
@@ -224,7 +224,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Removes a reference to the given <code>AIObject</code>.
+     * Removes a reference to the given {@code AIObject}.
      *
      * @param id The object identifier.
      * @return True if an object for the identifier is removed.
@@ -241,7 +241,7 @@ public class AIMain extends FreeColObject
     /**
      * Get a copy of the list of all AI objects.
      *
-     * @return A list of <code>AIObject</code>s.
+     * @return A list of {@code AIObject}s.
      */
     private List<AIObject> getAIObjects() {
         synchronized (aiObjects) {
@@ -250,13 +250,13 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>AIObject</code> with the specified object
+     * Gets the {@code AIObject} with the specified object
      * identifier and class.
      *
      * @param <T> The actual return type.
      * @param id The object identifier.
      * @param returnClass The expected class of the object.
-     * @return The <code>AIObject</code> found, or null if not.
+     * @return The {@code AIObject} found, or null if not.
      */
     public <T extends AIObject> T getAIObject(String id, Class<T> returnClass) {
         AIObject aio = getAIObject(id);
@@ -270,7 +270,7 @@ public class AIMain extends FreeColObject
     /**
      * Gets the AI colony corresponding to a given colony.
      *
-     * @param colony The <code>Colony</code> to look up.
+     * @param colony The {@code Colony} to look up.
      * @return The corresponding AI colony, or null if not found.
      */
     public AIColony getAIColony(Colony colony) {
@@ -280,7 +280,7 @@ public class AIMain extends FreeColObject
     /**
      * Gets the AI player corresponding to a given player.
      *
-     * @param player The <code>Player</code> to look up.
+     * @param player The {@code Player} to look up.
      * @return The corresponding AI player, or null if not found.
      */
     public AIPlayer getAIPlayer(Player player) {
@@ -290,7 +290,7 @@ public class AIMain extends FreeColObject
     /**
      * Gets the AI unit corresponding to a given unit.
      *
-     * @param unit The <code>Unit</code> to look up.
+     * @param unit The {@code Unit} to look up.
      * @return The corresponding AI unit, or null if not found.
      */
     public AIUnit getAIUnit(Unit unit) {
@@ -321,7 +321,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Checks the integrity of this <code>AIMain</code> by checking if
+     * Checks the integrity of this {@code AIMain} by checking if
      * there are any invalid objects.
      *
      * @param fix Fix problems if possible.
@@ -363,12 +363,12 @@ public class AIMain extends FreeColObject
     // Interface FreeColGameObjectListener
 
     /**
-     * Creates a new <code>AIObject</code> for a given
-     * <code>FreeColGameObject</code>. This method gets called
+     * Creates a new {@code AIObject} for a given
+     * {@code FreeColGameObject}. This method gets called
      * whenever a new object gets added to the {@link Game}.
      *
      * @param id The object identifier.
-     * @param fcgo The <code>FreeColGameObject</code> to add.
+     * @param fcgo The {@code FreeColGameObject} to add.
      * @see AIObject
      * @see FreeColGameObject
      * @see FreeColGameObject#getId
@@ -404,7 +404,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Removes the <code>AIObject</code> for a given AI identifier.
+     * Removes the {@code AIObject} for a given AI identifier.
      * Needed for interface FreeColGameObjectListener.
      *
      * @param id The object identifier.
@@ -419,9 +419,9 @@ public class AIMain extends FreeColObject
     /**
      * Replaces the AI object when ownership changes.
      *
-     * @param source The <code>FreeColGameObject</code> that has changed.
-     * @param oldOwner The old owning <code>Player</code>.
-     * @param newOwner The new owning <code>Player</code>.
+     * @param source The {@code FreeColGameObject} that has changed.
+     * @param oldOwner The old owning {@code Player}.
+     * @param newOwner The new owning {@code Player}.
      */
     @Override
     public void ownerChanged(FreeColGameObject source, Player oldOwner,

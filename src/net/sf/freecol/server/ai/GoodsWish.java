@@ -35,7 +35,7 @@ import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
- * Represents the need for goods within a <code>Colony</code>.
+ * Represents the need for goods within a {@code Colony}.
  */
 public class GoodsWish extends Wish {
 
@@ -50,7 +50,7 @@ public class GoodsWish extends Wish {
 
 
     /**
-     * Creates a new uninitialized <code>GoodsWish</code>.
+     * Creates a new uninitialized {@code GoodsWish}.
      *
      * @param aiMain The main AI-object.
      * @param id The object identifier.
@@ -63,14 +63,14 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Creates a new <code>GoodsWish</code>.
+     * Creates a new {@code GoodsWish}.
      *
      * @param aiMain The main AI-object.
-     * @param destination The <code>Location</code> in which the
+     * @param destination The {@code Location} in which the
      *       {@link Wish#getTransportable transportable} assigned to
-     *       this <code>GoodsWish</code> will have to reach.
+     *       this {@code GoodsWish} will have to reach.
      * @param value The value identifying the importance of
-     *       this <code>Wish</code>.
+     *       this {@code Wish}.
      * @param amountRequested The amount requested.
      * @param goodsType The type of goods needed for releasing this wish
      *       completly.
@@ -91,7 +91,7 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Creates a new <code>GoodsWish</code> from the given
+     * Creates a new {@code GoodsWish} from the given
      * XML-representation.
      *
      * @param aiMain The main AI-object.
@@ -108,9 +108,9 @@ public class GoodsWish extends Wish {
 
 
     /**
-     * Updates this <code>GoodsWish</code> with the given attributes.
+     * Updates this {@code GoodsWish} with the given attributes.
      *
-     * @param goodsType The <code>GoodsType</code> to wish for.
+     * @param goodsType The {@code GoodsType} to wish for.
      * @param amount The amount of goods.
      * @param value The urgency of the wish.
      */
@@ -122,7 +122,7 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Checks if this <code>Wish</code> needs to be stored in a savegame.
+     * Checks if this {@code Wish} needs to be stored in a savegame.
      *
      * @return True.  We always store goods wishes.
      */

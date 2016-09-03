@@ -43,10 +43,10 @@ public class NativeTradeSession extends Session {
 
 
     /**
-     * Creates a new <code>NativeTradeSession</code>.
+     * Creates a new {@code NativeTradeSession}.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> to trade with.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} to trade with.
      */
     public NativeTradeSession(NativeTrade nt) {
         super(makeSessionKey(NativeTradeSession.class, nt.getUnit(),
@@ -59,7 +59,7 @@ public class NativeTradeSession extends Session {
     /**
      * Get the native trade underway.
      *
-     * @return The <code>NativeTrade</code>.
+     * @return The {@code NativeTrade}.
      */
     public NativeTrade getNativeTrade() {
         return this.nt;

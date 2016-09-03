@@ -60,8 +60,8 @@ public class DisplayTileTextAction extends SelectableAction {
     /**
      * Creates this action
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param type a <code>DisplayText</code> value
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param type a {@code DisplayText} value
      */
     public DisplayTileTextAction(FreeColClient freeColClient,
                                  DisplayText type) {

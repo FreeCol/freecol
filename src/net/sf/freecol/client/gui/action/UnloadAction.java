@@ -39,19 +39,19 @@ public class UnloadAction extends MapboardAction {
     /**
      * Creates an action for unloading the currently selected unit.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public UnloadAction(FreeColClient freeColClient) {
         this(freeColClient, null);
     }
 
     /**
-     * Creates an action for unloading the <code>Unit</code>
-     * provided.  If the <code>Unit</code> is <code>null</code>, then
+     * Creates an action for unloading the {@code Unit}
+     * provided.  If the {@code Unit} is <code>null</code>, then
      * the currently selected unit is used instead.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> to unload.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} to unload.
      * @see net.sf.freecol.client.gui.MapViewer#getActiveUnit()
      */
     public UnloadAction(FreeColClient freeColClient, Unit unit) {

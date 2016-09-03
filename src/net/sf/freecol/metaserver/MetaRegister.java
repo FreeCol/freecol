@@ -30,7 +30,7 @@ import net.sf.freecol.common.networking.Connection;
 
 
 /**
- * The <code>MetaRegister</code> stores information about running servers.
+ * The {@code MetaRegister} stores information about running servers.
  * Each server has it's own {@link MetaItem} object.
  */
 public final class MetaRegister {
@@ -46,7 +46,7 @@ public final class MetaRegister {
      *
      * @param address The IP-address of the server.
      * @param port The port number of the server.
-     * @return The server entry or <code>null</code> if the given
+     * @return The server entry or {@code null} if the given
      *     entry could not be found.
      */
     private MetaItem getItem(String address, int port) {
@@ -63,7 +63,7 @@ public final class MetaRegister {
      *
      * @param address The IP-address of the server.
      * @param port The port number of the server.
-     * @return The index or <code>-1</code> if the given entry could
+     * @return The index or {@code -1} if the given entry could
      *     not be found.
      */
     private int indexOf(String address, int port) {
@@ -77,9 +77,9 @@ public final class MetaRegister {
     }
 
     /**
-     * Updates a given <code>MetaItem</code>.
+     * Updates a given {@code MetaItem}.
      *
-     * @param mi The <code>MetaItem</code> that should be updated.
+     * @param mi The {@code MetaItem} that should be updated.
      * @param name The name of the server.
      * @param address The IP-address of the server.
      * @param port The port number in which clients may connect.

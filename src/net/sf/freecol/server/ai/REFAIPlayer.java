@@ -145,11 +145,11 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
 
     /**
-     * Creates a new <code>REFAIPlayer</code>.
+     * Creates a new {@code REFAIPlayer}.
      *
      * @param aiMain The main AI-class.
      * @param player The player that should be associated with this
-     *            <code>REFAIPlayer</code>.
+     *            {@code REFAIPlayer}.
      */
     public REFAIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player);
@@ -158,7 +158,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     }
 
     /**
-     * Creates a new <code>REFAIPlayer</code>.
+     * Creates a new {@code REFAIPlayer}.
      *
      * @param aiMain The main AI-object.
      * @param xr The input stream containing the XML.
@@ -175,10 +175,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     /**
      * Find suitable colony targets.
      *
-     * @param aiu The <code>AIUnit</code> to search with.
+     * @param aiu The {@code AIUnit} to search with.
      * @param port If true, insist on the colonies being ports.
-     * @param aiCarrier The <code>AIUnit</code> to use as a carrier.
-     * @return A list of <code>TargetTuple</code> target choices.
+     * @param aiCarrier The {@code AIUnit} to use as a carrier.
+     * @return A list of {@code TargetTuple} target choices.
      */
     private List<TargetTuple> findColonyTargets(AIUnit aiu, boolean port,
                                                 AIUnit aiCarrier) {
@@ -469,12 +469,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * missions.
      *
      * @param nt The number of transport missions required.
-     * @param transports The list of <code>AIUnit</code>s with a transport
+     * @param transports The list of {@code AIUnit}s with a transport
      *     mission.
-     * @param privateers The list of <code>AIUnit</code>s with a privateer
+     * @param privateers The list of {@code AIUnit}s with a privateer
      *     mission.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return A list of new <code>AIUnit</code>s with transport missions.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return A list of new {@code AIUnit}s with transport missions.
      */
     private List<AIUnit> requireTransports(int nt, List<AIUnit> transports,
                                            List<AIUnit> privateers,

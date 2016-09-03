@@ -53,7 +53,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * Make a FreeColModFile from a File.
      *
-     * @param file The <code>File</code> containing a FreeCol mod.
+     * @param file The {@code File} containing a FreeCol mod.
      * @exception IOException if thrown while opening the file.
      */
     public FreeColModFile(final File file) throws IOException {
@@ -66,7 +66,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * Gets the input stream to the specification.
      *
-     * @return An <code>InputStream</code> to the file
+     * @return An {@code InputStream} to the file
      *     "specification.xml" within this data file, or null if none present.
      * @exception IOException if thrown while opening the input stream.
      */
@@ -82,7 +82,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * Gets the Specification.
      *
-     * @return The <code>Specification</code>, or null if none present.
+     * @return The {@code Specification}, or null if none present.
      * @exception IOException if an error occurs reading the specification.
      */
     public Specification getSpecification() throws IOException {
@@ -94,7 +94,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * Gets the input stream to the mod meta file.
      *
-     * @return An <code>InputStream</code> to the file "mod.xml"
+     * @return An {@code InputStream} to the file "mod.xml"
      *     within this data file.
      * @exception IOException if thrown while opening the input stream.
      */
@@ -144,7 +144,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * Helper to filter suitable file candidates to be made into
      * FreeColModFiles with {@see FreeColModFile::make}
      *
-     * @param The <code>File</code> to examine.
+     * @param The {@code File} to examine.
      * @return True if the file is suitable.
      */
     public static boolean fileFilter(File f) {
@@ -154,8 +154,8 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
     /**
      * Helper to make a mod file from a given file, logging the exception.
      *
-     * @param f The <code>File</code> to try to make the mod from.
-     * @return A new <code>FreeColModFile</code>, or null on error.
+     * @param f The {@code File} to try to make the mod from.
+     * @return A new {@code FreeColModFile}, or null on error.
      */
     public static FreeColModFile make(File f) {
         try {

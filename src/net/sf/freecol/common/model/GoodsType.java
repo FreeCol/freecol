@@ -132,7 +132,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * Create a new goods type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public GoodsType(String id, Specification specification) {
         super(id, specification);
@@ -258,7 +258,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * What type of goods is this goods type stored as?
      *
-     * @return The <code>GoodsType</code> this is stored as, usually itself.
+     * @return The {@code GoodsType} this is stored as, usually itself.
      */
     public GoodsType getStoredAs() {
         return (storedAs == null) ? this : storedAs;
@@ -267,7 +267,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * Can this goods type be made into somthing?
      *
-     * @return True if this <code>GoodsType</code> can be made into something.
+     * @return True if this {@code GoodsType} can be made into something.
      */
     public boolean isRawMaterial() {
         return makes != null;
@@ -276,7 +276,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * Is this goods type made from somthing?
      *
-     * @return True if this <code>GoodsType</code> is made from something.
+     * @return True if this {@code GoodsType} is made from something.
      */
     public boolean isRefined() {
         return madeFrom != null;
@@ -285,7 +285,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * What is this goods made into?
      *
-     * @return The <code>GoodsType</code> this is made into, if anything.
+     * @return The {@code GoodsType} this is made into, if anything.
      */
     public GoodsType getOutputType() {
         return makes;
@@ -294,7 +294,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * What is this goods type made from?
      *
-     * @return The <code>GoodsType</code> this is made from, if anything.
+     * @return The {@code GoodsType} this is made from, if anything.
      */
     public GoodsType getInputType() {
         return madeFrom;
@@ -353,7 +353,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * Is this type of goods breedable?
      *
-     * @return True if this <code>GoodsType</code> is breedable.
+     * @return True if this {@code GoodsType} is breedable.
      */
     public boolean isBreedable() {
         return breedingNumber != INFINITY;
@@ -403,7 +403,7 @@ public final class GoodsType extends FreeColSpecObjectType {
     /**
      * Gets the i18n-ed name for this goods type.
      *
-     * @return The name of this <code>GoodsType</code>.
+     * @return The name of this {@code GoodsType}.
      */
     public StringTemplate getLabel() {
         return StringTemplate.key(getNameKey());
@@ -427,7 +427,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * something else as is the case for grain etc.
      * FIXME: fix or retire this routine?
      *
-     * @return The production chain of this <code>GoodsType</code> as
+     * @return The production chain of this {@code GoodsType} as
      *     a list.
      */
     public List<GoodsType> getProductionChain() {
@@ -462,7 +462,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * Get all the equivalent goods types, in the sense that they are
      * stored as this type.
      *
-     * @return A set of equivalent <code>GoodsType</code>s, which
+     * @return A set of equivalent {@code GoodsType}s, which
      *     must include this one.
      */
     public Set<GoodsType> getEquivalentTypes() {
@@ -487,7 +487,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * in the classic ruleset and made-from grain in the freecol
      * ruleset.
      *
-     * @param spec The <code>Specification</code> to operate on.
+     * @param spec The {@code Specification} to operate on.
      */
     public static void setDerivedAttributes(Specification spec) {
         // Reset to default state

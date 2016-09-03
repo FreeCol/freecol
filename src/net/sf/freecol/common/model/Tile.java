@@ -49,7 +49,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
 
 
 /**
- * Represents a single tile on the <code>Map</code>.
+ * Represents a single tile on the {@code Map}.
  *
  * @see Map
  */
@@ -85,7 +85,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         /**
          * Update the internal information from a native settlement.
          *
-         * @param is The <code>IndianSettlement</code> to update.
+         * @param is The {@code IndianSettlement} to update.
          */
         public void update(IndianSettlement is) {
             setValues(is.getLearnableSkill(), is.getWantedGoods());
@@ -216,8 +216,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * The main tile constructor.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param type The <code>TileType</code>.
+     * @param game The enclosing {@code Game}.
+     * @param type The {@code TileType}.
      * @param locX The x-position of this tile on the map.
      * @param locY The y-position of this tile on the map.
      */
@@ -240,11 +240,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Create a new <code>Tile</code> with the given identifier.
+     * Create a new {@code Tile} with the given identifier.
      * The object should later be initialized by calling either
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Tile(Game game, String id) {
@@ -267,7 +267,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the type of this Tile.
      *
-     * @return The <code>TileType</code>.
+     * @return The {@code TileType}.
      */
     public TileType getType() {
         return type;
@@ -278,7 +278,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param t The new <code>TileType</code> for this <code>Tile</code>.
+     * @param t The new {@code TileType} for this <code>Tile</code>.
      */
     public void setType(TileType t) {
         type = t;
@@ -287,7 +287,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Check if the tile has been explored.
      *
-     * @return True if this is an explored <code>Tile</code>.
+     * @return True if this is an explored {@code Tile}.
      */
     public boolean isExplored() {
         return type != null;
@@ -296,7 +296,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Is this a land tile?
      *
-     * @return True if this a land <code>Tile</code>.
+     * @return True if this a land {@code Tile}.
      */
     public boolean isLand() {
         return type != null && !type.isWater();
@@ -305,7 +305,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Is this a forested tile?
      *
-     * @return True if this is a forested <code>Tile</code>.
+     * @return True if this is a forested {@code Tile}.
      */
     public boolean isForested() {
         return type != null && type.isForested();
@@ -314,7 +314,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the x-coordinate of this tile.
      *
-     * @return The x-coordinate of this <code>Tile</code>.
+     * @return The x-coordinate of this {@code Tile}.
      */
     public int getX() {
         return x;
@@ -323,7 +323,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the y-coordinate of this tile.
      *
-     * @return The y-coordinate of this <code>Tile</code>.
+     * @return The y-coordinate of this {@code Tile}.
      */
     public int getY() {
         return y;
@@ -332,7 +332,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the map in which this tile belongs.
      *
-     * @return The enclosing <code>Map</code>.
+     * @return The enclosing {@code Map}.
      */
     public Map getMap() {
         return getGame().getMap();
@@ -341,8 +341,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the settlement on this tile.
      *
-     * @return The <code>Settlement</code> that is located on this
-     *     <code>Tile</code>, or null if none is present.
+     * @return The {@code Settlement} that is located on this
+     *     {@code Tile}, or null if none is present.
      * @see #setSettlement
      */
     @Override
@@ -357,8 +357,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param settlement A <code>Settlement</code> to put on this
-     *     <code>Tile</code>.
+     * @param settlement A {@code Settlement} to put on this
+     *     {@code Tile}.
      * @see #getSettlement
      */
     public void setSettlement(Settlement settlement) {
@@ -377,7 +377,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the owning settlement for this tile.
      *
-     * @return The <code>Settlement</code> that owns this <code>Tile</code>.
+     * @return The {@code Settlement} that owns this <code>Tile</code>.
      * @see #setOwner
      */
     public Settlement getOwningSettlement() {
@@ -389,7 +389,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param owner The <code>Settlement</code> to own this <code>Tile</code>.
+     * @param owner The {@code Settlement} to own this <code>Tile</code>.
      * @see #getOwner
      */
     public void setOwningSettlement(Settlement owner) {
@@ -397,18 +397,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets this tiles <code>TileItemContainer</code>.
+     * Gets this tiles {@code TileItemContainer}.
      *
-     * @return The <code>TileItemContainer</code>.
+     * @return The {@code TileItemContainer}.
      */
     public TileItemContainer getTileItemContainer() {
         return tileItemContainer;
     }
 
     /**
-     * Sets the <code>TileItemContainer</code>.
+     * Sets the {@code TileItemContainer}.
      *
-     * @param newTileItemContainer The new <code>TileItemContainer</code> value.
+     * @param newTileItemContainer The new {@code TileItemContainer} value.
      */
     public void setTileItemContainer(TileItemContainer newTileItemContainer) {
         tileItemContainer = newTileItemContainer;
@@ -417,7 +417,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the completed tile items for this tile.
      *
-     * @return A list of completed <code>TileItem</code>s.
+     * @return A list of completed {@code TileItem}s.
      */
     public List<TileItem> getCompleteItems() {
         return (tileItemContainer == null) ? Collections.<TileItem>emptyList()
@@ -427,7 +427,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the tile region.
      *
-     * @return The tile <code>Region</code>.
+     * @return The tile {@code Region}.
      */
     public Region getRegion() {
         return region;
@@ -438,7 +438,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param newRegion The new <code>Region</code> value.
+     * @param newRegion The new {@code Region} value.
      */
     public void setRegion(final Region newRegion) {
         this.region = newRegion;
@@ -447,7 +447,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the discoverable region of this tile.
      *
-     * @return Any discoverable <code>Region</code>.
+     * @return Any discoverable {@code Region}.
      */
     public Region getDiscoverableRegion() {
         return (region == null) ? null : region.getDiscoverableRegion();
@@ -456,7 +456,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets whether this tile is connected to the high seas.
      *
-     * @return True if this <code>Tile</code> is connected to the high seas.
+     * @return True if this {@code Tile} is connected to the high seas.
      */
     public boolean isHighSeasConnected() {
         return highSeasCount >= 0;
@@ -492,7 +492,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the move-to-Europe state of the tile.
      *
-     * @return The move-to-Europe state of the <code>Tile</code>.
+     * @return The move-to-Europe state of the {@code Tile}.
      */
     public Boolean getMoveToEurope() {
         return moveToEurope;
@@ -502,7 +502,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Set the move-to-Europe state of the tile.
      *
      * @param moveToEurope The new move-to-Europe state for the
-     *     <code>Tile</code>.
+     *     {@code Tile}.
      */
     public void setMoveToEurope(Boolean moveToEurope) {
         this.moveToEurope = moveToEurope;
@@ -557,7 +557,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the style value.
      *
-     * @return The <code>Tile</code> style.
+     * @return The {@code Tile} style.
      */
     public int getStyle() {
         return style;
@@ -596,8 +596,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Is this tile connected to another across the same contiguous piece
      * of land or water?
      *
-     * @param other The other <code>Tile</code> to check.
-     * @return True if the <code>Tile</code>s are connected.
+     * @param other The other {@code Tile} to check.
+     * @return True if the {@code Tile}s are connected.
      */
     public boolean isConnectedTo(Tile other) {
         return getContiguity() == other.getContiguity();
@@ -607,7 +607,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Get the adjacent tiles that have a given contiguity.
      *
      * @param contiguity The contiguity to search for.
-     * @return A set of <code>Tile</code>s with the required contiguity.
+     * @return A set of {@code Tile}s with the required contiguity.
      */
     public Set<Tile> getContiguityAdjacent(final int contiguity) {
         return transform(getSurroundingTiles(1, 1),
@@ -638,7 +638,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * a unit.  This is a simplification, use getMoveType().isProgress()
      * for the full details.
      *
-     * @param unit The <code>Unit</code> to test.
+     * @param unit The {@code Unit} to test.
      * @return True if the unit can not move to this tile.
      */
     public boolean isBlocked(Unit unit) {
@@ -660,10 +660,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
        
     /**
-     * Gets the <code>IndianSettlementInternals</code> for the given player.
+     * Gets the {@code IndianSettlementInternals} for the given player.
      *
-     * @param player The <code>Player</code> to query.
-     * @return The <code>IndianSettlementInternals</code> for the given player,
+     * @param player The {@code Player} to query.
+     * @return The {@code IndianSettlementInternals} for the given player,
      *     or null if none present.
      */
     private IndianSettlementInternals getPlayerIndianSettlement(Player player) {
@@ -677,9 +677,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Gets a list of <code>TileImprovements</code>.
+     * Gets a list of {@code TileImprovements}.
      *
-     * @return A list of all the <code>TileImprovements</code>.
+     * @return A list of all the {@code TileImprovements}.
      */
     public List<TileImprovement> getTileImprovements() {
         return (tileItemContainer == null)
@@ -688,9 +688,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets a list of completed <code>TileImprovements</code>.
+     * Gets a list of completed {@code TileImprovements}.
      *
-     * @return A list of all completed <code>TileImprovements</code>.
+     * @return A list of all completed {@code TileImprovements}.
      */
     public List<TileImprovement> getCompleteTileImprovements() {
         return (tileItemContainer == null)
@@ -701,7 +701,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Does this tile contain a completed improvement of the given type?
      *
-     * @param type The <code>TileImprovementType</code> to look for.
+     * @param type The {@code TileImprovementType} to look for.
      * @return True if there is a completed improvement present.
      */
     public boolean hasTileImprovement(TileImprovementType type) {
@@ -713,8 +713,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the TileImprovement of a given type, or null if there is no match.
      *
-     * @param type The <code>TileImprovementType</code> to look for.
-     * @return The <code>TileImprovement</code> of the requested type found,
+     * @param type The {@code TileImprovementType} to look for.
+     * @return The {@code TileImprovement} of the requested type found,
      *     or null if none.
      */
     public TileImprovement getTileImprovement(TileImprovementType type) {
@@ -725,8 +725,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Does this tile have a LCR?
      *
-     * @return True if this <code>Tile</code> has a
-     *     <code>LostCityRumour</code> on it.
+     * @return True if this {@code Tile} has a
+     *     {@code LostCityRumour} on it.
      */
     public boolean hasLostCityRumour() {
         return tileItemContainer != null
@@ -736,8 +736,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets a lost city rumour on this tile.
      *
-     * @return The <code>LostCityRumour</code> on this
-     *     <code>Tile</code>, or null if none found.
+     * @return The {@code LostCityRumour} on this
+     *     {@code Tile}, or null if none found.
      */
     public LostCityRumour getLostCityRumour() {
         return (tileItemContainer == null) ? null
@@ -747,7 +747,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Does this tile have a resource?
      *
-     * @return True if this is a resource <code>Tile</code>.
+     * @return True if this is a resource {@code Tile}.
      */
     public boolean hasResource() {
         return tileItemContainer != null
@@ -757,7 +757,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Does this tile have a river?
      *
-     * @return True if this is a river <code>Tile</code>.
+     * @return True if this is a river {@code Tile}.
      */
     public boolean hasRiver() {
         return getRiver() != null;
@@ -766,7 +766,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the river on this tile.
      *
-     * @return A river <code>TileImprovement</code>, or null if none present.
+     * @return A river {@code TileImprovement}, or null if none present.
      */
     public TileImprovement getRiver() {
         return (tileItemContainer == null) ? null
@@ -776,7 +776,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the style of a river improvement on this tile.
      *
-     * @return The river <code>TileImprovementStyle</code>.
+     * @return The river {@code TileImprovementStyle}.
      */
     public TileImprovementStyle getRiverStyle() {
         TileImprovement river;
@@ -788,7 +788,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Does this tile have a road?
      *
-     * @return True if this <code>Tile</code> has a road.
+     * @return True if this {@code Tile} has a road.
      */
     public boolean hasRoad() {
         return getRoad() != null;
@@ -797,7 +797,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the road on this tile.
      *
-     * @return A road <code>TileImprovement</code>, or null if none present.
+     * @return A road {@code TileImprovement}, or null if none present.
      */
     public TileImprovement getRoad() {
         return (tileItemContainer == null) ? null : tileItemContainer.getRoad();
@@ -808,7 +808,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param item The <code>TileItem</code> to add.
+     * @param item The {@code TileItem} to add.
      * @return True if the item was added.
      */
     private boolean addTileItem(TileItem item) {
@@ -825,8 +825,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param <T> The actual <code>TileItem</code> type.
-     * @param item The <code>TileItem</code> to remove.
+     * @param <T> The actual {@code TileItem} type.
+     * @param item The {@code TileItem} to remove.
      * @return The item removed, or null on failure.
      */
     private <T extends TileItem> T removeTileItem(T item) {
@@ -839,19 +839,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param rumour The <code>LostCityRumour</code> to add.
+     * @param rumour The {@code LostCityRumour} to add.
      */
     public void addLostCityRumour(LostCityRumour rumour) {
         addTileItem(rumour);
     }
 
     /**
-     * Removes the lost city rumour from this <code>Tile</code> if there
+     * Removes the lost city rumour from this {@code Tile} if there
      * is one.
      *
      * -til: Changes appearance.
      *
-     * @return The removed <code>LostCityRumour</code>.
+     * @return The removed {@code LostCityRumour}.
      */
     public LostCityRumour removeLostCityRumour() {
         return removeTileItem(getLostCityRumour());
@@ -927,7 +927,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the resource on this tile.
      *
-     * @return A <code>Resource</code>, or null if none present.
+     * @return A {@code Resource}, or null if none present.
      */
     public Resource getResource() {
         return (tileItemContainer == null) ? null
@@ -939,7 +939,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param resource The <code>Resource</code> to add.
+     * @param resource The {@code Resource} to add.
      */
     public void addResource(Resource resource) {
         addTileItem(resource);
@@ -950,7 +950,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @return The removed <code>Resource</code>.
+     * @return The removed {@code Resource}.
      */
     public Resource removeResource() {
         Resource resource = getResource();
@@ -960,10 +960,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Get the number of turns it takes for a non-expert pioneer to build
-     * the given <code>TileImprovementType</code>. 
-     * It will check if it is valid for this <code>TileType</code>.
+     * the given {@code TileImprovementType}.
+     * It will check if it is valid for this {@code TileType}.
      *
-     * @param workType The <code>TileImprovementType</code> to check.
+     * @param workType The {@code TileImprovementType} to check.
      * @return The number of turns it should take a non-expert pioneer
      *     to finish the work.
      */
@@ -977,7 +977,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Check if a given improvement type is valid for this tile.
      *
-     * @param type The <code>TileImprovementType</code> to check.
+     * @param type The {@code TileImprovementType} to check.
      * @return True if this tile can be improved with the improvement type.
      */
     public boolean isImprovementTypeAllowed(TileImprovementType type) {
@@ -990,7 +990,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Check if a given improvement is valid for this tile.
      *
-     * @param tip The <code>TileImprovement</code> to check.
+     * @param tip The {@code TileImprovement} to check.
      * @return True if this tile can be improved with the improvement.
      */
     public boolean isImprovementAllowed(TileImprovement tip) {
@@ -1008,7 +1008,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * strike a tile of this type or a completed tile improvement
      * present.
      *
-     * @return A stream of <code>Disaster</code> choices.
+     * @return A stream of {@code Disaster} choices.
      */
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return concat(type.getDisasterChoices(),
@@ -1022,11 +1022,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Gets a description of the <code>Tile</code>, with the name of
+     * Gets a description of the {@code Tile}, with the name of
      * the tile and any improvements on it (road/plow/etc) from
-     * <code>TileItemContainer</code>.
+     * {@code TileItemContainer}.
      *
-     * @return The description label for this <code>Tile</code>.
+     * @return The description label for this {@code Tile}.
      */
     public StringTemplate getLabel() {
         StringTemplate label = StringTemplate.key(type);
@@ -1042,7 +1042,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a simple label for this tile, with just its coordinates.
      *
-     * @return A simple <code>StringTemplate</code> label.
+     * @return A simple {@code StringTemplate} label.
      */
     public StringTemplate getSimpleLabel() {
         return StringTemplate.template("model.tile.simpleLabel")
@@ -1053,7 +1053,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a detailed label for this tile.
      *
-     * @return A suitable <code>StringTemplate</code>.
+     * @return A suitable {@code StringTemplate}.
      */
     public StringTemplate getDetailedLocationLabel() {
         Settlement nearSettlement = null;
@@ -1087,8 +1087,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a detailed label for this tile for a given player.
      *
-     * @param player The <code>Player</code> to produce a label for.
-     * @return A suitable <code>StringTemplate</code>.
+     * @param player The {@code Player} to produce a label for.
+     * @return A suitable {@code StringTemplate}.
      */
     public StringTemplate getDetailedLocationLabelFor(Player player) {
         Settlement nearSettlement = null;
@@ -1122,8 +1122,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Get a label for this tile assuming it is a colony tile of
      * a given colony.
      *
-     * @param colony The <code>Colony</code> assumed to own this tile.
-     * @return A suitable <code>StringTemplate</code>, or null if this
+     * @param colony The {@code Colony} assumed to own this tile.
+     * @return A suitable {@code StringTemplate}, or null if this
      *     tile is not close enough to the colony to be a colony tile.
      */
     public StringTemplate getColonyTileLocationLabel(Colony colony) {
@@ -1154,7 +1154,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Gets the distance in tiles between this tile and the specified
      * one.
      *
-     * @param tile The <code>Tile</code> to check the distance to.
+     * @param tile The {@code Tile} to check the distance to.
      * @return The distance.
      */
     public int getDistanceTo(Tile tile) {
@@ -1164,8 +1164,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the direction to a neighbouring tile from this one.
      *
-     * @param tile The other <code>Tile</code>.
-     * @return The direction to the other <code>Tile</code>, or null
+     * @param tile The other {@code Tile}.
+     * @return The direction to the other {@code Tile}, or null
      *     if the other tile is not a neighbour.
      */
     public Direction getDirection(Tile tile) {
@@ -1175,9 +1175,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the neighbouring tile in the given direction.
      *
-     * @param direction The <code>Direction</code> to check in.
-     * @return The neighbouring <code>Tile</code> in the given
-     *     <code>Direction</code>, or null if none present.
+     * @param direction The {@code Direction} to check in.
+     * @return The neighbouring {@code Tile} in the given
+     *     {@code Direction}, or null if none present.
      */
     public Tile getNeighbourOrNull(Direction direction) {
         return getMap().getAdjacentTile(x, y, direction);
@@ -1186,9 +1186,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Determines whether this tile is adjacent to the specified tile.
      *
-     * @param tile A potentially adjacent <code>Tile</code>.
-     * @return True if the <code>Tile</code> is adjacent to this
-     *     <code>Tile</code>.
+     * @param tile A potentially adjacent {@code Tile}.
+     * @return True if the {@code Tile} is adjacent to this
+     *     {@code Tile}.
      */
     public boolean isAdjacent(Tile tile) {
         return (tile == null) ? false
@@ -1198,7 +1198,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Is this tile in the polar regions?
      *
-     * @return True if the <code>Tile</code> is polar.
+     * @return True if the {@code Tile} is polar.
      */
     public boolean isPolar() {
         return getMap().isPolar(this);
@@ -1221,7 +1221,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * river or an inland lake.  If this is true for a land tile with
      * a colony, the colony can build docks.
      *
-     * @return True if this <code>Tile</code> is on the shore.
+     * @return True if this {@code Tile} is on the shore.
      */
     public boolean isShore() {
         return any(getSurroundingTiles(1, 1), t -> t.isLand() != this.isLand());
@@ -1233,7 +1233,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * The center tile is not included.
      *
      * @param range How far away do we need to go starting from this.
-     * @return The tiles surrounding this <code>Tile</code>.
+     * @return The tiles surrounding this {@code Tile}.
      */
     public Iterable<Tile> getSurroundingTiles(int range) {
         return getMap().getCircleTiles(this, true, range);
@@ -1247,10 +1247,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * thus this tile is included if rangeMin is zero.
      *
      * @param rangeMin The inclusive minimum distance from this
-     *     <code>Tile</code>.
+     *     {@code Tile}.
      * @param rangeMax The inclusive maximum distance from this
-     *     <code>Tile</code>.
-     * @return A list of the tiles surrounding this <code>Tile</code>.
+     *     {@code Tile}.
+     * @return A list of the tiles surrounding this {@code Tile}.
      */
     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
         List<Tile> result = new ArrayList<>();
@@ -1276,7 +1276,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Determine whether this tile has adjacent tiles that are unexplored.
      *
-     * @return True if at least one neighbouring <code>Tile</code>s is
+     * @return True if at least one neighbouring {@code Tile}s is
      *     unexplored.
      */
     public boolean hasUnexploredAdjacent() {
@@ -1297,7 +1297,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the adjacent colonies.
      *
-     * @return A list of adjacent <code>Colony</code>s.
+     * @return A list of adjacent {@code Colony}s.
      */
     public List<Colony> getAdjacentColonies() {
         return transform(getSurroundingTiles(0,1), isNotNull(Tile::getColony),
@@ -1334,7 +1334,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @param player The owner of the unit to place (may be null).
      * @param random An optional pseudo-random number source.
-     * @return A vacant <code>Tile</code> near this one.
+     * @return A vacant {@code Tile} near this one.
      */
     public Tile getSafeTile(Player player, Random random) {
         if ((getFirstUnit() == null || getFirstUnit().getOwner() == player)
@@ -1385,9 +1385,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Get a list of surrounding land tiles, sorted with the most
      * defensible first.  Useful when planning an attack.
      *
-     * @param player A <code>Player</code> to use to check for
+     * @param player A {@code Player} to use to check for
      *     tile access.
-     * @return A list of land <code>Tile</code>s.
+     * @return A list of land {@code Tile}s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
         final Predicate<Tile> safeTilePred = t ->
@@ -1403,9 +1403,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Get the adjacent land tile with the best defence bonus.
      * Useful for incoming attackers as a disembark site.
      *
-     * @param player A <code>Player</code> to use to check for
+     * @param player A {@code Player} to use to check for
      *     tile access.
-     * @return The most defensible adjacent land <code>Tile</code>.
+     * @return The most defensible adjacent land {@code Tile}.
      */
     public Tile getBestDisembarkTile(Player player) {
         return find(getSafestSurroundingLandTiles(player),
@@ -1416,7 +1416,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Is this tile dangerous for a naval unit to enter?
      * That is, is there an adjacent settlement that is likely to bombard it.
      *
-     * @param ship The naval <code>Unit</code> to check.
+     * @param ship The naval {@code Unit} to check.
      * @return True if moving the ship to this tile exposes it to attack.
      */
     public boolean isDangerousToShip(Unit ship) {
@@ -1437,8 +1437,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * a unit to this tile.  To be safe, the tile must be adjacent to this
      * one but not adjacent to a dangerous settlement.
      *
-     * @param unit The transport <code>Unit</code> that needs a anchoring site.
-     * @return A list of suitable <code>Tile</code>s.
+     * @param unit The transport {@code Unit} that needs a anchoring site.
+     * @return A list of suitable {@code Tile}s.
      */
     public List<Tile> getSafeAnchoringTiles(Unit unit) {
         return transform(getSurroundingTiles(0, 1),
@@ -1459,7 +1459,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param type The new <code>TileType</code>.
+     * @param type The new {@code TileType}.
      */
     public void changeType(TileType type) {
         setType(type);
@@ -1475,7 +1475,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Is this tile under active use?
      *
-     * @return True if a <code>Colony</code> is using this <code>Tile</code>.
+     * @return True if a {@code Colony} is using this <code>Tile</code>.
      */
     public boolean isInUse() {
         return getOwningSettlement() instanceof Colony
@@ -1487,8 +1487,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param settlement The new owning <code>Settlement</code> for
-     *     this <code>Tile</code>.
+     * @param settlement The new owning {@code Settlement} for
+     *     this {@code Tile}.
      */
     public void changeOwningSettlement(Settlement settlement) {
         if (owningSettlement != null) {
@@ -1506,9 +1506,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param player The <code>Player</code> to own the tile.
-     * @param settlement The <code>Settlement</code> to own the
-     *     <code>Tile</code>.
+     * @param player The {@code Player} to own the tile.
+     * @param settlement The {@code Settlement} to own the
+     *     {@code Tile}.
      */
     public void changeOwnership(Player player, Settlement settlement) {
         setOwner(player);//-til
@@ -1519,8 +1519,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * A colony is proposed to be built on this tile.  Collect
      * warnings if this has disadvantages.
      *
-     * @param unit The <code>Unit</code> which is to build the colony.
-     * @return A <code>StringTemplate</code> containing the warnings,
+     * @param unit The {@code Unit} which is to build the colony.
+     * @return A {@code StringTemplate} containing the warnings,
      *      or null if none.
      */
     public StringTemplate getBuildColonyWarnings(Unit unit) {
@@ -1608,8 +1608,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * either the tile type must have a suitable production type, or
      * the tile item container contains suitable resource.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to use.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} to use.
      * @return True if the tile can produce the goods.
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
@@ -1621,10 +1621,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the base production exclusive of any bonuses.
      *
-     * @param productionType An optional <code>ProductionType</code> to use,
+     * @param productionType An optional {@code ProductionType} to use,
      *     if null the best available one is used.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to use.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} to use.
      * @return The base production due to tile type and resources.
      */
     public int getBaseProduction(ProductionType productionType,
@@ -1640,11 +1640,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Get the potential production of this tile for a given goods type
      * and optional worker type.
      *
-     * @param goodsType The <code>GoodsType</code> to check the
+     * @param goodsType The {@code GoodsType} to check the
      *     potential for.
-     * @param unitType An optional <code>UnitType</code> to do the work.
-     * @return The potential production of this <code>Tile</code> to
-     *     produce the given <code>GoodsType</code>.
+     * @param unitType An optional {@code UnitType} to do the work.
+     * @return The potential production of this {@code Tile} to
+     *     produce the given {@code GoodsType}.
      */
     public int getPotentialProduction(GoodsType goodsType,
                                       UnitType unitType) {
@@ -1659,9 +1659,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the production modifiers for this tile.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to do the work.
-     * @return A stream of production <code>Modifier</code>s.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} to do the work.
+     * @return A stream of production {@code Modifier}s.
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
@@ -1675,9 +1675,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * goods with a given unit if this tile is (perhaps changed to)
      * a given tile type.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @param unitType A <code>UnitType</code> to do the work.
-     * @param tileType A <code>TileType</code> to change to.
+     * @param goodsType The {@code GoodsType} to check.
+     * @param unitType A {@code UnitType} to do the work.
+     * @param tileType A {@code TileType} to change to.
      * @return The maximum potential.
      */
     private int getMaximumPotential(GoodsType goodsType, UnitType unitType,
@@ -1707,8 +1707,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * goods.  The maximum potential is the potential of a tile after
      * the tile has been plowed/built road on.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @param unitType A <code>UnitType</code> to do the work.
+     * @param goodsType The {@code GoodsType} to check.
+     * @param unitType A {@code UnitType} to do the work.
      * @return The maximum potential.
      */
     public int getMaximumPotential(GoodsType goodsType, UnitType unitType) {
@@ -1743,7 +1743,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Sort possible goods types according to potential.
      *
-     * @param unit the <code>Unit</code> to work on this <code>Tile</code>
+     * @param unit the {@code Unit} to work on this <code>Tile</code>
      * @return A list of goods, highest potential production first.
      */
     public List<AbstractGoods> getSortedPotential(Unit unit) {
@@ -1753,8 +1753,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Sort possible goods types according to potential.
      *
-     * @param unitType The <code>UnitType</code> to do the work.
-     * @param owner the <code>Player</code> owning the unit.
+     * @param unitType The {@code UnitType} to do the work.
+     * @param owner the {@code Player} owning the unit.
      * @return A list of goods, highest potential production first.
      */
     public List<AbstractGoods> getSortedPotential(UnitType unitType,
@@ -1782,7 +1782,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get the best food type to produce here.
      *
-     * @return The <code>AbstractGoods</code> to produce.
+     * @return The {@code AbstractGoods} to produce.
      */
     public AbstractGoods getBestFoodProduction() {
         final Comparator<AbstractGoods> goodsComp
@@ -1811,8 +1811,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a players view of this tile.
      *
-     * @param player The <code>Player</code> who owns the view.
-     * @return The view of this <code>Tile</code>.
+     * @param player The {@code Player} who owns the view.
+     * @return The view of this {@code Tile}.
      */
     public Tile getCachedTile(Player player) {
         return (cachedTiles == null) ? null
@@ -1823,8 +1823,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Set a players view of this tile.
      *
-     * @param player The <code>Player</code> who owns the view.
-     * @param tile The view of the <code>Tile</code> (either this
+     * @param player The {@code Player} who owns the view.
+     * @param tile The view of the {@code Tile} (either this
      *     tile, or an uninterned copy of it).
      */
     public void setCachedTile(Player player, Tile tile) {
@@ -1847,7 +1847,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Set a players view of this tile to the tile itself.
      *
-     * @param player The <code>Player</code> who owns the view.
+     * @param player The {@code Player} who owns the view.
      */
     public void seeTile(Player player) {
         setCachedTile(player, this);
@@ -1863,7 +1863,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a copy of this tile suitable for caching (lacking units).
      *
-     * @return An uninterned copy of this <code>Tile</code>.
+     * @return An uninterned copy of this {@code Tile}.
      */
     public Tile getTileToCache() {
         Tile tile = this.copy(getGame(), Tile.class);
@@ -1880,7 +1880,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * A change is about to occur on this tile.  Cache it if unseen.
      *
-     * @param player A <code>Player</code> that currently may not be able
+     * @param player A {@code Player} that currently may not be able
      *     to see the tile, but will as a result of the change, and so
      *     should not cache it.
      */
@@ -1893,7 +1893,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * needed.  Use the copied tile if supplied (which should have
      * been created previously with {@link #getTileToCache},
      *
-     * @param copied An optional <code>Tile</code> to cache.
+     * @param copied An optional {@code Tile} to cache.
      */
     public void cacheUnseen(Tile copied) {
         cacheUnseen(null, copied);
@@ -1904,10 +1904,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * needed.  Use the copied tile if supplied (which should have
      * been created previously with {@link #getTileToCache},
      *
-     * @param player A <code>Player</code> that currently may not be able
+     * @param player A {@code Player} that currently may not be able
      *     to see the tile, but will as a result of the change, and so
      *     should not cache it.
-     * @param copied An optional <code>Tile</code> to cache.
+     * @param copied An optional {@code Tile} to cache.
      */
     public void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
@@ -1920,9 +1920,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Updates the information about the native settlement on this
-     * <code>Tile</code> for the given <code>Player</code>.
+     * {@code Tile} for the given <code>Player</code>.
      *
-     * @param player The <code>Player</code>.
+     * @param player The {@code Player}.
      */
     public void updateIndianSettlement(Player player) {
         if (playerIndianSettlements == null || !player.isEuropean()) return;
@@ -1958,7 +1958,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Set native settlement information.  Do not check the current
      * map state as we might leak destruction information.
      *
-     * @param player The <code>Player</code> to pet belonged to.
+     * @param player The {@code Player} to pet belonged to.
      * @param skill The skill taught by the settlement.
      * @param wanted The goods wanted by the settlement.
      */
@@ -1973,8 +1973,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Checks if this <code>Tile</code> has been explored by the given
-     * <code>Player</code>.
+     * Checks if this {@code Tile} has been explored by the given
+     * {@code Player}.
      *
      * If we are in the server, then the presence of a cached tile
      * determines whether exploration has happened.  In the client
@@ -1982,9 +1982,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * server will have updated the client with the tile type (checked
      * by isExplored()).
      *
-     * @param player The <code>Player</code>.
-     * @return True if this <code>Tile</code> has been explored
-     *     by the given <code>Player</code>.
+     * @param player The {@code Player}.
+     * @return True if this {@code Tile} has been explored
+     *     by the given {@code Player}.
      */
     public boolean isExploredBy(Player player) {
         return (!player.isEuropean()) ? true
@@ -1996,7 +1996,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Explore/unexplore a tile for a player.
      *
-     * @param player The <code>Player</code> that is exploring.
+     * @param player The {@code Player} that is exploring.
      * @param reveal The exploration state.
      */
     public void setExplored(Player player, boolean reveal) {
@@ -2020,10 +2020,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * <p>As this method is quite expensive, it should not be used to
      * test for the presence of enemy units.
      *
-     * @param attacker The <code>Unit</code> that would be attacking
-     *     this <code>Tile</code>.
-     * @return The <code>Unit</code> that has been chosen to defend this
-     *     <code>Tile</code>.
+     * @param attacker The {@code Unit} that would be attacking
+     *     this {@code Tile}.
+     * @return The {@code Unit} that has been chosen to defend this
+     *     {@code Tile}.
      */
     public Unit getDefendingUnit(Unit attacker) {
         CombatModel cm = getGame().getCombatModel();
@@ -2079,7 +2079,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the unit that is occupying the tile.
      *
-     * @return The <code>Unit</code> that is occupying this <code>Tile</code>.
+     * @return The {@code Unit} that is occupying this <code>Tile</code>.
      * @see #isOccupied()
      */
     public Unit getOccupyingUnit() {
@@ -2098,7 +2098,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Checks whether there is an enemy unit occupying this tile.
      * Units can not produce in occupied tiles.
      *
-     * @return True if an enemy unit is occupying this <code>Tile</code>.
+     * @return True if an enemy unit is occupying this {@code Tile}.
      */
     public boolean isOccupied() {
         return getOccupyingUnit() != null;
@@ -2124,10 +2124,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Get a label for a nearby location.
      *
-     * @param direction The <code>Direction</code> from this tile to the
+     * @param direction The {@code Direction} from this tile to the
      *     nearby location.
-     * @param location A <code>StringTemplate</code> describing the location.
-     * @return A <code>StringTemplate</code> stating that the location
+     * @param location A {@code StringTemplate} describing the location.
+     * @return A {@code StringTemplate} stating that the location
      *     is nearby.
      */
     public StringTemplate getNearLocationLabel(Direction direction,
@@ -2407,7 +2407,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Fundamental (post-cache) version of toXML.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @param tag The tag to use.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.

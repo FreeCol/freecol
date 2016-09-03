@@ -68,10 +68,10 @@ public class Effect extends FreeColSpecObjectType {
     protected Effect() {}
 
     /**
-     * Creates a new <code>Effect</code> instance.
+     * Creates a new {@code Effect} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public Effect(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
@@ -82,7 +82,7 @@ public class Effect extends FreeColSpecObjectType {
     /**
      * Create a new effect from an existing one.
      *
-     * @param template The <code>Effect</code> to copy from.
+     * @param template The {@code Effect} to copy from.
      */
     public Effect(Effect template) {
         setId(template.getId());

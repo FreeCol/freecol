@@ -120,10 +120,10 @@ public final class UnitType extends BuildableType implements Consumer {
 
 
     /**
-     * Creates a new <code>UnitType</code> instance.
+     * Creates a new {@code UnitType} instance.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public UnitType(String id, Specification specification) {
         super(id, specification);
@@ -379,7 +379,7 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Get the type of goods this unit type has expert ability to produce.
      *
-     * @return The expert production <code>GoodsType</code>.
+     * @return The expert production {@code GoodsType}.
      */
     public GoodsType getExpertProduction() {
         return expertProduction;
@@ -397,7 +397,7 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Gets the default role of this unit type, mostly model.role.default.
      *
-     * @return The default <code>Role</code>.
+     * @return The default {@code Role}.
      */
     public Role getDefaultRole() {
         return defaultRole;
@@ -428,8 +428,8 @@ public final class UnitType extends BuildableType implements Consumer {
      * Get the type that this unit type can be educated to by a
      * teacher unit type, if any.
      *
-     * @param teacherType The <code>UnitType</code> of the teacher.
-     * @return The <code>UnitType</code> that this unit type can be educated
+     * @param teacherType The {@code UnitType} of the teacher.
+     * @return The {@code UnitType} that this unit type can be educated
      *     to by the teacher unit type, or null if education is not possible.
      */
     public UnitType getTeachingType(UnitType teacherType) {
@@ -507,7 +507,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * Gets the number of units of the given GoodsType this UnitType
      * consumes per turn (when in a settlement).
      *
-     * @param goodsType The <code>GoodsType</code> to consume.
+     * @param goodsType The {@code GoodsType} to consume.
      * @return The amount of goods consumed per turn.
      */
     public int getConsumptionOf(GoodsType goodsType) {
@@ -517,7 +517,7 @@ public final class UnitType extends BuildableType implements Consumer {
     /**
      * Add consumption.
      *
-     * @param type The <code>GoodsType</code> to consume.
+     * @param type The {@code GoodsType} to consume.
      * @param amount The amount of goods to consume.
      */
     private void addConsumption(GoodsType type, int amount) {

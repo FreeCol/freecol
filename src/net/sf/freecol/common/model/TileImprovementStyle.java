@@ -134,7 +134,7 @@ public class TileImprovementStyle {
      * Gets the style corresponding to the given string.
      *
      * @param key The key to look up.
-     * @return The corresponding <code>TileImprovementStyle</code>.
+     * @return The corresponding {@code TileImprovementStyle}.
      */
     public static TileImprovementStyle getInstance(String key) {
         if (key == null || key.isEmpty() || "0".equals(key)) return null;

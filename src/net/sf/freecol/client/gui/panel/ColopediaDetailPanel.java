@@ -33,7 +33,7 @@ public interface ColopediaDetailPanel<T> {
      * ColopediaDetailPanel could build a detail panel to the given
      * root node.
      *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * @param root a {@code DefaultMutableTreeNode}
      */
     public void addSubTrees(DefaultMutableTreeNode root);
 

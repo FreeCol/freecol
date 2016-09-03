@@ -111,9 +111,9 @@ public class NationOptions extends FreeColSpecObject {
 
 
     /**
-     * Creates a new <code>NationOptions</code> instance.
+     * Creates a new {@code NationOptions} instance.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public NationOptions(Specification specification) {
         super(specification);
@@ -138,10 +138,10 @@ public class NationOptions extends FreeColSpecObject {
     }
 
     /**
-     * Creates a new <code>NationOptions</code> instance by reading a stream.
+     * Creates a new {@code NationOptions} instance by reading a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public NationOptions(FreeColXMLReader xr,
@@ -171,20 +171,20 @@ public class NationOptions extends FreeColSpecObject {
     }
 
     /**
-     * Get the <code>NationState</code> value of a particular Nation.
+     * Get the {@code NationState} value of a particular Nation.
      *
-     * @param nation The <code>Nation</code> to query.
-     * @return The corresponding <code>NationState</code>.
+     * @param nation The {@code Nation} to query.
+     * @return The corresponding {@code NationState}.
      */
     public final NationState getNationState(Nation nation) {
         return nations.get(nation);
     }
 
     /**
-     * Set the <code>NationState</code> value of a particular Nation.
+     * Set the {@code NationState} value of a particular Nation.
      *
-     * @param nation The <code>Nation</code> to set the state for.
-     * @param state The <code>NationState</code> to set.
+     * @param nation The {@code Nation} to set the state for.
+     * @param state The {@code NationState} to set.
      */
     public final void setNationState(final Nation nation,
                                      final NationState state) {

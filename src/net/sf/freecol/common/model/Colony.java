@@ -50,7 +50,7 @@ import net.sf.freecol.common.util.RandomChoice;
 /**
  * Represents a colony. A colony contains {@link Building}s and
  * {@link ColonyTile}s. The latter represents the tiles around the
- * <code>Colony</code> where working is possible.
+ * {@code Colony} where working is possible.
  */
 public class Colony extends Settlement implements Nameable, TradeLocation {
 
@@ -153,21 +153,21 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Constructor for ServerColony.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param owner The <code>Player</code> owning this <code>Colony</code>.
-     * @param name The name of the new <code>Colony</code>.
-     * @param tile The containing <code>Tile</code>.
+     * @param game The enclosing {@code Game}.
+     * @param owner The {@code Player} owning this <code>Colony</code>.
+     * @param name The name of the new {@code Colony}.
+     * @param tile The containing {@code Tile}.
      */
     protected Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, name, tile);
     }
 
     /**
-     * Create a new <code>Colony</code> with the given
+     * Create a new {@code Colony} with the given
      * identifier. The object should later be initialized by calling
      * either {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Colony(Game game, String id) {
@@ -178,10 +178,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     // Primitive accessors.
 
     /**
-     * Gets a <code>List</code> of every {@link Building} in this
-     * <code>Colony</code>.
+     * Gets a {@code List} of every {@link Building} in this
+     * {@code Colony}.
      *
-     * @return A list of <code>Building</code>s.
+     * @return A list of {@code Building}s.
      * @see Building
      */
     public List<Building> getBuildings() {
@@ -197,7 +197,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * ancestor of the specified type).
      *
      * @param type The type of the building to get.
-     * @return The <code>Building</code> found.
+     * @return The {@code Building} found.
      */
     public Building getBuilding(BuildingType type) {
         synchronized (buildingMap) {
@@ -206,10 +206,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Gets a <code>List</code> of every {@link ColonyTile} in this
-     * <code>Colony</code>.
+     * Gets a {@code List} of every {@link ColonyTile} in this
+     * {@code Colony}.
      *
-     * @return A list of <code>ColonyTile</code>s.
+     * @return A list of {@code ColonyTile}s.
      * @see ColonyTile
      */
     public List<ColonyTile> getColonyTiles() {
@@ -219,11 +219,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Get the <code>ColonyTile</code> matching the given
-     * <code>Tile</code>.
+     * Get the {@code ColonyTile} matching the given
+     * {@code Tile}.
      *
-     * @param tile The <code>Tile</code> to check.
-     * @return The corresponding <code>ColonyTile</code>, or null if not found.
+     * @param tile The {@code Tile} to check.
+     * @return The corresponding {@code ColonyTile}, or null if not found.
      */
     public ColonyTile getColonyTile(Tile tile) {
         return find(getColonyTiles(), matchKey(tile, ColonyTile::getWorkTile));
@@ -232,8 +232,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Get the export date for a goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The required <code>ExportData</code>.
+     * @param goodsType The {@code GoodsType} to check.
+     * @return The required {@code ExportData}.
      */
     public ExportData getExportData(final GoodsType goodsType) {
         ExportData result = exportData.get(goodsType.getId());
@@ -247,7 +247,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Set some export data.
      *
-     * @param newExportData A new <code>ExportData</code> value.
+     * @param newExportData A new {@code ExportData} value.
      */
     public final void setExportData(final ExportData newExportData) {
         exportData.put(newExportData.getId(), newExportData);
@@ -303,7 +303,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Get the turn this colony was established.
      *
-     * @return The establishment <code>Turn</code>.
+     * @return The establishment {@code Turn}.
      */
     public Turn getEstablished() {
         return established;
@@ -312,16 +312,16 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Set the turn of establishment.
      *
-     * @param newEstablished The new <code>Turn</code> of establishment.
+     * @param newEstablished The new {@code Turn} of establishment.
      */
     public void setEstablished(final Turn newEstablished) {
         this.established = newEstablished;
     }
 
     /**
-     * Get the <code>BuildQueue</code> contents.
+     * Get the {@code BuildQueue} contents.
      *
-     * @return A list of <code>Buildable</code>s.
+     * @return A list of {@code Buildable}s.
      */
     public List<BuildableType> getBuildQueue() {
         return buildQueue.getValues();
@@ -381,10 +381,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Get a list of collections of goods types, in order of priority
      * to try to produce in this colony by a given unit.
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @return The list of collections of <code>GoodsType</code>s.
+     * @return The list of collections of {@code GoodsType}s.
      */
     public List<Collection<GoodsType>> getWorkTypeChoices(Unit unit,
                                                           boolean userMode) {
@@ -429,12 +429,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the best occupation for a given unit to produce one of
      * a given set of goods types.
      *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
-     * @param workTypes A collection of <code>GoodsType</code> to
+     * @param unit The {@code Unit} to find an
+     *     {@code Occupation} for.
+     * @param workTypes A collection of {@code GoodsType} to
      *     consider producing.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return An <code>Occupation</code> for the given unit, or null
+     * @param lb A {@code LogBuilder} to log to.
+     * @return An {@code Occupation} for the given unit, or null
      *     if none found.
      */
     private Occupation getOccupationFor(Unit unit,
@@ -457,12 +457,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the best occupation for a given unit.
      *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
+     * @param unit The {@code Unit} to find an
+     *     {@code Occupation} for.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return An <code>Occupation</code> for the given unit, or
+     * @param lb A {@code LogBuilder} to log to.
+     * @return An {@code Occupation} for the given unit, or
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode,
@@ -481,11 +481,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the best occupation for a given unit to produce one of
      * a given set of goods types.
      *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
-     * @param workTypes A collection of <code>GoodsType</code> to
+     * @param unit The {@code Unit} to find an
+     *     {@code Occupation} for.
+     * @param workTypes A collection of {@code GoodsType} to
      *     consider producing.
-     * @return An <code>Occupation</code> for the given unit, or null
+     * @return An {@code Occupation} for the given unit, or null
      *     if none found.
      */
     private Occupation getOccupationFor(Unit unit,
@@ -503,11 +503,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the best occupation for a given unit.
      *
-     * @param unit The <code>Unit</code> to find an
-     *     <code>Occupation</code> for.
+     * @param unit The {@code Unit} to find an
+     *     {@code Occupation} for.
      * @param userMode If a user requested this, favour the current
      *     work type, if not favour goods that the unit requires.
-     * @return An <code>Occupation</code> for the given unit, or
+     * @return An {@code Occupation} for the given unit, or
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
@@ -558,7 +558,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a list of all freely available work locations
      * in this colony.
      *
-     * @return The list of available <code>WorkLocation</code>s.
+     * @return The list of available {@code WorkLocation}s.
      */
     public List<WorkLocation> getAvailableWorkLocationsList() {
         return transform(getAllWorkLocations(), WorkLocation::isAvailable);
@@ -568,7 +568,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Get a stream of all freely available work locations in this
      * colony.
      *
-     * @return The stream of available <code>WorkLocation</code>s.
+     * @return The stream of available {@code WorkLocation}s.
      */
     public Stream<WorkLocation> getAvailableWorkLocations() {
         return getAvailableWorkLocationsList().stream();
@@ -577,7 +577,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets a list of all current work locations in this colony.
      *
-     * @return The list of current <code>WorkLocation</code>s.
+     * @return The list of current {@code WorkLocation}s.
      */
     public List<WorkLocation> getCurrentWorkLocationsList() {
         return transform(getAllWorkLocations(), WorkLocation::isCurrent);
@@ -586,7 +586,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Get a stream of all current work locations in this colony.
      *
-     * @return The stream of current <code>WorkLocation</code>s.
+     * @return The stream of current {@code WorkLocation}s.
      */
     public Stream<WorkLocation> getCurrentWorkLocations() {
         return getCurrentWorkLocationsList().stream();
@@ -601,7 +601,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * -til: Could change the tile appearance if the building is
      * stockade-type
      *
-     * @param building The <code>Building</code> to build.
+     * @param building The {@code Building} to build.
      * @return True if the building was added.
      */
     public boolean addBuilding(final Building building) {
@@ -621,7 +621,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * -til: Could change the tile appearance if the building is
      * stockade-type
      *
-     * @param building The <code>Building</code> to remove.
+     * @param building The {@code Building} to remove.
      * @return True if the building was removed.
      */
     protected boolean removeBuilding(final Building building) {
@@ -636,7 +636,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Add a colony tile.
      *
-     * @param ct The <code>ColonyTile</code> to add.
+     * @param ct The {@code ColonyTile} to add.
      */
     private void addColonyTile(ColonyTile ct) {
         if (ct == null) return;
@@ -649,8 +649,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a work location with a given ability.
      *
      * @param ability An ability key.
-     * @return A <code>WorkLocation</code> with the required
-     *     <code>Ability</code>, or null if not found.
+     * @return A {@code WorkLocation} with the required
+     *     {@code Ability}, or null if not found.
      */
     public WorkLocation getWorkLocationWithAbility(String ability) {
         return find(getCurrentWorkLocations(), wl -> wl.hasAbility(ability));
@@ -662,8 +662,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param <T> The actual return type.
      * @param ability An ability key.
      * @param returnClass The expected subclass.
-     * @return A <code>WorkLocation</code> with the required
-     *     <code>Ability</code>, or null if not found.
+     * @return A {@code WorkLocation} with the required
+     *     {@code Ability}, or null if not found.
      */
     public <T extends WorkLocation> T getWorkLocationWithAbility(String ability,
         Class<T> returnClass) {
@@ -678,8 +678,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a work location with a given modifier.
      *
      * @param modifier A modifier key.
-     * @return A <code>WorkLocation</code> with the required
-     *     <code>Modifier</code>, or null if not found.
+     * @return A {@code WorkLocation} with the required
+     *     {@code Modifier}, or null if not found.
      */
     public WorkLocation getWorkLocationWithModifier(String modifier) {
         return find(getCurrentWorkLocations(), wl -> wl.hasModifier(modifier));
@@ -691,8 +691,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param <T> The actual return type.
      * @param modifier A modifier key.
      * @param returnClass The expected subclass.
-     * @return A <code>WorkLocation</code> with the required
-     *     <code>Modifier</code>, or null if not found.
+     * @return A {@code WorkLocation} with the required
+     *     {@code Modifier}, or null if not found.
      */
     public <T extends WorkLocation> T getWorkLocationWithModifier(String modifier,
         Class<T> returnClass) {
@@ -704,8 +704,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Collect the work locations for consuming a given type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to consume.
-     * @return A list of <code>WorkLocation</code>s which consume
+     * @param goodsType The {@code GoodsType} to consume.
+     * @return A list of {@code WorkLocation}s which consume
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForConsuming(GoodsType goodsType) {
@@ -716,8 +716,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Collect the work locations for producing a given type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return A list of <code>WorkLocation</code>s which produce
+     * @param goodsType The {@code GoodsType} to produce.
+     * @return A list of {@code WorkLocation}s which produce
      *     the given type of goods.
      */
     public List<WorkLocation> getWorkLocationsForProducing(GoodsType goodsType) {
@@ -730,8 +730,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Beware that this may not be the optimal location for the
      * production, for which {@link #getWorkLocationFor} is better.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return A <code>WorkLocation</code>s which produces
+     * @param goodsType The {@code GoodsType} to produce.
+     * @return A {@code WorkLocation}s which produces
      *      the given type of goods, or null if not found.
      */
     public WorkLocation getWorkLocationForProducing(GoodsType goodsType) {
@@ -742,9 +742,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the work location best suited for the given unit to
      * produce a type of goods.
      *
-     * @param unit The <code>Unit</code> to get the building for.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return The best <code>WorkLocation</code> found.
+     * @param unit The {@code Unit} to get the building for.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @return The best {@code WorkLocation} found.
      */
     public WorkLocation getWorkLocationFor(Unit unit, GoodsType goodsType) {
         if (goodsType == null) return getWorkLocationFor(unit);
@@ -756,8 +756,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the work location best suited for the given unit.
      *
-     * @param unit The <code>Unit</code> to check for.
-     * @return The best <code>WorkLocation</code> found.
+     * @param unit The {@code Unit} to check for.
+     * @return The best {@code WorkLocation} found.
      */
     public WorkLocation getWorkLocationFor(Unit unit) {
         Occupation occupation = getOccupationFor(unit, false);
@@ -767,7 +767,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Is a tile actually in use by this colony?
      *
-     * @param tile The <code>Tile</code> to test.
+     * @param tile The {@code Tile} to test.
      * @return True if this tile is actively in use by this colony.
      */
     public boolean isTileInUse(Tile tile) {
@@ -778,7 +778,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Get the warehouse-type building in this colony.
      *
-     * @return The warehouse <code>Building</code>.
+     * @return The warehouse {@code Building}.
      */
     public Building getWarehouse() {
         return getWorkLocationWithModifier(Modifier.WAREHOUSE_STORAGE,
@@ -797,7 +797,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the stockade building in this colony.
      *
-     * @return The stockade <code>Building</code>.
+     * @return The stockade {@code Building}.
      */
     public Building getStockade() {
         return getWorkLocationWithModifier(Modifier.DEFENCE, Building.class);
@@ -819,7 +819,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * colony.  This list comprises all natural disasters that can
      * strike the colony's tiles.
      *
-     * @return A stream of <code>Disaster</code>s.
+     * @return A stream of {@code Disaster}s.
      */
     public Stream<RandomChoice<Disaster>> getDisasterChoices() {
         return flatten(getColonyTiles(),
@@ -833,7 +833,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Is a building type able to be automatically built at no cost.
      * True when the player has a modifier that collapses the cost to zero.
      *
-     * @param buildingType a <code>BuildingType</code> value
+     * @param buildingType a {@code BuildingType} value
      * @return True if the building is available at zero cost.
      */
     public boolean isAutomaticBuild(BuildingType buildingType) {
@@ -845,7 +845,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets a list of every unit type this colony may build.
      *
-     * @return A list of buildable <code>UnitType</code>s.
+     * @return A list of buildable {@code UnitType}s.
      */
     public List<UnitType> getBuildableUnits() {
         return transform(getSpecification().getUnitTypeList(),
@@ -854,9 +854,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     /**
      * Returns how many turns it would take to build the given
-     * <code>BuildableType</code>.
+     * {@code BuildableType}.
      *
-     * @param buildable The <code>BuildableType</code> to build.
+     * @param buildable The {@code BuildableType} to build.
      * @return The number of turns to build the buildable, negative if
      *     some goods are not being built, UNDEFINED if none is.
      */
@@ -866,10 +866,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     /**
      * Returns how many turns it would take to build the given
-     * <code>BuildableType</code>.
+     * {@code BuildableType}.
      *
-     * @param buildable The <code>BuildableType</code> to build.
-     * @param needed The <code>AbstractGoods</code> needed to continue
+     * @param buildable The {@code BuildableType} to build.
+     * @param needed The {@code AbstractGoods} needed to continue
      *     the build.
      * @return The number of turns to build the buildable (which may
      *     be zero, UNDEFINED if no useful work is being done, negative
@@ -922,12 +922,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     }
 
     /**
-     * Returns <code>true</code> if this Colony can breed the given
+     * Returns {@code true} if this Colony can breed the given
      * type of Goods. Only animals (such as horses) are expected to be
      * breedable.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
+     * @param goodsType a {@code GoodsType} value
+     * @return a {@code boolean} value
      */
     public boolean canBreed(GoodsType goodsType) {
         int breedingNumber = goodsType.getBreedingNumber();
@@ -948,7 +948,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Sets the current type of buildable to be built and if it is a building
      * insist that there is only one in the queue.
      *
-     * @param buildable The <code>BuildableType</code> to build.
+     * @param buildable The {@code BuildableType} to build.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
         buildQueue.setCurrentlyBuilding(buildable);
@@ -961,23 +961,23 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Returns true if this Colony can build the given BuildableType.
      *
-     * @param buildableType a <code>BuildableType</code> value
-     * @return a <code>boolean</code> value
+     * @param buildableType a {@code BuildableType} value
+     * @return a {@code boolean} value
      */
     public boolean canBuild(BuildableType buildableType) {
         return getNoBuildReason(buildableType, null) == NoBuildReason.NONE;
     }
 
     /**
-     * Return the reason why the give <code>BuildableType</code> can
+     * Return the reason why the give {@code BuildableType} can
      * not be built.
      *
-     * @param buildableType A <code>BuildableType</code> to build.
+     * @param buildableType A {@code BuildableType} to build.
      * @param assumeBuilt An optional list of other buildable types
      *     which can be assumed to be built, for the benefit of build
      *     queue checks.
-     * @return A <code>NoBuildReason</code> value decribing the failure,
-     *     including <code>NoBuildReason.NONE</code> on success.
+     * @return A {@code NoBuildReason} value decribing the failure,
+     *     including {@code NoBuildReason.NONE} on success.
      */
     public NoBuildReason getNoBuildReason(BuildableType buildableType,
                                           List<BuildableType> assumeBuilt) {
@@ -1048,7 +1048,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the price for the remaining resources to build a given buildable.
      *
-     * @param type The <code>BuildableType</code> to build.
+     * @param type The {@code BuildableType} to build.
      * @return The price.
      * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
@@ -1059,7 +1059,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets a price for a map of resources to build a given buildable.
      *
-     * @param required A list of required <code>AbstractGoods</code>.
+     * @param required A list of required {@code AbstractGoods}.
      * @return The price.
      * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
@@ -1076,7 +1076,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a map of the types of goods and amount thereof required to
      * finish a buildable in this colony.
      *
-     * @param type The <code>BuildableType</code> to build.
+     * @param type The {@code BuildableType} to build.
      * @return The map to completion.
      */
     public List<AbstractGoods> getRequiredGoods(BuildableType type) {
@@ -1096,7 +1096,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * Public for the benefit of AI planning and the test suite.
      *
-     * @param buildable The <code>BuildableType</code> to consider.
+     * @param buildable The {@code BuildableType} to consider.
      * @return A list of required abstract goods.
      */
     public List<AbstractGoods> getFullRequiredGoods(BuildableType buildable) {
@@ -1122,7 +1122,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @return True if the user can afford to pay.
      * @exception IllegalStateException If the owner of this
-     *     <code>Colony</code> has an insufficient amount of gold.
+     *     {@code Colony} has an insufficient amount of gold.
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding() {
@@ -1133,10 +1133,10 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Check if the owner can buy the remaining hammers and tools for
      * the {@link Building} given.
      *
-     * @param buildableType a <code>BuildableType</code> value
+     * @param buildableType a {@code BuildableType} value
      * @return True if the user can afford to pay.
      * @exception IllegalStateException If the owner of this
-     *     <code>Colony</code> has an insufficient amount of gold.
+     *     {@code Colony} has an insufficient amount of gold.
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding(BuildableType buildableType) {
@@ -1315,7 +1315,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Special routine to handle non-specific add of unit to colony.
      *
-     * @param unit The <code>Unit</code> to add.
+     * @param unit The {@code Unit} to add.
      * @return True if the add succeeds.
      */
     public boolean joinColony(Unit unit) {
@@ -1355,7 +1355,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the message to display if the colony can not reduce its
      * population.
      *
-     * @return A <code>StringTemplate</code> describing why a colony
+     * @return A {@code StringTemplate} describing why a colony
      *     can not reduce its population, or null if it can.
      */
     public StringTemplate getReducePopulationMessage() {
@@ -1380,8 +1380,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the message to display if a colony can not build something.
      *
-     * @param buildable The <code>BuildableType</code> that can not be built.
-     * @return A <code>ModelMessage</code> describing the build failure.
+     * @param buildable The {@code BuildableType} that can not be built.
+     * @return A {@code ModelMessage} describing the build failure.
      */
     public ModelMessage getUnbuildableMessage(BuildableType buildable) {
         return new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -1533,7 +1533,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * teacher or student, or clearing any existing education
      * relationships.
      *
-     * @param unit The <code>Unit</code> that is changing its education state.
+     * @param unit The {@code Unit} that is changing its education state.
      * @param enable If true, check for new education opportunities, otherwise
      *     clear existing ones.
      */
@@ -1596,7 +1596,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets the apparent number of units at this colony.
      * Used in client enemy colonies
      *
-     * @return The apparent number of <code>Unit</code>s at this colony.
+     * @return The apparent number of {@code Unit}s at this colony.
      */
     public int getDisplayUnitCount() {
         return (displayUnitCount > 0) ? displayUnitCount : getUnitCount();
@@ -1606,7 +1606,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Sets the apparent number of units at this colony.
      * Used in client enemy colonies
      *
-     * @param count The new apparent number of <code>Unit</code>s at
+     * @param count The new apparent number of {@code Unit}s at
      *     this colony.
      */
     public void setDisplayUnitCount(int count) {
@@ -1646,7 +1646,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * contains something worth pillaging.  To be called by CombatModels
      * when the attacker has defeated an unarmed colony defender.
      *
-     * @param attacker The <code>Unit</code> that has defeated the defender.
+     * @param attacker The {@code Unit} that has defeated the defender.
      * @return True if the attacker can pillage this colony.
      */
     public boolean canBePillaged(Unit attacker) {
@@ -1720,7 +1720,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Evaluate this colony for a given player.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the player.
      */
     public int evaluateFor(Player player) {
@@ -1766,7 +1766,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * schoolhouse. @see Building#canAdd
      *
      * @param unit The unit to add as a teacher.
-     * @return <code>true</code> if this unit type could be added.
+     * @return {@code true} if this unit type could be added.
      */
     public boolean canTrain(Unit unit) {
         return canTrain(unit.getType());
@@ -1780,7 +1780,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Building#canAdd
      *
      * @param unitType The unit type to add as a teacher.
-     * @return <code>true</code> if this unit type could be added.
+     * @return {@code true} if this unit type could be added.
      */
     public boolean canTrain(UnitType unitType) {
         return hasAbility(Ability.TEACH)
@@ -1792,7 +1792,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Gets a list of all teachers currently present in the school
      * building.
      *
-     * @return A stream of teacher <code>Unit</code>s.
+     * @return A stream of teacher {@code Unit}s.
      */
     public Stream<Unit> getTeachers() {
         return flatten(getBuildings(), Building::canTeach, Building::getUnits);
@@ -1803,7 +1803,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Do not search if ALLOW_STUDENT_SELECTION is true--- it is the
      * player's job then.
      *
-     * @param student The student <code>Unit</code> that needs a teacher.
+     * @param student The student {@code Unit} that needs a teacher.
      * @return A potential teacher, or null of none found.
      */
     public Unit findTeacher(Unit student) {
@@ -1819,7 +1819,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Do not search if ALLOW_STUDENT_SELECTION is true--- its the
      * player's job then.
      *
-     * @param teacher The teacher <code>Unit</code> that needs a student.
+     * @param teacher The teacher {@code Unit} that needs a student.
      * @return A potential student, or null of none found.
      */
     public Unit findStudent(final Unit teacher) {
@@ -1851,7 +1851,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * This is more reliable than checking net or total production,
      * either of which might be cancelling to zero.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if goods type is produced.
      */
     public boolean isProducing(GoodsType goodsType) {
@@ -1864,7 +1864,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * This is more reliable than checking net or total consumption,
      * either of which might be cancelling to zero.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if goods type is consumed.
      */
     public boolean isConsuming(GoodsType goodsType) {
@@ -1893,8 +1893,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
-     * @param goodsType <code>GoodsType</code> values
-     * @return an <code>int</code> value
+     * @param goodsType {@code GoodsType} values
+     * @return an {@code int} value
      */
     @Override
     public int getConsumptionOf(GoodsType goodsType) {
@@ -1909,7 +1909,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Gets the combined production of all food types.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public int getFoodProduction() {
         return sum(getSpecification().getFoodGoodsTypeList(),
@@ -1947,14 +1947,14 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         
         
     /**
-     * Get the current production <code>Modifier</code>, which is
+     * Get the current production {@code Modifier}, which is
      * generated from the current production bonus.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType An optional <code>UnitType</code> to do the work.
-     * @param workLocation The <code>WorkLocation</code> where the work
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType An optional {@code UnitType} to do the work.
+     * @param workLocation The {@code WorkLocation} where the work
      *     is done.
-     * @return A stream of suitable <code>Modifier</code>s.
+     * @return A stream of suitable {@code Modifier}s.
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
         UnitType unitType, WorkLocation wl) {
@@ -1972,8 +1972,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * (Also part of interface TradeLocation)
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param goodsType a {@code GoodsType} value
+     * @return an {@code int} value
      */
     public int getNetProductionOf(GoodsType goodsType) {
         return productionCache.getNetProductionOf(goodsType);
@@ -1982,9 +1982,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Is a work location productive?
      *
-     * @param workLocation The <code>WorkLocation</code> to check.
+     * @param workLocation The {@code WorkLocation} to check.
      * @return True if something is being produced at the
-     *     <code>WorkLocation</code>.
+     *     {@code WorkLocation}.
      */
     public boolean isProductive(WorkLocation workLocation) {
         ProductionInfo info = productionCache.getProductionInfo(workLocation);
@@ -1997,8 +1997,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Returns the net production of the given GoodsType adjusted by
      * the possible consumption of BuildQueues.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param goodsType a {@code GoodsType} value
+     * @return an {@code int} value
      */
     public int getAdjustedNetProductionOf(final GoodsType goodsType) {
         final ToIntFunction<BuildQueue> consumes = q -> {
@@ -2023,8 +2023,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Returns the ProductionInfo for the given Object.
      *
-     * @param object an <code>Object</code> value
-     * @return a <code>ProductionInfo</code> value
+     * @param object an {@code Object} value
+     * @return a {@code ProductionInfo} value
      */
     public ProductionInfo getProductionInfo(Object object) {
         return productionCache.getProductionInfo(object);
@@ -2053,7 +2053,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Can this colony produce certain goods?
      *
-     * @param goodsType The <code>GoodsType</code> to check production of.
+     * @param goodsType The {@code GoodsType} to check production of.
      * @return True if the goods can be produced.
      */
     public boolean canProduce(GoodsType goodsType) {
@@ -2114,7 +2114,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Collect suggestions for tiles that need exploration or
      * improvement (which may depend on current use within the colony).
      *
-     * @return A list of <code>TileImprovementSuggestion</code>s.
+     * @return A list of {@code TileImprovementSuggestion}s.
      */
     public List<TileImprovementSuggestion> getTileImprovementSuggestions() {
         final Specification spec = getSpecification();
@@ -2144,7 +2144,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Finds another unit in this colony that would be better at doing the
      * job of the specified unit.
      *
-     * @param expert The <code>Unit</code> to consider.
+     * @param expert The {@code Unit} to consider.
      * @return A better expert, or null if none available.
      */
     public Unit getBetterExpert(Unit expert) {
@@ -2209,7 +2209,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Determine if there is a problem with the production of a given
      * goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return A collection of warning messages.
      */
     public Collection<StringTemplate> getProductionWarnings(GoodsType goodsType) {
@@ -2291,9 +2291,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      * Get a message about insufficient production for a building
      *
-     * @param info The <code>ProductionInfo</code> for the work location.
-     * @param deficit The <code>AbstractGoods</code> in deficit.
-     * @return A suitable <code>StringTemplate</code> or null if none required.
+     * @param info The {@code ProductionInfo} for the work location.
+     * @param deficit The {@code AbstractGoods} in deficit.
+     * @return A suitable {@code StringTemplate} or null if none required.
      */
     private StringTemplate getInsufficientProductionMessage(ProductionInfo info,
         AbstractGoods deficit) {
@@ -2319,7 +2319,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Note the latter may change when we implement sailing to other European
      * ports.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
      * @return True if these goods are still useful here.
      */
     public boolean goodsUseful(GoodsType goodsType) {
@@ -2334,7 +2334,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Special goods need modifiers applied when changed, and immigration
      * accumulates to the owner.
      *
-     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param goodsType The {@code GoodsType} to modify.
      * @param amount The amount of modification.
      */
     private void modifySpecialGoods(GoodsType goodsType, int amount) {
@@ -2392,8 +2392,8 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Finds the corresponding FreeColObject from another copy of this colony.
      *
      * @param <T> The actual return type.
-     * @param fco The <code>FreeColObject</code> in the other colony.
-     * @return The corresponding <code>FreeColObject</code> in this
+     * @param fco The {@code FreeColObject} in the other colony.
+     * @return The corresponding {@code FreeColObject} in this
      *     colony, or null if not found.
      */
     @SuppressWarnings("unchecked")

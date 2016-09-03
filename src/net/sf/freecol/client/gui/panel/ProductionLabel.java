@@ -82,8 +82,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * Creates a new production label.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param ag The {@code AbstractGoods} to create a label for.
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag) {
         this(freeColClient, ag, -1);
@@ -92,8 +92,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * Creates a new production label.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param ag The {@code AbstractGoods} to create a label for.
      * @param maximumProduction The maximum production.
      */
     public ProductionLabel(FreeColClient freeColClient, AbstractGoods ag,
@@ -104,8 +104,8 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * Creates a new production label.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param ag The {@code AbstractGoods} to create a label for.
      * @param maximumProduction The maximum production.
      * @param stockNumber The lower bound on number of items to display.
      */
@@ -118,9 +118,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * Creates a new production label.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param lib The <code>ImageLibrary</code> to use for the label.
-     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param lib The {@code ImageLibrary} to use for the label.
+     * @param ag The {@code AbstractGoods} to create a label for.
      */
     public ProductionLabel(FreeColClient freeColClient, ImageLibrary lib,
                            AbstractGoods ag) {
@@ -130,9 +130,9 @@ public final class ProductionLabel extends AbstractGoodsLabel {
     /**
      * Creates a new production label.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param lib The <code>ImageLibrary</code> to use for the label.
-     * @param ag The <code>AbstractGoods</code> to create a label for.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param lib The {@code ImageLibrary} to use for the label.
+     * @param ag The {@code AbstractGoods} to create a label for.
      * @param maximumProduction The maximum production.
      * @param stockNumber The lower bound on number of items to display.
      */

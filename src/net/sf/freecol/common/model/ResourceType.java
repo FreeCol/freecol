@@ -43,7 +43,7 @@ public final class ResourceType extends FreeColSpecObjectType {
      * Creates a new resource type.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ResourceType(String id, Specification specification) {
         super(id, specification);
@@ -72,7 +72,7 @@ public final class ResourceType extends FreeColSpecObjectType {
     /**
      * Get the best goods type to make with this resource type.
      *
-     * @return The best <code>GoodsType</code>.
+     * @return The best {@code GoodsType}.
      */
     public GoodsType getBestGoodsType() {
         final Specification spec = getSpecification();

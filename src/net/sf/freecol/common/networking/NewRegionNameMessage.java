@@ -55,12 +55,12 @@ public class NewRegionNameMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>NewRegionNameMessage</code> with the
+     * Create a new {@code NewRegionNameMessage} with the
      * supplied name.
      *
-     * @param region The <code>Region</code> being discovered.
-     * @param tile The <code>Tile</code> where the region is discovered.
-     * @param unit The <code>Unit</code> that discovers the region.
+     * @param region The {@code Region} being discovered.
+     * @param tile The {@code Tile} where the region is discovered.
+     * @param unit The {@code Unit} that discovers the region.
      * @param newRegionName The default new region name.
      */
     public NewRegionNameMessage(Region region, Tile tile, Unit unit,
@@ -74,11 +74,11 @@ public class NewRegionNameMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>NewRegionNameMessage</code> from a
+     * Create a new {@code NewRegionNameMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public NewRegionNameMessage(Game game, Element element) {
         super(getTagName());
@@ -95,7 +95,7 @@ public class NewRegionNameMessage extends DOMMessage {
     /**
      * Public accessor for the region.
      *
-     * @param game The <code>Game</code> to look for a region in.
+     * @param game The {@code Game} to look for a region in.
      * @return The region of this message.
      */
     public Region getRegion(Game game) {
@@ -105,7 +105,7 @@ public class NewRegionNameMessage extends DOMMessage {
     /**
      * Public accessor for the tile.
      *
-     * @param game The <code>Game</code> to look for a tile in.
+     * @param game The {@code Game} to look for a tile in.
      * @return The tile of this message.
      */
     public Tile getTile(Game game) {
@@ -115,8 +115,8 @@ public class NewRegionNameMessage extends DOMMessage {
     /**
      * Public accessor for the unit.
      *
-     * @param player The <code>Player</code> who owns the unit.
-     * @return The <code>Unit</code> of this message.
+     * @param player The {@code Player} who owns the unit.
+     * @return The {@code Unit} of this message.
      */
     public Unit getUnit(Player player) {
         return player.getOurFreeColGameObject(unitId, Unit.class);
@@ -135,11 +135,11 @@ public class NewRegionNameMessage extends DOMMessage {
     /**
      * Handle a "newRegionName"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update setting the new region name, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

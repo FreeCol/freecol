@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>Font</code>.
+ * A {@code Resource} wrapping a <code>Font</code>.
  *
  * @see Resource
  * @see Font
@@ -51,7 +51,7 @@ public class FontResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if unable to read the font.
      */
@@ -84,12 +84,12 @@ public class FontResource extends Resource {
 
 
     /**
-     * Gets the <code>Font</code> represented by this resource.  As
+     * Gets the {@code Font} represented by this resource.  As
      * failure to load a critical font might remove the ability to
      * even display an error message, it is too risky to allow this
      * routine to return null.  Hence the emergency font use.
      *
-     * @return The <code>Font</code> for this resource, or the default
+     * @return The {@code Font} for this resource, or the default
      *     Java font if none found.
      */
     public Font getFont() {

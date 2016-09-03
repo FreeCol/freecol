@@ -33,9 +33,9 @@ public class ZoomOutAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>ZoomOutAction</code>.
+     * Creates a new {@code ZoomOutAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ZoomOutAction(FreeColClient freeColClient) {
         super(freeColClient, id);

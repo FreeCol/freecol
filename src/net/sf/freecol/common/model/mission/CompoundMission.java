@@ -48,19 +48,19 @@ public class CompoundMission extends AbstractMission {
 
 
     /**
-     * Creates a new <code>CompoundMission</code> instance.
+     * Creates a new {@code CompoundMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      */
     public CompoundMission(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>CompoundMission</code> instance.
+     * Creates a new {@code CompoundMission} instance.
      *
-     * @param game a <code>Game</code> value
-     * @param xr a <code>FreeColXMLReader</code> value
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
      * @exception XMLStreamException if an error occurs
      */
     public CompoundMission(Game game,
@@ -69,9 +69,9 @@ public class CompoundMission extends AbstractMission {
     }
 
     /**
-     * Creates a new <code>CompoundMission</code> instance.
+     * Creates a new {@code CompoundMission} instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game a {@code Game} value
      * @param id The object identifier.
      */
     public CompoundMission(Game game, String id) {
@@ -80,16 +80,16 @@ public class CompoundMission extends AbstractMission {
 
 
     /**
-     * Get the <code>Missions</code> value.
+     * Get the {@code Missions} value.
      *
-     * @return A list of <code>Mission</code>s.
+     * @return A list of {@code Mission}s.
      */
     public final List<Mission> getMissions() {
         return missions;
     }
 
     /**
-     * Set the <code>Missions</code> value.
+     * Set the {@code Missions} value.
      *
      * @param newMissions The new Missions value.
      */
@@ -98,16 +98,16 @@ public class CompoundMission extends AbstractMission {
     }
 
     /**
-     * Get the <code>Index</code> value.
+     * Get the {@code Index} value.
      *
-     * @return an <code>int</code> value
+     * @return an {@code int} value
      */
     public final int getIndex() {
         return index;
     }
 
     /**
-     * Set the <code>Index</code> value.
+     * Set the {@code Index} value.
      *
      * @param newIndex The new Index value.
      */
@@ -118,7 +118,7 @@ public class CompoundMission extends AbstractMission {
     /**
      * Returns true if the mission is valid.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     @Override
     public boolean isValid() {

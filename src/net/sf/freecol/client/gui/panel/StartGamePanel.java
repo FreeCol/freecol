@@ -75,7 +75,7 @@ public final class StartGamePanel extends FreeColPanel {
     /**
      * Create the panel from which to start a game.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public StartGamePanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("fill, wrap 2"));

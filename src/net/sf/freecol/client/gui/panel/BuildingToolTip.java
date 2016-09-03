@@ -55,7 +55,7 @@ public class BuildingToolTip extends JToolTip {
     /**
      * Creates this BuildingToolTip.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param building The building to display information from.
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building) {

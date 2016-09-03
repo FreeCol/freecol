@@ -65,7 +65,7 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 
 
 /**
- * A panel for choosing the current <code>MapTransform</code>.
+ * A panel for choosing the current {@code MapTransform}.
  *
  * <br><br>
  *
@@ -93,7 +93,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     /**
      * Creates a panel to choose a map transform.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MapEditorTransformPanel(FreeColClient freeColClient) {
         super(freeColClient, new BorderLayout());
@@ -151,9 +151,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     /**
      * Builds the button for the given terrain.
      *
-     * @param image an <code>Image</code> value
-     * @param text a <code>String</code> value
-     * @param mt a <code>MapTransform</code> value
+     * @param image an {@code Image} value
+     * @param text a {@code String} value
+     * @param mt a {@code MapTransform} value
      * @return A suitable button.
      */
     private JToggleButton buildButton(Image image, String text,
@@ -195,8 +195,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Ripped out of ResourceTransform to dodge the name clash with
      * CollectionUtils.transform which we want to use here.
      *
-     * @param resource A list of <code>ResourceType</code>s to choose from.
-     * @return The chosen <code>ResourceType</code>.
+     * @param resource A list of {@code ResourceType}s to choose from.
+     * @return The chosen {@code ResourceType}.
      */
     private ResourceType getResourceChoice(List<ResourceType> resources) {
         final Function<ResourceType, ChoiceItem<ResourceType>> mapper
@@ -210,7 +210,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     /**
      * Set the native nation.
      *
-     * @param newNativeNation The new native <code>Nation</code>.
+     * @param newNativeNation The new native {@code Nation}.
      */
     public static void setNativeNation(Nation newNativeNation) {
         nativeNation = newNativeNation;
@@ -218,7 +218,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     /**
      * Represents a transformation that can be applied to
-     * a <code>Tile</code>.
+     * a {@code Tile}.
      *
      * @see #transform(Tile)
      */
@@ -231,7 +231,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         /**
          * Applies this transformation to the given tile.
-         * @param t The <code>Tile</code> to be transformed,
+         * @param t The {@code Tile} to be transformed,
          */
         public abstract void transform(Tile t);
 
@@ -241,7 +241,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
          * {@link InfoPanel} when selected, but might be
          * used elsewhere as well.
          *
-         * @return The panel or <code>null</code> if no panel
+         * @return The panel or {@code null} if no panel
          *      has been set.
          */
         public JPanel getDescriptionPanel() {

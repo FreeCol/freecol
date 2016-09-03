@@ -195,7 +195,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     /**
      * Installs a FreeColLookAndFeel as the default look and feel.
      *
-     * @param fclaf The <code>FreeColLookAndFeel</code> to install.
+     * @param fclaf The {@code FreeColLookAndFeel} to install.
      * @throws FreeColException if the installation fails.
      */
     public static void install(FreeColLookAndFeel fclaf)
@@ -211,7 +211,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     /**
      * Set the default font in all UI elements.
      *
-     * @param defaultFont A <code>Font</code> to use by default.
+     * @param defaultFont A {@code Font} to use by default.
      */
     public static void installFont(Font defaultFont) {
         UIDefaults u = UIManager.getDefaults();

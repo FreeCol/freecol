@@ -45,10 +45,10 @@ public class SetDestinationMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>SetDestinationMessage</code> with the supplied unit
+     * Create a new {@code SetDestinationMessage} with the supplied unit
      * and destination.
      *
-     * @param unit The <code>Unit</code> whose destination is to be set
+     * @param unit The {@code Unit} whose destination is to be set
      * @param destination The destination to set (may be null)
      */
     public SetDestinationMessage(Unit unit, Location destination) {
@@ -60,10 +60,10 @@ public class SetDestinationMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>SetDestinationMessage</code> from a supplied element.
+     * Create a new {@code SetDestinationMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public SetDestinationMessage(Game game, Element element) {
         super(getTagName());
@@ -76,10 +76,10 @@ public class SetDestinationMessage extends DOMMessage {
     /**
      * Handle a "setDestination"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> the message is from.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} the message is from.
      * @return An update containing the unit with the new destination,
-     *     or an error <code>Element</code> on failure.
+     *     or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

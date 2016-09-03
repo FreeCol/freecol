@@ -48,7 +48,7 @@ public class ChatMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ChatMessage</code> with the
+     * Create a new {@code ChatMessage} with the
      * supplied message.
      *
      * @param player The player that is sending the message.
@@ -64,11 +64,11 @@ public class ChatMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ChatMessage</code> from a
+     * Create a new {@code ChatMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      * @throws IllegalStateException if there is problem with the senderID.
      */
     public ChatMessage(Game game, Element element) {
@@ -85,7 +85,7 @@ public class ChatMessage extends DOMMessage {
     /**
      * Who sent this ChatMessage?
      *
-     * @param game The <code>Game</code> the player is in.
+     * @param game The {@code Game} the player is in.
      * @return The player that sent this ChatMessage.
      */
     public Player getPlayer(Game game) {
@@ -114,8 +114,8 @@ public class ChatMessage extends DOMMessage {
     /**
      * Handle a "chat"-message.
      *
-     * @param server The <code>FreeColServer</code> that handles the message.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} that handles the message.
+     * @param connection The {@code Connection} message was received on.
      *
      * @return Null.
      */

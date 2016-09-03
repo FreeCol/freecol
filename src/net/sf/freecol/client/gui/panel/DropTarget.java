@@ -29,20 +29,20 @@ import net.sf.freecol.common.model.Unit;
 public interface DropTarget {
 
     /**
-     * Returns <code>true</code> if the given Unit could be dropped on
+     * Returns {@code true} if the given Unit could be dropped on
      * this target.
      *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>boolean</code> value
+     * @param unit an {@code Unit} value
+     * @return a {@code boolean} value
      */
     public boolean accepts(Unit unit);
 
     /**
-     * Returns <code>true</code> if the given Goods could be dropped on
+     * Returns {@code true} if the given Goods could be dropped on
      * this target.
      *
-     * @param goods a <code>Goods</code> value
-     * @return a <code>boolean</code> value
+     * @param goods a {@code Goods} value
+     * @return a {@code boolean} value
      */
     public boolean accepts(Goods goods);
 
@@ -65,7 +65,7 @@ public interface DropTarget {
      * Get a suggested amount of goods to add, used when partial
      * amounts are selected.
      *
-     * @param goodsType The <code>GoodsType</code> proposed to add.
+     * @param goodsType The {@code GoodsType} proposed to add.
      * @return A good amount of goods to add.
      */
     public int suggested(GoodsType goodsType);

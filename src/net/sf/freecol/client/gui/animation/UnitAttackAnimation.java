@@ -45,11 +45,11 @@ final class UnitAttackAnimation extends FreeColClientHolder {
     /**
      * Build a new attack animation.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
-     * @param attacker The <code>Unit</code> that is attacking.
-     * @param defender The <code>Unit</code> that is defending.
-     * @param attackerTile The <code>Tile</code> the attack comes from.
-     * @param defenderTile The <code>Tile</code> the attack goes to.
+     * @param freeColClient The enclosing {@code FreeColClient}.
+     * @param attacker The {@code Unit} that is attacking.
+     * @param defender The {@code Unit} that is defending.
+     * @param attackerTile The {@code Tile} the attack comes from.
+     * @param defenderTile The {@code Tile} the attack goes to.
      * @param success Does the attack succeed?
      */
     public UnitAttackAnimation(FreeColClient freeColClient,
@@ -88,8 +88,8 @@ final class UnitAttackAnimation extends FreeColClientHolder {
     /**
      * Find the animation for a unit attack.
      *
-     * @param unit The <code>Unit</code> to animate.
-     * @param direction The <code>Direction</code> of the attack.
+     * @param unit The {@code Unit} to animate.
+     * @param direction The {@code Direction} of the attack.
      * @return An animation, if available.
      */
     private SimpleZippedAnimation getAnimation(Unit unit,

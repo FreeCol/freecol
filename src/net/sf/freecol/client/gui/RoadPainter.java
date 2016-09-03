@@ -60,7 +60,7 @@ public final class RoadPainter {
     /**
      * Create a new road painter for a given tile size.
      *
-     * @param tileSize The tile size as a <code>Dimension</code>.
+     * @param tileSize The tile size as a {@code Dimension}.
      */
     public RoadPainter(Dimension tileSize) {
         this.tileHeight = tileSize.height;
@@ -110,8 +110,8 @@ public final class RoadPainter {
     /**
      * Draws all roads on the given Tile.
      *
-     * @param g The <code>Graphics</code> to draw the road upon.
-     * @param tile The <code>Tile</code> with the road.
+     * @param g The {@code Graphics} to draw the road upon.
+     * @param tile The {@code Tile} with the road.
      */
     public void displayRoad(Graphics2D g, Tile tile) {
         Color oldColor = g.getColor();

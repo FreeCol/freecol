@@ -45,7 +45,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>DeclareIndependenceMessage</code> with the
+     * Create a new {@code DeclareIndependenceMessage} with the
      * supplied name.
      *
      * @param nationName The new name for the rebelling nation.
@@ -59,11 +59,11 @@ public class DeclareIndependenceMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DeclareIndependenceMessage</code> from a
+     * Create a new {@code DeclareIndependenceMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public DeclareIndependenceMessage(Game game, Element element) {
         this(getStringAttribute(element, NATION_NAME_TAG),
@@ -74,12 +74,12 @@ public class DeclareIndependenceMessage extends DOMMessage {
     /**
      * Handle a "declareIndependence"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message is from.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} the message is from.
      *
-     * @return An update <code>Element</code> describing the REF and the
-     *         rebel player, or an error <code>Element</code> on failure.
+     * @return An update {@code Element} describing the REF and the
+     *         rebel player, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

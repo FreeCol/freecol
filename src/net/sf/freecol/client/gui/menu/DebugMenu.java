@@ -69,7 +69,7 @@ public class DebugMenu extends JMenu {
     /**
      * Create the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DebugMenu(FreeColClient freeColClient) {
         super(Messages.message("menuBar.debug"));

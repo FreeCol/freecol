@@ -25,10 +25,10 @@ public interface Selector {
      * Transform the given string selector into a replacement key for
      * a choice format.
      *
-     * @param selector a <code>String</code> value
-     * @param template the <code>String</code> template that contains
+     * @param selector a {@code String} value
+     * @param template the {@code String} template that contains
      * the selector (only used for error reporting)
-     * @return a <code>String</code> value
+     * @return a {@code String} value
      */
     public String getKey(String selector, String template);
 

@@ -58,18 +58,18 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     /**
      * The object we are trying to destroy. This can be a
-     * either <code>Settlement</code> or a <code>Unit</code>.
+     * either {@code Settlement} or a <code>Unit</code>.
      */
     private Location target, transportTarget;
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param target The object we are trying to destroy.  This can be
-     *     either a <code>Settlement</code> or a <code>Unit</code>.
+     *     either a {@code Settlement} or a <code>Unit</code>.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
                                      Location target) {
@@ -77,11 +77,11 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Creates a new <code>UnitSeekAndDestroyMission</code> and reads
+     * Creates a new {@code UnitSeekAndDestroyMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -98,8 +98,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from.
+     * @param aiUnit The {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from.
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
@@ -127,9 +127,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      * FIXME: if we are the REF and there is a significant Tory
      * population inside, assume traitors have briefed us.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path The <code>PathNode</code> to take to the settlement.
-     * @param settlement The <code>Settlement</code> to attack.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path The {@code PathNode} to take to the settlement.
+     * @param settlement The {@code Settlement} to attack.
      * @return A score of the desirability of the mission.
      */
     private static int scoreSettlementPath(AIUnit aiUnit, PathNode path,
@@ -166,9 +166,9 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Scores a potential attack on a unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path The <code>PathNode</code> to take to the settlement.
-     * @param defender The <code>Unit</code> to attack.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path The {@code PathNode} to take to the settlement.
+     * @param defender The {@code Unit} to attack.
      * @return A score of the desirability of the mission.
      */
     private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
@@ -206,8 +206,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Evaluate a potential seek and destroy mission for a given unit
      * to a given tile.
      *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
+     * @param aiUnit The {@code AIUnit} to do the mission.
+     * @param path A {@code PathNode} to take to the target.
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -220,12 +220,12 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for finding the best colony
-     * <code>Tile</code>, optionally falling back to the nearest colony.
+     * Gets a {@code GoalDecider} for finding the best colony
+     * {@code Tile}, optionally falling back to the nearest colony.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param aiUnit The {@code AIUnit} that is searching.
      * @param deferOK Not used in this mission.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
@@ -253,7 +253,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Finds a suitable seek-and-destroy target path for an AI unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a target for.
+     * @param aiUnit The {@code AIUnit} to find a target for.
      * @param range An upper bound on the number of moves.
      * @param deferOK Not implemented in this mission.
      * @return A path to the target, or null if none found.
@@ -273,7 +273,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Finds a suitable seek-and-destroy target for an AI unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a target for.
+     * @param aiUnit The {@code AIUnit} to find a target for.
      * @param range An upper bound on the number of moves.
      * @param deferOK Not implemented in this mission.
      * @return A suitable target, or null if none found.
@@ -288,7 +288,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Why would a UnitSeekAndDestroyMission be invalid with the given unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -307,8 +307,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Why would a UnitSeekAndDestroyMission be invalid with the given unit
      * and settlement.
      *
-     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param settlement The <code>Settlement</code> to test.
+     * @param aiUnit The {@code AIUnit} to seek-and-destroy with.
+     * @param settlement The {@code Settlement} to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -328,8 +328,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Why would a UnitSeekAndDestroyMission be invalid with the given unit
      * and target unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param unit The target <code>Unit</code> to test.
+     * @param aiUnit The {@code AIUnit} to seek-and-destroy with.
+     * @param unit The target {@code Unit} to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
@@ -351,7 +351,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -361,8 +361,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

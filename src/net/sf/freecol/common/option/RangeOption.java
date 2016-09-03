@@ -45,9 +45,9 @@ public class RangeOption extends SelectOption {
 
 
     /**
-     * Creates a new <code>RangeOption</code>.
+     * Creates a new {@code RangeOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public RangeOption(Specification specification) {
         super(specification);
@@ -56,7 +56,7 @@ public class RangeOption extends SelectOption {
 
     /**
      * Gets the rank of the current selected value in the list of
-     * values of this <code>RangeOption</code>.
+     * values of this {@code RangeOption}.
      *
      * @return The value.
      */
@@ -71,7 +71,7 @@ public class RangeOption extends SelectOption {
 
     /**
      * Sets the value through the rank in the list of values of this
-     * <code>RangeOption</code>.
+     * {@code RangeOption}.
      *
      * @param rank The rank of the value to be set.
      */

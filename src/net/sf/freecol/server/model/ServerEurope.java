@@ -57,7 +57,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
      */
     public ServerEurope(Game game, String id) {
@@ -67,9 +67,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
     /**
      * Creates a new ServerEurope.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param owner The <code>Player</code> that will be using this object of
-     *            <code>Europe</code>.
+     * @param game The {@code Game} in which this object belong.
+     * @param owner The {@code Player} that will be using this object of
+     *            {@code Europe}.
      */
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
@@ -169,7 +169,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
      *
      * @param slot The slot to recruit with.
      * @param random A pseudo-random number source.
-     * @return The recruited <code>UnitType</code>.
+     * @return The recruited {@code UnitType}.
      */
     public UnitType extractRecruitable(int slot, Random random) {
         // An invalid slot is normal when the player has no control over
@@ -243,7 +243,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     /**
      * Increases the price for a unit.
      *
-     * @param unitType The <code>UnitType</code>, trained or purchased
+     * @param unitType The {@code UnitType}, trained or purchased
      * @param price The current price of the unit
      */
     public void increasePrice(UnitType unitType, int price) {
@@ -263,9 +263,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
      *
      * FIXME: give Europe a shipyard and remove this?
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -280,11 +280,11 @@ public class ServerEurope extends Europe implements ServerModelObject {
     /**
      * Equip a unit for a specific role.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the equipping succeeds.
      */
     public boolean csEquipForRole(Unit unit, Role role, int roleCount,

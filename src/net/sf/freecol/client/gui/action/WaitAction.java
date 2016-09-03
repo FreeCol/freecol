@@ -35,7 +35,7 @@ public class WaitAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public WaitAction(FreeColClient freeColClient) {
         super(freeColClient, id);

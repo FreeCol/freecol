@@ -68,9 +68,9 @@ public class AbstractGoods extends FreeColObject implements Named {
     public AbstractGoods() {}
 
     /**
-     * Creates a new <code>AbstractGoods</code> instance.
+     * Creates a new {@code AbstractGoods} instance.
      *
-     * @param type The <code>GoodsType</code> to create.
+     * @param type The {@code GoodsType} to create.
      * @param amount The amount of goods to create.
      */
     public AbstractGoods(GoodsType type, int amount) {
@@ -80,9 +80,9 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
     /**
-     * Creates a new <code>AbstractGoods</code> instance.
+     * Creates a new {@code AbstractGoods} instance.
      *
-     * @param other Another <code>AbstractGoods</code> to copy.
+     * @param other Another {@code AbstractGoods} to copy.
      */
     public AbstractGoods(AbstractGoods other) {
         setId(other.type.getId());
@@ -94,7 +94,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Get the goods type.
      *
-     * @return The <code>GoodsType</code>.
+     * @return The {@code GoodsType}.
      */
     public final GoodsType getType() {
         return type;
@@ -103,7 +103,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Set the goods type.
      *
-     * @param newType The new <code>GoodsType</code>.
+     * @param newType The new {@code GoodsType}.
      */
     public final void setType(final GoodsType newType) {
         this.type = newType;
@@ -179,7 +179,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Get a label given a goods type and amount.
      *
-     * @param type The <code>GoodsType</code> to display.
+     * @param type The {@code GoodsType} to display.
      * @param amount The amount of goods.
      * @return The goods label.
      */
@@ -206,8 +206,8 @@ public class AbstractGoods extends FreeColObject implements Named {
      * Convenience lookup of the goods count in a collection of
      * abstract goods given a goods type.
      * 
-     * @param type The <code>GoodsType</code> to look for.
-     * @param goods The collection of <code>AbstractGoods</code> to look in.
+     * @param type The {@code GoodsType} to look for.
+     * @param goods The collection of {@code AbstractGoods} to look in.
      * @return The goods count found, or zero if not found.
      */
     public static int getCount(GoodsType type,
@@ -219,7 +219,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Evaluate goods for trade purposes.
      *
-     * @param player The <code>Player</code> to evaluate for.
+     * @param player The {@code Player} to evaluate for.
      * @return A value for the goods.
      */
     public int evaluateFor(Player player) {
@@ -231,7 +231,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * A predicate maker to match by type.
      *
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static final Predicate<? super AbstractGoods> matches(final GoodsType key) {
         return matchKey(key, AbstractGoods::getType);
@@ -286,7 +286,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Simple string version of some goods.
      *
-     * @param ag The <code>AbstractGoods</code> to make a string from.
+     * @param ag The {@code AbstractGoods} to make a string from.
      * @return A string version of the goods.
      */     
     public static String toString(AbstractGoods ag) {
@@ -296,7 +296,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * Simple string version of the component parts of some goods.
      *
-     * @param goodsType The <code>GoodsType</code> to use.
+     * @param goodsType The {@code GoodsType} to use.
      * @param amount The amount of goods.
      * @return A string version of the goods.
      */     

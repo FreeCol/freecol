@@ -21,22 +21,22 @@
 package net.sf.freecol.common.model;
 
 /**
- * An object that can be put in a <code>Location</code>.
+ * An object that can be put in a {@code Location}.
  */
 public interface Locatable {
 
     /**
-     * Gets the location of this <code>Locatable</code>.
+     * Gets the location of this {@code Locatable}.
      *
-     * @return The location of this <code>Locatable</code>.
+     * @return The location of this {@code Locatable}.
      */
     public Location getLocation();
 
     /**
-     * Sets the location for this <code>Locatable</code>.
+     * Sets the location for this {@code Locatable}.
      *
-     * @param newLocation The new <code>Location</code> for the
-     *     <code>Locatable</code>.
+     * @param newLocation The new {@code Location} for the
+     *     {@code Locatable}.
      * @return True if the location change succeeds.
      */
     public boolean setLocation(Location newLocation);
@@ -44,22 +44,22 @@ public interface Locatable {
     /**
      * Is this locatable in Europe.
      *
-     * @return True if the <code>Locatable</code> is in <code>Europe</code>.
+     * @return True if the {@code Locatable} is in <code>Europe</code>.
      */
     public boolean isInEurope();
 
     /**
-     * Get the <code>Tile</code> where this <code>Locatable</code> is
-     * located, or <code>null</code> if it is in <code>Europe</code>.
+     * Get the {@code Tile} where this <code>Locatable</code> is
+     * located, or {@code null} if it is in <code>Europe</code>.
      *
-     * @return The <code>Tile</code> where this <code>Locatable</code>
+     * @return The {@code Tile} where this <code>Locatable</code>
      *     is located, if any.
      */
     public Tile getTile();
 
     /**
      * Gets the number of cargo slots consumed when this
-     * <code>Locatable</code> if put onto a carrier.
+     * {@code Locatable} if put onto a carrier.
      *
      * @return The number of cargo slots required.
      */

@@ -29,7 +29,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>SimpleZippedAnimation</code>.
+ * A {@code Resource} wrapping a <code>SimpleZippedAnimation</code>.
  * 
  * @see Resource
  * @see SimpleZippedAnimation
@@ -46,7 +46,7 @@ public class SZAResource extends Resource implements Resource.Preloadable {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
     public SZAResource(URI resourceLocator) {
@@ -74,10 +74,10 @@ public class SZAResource extends Resource implements Resource.Preloadable {
     }
 
     /**
-     * Gets the <code>SimpleZippedAnimation</code> represented by this
+     * Gets the {@code SimpleZippedAnimation} represented by this
      * resource.
      *
-     * @return The <code>SimpleZippedAnimation</code> in it's original size.
+     * @return The {@code SimpleZippedAnimation} in it's original size.
      */
     public SimpleZippedAnimation getSimpleZippedAnimation() {
         if (szAnimation == null) {
@@ -88,13 +88,13 @@ public class SZAResource extends Resource implements Resource.Preloadable {
     }
 
     /**
-     * Get the <code>SimpleZippedAnimation</code> using the specified
+     * Get the {@code SimpleZippedAnimation} using the specified
      * scale.
      * 
      * @param scale The size of the requested animation (with 1 being normal
      *      size, 2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
-     * @return The <code>SimpleZippedAnimation</code>.
+     * @return The {@code SimpleZippedAnimation}.
      */
     public SimpleZippedAnimation getSimpleZippedAnimation(float scale) {
         final SimpleZippedAnimation sza = getSimpleZippedAnimation();

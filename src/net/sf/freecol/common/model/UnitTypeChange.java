@@ -95,17 +95,17 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     /**
      * Deliberately trivial constructor.
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     public UnitTypeChange(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>UnitTypeChange</code> instance.
+     * Creates a new {@code UnitTypeChange} instance.
      *
-     * @param xr An <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr An {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public UnitTypeChange(FreeColXMLReader xr,
@@ -119,7 +119,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     /**
      * Gets the unit type to change to.
      *
-     * @return The new <code>UnitType</code>.
+     * @return The new {@code UnitType}.
      */
     public final UnitType getNewUnitType() {
         return newUnitType;
@@ -129,7 +129,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
      * Sets the new unit type to change to.
      * Public for the test suite.
      *
-     * @param newUnitType The new <code>UnitType</code>.
+     * @param newUnitType The new {@code UnitType}.
      */
     public final void setNewUnitType(final UnitType newUnitType) {
         this.newUnitType = newUnitType;
@@ -167,7 +167,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
      * At the moment, this probability only applies to the
      * ChangeTypes EXPERIENCE and PROMOTION.
      *
-     * @param type The <code>ChangeType</code> to check.
+     * @param type The {@code ChangeType} to check.
      * @return The probability, defaulting to zero.
      */
     public final int getProbability(ChangeType type) {
@@ -178,7 +178,7 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     /**
      * Is this unit change type possible as a specific change type.
      *
-     * @param type The <code>ChangeType</code> to check.
+     * @param type The {@code ChangeType} to check.
      * @return True if the change type can occur.
      */
     public boolean asResultOf(ChangeType type) {

@@ -48,7 +48,7 @@ public class SoundController {
     /**
      * Prepare the sound system.
      * 
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param sound Enable sound if true.
      */
     public SoundController(FreeColClient freeColClient, boolean sound) {

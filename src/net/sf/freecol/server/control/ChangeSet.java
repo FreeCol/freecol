@@ -114,7 +114,7 @@ public class ChangeSet {
         /**
          * Check this visibility with respect to a player.
          *
-         * @param player The <code>ServerPlayer</code> to consider.
+         * @param player The {@code ServerPlayer} to consider.
          * @param perhapsResult The result if the visibility is ambiguous.
          * @return True if the player satisfies the visibility test.
          */
@@ -133,7 +133,7 @@ public class ChangeSet {
         /**
          * Make this change visible to all players.
          *
-         * @return a <code>See</code> value
+         * @return a {@code See} value
          */
         public static See all() {
             return new See(ALL);
@@ -143,7 +143,7 @@ public class ChangeSet {
          * Make this change visible to all players, provided they can
          * see the objects that are being changed.
          *
-         * @return a <code>See</code> value
+         * @return a {@code See} value
          */
         public static See perhaps() {
             return new See(PERHAPS);
@@ -152,8 +152,8 @@ public class ChangeSet {
         /**
          * Make this change visible only to the given player.
          *
-         * @param player a <code>ServerPlayer</code> value
-         * @return a <code>See</code> value
+         * @param player a {@code ServerPlayer} value
+         * @return a {@code See} value
          */
         public static See only(ServerPlayer player) {
             return new See(ONLY).always(player);
@@ -164,8 +164,8 @@ public class ChangeSet {
         /**
          * Make this change visible to the given player.
          *
-         * @param player a <code>ServerPlayer</code> value
-         * @return a <code>See</code> value
+         * @param player a {@code ServerPlayer} value
+         * @return a {@code See} value
          */
         public See always(ServerPlayer player) {
             seeAlways = player;
@@ -176,8 +176,8 @@ public class ChangeSet {
          * Make this change visible to the given player, provided the
          * player can see the objects being changed.
          *
-         * @param player a <code>ServerPlayer</code> value
-         * @return a <code>See</code> value
+         * @param player a {@code ServerPlayer} value
+         * @return a {@code See} value
          */
         public See perhaps(ServerPlayer player) {
             seePerhaps = player;
@@ -187,8 +187,8 @@ public class ChangeSet {
         /**
          * Make this change invisible to the given player.
          *
-         * @param player a <code>ServerPlayer</code> value
-         * @return a <code>See</code> value
+         * @param player a {@code ServerPlayer} value
+         * @return a {@code See} value
          */
         public See except(ServerPlayer player) {
             seeNever = player;
@@ -240,7 +240,7 @@ public class ChangeSet {
         /**
          * Does this Change operate on the given object?
          *
-         * @param fcgo The <code>FreeColGameObject</code> to check.
+         * @param fcgo The {@code FreeColGameObject} to check.
          * @return True if the object is a subject of this change.
          */
         public boolean matches(FreeColGameObject fcgo) {
@@ -258,8 +258,8 @@ public class ChangeSet {
         /**
          * Should a player be notified of this Change?
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to consider.
-         * @return True if this <code>Change</code> should be sent.
+         * @param serverPlayer The {@code ServerPlayer} to consider.
+         * @return True if this {@code Change} should be sent.
          */
         public boolean isNotifiable(ServerPlayer serverPlayer) {
             return see.check(serverPlayer, isPerhapsNotifiable(serverPlayer));
@@ -273,7 +273,7 @@ public class ChangeSet {
          * This is false by default, subclasses should override when
          * special case handling is required.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to consider.
+         * @param serverPlayer The {@code ServerPlayer} to consider.
          * @return False.
          */
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
@@ -283,8 +283,8 @@ public class ChangeSet {
         /**
          * Are the secondary changes consequent to this Change?
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to consider.
-         * @return A list of secondary <code>Change</code>s or the
+         * @param serverPlayer The {@code ServerPlayer} to consider.
+         * @return A list of secondary {@code Change}s or the
          *     empty list if there are none, which is usually the case.
          */
         public List<Change> consequences(ServerPlayer serverPlayer) {
@@ -303,9 +303,9 @@ public class ChangeSet {
         /**
          * Specialize a Change for a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code> to build the element in.
-         * @return An <code>Element</code> encapsulating this change.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document} to build the element in.
+         * @return An {@code Element} encapsulating this change.
          */
         public abstract Element toElement(ServerPlayer serverPlayer,
                                           Document doc);
@@ -314,7 +314,7 @@ public class ChangeSet {
          * Some changes can not be directly specialized, but need to be
          * directly attached to an element.
          *
-         * @param element The <code>Element</code> to attach to.
+         * @param element The {@code Element} to attach to.
          */
         public abstract void attachToElement(Element element);
     }
@@ -349,8 +349,8 @@ public class ChangeSet {
          * exception to the normal visibility rules.
          *
          * @param see The visibility of this change.
-         * @param attacker The <code>Unit</code> that is attacking.
-         * @param defender The <code>Unit</code> that is defending.
+         * @param attacker The {@code Unit} that is attacking.
+         * @param defender The {@code Unit} that is defending.
          * @param success Did the attack succeed.
          */
         public AttackChange(See see, Unit attacker, Unit defender,
@@ -382,7 +382,7 @@ public class ChangeSet {
          * use canSeeUnit because that gives a false negative for
          * units in settlements, which should be animated.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return True if the player should be notified.
          */
         @Override
@@ -397,8 +397,8 @@ public class ChangeSet {
          * Specialize a AttackChange into an "animateAttack" element
          * for a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "animateAttack" element.
          */
         @Override
@@ -461,8 +461,8 @@ public class ChangeSet {
          * Build a new AttributeChange.
          *
          * @param see The visibility of this change.
-         * @param key A key <code>String</code>.
-         * @param value The corresponding value as a <code>String</code>.
+         * @param key A key {@code String}.
+         * @param value The corresponding value as a {@code String}.
          */
         public AttributeChange(See see, String key, String value) {
             super(see);
@@ -494,8 +494,8 @@ public class ChangeSet {
         /**
          * We do not specialize AttributeChanges.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return Null.
          */
         @Override
@@ -506,7 +506,7 @@ public class ChangeSet {
         /**
          * Tack attributes onto the element.
          *
-         * @param element The <code>Element</code> to attach to.
+         * @param element The {@code Element} to attach to.
          */
         @Override
         public void attachToElement(Element element) {
@@ -541,7 +541,7 @@ public class ChangeSet {
          *
          * @param see The visibility of this change.
          * @param priority The priority of the change.
-         * @param message The <code>Message</code> to add.
+         * @param message The {@code Message} to add.
          */
         public MessageChange(See see, ChangePriority priority,
                              DOMMessage message) {
@@ -563,8 +563,8 @@ public class ChangeSet {
         /**
          * Specialize a MessageChange to a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An element.
          */
         @Override
@@ -620,9 +620,9 @@ public class ChangeSet {
          * Build a new MoveChange.
          *
          * @param see The visibility of this change.
-         * @param unit The <code>Unit</code> that is moving.
+         * @param unit The {@code Unit} that is moving.
          * @param oldLocation The location from which the unit is moving.
-         * @param newTile The <code>Tile</code> to which the unit is moving.
+         * @param newTile The {@code Tile} to which the unit is moving.
          */
         public MoveChange(See see, Unit unit, Location oldLocation,
                           Tile newTile) {
@@ -645,7 +645,7 @@ public class ChangeSet {
         /**
          * Should a player perhaps be notified of this move?
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return True if the player should be notified.
          */
         @Override
@@ -657,7 +657,7 @@ public class ChangeSet {
          * There are consequences to a move.  If the player can not
          * see the unit after the move, it should be removed.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return A RemoveChange if the unit disappears (but not if it
          *     is destroyed, that is handled elsewhere).
          */
@@ -677,8 +677,8 @@ public class ChangeSet {
          * Specialize a MoveChange into an "animateMove" element for a
          * particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "animateMove" element.
          */
         @Override
@@ -730,7 +730,7 @@ public class ChangeSet {
          * Build a new ObjectChange for a single object.
          *
          * @param see The visibility of this change.
-         * @param fcgo The <code>FreeColGameObject</code> to update.
+         * @param fcgo The {@code FreeColGameObject} to update.
          */
         public ObjectChange(See see, FreeColGameObject fcgo) {
             super(see);
@@ -759,7 +759,7 @@ public class ChangeSet {
         /**
          * Should a player perhaps be notified of this update?
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return True if the object update can is notifiable.
          */
         @Override
@@ -792,8 +792,8 @@ public class ChangeSet {
         /**
          * Specialize a ObjectChange to a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "update" element, or null if the update should not
          *     be visible to the player.
          */
@@ -835,7 +835,7 @@ public class ChangeSet {
          * Build a new PartialObjectChange for a single object.
          *
          * @param see The visibility of this change.
-         * @param fcgo The <code>FreeColGameObject</code> to update.
+         * @param fcgo The {@code FreeColGameObject} to update.
          * @param fields The fields to update.
          */
         public PartialObjectChange(See see, FreeColGameObject fcgo,
@@ -848,7 +848,7 @@ public class ChangeSet {
         /**
          * Should a player perhaps be notified of this update?
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return False.  Revert to default from ObjectChange special case.
          */
         @Override
@@ -859,8 +859,8 @@ public class ChangeSet {
         /**
          * Specialize a PartialObjectChange to a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "update" element.
          */
         @Override
@@ -896,7 +896,7 @@ public class ChangeSet {
          * Build a new PlayerChange.
          *
          * @param see The visibility of this change.
-         * @param player The <code>Player</code> to add.
+         * @param player The {@code Player} to add.
          */
         public PlayerChange(See see, ServerPlayer player) {
             super(see);
@@ -966,8 +966,8 @@ public class ChangeSet {
          * Build a new RemoveChange for an object that is disposed.
          *
          * @param see The visibility of this change.
-         * @param loc The <code>Location</code> where the object was.
-         * @param objects The <code>FreeColGameObject</code>s to remove.
+         * @param loc The {@code Location} where the object was.
+         * @param objects The {@code FreeColGameObject}s to remove.
          */
         public RemoveChange(See see, Location loc,
                             Stream<? extends FreeColGameObject> objects) {
@@ -992,7 +992,7 @@ public class ChangeSet {
          * They should if they can see the tile, and there is no
          * other-player settlement present.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to notify.
+         * @param serverPlayer The {@code ServerPlayer} to notify.
          * @return True if the player should be notified.
          */
         @Override
@@ -1008,8 +1008,8 @@ public class ChangeSet {
         /**
          * Specialize a RemoveChange to a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return A "remove" element.
          */
         @Override
@@ -1062,7 +1062,7 @@ public class ChangeSet {
          * Build a new OwnedChange.
          *
          * @param see The visibility of this change.
-         * @param fco The <code>FreeColObject</code> to update.
+         * @param fco The {@code FreeColObject} to update.
          */
         public OwnedChange(See see, FreeColObject fco) {
             super(see);
@@ -1083,8 +1083,8 @@ public class ChangeSet {
          * Specialize a OwnedChange into an "addObject" element for a
          * particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "addObject" element.
          */
         @Override
@@ -1129,9 +1129,9 @@ public class ChangeSet {
          * Build a new FeatureChange.
          *
          * @param see The visibility of this change.
-         * @param object The <code>FreeColGameObject</code> to update.
-         * @param feature a <code>Feature</code> value to add or remove.
-         * @param add a <code>boolean</code> value
+         * @param object The {@code FreeColGameObject} to update.
+         * @param feature a {@code Feature} value to add or remove.
+         * @param add a {@code boolean} value
          */
         public FeatureChange(See see, FreeColGameObject object,
                              Feature feature, boolean add) {
@@ -1155,8 +1155,8 @@ public class ChangeSet {
          * Specialize a feature change into an element for a
          * particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An "addObject" element.
          */
         @Override
@@ -1204,8 +1204,8 @@ public class ChangeSet {
          * Build a new SpyChange.
          *
          * @param see The visibility of this change.
-         * @param unit The <code>Unit</code> that is spying.
-         * @param settlement The <code>Settlement</code> to spy on.
+         * @param unit The {@code Unit} that is spying.
+         * @param settlement The {@code Settlement} to spy on.
          */
         public SpyChange(See see, Unit unit, Settlement settlement) {
             super(see);
@@ -1226,8 +1226,8 @@ public class ChangeSet {
         /**
          * Specialize a SpyChange into an element with the supplied name.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An element.
          */
         @Override
@@ -1275,9 +1275,9 @@ public class ChangeSet {
          * Build a new StanceChange.
          *
          * @param see The visibility of this change.
-         * @param first The <code>Player</code> changing stance.
-         * @param stance The <code>Stance</code> to change to.
-         * @param second The <code>Player</code> wrt with to change.
+         * @param first The {@code Player} changing stance.
+         * @param stance The {@code Stance} to change to.
+         * @param second The {@code Player} wrt with to change.
          */
         public StanceChange(See see, Player first, Stance stance,
                             Player second) {
@@ -1300,8 +1300,8 @@ public class ChangeSet {
         /**
          * Specialize a StanceChange to a particular player.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return A "setStance" element.
          */
         @Override
@@ -1377,8 +1377,8 @@ public class ChangeSet {
         /**
          * Specialize a TrivialChange into an element with the supplied name.
          *
-         * @param serverPlayer The <code>ServerPlayer</code> to update.
-         * @param doc The owner <code>Document</code>.
+         * @param serverPlayer The {@code ServerPlayer} to update.
+         * @param doc The owner {@code Document}.
          * @return An element.
          */
         @Override
@@ -1422,7 +1422,7 @@ public class ChangeSet {
     /**
      * Copying constructor.
      *
-     * @param other The other <code>ChangeSet</code> to copy.
+     * @param other The other {@code ChangeSet} to copy.
      */
     public ChangeSet(ChangeSet other) {
         changes = new ArrayList<>(other.changes);
@@ -1434,7 +1434,7 @@ public class ChangeSet {
     /**
      * Sometimes we need to backtrack on making a change.
      *
-     * @param fcgo A <code>FreeColGameObject</code> to remove a matching
+     * @param fcgo A {@code FreeColGameObject} to remove a matching
      *     change for.
      */
     public void remove(FreeColGameObject fcgo) {
@@ -1445,8 +1445,8 @@ public class ChangeSet {
      * Helper function to add updates for multiple objects to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param objects The <code>FreeColGameObject</code>s that changed.
-     * @return The updated <code>ChangeSet</code>.
+     * @param objects The {@code FreeColGameObject}s that changed.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet add(See see, FreeColGameObject... objects) {
         for (FreeColGameObject o : objects) {
@@ -1459,8 +1459,8 @@ public class ChangeSet {
      * Helper function to add updates for multiple objects to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param objects The <code>FreeColGameObject</code>s that changed.
-     * @return The updated <code>ChangeSet</code>.
+     * @param objects The {@code FreeColGameObject}s that changed.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet add(See see, Collection<? extends FreeColGameObject> objects) {
         for (FreeColGameObject o : objects) {
@@ -1474,8 +1474,8 @@ public class ChangeSet {
      *
      * @param see The visibility of this change.
      * @param cp The priority of this change.
-     * @param message The <code>Message</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param message The {@code Message} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet add(See see, ChangePriority cp, DOMMessage message) {
         changes.add(new MessageChange(see, cp, message));
@@ -1486,10 +1486,10 @@ public class ChangeSet {
      * Helper function to add an attack to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param attacker The <code>Unit</code> that is attacking.
-     * @param defender The <code>Unit</code> that is defending.
+     * @param attacker The {@code Unit} that is attacking.
+     * @param defender The {@code Unit} that is defending.
      * @param success Did the attack succeed?
-     * @return The updated <code>ChangeSet</code>.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addAttack(See see, Unit attacker, Unit defender,
                                boolean success) {
@@ -1501,9 +1501,9 @@ public class ChangeSet {
      * Helper function to add an attribute setting to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param key A key <code>String</code>.
-     * @param value The corresponding value as a <code>String</code>.
-     * @return The updated <code>ChangeSet</code>.
+     * @param key A key {@code String}.
+     * @param value The corresponding value as a {@code String}.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addAttribute(See see, String key, String value) {
         changes.add(new AttributeChange(see, key, value));
@@ -1514,8 +1514,8 @@ public class ChangeSet {
      * Helper function to add a dead player event to a ChangeSet.
      * Deaths are public knowledge.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> that died.
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer The {@code ServerPlayer} that died.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addDead(ServerPlayer serverPlayer) {
         addTrivial(See.all(), "setDead", ChangePriority.CHANGE_EARLY,
@@ -1527,10 +1527,10 @@ public class ChangeSet {
      * Helper function to add a removal for an object that disappears
      * (that is, moves where it can not be seen) to a ChangeSet.
      *
-     * @param owner The <code>ServerPlayer</code> that owns this object.
-     * @param tile The <code>Tile</code> where the object was.
-     * @param fcgo The <code>FreeColGameObject</code> that disappears.
-     * @return The updated <code>ChangeSet</code>.
+     * @param owner The {@code ServerPlayer} that owns this object.
+     * @param tile The {@code Tile} where the object was.
+     * @param fcgo The {@code FreeColGameObject} that disappears.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addDisappear(ServerPlayer owner, Tile tile,
                                   FreeColGameObject fcgo) {
@@ -1544,9 +1544,9 @@ public class ChangeSet {
      * Helper function to add a founding father addition event to a ChangeSet.
      * Also adds the father to the owner.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
-     * @param father The <code>FoundingFather</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer The {@code ServerPlayer} adding the father.
+     * @param father The {@code FoundingFather} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addFather(ServerPlayer serverPlayer,
                                FoundingFather father) {
@@ -1558,11 +1558,11 @@ public class ChangeSet {
     /**
      * Helper function to add an Ability to a FreeColGameObject, or remove it.
      *
-     * @param serverPlayer a <code>ServerPlayer</code> value
-     * @param object a <code>FreeColGameObject</code> value
-     * @param ability an <code>Ability</code> value
-     * @param add a <code>boolean</code> value
-     * @return a <code>ChangeSet</code> value
+     * @param serverPlayer a {@code ServerPlayer} value
+     * @param object a {@code FreeColGameObject} value
+     * @param ability an {@code Ability} value
+     * @param add a {@code boolean} value
+     * @return a {@code ChangeSet} value
      */
     public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
                                       Ability ability, boolean add) {
@@ -1578,11 +1578,11 @@ public class ChangeSet {
     /**
      * Helper function to add a Modifier to a FreeColGameObject, or remove it.
      *
-     * @param serverPlayer a <code>ServerPlayer</code> value
-     * @param object a <code>FreeColGameObject</code> value
-     * @param modifier a <code>Modifier</code> value
-     * @param add a <code>boolean</code> value
-     * @return a <code>ChangeSet</code> value
+     * @param serverPlayer a {@code ServerPlayer} value
+     * @param object a {@code FreeColGameObject} value
+     * @param modifier a {@code Modifier} value
+     * @param add a {@code boolean} value
+     * @return a {@code ChangeSet} value
      */
     public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
                                       Modifier modifier, boolean add) {
@@ -1599,9 +1599,9 @@ public class ChangeSet {
      * Helper function to add a global history event to a ChangeSet.
      * Also adds the history to all the European players.
      *
-     * @param game The <code>Game</code> to find players in.
-     * @param history The <code>HistoryEvent</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param game The {@code Game} to find players in.
+     * @param history The {@code HistoryEvent} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addGlobalHistory(Game game, HistoryEvent history) {
         changes.add(new OwnedChange(See.all(), history));
@@ -1615,9 +1615,9 @@ public class ChangeSet {
      * Helper function to add a history event to a ChangeSet.
      * Also adds the history to the owner.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making history.
-     * @param history The <code>HistoryEvent</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer The {@code ServerPlayer} making history.
+     * @param history The {@code HistoryEvent} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addHistory(ServerPlayer serverPlayer,
                                 HistoryEvent history) {
@@ -1630,8 +1630,8 @@ public class ChangeSet {
      * Helper function to add a message to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param message The <code>ModelMessage</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param message The {@code ModelMessage} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addMessage(See see, ModelMessage message) {
         changes.add(new OwnedChange(see, message));
@@ -1642,10 +1642,10 @@ public class ChangeSet {
      * Helper function to add a move to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param unit The <code>Unit</code> that is moving.
+     * @param unit The {@code Unit} that is moving.
      * @param loc The location from which the unit is moving.
-     * @param tile The <code>Tile</code> to which the unit is moving.
-     * @return The updated <code>ChangeSet</code>.
+     * @param tile The {@code Tile} to which the unit is moving.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addMove(See see, Unit unit, Location loc, Tile tile) {
         changes.add(new MoveChange(see, unit, loc, tile));
@@ -1657,9 +1657,9 @@ public class ChangeSet {
      * a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param fcgo The <code>FreeColGameObject</code> to update.
+     * @param fcgo The {@code FreeColGameObject} to update.
      * @param fields The fields to update.
-     * @return The updated <code>ChangeSet</code>.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addPartial(See see, FreeColGameObject fcgo,
                                 String... fields) {
@@ -1670,8 +1670,8 @@ public class ChangeSet {
     /**
      * Helper function to add a new player to a ChangeSet.
      *
-     * @param serverPlayer The new <code>ServerPlayer</code> to add.
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer The new {@code ServerPlayer} to add.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addPlayer(ServerPlayer serverPlayer) {
         changes.add(new PlayerChange(See.all().except(serverPlayer),
@@ -1686,9 +1686,9 @@ public class ChangeSet {
      * player visibility.
      *
      * @param see The visibility of this change.
-     * @param loc The <code>Location</code> where the object was.
-     * @param obj The <code>FreeColGameObject</code> to remove.
-     * @return The updated <code>ChangeSet</code>.
+     * @param loc The {@code Location} where the object was.
+     * @param obj The {@code FreeColGameObject} to remove.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addRemove(See see, Location loc, FreeColGameObject obj) {
         changes.add(new RemoveChange(see, loc, obj.getDisposables()));//-vis
@@ -1699,9 +1699,9 @@ public class ChangeSet {
      * Helper function to add removals for several objects to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param loc The <code>Location</code> where the object was.
-     * @param objects A list of <code>FreeColGameObject</code>s to remove.
-     * @return The updated <code>ChangeSet</code>.
+     * @param loc The {@code Location} where the object was.
+     * @param objects A list of {@code FreeColGameObject}s to remove.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addRemoves(See see, Location loc,
                                 List<? extends FreeColGameObject> objects) {
@@ -1714,11 +1714,11 @@ public class ChangeSet {
     /**
      * Helper function to add a sale change to a ChangeSet.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> making the sale.
-     * @param settlement The <code>Settlement</code> that is buying.
-     * @param type The <code>GoodsType</code> bought.
+     * @param serverPlayer The {@code ServerPlayer} making the sale.
+     * @param settlement The {@code Settlement} that is buying.
+     * @param type The {@code GoodsType} bought.
      * @param price The per unit price.
-     * @return The updated <code>ChangeSet</code>.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addSale(ServerPlayer serverPlayer, Settlement settlement,
                              GoodsType type, int price) {
@@ -1733,9 +1733,9 @@ public class ChangeSet {
      * Helper function to add a spying change to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param unit The <code>Unit</code> that is spying.
-     * @param settlement The <code>Settlement</code> to spy on.
-     * @return The updated <code>ChangeSet</code>.
+     * @param unit The {@code Unit} that is spying.
+     * @param settlement The {@code Settlement} to spy on.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addSpy(See see, Unit unit, Settlement settlement) {
         changes.add(new SpyChange(see, unit, settlement));
@@ -1746,10 +1746,10 @@ public class ChangeSet {
      * Helper function to add a stance change to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param first The <code>Player</code> changing stance.
-     * @param stance The <code>Stance</code> to change to.
-     * @param second The <code>Player</code> wrt with to change.
-     * @return The updated <code>ChangeSet</code>.
+     * @param first The {@code Player} changing stance.
+     * @param stance The {@code Stance} to change to.
+     * @param second The {@code Player} wrt with to change.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addStance(See see, Player first, Stance stance,
                                Player second) {
@@ -1761,9 +1761,9 @@ public class ChangeSet {
      * Helper function to add a new trade route change to a ChangeSet.
      * Also adds the trade route to the player.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> adding the route.
-     * @param tradeRoute The new <code>TradeRoute</code>.
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer The {@code ServerPlayer} adding the route.
+     * @param tradeRoute The new {@code TradeRoute}.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addTradeRoute(ServerPlayer serverPlayer,
                                    TradeRoute tradeRoute) {
@@ -1776,9 +1776,9 @@ public class ChangeSet {
      *
      * @param see The visibility of this change.
      * @param name The name of the element.
-     * @param cp The <code>ChangePriority</code> for this change.
+     * @param cp The {@code ChangePriority} for this change.
      * @param attributes Attributes to add to this trivial change.
-     * @return The updated <code>ChangeSet</code>.
+     * @return The updated {@code ChangeSet}.
      */
     public ChangeSet addTrivial(See see, String name, ChangePriority cp,
                                 String... attributes) {
@@ -1791,8 +1791,8 @@ public class ChangeSet {
     /**
      * Collapse one element into another.
      *
-     * @param head The <code>Element</code> to collapse into.
-     * @param tail The <code>Element</code> to extract nodes from.
+     * @param head The {@code Element} to collapse into.
+     * @param tail The {@code Element} to extract nodes from.
      */
     private static void collapseElements(Element head, Element tail) {
         while (tail.hasChildNodes()) {
@@ -1804,8 +1804,8 @@ public class ChangeSet {
      * Can two elements be collapsed?
      * They need to have the same name and attributes.
      *
-     * @param e1 The first <code>Element</code>.
-     * @param e2 The second <code>Element</code>.
+     * @param e1 The first {@code Element}.
+     * @param e2 The second {@code Element}.
      * @return True if they can be collapsed.
      */
     private static boolean collapseOK(Element e1, Element e2) {
@@ -1830,7 +1830,7 @@ public class ChangeSet {
     /**
      * Collapse adjacent elements in a list with the same tag.
      *
-     * @param elements The list of <code>Element</code>s to consider.
+     * @param elements The list of {@code Element}s to consider.
      * @return A collapsed list of elements.
      */
     private static List<Element> collapseElementList(List<Element> elements) {
@@ -1857,7 +1857,7 @@ public class ChangeSet {
      * its tile correctly on the client side--- if a tile update
      * is needed the tile should be supplied in the objects list.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> to send the
+     * @param serverPlayer The {@code ServerPlayer} to send the
      *            update to.
      * @return An element encapsulating an update of the objects to
      *         consider, or null if there is nothing to report.

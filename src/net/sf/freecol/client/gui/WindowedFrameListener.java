@@ -36,7 +36,7 @@ public final class WindowedFrameListener extends FreeColClientHolder
     /**
      * Constructs this WindowListener.
      *
-     * @param freeColClient The <code>FreeColClient</code> to notify.
+     * @param freeColClient The {@code FreeColClient} to notify.
      */
     public WindowedFrameListener(FreeColClient freeColClient) {
         super(freeColClient);

@@ -342,8 +342,8 @@ public final class FreeCol {
     /**
      * Get the JarURLConnection from a class.
      *
-     * @param c The <code>Class</code> to get the connection for.
-     * @return The <code>JarURLConnection</code>.
+     * @param c The {@code Class} to get the connection for.
+     * @return The {@code JarURLConnection}.
      * @exception IOException if the connection fails to open.
      */
     private static JarURLConnection getJarURLConnection(Class c)
@@ -356,7 +356,7 @@ public final class FreeCol {
     /**
      * Extract the package version from the class.
      *
-     * @param juc The <code>JarURLConnection</code> to extract from.
+     * @param juc The {@code JarURLConnection} to extract from.
      * @return A value of the package version attribute.
      * @exception IOException if the manifest is not available.
      */
@@ -372,8 +372,8 @@ public final class FreeCol {
      * Note: Not bothering to check for nulls as this is called in try
      * block that ignores all exceptions.
      *
-     * @param juc The <code>JarURLConnection</code> to extract from.
-     * @return A suitable <code>InputStream</code>, or null on error.
+     * @param juc The {@code JarURLConnection} to extract from.
+     * @return A suitable {@code InputStream}, or null on error.
      * @exception IOException if the connection fails to open.
      */
     private static InputStream getDefaultSplashStream(JarURLConnection juc)
@@ -386,7 +386,7 @@ public final class FreeCol {
     /**
      * Exit printing fatal error message.
      *
-     * @param template A <code>StringTemplate</code> to print.
+     * @param template A {@code StringTemplate} to print.
      */
     public static void fatal(StringTemplate template) {
         fatal(Messages.message(template));
@@ -409,7 +409,7 @@ public final class FreeCol {
     /**
      * Just gripe to System.err.
      *
-     * @param template A <code>StringTemplate</code> to print.
+     * @param template A {@code StringTemplate} to print.
      */
     public static void gripe(StringTemplate template) {
         System.err.println(Messages.message(template));
@@ -886,7 +886,7 @@ public final class FreeCol {
     /**
      * Prints the usage message and exits.
      *
-     * @param options The command line <code>Options</code>.
+     * @param options The command line {@code Options}.
      * @param status The status to exit with.
      */
     private static void printUsage(Options options, int status) {
@@ -899,10 +899,10 @@ public final class FreeCol {
     /**
      * Get the specification from a given TC file.
      *
-     * @param tcf The <code>FreeColTcFile</code> to load.
-     * @param advantages An optional <code>Advantages</code> setting.
+     * @param tcf The {@code FreeColTcFile} to load.
+     * @param advantages An optional {@code Advantages} setting.
      * @param difficulty An optional difficulty level.
-     * @return A <code>Specification</code>.
+     * @return A {@code Specification}.
      */
     public static Specification loadSpecification(FreeColTcFile tcf,
                                                   Advantages advantages,
@@ -921,7 +921,7 @@ public final class FreeCol {
     /**
      * Get the specification from the specified TC.
      *
-     * @return A <code>Specification</code>, quits on error.
+     * @return A {@code Specification}, quits on error.
      */
     private static Specification getTCSpecification() {
         Specification spec = loadSpecification(getTCFile(), getAdvantages(),
@@ -963,7 +963,7 @@ public final class FreeCol {
     /**
      * Sets the advantages type.
      *
-     * @param advantages The new <code>Advantages</code> type.
+     * @param advantages The new {@code Advantages} type.
      */
     public static void setAdvantages(Advantages advantages) {
         FreeCol.advantages = advantages;
@@ -1005,7 +1005,7 @@ public final class FreeCol {
     /**
      * Sets the difficulty level.
      *
-     * @param difficulty The actual <code>OptionGroup</code>
+     * @param difficulty The actual {@code OptionGroup}
      *     containing the difficulty level.
      */
     public static void setDifficulty(OptionGroup difficulty) {
@@ -1136,7 +1136,7 @@ public final class FreeCol {
     /**
      * Get the selected locale.
      *
-     * @return The <code>Locale</code> currently in use.
+     * @return The {@code Locale} currently in use.
      */
     public static Locale getLocale() {
         return FreeCol.locale;
@@ -1208,7 +1208,7 @@ public final class FreeCol {
     /**
      * Gets the FreeColTcFile for the current TC.
      *
-     * @return The <code>FreeColTcFile</code>.
+     * @return The {@code FreeColTcFile}.
      */
     public static FreeColTcFile getTCFile() {
         try {
@@ -1285,8 +1285,8 @@ public final class FreeCol {
      * Generate a failure message depending on a file parameter.
      *
      * @param messageId The failure message identifier.
-     * @param file The <code>File</code> that caused the failure.
-     * @return A <code>StringTemplate</code> with the error message.
+     * @param file The {@code File} that caused the failure.
+     * @return A {@code StringTemplate} with the error message.
      */
     public static StringTemplate badFile(String messageId, File file) {
         return StringTemplate.template(messageId)
@@ -1296,10 +1296,10 @@ public final class FreeCol {
     /**
      * Build an error template from an exception.
      *
-     * @param ex The <code>Exception</code> to make an error from.
+     * @param ex The {@code Exception} to make an error from.
      * @param fallbackKey A message key to use to make a fallback message
      *     if the exception is unsuitable.
-     * @return An error <code>StringTemplate</code>.
+     * @return An error {@code StringTemplate}.
      */
     public static StringTemplate errorFromException(Exception ex,
                                                     String fallbackKey) {
@@ -1309,10 +1309,10 @@ public final class FreeCol {
     /**
      * Build an error template from an exception.
      *
-     * @param ex The <code>Exception</code> to make an error from.
-     * @param fallback A <code>StringTemplate</code> to use as a fall
+     * @param ex The {@code Exception} to make an error from.
+     * @param fallback A {@code StringTemplate} to use as a fall
      *     back if the exception is unsuitable.
-     * @return An error <code>StringTemplate</code>.
+     * @return An error {@code StringTemplate}.
      */
     public static StringTemplate errorFromException(Exception ex,
                                                     StringTemplate fallback) {
@@ -1331,7 +1331,7 @@ public final class FreeCol {
      * information.  Get a buffer containing as much information as we can
      * to embed in the log file and saved games.
      *
-     * @return A <code>StringBuilder</code> full of configuration information.
+     * @return A {@code StringBuilder} full of configuration information.
      */
     public static StringBuilder getConfiguration() {
         File autosave = FreeColDirectories.getAutosaveDirectory();

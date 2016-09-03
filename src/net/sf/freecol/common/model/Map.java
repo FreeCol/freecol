@@ -94,7 +94,7 @@ public class Map extends FreeColGameObject implements Location {
 
 
         /**
-         * Creates a new <code>Position</code> object with the given
+         * Creates a new {@code Position} object with the given
          * coordinates.
          *
          * @param posX The x-coordinate for this position.
@@ -106,21 +106,21 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Creates a new <code>Position</code> object with the coordinates
+         * Creates a new {@code Position} object with the coordinates
          * of a supplied tile.
          *
-         * @param tile The <code>Tile</code> to extract coordinates from.
+         * @param tile The {@code Tile} to extract coordinates from.
          */
         public Position(Tile tile) {
             this(tile.getX(), tile.getY());
         }
 
         /**
-         * Creates a new <code>Position</code> from an existing one with
+         * Creates a new {@code Position} from an existing one with
          * an optional step in a given direction.
          *
-         * @param start The starting <code>Position</code>.
-         * @param direction An optional <code>Direction</code> to step.
+         * @param start The starting {@code Position}.
+         * @param direction An optional {@code Direction} to step.
          */
         public Position(Position start, Direction direction) {
             Position step = (direction == null) ? start
@@ -190,7 +190,7 @@ public class Map extends FreeColGameObject implements Location {
          * error.  It should cover all cases, but I wouldn't bet my
          * life on it.
          *
-         * @param position The other <code>Position</code> to compare.
+         * @param position The other {@code Position} to compare.
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
@@ -201,8 +201,8 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Get the direction from this position to an adjacent position.
          *
-         * @param other The adjacent <code>Position</code>.
-         * @return The <code>Direction</code>, or null if not adjacent.
+         * @param other The adjacent {@code Position}.
+         * @return The {@code Direction}, or null if not adjacent.
          */
         public Direction getDirection(Position other) {
             return find(Direction.values(),
@@ -273,9 +273,9 @@ public class Map extends FreeColGameObject implements Location {
 
 
     /**
-     * Create a new <code>Map</code> from a collection of tiles.
+     * Create a new {@code Map} from a collection of tiles.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param width The map width.
      * @param height The map height.
      */
@@ -288,9 +288,9 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Create a new <code>Map</code> from an input stream.
+     * Create a new {@code Map} from an input stream.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -301,11 +301,11 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Creates a new <code>Map</code> with the given object identifier.
+     * Creates a new {@code Map} with the given object identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Map(Game game, String id) {
@@ -341,7 +341,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Checks whether a position is valid (within the map limits).
      *
-     * @param position The <code>Position</code> to check.
+     * @param position The {@code Position} to check.
      * @return True if the position is valid.
      */
     public boolean isValid(Position position) {
@@ -353,9 +353,9 @@ public class Map extends FreeColGameObject implements Location {
      * 'y' specifies a row.  (0, 0) is the Tile at the top-left corner
      * of the Map.
      *
-     * @param x The x-coordinate of the <code>Tile</code>.
-     * @param y The y-coordinate of the <code>Tile</code>.
-     * @return The <code>Tile</code> at (x, y), or null if the
+     * @param x The x-coordinate of the {@code Tile}.
+     * @param y The y-coordinate of the {@code Tile}.
+     * @return The {@code Tile} at (x, y), or null if the
      *     position is invalid.
      */
     public Tile getTile(int x, int y) {
@@ -365,8 +365,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Gets the Tile at a requested position.
      *
-     * @param p The <code>Position</code> to query.
-     * @return The <code>Tile</code> at the given position.
+     * @param p The {@code Position} to query.
+     * @return The {@code Tile} at the given position.
      */
     public Tile getTile(Position p) {
         return getTile(p.getX(), p.getY());
@@ -375,9 +375,9 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Sets the tile at the given coordinates.
      *
-     * @param x The x-coordinate of the <code>Tile</code>.
-     * @param y The y-coordinate of the <code>Tile</code>.
-     * @param tile The <code>Tile</code> to set.
+     * @param x The x-coordinate of the {@code Tile}.
+     * @param y The y-coordinate of the {@code Tile}.
+     * @param tile The {@code Tile} to set.
      */
     public void setTile(Tile tile, int x, int y) {
         this.tiles[x][y] = tile;
@@ -410,7 +410,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the <code>MinimumLatitude</code> value.
+     * Gets the {@code MinimumLatitude} value.
      *
      * @return The minimum latitude of this map.
      */
@@ -424,7 +424,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the <code>MaximumLatitude</code> value.
+     * Gets the {@code MaximumLatitude} value.
      *
      * @return The maximum latitude of this map.
      */
@@ -438,7 +438,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the <code>LatitudePerRow</code> value.
+     * Gets the {@code LatitudePerRow} value.
      *
      * @return The latitude change between rows.
      */
@@ -495,10 +495,10 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets a <code>Region</code> by name key.
+     * Gets a {@code Region} by name key.
      *
      * @param key The name key to lookup the region with.
-     * @return The <code>Region</code> with the given name key, or
+     * @return The {@code Region} with the given name key, or
      *     null if none found.
      */
     public Region getRegionByKey(final String key) {
@@ -507,10 +507,10 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets a <code>Region</code> by name.
+     * Gets a {@code Region} by name.
      *
      * @param name The region name.
-     * @return The <code>Region</code> with the given name, or null if
+     * @return The {@code Region} with the given name, or null if
      *     not found.
      */
     public Region getRegionByName(final String name) {
@@ -521,7 +521,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Adds a region to this map.
      *
-     * @param region The <code>Region</code> to add.
+     * @param region The {@code Region} to add.
      */
     public void addRegion(final Region region) {
         regions.add(region);
@@ -532,8 +532,8 @@ public class Map extends FreeColGameObject implements Location {
      * Are two locations non-null and either the same or at the same tile.
      * This routine is here because Location is an interface.
      *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
+     * @param l1 The first {@code Location}.
+     * @param l2 The second {@code Location}.
      * @return True if the locations are the same or at the same tile.
      */
     public static final boolean isSameLocation(Location l1, Location l2) {
@@ -547,8 +547,8 @@ public class Map extends FreeColGameObject implements Location {
      * Are two locations at least in the same contiguous land/sea-mass?
      * This routine is here because Location is an interface.
      *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
+     * @param l1 The first {@code Location}.
+     * @param l2 The second {@code Location}.
      * @return True if the locations are the same or in the same land/sea-mass.
      */
     public static final boolean isSameContiguity(Location l1, Location l2) {
@@ -561,7 +561,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Is a tile in the map in a polar region?
      *
-     * @param tile The <code>Tile</code> to examine.
+     * @param tile The {@code Tile} to examine.
      * @return True if the tile is in a polar region.
      */
     public boolean isPolar(Tile tile) {
@@ -571,13 +571,13 @@ public class Map extends FreeColGameObject implements Location {
 
     /**
      * Gets the direction a unit needs to move in
-     * order to get from <code>t1</code> to <code>t2</code>
+     * order to get from {@code t1} to <code>t2</code>
      *
      * @param t1 The tile to move from.
-     * @param t2 The target tile if moving from <code>t1</code>
+     * @param t2 The target tile if moving from {@code t1}
      *      in the direction returned by this method.
-     * @return The direction you need to move from <code>t1</code>
-     *      in order to reach <code>t2</code>, or null if the two
+     * @return The direction you need to move from {@code t1}
+     *      in order to reach {@code t2}, or null if the two
      *      specified tiles are not neighbours.
      */
     public Direction getDirection(Tile t1, Tile t2) {
@@ -588,8 +588,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Get the approximate direction from one tile to another.
      *
-     * @param src The source <code>Tile</code>.
-     * @param dst The destination <code>Tile</code>.
+     * @param src The source {@code Tile}.
+     * @param dst The destination {@code Tile}.
      * @return The approximate direction from source to direction, or null
      *     if source and destination are the same.
      */
@@ -607,8 +607,8 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param x The x coordinate to work from.
      * @param y The y coordinate to work from.
-     * @param direction The <code>Direction</code> to check.
-     * @return The adjacent <code>Tile</code> in the specified
+     * @param direction The {@code Direction} to check.
+     * @return The adjacent {@code Tile} in the specified
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(int x, int y, Direction direction) {
@@ -618,9 +618,9 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Gets the adjacent tile in a given direction from a given tile.
      *
-     * @param tile The starting <code>Tile</code>.
-     * @param direction The <code>Direction</code> to check.
-     * @return The adjacent <code>Tile</code> in the specified
+     * @param tile The starting {@code Tile}.
+     * @param direction The {@code Direction} to check.
+     * @return The adjacent {@code Tile} in the specified
      *     direction, or null if invalid.
      */
     public Tile getAdjacentTile(Tile tile, Direction direction) {
@@ -630,8 +630,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Gets the distance between two tiles.
      *
-     * @param t1 The first <code>Tile</code>.
-     * @param t2 The second <code>Tile</code>.
+     * @param t1 The first {@code Tile}.
+     * @param t2 The second {@code Tile}.
      * @return The distance between the tiles.
      */
     public int getDistance(Tile t1, Tile t2) {
@@ -642,8 +642,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Get the closest tile to a given one from a list of other tiles.
      *
-     * @param tile The <code>Tile</code> to start from.
-     * @param tiles The list of <code>Tile</code>s to check.
+     * @param tile The {@code Tile} to start from.
+     * @param tiles The list of {@code Tile}s to check.
      * @return The closest tile found (may be null if the list is empty).
      */
     public Tile getClosestTile(Tile tile, Collection<Tile> tiles) {
@@ -653,7 +653,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Select a random land tile on the map.
      *
-     * @param random A <code>Random</code> number source.
+     * @param random A {@code Random} number source.
      * @return A random land tile, or null if none found.
      */
     public Tile getRandomLandTile(Random random) {
@@ -688,8 +688,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Gets a search heuristic using the Manhatten distance to an end tile.
      *
-     * @param endTile The <code>Tile</code> to aim for.
-     * @return A new <code>SearchHeuristic</code> aiming for the end tile.
+     * @param endTile The {@code Tile} to aim for.
+     * @return A new {@code SearchHeuristic} aiming for the end tile.
      */
     private SearchHeuristic getManhattenHeuristic(Tile endTile) {
         return (Tile tile) -> tile.getDistanceTo(endTile);
@@ -700,9 +700,9 @@ public class Map extends FreeColGameObject implements Location {
      * the actual starting location for the path.  Deals with special
      * cases like starting on a carrier and/or high seas.
      *
-     * @param unit The <code>Unit</code> to find the path for.
-     * @param start The <code>Location</code> in which the path starts from.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @param unit The {@code Unit} to find the path for.
+     * @param start The {@code Location} in which the path starts from.
+     * @param carrier An optional naval carrier {@code Unit} to use.
      * @return The actual starting location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
@@ -764,8 +764,8 @@ public class Map extends FreeColGameObject implements Location {
      * Destination argument test for path searches.  Find the actual
      * destination of a path.
      *
-     * @param unit An optional <code>Unit</code> to search for.
-     * @param end The candidate end <code>Location</code>.
+     * @param unit An optional {@code Unit} to search for.
+     * @param end The candidate end {@code Location}.
      * @return The actual end location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
@@ -789,10 +789,10 @@ public class Map extends FreeColGameObject implements Location {
      * Gets the best (closest) path location for this unit to reach a
      * given tile from off the map.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @param tile The target <code>Tile</code>.
-     * @param carrier An optional carrier <code>Unit</code>to use.
-     * @param costDecider An optional <code>CostDecider</code> to use.
+     * @param unit The {@code Unit} to check.
+     * @param tile The target {@code Tile}.
+     * @param carrier An optional carrier {@code Unit}to use.
+     * @param costDecider An optional {@code CostDecider} to use.
      * @return A path to the best entry location tile to arrive on the
      *     map at, or null if none found.
      */
@@ -808,10 +808,10 @@ public class Map extends FreeColGameObject implements Location {
      * Gets the best (closest) entry location for this unit to reach a
      * given tile from off the map.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @param tile The target <code>Tile</code>.
-     * @param carrier An optional carrier <code>Unit</code>to use.
-     * @param costDecider An optional <code>CostDecider</code> to use.
+     * @param unit The {@code Unit} to check.
+     * @param tile The target {@code Tile}.
+     * @param carrier An optional carrier {@code Unit}to use.
+     * @param costDecider An optional {@code CostDecider} to use.
      * @return The best entry location tile to arrive on the map at, or null
      *     if none found.
      */
@@ -825,14 +825,14 @@ public class Map extends FreeColGameObject implements Location {
      * Find the quickest path for a unit (with optional carrier) from
      * a start tile to an end tile.
      *
-     * @param unit The <code>Unit</code> to find the path for.
-     * @param start The <code>Tile</code> in which the path starts from.
-     * @param end The <code>Tile</code> at the end of the path.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @param costDecider An optional <code>CostDecider</code> for
+     * @param unit The {@code Unit} to find the path for.
+     * @param start The {@code Tile} in which the path starts from.
+     * @param end The {@code Tile} at the end of the path.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @param costDecider An optional {@code CostDecider} for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return A path starting at the start tile and ending at the end
      *     tile, or null if none found.
      */
@@ -904,9 +904,9 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Finish processing a path.
      *
-     * @param path The <code>PathNode</code> to finish.
-     * @param unit The <code>Unit</code> that is travelling along the path.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param path The {@code PathNode} to finish.
+     * @param unit The {@code Unit} that is travelling along the path.
+     * @param lb An optional {@code LogBuilder} to log to.
      */
     private void finishPath(PathNode path, Unit unit, LogBuilder lb) {
         if (path != null) {
@@ -927,14 +927,14 @@ public class Map extends FreeColGameObject implements Location {
      * Find the quickest path for a unit (with optional carrier) from
      * a start location to an end location.
      *
-     * @param unit The <code>Unit</code> to find the path for.
-     * @param start The <code>Location</code> in which the path starts from.
-     * @param end The <code>Location</code> at the end of the path.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @param costDecider An optional <code>CostDecider</code> for
+     * @param unit The {@code Unit} to find the path for.
+     * @param start The {@code Location} in which the path starts from.
+     * @param end The {@code Location} at the end of the path.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @param costDecider An optional {@code CostDecider} for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return A path starting at the start location and ending at the
      *     end location, or null if none found.
      * @throws IllegalArgumentException For many reasons, see
@@ -1086,17 +1086,17 @@ public class Map extends FreeColGameObject implements Location {
      * which is not optimal most of the time.
      * Returns the full path including the start and end locations.
      *
-     * @param unit The <code>Unit</code> to find a path for.
-     * @param start The <code>Location</code> to start the search from.
+     * @param unit The {@code Unit} to find a path for.
+     * @param start The {@code Location} to start the search from.
      * @param goalDecider The object responsible for determining whether a
-     *     given <code>PathNode</code> is a goal or not.
-     * @param costDecider An optional <code>CostDecider</code>
+     *     given {@code PathNode} is a goal or not.
+     * @param costDecider An optional {@code CostDecider}
      *     responsible for determining the path cost.
      * @param maxTurns The maximum number of turns the given
-     *     <code>Unit</code> is allowed to move.  This is the
+     *     {@code Unit} is allowed to move.  This is the
      *     maximum search range for a goal.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return The path to a goal, or null if none can be found.
      * @throws IllegalArgumentException If the unit is null, or the
      *     start location does not make sense, or the carrier/unit
@@ -1203,13 +1203,13 @@ public class Map extends FreeColGameObject implements Location {
          * Creates a new move candidate where a cost decider will be used
          * to work out the new moves and turns left.
          *
-         * @param unit The <code>Unit</code> to move.
+         * @param unit The {@code Unit} to move.
          * @param current The current position on the path.
-         * @param dst The <code>Location</code> to move to.
+         * @param dst The {@code Location} to move to.
          * @param movesLeft The initial number of moves left.
          * @param turns The initial number of turns.
          * @param onCarrier Will the new move be on a carrier.
-         * @param decider The <code>CostDecider</code> to use.
+         * @param decider The {@code CostDecider} to use.
          */
         public MoveCandidate(Unit unit, PathNode current, Location dst,
             int movesLeft, int turns, boolean onCarrier,
@@ -1243,7 +1243,7 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Handles the change of unit as a result of an embark.
          *
-         * @param unit The <code>Unit</code> to embark.
+         * @param unit The {@code Unit} to embark.
          */
         public void embarkUnit(Unit unit) {
             this.unit = unit;
@@ -1298,7 +1298,7 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Does this move candidate improve on a specified move.
          *
-         * @param best The <code>PathNode</code> to compare against.
+         * @param best The {@code PathNode} to compare against.
          * @return True if this candidate is an improvement.
          */
         public boolean canImprove(PathNode best) {
@@ -1314,7 +1314,7 @@ public class Map extends FreeColGameObject implements Location {
          * @param openMap The list of available nodes.
          * @param openMapQueue The queue of available nodes.
          * @param f The heuristic values for A*.
-         * @param sh An optional <code>SearchHeuristic</code> to apply.
+         * @param sh An optional {@code SearchHeuristic} to apply.
          */
         public void improve(HashMap<String, PathNode> openMap,
             PriorityQueue<PathNode> openMapQueue,
@@ -1354,7 +1354,7 @@ public class Map extends FreeColGameObject implements Location {
 
     /**
      * Searches for a path to a goal determined by the given
-     * <code>GoalDecider</code>.
+     * {@code GoalDecider}.
      *
      * Using A* with a List (closedMap) for marking the visited nodes
      * and using a PriorityQueue (openMapQueue) for getting the next
@@ -1371,20 +1371,20 @@ public class Map extends FreeColGameObject implements Location {
      * with the minimal f (cost+heuristics). This gives O(1) on membership
      * test and O(log N) for remove-best and insertions.
      *
-     * @param unit The <code>Unit</code> to find a path for.
-     * @param start The <code>Tile</code> to start the search from.
+     * @param unit The {@code Unit} to find a path for.
+     * @param start The {@code Tile} to start the search from.
      * @param goalDecider The object responsible for determining whether a
-     *     given <code>PathNode</code> is a goal or not.
-     * @param costDecider An optional <code>CostDecider</code>
+     *     given {@code PathNode} is a goal or not.
+     * @param costDecider An optional {@code CostDecider}
      *     responsible for determining the path cost.
      * @param maxTurns The maximum number of turns the given
-     *     <code>Unit</code> is allowed to move. This is the
+     *     {@code Unit} is allowed to move. This is the
      *     maximum search range for a goal.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @param searchHeuristic An optional <code>SearchHeuristic</code>.
-     * @param lb An optional <code>LogBuilder</code> to log to.
+     * @param carrier An optional naval carrier {@code Unit} to use.
+     * @param searchHeuristic An optional {@code SearchHeuristic}.
+     * @param lb An optional {@code LogBuilder} to log to.
      * @return A path to a goal determined by the given
-     *     <code>GoalDecider</code>.
+     *     {@code GoalDecider}.
      */
     private PathNode searchMap(final Unit unit, final Tile start,
         final GoalDecider goalDecider,
@@ -1663,8 +1663,8 @@ public class Map extends FreeColGameObject implements Location {
      *
      * Does not use a unit, and thus does not consider movement validity.
      *
-     * @param start The starting <code>Tile</code>.
-     * @param goalDecider A <code>GoalDecider</code> that chooses the goal,
+     * @param start The starting {@code Tile}.
+     * @param goalDecider A {@code GoalDecider} that chooses the goal,
      *     which must be capable of tolerating a null unit.
      * @param radius The maximum radius of tiles to search from the start.
      * @return The goal tile as determined by the, or null if none found.
@@ -1708,7 +1708,7 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Create a new Circle Iterator.
          *
-         * @param center The center <code>Tile</code> of the circle.
+         * @param center The center {@code Tile} of the circle.
          * @param isFilled True to get all of the positions within the circle.
          * @param radius The radius of the circle.
          */
@@ -1745,7 +1745,7 @@ public class Map extends FreeColGameObject implements Location {
          * Gets the current radius of the circle.
          *
          * @return The distance from the center tile this
-         *     <code>CircleIterator</code> was initialized with.
+         *     {@code CircleIterator} was initialized with.
          */
         public int getCurrentRadius() {
             return currentRadius;
@@ -1834,7 +1834,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Gets a circle iterator.
      *
-     * @param center The center <code>Tile</code> to iterate around.
+     * @param center The center {@code Tile} to iterate around.
      * @param isFilled True to get all of the positions in the circle.
      * @param radius The radius of circle.
      * @return The circle iterator.
@@ -1848,10 +1848,10 @@ public class Map extends FreeColGameObject implements Location {
      * Gets an iterable for all the tiles in a circle using an
      * underlying CircleIterator.
      *
-     * @param center The center <code>Tile</code> to iterate around.
+     * @param center The center {@code Tile} to iterate around.
      * @param isFilled True to get all of the positions in the circle.
      * @param radius The radius of circle.
-     * @return An <code>Iterable</code> for a circle of tiles.
+     * @return An {@code Iterable} for a circle of tiles.
      */
     public Iterable<Tile> getCircleTiles(final Tile center,
         final boolean isFilled,
@@ -1915,9 +1915,9 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
+     * Gets an {@code Iterator} of every <code>Tile</code> on the map.
      *
-     * @return An <code>Iterator</code> for the whole map.
+     * @return An {@code Iterator} for the whole map.
      */
     public Iterator<Tile> getWholeMapIterator() {
         return new WholeMapIterator();
@@ -1927,7 +1927,7 @@ public class Map extends FreeColGameObject implements Location {
      * Get a stream of all the tiles in the map using an underlying
      * WholeMapIterator.
      *
-     * @return A <code>Stream</code> of all tiles of the map.
+     * @return A {@code Stream} of all tiles of the map.
      */
     public Stream<Tile> getAllTiles() {
         return toStream(new WholeMapIterator());
@@ -1936,7 +1936,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Perform an action on each tile.
      *
-     * @param consumer The <code>Consumer</code> action to perform.
+     * @param consumer The {@code Consumer} action to perform.
      */
     public void forEachTile(Consumer<Tile> consumer) {
         forEachTile(alwaysTrue(), consumer);
@@ -1945,8 +1945,8 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Perform an action on each tile that matches a predicate.
      *
-     * @param predicate The <code>Predicate</code> to match.
-     * @param consumer The <code>Consumer</code> action to perform.
+     * @param predicate The {@code Predicate} to match.
+     * @param consumer The {@code Consumer} action to perform.
      */
     public void forEachTile(Predicate<Tile> predicate,
                             Consumer<Tile> consumer) {
@@ -2014,7 +2014,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Flood fills from a given <code>Position</code> p, based on
+     * Flood fills from a given {@code Position} p, based on
      * connectivity information encoded in boolmap
      *
      * @param boolmap The connectivity information for this floodfill.
@@ -2028,7 +2028,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Flood fills from a given <code>Position</code> p, based on
+     * Flood fills from a given {@code Position} p, based on
      * connectivity information encoded in boolmap
      *
      * @param boolmap The connectivity information for this floodfill.

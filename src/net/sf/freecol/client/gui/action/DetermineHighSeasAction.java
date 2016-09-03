@@ -35,9 +35,9 @@ public class DetermineHighSeasAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>DetermineHighSeasAction</code>.
+     * Creates a new {@code DetermineHighSeasAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DetermineHighSeasAction(FreeColClient freeColClient) {
         super(freeColClient, id);

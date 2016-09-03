@@ -53,7 +53,7 @@ import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 
 /**
- * Mission for building a <code>Colony</code>.
+ * Mission for building a {@code Colony}.
  *
  * @see net.sf.freecol.common.model.Colony Colony
  */
@@ -71,27 +71,27 @@ public class BuildColonyMission extends Mission {
      */
     private Location target;
 
-    /** The value of a target <code>Tile</code>. */
+    /** The value of a target {@code Tile}. */
     private int colonyValue;
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The target <code>Location</code> for this mission.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The target {@code Location} for this mission.
      */
     public BuildColonyMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit, target);
     }
 
     /**
-     * Creates a new <code>BuildColonyMission</code> and reads the given
+     * Creates a new {@code BuildColonyMission} and reads the given
      * element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
@@ -107,7 +107,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Get the colony value for a tile.
      *
-     * @param tile The <code>Tile</code> to test.
+     * @param tile The {@code Tile} to test.
      * @return The colony value for this player.
      */
     private int getColonyValue(Tile tile) {
@@ -118,8 +118,8 @@ public class BuildColonyMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
+     * @param aiUnit A {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from,
      *     (uses the unit location if null).
      * @return A target for this mission, or null if none found.
      */
@@ -136,8 +136,8 @@ public class BuildColonyMission extends Mission {
     /**
      * Gets the value of a path to a colony building site.
      *
-     * @param aiUnit The <code>AIUnit</code> to build the colony.
-     * @param path The <code>PathNode</code> to check.
+     * @param aiUnit The {@code AIUnit} to build the colony.
+     * @param path The {@code PathNode} to check.
      * @return A score for the target.
      */
     public static float scorePath(AIUnit aiUnit, PathNode path) {
@@ -153,12 +153,12 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for finding the best colony
-     * <code>Tile</code>, optionally falling back to the nearest colony.
+     * Gets a {@code GoalDecider} for finding the best colony
+     * {@code Tile}, optionally falling back to the nearest colony.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param aiUnit The {@code AIUnit} that is searching.
      * @param deferOK Enable colony fallback.
-     * @return A suitable <code>GoalDecider</code>.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               boolean deferOK) {
@@ -192,7 +192,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Finds a site for a new colony.  Favour closer sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
@@ -214,7 +214,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Finds a site for a new colony or a backup colony to go to.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
+     * @param aiUnit The {@code AIUnit} to find a colony site with.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
@@ -230,7 +230,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -248,8 +248,8 @@ public class BuildColonyMission extends Mission {
     /**
      * Why is this mission invalid with a given colony target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param colony The potential target <code>Colony</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param colony The potential target {@code Colony}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
@@ -259,8 +259,8 @@ public class BuildColonyMission extends Mission {
     /**
      * Why is this mission invalid with a given tile target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param tile The potential target <code>Tile</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param tile The potential target {@code Tile}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
@@ -279,8 +279,8 @@ public class BuildColonyMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
@@ -296,7 +296,7 @@ public class BuildColonyMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {

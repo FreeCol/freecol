@@ -37,7 +37,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * Contains <code>TileItem</code>s and can be used by a {@link Tile}
+ * Contains {@code TileItem}s and can be used by a {@link Tile}
  * to make certain tasks easier.
  */
 public class TileItemContainer extends FreeColGameObject {
@@ -52,11 +52,11 @@ public class TileItemContainer extends FreeColGameObject {
 
 
     /**
-     * Create an empty <code>TileItemContainer</code>.
+     * Create an empty {@code TileItemContainer}.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> this <code>TileItemContainer</code>
-     *     contains <code>TileItems</code> for.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} this <code>TileItemContainer</code>
+     *     contains {@code TileItems} for.
      */
     public TileItemContainer(Game game, Tile tile) {
         super(game);
@@ -68,13 +68,13 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Create a new <code>TileItemContainer</code> from an existing template.
+     * Create a new {@code TileItemContainer} from an existing template.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> this <code>TileItemContainer</code>
-     *     contains <code>TileItems</code> for.
-     * @param template A <code>TileItemContainer</code> to copy.
-     * @param layer A maximum allowed <code>Layer</code>.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} this <code>TileItemContainer</code>
+     *     contains {@code TileItems} for.
+     * @param template A {@code TileItemContainer} to copy.
+     * @param layer A maximum allowed {@code Layer}.
      */
     public TileItemContainer(Game game, Tile tile, TileItemContainer template,
                              Layer layer) {
@@ -84,9 +84,9 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Create a new <code>TileItemContainer</code>.
+     * Create a new {@code TileItemContainer}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public TileItemContainer(Game game, String id) {
@@ -97,7 +97,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Get the tile this container belongs to.
      *
-     * @return The owning <code>Tile</code>.
+     * @return The owning {@code Tile}.
      */
     public final Tile getTile() {
         return tile;
@@ -117,7 +117,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Get a copy of the tile items list.
      *
-     * @return A copy of the <code>TileItem</code>s.
+     * @return A copy of the {@code TileItem}s.
      */
     private List<TileItem> getTileItems() {
         synchronized (tileItems) {
@@ -152,7 +152,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Add a tile item to this container.
      *
-     * @param item The <code>TileItem</code> to add.
+     * @param item The {@code TileItem} to add.
      */
     private final void addTileItem(TileItem item) {
         synchronized (tileItems) {
@@ -161,13 +161,13 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Try to add a <code>TileItem</code> to this container.
+     * Try to add a {@code TileItem} to this container.
      * If the item is of lower magnitude than an existing one the existing
      * one stands.
      *
-     * @param item The <code>TileItem</code> to add to this container.
-     * @return The added <code>TileItem</code> or the existing
-     *     <code>TileItem</code> if of higher magnitude, or null on error.
+     * @param item The {@code TileItem} to add to this container.
+     * @return The added {@code TileItem} or the existing
+     *     {@code TileItem} if of higher magnitude, or null on error.
      */
     public final TileItem tryAddTileItem(TileItem item) {
         if (item == null) return null;
@@ -200,11 +200,11 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Removes a <code>TileItem</code> from this container.
+     * Removes a {@code TileItem} from this container.
      *
-     * @param <T> The actual <code>TileItem</code> type.
-     * @param item The <code>TileItem</code> to remove from this container.
-     * @return The <code>TileItem</code> that has been removed from
+     * @param <T> The actual {@code TileItem} type.
+     * @param item The {@code TileItem} to remove from this container.
+     * @return The {@code TileItem} that has been removed from
      *     this container (if any).
      */
     public final <T extends TileItem> T removeTileItem(T item) {
@@ -223,8 +223,8 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes all tile items of a given class.
      *
-     * @param <T> The actual <code>TileItem</code> type.
-     * @param c The <code>Class</code> to remove.
+     * @param <T> The actual {@code TileItem} type.
+     * @param c The {@code Class} to remove.
      */
     public final <T extends TileItem> void removeAll(Class<T> c) {
         synchronized (tileItems) {
@@ -235,7 +235,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Get the completed tile items.
      *
-     * @return A list of complete <code>TileItem</code>s.
+     * @return A list of complete {@code TileItem}s.
      */
     public List<TileItem> getCompleteItems() {
         return transform(getTileItems(), TileItem::isComplete);
@@ -244,8 +244,8 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets the tile improvement of the given type if any.
      *
-     * @param type The <code>TileImprovementType</code> to look for.
-     * @return The <code>TileImprovement</code> of the given type if
+     * @param type The {@code TileImprovementType} to look for.
+     * @return The {@code TileImprovement} of the given type if
      *     present, otherwise null.
      */
     public TileImprovement getImprovement(TileImprovementType type) {
@@ -257,11 +257,11 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Gets a list of the <code>TileImprovement</code>s in this
-     * <code>TileItemContainer</code>.
+     * Gets a list of the {@code TileImprovement}s in this
+     * {@code TileItemContainer}.
      *
      * @param completedOnly If true select only the completed improvements.
-     * @return A list of <code>TileImprovement</code>s.
+     * @return A list of {@code TileImprovement}s.
      */
     private List<TileImprovement> getImprovements(boolean completedOnly) {
         synchronized (tileItems) {
@@ -273,20 +273,20 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Gets a list of the <code>TileImprovement</code>s in this
-     * <code>TileItemContainer</code>.
+     * Gets a list of the {@code TileImprovement}s in this
+     * {@code TileItemContainer}.
      *
-     * @return A list of <code>TileImprovement</code>s.
+     * @return A list of {@code TileImprovement}s.
      */
     public List<TileImprovement> getImprovements() {
         return getImprovements(false);
     }
 
     /**
-     * Gets a list of the completed <code>TileImprovement</code>s in
-     * this <code>TileItemContainer</code>.
+     * Gets a list of the completed {@code TileImprovement}s in
+     * this {@code TileItemContainer}.
      *
-     * @return A list of <code>TileImprovement</code>s.
+     * @return A list of {@code TileImprovement}s.
      */
     public List<TileImprovement> getCompleteImprovements() {
         return getImprovements(true);
@@ -295,8 +295,8 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Find a tile item matching a predicate.
      *
-     * @param pred The <code>Predicate</code> to match.
-     * @return The <code>TileItem</code> found, or null if none present.
+     * @param pred The {@code Predicate} to match.
+     * @return The {@code TileItem} found, or null if none present.
      */
     private TileItem findTileItem(Predicate<TileItem> pred) {
         synchronized (tileItems) {
@@ -307,7 +307,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets any lost city rumour in this container.
      *
-     * @return A <code>LostCityRumour</code> item if any, or null if
+     * @return A {@code LostCityRumour} item if any, or null if
      *     not found.
      */
     public final LostCityRumour getLostCityRumour() {
@@ -317,7 +317,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets any resource item.
      *
-     * @return A <code>Resource</code> item, or null is none found.
+     * @return A {@code Resource} item, or null is none found.
      */
     public final Resource getResource() {
         return (Resource)findTileItem(ti -> ti instanceof Resource);
@@ -326,7 +326,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets any road improvement in this container.
      *
-     * @return A road <code>TileImprovement</code> if any, or null if
+     * @return A road {@code TileImprovement} if any, or null if
      *     not found.
      */
     public TileImprovement getRoad() {
@@ -337,7 +337,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets any river improvement in this container.
      *
-     * @return A river <code>TileImprovement</code> if any, or null if
+     * @return A river {@code TileImprovement} if any, or null if
      *     not found.
      */
     public TileImprovement getRiver() {
@@ -349,7 +349,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Check whether this tile has a completed improvement of the given
      * type.
      *
-     * @param type The <code>TileImprovementType</code> to check for.
+     * @param type The {@code TileImprovementType} to check for.
      * @return Whether the tile has the improvement and the improvement is
      *     completed.
      */
@@ -384,8 +384,8 @@ public class TileItemContainer extends FreeColGameObject {
      * also used to assess which goods are likely to be most
      * productive on a tile.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @param unitType The <code>UnitType</code> to check.
+     * @param goodsType The {@code GoodsType} to check.
+     * @param unitType The {@code UnitType} to check.
      * @param potential The base potential production.
      * @param onlyNatural Only allow natural improvements.
      * @return The resulting production.
@@ -403,9 +403,9 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Gets the production modifiers for the given type of goods and unit.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>unitType</code> to produce them.
-     * @return A stream of the applicable <code>Modifier</code>s.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code unitType} to produce them.
+     * @return A stream of the applicable {@code Modifier}s.
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
@@ -419,8 +419,8 @@ public class TileItemContainer extends FreeColGameObject {
      * Does this container contain an item that allows the tile to 
      * produce a goods type?
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The optional <code>unitType</code> to produce with.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param unitType The optional {@code unitType} to produce with.
      * @return True if this container allows the goods type to be produced.
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
@@ -430,12 +430,12 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the movement cost to this <code>Tile</code> from
-     * another <code>Tile</code>.
+     * Determine the movement cost to this {@code Tile} from
+     * another {@code Tile}.
      * Does not consider special unit abilities.
      *
-     * @param fromTile The <code>Tile</code> to move from.
-     * @param targetTile The <code>Tile</code> to move to.
+     * @param fromTile The {@code Tile} to move from.
+     * @param targetTile The {@code Tile} to move to.
      * @param basicMoveCost The basic cost.
      * @return The movement cost.
      */
@@ -453,14 +453,14 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Copy the tile items from another <code>TileItemContainer</code>,
+     * Copy the tile items from another {@code TileItemContainer},
      * observing a layer maximum.
      *
      * Note that some types need to be looked up in the spec as the tic
      * parameter might be an import from a different game.
      *
-     * @param tic The <code>TileItemContainer</code> to copy from.
-     * @param layer The maximum <code>Layer</code> to import from.
+     * @param tic The {@code TileItemContainer} to copy from.
+     * @param layer The maximum {@code Layer} to import from.
      */
     public void copyFrom(TileItemContainer tic, Layer layer) {
         final Specification spec = getSpecification();
@@ -495,9 +495,9 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Checks if the specified <code>TileItem</code> is in this container.
+     * Checks if the specified {@code TileItem} is in this container.
      *
-     * @param t The <code>TileItem</code> to test the presence of.
+     * @param t The {@code TileItem} to test the presence of.
      * @return True if the tile item is present.
      */
     public boolean contains(TileItem t) {

@@ -44,21 +44,21 @@ public class IdleAtSettlementMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     public IdleAtSettlementMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit, null);
     }
 
     /**
-     * Creates a new <code>IdleAtSettlementMission</code> and reads the
+     * Creates a new {@code IdleAtSettlementMission} and reads the
      * given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.

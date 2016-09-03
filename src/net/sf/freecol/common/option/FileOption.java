@@ -29,7 +29,7 @@ import net.sf.freecol.common.model.Specification;
 
 
 /**
- * Represents an option for specifying a <code>File</code>.
+ * Represents an option for specifying a {@code File}.
  */
 public class FileOption extends AbstractOption<File> {
 
@@ -41,9 +41,9 @@ public class FileOption extends AbstractOption<File> {
 
 
     /**
-     * Creates a new <code>FileOption</code>.
+     * Creates a new {@code FileOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public FileOption(Specification specification) {
         super(specification);

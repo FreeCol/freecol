@@ -105,9 +105,9 @@ public abstract class FreeColAction extends AbstractAction
 
 
     /**
-     * Creates a new <code>FreeColAction</code>.
+     * Creates a new {@code FreeColAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param id The object identifier for this action.
      */
     protected FreeColAction(FreeColClient freeColClient, String id) {
@@ -142,7 +142,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Gets the game.
      *
-     * @return The <code>Game</code>.
+     * @return The {@code Game}.
      */
     protected Game getGame() {
         return freeColClient.getGame();
@@ -160,7 +160,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Get the controller.
      *
-     * @return The <code>InGameController</code>.
+     * @return The {@code InGameController}.
      */
     protected InGameController igc() {
         return freeColClient.getInGameController();
@@ -169,7 +169,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Get the connect controller.
      *
-     * @return The <code>ConnectController</code>.
+     * @return The {@code ConnectController}.
      */
     protected ConnectController getConnectController() {
         return freeColClient.getConnectController();
@@ -178,7 +178,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Get the action manager.
      *
-     * @return The <code>ActionManager</code>.
+     * @return The {@code ActionManager}.
      */
     protected ActionManager getActionManager() {
         return freeColClient.getActionManager();
@@ -187,7 +187,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Get the client options
      *
-     * @return The <code>ClientOptions</code>.
+     * @return The {@code ClientOptions}.
      */
     protected ClientOptions getClientOptions() {
         return freeColClient.getClientOptions();
@@ -252,7 +252,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Sets a keyboard accelerator.
      *
-     * @param accelerator The <code>KeyStroke</code>. Using <code>null</code>
+     * @param accelerator The {@code KeyStroke}. Using <code>null</code>
      *            is the same as disabling the keyboard accelerator.
      */
     public final void setAccelerator(KeyStroke accelerator) {
@@ -262,7 +262,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Gets the keyboard accelerator for this option.
      *
-     * @return The <code>KeyStroke</code> or <code>null</code> if the
+     * @return The {@code KeyStroke} or <code>null</code> if the
      *         keyboard accelerator is disabled.
      */
     public final KeyStroke getAccelerator() {
@@ -270,7 +270,7 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Gives a short description of this <code>Option</code>. Can for
+     * Gives a short description of this {@code Option}. Can for
      * instance be used as a tooltip text.
      *
      * @return A short description of this action.
@@ -280,7 +280,7 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Get the identifier of this <code>Option</code>.
+     * Get the identifier of this {@code Option}.
      *
      * @return An unique identifier for this action.
      */
@@ -290,7 +290,7 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Returns the name of this <code>Option</code>.
+     * Returns the name of this {@code Option}.
      *
      * @return The name as provided in the constructor.
      */
@@ -299,14 +299,14 @@ public abstract class FreeColAction extends AbstractAction
     }
 
     /**
-     * Creates a <code>String</code> that keeps the attributes given
-     * <code>KeyStroke</code>. This <code>String</code> can be used to
+     * Creates a {@code String} that keeps the attributes given
+     * {@code KeyStroke}. This <code>String</code> can be used to
      * store the key stroke in an XML-file.
      *
-     * @param keyStroke The <code>KeyStroke</code>.
-     * @return A <code>String</code> that produces a key stroke equal to the
-     *         given <code>KeyStroke</code> if passed as a parameter to
-     *         <code>getAWTKeyStroke(String)</code>.
+     * @param keyStroke The {@code KeyStroke}.
+     * @return A {@code String} that produces a key stroke equal to the
+     *         given {@code KeyStroke} if passed as a parameter to
+     *         {@code getAWTKeyStroke(String)}.
      */
     public static String getKeyStrokeText(KeyStroke keyStroke) {
         return (keyStroke == null) ? "" : keyStroke.toString();
@@ -318,7 +318,7 @@ public abstract class FreeColAction extends AbstractAction
      * FIXME: at the moment, this is only necessary in order to
      * implement Option.
      *
-     * @return This <code>FreeColAction</code>.
+     * @return This {@code FreeColAction}.
      */
     @Override
     public FreeColAction getValue() {
@@ -331,7 +331,7 @@ public abstract class FreeColAction extends AbstractAction
      * FIXME: at the moment, this is only necessary in order to
      * implement Option.
      *
-     * @param value a <code>FreeColAction</code> value
+     * @param value a {@code FreeColAction} value
      */
     @Override
     public void setValue(FreeColAction value) {
@@ -373,7 +373,7 @@ public abstract class FreeColAction extends AbstractAction
      * This method writes an XML-representation of this object to the given
      * stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @throws XMLStreamException if there is a problem writing to the stream.
      */
     @Override
@@ -390,7 +390,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override

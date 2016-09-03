@@ -75,7 +75,7 @@ public class Mods {
      * Gets the mod with the given object identifier.
      *
      * @param id The identifier of the mod to search for.
-     * @return The <code>FreeColModFile</code> for the mod, or null if
+     * @return The {@code FreeColModFile} for the mod, or null if
      *     not found.
      */
     public static FreeColModFile getModFile(String id) {
@@ -86,7 +86,7 @@ public class Mods {
      * Gets all available mods.
      * User mods before standard mods to allow user override.
      *
-     * @return A list of <code>FreeColModFile</code>s contain mods.
+     * @return A list of {@code FreeColModFile}s contain mods.
      */
     public static Collection<FreeColModFile> getAllMods() {
         return allMods.values();
@@ -96,7 +96,7 @@ public class Mods {
      * Get a mod by id.
      *
      * @param id The mod file identifier to look for.
-     * @return The <code>FreeColModFile</code> found, or null if none present.
+     * @return The {@code FreeColModFile} found, or null if none present.
      */
     public static FreeColModFile getFreeColModFile(String id) {
         return allMods.get(id);
@@ -105,7 +105,7 @@ public class Mods {
     /**
      * Gets all available rulesets.
      *
-     * @return A list of <code>FreeColModFile</code>s containing rulesets.
+     * @return A list of {@code FreeColModFile}s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
         return transform(fileStream(FreeColDirectories.getRulesDirectory()),

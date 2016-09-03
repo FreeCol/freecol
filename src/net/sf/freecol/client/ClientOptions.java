@@ -63,16 +63,16 @@ import net.sf.freecol.common.util.Utils;
  * for display purposes.
  *
  * Most available client options and their default values are defined
- * in the file <code>base/client-options.xml</code> in the FreeCol
+ * in the file {@code base/client-options.xml} in the FreeCol
  * data directory. They are overridden by the player's personal
- * settings in the file <code>options.xml</code> in the user
+ * settings in the file {@code options.xml} in the user
  * directory. Note that some options are generated and added dynamically.
  *
  * Each option should be given an unique identifier (defined as a
  * constant in this class). In general, the options are called
  * something like "model.option.UNIQUENAME". Since the options must
  * also be represented by the GUI, they following two keys must be
- * added to the file <code>FreeColMessages.properties</code>:
+ * added to the file {@code FreeColMessages.properties}:
  *
  * <ul><li>model.option.UNIQUENAME.name</li>
  * <li>model.option.UNIQUENAME.shortDescription</li></ul>
@@ -514,7 +514,7 @@ public class ClientOptions extends OptionGroup {
 
 
     /**
-     * Creates a new <code>ClientOptions</code>.
+     * Creates a new {@code ClientOptions}.
      *
      * Unlike other OptionGroup classes, ClientOptions can not supply a
      * specification as it is needed before the specification is available.
@@ -527,7 +527,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Loads the options from the given save game.
      *
-     * @param save The <code>FreeColSaveGame</code> to read the options from.
+     * @param save The {@code FreeColSaveGame} to read the options from.
      * @return True if the options were loaded without error.
      */
     private boolean load(FreeColSavegameFile save) {
@@ -550,7 +550,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Merge the options from the given file game.
      *
-     * @param file The <code>File</code> to merge the options from.
+     * @param file The {@code File} to merge the options from.
      * @return True if the options were merge without error.
      */
     public boolean merge(File file) {
@@ -561,7 +561,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Merge the options from the given save game.
      *
-     * @param save The <code>FreeColSaveGame</code> to merge from.
+     * @param save The {@code FreeColSaveGame} to merge from.
      * @return True if the options were merged without error.
      */
     public boolean merge(FreeColSavegameFile save) {
@@ -605,7 +605,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Get the client's preferred tile text type.
      *
-     * @return A <code>DISPLAY_TILE_TEXT_</code> value
+     * @return A {@code DISPLAY_TILE_TEXT_} value
      */
     public int getDisplayTileText() {
         return getInteger(DISPLAY_TILE_TEXT);
@@ -615,7 +615,7 @@ public class ClientOptions extends OptionGroup {
      * Gets a fresh list of sorted colonies for a player.
      * Helper function for a common idiom.
      *
-     * @param p The <code>Player</code> to get the colony list for.
+     * @param p The {@code Player} to get the colony list for.
      * @return A fresh list of colonies sorted according to the
      *    current comparator.
      */
@@ -626,7 +626,7 @@ public class ClientOptions extends OptionGroup {
     /**
      * Return the client's preferred comparator for colonies.
      *
-     * @return a <code>Comparator</code> value
+     * @return a {@code Comparator} value
      */
     public Comparator<Colony> getColonyComparator() {
         return getColonyComparator(getInteger(COLONY_COMPARATOR));
@@ -635,8 +635,8 @@ public class ClientOptions extends OptionGroup {
     /**
      * Return the colony comparator identified by type.
      *
-     * @param type an <code>int</code> value
-     * @return a <code>Comparator</code> value
+     * @param type an {@code int} value
+     * @return a {@code Comparator} value
      */
     public static Comparator<Colony> getColonyComparator(int type) {
         switch (type) {
@@ -658,8 +658,8 @@ public class ClientOptions extends OptionGroup {
     /**
      * Return the client's preferred comparator for ModelMessages.
      *
-     * @param game The <code>Game</code> to extract a comparator for.
-     * @return The preferred <code>Comparator</code>.
+     * @param game The {@code Game} to extract a comparator for.
+     * @return The preferred {@code Comparator}.
      */
     public Comparator<ModelMessage> getModelMessageComparator(Game game) {
         switch (getInteger(MESSAGES_GROUP_BY)) {
@@ -675,8 +675,8 @@ public class ClientOptions extends OptionGroup {
     /**
      * Returns the boolean option associated with a ModelMessage.
      *
-     * @param message a <code>ModelMessage</code> value
-     * @return a <code>BooleanOption</code> value
+     * @param message a {@code ModelMessage} value
+     * @return a {@code BooleanOption} value
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
         return (BooleanOption)getOption(message.getMessageType()

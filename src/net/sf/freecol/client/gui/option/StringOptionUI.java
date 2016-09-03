@@ -39,10 +39,10 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
 
 
     /**
-     * Creates a new <code>StringOptionUI</code> for the given
-     * <code>StringOption</code>.
+     * Creates a new {@code StringOptionUI} for the given
+     * {@code StringOption}.
      *
-     * @param option The <code>StringOption</code> to make a user
+     * @param option The {@code StringOption} to make a user
      *     interface for.
      * @param editable Whether user can modify the setting.
      */

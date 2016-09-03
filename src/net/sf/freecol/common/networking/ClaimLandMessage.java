@@ -53,10 +53,10 @@ public class ClaimLandMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ClaimLandMessage</code>.
+     * Create a new {@code ClaimLandMessage}.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param claimant The <code>Unit</code> or <code>Settlement</code>
+     * @param tile The {@code Tile} to claim.
+     * @param claimant The {@code Unit} or <code>Settlement</code>
      *     claiming the tile.
      * @param price The price to pay for the tile, negative if stealing.
      */
@@ -69,10 +69,10 @@ public class ClaimLandMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ClaimLandMessage</code> from a supplied element.
+     * Create a new {@code ClaimLandMessage} from a supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ClaimLandMessage(Game game, Element element) {
         super(getTagName());
@@ -86,11 +86,11 @@ public class ClaimLandMessage extends DOMMessage {
     /**
      * Handle a "claimLand"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was from.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} the message was from.
      *
-     * @return An update, or error <code>Element</code> on failure.
+     * @return An update, or error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

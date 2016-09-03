@@ -58,19 +58,19 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
 
     /**
-     * Creates a new <code>AbstractUnitOption</code>.
+     * Creates a new {@code AbstractUnitOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public AbstractUnitOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>AbstractUnitOption</code>.
+     * Creates a new {@code AbstractUnitOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public AbstractUnitOption(String id, Specification specification) {
         super(id, specification);
@@ -95,7 +95,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Get the unit type option.
      *
-     * @return The <code>UnitTypeOption</code> containing the unit type.
+     * @return The {@code UnitTypeOption} containing the unit type.
      */
     public final UnitTypeOption getUnitType() {
         return unitType;
@@ -104,7 +104,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Get the role option.
      *
-     * @return The <code>StringOption</code> containing the role.
+     * @return The {@code StringOption} containing the role.
      */
     public final StringOption getRole() {
         return role;
@@ -113,7 +113,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Get the number option.
      *
-     * @return The <code>IntegerOption</code> containing the number.
+     * @return The {@code IntegerOption} containing the number.
      */
     public final IntegerOption getNumber() {
         return number;

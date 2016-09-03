@@ -109,7 +109,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Panel for displaying <code>Tile</code>-information.
+     * Panel for displaying {@code Tile}-information.
      */
     public class TileInfoPanel extends MigPanel {
 
@@ -122,7 +122,7 @@ public final class InfoPanel extends FreeColPanel {
 
 
         /**
-         * Create a <code>TileInfoPanel</code>.
+         * Create a {@code TileInfoPanel}.
          */
         public TileInfoPanel() {
             super(new MigLayout("fill, wrap " + (PRODUCTION+1) + ", gap 1 1"));
@@ -133,7 +133,7 @@ public final class InfoPanel extends FreeColPanel {
 
 
         /**
-         * Updates this <code>InfoPanel</code>.
+         * Updates this {@code InfoPanel}.
          *
          * @param tile The displayed tile (or null if none)
          */
@@ -207,11 +207,11 @@ public final class InfoPanel extends FreeColPanel {
         }
 
         /**
-         * Gets the <code>Tile</code> in which this <code>InfoPanel</code>
+         * Gets the {@code Tile} in which this <code>InfoPanel</code>
          * is displaying information about.
          *
-         * @return The <code>Tile</code> or <i>null</i> if no
-         *         <code>Tile</code> applies.
+         * @return The {@code Tile} or <i>null</i> if no
+         *         {@code Tile} applies.
          */
         public Tile getTile() {
             return tile;
@@ -219,7 +219,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Panel for displaying <code>Unit</code>-information.
+     * Panel for displaying {@code Unit}-information.
      */
     public class UnitInfoPanel extends JPanel
         implements PropertyChangeListener {
@@ -251,7 +251,7 @@ public final class InfoPanel extends FreeColPanel {
         /**
          * Updates this unit information panel to use a new unit.
          *
-         * @param unit The displayed <code>Unit</code> (may be null).
+         * @param unit The displayed {@code Unit} (may be null).
          */
         public void update(Unit unit) {
             if (this.unit != unit) {
@@ -379,7 +379,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public InfoPanel(final FreeColClient freeColClient) {
         this(freeColClient, true);
@@ -388,7 +388,7 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param useSkin Use the info panel skin.
      */
     public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
@@ -464,7 +464,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Updates this <code>InfoPanel</code>.
+     * Updates this {@code InfoPanel}.
      *
      * @param mapTransform The current MapTransform.
      */
@@ -485,7 +485,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Updates this <code>InfoPanel</code>.
+     * Updates this {@code InfoPanel}.
      *
      * @param tile The displayed tile (or null if none)
      */
@@ -497,7 +497,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Updates this <code>InfoPanel</code>.
+     * Updates this {@code InfoPanel}.
      *
      * @param unit The displayed unit (or null if none)
      */
@@ -507,7 +507,7 @@ public final class InfoPanel extends FreeColPanel {
     }
 
     /**
-     * Update this <code>InfoPanel</code> by selecting the correct internal
+     * Update this {@code InfoPanel} by selecting the correct internal
      * panel to display.
      */
     public void update() {

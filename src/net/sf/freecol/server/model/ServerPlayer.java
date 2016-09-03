@@ -115,7 +115,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * A <code>Player</code> with additional (server specific) information.
+ * A {@code Player} with additional (server specific) information.
  *
  * That is: pointers to this player's
  * {@link Connection} and {@link Socket}
@@ -175,7 +175,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Trivial constructor required for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param id The object identifier.
      */
     public ServerPlayer(Game game, String id) {
@@ -185,11 +185,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Creates a new ServerPlayer.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The {@code Game} this object belongs to.
      * @param admin Whether the player is the game administrator or not.
-     * @param nation The nation of the <code>Player</code>.
+     * @param nation The nation of the {@code Player}.
      * @param socket The socket to the player's client.
-     * @param connection The <code>Connection</code> for the socket.
+     * @param connection The {@code Connection} for the socket.
      */
     public ServerPlayer(Game game, boolean admin, Nation nation,
                         Socket socket, Connection connection) {
@@ -279,7 +279,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Gets the socket of this player.
-     * @return The <code>Socket</code>.
+     * @return The {@code Socket}.
      */
     public Socket getSocket() {
         return this.socket;
@@ -288,7 +288,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Gets the connection of this player.
      *
-     * @return The <code>Connection</code>.
+     * @return The {@code Connection}.
      */
     public Connection getConnection() {
         return this.connection;
@@ -297,7 +297,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Sets the connection of this player.
      *
-     * @param connection The <code>Connection</code>.
+     * @param connection The {@code Connection}.
      */
     public void setConnection(Connection connection) {
         this.connection = connection;
@@ -307,7 +307,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Send a change set to this player.
      *
-     * @param cs The <code>ChangeSet</code> to send.
+     * @param cs The {@code ChangeSet} to send.
      */
     public void send(ChangeSet cs) {
         askElement(cs.build(this));
@@ -316,9 +316,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Send a message to the player, and return the resulting message.
      *
-     * @param game The <code>Game</code> to build the return message in.
-     * @param request The <code>DOMMessage</code> to send.
-     * @return The resulting <code>DOMMessage</code>.
+     * @param game The {@code Game} to build the return message in.
+     * @param request The {@code DOMMessage} to send.
+     * @return The resulting {@code DOMMessage}.
      */
     public DOMMessage ask(Game game, DOMMessage request) {
         return (isConnected()) ? this.connection.ask(game, request) : null;
@@ -328,7 +328,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Send an element to this player.
      * Do not use (sole use in send() above). This will go away.
      *
-     * @param request An <code>Element</code> containing the update.
+     * @param request An {@code Element} containing the update.
      */
     private void askElement(Element request) {
         if (!isConnected()) return;
@@ -359,7 +359,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * and wrap it into a change set.
      *
      * @param message The non-i18n message.
-     * @return A new <code>ChangeSet</code>.
+     * @return A new {@code ChangeSet}.
      */
     public ChangeSet clientError(String message) {
         logger.warning(message);
@@ -375,7 +375,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Update the current father.
      *
-     * @param ff The <code>FoundingFather</code> to recruit.
+     * @param ff The {@code FoundingFather} to recruit.
      */
     public void updateCurrentFather(FoundingFather ff) {
         setCurrentFather(ff);
@@ -389,7 +389,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Get a new trade route.
      *
-     * @return The new <code>TradeRoute</code>.
+     * @return The new {@code TradeRoute}.
      */
     public TradeRoute newTradeRoute() {
         TradeRoute route = new TradeRoute(getGame(), getNameForTradeRoute(),
@@ -401,7 +401,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Accumulate extra trades.
      *
-     * @param ag The <code>AbstractGoods</code> describing the sale.
+     * @param ag The {@code AbstractGoods} describing the sale.
      */
     public void addExtraTrade(AbstractGoods ag) {
         extraTrades.add(ag);
@@ -654,7 +654,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * +vis: Albeit killing the player makes visibility changes moot.
      * +til: Fixes the appearance changes too.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csKill(ChangeSet cs) {
         setDead(true);
@@ -728,7 +728,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Withdraw a player from the new world.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csWithdraw(ChangeSet cs) {
         String key = (isEuropean() && getPlayerType() == PlayerType.COLONIAL)
@@ -838,7 +838,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Add a HistoryEvent to this player.
      *
-     * @param event The <code>HistoryEvent</code> to add.
+     * @param event The {@code HistoryEvent} to add.
      */
     @Override
     public void addHistory(HistoryEvent event) {
@@ -895,11 +895,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Checks if this <code>Player</code> has explored the given
-     * <code>Tile</code>.
+     * Checks if this {@code Player} has explored the given
+     * {@code Tile}.
      *
-     * @param tile The <code>Tile</code>.
-     * @return <i>true</i> if the <code>Tile</code> has been explored and
+     * @param tile The {@code Tile}.
+     * @return <i>true</i> if the {@code Tile} has been explored and
      *         <i>false</i> otherwise.
      */
     @Override
@@ -913,7 +913,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * +til: Exploring the tile also updates the pet.
      *
-     * @param tile The <code>Tile</code> to explore.
+     * @param tile The {@code Tile} to explore.
      * @return True if the tile is newly explored by this action.
      */
     public boolean exploreTile(Tile tile) {
@@ -923,11 +923,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Sets the tiles within the given <code>Unit</code>'s line of
+     * Sets the tiles within the given {@code Unit}'s line of
      * sight to be explored by this player.
      *
-     * @param tiles A list of <code>Tile</code>s.
-     * @return A list of newly explored <code>Tile</code>s.
+     * @param tiles A list of {@code Tile}s.
+     * @return A list of newly explored {@code Tile}s.
      * @see #hasExplored
      */
     public Set<Tile> exploreTiles(Collection<? extends Tile> tiles) {
@@ -941,8 +941,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * tiles.  Note that the player does not necessarily own the settlement
      * (e.g. missionary at native settlement).
      *
-     * @param settlement The <code>Settlement</code> that is exploring.
-     * @return A list of newly explored <code>Tile</code>s.
+     * @param settlement The {@code Settlement} that is exploring.
+     * @return A list of newly explored {@code Tile}s.
      */
     public Set<Tile> exploreForSettlement(Settlement settlement) {
         Set<Tile> tiles = new HashSet<>(settlement.getOwnedTiles());
@@ -952,11 +952,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Sets the tiles within the given <code>Unit</code>'s line of
+     * Sets the tiles within the given {@code Unit}'s line of
      * sight to be explored by this player.
      *
-     * @param unit The <code>Unit</code>.
-     * @return A list of newly explored <code>Tile</code>s.
+     * @param unit The {@code Unit}.
+     * @return A list of newly explored {@code Tile}s.
      * @see #hasExplored
      */
     public Set<Tile> exploreForUnit(Unit unit) {
@@ -990,8 +990,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Checks if this player can see a unit.
      *
-     * @param unit The <code>Unit</code> to check.
-     * @return True if the <code>Unit</code> is visible to the player.
+     * @param unit The {@code Unit} to check.
+     * @return True if the {@code Unit} is visible to the player.
      */
     public boolean canSeeUnit(Unit unit) {
         Tile tile;
@@ -1010,8 +1010,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Do it in two passes so the first successful claim does not give
      * a large advantage.
      *
-     * @param tiles The collection of <code>Tile</code>s to reassign.
-     * @param avoid An optional <code>Settlement</code> to consider last
+     * @param tiles The collection of {@code Tile}s to reassign.
+     * @param avoid An optional {@code Settlement} to consider last
      *     when making claims.
      */
     public void reassignTiles(Collection<Tile> tiles, Settlement avoid) {
@@ -1082,9 +1082,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * -vis: Visibility issues depending on location.
      * -til: Tile appearance issue if created in a colony (not ATM)
      *
-     * @param abstractUnits The list of <code>AbstractUnit</code>s to
+     * @param abstractUnits The list of {@code AbstractUnit}s to
      *     create.
-     * @param location The <code>Location</code> where the units will
+     * @param location The {@code Location} where the units will
      *     be created.
      * @return A list of units created.
      */
@@ -1188,7 +1188,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Simpler frontend to loadShips.
      *
-     * @param units The <code>Unit</code>s to load.
+     * @param units The {@code Unit}s to load.
      * @return The left over units.
      */
     public List<Unit> loadShips(List<Unit> units) {
@@ -1215,7 +1215,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Flush any market price changes.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the market has changed.
      */
     public boolean csFlushMarket(ChangeSet cs) {
@@ -1237,8 +1237,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Flush any market price changes for a specified goods type.
      *
-     * @param type The <code>GoodsType</code> to check.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param type The {@code GoodsType} to check.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the market price had changed.
      */
     public boolean csFlushMarket(GoodsType type, ChangeSet cs) {
@@ -1258,8 +1258,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Buy goods in Europe.
      *
-     * @param container The <code>GoodsContainer</code> to carry the goods.
-     * @param type The <code>GoodsType</code> to buy.
+     * @param container The {@code GoodsContainer} to carry the goods.
+     * @param type The {@code GoodsType} to buy.
      * @param amount The amount of goods to buy.
      * @return The amount actually removed from the market, or
      *     negative on failure.
@@ -1283,9 +1283,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Sell goods in Europe.
      *
-     * @param container An optional <code>GoodsContainer</code>
+     * @param container An optional {@code GoodsContainer}
      *     carrying the goods.
-     * @param type The <code>GoodsType</code> to sell.
+     * @param type The {@code GoodsType} to sell.
      * @param amount The amount of goods to sell.
      * @return The amount actually added to the market, or negative on failure.
      */
@@ -1309,7 +1309,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Adds a player to the list of players for whom the stance has changed.
      *
-     * @param other The <code>ServerPlayer</code> to add.
+     * @param other The {@code ServerPlayer} to add.
      */
     public void addStanceChange(ServerPlayer other) {
         if (!stanceDirty.contains(other)) stanceDirty.add(other);
@@ -1318,10 +1318,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Modifies stance.
      *
-     * @param stance The new <code>Stance</code>.
-     * @param otherPlayer The <code>Player</code> wrt which the stance changes.
+     * @param stance The new {@code Stance}.
+     * @param otherPlayer The {@code Player} wrt which the stance changes.
      * @param symmetric If true, change the otherPlayer stance as well.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if there was a change in stance at all.
      */
     public boolean csChangeStance(Stance stance, ServerPlayer otherPlayer,
@@ -1385,9 +1385,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * +til: Handles tile modifications.
      *
-     * @param player The <code>Player</code>.
+     * @param player The {@code Player}.
      * @param add The amount to add to the current tension level.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csModifyTension(Player player, int add, ChangeSet cs) {
         csModifyTension(player, add, null, cs);
@@ -1398,11 +1398,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * +til: Handles tile modifications.
      *
-     * @param player The <code>Player</code>.
+     * @param player The {@code Player}.
      * @param add The amount to add to the current tension level.
-     * @param origin A <code>Settlement</code> where the alarming event
+     * @param origin A {@code Settlement} where the alarming event
      *     occurred.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csModifyTension(Player player, int add, Settlement origin,
                                 ChangeSet cs) {
@@ -1426,9 +1426,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * New turn for this player.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -1637,18 +1637,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Apply the effects of the given <code>Disaster</code> to the
-     * given <code>Colony</code>, or the <code>Player</code> if the
-     * <code>Colony</code> is <code>null</code>, and return a list of
-     * appropriate <code>ModelMessage</code>s. Note that a disaster
+     * Apply the effects of the given {@code Disaster} to the
+     * given {@code Colony}, or the <code>Player</code> if the
+     * {@code Colony} is <code>null</code>, and return a list of
+     * appropriate {@code ModelMessage}s. Note that a disaster
      * might have no effect on a particular colony. In that case, the
      * returned list is empty.
      *
-     * @param random A <code>Random</code> number source.
-     * @param colony A <code>Colony</code>, or <code>null</code>.
-     * @param disaster A <code>Disaster</code> value.
-     * @param cs A <code>ChangeSet</code> to update.
-     * @return A list of <code>ModelMessage</code>s, possibly empty.
+     * @param random A {@code Random} number source.
+     * @param colony A {@code Colony}, or <code>null</code>.
+     * @param disaster A {@code Disaster} value.
+     * @param cs A {@code ChangeSet} to update.
+     * @return A list of {@code ModelMessage}s, possibly empty.
      */
     public List<ModelMessage> csApplyDisaster(Random random, Colony colony,
                                               Disaster disaster, ChangeSet cs) {
@@ -1854,7 +1854,7 @@ outer:  for (Effect effect : effects) {
      * accumulated trades.
      *
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csYearlyGoodsAdjust(Random random, ChangeSet cs) {
         final Game game = getGame();
@@ -1894,7 +1894,7 @@ outer:  for (Effect effect : effects) {
      * Starts a new turn for a player.
      *
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csStartTurn(Random random, ChangeSet cs) {
         Game game = getGame();
@@ -2029,7 +2029,7 @@ outer:  for (Effect effect : effects) {
      * All player colonies bombard all available targets.
      *
      * @param random A random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csBombardEnemyShips(Random random, ChangeSet cs) {
         // A unit is a bombard target only if it is:
@@ -2055,9 +2055,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Adds a founding father to a players continental congress.
      *
-     * @param father The <code>FoundingFather</code> to add.
+     * @param father The {@code FoundingFather} to add.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csAddFoundingFather(FoundingFather father, Random random,
                                     ChangeSet cs) {
@@ -2223,7 +2223,7 @@ outer:  for (Effect effect : effects) {
      * through its choice of founding fathers.  Used to upgrade newly
      * captured colonies.
      *
-     * @return A list of free <code>BuildingType</code>s.
+     * @return A list of free {@code BuildingType}s.
      */
     public List<BuildingType> getFreeBuildingTypes() {
         final Specification spec = getGame().getSpecification();
@@ -2235,11 +2235,11 @@ outer:  for (Effect effect : effects) {
     /**
      * Claim land.
      *
-     * @param tile The <code>Tile</code> to claim.
-     * @param settlement The <code>Settlement</code> to claim for.
+     * @param tile The {@code Tile} to claim.
+     * @param settlement The {@code Settlement} to claim for.
      * @param price The price to pay for the land, which must agree
      *     with the owner valuation, unless negative which denotes stealing.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csClaimLand(Tile tile, Settlement settlement, int price,
                             ChangeSet cs) {
@@ -2275,10 +2275,10 @@ outer:  for (Effect effect : effects) {
     /**
      * A unit migrates from Europe.
      *
-     * @param slot The slot within <code>Europe</code> to select the unit from.
+     * @param slot The slot within {@code Europe} to select the unit from.
      * @param type The type of migration occurring.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csEmigrate(int slot, MigrationType type, Random random,
                            ChangeSet cs) {
@@ -2330,11 +2330,11 @@ outer:  for (Effect effect : effects) {
     /**
      * Combat.
      *
-     * @param attacker The <code>FreeColGameObject</code> that is attacking.
-     * @param defender The <code>FreeColGameObject</code> that is defending.
-     * @param crs A list of <code>CombatResult</code>s defining the result.
+     * @param attacker The {@code FreeColGameObject} that is attacking.
+     * @param defender The {@code FreeColGameObject} that is defending.
+     * @param crs A list of {@code CombatResult}s defining the result.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csCombat(FreeColGameObject attacker,
                          FreeColGameObject defender,
@@ -2822,7 +2822,7 @@ outer:  for (Effect effect : effects) {
     /**
      * Gets the amount to raise tension by when a unit is slaughtered.
      *
-     * @param loser The <code>Unit</code> that dies.
+     * @param loser The {@code Unit} that dies.
      * @return An amount to raise tension by.
      */
     private int getSlaughterTension(Unit loser) {
@@ -2846,9 +2846,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Notifies of automatic arming.
      *
-     * @param unit The <code>Unit</code> that is auto-equipping.
-     * @param settlement The <code>Settlement</code> being defended.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param unit The {@code Unit} that is auto-equipping.
+     * @param settlement The {@code Settlement} being defended.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csAutoequipUnit(Unit unit, Settlement settlement,
                                  ChangeSet cs) {
@@ -2863,9 +2863,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Burns a players missions.
      *
-     * @param attacker The <code>Unit</code> that attacked.
-     * @param is The <code>IndianSettlement</code> that was attacked.
-     * @param cs The <code>ChangeSet</code> to update.
+     * @param attacker The {@code Unit} that attacked.
+     * @param is The {@code IndianSettlement} that was attacked.
+     * @param cs The {@code ChangeSet} to update.
      */
     private void csBurnMissions(Unit attacker, IndianSettlement is,
                                 ChangeSet cs) {
@@ -2893,9 +2893,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Defender auto equips but loses and attacker captures the equipment.
      *
-     * @param attacker The <code>Unit</code> that attacked.
-     * @param defender The <code>Unit</code> that defended and loses equipment.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The {@code Unit} that attacked.
+     * @param defender The {@code Unit} that defended and loses equipment.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureAutoEquip(Unit attacker, Unit defender,
                                     ChangeSet cs) {
@@ -2907,10 +2907,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Captures a colony.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param colony The <code>ServerColony</code> to capture.
+     * @param attacker The attacking {@code Unit}.
+     * @param colony The {@code ServerColony} to capture.
      * @param random A pseudo-random number source.
-     * @param cs The <code>ChangeSet</code> to update.
+     * @param cs The {@code ChangeSet} to update.
      */
     private void csCaptureColony(Unit attacker, ServerColony colony,
                                  Random random, ChangeSet cs) {
@@ -2978,10 +2978,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Extracts a convert from a native settlement.
      *
-     * @param attacker The <code>Unit</code> that is attacking.
-     * @param is The <code>IndianSettlement</code> under attack.
+     * @param attacker The {@code Unit} that is attacking.
+     * @param is The {@code IndianSettlement} under attack.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureConvert(Unit attacker, IndianSettlement is,
                                   Random random, ChangeSet cs) {
@@ -3014,9 +3014,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Captures equipment.
      *
-     * @param winner The <code>Unit</code> that captures equipment.
-     * @param loser The <code>Unit</code> that defended and loses equipment.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that captures equipment.
+     * @param loser The {@code Unit} that defended and loses equipment.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureEquip(Unit winner, Unit loser, ChangeSet cs) {
         Role role = loser.getRole();
@@ -3027,10 +3027,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Capture equipment.
      *
-     * @param winner The <code>Unit</code> that is capturing equipment.
-     * @param loser The <code>Unit</code> that is losing equipment.
-     * @param role The <code>Role</code> wrest from the loser.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that is capturing equipment.
+     * @param loser The {@code Unit} that is losing equipment.
+     * @param role The {@code Role} wrest from the loser.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureEquipment(Unit winner, Unit loser,
                                     Role role, ChangeSet cs) {
@@ -3075,9 +3075,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Capture a unit.
      *
-     * @param winner A <code>Unit</code> that is capturing.
-     * @param loser A <code>Unit</code> to capture.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner A {@code Unit} that is capturing.
+     * @param loser A {@code Unit} to capture.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
@@ -3131,9 +3131,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Damages all ships in a colony in preparation for capture.
      *
-     * @param attacker The <code>Unit</code> that is damaging.
-     * @param colony The <code>Colony</code> to damage ships in.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The {@code Unit} that is damaging.
+     * @param colony The {@code Colony} to damage ships in.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageColonyShips(Unit attacker, Colony colony,
                                      ChangeSet cs) {
@@ -3163,9 +3163,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Damage a ship through normal attack.
      *
-     * @param attacker The attacker <code>Unit</code>.
-     * @param ship The <code>Unit</code> which is a ship to damage.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The attacker {@code Unit}.
+     * @param ship The {@code Unit} which is a ship to damage.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
@@ -3200,9 +3200,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Damage a ship through bombard.
      *
-     * @param settlement The attacker <code>Settlement</code>.
-     * @param ship The <code>Unit</code> which is a ship to damage.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param settlement The attacker {@code Settlement}.
+     * @param ship The {@code Unit} which is a ship to damage.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageShipBombard(Settlement settlement, Unit ship,
                                      ChangeSet cs) {
@@ -3239,9 +3239,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Damage a ship.
      *
-     * @param ship The naval <code>Unit</code> to damage.
-     * @param repair The <code>Location</code> to send it to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param ship The naval {@code Unit} to damage.
+     * @param repair The {@code Location} to send it to.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDamageShip(Unit ship, Location repair, ChangeSet cs) {
         ServerPlayer player = (ServerPlayer) ship.getOwner();
@@ -3271,9 +3271,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Demotes a unit.
      *
-     * @param winner The <code>Unit</code> that won.
-     * @param loser The <code>Unit</code> that lost and should be demoted.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that won.
+     * @param loser The {@code Unit} that lost and should be demoted.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
         final Specification spec = getSpecification();
@@ -3322,10 +3322,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Destroy a colony.
      *
-     * @param attacker The <code>Unit</code> that attacked.
-     * @param colony The <code>Colony</code> that was attacked.
+     * @param attacker The {@code Unit} that attacked.
+     * @param colony The {@code Colony} that was attacked.
      * @param random A pseudo-random number source.
-     * @param cs The <code>ChangeSet</code> to update.
+     * @param cs The {@code ChangeSet} to update.
      */
     private void csDestroyColony(Unit attacker, Colony colony, Random random,
                                  ChangeSet cs) {
@@ -3372,10 +3372,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Destroys an Indian settlement.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param is An <code>IndianSettlement</code> to destroy.
+     * @param attacker The attacking {@code Unit}.
+     * @param is An {@code IndianSettlement} to destroy.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csDestroySettlement(Unit attacker, IndianSettlement is,
                                      Random random, ChangeSet cs) {
@@ -3451,8 +3451,8 @@ outer:  for (Effect effect : effects) {
      *
      * +vis,til: Resolves the whole mess.
      *
-     * @param settlement The <code>Settlement</code> under attack.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param settlement The {@code Settlement} under attack.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
         logger.finest("Disposing of " + settlement.getName());
@@ -3515,9 +3515,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Evade a normal attack.
      *
-     * @param attacker The attacker <code>Unit</code>.
-     * @param defender A naval <code>Unit</code> that evades the attacker.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The attacker {@code Unit}.
+     * @param defender A naval {@code Unit} that evades the attacker.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
@@ -3548,9 +3548,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Evade a bombardment.
      *
-     * @param settlement The attacker <code>Settlement</code>.
-     * @param defender A naval <code>Unit</code> that evades the attacker.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param settlement The attacker {@code Settlement}.
+     * @param defender A naval {@code Unit} that evades the attacker.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csEvadeBombard(Settlement settlement, Unit defender,
                                 ChangeSet cs) {
@@ -3581,9 +3581,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Loot a ship.
      *
-     * @param winner The winning naval <code>Unit</code>.
-     * @param loser The losing naval <code>Unit</code>
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The winning naval {@code Unit}.
+     * @param loser The losing naval {@code Unit}
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
@@ -3601,9 +3601,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Unit auto equips but loses equipment.
      *
-     * @param attacker The <code>Unit</code> that attacked.
-     * @param defender The <code>Unit</code> that defended and loses equipment.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The {@code Unit} that attacked.
+     * @param defender The {@code Unit} that defended and loses equipment.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
@@ -3646,9 +3646,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Unit drops some equipment.
      *
-     * @param winner The <code>Unit</code> that won.
-     * @param loser The <code>Unit</code> that lost and loses equipment.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that won.
+     * @param loser The {@code Unit} that lost and loses equipment.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csLoseEquip(Unit winner, Unit loser, ChangeSet cs) {
         final Specification spec = getSpecification();
@@ -3721,8 +3721,8 @@ outer:  for (Effect effect : effects) {
      * Hook for when a player loses access to a location for whatever
      * reason.  Useful for disabling trade routes.
      *
-     * @param loc The <code>Location</code> that was lost.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param loc The {@code Location} that was lost.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csLoseLocation(Location loc, ChangeSet cs) {
         for (TradeRoute tr : transform(getTradeRoutes(),
@@ -3743,10 +3743,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Damage a building or a ship or steal some goods or gold.
      *
-     * @param attacker The attacking <code>Unit</code>.
-     * @param colony The <code>Colony</code> to pillage.
+     * @param attacker The attacking {@code Unit}.
+     * @param colony The {@code Colony} to pillage.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csPillageColony(Unit attacker, Colony colony,
                                  Random random, ChangeSet cs) {
@@ -3825,8 +3825,8 @@ outer:  for (Effect effect : effects) {
      * This is called as a result of pillaging, which always updates
      * the colony tile.
      *
-     * @param building The <code>Building</code> to damage.
-     * @param cs a <code>ChangeSet</code> value
+     * @param building The {@code Building} to damage.
+     * @param cs a {@code ChangeSet} value
      */
     private void csDamageBuilding(Building building, ChangeSet cs) {
         ServerColony colony = (ServerColony)building.getColony();
@@ -3865,8 +3865,8 @@ outer:  for (Effect effect : effects) {
     /**
      * Promotes a unit.
      *
-     * @param winner The <code>Unit</code> that won and should be promoted.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that won and should be promoted.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csPromoteUnit(Unit winner, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
@@ -3891,9 +3891,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Sinks all ships in a colony.
      *
-     * @param attacker The attacker <code>Unit</code>.
-     * @param colony The <code>Colony</code> to sink ships in.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The attacker {@code Unit}.
+     * @param colony The {@code Colony} to sink ships in.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csSinkColonyShips(Unit attacker, Colony colony, ChangeSet cs) {
         boolean captureRepairing = getSpecification()
@@ -3919,9 +3919,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Sinks this ship as result of a normal attack.
      *
-     * @param attacker The attacker <code>Unit</code>.
-     * @param ship The naval <code>Unit</code> to sink.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param attacker The attacker {@code Unit}.
+     * @param ship The naval {@code Unit} to sink.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csSinkShipAttack(Unit attacker, Unit ship, ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
@@ -3954,9 +3954,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Sinks this ship as result of a bombard.
      *
-     * @param settlement The bombarding <code>Settlement</code>.
-     * @param ship The naval <code>Unit</code> to sink.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param settlement The bombarding {@code Settlement}.
+     * @param ship The naval {@code Unit} to sink.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csSinkShipBombard(Settlement settlement, Unit ship,
                                    ChangeSet cs) {
@@ -3989,10 +3989,10 @@ outer:  for (Effect effect : effects) {
     /**
      * Sink the ship.
      *
-     * @param ship The naval <code>Unit</code> to sink.
-     * @param attackerPlayer The <code>ServerPlayer</code> that
+     * @param ship The naval {@code Unit} to sink.
+     * @param attackerPlayer The {@code ServerPlayer} that
      * attacked, or null
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csSinkShip(Unit ship, ServerPlayer attackerPlayer,
                             ChangeSet cs) {
@@ -4010,9 +4010,9 @@ outer:  for (Effect effect : effects) {
     /**
      * Slaughter a unit.
      *
-     * @param winner The <code>Unit</code> that is slaughtering.
-     * @param loser The <code>Unit</code> to slaughter.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param winner The {@code Unit} that is slaughtering.
+     * @param loser The {@code Unit} to slaughter.
+     * @param cs A {@code ChangeSet} to update.
      */
     private void csSlaughterUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
@@ -4073,8 +4073,8 @@ outer:  for (Effect effect : effects) {
      * Updates the player view for each new tile on a supplied list,
      * and update a ChangeSet as well.
      *
-     * @param newTiles A list of <code>Tile</code>s to update.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param newTiles A list of {@code Tile}s to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csSeeNewTiles(Collection<? extends Tile> newTiles,
                               ChangeSet cs) {
@@ -4087,7 +4087,7 @@ outer:  for (Effect effect : effects) {
      *
      * Public for the test suite.
      *
-     * @return A tea party <code>Modifier</code>.
+     * @return A tea party {@code Modifier}.
      */
     public Modifier makeTeaPartyModifier() {
         final Specification spec = getGame().getSpecification();
@@ -4105,9 +4105,9 @@ outer:  for (Effect effect : effects) {
      * Raises the players tax rate, or handles a goods party.
      *
      * @param tax The new tax rate.
-     * @param goods The <code>Goods</code> to use in a goods party.
+     * @param goods The {@code Goods} to use in a goods party.
      * @param accepted Whether the tax raise was accepted.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csRaiseTax(int tax, Goods goods, boolean accepted,
                            ChangeSet cs) {
@@ -4173,8 +4173,8 @@ outer:  for (Effect effect : effects) {
      * increase demand.
      *
      * @param tax The new tax rate.
-     * @param goods The <code>Goods</code> to use in a goods party.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param goods The {@code Goods} to use in a goods party.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void ignoreTax(int tax, Goods goods, ChangeSet cs) {
         csRaiseTax(tax, goods, true, cs);
@@ -4188,7 +4188,7 @@ outer:  for (Effect effect : effects) {
      * Handle the end of a session where the player has ignored an
      * offer of mercenaries.
      *
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void ignoreMercenaries(ChangeSet cs) {
         cs.addMessage(See.only(this),
@@ -4202,7 +4202,7 @@ outer:  for (Effect effect : effects) {
      * @param mercenaries A list of mercenary units.
      * @param action The monarch action that caused the offer.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csMercenaries(List<AbstractUnit> mercenaries,
                               Monarch.MonarchAction action,
@@ -4228,7 +4228,7 @@ outer:  for (Effect effect : effects) {
      * the feature container.
      *
      * @param tax The new tax rate.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csSetTax(int tax, ChangeSet cs) {
         setTax(tax);
@@ -4244,7 +4244,7 @@ outer:  for (Effect effect : effects) {
      *
      * @param mercs A list of mercenaries.
      * @param price The price to be charged for them.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,
                                  ChangeSet cs) {
@@ -4282,8 +4282,8 @@ outer:  for (Effect effect : effects) {
     /**
      * Make contact between two nations if necessary.
      *
-     * @param other The other <code>ServerPlayer</code>.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param other The other {@code ServerPlayer}.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if this was a first contact.
      */
     public boolean csContact(ServerPlayer other, ChangeSet cs) {
@@ -4314,11 +4314,11 @@ outer:  for (Effect effect : effects) {
     /**
      * Initiate first contact between this European and native player.
      *
-     * @param other The native <code>ServerPlayer</code>.
-     * @param tile The <code>Tile</code> contact is made at if this is
+     * @param other The native {@code ServerPlayer}.
+     * @param tile The {@code Tile} contact is made at if this is
      *     a first landing in the new world and it is owned by the
      *     other player.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csNativeFirstContact(ServerPlayer other, Tile tile,
                                      ChangeSet cs) {
@@ -4338,10 +4338,10 @@ outer:  for (Effect effect : effects) {
      * Initiate first contact between this European and another
      * European player.
      *
-     * @param unit The <code>Unit</code> making contact.
-     * @param settlement The <code>Settlement</code> being contacted.
-     * @param otherUnit The <code>Unit</code> being contacted.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param unit The {@code Unit} making contact.
+     * @param settlement The {@code Settlement} being contacted.
+     * @param otherUnit The {@code Unit} being contacted.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csEuropeanFirstContact(Unit unit, Settlement settlement,
                                        Unit otherUnit, ChangeSet cs) {
@@ -4377,11 +4377,11 @@ outer:  for (Effect effect : effects) {
      *
      * -vis(owner,newOwner)
      *
-     * @param unit The <code>Unit</code> to change ownership of.
-     * @param newOwner The new owning <code>ServerPlayer</code>.
+     * @param unit The {@code Unit} to change ownership of.
+     * @param newOwner The new owning {@code ServerPlayer}.
      * @param change An optional accompanying change type.
-     * @param loc A optional new <code>Location</code> for the unit.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param loc A optional new {@code Location} for the unit.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the new owner can have this unit.
      */
     public boolean csChangeOwner(Unit unit, ServerPlayer newOwner,

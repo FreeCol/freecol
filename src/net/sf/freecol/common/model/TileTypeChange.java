@@ -47,17 +47,17 @@ public class TileTypeChange extends FreeColSpecObjectType {
     /**
      * Create a new tile type change.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public TileTypeChange(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>TileTypeChange</code> instance.
+     * Creates a new {@code TileTypeChange} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public TileTypeChange(FreeColXMLReader xr, Specification specification) throws XMLStreamException {

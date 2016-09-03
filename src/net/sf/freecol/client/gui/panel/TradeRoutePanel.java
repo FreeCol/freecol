@@ -90,8 +90,8 @@ public final class TradeRoutePanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The optional <code>Unit</code> to operate on.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The optional {@code Unit} to operate on.
      */
     public TradeRoutePanel(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, new MigLayout("wrap 2", "[fill][fill]"));
@@ -205,7 +205,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     /**
      * Gets the currently selected route.
      *
-     * @return The selected <code>TradeRoute</code>.
+     * @return The selected {@code TradeRoute}.
      */
     private TradeRoute getRoute() {
         return this.tradeRoutes.getSelectedValue();
@@ -256,7 +256,7 @@ public final class TradeRoutePanel extends FreeColPanel {
     /**
      * Update the list of routes displayed.
      *
-     * @param selectRoute An optional <code>TradeRoute</code> to select.
+     * @param selectRoute An optional {@code TradeRoute} to select.
      */
     private void updateList(TradeRoute selectRoute) {
         final Player player = getMyPlayer();

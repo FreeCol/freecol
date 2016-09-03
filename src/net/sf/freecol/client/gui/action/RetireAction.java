@@ -34,9 +34,9 @@ public class RetireAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>RetireAction</code>.
+     * Creates a new {@code RetireAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public RetireAction(FreeColClient freeColClient) {
         super(freeColClient, id);

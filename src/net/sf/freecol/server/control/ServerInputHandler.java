@@ -81,7 +81,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * Register a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The <code>NetworkRequestHandler</code> to register.
+     * @param handler The {@code NetworkRequestHandler} to register.
      */
     protected final void register(String name, NetworkRequestHandler handler) {
         this.handlerMap.put(name, handler);
@@ -91,7 +91,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
      * Unregister a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The <code>NetworkRequestHandler</code> to unregister.
+     * @param handler The {@code NetworkRequestHandler} to unregister.
      * @return True if the supplied handler was actually removed.
      */
     protected final boolean unregister(String name, NetworkRequestHandler handler) {
@@ -101,9 +101,9 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * Handle a "disconnect"-message.
      * 
-     * @param connection The <code>Connection</code> the message was received
+     * @param connection The {@code Connection} the message was received
      *     on.
-     * @param element The <code>Element</code> (root element in a
+     * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information.
      * @return Null.
      */
@@ -124,9 +124,9 @@ public abstract class ServerInputHandler extends FreeColServerHolder
     /**
      * Handle a "logout"-message.
      * 
-     * @param connection The <code>Connection</code> the message was received
+     * @param connection The {@code Connection} the message was received
      *     on.
-     * @param element The <code>Element</code> (root element in a
+     * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information.
      * @return The reply.
      */

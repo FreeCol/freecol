@@ -55,12 +55,12 @@ public final class ChooseFoundingFatherDialog
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      * @param possibleFoundingFathers The Founding Fathers which can
      *     be selected. The length of the array is the same as the
-     *     number of <code>FoundingFather</code> categories and the
-     *     values identifies a <code>FoundingFather</code> to be
+     *     number of {@code FoundingFather} categories and the
+     *     values identifies a {@code FoundingFather} to be
      *     picked in each of those categories.
      */
     public ChooseFoundingFatherDialog(FreeColClient freeColClient, JFrame frame,

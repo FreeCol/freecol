@@ -61,12 +61,12 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Creates a new <code>FreeColGameObject</code>.
+     * Creates a new {@code FreeColGameObject}.
      *
      * Automatically assign an object identifier and register this
-     * object at the specified <code>Game</code>.
+     * object at the specified {@code Game}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public FreeColGameObject(Game game) {
         if (game != null) {
@@ -78,13 +78,13 @@ public abstract class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>FreeColGameObject</code>.
+     * Creates a new {@code FreeColGameObject}.
      * If an identifier is supplied, use that, otherwise leave it undefined.
      *
      * This routine should be used when we know that the object will need
      * further initialization.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
@@ -99,8 +99,8 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Instantiate an uninitialized FreeColGameObject within a game.
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to instantiate within.
-     * @param returnClass The required <code>FreeColObject</code> class.
+     * @param game The {@code Game} to instantiate within.
+     * @param returnClass The required {@code FreeColObject} class.
      * @return The new uninitialized object, or null on error.
      */
     public static <T extends FreeColObject> T newInstance(Game game,
@@ -119,7 +119,7 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     /**
      * Sets the unique identifier of this object and registers it in its
-     * <code>Game</code> with that identifier, i.e. "intern" this object.
+     * {@code Game} with that identifier, i.e. "intern" this object.
      *
      * @param newId The unique identifier of this object.
      */
@@ -204,7 +204,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Overriding routines should call upwards towards this routine,
      * arranging that the object itself is last.
      *
-     * @return A stream of <code>FreeColGameObject</code>s to dispose of.
+     * @return A stream of {@code FreeColGameObject}s to dispose of.
      */
     public Stream<FreeColGameObject> getDisposables() {
         return Stream.of(this);
@@ -229,7 +229,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * here.  However, for example, a player's colony should return
      * itself as a link target.
      *
-     * @param player The <code>Player</code> to make a link for.
+     * @param player The {@code Player} to make a link for.
      * @return A suitable link target if available, although usually null.
      */
     public FreeColGameObject getLinkTarget(Player player) {

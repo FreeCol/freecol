@@ -250,7 +250,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public ConfirmDeclarationDialog(FreeColClient freeColClient, JFrame frame) {

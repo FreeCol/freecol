@@ -82,7 +82,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param key the report name key
      * @param showColonies Whether to show colonies with no selected units.
      */

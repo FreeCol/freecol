@@ -50,11 +50,11 @@ public class DemandTributeMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>DemandTributeMessage</code> with the
+     * Create a new {@code DemandTributeMessage} with the
      * supplied unit and direction.
      *
-     * @param unit The <code>Unit</code> that is demanding.
-     * @param direction The <code>Direction</code> the unit is looking.
+     * @param unit The {@code Unit} that is demanding.
+     * @param direction The {@code Direction} the unit is looking.
      */
     public DemandTributeMessage(Unit unit, Direction direction) {
         super(getTagName());
@@ -64,11 +64,11 @@ public class DemandTributeMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DemandTributeMessage</code> from a
+     * Create a new {@code DemandTributeMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public DemandTributeMessage(Game game, Element element) {
         super(getTagName());
@@ -81,10 +81,10 @@ public class DemandTributeMessage extends DOMMessage {
     /**
      * Handle a "demandTribute"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> that sent the message.
-     * @param connection The <code>Connection</code> message was received on.
-     * @return An <code>Element</code> to update the originating
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} that sent the message.
+     * @param connection The {@code Connection} message was received on.
+     * @return An {@code Element} to update the originating
      *     player with the result of the demand.
      */
     public Element handle(FreeColServer server, Player player,

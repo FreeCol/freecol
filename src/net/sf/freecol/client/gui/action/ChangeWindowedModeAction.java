@@ -34,9 +34,9 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
 
     /**
-     * Creates a new <code>ChangeWindowedModeAction</code>.
+     * Creates a new {@code ChangeWindowedModeAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ChangeWindowedModeAction(FreeColClient freeColClient) {
         super(freeColClient, id, null);

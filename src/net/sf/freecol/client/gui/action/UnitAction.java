@@ -30,9 +30,9 @@ public abstract class UnitAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>UnitAction</code>.
+     * Creates a new {@code UnitAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param id The object identifier.
      */
     protected UnitAction(FreeColClient freeColClient, String id) {

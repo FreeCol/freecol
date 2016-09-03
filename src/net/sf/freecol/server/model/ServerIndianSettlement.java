@@ -71,7 +71,7 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Trivial constructor for all ServerModelObjects.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The {@code Game} in which this object belong.
      * @param id The object identifier.
      */
     public ServerIndianSettlement(Game game, String id) {
@@ -81,10 +81,10 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Creates a new ServerIndianSettlement.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param owner The <code>Player</code> owning this settlement.
+     * @param game The {@code Game} in which this object belong.
+     * @param owner The {@code Player} owning this settlement.
      * @param name The name for this settlement.
-     * @param tile The location of the <code>IndianSettlement</code>.
+     * @param tile The location of the {@code IndianSettlement}.
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by
      *     Europeans at this settlement.
@@ -108,10 +108,10 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Creates a new ServerIndianSettlement from a template.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param owner The <code>Player</code> owning this settlement.
-     * @param tile The location of the <code>IndianSettlement</code>.
-     * @param template The template <code>IndianSettlement</code> to copy.
+     * @param game The {@code Game} in which this object belong.
+     * @param owner The {@code Player} owning this settlement.
+     * @param tile The location of the {@code IndianSettlement}.
+     * @param template The template {@code IndianSettlement} to copy.
      */
     public ServerIndianSettlement(Game game, Player owner, Tile tile,
                                   IndianSettlement template) {
@@ -147,7 +147,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * Starts a new turn for a player.
      *
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csStartTurn(Random random, ChangeSet cs) {
         final Unit missionary = getMissionary();
@@ -224,9 +224,9 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * New turn for this native settlement.
      *
-     * @param random A <code>Random</code> number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     @Override
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
@@ -313,7 +313,7 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Convenience function to remove an amount of goods.
      *
-     * @param type The <code>GoodsType</code> to remove.
+     * @param type The {@code GoodsType} to remove.
      * @param amount The amount of goods to remove.
      */
     private void consumeGoods(GoodsType type, int amount) {
@@ -328,7 +328,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param player The <code>Player</code> to set the alarm level for.
+     * @param player The {@code Player} to set the alarm level for.
      * @param newAlarm The new alarm value.
      */
     @Override
@@ -345,7 +345,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param player The <code>Player</code> to remove the alarm for.
+     * @param player The {@code Player} to remove the alarm for.
      */
     public void removeAlarm(Player player) {
         if (player != null) {
@@ -381,9 +381,9 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param player The <code>Player</code> the alarm level changes wrt.
+     * @param player The {@code Player} the alarm level changes wrt.
      * @param amount The amount to change the alarm by.
-     * @return True if the <code>Tension.Level</code> of the
+     * @return True if the {@code Tension.Level} of the
      *     settlement alarm changes as a result of this change.
      */
     private boolean changeAlarm(Player player, int amount) {
@@ -405,11 +405,11 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param player The <code>Player</code> to modify alarm for.
+     * @param player The {@code Player} to modify alarm for.
      * @param add The amount to add to the current alarm level.
      * @param propagate If true, propagate the alarm change upward to the
      *     owning player.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the alarm changed.
      */
     private boolean csChangeAlarm(Player player, int add, boolean propagate,
@@ -434,11 +434,11 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * +til: Handles tile visibility changes.
      *
-     * @param player The <code>Player</code> to modify alarm for.
+     * @param player The {@code Player} to modify alarm for.
      * @param add The amount to add to the current alarm level.
      * @param propagate If true, propagate the alarm change upward to the
      *     owning player.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the alarm changed and the tile added.
      */
     public boolean csModifyAlarm(Player player, int add, boolean propagate,
@@ -459,7 +459,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * +til: Handles the tile appearance change.
      *
      * @param missionary The new missionary for this settlement.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csChangeMissionary(Unit missionary, ChangeSet cs) {
         final Unit old = getMissionary();
@@ -508,7 +508,7 @@ public class ServerIndianSettlement extends IndianSettlement
      *
      * @param destroy If true, the settlement is destroyed, if false the
      *     missionary is denounced, if null do not generate a message.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csKillMissionary(Boolean destroy, ChangeSet cs) {
         Unit missionary = getMissionary();
@@ -539,11 +539,11 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Equip a unit for a specific role.
      *
-     * @param unit The <code>Unit</code> to equip.
-     * @param role The <code>Role</code> to equip for.
+     * @param unit The {@code Unit} to equip.
+     * @param role The {@code Role} to equip for.
      * @param roleCount The role count.
      * @param random A pseudo-random number source.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param cs A {@code ChangeSet} to update.
      * @return True if the equipping succeeds.
      */
     public boolean csEquipForRole(Unit unit, Role role, int roleCount,
@@ -559,9 +559,9 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Check if tension has increased with respect to an enemy.
      *
-     * @param enemy The enemy <code>Player</code>.
-     * @param oldLevel The previous tension <code>Level</code>.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param enemy The enemy {@code Player}.
+     * @param oldLevel The previous tension {@code Level}.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csCheckTension(Player enemy, Tension.Level oldLevel,
                                ChangeSet cs) {

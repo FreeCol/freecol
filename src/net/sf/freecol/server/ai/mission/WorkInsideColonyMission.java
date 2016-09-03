@@ -50,11 +50,11 @@ public class WorkInsideColonyMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param aiColony The <code>AIColony</code> the unit should be
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param aiColony The {@code AIColony} the unit should be
      *     working in.
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
@@ -63,11 +63,11 @@ public class WorkInsideColonyMission extends Mission {
     }
 
     /**
-     * Creates a new <code>WorkInsideColonyMission</code> and reads
+     * Creates a new {@code WorkInsideColonyMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -84,7 +84,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * Convenience accessor for the colony to work in.
      *
-     * @return The <code>AIColony</code> to work in.
+     * @return The {@code AIColony} to work in.
      */
     public AIColony getAIColony() {
         return getAIMain().getAIColony(colony);
@@ -93,8 +93,8 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

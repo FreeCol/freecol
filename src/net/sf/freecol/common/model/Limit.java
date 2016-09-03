@@ -27,7 +27,7 @@ import net.sf.freecol.common.model.Operand.OperandType;
 
 
 /**
- * The <code>Limit</code> class encapsulates a limit on the
+ * The {@code Limit} class encapsulates a limit on the
  * availability of FreeColObjects.  It consists of a left hand side,
  * an operator and a right hand side, and can be used to limit the
  * number of units of a particular type (e.g. wagon trains) to the
@@ -54,7 +54,7 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Create a new limit.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public Limit(Specification specification) {
         super(specification);
@@ -63,8 +63,8 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Create a new limit.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is a problem reading.
      */
     public Limit(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
@@ -77,9 +77,9 @@ public final class Limit extends FreeColSpecObjectType {
      * Create a new limit.
      *
      * @param id The object identifier.
-     * @param lhs The left hand side <code>Operand</code>.
-     * @param op The <code>Operator</code> to apply.
-     * @param rhs The right hand side <code>Operand</code>.
+     * @param lhs The left hand side {@code Operand}.
+     * @param op The {@code Operator} to apply.
+     * @param rhs The right hand side {@code Operand}.
      */
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {
         setId(id);
@@ -90,9 +90,9 @@ public final class Limit extends FreeColSpecObjectType {
 
 
     /**
-     * Get the <code>Operator</code> value.
+     * Get the {@code Operator} value.
      *
-     * @return The <code>Operator</code> of this limit.
+     * @return The {@code Operator} of this limit.
      */
     public Operator getOperator() {
         return operator;
@@ -103,36 +103,36 @@ public final class Limit extends FreeColSpecObjectType {
     }
 
     /**
-     * Get the left hand side <code>Operand</code>.
+     * Get the left hand side {@code Operand}.
      *
-     * @return The left hand side <code>Operand</code>.
+     * @return The left hand side {@code Operand}.
      */
     public Operand getLeftHandSide() {
         return leftHandSide;
     }
 
     /**
-     * Set the left hand side <code>Operand</code>.
+     * Set the left hand side {@code Operand}.
      *
-     * @param newLeftHandSide The new left hand side <code>Operand</code>.
+     * @param newLeftHandSide The new left hand side {@code Operand}.
      */
     public void setLeftHandSide(final Operand newLeftHandSide) {
         this.leftHandSide = newLeftHandSide;
     }
 
     /**
-     * Get the right hand side <code>Operand</code>.
+     * Get the right hand side {@code Operand}.
      *
-     * @return The right hand side <code>Operand</code>.
+     * @return The right hand side {@code Operand}.
      */
     public Operand getRightHandSide() {
         return rightHandSide;
     }
 
     /**
-     * Set the right hand side <code>Operand</code>.
+     * Set the right hand side {@code Operand}.
      *
-     * @param newRightHandSide The new right hand side <code>Operand</code>.
+     * @param newRightHandSide The new right hand side {@code Operand}.
      */
     public void setRightHandSide(final Operand newRightHandSide) {
         this.rightHandSide = newRightHandSide;
@@ -151,7 +151,7 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Evaluate this limit within a game.
      *
-     * @param game The <code>Game</code> to use.
+     * @param game The {@code Game} to use.
      * @return The result of the evaluation.
      */
     public boolean evaluate(Game game) {
@@ -180,7 +180,7 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Evaluate this limit with respect to a player.
      *
-     * @param player The <code>Player</code> to use.
+     * @param player The {@code Player} to use.
      * @return The result of the evaluation.
      */
     public boolean evaluate(Player player) {
@@ -216,7 +216,7 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Evaluate this limit with respect to a player.
      *
-     * @param settlement The <code>Settlement</code> to use.
+     * @param settlement The {@code Settlement} to use.
      * @return The result of the evaluation.
      */
     public boolean evaluate(Settlement settlement) {
@@ -258,7 +258,7 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Check if at least one of the Operands has a given OperandType.
      *
-     * @param type The <code>OperandType</code> to check for.
+     * @param type The {@code OperandType} to check for.
      * @return True if the type is present.
      */
     public boolean hasOperandType(OperandType type) {
@@ -269,8 +269,8 @@ public final class Limit extends FreeColSpecObjectType {
     /**
      * Evaluate two integers using the limit operator.
      *
-     * @param lhs The left hand side <code>Integer</code>.
-     * @param rhs The right hand side <code>Integer</code>.
+     * @param lhs The left hand side {@code Integer}.
+     * @param rhs The right hand side {@code Integer}.
      * @return The result of the evaluation.
      */
     private boolean evaluate(Integer lhs, Integer rhs) {

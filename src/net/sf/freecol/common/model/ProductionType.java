@@ -62,7 +62,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Simple constructor.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ProductionType(Specification specification) {
         super(specification);
@@ -72,7 +72,7 @@ public class ProductionType extends FreeColSpecObject {
      * Creates a new production type that consumes no raw materials
      * and produces the given output.
      *
-     * @param outputs A list of the <code>AbstractGoods</code> produced.
+     * @param outputs A list of the {@code AbstractGoods} produced.
      */
     public ProductionType(List<AbstractGoods> outputs) {
         this((Specification)null);
@@ -84,8 +84,8 @@ public class ProductionType extends FreeColSpecObject {
      * Creates a new production type that consumes the given raw materials
      * and produces the given output.
      *
-     * @param inputs A list of the <code>AbstractGoods</code> consumed.
-     * @param outputs A list of the <code>AbstractGoods</code> produced.
+     * @param inputs A list of the {@code AbstractGoods} consumed.
+     * @param outputs A list of the {@code AbstractGoods} produced.
      */
     public ProductionType(List<AbstractGoods> inputs,
                           List<AbstractGoods> outputs) {
@@ -97,7 +97,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Convenience constructor for a production type with a single output.
      *
-     * @param output The <code>AbstractGoods</code> produced.
+     * @param output The {@code AbstractGoods} produced.
      * @param unattended True if this is unattended production.
      * @param level The difficulty level key.
      */
@@ -111,11 +111,11 @@ public class ProductionType extends FreeColSpecObject {
     }
 
     /**
-     * Convenience constructor for a new <code>ProductionType</code>
+     * Convenience constructor for a new {@code ProductionType}
      * instance with a single input and output.
      *
-     * @param input The <code>GoodsType</code> consumed.
-     * @param output The <code>GoodsType</code> produced.
+     * @param input The {@code GoodsType} consumed.
+     * @param output The {@code GoodsType} produced.
      * @param amount The amount of goods both produced and consumed.
      */
     public ProductionType(GoodsType input, GoodsType output, int amount) {
@@ -132,10 +132,10 @@ public class ProductionType extends FreeColSpecObject {
     }
 
     /**
-     * Creates a new <code>ProductionType</code> instance.
+     * Creates a new {@code ProductionType} instance.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param xr The {@code FreeColXMLReader} to read from.
+     * @param specification The {@code Specification} to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public ProductionType(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
@@ -148,7 +148,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the input goods.
      *
-     * @return A stream of the input <code>AbstractGoods</code>.
+     * @return A stream of the input {@code AbstractGoods}.
      */
     public final Stream<AbstractGoods> getInputs() {
         return (inputs == null) ? Stream.<AbstractGoods>empty()
@@ -158,7 +158,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Set the input goods.
      *
-     * @param newInputs The new list of input <code>AbstractGoods</code>.
+     * @param newInputs The new list of input {@code AbstractGoods}.
      */
     public final void setInputs(final List<AbstractGoods> newInputs) {
         this.inputs = newInputs;
@@ -167,7 +167,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Add a new input.
      *
-     * @param type The <code>GoodsType</code> to add.
+     * @param type The {@code GoodsType} to add.
      * @param amount The amount of goods.
      */
     private void addInput(GoodsType type, int amount) {
@@ -178,7 +178,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the output goods.
      *
-     * @return A stream of the output <code>AbstractGoods</code>.
+     * @return A stream of the output {@code AbstractGoods}.
      */
     public final Stream<AbstractGoods> getOutputs() {
         return (outputs == null) ? Stream.<AbstractGoods>empty()
@@ -188,7 +188,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Set the output goods.
      *
-     * @param newOutputs The new list of output <code>AbstractGoods</code>.
+     * @param newOutputs The new list of output {@code AbstractGoods}.
      */
     public final void setOutputs(final List<AbstractGoods> newOutputs) {
         this.outputs = newOutputs;
@@ -197,7 +197,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Add a new output.
      *
-     * @param type The <code>GoodsType</code> to add.
+     * @param type The {@code GoodsType} to add.
      * @param amount The amount of goods.
      */
     public void addOutput(GoodsType type, int amount) {
@@ -208,7 +208,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Add a new output.
      *
-     * @param ag The <code>AbstractGoods</code> to add.
+     * @param ag The {@code AbstractGoods} to add.
      */
     public void addOutput(AbstractGoods ag) {
         if (outputs == null) outputs = new ArrayList<>(1);
@@ -218,8 +218,8 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the goods of the given goods type in this production type.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The <code>AbstractGoods</code> output if any, otherwise
+     * @param goodsType The {@code GoodsType} to check.
+     * @return The {@code AbstractGoods} output if any, otherwise
      *     null.
      */
     public AbstractGoods getOutput(GoodsType goodsType) {
@@ -230,7 +230,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the type of the most productive output.
      *
-     * @return The <code>GoodsType</code> of the most productive output.
+     * @return The {@code GoodsType} of the most productive output.
      */
     public GoodsType getBestOutputType() {
         AbstractGoods goods;
@@ -297,8 +297,8 @@ public class ProductionType extends FreeColSpecObject {
      * Convenience function to check if there is an output for a given
      * goods type in a collection of production types.
      *
-     * @param goodsType The <code>GoodsType</code> to use.
-     * @param types A list of <code>ProductionType</code>s to consider.
+     * @param goodsType The {@code GoodsType} to use.
+     * @param types A list of {@code ProductionType}s to consider.
      * @return The most productive output that produces the goods type,
      *     or null if none found.
      */
@@ -312,10 +312,10 @@ public class ProductionType extends FreeColSpecObject {
      * Get the production type with the greatest total output of an
      * optional goods type from a collection of production types
      *
-     * @param goodsType An optional <code>GoodsType</code> to restrict the
+     * @param goodsType An optional {@code GoodsType} to restrict the
      *     choice of outputs with.
-     * @param types A collection of <code>ProductionType</code>s to consider.
-     * @return The most productive <code>ProductionType</code>.
+     * @param types A collection of {@code ProductionType}s to consider.
+     * @return The most productive {@code ProductionType}.
      */
     public static ProductionType getBestProductionType(GoodsType goodsType,
         Collection<ProductionType> types) {
@@ -329,7 +329,7 @@ public class ProductionType extends FreeColSpecObject {
     /**
      * Get the output the maximizes production for an optional goods type.
      *
-     * @param goodsType The optional <code>GoodsType</code> to check.
+     * @param goodsType The optional {@code GoodsType} to check.
      * @return The best production.
      */
     public AbstractGoods getBestOutputFor(GoodsType goodsType) {

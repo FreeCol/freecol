@@ -31,9 +31,9 @@ public interface NetworkRequestHandler {
      * Handle a request represented by an {@link Element} and return another
      * {@link Element} or null as the answer.
      * 
-     * @param connection The message's <code>Connection</code>.
-     * @param element The root <code>Element</code> of the message.
-     * @return The reply <code>Element</code>, which may be null.
+     * @param connection The message's {@code Connection}.
+     * @param element The root {@code Element} of the message.
+     * @return The reply {@code Element}, which may be null.
      */
     Element handle(Connection connection, Element element);
 }

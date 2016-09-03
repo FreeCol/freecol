@@ -51,11 +51,11 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
 
     /**
-     * Creates a new <code>AudioMixerOptionUI</code> for the given
-     * <code>AudioMixerOption</code>.
+     * Creates a new {@code AudioMixerOptionUI} for the given
+     * {@code AudioMixerOption}.
      *
      * @param gui The GUI.
-     * @param option The <code>AudioMixerOption</code> to make a user
+     * @param option The {@code AudioMixerOption} to make a user
      *      interface for.
      * @param editable boolean whether user can modify the setting
      */

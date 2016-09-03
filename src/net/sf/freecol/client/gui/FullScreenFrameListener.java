@@ -38,7 +38,7 @@ public final class FullScreenFrameListener implements WindowListener {
     /**
      * Constructs this WindowListener.
      *
-     * @param freeColClient The <code>FreeColClient</code> to notify.
+     * @param freeColClient The {@code FreeColClient} to notify.
      * @param frame The frame.
      */
     public FullScreenFrameListener(FreeColClient freeColClient,

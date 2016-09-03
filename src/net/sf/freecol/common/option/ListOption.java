@@ -59,19 +59,19 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
 
 
     /**
-     * Creates a new <code>ListOption</code>.
+     * Creates a new {@code ListOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ListOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>ListOption</code>.
+     * Creates a new {@code ListOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public ListOption(String id, Specification specification) {
         super(id, specification);
@@ -108,7 +108,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     /**
      * Add a member to the values list.
      *
-     * @param ao The new <code>AbstractOption</code> member to add.
+     * @param ao The new {@code AbstractOption} member to add.
      */
     private void addMember(AbstractOption<T> ao) {
         if (canAdd(ao)) this.value.add(ao);
@@ -146,7 +146,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     // Interface Option
 
     /**
-     * Gets the current value of this <code>ListOption</code>.
+     * Gets the current value of this {@code ListOption}.
      *
      * @return The value.
      */
@@ -156,7 +156,7 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     }
 
     /**
-     * Sets the value of this <code>ListOption</code>.
+     * Sets the value of this {@code ListOption}.
      *
      * @param value The value to be set.
      */

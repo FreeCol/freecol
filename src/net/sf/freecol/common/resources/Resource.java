@@ -24,9 +24,9 @@ import java.net.URI;
 
 /**
  * Represents a resource that either has been or can be loaded using a
- * <code>URI</code>.  There can only be one instance of
- * <code>Resource</code> having the same (as in URI's equals, not the
- * identity) <code>URI</code>.
+ * {@code URI}.  There can only be one instance of
+ * {@code Resource} having the same (as in URI's equals, not the
+ * identity) {@code URI}.
  */
 public abstract class Resource {
 
@@ -58,7 +58,7 @@ public abstract class Resource {
 
 
     /**
-     * The <code>URI</code> used when loading this resource.
+     * The {@code URI} used when loading this resource.
      */
     private final URI resourceLocator;
 
@@ -72,7 +72,7 @@ public abstract class Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
     public Resource(URI resourceLocator) {
@@ -81,8 +81,8 @@ public abstract class Resource {
 
 
     /**
-     * Returns the <code>URI</code> used for loading the resource.
-     * @return The <code>URI</code>.
+     * Returns the {@code URI} used for loading the resource.
+     * @return The {@code URI}.
      */
     public URI getResourceLocator() {
         return resourceLocator;

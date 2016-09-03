@@ -46,10 +46,10 @@ public class SetCurrentStopMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>SetCurrentStopMessage</code> for the
+     * Create a new {@code SetCurrentStopMessage} for the
      * supplied unit.
      *
-     * @param unit A <code>Unit</code> whose stop is to be setd.
+     * @param unit A {@code Unit} whose stop is to be setd.
      * @param index The stop index.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
@@ -60,11 +60,11 @@ public class SetCurrentStopMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>SetCurrentStopMessage</code> from a
+     * Create a new {@code SetCurrentStopMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public SetCurrentStopMessage(Game game, Element element) {
         super(getTagName());
@@ -77,10 +77,10 @@ public class SetCurrentStopMessage extends DOMMessage {
     /**
      * Handle a "setCurrentStop"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> the message is from.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param connection The {@code Connection} the message is from.
      * @return An set containing the unit after updating its
-     *     current stop, or an error <code>Element</code> on failure.
+     *     current stop, or an error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         final ServerPlayer serverPlayer = server.getPlayer(connection);

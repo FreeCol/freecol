@@ -33,9 +33,9 @@ public class ShowGameOptionsAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>ShowGameOptionsAction</code>.
+     * Creates a new {@code ShowGameOptionsAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ShowGameOptionsAction(FreeColClient freeColClient) {
         super(freeColClient, id);

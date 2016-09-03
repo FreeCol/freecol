@@ -34,9 +34,9 @@ public class MiniMapToggleViewAction extends MapboardAction {
     
     
     /**
-     * Creates a new <code>MiniMapToggleViewAction</code>.
+     * Creates a new {@code MiniMapToggleViewAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MiniMapToggleViewAction(FreeColClient freeColClient) {
         super(freeColClient, id);
@@ -45,10 +45,10 @@ public class MiniMapToggleViewAction extends MapboardAction {
     }
 
     /**
-     * Creates a new <code>MiniMapToggleViewAction</code>.
+     * Creates a new {@code MiniMapToggleViewAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param b a <code>boolean</code> value
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param b a {@code boolean} value
      */
     public MiniMapToggleViewAction(FreeColClient freeColClient, boolean b) {
         super(freeColClient, id + ".secondary");

@@ -46,9 +46,9 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Initializes this JLabel with the given goods type.
      *
-     * @param lib The <code>ImageLibrary</code> to display with.
-     * @param type The <code>GoodsType</code> to represent.
-     * @param market The <code>Market</code> in which to trade the goods.
+     * @param lib The {@code ImageLibrary} to display with.
+     * @param type The {@code GoodsType} to represent.
+     * @param market The {@code Market} in which to trade the goods.
      */
     public MarketLabel(ImageLibrary lib, GoodsType type, Market market) {
         super(lib, new AbstractGoods(type, GoodsContainer.CARGO_SIZE));
@@ -62,7 +62,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Wrap the label with a border.
      *
-     * @return This <code>MarketLabel</code>.
+     * @return This {@code MarketLabel}.
      */
     public MarketLabel addBorder() {
         setBorder(Utility.TOPCELLBORDER);
@@ -95,7 +95,7 @@ public final class MarketLabel extends AbstractGoodsLabel
     /**
      * Get this MarketLabel's market.
      *
-     * @return The enclosing <code>Market</code>.
+     * @return The enclosing {@code Market}.
      */
     public Market getMarket() {
         return market;

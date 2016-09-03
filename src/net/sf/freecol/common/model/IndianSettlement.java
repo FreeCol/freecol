@@ -148,10 +148,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Constructor for ServerIndianSettlement.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param owner The <code>Player</code> owning this settlement.
+     * @param game The enclosing {@code Game}.
+     * @param owner The {@code Player} owning this settlement.
      * @param name The name for this settlement.
-     * @param tile The containing <code>Tile</code>.
+     * @param tile The containing {@code Tile}.
      */
     protected IndianSettlement(Game game, Player owner, String name,
                                Tile tile) {
@@ -159,11 +159,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Creates a new <code>IndianSettlement</code> with the given
+     * Creates a new {@code IndianSettlement} with the given
      * identifier.  The object should later be initialized by calling either
      * {@link #readFromXML(FreeColXMLReader)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The {@code Game} in which this object belong.
      * @param id The object identifier.
      */
     public IndianSettlement(Game game, String id) {
@@ -183,10 +183,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Adds the given <code>Unit</code> to the list of units that
-     * belongs to this <code>IndianSettlement</code>.
+     * Adds the given {@code Unit} to the list of units that
+     * belongs to this {@code IndianSettlement}.
      *
-     * @param unit The <code>Unit</code> to be added.
+     * @param unit The {@code Unit} to be added.
      */
     public void addOwnedUnit(Unit unit) {
         if (unit == null) {
@@ -221,13 +221,13 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Removes the given <code>Unit</code> to the list of units that
-     * belongs to this <code>IndianSettlement</code>. Returns true if
+     * Removes the given {@code Unit} to the list of units that
+     * belongs to this {@code IndianSettlement}. Returns true if
      * the Unit was removed.
      *
-     * @param unit The <code>Unit</code> to be removed from the
-     *     list of the units this <code>IndianSettlement</code> owns.
-     * @return a <code>boolean</code> value
+     * @param unit The {@code Unit} to be removed from the
+     *     list of the units this {@code IndianSettlement} owns.
+     * @return a {@code boolean} value
      */
     public boolean removeOwnedUnit(Unit unit) {
         if (unit == null) {
@@ -279,7 +279,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * and whether the requestor has visited this settlement.
      *
      * @param visited The visiting status.
-     * @return A <code>StringTemplate</code> describing the perceived skill.
+     * @return A {@code StringTemplate} describing the perceived skill.
      */
     public StringTemplate getLearnableSkillLabel(boolean visited) {
         return StringTemplate.key((visited)
@@ -310,7 +310,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Does this settlement have a missionary from the given player?
      *
-     * @param player The <code>Player</code> to test.
+     * @param player The {@code Player} to test.
      * @return True if there is a suitable missionary present.
      */
     public boolean hasMissionary(Player player) {
@@ -382,7 +382,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Gets one of the goods wanted by this settlement.
      *
      * @param index Which of the goods to get.
-     * @return The wanted <code>GoodsType</code> or null if not present or
+     * @return The wanted {@code GoodsType} or null if not present or
      *     the index is out of range.
      */
     public GoodsType getWantedGoods(int index) {
@@ -393,7 +393,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Sets the goods wanted by this Settlement.
      *
-     * @param wanted The new wanted <code>GoodsType</code> list.
+     * @param wanted The new wanted {@code GoodsType} list.
      */
     public void setWantedGoods(List<GoodsType> wanted) {
         final int n = wanted.size();
@@ -406,7 +406,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Sets the goods wanted by this settlement.
      *
      * @param index Which of the (usually 3) goods to set.
-     * @param type The <code>GoodsType</code> wanted.
+     * @param type The {@code GoodsType} wanted.
      */
     public void setWantedGoods(int index, GoodsType type) {
         if (validWantedGoodsIndex(index)) this.wantedGoods.set(index, type);
@@ -426,8 +426,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Get a label for one of the wanted goods.
      *
      * @param index The index into the wanted goods.
-     * @param player The requesting <code>Player</code>.
-     * @return A list of a <code>StringTemplate</code> for the label, and
+     * @param player The requesting {@code Player}.
+     * @return A list of a {@code StringTemplate} for the label, and
      *     optionally one for a tool tip.
      */
     public List<StringTemplate> getWantedGoodsLabel(int index, Player player) {
@@ -475,7 +475,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * whether the requestor has contacted this settlement.
      *
      * @param contacted The contact status.
-     * @return A <code>StringTemplate</code> describing the perceived
+     * @return A {@code StringTemplate} describing the perceived
      *     most hated nation.
      */
     public StringTemplate getMostHatedLabel(boolean contacted) {
@@ -489,7 +489,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Gets the contact level between this settlement and a player.
      *
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return The contact level.
      */
     public ContactLevel getContactLevel(Player player) {
@@ -503,7 +503,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * level with respect to the contacting player--- effectively the
      * average reputation of this player with the overall tribe.
      *
-     * @param player The <code>Player</code> making contact.
+     * @param player The {@code Player} making contact.
      * @return True if this was indeed the first contact between settlement
      *     and player.
      */
@@ -519,7 +519,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Has a player visited this settlement?
      *
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return True if the player has contacted this settlement.
      */
     public boolean hasVisited(Player player) {
@@ -531,7 +531,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Sets the contact level of this settlement to indicate
      * that a European player has visited the settlement.
      *
-     * @param player The visiting <code>Player</code>.
+     * @param player The visiting {@code Player}.
      * @return True if this was the first time the settlement was visited
      *     by the player.
      */
@@ -547,7 +547,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Has a player has spoken with the chief of this settlement.
      *
-     * @param player The <code>Player</code> to check.
+     * @param player The {@code Player} to check.
      * @return True if the player has visited this settlement to speak
      *     with the chief.
      */
@@ -559,7 +559,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Sets the contact level of this settlement to indicate
      * that a European player has had a chat with the chief.
      *
-     * @param player The visiting <code>Player</code>.
+     * @param player The visiting {@code Player}.
      * @return True if this was the first time the settlement was scouted
      *     by the player.
      */
@@ -586,7 +586,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * That is, has it been contacted, but not scouted already, or
      * visited when the "Chief contact" option is set.
      *
-     * @param player The <code>Player</code> contemplating scouting.
+     * @param player The {@code Player} contemplating scouting.
      * @return Whether it might be worth the player scouting this settlement.
      */
     public boolean worthScouting(Player player) {
@@ -606,7 +606,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Gets the alarm level towards the given player.
      *
-     * @param player The <code>Player</code> to get the alarm level for.
+     * @param player The {@code Player} to get the alarm level for.
      * @return The current alarm level or null if the settlement has not
      *     encoutered the player.
      */
@@ -621,7 +621,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * -til: Might change tile appearance through most hated state
      *
-     * @param player The <code>Player</code> to set the alarm level for.
+     * @param player The {@code Player} to set the alarm level for.
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
@@ -643,7 +643,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Initialize the alarm at this settlement with respect to a
      * player with the current national tension.
      *
-     * @param player The <code>Player</code> to set the alarm level for.
+     * @param player The {@code Player} to set the alarm level for.
      */
     protected void initializeAlarm(Player player) {
         Tension tension = owner.getTension(player);
@@ -654,7 +654,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Gets a message key for a short alarm message associated with the
      * alarm level of this player.
      *
-     * @param player The other <code>Player</code>.
+     * @param player The other {@code Player}.
      * @return The alarm message key.
      */
     public String getAlarmLevelKey(Player player) {
@@ -668,7 +668,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Get the current goods offered for sale.
      *
-     * @return A list of <code>Goods</code> for sale.
+     * @return A list of {@code Goods} for sale.
      */
     public List<Goods> getGoodsForSale() {
         return this.forSale;
@@ -677,7 +677,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Set the current goods offered for sale.
      *
-     * @param forSale A new list of <code>Goods</code> for sale.
+     * @param forSale A new list of {@code Goods} for sale.
      */
     public void setGoodsForSale(List<Goods> forSale) {
         this.forSale.clear();
@@ -690,7 +690,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * or in the first instance, must be arriving by land, with the
      * exception of trading ships.
      *
-     * @param unit The <code>Unit</code> that proposes to contact this
+     * @param unit The {@code Unit} that proposes to contact this
      *             settlement.
      * @return True if the settlement accepts such contact.
      */
@@ -701,8 +701,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to pay for the given <code>Goods</code>.
+     * Gets the amount of gold this {@code IndianSettlment}
+     * is willing to pay for the given {@code Goods}.
      *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
@@ -717,8 +717,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to pay for the given <code>Goods</code>.
+     * Gets the amount of gold this {@code IndianSettlment}
+     * is willing to pay for the given {@code Goods}.
      *
      * It is only meaningful to call this method from the server,
      * since the settlement's {@link GoodsContainer} is hidden from
@@ -728,8 +728,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *
      * FIXME: this is rancid with magic numbers.
      *
-     * @param type The type of <code>Goods</code> to price.
-     * @param amount The amount of <code>Goods</code> to price.
+     * @param type The type of {@code Goods} to price.
+     * @param amount The amount of {@code Goods} to price.
      * @return The price.
      */
     public int getPriceToBuy(GoodsType type, int amount) {
@@ -813,7 +813,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Calculates how much of the given goods type this settlement
      * wants and should retain.
      *
-     * @param type The <code>GoodsType</code>.
+     * @param type The {@code GoodsType}.
      * @return The amount of goods wanted.
      */
     protected int getWantedGoodsAmount(GoodsType type) {
@@ -871,8 +871,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to sell the given <code>Goods</code> for.
+     * Gets the amount of gold this {@code IndianSettlment}
+     * is willing to sell the given {@code Goods} for.
      *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
@@ -887,15 +887,15 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
     /**
-     * Gets the amount of gold this <code>IndianSettlment</code>
-     * is willing to sell the given <code>Goods</code> for.
+     * Gets the amount of gold this {@code IndianSettlment}
+     * is willing to sell the given {@code Goods} for.
      *
      * It is only meaningful to call this method from the
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
      *
-     * @param type The type of <code>Goods</code> to price.
-     * @param amount The amount of <code>Goods</code> to price.
+     * @param type The type of {@code Goods} to price.
+     * @param amount The amount of {@code Goods} to price.
      * @return The price.
      */
     public int getPriceToSell(GoodsType type, int amount) {
@@ -921,7 +921,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Will this settlement sell a type of goods.
      * Placeholder until we have a spec-configured blacklist.
      *
-     * @param type The <code>GoodsType</code> to consider.
+     * @param type The {@code GoodsType} to consider.
      * @return True if the settlement would sell the goods.
      */
     public boolean willSell(GoodsType type) {
@@ -934,7 +934,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Sell new world goods first, then by decreasing price, then
      * decreasing amount.
      *
-     * @param unit An optional <code>Unit</code> that is trading.
+     * @param unit An optional {@code Unit} that is trading.
      * @return A list of goods to sell.
      */
     public List<Goods> getSellGoods(Unit unit) {
@@ -975,7 +975,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     /**
      * Allows spread of horses and arms between settlements
      *
-     * @param is The other <code>IndianSettlement</code> to trade with.
+     * @param is The other {@code IndianSettlement} to trade with.
      */
     public void tradeGoodsWithSettlement(IndianSettlement is) {
         final Specification spec = getSpecification();
@@ -1043,7 +1043,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * Simple rule: choose the refined goods that is the greatest shortage
      * for which there is a surplus of the raw material.
      *
-     * @return A <code>GoodsType</code> to manufacture, or null if
+     * @return A {@code GoodsType} to manufacture, or null if
      *      none suitable.
      */
     private GoodsType goodsToMake() {

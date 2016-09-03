@@ -48,11 +48,11 @@ public class AttackMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>AttackMessage</code> for the supplied unit and
+     * Create a new {@code AttackMessage} for the supplied unit and
      * direction.
      *
-     * @param unit The <code>Unit</code> attacking.
-     * @param direction The <code>Direction</code> to attack in.
+     * @param unit The {@code Unit} attacking.
+     * @param direction The {@code Direction} to attack in.
      */
     public AttackMessage(Unit unit, Direction direction) {
         super(getTagName());
@@ -62,11 +62,11 @@ public class AttackMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>AttackMessage</code> from a
+     * Create a new {@code AttackMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public AttackMessage(Game game, Element element) {
         super(getTagName());
@@ -79,11 +79,11 @@ public class AttackMessage extends DOMMessage {
     /**
      * Handle a "attack"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update encapsulating the attack or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

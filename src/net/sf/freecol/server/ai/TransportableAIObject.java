@@ -81,7 +81,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     public static final int TOOLS_FOR_BUILDING = 100;
 
     /**
-     * The <code>AIUnit</code> which has been allocated to transport
+     * The {@code AIUnit} which has been allocated to transport
      * this object.
      */
     private AIUnit transport;
@@ -90,7 +90,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Create a new uninitialized transportable AI object.
      *
-     * @param aiMain an <code>AIMain</code> value
+     * @param aiMain an {@code AIMain} value
      * @param id The object identifier.
      */
     public TransportableAIObject(AIMain aiMain, String id) {
@@ -144,7 +144,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Gets the carrier responsible for transporting this object.
      *
-     * @return The <code>AIUnit</code> which will transport this object.
+     * @return The {@code AIUnit} which will transport this object.
      */
     public final AIUnit getTransport() {
         return this.transport;
@@ -153,7 +153,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Sets the carrier responsible for transporting this object.
      *
-     * @param transport The new carrier <code>AIUnit</code>.
+     * @param transport The new carrier {@code AIUnit}.
      */
     public final void setTransport(AIUnit transport) {
         this.transport = transport;
@@ -201,7 +201,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * TransportMission lists, and disembark from the old carrier if
      * possible.
      *
-     * @param aiCarrier The new carrier <code>AIUnit</code>.
+     * @param aiCarrier The new carrier {@code AIUnit}.
      * @return True if the transport was changed, false if the transportable
      *     was unable to disembark from the old carrier or unable to be
      *     added to the new carrier transport list.
@@ -236,7 +236,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Get the transportables location if any.
      *
-     * @return The transportable <code>Location</code>.
+     * @return The transportable {@code Location}.
      */
     public Location getLocation() {
         Locatable l = getTransportLocatable();
@@ -249,7 +249,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Gets the underlying locatable object which should be transported.
      *
-     * @return The <code>Locatable</code>.
+     * @return The {@code Locatable}.
      */
     public abstract Locatable getTransportLocatable();
 
@@ -258,7 +258,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * This is normally the location of the
      * {@link #getTransportLocatable locatable}.
      *
-     * @return The source <code>Location</code>.
+     * @return The source {@code Location}.
      */
     public abstract Location getTransportSource();
 
@@ -267,14 +267,14 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * This can be the target {@link net.sf.freecol.common.model.Tile}
      * of the transport or the target of the mission.
      *
-     * @return The destination <code>Location</code>.
+     * @return The destination {@code Location}.
      */
     public abstract Location getTransportDestination();
 
     /**
      * Set the destination location for this transportable AI object.
      *
-     * @param destination The destination <code>Location</code>.
+     * @param destination The destination {@code Location}.
      */
     public abstract void setTransportDestination(Location destination);
 
@@ -282,8 +282,8 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * Get the path to deliver this transportable to its destination
      * with a given carrier.
      *
-     * @param carrier The carrier <code>Unit</code> to use.
-     * @param dst The destination <code>Location</code>, defaulting to the
+     * @param carrier The carrier {@code Unit} to use.
+     * @param dst The destination {@code Location}, defaulting to the
      *     transport destination if null.
      * @return A path, or null if none found.
      */
@@ -295,8 +295,8 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * it need only improve the current situation rather than complete
      * the delivery to the destination.
      *
-     * @param carrier The carrier <code>Unit</code> to use.
-     * @param dst The destination <code>Location</code>, defaulting to the
+     * @param carrier The carrier {@code Unit} to use.
+     * @param dst The destination {@code Location}, defaulting to the
      *     transport destination if null.
      * @return A path, or null if none found.
      */
@@ -305,7 +305,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * Can this transportable be carried by a given carrier unit?
      *
-     * @param carrier The potential carrier <code>Unit</code>.
+     * @param carrier The potential carrier {@code Unit}.
      * @return True if the unit can carry this transportable.
      */
     public abstract boolean carriableBy(Unit carrier);
@@ -329,7 +329,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * This object leaves its current carrier unit.
      *
-     * @param direction The <code>Direction</code> to leave in, null
+     * @param direction The {@code Direction} to leave in, null
      *     to leave in place.
      * @return True if the object successfully left the carrier.
      */
@@ -338,8 +338,8 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     /**
      * This object joins a carrier unit.
      *
-     * @param carrier The carrier <code>Unit</code> to join.
-     * @param direction The <code>Direction</code> to move, null to join
+     * @param carrier The carrier {@code Unit} to join.
+     * @param direction The {@code Direction} to move, null to join
      *     a carrier in the same location.
      * @return True if the object has joined tha carrier.
      */

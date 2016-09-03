@@ -57,11 +57,11 @@ public class MonarchActionMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>MonarchActionMessage</code> with the given action
+     * Create a new {@code MonarchActionMessage} with the given action
      * to be sent to the client to solicit a response.
      *
-     * @param action The <code>MonarchAction</code> to do.
-     * @param template A <code>StringTemplate</code> describing the action.
+     * @param action The {@code MonarchAction} to do.
+     * @param template A {@code StringTemplate} describing the action.
      * @param monarchKey The resource key for the monarch image.
      */
     public MonarchActionMessage(MonarchAction action,
@@ -76,11 +76,11 @@ public class MonarchActionMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>MonarchActionMessage</code> from a
+     * Create a new {@code MonarchActionMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public MonarchActionMessage(Game game, Element element) {
         super(getTagName());
@@ -171,11 +171,11 @@ public class MonarchActionMessage extends DOMMessage {
     /**
      * Handles a "monarchAction"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      *
-     * @return An <code>Element</code> containing the response.
+     * @return An {@code Element} containing the response.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

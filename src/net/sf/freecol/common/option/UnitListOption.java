@@ -30,19 +30,19 @@ import net.sf.freecol.common.model.Specification;
 public class UnitListOption extends ListOption<AbstractUnit> {
 
     /**
-     * Creates a new <code>UnitListOption</code>.
+     * Creates a new {@code UnitListOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public UnitListOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>UnitListOption</code>.
+     * Creates a new {@code UnitListOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public UnitListOption(String id, Specification specification) {
         super(id, specification);

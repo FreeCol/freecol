@@ -122,8 +122,8 @@ public class Connection implements Closeable {
     }
 
     /**
-     * Creates a new <code>Connection</code> with the specified
-     * <code>Socket</code> and {@link MessageHandler}.
+     * Creates a new {@code Connection} with the specified
+     * {@code Socket} and {@link MessageHandler}.
      *
      * @param socket The socket to the client.
      * @param messageHandler The MessageHandler to call for each message
@@ -233,7 +233,7 @@ public class Connection implements Closeable {
     /**
      * Gets the socket.
      *
-     * @return The <code>Socket</code> used while communicating with
+     * @return The {@code Socket} used while communicating with
      *     the other peer.
      */
     public Socket getSocket() {
@@ -298,10 +298,10 @@ public class Connection implements Closeable {
     /**
      * Write an element into a string writer.
      *
-     * @param transformer A <code>Transformer</code> to convert the
+     * @param transformer A {@code Transformer} to convert the
      *     element with.
-     * @param element The <code>Element</code> to write.
-     * @return A new <code>StringWriter</code> containing the element, or
+     * @param element The {@code Element} to write.
+     * @return A new {@code StringWriter} containing the element, or
      *     null if the element could not be transformed.
      */
     private StringWriter elementToStringWriter(Transformer transformer,
@@ -323,7 +323,7 @@ public class Connection implements Closeable {
      *
      * FIXME: Convert to not use Element.
      *
-     * @param element An <code>Element</code> to log.
+     * @param element An {@code Element} to log.
      * @param send True if sending (else replying).
      */
     protected void log(Element element, boolean send) {
@@ -346,7 +346,7 @@ public class Connection implements Closeable {
     /**
      * Low level routine to send a message over this Connection.
      *
-     * @param element The <code>Element</code> (root element in a
+     * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information
      * @exception IOException If an error occur while sending the message.
      */
@@ -412,7 +412,7 @@ public class Connection implements Closeable {
     /**
      * Main public routine to send a message over this connection.
      *
-     * @param element The <code>Element</code> (root element in a
+     * @param element The {@code Element} (root element in a
      *     DOM-parsed XML tree) that holds all the information
      * @exception IOException If an error occur while sending the message.
      * @see #sendAndWait(Element)
@@ -457,9 +457,9 @@ public class Connection implements Closeable {
     /**
      * Sends a message to the peer and returns a message in reply.
      *
-     * @param game The <code>Game</code> to create the reply message in.
-     * @param message The <code>DOMMessage</code> to send.
-     * @return A <code>DOMMessage</code> created from the reply.
+     * @param game The {@code Game} to create the reply message in.
+     * @param message The {@code DOMMessage} to send.
+     * @return A {@code DOMMessage} created from the reply.
      */
     public DOMMessage ask(Game game, DOMMessage message) {
         Element reply;
@@ -477,10 +477,10 @@ public class Connection implements Closeable {
      * Sends a message to the peer and returns a message of requested type
      * or error in reply.
      *
-     * @param game The <code>Game</code> to create the reply message in.
-     * @param message The <code>DOMMessage</code> to send.
+     * @param game The {@code Game} to create the reply message in.
+     * @param message The {@code DOMMessage} to send.
      * @param replyTag The requested tag of the reply.
-     * @return A <code>DOMMessage</code> in reply, either of the requested
+     * @return A {@code DOMMessage} in reply, either of the requested
      *     type or error.
      */
     public DOMMessage ask(Game game, DOMMessage message, String replyTag) {
@@ -500,7 +500,7 @@ public class Connection implements Closeable {
      * Handle a query (has QUESTION_TAG), with given reply identifier,
      * and send a reply (has REPLY_TAG and the given reply identifier).
      * 
-     * @param msg The query <code>DOMMessage</code>.
+     * @param msg The query {@code DOMMessage}.
      * @param replyId The reply identifier.
      * @exception FreeColException if there is a handler problem.
      * @exception IOException if sending fails.
@@ -519,7 +519,7 @@ public class Connection implements Closeable {
     /**
      * Handle an ordinary message, and if the response is non-null send it.
      * 
-     * @param msg The <code>DOMMessage</code> to handle.
+     * @param msg The {@code DOMMessage} to handle.
      * @exception FreeColException if there is a handler problem.
      * @exception IOException if sending fails.
      */
@@ -533,7 +533,7 @@ public class Connection implements Closeable {
     /**
      * Handle a request.
      *
-     * @param request The request <code>Element</code> to handle.
+     * @param request The request {@code Element} to handle.
      * @return The reply from the message handler.
      * @exception FreeColException if there is trouble with the response.
      */

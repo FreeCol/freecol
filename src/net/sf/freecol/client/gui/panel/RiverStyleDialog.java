@@ -51,7 +51,7 @@ public final class RiverStyleDialog extends FreeColChoiceDialog<String> {
     /**
      * Creates a dialog to choose a river style.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public RiverStyleDialog(FreeColClient freeColClient, JFrame frame) {

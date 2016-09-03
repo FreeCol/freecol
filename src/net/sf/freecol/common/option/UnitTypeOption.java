@@ -64,19 +64,19 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
 
 
     /**
-     * Creates a new <code>UnitTypeOption</code>.
+     * Creates a new {@code UnitTypeOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public UnitTypeOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>UnitTypeOption</code>.
+     * Creates a new {@code UnitTypeOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public UnitTypeOption(String id, Specification specification) {
         super(id, specification);
@@ -95,7 +95,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Get the list of choices for this option.
      *
-     * @return A list of <code>UnitType</code>s.
+     * @return A list of {@code UnitType}s.
      */
     public final List<UnitType> getChoices() {
         return choices;
@@ -128,9 +128,9 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     }
 
     /**
-     * Gets the current value of this <code>UnitTypeOption</code>.
+     * Gets the current value of this {@code UnitTypeOption}.
      *
-     * @return The <code>UnitType</code> value.
+     * @return The {@code UnitType} value.
      */
     @Override
     public UnitType getValue() {
@@ -138,9 +138,9 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     }
 
     /**
-     * Sets the current value of this <code>UnitTypeOption</code>.
+     * Sets the current value of this {@code UnitTypeOption}.
      *
-     * @param value The new <code>UnitType</code> value.
+     * @param value The new {@code UnitType} value.
      */
     @Override
     public void setValue(UnitType value) {

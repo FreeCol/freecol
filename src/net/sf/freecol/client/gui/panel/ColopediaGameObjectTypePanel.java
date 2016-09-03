@@ -74,8 +74,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
     /**
      * Create a new Colopedia game object type panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colopediaPanel The parent <code>ColopediaPanel</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colopediaPanel The parent {@code ColopediaPanel}.
      * @param id The panel type identifier.
      */
     public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
@@ -111,7 +111,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
     /**
      * Builds a subtree including all the given objects.
      *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * @param root a {@code DefaultMutableTreeNode}
      * @param types a List of FreeColSpecObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, List<T> types) {
@@ -121,7 +121,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
     /**
      * Builds a subtree including all the given objects.
      *
-     * @param root a <code>DefaultMutableTreeNode</code>
+     * @param root a {@code DefaultMutableTreeNode}
      * @param id The object identifier of the new branch node.
      * @param types a List of FreeColSpecObjectTypes
      */

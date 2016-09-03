@@ -60,8 +60,8 @@ public class WorkProductionPanel extends FreeColPanel {
      *
      * FIXME: expand display to handle several outputs
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param unit The <code>Unit</code> that is producing.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param unit The {@code Unit} that is producing.
      */
     public WorkProductionPanel(FreeColClient freeColClient, Unit unit) {
         super(freeColClient, new MigLayout("wrap 3, insets 10 10 10 10",

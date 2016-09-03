@@ -40,7 +40,7 @@ import net.sf.freecol.server.ai.WorkerWish;
 
 
 /**
- * Mission for realizing a <code>Wish</code>.
+ * Mission for realizing a {@code Wish}.
  */
 public class WishRealizationMission extends Mission {
 
@@ -54,11 +54,11 @@ public class WishRealizationMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param wish The <code>Wish</code> which will be realized by
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param wish The {@code Wish} which will be realized by
      *     the unit and this mission.
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit, Wish wish) {
@@ -69,11 +69,11 @@ public class WishRealizationMission extends Mission {
     }
 
     /**
-     * Creates a new <code>WishRealizationMission</code> and reads the
+     * Creates a new {@code WishRealizationMission} and reads the
      * given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -90,7 +90,7 @@ public class WishRealizationMission extends Mission {
     /**
      * Get the wish handled by this mission.
      *
-     * @return The mission <code>Wish</code>.
+     * @return The mission {@code Wish}.
      */
     public Wish getWish() {
         return this.wish;
@@ -99,8 +99,8 @@ public class WishRealizationMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
@@ -287,7 +287,7 @@ public class WishRealizationMission extends Mission {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return The <code>String</code> "wishRealizationMission".
+     * @return The {@code String} "wishRealizationMission".
      */
     public static String getTagName() {
         return "wishRealizationMission";

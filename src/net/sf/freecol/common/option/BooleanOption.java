@@ -41,19 +41,19 @@ public class BooleanOption extends AbstractOption<Boolean> {
 
 
     /**
-     * Creates a new <code>BooleanOption</code>.
+     * Creates a new {@code BooleanOption}.
      *
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public BooleanOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>BooleanOption</code>.
+     * Creates a new {@code BooleanOption}.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> to refer to.
+     * @param specification The {@code Specification} to refer to.
      */
     public BooleanOption(String id, Specification specification) {
         super(id, specification);

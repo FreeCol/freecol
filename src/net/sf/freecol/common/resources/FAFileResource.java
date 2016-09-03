@@ -25,7 +25,7 @@ import java.net.URL;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>FAFile</code>.
+ * A {@code Resource} wrapping a <code>FAFile</code>.
  *
  * @see Resource
  * @see FAFile
@@ -43,7 +43,7 @@ public class FAFileResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      * @exception IOException if FAFile can not be opened.
      */
@@ -55,9 +55,9 @@ public class FAFileResource extends Resource {
 
 
     /**
-     * Gets the <code>FAFile</code> represented by this resource.
+     * Gets the {@code FAFile} represented by this resource.
      *
-     * @return The <code>FAFile</code> for this resource, or the default
+     * @return The {@code FAFile} for this resource, or the default
      *     Java FAFile if none found.
      */
     public FAFile getFAFile() {

@@ -35,9 +35,9 @@ public class DeclareIndependenceAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>DeclareIndependenceAction</code>.
+     * Creates a new {@code DeclareIndependenceAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DeclareIndependenceAction(FreeColClient freeColClient) {
         super(freeColClient, id);

@@ -25,7 +25,7 @@ import net.sf.freecol.common.util.LogBuilder;
 
 
 /**
- * Represents a single <code>Location</code> in a path.
+ * Represents a single {@code Location} in a path.
  *
  * You will most likely be using: {@link #next}, {@link #getDirection},
  * {@link #getTile} and {@link #getTotalTurns}, when
@@ -62,18 +62,18 @@ public class PathNode {
 
 
     /**
-     * Creates a new <code>PathNode</code>.
+     * Creates a new {@code PathNode}.
      *
-     * @param location The <code>Location</code> this
-     *      <code>PathNode</code> represents in the path.
+     * @param location The {@code Location} this
+     *      {@code PathNode} represents in the path.
      * @param movesLeft The number of moves remaining at this point in
      *      the path.
      * @param turns The number of turns it takes to reach this
-     *      <code>PathNode</code>'s <code>Tile</code> from the start
+     *      {@code PathNode}'s <code>Tile</code> from the start
      *      of the path.
      * @param onCarrier Whether the path is still using a carrier.
-     * @param previous The previous <code>PathNode</code> in the path.
-     * @param next The next <code>PathNode</code> in the path.
+     * @param previous The previous {@code PathNode} in the path.
+     * @param next The next {@code PathNode} in the path.
      */
     public PathNode(Location location, int movesLeft, int turns,
                     boolean onCarrier, PathNode previous, PathNode next) {
@@ -89,16 +89,16 @@ public class PathNode {
     /**
      * Gets the location of this path.
      *
-     * @return The <code>Location</code>.
+     * @return The {@code Location}.
      */
     public Location getLocation() {
         return location;
     }
 
     /**
-     * Gets the <code>Tile</code> of this <code>PathNode</code>.
+     * Gets the {@code Tile} of this <code>PathNode</code>.
      *
-     * @return The <code>Tile</code> this <code>PathNode</code>
+     * @return The {@code Tile} this <code>PathNode</code>
      *     represents in the path, if any.
      */
     public Tile getTile() {
@@ -108,7 +108,7 @@ public class PathNode {
     /**
      * Gets the number of moves remaining at this point in the path.
      *
-     * @return The number of moves remaining. <code>-1</code> is
+     * @return The number of moves remaining. {@code -1} is
      *     returned if the number of moves left has not been calculated.
      */
     public int getMovesLeft() {
@@ -126,10 +126,10 @@ public class PathNode {
 
     /**
      * Gets the number of turns it will take to reach this
-     * <code>PathNode</code>'s <code>Tile</code> in the path.
+     * {@code PathNode}'s <code>Tile</code> in the path.
      *
      * @return The number of turns, using zero for the first
-     *     move. <code>-1</code> is returned if the number of turns
+     *     move. {@code -1} is returned if the number of turns
      *     has not been calculated.
      */
     public int getTurns() {
@@ -138,7 +138,7 @@ public class PathNode {
 
     /**
      * Sets the number of turns it will take to reach this
-     * <code>PathNode</code>'s <code>Tile</code> in the path.
+     * {@code PathNode}'s <code>Tile</code> in the path.
      *
      * @param turns The new number of turns.
      */
@@ -160,7 +160,7 @@ public class PathNode {
     /**
      * Checks if the unit using this path is still onboard its transport.
      *
-     * @return <code>true</code> if the unit is still onboard a
+     * @return {@code true} if the unit is still onboard a
      *     carrier when using this path.
      * @see #getTransportDropTurns
      */
@@ -171,7 +171,7 @@ public class PathNode {
     /**
      * Sets if the unit using this path is still onboard its transport.
      *
-     * @param onCarrier Should be set to <code>true</code> in order to
+     * @param onCarrier Should be set to {@code true} in order to
      *     indicate that the unit using this path is still onboard the
      *     carrier on this path node.
      * @see #getTransportDropTurns
@@ -195,7 +195,7 @@ public class PathNode {
      * Gets the direction to move in order to get to this path node.
      *
      * @return The direction to move on the map in order to get to the
-     *     <code>Tile</code> returned by this <code>PathNode</code>'s
+     *     {@code Tile} returned by this <code>PathNode</code>'s
      *     {@link #getTile}, or null if there is no previous node or either
      *     this or the previous node location is not on the map.
      */
@@ -222,7 +222,7 @@ public class PathNode {
     /**
      * Gets the first node of this path.
      *
-     * @return The first <code>PathNode</code>.
+     * @return The first {@code PathNode}.
      */
     public PathNode getFirstNode() {
         PathNode path;
@@ -233,7 +233,7 @@ public class PathNode {
     /**
      * Gets the last node of this path.
      *
-     * @return The last <code>PathNode</code>.
+     * @return The last {@code PathNode}.
      */
     public PathNode getLastNode() {
         PathNode path;
@@ -243,7 +243,7 @@ public class PathNode {
 
     /**
      * Gets the number of turns it will take to move the entire path,
-     * from the starting <code>PathNode</code> until the end.
+     * from the starting {@code PathNode} until the end.
      *
      * @return The number of turns, using zero for the first move.
      */
@@ -266,7 +266,7 @@ public class PathNode {
     }
 
     /**
-     * Standard function to get the cost of moving to a <code>PathNode</code>.
+     * Standard function to get the cost of moving to a {@code PathNode}.
      *
      * Static version provided for path calculation comparisons.  Some
      * care is taken to avoid overflow as test paths with infinite
@@ -274,7 +274,7 @@ public class PathNode {
      *
      * @param turns The number of turns taken.
      * @param movesLeft The number of moves left for the moving unit.
-     * @return The cost of moving to a <code>PathNode</code>.
+     * @return The cost of moving to a {@code PathNode}.
      */
     public static int getCost(int turns, int movesLeft) {
         return (turns >= FreeColObject.INFINITY / (TURN_FACTOR + 1))
@@ -283,9 +283,9 @@ public class PathNode {
     }
         
     /**
-     * Gets the cost of moving to this <code>PathNode</code>.
+     * Gets the cost of moving to this {@code PathNode}.
      *
-     * @return The cost of moving to this <code>PathNode</code>.
+     * @return The cost of moving to this {@code PathNode}.
      */
     public int getCost() {
         return getCost(turns, movesLeft);

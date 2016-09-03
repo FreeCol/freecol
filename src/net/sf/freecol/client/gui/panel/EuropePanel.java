@@ -83,7 +83,7 @@ public final class EuropePanel extends PortPanel {
         /**
          * Initialize this DestinationPanel.
          *
-         * @param destination The destination <code>Location</code>
+         * @param destination The destination {@code Location}
          *     for this panel.
          */
         public void initialize(Location destination) {
@@ -567,7 +567,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * The constructor for a EuropePanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param header True when a header should be added.
      */
     public EuropePanel(FreeColClient freeColClient, boolean header) {
@@ -708,7 +708,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * Initialize this EuropePanel.
      *
-     * @param europe The <code>Europe</code> this panel should display.
+     * @param europe The {@code Europe} this panel should display.
      */
     private void initialize(Europe europe) {
         // Initialize the subpanels.
@@ -753,7 +753,7 @@ public final class EuropePanel extends PortPanel {
     /**
      * Selects a unit that is located somewhere on this panel.
      *
-     * @param unitLabel The <code>UnitLabel</code> for the unit that
+     * @param unitLabel The {@code UnitLabel} for the unit that
      *     is being selected.
      */
     @Override

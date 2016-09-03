@@ -144,7 +144,7 @@ public final class DefaultHandler extends Handler {
      * Publishes the given LogRecord by writing its data to a file using a
      * TextFormatter.
      * 
-     * @param record The <code>LogRecord</code> to publish.
+     * @param record The {@code LogRecord} to publish.
      */
     @Override
     public void publish(LogRecord record) {

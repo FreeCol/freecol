@@ -50,11 +50,11 @@ public class DeliverGiftMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>DeliverGiftMessage</code>.
+     * Create a new {@code DeliverGiftMessage}.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param is The <code>IndianSettlement</code> that is trading.
-     * @param goods The <code>Goods</code> to deliverGift.
+     * @param unit The {@code Unit} that is trading.
+     * @param is The {@code IndianSettlement} that is trading.
+     * @param goods The {@code Goods} to deliverGift.
      */
     public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
         super(getTagName());
@@ -65,11 +65,11 @@ public class DeliverGiftMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DeliverGiftMessage</code> from a
+     * Create a new {@code DeliverGiftMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
         super(getTagName());
@@ -83,11 +83,11 @@ public class DeliverGiftMessage extends DOMMessage {
     // Public interface
 
     /**
-     * Get the <code>Unit</code> which is delivering the gift.  This
+     * Get the {@code Unit} which is delivering the gift.  This
      * is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
-     * @return The <code>Unit</code>, or null if none.
+     * @return The {@code Unit}, or null if none.
      */
     public Unit getUnit() {
         return this.goods.getGame().getFreeColGameObject(this.unitId,
@@ -95,11 +95,11 @@ public class DeliverGiftMessage extends DOMMessage {
     }
 
     /**
-     * Get the <code>Settlement</code> which is receiving the gift.
+     * Get the {@code Settlement} which is receiving the gift.
      * This is a helper routine to be called in-client as it blindly trusts
      * its field.
      *
-     * @return The <code>Settlement</code>, or null if none.
+     * @return The {@code Settlement}, or null if none.
      */
     public IndianSettlement getSettlement() {
         return this.goods.getGame().getFreeColGameObject(this.settlementId,
@@ -107,11 +107,11 @@ public class DeliverGiftMessage extends DOMMessage {
     }
 
     /**
-     * Get the <code>Goods</code> delivered as a gift.  This is a
+     * Get the {@code Goods} delivered as a gift.  This is a
      * helper routine to be called in-client as it blindly trusts its
      * field.
      *
-     * @return The <code>Goods</code>, or null if none.
+     * @return The {@code Goods}, or null if none.
      */
     public Goods getGoods() {
         return this.goods;
@@ -121,11 +121,11 @@ public class DeliverGiftMessage extends DOMMessage {
     /**
      * Handle a "deliverGift"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the unit and settlement, or an
-     *     error <code>Element</code> on failure.
+     *     error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

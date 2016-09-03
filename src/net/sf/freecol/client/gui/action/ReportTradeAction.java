@@ -35,7 +35,7 @@ public class ReportTradeAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ReportTradeAction(FreeColClient freeColClient) {
         super(freeColClient, id);

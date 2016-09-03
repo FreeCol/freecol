@@ -91,9 +91,9 @@ public class Cargo {
         /**
          * Plan the transport of a transportable with a given carrier.
          *
-         * @param t The <code>TransportableAIObject</code> to deliver.
-         * @param carrier The carrier <code>Unit</code> to use.
-         * @param destination The destination <code>Location</code> to take the
+         * @param t The {@code TransportableAIObject} to deliver.
+         * @param carrier The carrier {@code Unit} to use.
+         * @param destination The destination {@code Location} to take the
          *     transportable to, using the transport destination if null.
          * @param allowFallback Allow a fallback plan that does not complete
          *     the transport but does at least improve matters.
@@ -220,10 +220,10 @@ public class Cargo {
     /**
      * Create a new cargo.
      *
-     * @param transportable The <code>TransportableAIObject</code>
+     * @param transportable The {@code TransportableAIObject}
      *     to transport.
-     * @param carrier The carrier <code>Unit</code>.
-     * @param plan The <code>CargoPlan</code> to perform.
+     * @param carrier The carrier {@code Unit}.
+     * @param plan The {@code CargoPlan} to perform.
      */
     private Cargo(TransportableAIObject transportable, Unit carrier,
                   CargoPlan plan) {
@@ -238,7 +238,7 @@ public class Cargo {
     /**
      * Create a new cargo from a stream.
      *
-     * @param aiMain The <code>AIMain</code> root.
+     * @param aiMain The {@code AIMain} root.
      * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
@@ -251,7 +251,7 @@ public class Cargo {
     /**
      * Initialize this cargo.
      *
-     * @param destination The destination <code>Location</code> to take
+     * @param destination The destination {@code Location} to take
      *     the transportable to, defaulting to the transport destination
      *     if null.
      * @param allowFallback Allow a fallback transport.
@@ -275,9 +275,9 @@ public class Cargo {
     /**
      * Make a new cargo with given transportable and carrier.
      *
-     * @param t The <code>TransportableAIObject</code> to transport.
-     * @param carrier The carrier <code>Unit</code> to perform the transport.
-     * @return The new <code>Cargo</code>.
+     * @param t The {@code TransportableAIObject} to transport.
+     * @param carrier The carrier {@code Unit} to perform the transport.
+     * @return The new {@code Cargo}.
      * @exception FreeColException on failure of the planning stage.
      */
     public static Cargo newCargo(TransportableAIObject t, Unit carrier)
@@ -289,12 +289,12 @@ public class Cargo {
      * Make a new cargo with given transportable, carrier and explicit
      * destination and fallback state.
      *
-     * @param t The <code>TransportableAIObject</code> to transport.
-     * @param carrier The carrier <code>Unit</code> to perform the transport.
-     * @param destination The destination <code>Location</code> for
+     * @param t The {@code TransportableAIObject} to transport.
+     * @param carrier The carrier {@code Unit} to perform the transport.
+     * @param destination The destination {@code Location} for
      *     the transportable.
      * @param allowFallback Allow a fallback destination.
-     * @return The new <code>Cargo</code>.
+     * @return The new {@code Cargo}.
      * @exception FreeColException on failure of the planning stage.
      */
     public static Cargo newCargo(TransportableAIObject t, Unit carrier,
@@ -325,7 +325,7 @@ public class Cargo {
     /**
      * Get the transportable.
      *
-     * @return The <code>TransportableAIObject</code> to transport.
+     * @return The {@code TransportableAIObject} to transport.
      */
     public TransportableAIObject getTransportable() {
         return transportable;
@@ -438,7 +438,7 @@ public class Cargo {
     /**
      * Get the movement direction to join the carrier.
      *
-     * @return The <code>Direction</code> to join by.
+     * @return The {@code Direction} to join by.
      */
     public Direction getJoinDirection() {
         return (carrier.isInEurope() || plan.cwait == plan.twait) ? null
@@ -449,7 +449,7 @@ public class Cargo {
     /**
      * Get the movement direction to leave the carrier.
      *
-     * @return The <code>Direction</code> to leave by.
+     * @return The {@code Direction} to leave by.
      */
     public Direction getLeaveDirection() {
         if (!carrier.hasTile() || plan.cdst == plan.tdst) return null;
@@ -488,7 +488,7 @@ public class Cargo {
      * TransportableAIObjects can be `wrapped' if they have the
      * same target and advancing them reduces the space on the carrier.
      *
-     * @param other The other <code>TransportableAIObject</code>
+     * @param other The other {@code TransportableAIObject}
      *     to consider.
      * @return True if the transportables can be wrapped.
      */
@@ -500,7 +500,7 @@ public class Cargo {
     /**
      * Wrap a Cargo into this one.
      *
-     * @param other The other <code>Cargo</code> to wrap.
+     * @param other The other {@code Cargo} to wrap.
      */
     public void wrap(Cargo other) {
         if (other == this) {
@@ -525,12 +525,12 @@ public class Cargo {
     }
             
     /**
-     * Should this <code>Cargo</code> be retried after encountering
+     * Should this {@code Cargo} be retried after encountering
      * a blockage?  For now, just tries three times.
      *
      * FIXME: be smarter.
      *
-     * @return True if the <code>Cargo</code> should be retried.
+     * @return True if the {@code Cargo} should be retried.
      */
     public boolean retry() {
         return tries++ < MAX_TRY;
@@ -546,7 +546,7 @@ public class Cargo {
     /**
      * Does this cargo involve trade with Europe in a given goods type?
      *
-     * @param type The <code>GoodsType</code> to check.
+     * @param type The {@code GoodsType} to check.
      * @return True if this cargo is of the given type and to be
      *     collected or delivered to Europe.
      */
@@ -559,7 +559,7 @@ public class Cargo {
     /**
      * Check the integrity of this cargo.
      *
-     * @param aiCarrier The <code>AIUnit</code> version of the carrier.
+     * @param aiCarrier The {@code AIUnit} version of the carrier.
      * @return A reason for integrity failure, or null if none.
      */
     public String check(AIUnit aiCarrier) {
@@ -590,9 +590,9 @@ public class Cargo {
      * TODO: be smarter and break out of the loop if the cargo reaches
      * its delivery point.
      *
-     * @param carrier The <code>Unit</code> to queue to.
+     * @param carrier The {@code Unit} to queue to.
      * @param index The queuing position to test.
-     * @param cargoes A list of <code>Cargo</code>s.
+     * @param cargoes A list of {@code Cargo}s.
      * @return True if there is space to add the cargo.
      */
     public boolean canQueueAt(Unit carrier, int index, List<Cargo> cargoes) {

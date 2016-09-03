@@ -44,7 +44,7 @@ public class HighSeas extends UnitLocation {
     /**
      * Simple constructor.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public HighSeas(Game game) {
         super(game);
@@ -53,7 +53,7 @@ public class HighSeas extends UnitLocation {
     /**
      * Create a new high seas.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public HighSeas(Game game, String id) {
@@ -64,7 +64,7 @@ public class HighSeas extends UnitLocation {
     /**
      * Get the destinations connected by these seas.
      *
-     * @return A list of <code>Location</code>s.
+     * @return A list of {@code Location}s.
      */
     public final List<Location> getDestinations() {
         return destinations;
@@ -73,7 +73,7 @@ public class HighSeas extends UnitLocation {
     /**
      * Add a single destination to this HighSeas instance.
      *
-     * @param destination A destination <code>Location</code>.
+     * @param destination A destination {@code Location}.
      */
     public void addDestination(Location destination) {
         if (destination != null) {
@@ -91,7 +91,7 @@ public class HighSeas extends UnitLocation {
     /**
      * Remove a single destination from this HighSeas instance.
      *
-     * @param destination A destination <code>Location</code>.
+     * @param destination A destination {@code Location}.
      */
     public void removeDestination(Location destination) {
         destinations.remove(destination);

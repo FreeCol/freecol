@@ -60,12 +60,12 @@ public class IndianDemandMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>IndianDemandMessage</code> with the
+     * Create a new {@code IndianDemandMessage} with the
      * supplied unit, colony and demands.
      *
-     * @param unit The <code>Unit</code> that is demanding.
-     * @param colony The <code>Colony</code> being demanded of.
-     * @param type The <code>GoodsType</code> being demanded.
+     * @param unit The {@code Unit} that is demanding.
+     * @param colony The {@code Colony} being demanded of.
+     * @param type The {@code GoodsType} being demanded.
      * @param amount The amount of goods being demanded.
      */
     public IndianDemandMessage(Unit unit, Colony colony,
@@ -80,11 +80,11 @@ public class IndianDemandMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>IndianDemandMessage</code> from a
+     * Create a new {@code IndianDemandMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public IndianDemandMessage(Game game, Element element) {
         super(getTagName());
@@ -102,8 +102,8 @@ public class IndianDemandMessage extends DOMMessage {
     /**
      * Client-side convenience function to get the unit in this message.
      *
-     * @param game The <code>Game</code> to look for the unit in.
-     * @return The <code>Unit</code> found.
+     * @param game The {@code Game} to look for the unit in.
+     * @return The {@code Unit} found.
      */
     public Unit getUnit(Game game) {
         return game.getFreeColGameObject(unitId, Unit.class);
@@ -112,8 +112,8 @@ public class IndianDemandMessage extends DOMMessage {
     /**
      * Client-side convenience function to get the colony in this message.
      *
-     * @param game The <code>Game</code> to look for the colony in.
-     * @return The <code>Colony</code> found.
+     * @param game The {@code Game} to look for the colony in.
+     * @return The {@code Colony} found.
      */
     public Colony getColony(Game game) {
         return game.getFreeColGameObject(colonyId, Colony.class);
@@ -122,8 +122,8 @@ public class IndianDemandMessage extends DOMMessage {
     /**
      * Client-side convenience function to get the goods type in this message.
      *
-     * @param game The <code>Game</code> to look for the goods type in.
-     * @return The <code>GoodsType</code> found.
+     * @param game The {@code Game} to look for the goods type in.
+     * @return The {@code GoodsType} found.
      */
     public GoodsType getType(Game game) {
         return (typeId == null) ? null
@@ -165,11 +165,11 @@ public class IndianDemandMessage extends DOMMessage {
     /**
      * Handle a "indianDemand"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the indianDemandd unit, or an
-     *     error <code>Element</code> on failure.
+     *     error {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

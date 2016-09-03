@@ -53,13 +53,13 @@ public class Resource extends TileItem {
 
 
     /**
-     * Creates a standard <code>Resource</code>-instance.
+     * Creates a standard {@code Resource}-instance.
      *
      * This constructor asserts that the game, tile and type are valid.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> on which this object sits.
-     * @param type The <code>ResourceType</code> of this Resource.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} on which this object sits.
+     * @param type The {@code ResourceType} of this Resource.
      * @param quantity The quantity of resource.
      */
     public Resource(Game game, Tile tile, ResourceType type, int quantity) {
@@ -73,22 +73,22 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Creates a standard <code>Resource</code>-instance.
+     * Creates a standard {@code Resource}-instance.
      *
      * This constructor asserts that the game, tile and type are valid.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param tile The <code>Tile</code> on which this object sits.
-     * @param type The <code>ResourceType</code> of this Resource.
+     * @param game The enclosing {@code Game}.
+     * @param tile The {@code Tile} on which this object sits.
+     * @param type The {@code ResourceType} of this Resource.
      */
     public Resource(Game game, Tile tile, ResourceType type) {
         this(game, tile, type, type.getMaxValue());
     }
 
     /**
-     * Creates new <code>Resource</code>.
+     * Creates new {@code Resource}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Resource(Game game, String id) {
@@ -143,10 +143,10 @@ public class Resource extends TileItem {
 
     /**
      * Reduce the available quantity by the bonus output of
-     * <code>GoodsType</code>.
+     * {@code GoodsType}.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @param unitType The producing <code>UnitType</code>.
+     * @param goodsType The {@code GoodsType} to check.
+     * @param unitType The producing {@code UnitType}.
      * @param potential The base potential of the tile.
      * @return The new quantity of resource.
      */

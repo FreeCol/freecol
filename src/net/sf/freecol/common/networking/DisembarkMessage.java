@@ -42,10 +42,10 @@ public class DisembarkMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>DisembarkMessage</code> with the
+     * Create a new {@code DisembarkMessage} with the
      * supplied name.
      *
-     * @param unit The <code>Unit</code> that is disembarking.
+     * @param unit The {@code Unit} that is disembarking.
      */
     public DisembarkMessage(Unit unit) {
         super(getTagName());
@@ -54,11 +54,11 @@ public class DisembarkMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>DisembarkMessage</code> from a
+     * Create a new {@code DisembarkMessage} from a
      * supplied element.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public DisembarkMessage(Game game, Element element) {
         super(getTagName());
@@ -70,11 +70,11 @@ public class DisembarkMessage extends DOMMessage {
     /**
      * Handle a "disembark"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return An update containing the disembarked unit, or an error
-     *     <code>Element</code> on failure.
+     *     {@code Element} on failure.
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {

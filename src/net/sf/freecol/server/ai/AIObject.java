@@ -31,9 +31,9 @@ import net.sf.freecol.common.networking.DOMMessage;
 
 
 /**
- * An <code>AIObject</code> contains AI-related information and methods.
- * Each <code>FreeColGameObject</code>, that is owned by an AI-controlled
- * player, can have a single <code>AIObject</code> attached to it.
+ * An {@code AIObject} contains AI-related information and methods.
+ * Each {@code FreeColGameObject}, that is owned by an AI-controlled
+ * player, can have a single {@code AIObject} attached to it.
  */
 public abstract class AIObject extends FreeColObject {
 
@@ -48,7 +48,7 @@ public abstract class AIObject extends FreeColObject {
 
 
     /**
-     * Creates a new uninitialized <code>AIObject</code>.
+     * Creates a new uninitialized {@code AIObject}.
      *
      * @param aiMain The main AI-object.
      */
@@ -58,7 +58,7 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Creates a new uninitialized <code>AIObject</code> with a registerable
+     * Creates a new uninitialized {@code AIObject} with a registerable
      * AI identifier.
      *
      * @param aiMain The main AI-object.
@@ -76,7 +76,7 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>AIObject</code>.
+     * Creates a new {@code AIObject}.
      *
      * @param aiMain The main AI-object.
      * @param xr The input stream containing the XML.
@@ -96,26 +96,26 @@ public abstract class AIObject extends FreeColObject {
     /**
      * Convenience accessor for the main AI-object.
      *
-     * @return The <code>AIMain</code>.
+     * @return The {@code AIMain}.
      */
     public final AIMain getAIMain() {
         return aiMain;
     }
 
     /**
-     * Checks if this <code>AIObject</code>
+     * Checks if this {@code AIObject}
      * is uninitialized. That is: it has been referenced
      * by another object, but has not yet been updated with
      * {@link #readFromXML}.
      *
-     * @return <code>true</code> if this object is not initialized.
+     * @return {@code true} if this object is not initialized.
      */
     public final boolean isUninitialized() {
         return uninitialized;
     }
 
     /**
-     * Disposes this <code>AIObject</code> by removing the reference
+     * Disposes this {@code AIObject} by removing the reference
      * to this object from the enclosing AIMain.
      */
     public void dispose() {

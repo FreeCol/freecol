@@ -159,7 +159,7 @@ public class StringUtils {
      *
      * @param text The text to split.
      * @param delim Characters to consider as word delimiting.
-     * @param fontMetrics <code>FontMetrics</code> used to calculate
+     * @param fontMetrics {@code FontMetrics} used to calculate
      *     text width.
      * @param width The text width maximum.
      * @return A list of split text.

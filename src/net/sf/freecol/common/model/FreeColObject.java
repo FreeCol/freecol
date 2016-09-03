@@ -192,8 +192,8 @@ public abstract class FreeColObject
     /**
      * Compare two FreeColObjects by their identifiers.
      *
-     * @param fco1 The first <code>FreeColObject</code> to compare.
-     * @param fco2 The second <code>FreeColObject</code> to compare.
+     * @param fco1 The first {@code FreeColObject} to compare.
+     * @param fco2 The second {@code FreeColObject} to compare.
      * @return The comparison result.
      */
     public static int compareIds(FreeColObject fco1, FreeColObject fco2) {
@@ -226,7 +226,7 @@ public abstract class FreeColObject
     /**
      * Get the specification.
      *
-     * @return The <code>Specification</code> used by this object.
+     * @return The {@code Specification} used by this object.
      */
     public Specification getSpecification() {
         return null;
@@ -235,7 +235,7 @@ public abstract class FreeColObject
     /**
      * Sets the specification for this object. 
      *
-     * @param specification The <code>Specification</code> to use.
+     * @param specification The {@code Specification} to use.
      */
     protected void setSpecification(@SuppressWarnings("unused") Specification specification) {}
 
@@ -247,7 +247,7 @@ public abstract class FreeColObject
     /**
      * Gets the game this object belongs to.
      *
-     * @return The <code>Game</code> this object belongs to.
+     * @return The {@code Game} this object belongs to.
      */
     public Game getGame() {
         return null;
@@ -256,7 +256,7 @@ public abstract class FreeColObject
     /**
      * Sets the game object this object belongs to.
      *
-     * @param game The <code>Game</code> to set.
+     * @param game The {@code Game} to set.
      */
     public void setGame(@SuppressWarnings("unused") Game game) {}
         
@@ -351,7 +351,7 @@ public abstract class FreeColObject
     /**
      * Gets the feature container for this object, if any.
      *
-     * @return The <code>FeatureContainer</code> for this object.
+     * @return The {@code FeatureContainer} for this object.
      */
     public FeatureContainer getFeatureContainer() {
         return null;
@@ -371,7 +371,7 @@ public abstract class FreeColObject
      * Is an ability present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
      * @return True if the ability is present.
      */
@@ -383,9 +383,9 @@ public abstract class FreeColObject
      * Is an ability present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return True if the ability is present.
      */
     public final boolean hasAbility(String id, FreeColSpecObjectType fcgot,
@@ -435,7 +435,7 @@ public abstract class FreeColObject
      * Gets the set of abilities with the given identifier from this object.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
      * @return A stream of abilities.
      */
@@ -450,9 +450,9 @@ public abstract class FreeColObject
      * override this as all prior routines are derived from it.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return A set of abilities.
      */
     public Stream<Ability> getAbilities(String id,
@@ -466,7 +466,7 @@ public abstract class FreeColObject
     /**
      * Add the given ability to this object.
      *
-     * @param ability An <code>Ability</code> to add.
+     * @param ability An {@code Ability} to add.
      * @return True if the ability was added.
      */
     public boolean addAbility(Ability ability) {
@@ -477,7 +477,7 @@ public abstract class FreeColObject
     /**
      * Remove the given ability from this object.
      *
-     * @param ability An <code>Ability</code> to remove.
+     * @param ability An {@code Ability} to remove.
      * @return The ability removed or null on failure.
      */
     public Ability removeAbility(Ability ability) {
@@ -510,7 +510,7 @@ public abstract class FreeColObject
      * Is an modifier present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
      * @return True if the modifier is present.
      */
@@ -522,9 +522,9 @@ public abstract class FreeColObject
      * Is an modifier present in this object?
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return True if the modifier is present.
      */
     public boolean hasModifier(String id, FreeColSpecObjectType fcgot,
@@ -574,7 +574,7 @@ public abstract class FreeColObject
      * Gets the set of modifiers with the given identifier from this object.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
      * @return A set of modifiers.
      */
@@ -590,9 +590,9 @@ public abstract class FreeColObject
      * routine.
      *
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @return A set of modifiers.
      */
     public Stream<Modifier> getModifiers(String id,
@@ -608,7 +608,7 @@ public abstract class FreeColObject
      * given number.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @param id The object identifier.
      * @return The modified number.
      */
@@ -621,9 +621,9 @@ public abstract class FreeColObject
      * given number.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param turn An optional applicable {@code Turn}.
      * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColSpecObjectType</code> the
+     * @param fcgot An optional {@code FreeColSpecObjectType} the
      *     modifier applies to.
      * @return The modified number.
      */
@@ -636,8 +636,8 @@ public abstract class FreeColObject
      * Applies a collection of modifiers to the given number.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
     public static final float applyModifiers(float number, Turn turn,
@@ -649,8 +649,8 @@ public abstract class FreeColObject
      * Applies a stream of modifiers to the given number.
      *
      * @param number The number to modify.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @param mods The <code>Modifier</code>s to apply.
+     * @param turn An optional applicable {@code Turn}.
+     * @param mods The {@code Modifier}s to apply.
      * @return The modified number.
      */
     public static final float applyModifiers(float number, Turn turn,
@@ -661,7 +661,7 @@ public abstract class FreeColObject
     /**
      * Add the given modifier to this object.
      *
-     * @param modifier An <code>Modifier</code> to add.
+     * @param modifier An {@code Modifier} to add.
      * @return True if the modifier was added.
      */
     public boolean addModifier(Modifier modifier) {
@@ -673,7 +673,7 @@ public abstract class FreeColObject
     /**
      * Remove the given modifier from this object.
      *
-     * @param modifier An <code>Modifier</code> to remove.
+     * @param modifier An {@code Modifier} to remove.
      * @return The modifier removed.
      */
     public Modifier removeModifier(Modifier modifier) {
@@ -696,7 +696,7 @@ public abstract class FreeColObject
     /**
      * Adds all the features in an object to this object.
      *
-     * @param fco The <code>FreeColObject</code> to add features from.
+     * @param fco The {@code FreeColObject} to add features from.
      */
     public void addFeatures(FreeColObject fco) {
         FeatureContainer fc = getFeatureContainer();
@@ -706,7 +706,7 @@ public abstract class FreeColObject
     /**
      * Removes all the features in an object from this object.
      *
-     * @param fco The <code>FreeColObject</code> to find features to remove in.
+     * @param fco The {@code FreeColObject} to find features to remove in.
      */
     public void removeFeatures(FreeColObject fco) {
         FeatureContainer fc = getFeatureContainer();
@@ -716,7 +716,7 @@ public abstract class FreeColObject
     /**
      * Get the defence modifiers applicable to this object.
      *
-     * @return A list of defence <code>Modifier</code>s.
+     * @return A list of defence {@code Modifier}s.
      */
     public List<Modifier> getDefenceModifiers() {
         return toList(getModifiers(Modifier.DEFENCE));
@@ -728,7 +728,7 @@ public abstract class FreeColObject
     /**
      * Base for Comparable implementations.
      *
-     * @param other The other <code>FreeColObject</code> subclass to compare.
+     * @param other The other {@code FreeColObject} subclass to compare.
      * @return The comparison result.
      */
     @Override
@@ -740,11 +740,11 @@ public abstract class FreeColObject
     // Miscellaneous routines
 
     /**
-     * Log a collection of <code>FreeColObject</code>s.
+     * Log a collection of {@code FreeColObject}s.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to log.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param c The {@code Collection} to log.
+     * @param lb A {@code LogBuilder} to log to.
      */
     public static <T extends FreeColObject> void logFreeColObjects(Collection<T> c, LogBuilder lb) {
         lb.add("[");
@@ -845,7 +845,7 @@ public abstract class FreeColObject
     /**
      * Writes the object to the given file.
      *
-     * @param file The <code>File</code> to write to.
+     * @param file The {@code File} to write to.
      * @return True if the save proceeded without error.
      * @exception FileNotFoundException if unable to open the file.
      */
@@ -856,8 +856,8 @@ public abstract class FreeColObject
     /**
      * Writes the object to the given file.
      *
-     * @param file The <code>File</code> to write to.
-     * @param scope The <code>WriteScope</code> to use.
+     * @param file The {@code File} to write to.
+     * @param scope The {@code WriteScope} to use.
      * @return True if the save proceeded without error.
      */
     public boolean save(File file, WriteScope scope) {
@@ -867,8 +867,8 @@ public abstract class FreeColObject
     /**
      * Writes the object to the given file.
      *
-     * @param file The <code>File</code> to write to.
-     * @param scope The <code>WriteScope</code> to use.
+     * @param file The {@code File} to write to.
+     * @param scope The {@code WriteScope} to use.
      * @param pretty Attempt to indent the output nicely.
      * @return True if the save proceeded without error.
      */
@@ -888,8 +888,8 @@ public abstract class FreeColObject
     /**
      * Writes the object to the given output stream
      *
-     * @param out The <code>OutputStream</code> to write to.
-     * @param scope The <code>WriteScope</code> to use.
+     * @param out The {@code OutputStream} to write to.
+     * @param scope The {@code WriteScope} to use.
      * @param pretty Attempt to indent the output nicely.
      * @return True if the save proceeded without error.
      */
@@ -963,7 +963,7 @@ public abstract class FreeColObject
      * tile, but both will refer to the original uncopied owning player. 
      *
      * @param <T> The actual return type.
-     * @param game The <code>Game</code> to add the object to.
+     * @param game The {@code Game} to add the object to.
      * @param returnClass The expected return class.
      * @return The copied object, or null on error.
      */
@@ -985,7 +985,7 @@ public abstract class FreeColObject
      *
      * All attributes will be made visible.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      * @see #toXML(FreeColXMLWriter)
@@ -1005,7 +1005,7 @@ public abstract class FreeColObject
      *
      * All attributes will be made visible.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @param tag The tag to use.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
@@ -1026,7 +1026,7 @@ public abstract class FreeColObject
      * To be overridden if required by any object that has attributes
      * and uses the toXML(FreeColXMLWriter, String) call.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
@@ -1044,7 +1044,7 @@ public abstract class FreeColObject
      * To be overridden if required by any object that has children
      * and uses the toXML(FreeColXMLWriter, String) call.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
@@ -1061,7 +1061,7 @@ public abstract class FreeColObject
      * on the presence of a getFieldName() method that returns a type
      * compatible with String.valueOf.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @param fields The fields to write.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
@@ -1117,7 +1117,7 @@ public abstract class FreeColObject
     /**
      * Reads the attributes of this object from an XML stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
@@ -1128,7 +1128,7 @@ public abstract class FreeColObject
     /**
      * Reads the children of this object from an XML stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
@@ -1154,7 +1154,7 @@ public abstract class FreeColObject
      * super.readChild() when an unexpected tag is encountered, as the
      * exception thrown here provides some useful debugging context.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
@@ -1227,7 +1227,7 @@ public abstract class FreeColObject
      * should be overridden by all subclasses that need to be
      * serialized if instances are expected to be read.
      *
-     * @return <code>null</code>.
+     * @return {@code null}.
      */
     public static String getTagName() {
         return null;

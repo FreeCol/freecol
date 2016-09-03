@@ -42,7 +42,7 @@ public final class EventPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param header The title.
      * @param key A resource key for the image to display.
      * @param footer Optional footer text.

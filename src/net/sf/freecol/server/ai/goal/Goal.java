@@ -610,7 +610,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Writes this object to an XML stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */

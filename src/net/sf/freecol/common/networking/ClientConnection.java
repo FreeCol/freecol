@@ -45,11 +45,11 @@ public final class ClientConnection extends Connection {
 
 
     /**
-     * Creates a new <code>ClientConnection</code>.
+     * Creates a new {@code ClientConnection}.
      *
      * @param host The host to connect to.
      * @param port The port to connect to.
-     * @param handler The <code>MessageHandler</code> to use.
+     * @param handler The {@code MessageHandler} to use.
      * @param name The name for the connection.
      * @exception IOException If an exception is thrown while creating
      *     a new {@link Connection}.

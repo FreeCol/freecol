@@ -33,7 +33,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * A <code>GoodsLocation</code> is a place where {@link Unit}s and
+ * A {@code GoodsLocation} is a place where {@link Unit}s and
  * {@link Goods} can be put.  It can not store any other Locatables,
  * such as {@link TileItem}s.
  *
@@ -48,18 +48,18 @@ public abstract class GoodsLocation extends UnitLocation {
 
 
     /**
-     * Creates a new <code>GoodsLocation</code> instance.
+     * Creates a new {@code GoodsLocation} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      */
     public GoodsLocation(Game game) {
         super(game);
     }
 
     /**
-     * Creates a new <code>GoodsLocation</code> instance.
+     * Creates a new {@code GoodsLocation} instance.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public GoodsLocation(Game game, String id) {
@@ -76,7 +76,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Adds some goods to this location.
      *
-     * @param goods The <code>AbstractGoods</code> to add.
+     * @param goods The {@code AbstractGoods} to add.
      * @return True if the goods were added.
      */
     public final boolean addGoods(AbstractGoods goods) {
@@ -86,7 +86,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Adds a list of goods to this location.
      *
-     * @param goods The list of <code>AbstractGoods</code> to add.
+     * @param goods The list of {@code AbstractGoods} to add.
      * @return True if the goods were all added.
      */
     public final boolean addGoods(List<AbstractGoods> goods) {
@@ -96,7 +96,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Removes the some goods from this location.
      *
-     * @param goods The <code>AbstractGoods</code> to remove.
+     * @param goods The {@code AbstractGoods} to remove.
      * @return The goods that was removed, which may be less than that
      *     requested, or null if none.
      */
@@ -107,7 +107,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Removes all Goods of the given type from this location.
      *
-     * @param type The <code>GoodsType</code> to remove.
+     * @param type The {@code GoodsType} to remove.
      * @return The goods that was removed, or null if none.
      */
     public final Goods removeGoods(GoodsType type) {
@@ -117,7 +117,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Gets the amount of one type of goods at this location.
      *
-     * @param type The <code>GoodsType</code> to look for.
+     * @param type The {@code GoodsType} to look for.
      * @return The amount of goods.
      */
     public final int getGoodsCount(GoodsType type) {
@@ -129,7 +129,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * Does this location contain enough goods to satisfy a list of
      * requirements?
      *
-     * @param goods A list of <code>AbstractGoods</code> to check.
+     * @param goods A list of {@code AbstractGoods} to check.
      * @return True if the goods are all present.
      */
     public final boolean containsGoods(List<AbstractGoods> goods) {
@@ -150,7 +150,7 @@ public abstract class GoodsLocation extends UnitLocation {
 
     /**
      * Gets an list of all the goods in this location.  There is only
-     * one <code>Goods</code> for each <code>GoodsType</code>, thus the
+     * one {@code Goods} for each <code>GoodsType</code>, thus the
      * amount of goods may exceed CARGO_SIZE.
      *
      * @return A list of goods.
@@ -241,7 +241,7 @@ public abstract class GoodsLocation extends UnitLocation {
     // GoodsLocation routines to be implemented/overridden by subclasses
 
     /**
-     * Gets the maximum number of <code>Goods</code> this Location
+     * Gets the maximum number of {@code Goods} this Location
      * can hold.
      *
      * @return The capacity for goods
@@ -251,7 +251,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Adds a specified amount of a type of goods to this location.
      *
-     * @param type The <code>GoodsType</code> to add.
+     * @param type The {@code GoodsType} to add.
      * @param amount The amount of goods to add.
      * @return True if the goods were added.
      */

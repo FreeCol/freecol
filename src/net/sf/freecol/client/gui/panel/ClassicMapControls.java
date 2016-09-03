@@ -52,7 +52,7 @@ public final class ClassicMapControls extends MapControls {
     /**
      * The basic constructor.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ClassicMapControls(final FreeColClient freeColClient) {
         super(freeColClient, false);
@@ -110,7 +110,7 @@ public final class ClassicMapControls extends MapControls {
     /**
      * Removes the map controls from the parent canvas component.
      *
-     * @param canvas <code>Canvas</code> parent
+     * @param canvas {@code Canvas} parent
      */
     @Override
     public void removeFromComponent(Canvas canvas) {

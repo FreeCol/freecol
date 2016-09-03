@@ -38,7 +38,7 @@ public class MapControlsAction extends SelectableAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public MapControlsAction(FreeColClient freeColClient) {
         super(freeColClient, id, ClientOptions.DISPLAY_MAP_CONTROLS);

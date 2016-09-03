@@ -54,9 +54,9 @@ public final class DumpCargoDialog extends FreeColDialog<List<Goods>> {
     /**
      * Creates a dialog for choosing cargo for a unit to dump.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param unit The <code>Unit</code> that is dumping cargo.
+     * @param unit The {@code Unit} that is dumping cargo.
      */
     public DumpCargoDialog(FreeColClient freeColClient, JFrame frame, Unit unit) {
         super(freeColClient, frame);

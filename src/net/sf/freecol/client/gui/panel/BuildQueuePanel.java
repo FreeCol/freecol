@@ -103,13 +103,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * This class implements a transfer handler able to transfer
-     * <code>BuildQueueItem</code>s between the build queue list, the
+     * {@code BuildQueueItem}s between the build queue list, the
      * unit list and the building list.
      */
     private class BuildQueueTransferHandler extends TransferHandler {
 
         /**
-         * This class implements the <code>Transferable</code> interface.
+         * This class implements the {@code Transferable} interface.
          */
         public class BuildablesTransferable implements Transferable {
 
@@ -131,7 +131,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
 
             /**
-             * Get the build queue from the <code>Transferable</code>.
+             * Get the build queue from the {@code Transferable}.
              *
              * @return The build queue.
              */
@@ -525,8 +525,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     /**
      * Create a new build queue panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param colony The enclosing <code>Colony</code>.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param colony The enclosing {@code Colony}.
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
         super(freeColClient, new MigLayout("wrap 3", 
@@ -673,7 +673,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     /**
      * Get the colony for this build queue.
      *
-     * @return The <code>Colony</code>.
+     * @return The {@code Colony}.
      */
     public Colony getColony() {
         return this.colony;
@@ -683,8 +683,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * Convert a component to an actual part of this panel,
      * recovering its list type.
      *
-     * @param comp The <code>JComponent</code> to convert.
-     * @return The actual panel component <code>JList</code>, or
+     * @param comp The {@code JComponent} to convert.
+     * @return The actual panel component {@code JList}, or
      *     null on error.
      */
     private JList<? extends BuildableType> convertJComp(JComponent comp) {

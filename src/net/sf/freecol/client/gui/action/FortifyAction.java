@@ -36,7 +36,7 @@ public class FortifyAction extends UnitAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public FortifyAction(FreeColClient freeColClient) {
         super(freeColClient, id);

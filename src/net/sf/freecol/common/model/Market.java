@@ -49,7 +49,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public static final int MINIMUM_AMOUNT = 100;
 
     /**
-     * Constant for specifying the access to this <code>Market</code>
+     * Constant for specifying the access to this {@code Market}
      * when selling goods.
      */
     public static enum Access {
@@ -71,8 +71,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Main constructor for creating a market for a new player.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param player The <code>Player</code> to own the market.
+     * @param game The enclosing {@code Game}.
+     * @param player The {@code Player} to own the market.
      */
     public Market(Game game, Player player) {
         super(game);
@@ -90,11 +90,11 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Creates a new <code>Market</code> with the given identifier.
+     * Creates a new {@code Market} with the given identifier.
      *
      * The object should be initialized later.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public Market(Game game, String id) {
@@ -110,8 +110,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Gets the market data for a specified goods type, creating it
      * if it does not exist yet.
      *
-     * @param goodsType The <code>GoodsType</code> to query.
-     * @return The <code>MarketData</code> required.
+     * @param goodsType The {@code GoodsType} to query.
+     * @return The {@code MarketData} required.
      */
     private MarketData requireMarketData(GoodsType goodsType) {
         MarketData data = getMarketData(goodsType);
@@ -138,8 +138,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * Public so the server can send individual MarketData updates.
      *
-     * @param goodsType The <code>GoodsType</code> to look for.
-     * @return The corresponding <code>MarketData</code>, or null if none.
+     * @param goodsType The {@code GoodsType} to look for.
+     * @return The corresponding {@code MarketData}, or null if none.
      */
     public MarketData getMarketData(GoodsType goodsType) {
         return marketData.get(goodsType);
@@ -159,7 +159,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Determines the cost to buy a single unit of a particular type of good.
      *
-     * @param type A <code>GoodsType</code> value.
+     * @param type A {@code GoodsType} value.
      * @return The cost to buy a single unit of the given type of goods.
      */
     public int getCostToBuy(GoodsType type) {
@@ -171,7 +171,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Determines the price paid for the sale of a single unit of a particular
      * type of goods.
      *
-     * @param type A <code>GoodsType</code> value.
+     * @param type A {@code GoodsType} value.
      * @return The price for a single unit of the given type of goods
      *         if it is for sale.
      */
@@ -183,7 +183,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Add (or remove) some goods to this market.
      *
-     * @param goodsType The <code>GoodsType</code> to add.
+     * @param goodsType The {@code GoodsType} to add.
      * @param amount The amount of goods.
      * @return True if the price changes as a result of this addition.
      */
@@ -200,7 +200,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the initial price of a given goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to get the initial price of.
+     * @param goodsType The {@code GoodsType} to get the initial price of.
      * @return The initial price.
      */
     public int getInitialPrice(GoodsType goodsType) {
@@ -211,7 +211,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Sets the initial price of a given goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to set the initial price of.
+     * @param goodsType The {@code GoodsType} to set the initial price of.
      * @param amount The new initial price.
      */
     public void setInitialPrice(GoodsType goodsType, int amount) {
@@ -220,9 +220,9 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Gets the price of a given goods when the <code>Player</code> buys.
+     * Gets the price of a given goods when the {@code Player} buys.
      *
-     * @param type a <code>GoodsType</code> value
+     * @param type a {@code GoodsType} value
      * @param amount The amount of goods.
      * @return The bid price of the given goods.
      */
@@ -232,9 +232,9 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Gets the price of a given goods when the <code>Player</code> sells.
+     * Gets the price of a given goods when the {@code Player} sells.
      *
-     * @param type a <code>GoodsType</code> value
+     * @param type a {@code GoodsType} value
      * @param amount The amount of goods.
      * @return The sale price of the given goods.
      */
@@ -244,10 +244,10 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Gets the price of a given goods when the <code>Player</code> sells.
+     * Gets the price of a given goods when the {@code Player} sells.
      *
      * @param T The base type of the goods.
-     * @param goods The <code>Goods</code> to evaluate.
+     * @param goods The {@code Goods} to evaluate.
      * @return The price.
      */
     public <T extends AbstractGoods> int getSalePrice(T goods) {
@@ -257,7 +257,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the arrears for of a given goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to get arrears for.
+     * @param goodsType The {@code GoodsType} to get arrears for.
      * @return The arrears.
      */
     public int getArrears(GoodsType goodsType) {
@@ -268,7 +268,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Sets the arrears associated with a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to set the arrears for.
+     * @param goodsType The {@code GoodsType} to set the arrears for.
      * @param value The amount of arrears to set.
      */
     public void setArrears(GoodsType goodsType, int value) {
@@ -279,7 +279,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the sales of a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to get the sales for.
+     * @param goodsType The {@code GoodsType} to get the sales for.
      * @return The current sales amount.
      */
     public int getSales(GoodsType goodsType) {
@@ -290,7 +290,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Modifies the sales of a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to set the sales for.
+     * @param goodsType The {@code GoodsType} to set the sales for.
      * @param amount The amount of sales to add to the current amount.
      */
     public void modifySales(GoodsType goodsType, int amount) {
@@ -304,7 +304,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the income before taxes for a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to get the income for.
+     * @param goodsType The {@code GoodsType} to get the income for.
      * @return The current income before taxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
@@ -315,7 +315,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Modifies the income before taxes on sales of a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to set the income for.
+     * @param goodsType The {@code GoodsType} to set the income for.
      * @param amount The amount of tax income to add to the current amount.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
@@ -326,7 +326,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the income after taxes for a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to get the income for.
+     * @param goodsType The {@code GoodsType} to get the income for.
      * @return The current income after taxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
@@ -337,7 +337,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Modifies the income after taxes on sales of a type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> to set the income for.
+     * @param goodsType The {@code GoodsType} to set the income for.
      * @param amount The amount of tax income to add to the current amount.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
@@ -348,7 +348,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the amount of a goods type in the market.
      *
-     * @param goodsType The <code>GoodsType</code> to get the amount of.
+     * @param goodsType The {@code GoodsType} to get the amount of.
      * @return The current amount of the goods in the market.
      */
     public int getAmountInMarket(GoodsType goodsType) {
@@ -381,10 +381,10 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Make up a <code>ModelMessage</code> describing the change in this
-     * <code>Market</code> for a specified type of goods.
+     * Make up a {@code ModelMessage} describing the change in this
+     * {@code Market} for a specified type of goods.
      *
-     * @param goodsType The <code>GoodsType</code> that has changed price.
+     * @param goodsType The {@code GoodsType} that has changed price.
      * @return A message describing the change.
      */
     public ModelMessage makePriceChangeMessage(GoodsType goodsType) {
@@ -411,7 +411,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * not use during the game, the price change clamping mechanism should
      * remain in effect.
      *
-     * @param goodsType The <code>GoodsType</code> to update.
+     * @param goodsType The {@code GoodsType} to update.
      */
     public void update(GoodsType goodsType) {
         MarketData data = requireMarketData(goodsType);
@@ -421,8 +421,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Get a sale price comparator for this market.
      *
-     * @param <T> The <code>AbstractGoods</code> type to compare.
-     * @return A suitable <code>Comparator</code>.
+     * @param <T> The {@code AbstractGoods} type to compare.
+     * @return A suitable {@code Comparator}.
      */
     public <T extends AbstractGoods> Comparator<T> getSalePriceComparator() {
         return Comparator.comparingInt((T t)
@@ -432,7 +432,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Adds a transaction listener for notification of any transaction
      *
-     * @param listener The <code>TransactionListener</code> to add.
+     * @param listener The {@code TransactionListener} to add.
      */
     public void addTransactionListener(TransactionListener listener) {
         transactionListeners.add(listener);
@@ -441,7 +441,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Removes a transaction listener
      *
-     * @param listener The <code>TransactionListener</code> to remove.
+     * @param listener The {@code TransactionListener} to remove.
      */
     public void removeTransactionListener(TransactionListener listener) {
         transactionListeners.remove(listener);
@@ -450,7 +450,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the listeners added to this market.
      *
-     * @return An array of all the <code>TransactionListener</code>s
+     * @return An array of all the {@code TransactionListener}s
      *     added, or an empty array if none found.
      */
     public TransactionListener[] getTransactionListener() {
@@ -461,9 +461,9 @@ public final class Market extends FreeColGameObject implements Ownable {
     // Interface Ownable
 
     /**
-     * Gets the owner of this <code>Market</code>.
+     * Gets the owner of this {@code Market}.
      *
-     * @return The owner of this <code>Market</code>.
+     * @return The owner of this {@code Market}.
      */
     @Override
     public Player getOwner() {
@@ -471,9 +471,9 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Sets the owner of this <code>Market</code>.
+     * Sets the owner of this {@code Market}.
      *
-     * @param owner The <code>Player</code> to own this <code>Market</code>.
+     * @param owner The {@code Player} to own this <code>Market</code>.
      */
     @Override
     public void setOwner(Player owner) {

@@ -55,7 +55,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ClientInputHandler(FreeColClient freeColClient) {
         super(freeColClient);
@@ -69,7 +69,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Register a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The <code>NetworkRequestHandler</code> to register.
+     * @param handler The {@code NetworkRequestHandler} to register.
      */
     protected final void register(String name, NetworkRequestHandler handler) {
         this.handlerMap.put(name, handler);
@@ -79,7 +79,7 @@ public abstract class ClientInputHandler extends FreeColClientHolder
      * Unregister a network request handler.
      * 
      * @param name The handler name.
-     * @param handler The <code>NetworkRequestHandler</code> to unregister.
+     * @param handler The {@code NetworkRequestHandler} to unregister.
      * @return True if the supplied handler was actually removed.
      */
     protected final boolean unregister(String name, NetworkRequestHandler handler) {

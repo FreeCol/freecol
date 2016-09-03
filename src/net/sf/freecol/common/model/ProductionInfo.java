@@ -89,7 +89,7 @@ public class ProductionInfo {
      * Get a list of the goods that are in production deficit, that is,
      * those which are produced at less than their maximum possible rate.
      *
-     * @return A list of <code>AbstractGoods</code>.
+     * @return A list of {@code AbstractGoods}.
      */
     public List<AbstractGoods> getProductionDeficit() {
         final Function<AbstractGoods, AbstractGoods> mapper = ag -> {
@@ -109,7 +109,7 @@ public class ProductionInfo {
      * Get a list of the goods that are in consumption deficit, that is,
      * those which are consumed at less than their maximum possible rate.
      *
-     * @return A list of <code>AbstractGoods</code>.
+     * @return A list of {@code AbstractGoods}.
      */
     public List<AbstractGoods> getConsumptionDeficit() {
         final Function<AbstractGoods, AbstractGoods> mapper = ag -> {

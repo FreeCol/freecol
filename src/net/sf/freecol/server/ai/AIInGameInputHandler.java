@@ -91,7 +91,7 @@ public final class AIInGameInputHandler implements MessageHandler {
      * The constructor to use.
      *
      * @param freeColServer The main server.
-     * @param me The AI <code>ServerPlayer</code> that is being
+     * @param me The AI {@code ServerPlayer} that is being
      *     managed by this AIInGameInputHandler.
      * @param aiMain The main AI-object.
      */
@@ -114,9 +114,9 @@ public final class AIInGameInputHandler implements MessageHandler {
 
 
     /**
-     * Get the AI player using this <code>AIInGameInputHandler</code>.
+     * Get the AI player using this {@code AIInGameInputHandler}.
      *
-     * @return The <code>AIPlayer</code>.
+     * @return The {@code AIPlayer}.
      */
     private AIPlayer getAIPlayer() {
         return aiMain.getAIPlayer(serverPlayer);
@@ -125,7 +125,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Gets the AI unit corresponding to a given unit, if any.
      *
-     * @param unit The <code>Unit</code> to look up.
+     * @param unit The {@code Unit} to look up.
      * @return The corresponding AI unit or null if not found.
      */
     private AIUnit getAIUnit(Unit unit) {
@@ -138,7 +138,7 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Deals with incoming messages that have just been received.
      *
-     * @param connection The <code>Connection</code> the message was
+     * @param connection The {@code Connection} the message was
      *     received on.
      * @param element The root element of the message.
      * @return The reply.
@@ -224,9 +224,9 @@ public final class AIInGameInputHandler implements MessageHandler {
      * Handles a "chooseFoundingFather"-message.
      * Only meaningful for AIPlayer types that implement selectFoundingFather.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element chooseFoundingFather(
         @SuppressWarnings("unused") Connection connection,
@@ -245,9 +245,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles an "diplomacy"-message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element diplomacy(
         @SuppressWarnings("unused") Connection connection,
@@ -271,9 +271,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to a first contact offer.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element firstContact(
         @SuppressWarnings("unused") Connection connection,
@@ -287,8 +287,8 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to fountain of youth offer.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
      * @return Null.
      */
     private Element fountainOfYouth(
@@ -310,8 +310,8 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles an "indianDemand"-message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
      * @return The original message with the acceptance state set if querying
      *     the colony player (result == null), or null if reporting the final
      *     result to the native player (result != null).
@@ -339,8 +339,8 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to loot cargo offer.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
      * @return Null.
      */
     private Element lootCargo(
@@ -368,9 +368,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles a "monarchAction"-message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element monarchAction(
         @SuppressWarnings("unused") Connection connection,
@@ -405,9 +405,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handle all the children of this element.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     public Element multiple(Connection connection, Element element) {
         return new MultipleMessage(element).applyHandler(this, connection);
@@ -416,8 +416,8 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handle an incoming nation summary.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
      * @return Null.
      */
     private Element nationSummary(
@@ -439,9 +439,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handle a native trade message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element nativeTrade(
         @SuppressWarnings("unused") Connection connection,
@@ -458,9 +458,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to offer to name the new land.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element newLandName(
         @SuppressWarnings("unused") Connection connection,
@@ -472,9 +472,9 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Replies to offer to name a new region name.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
-     * @return An <code>Element</code> containing the response/s.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
+     * @return An {@code Element} containing the response/s.
      */
     private Element newRegionName(
         @SuppressWarnings("unused") Connection connection,
@@ -486,8 +486,8 @@ public final class AIInGameInputHandler implements MessageHandler {
     /**
      * Handles a "setCurrentPlayer"-message.
      *
-     * @param connection The <code>Connection</code> the element arrived on.
-     * @param element The <code>Element</code> to process.
+     * @param connection The {@code Connection} the element arrived on.
+     * @param element The {@code Element} to process.
      * @return Null.
      */
     private Element setCurrentPlayer(

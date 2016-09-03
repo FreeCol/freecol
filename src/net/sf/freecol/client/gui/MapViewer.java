@@ -75,7 +75,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
  * MapViewer is a private helper class of Canvas and SwingGUI.
  * 
  * This class is responsible for drawing the map/background on the
- * <code>Canvas</code>.
+ * {@code Canvas}.
  * In addition, the graphical state of the map (focus, active unit..)
  * is currently handled by this class.
  */
@@ -184,7 +184,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     MapViewer(FreeColClient freeColClient) {
         super(freeColClient);
@@ -203,7 +203,7 @@ public final class MapViewer extends FreeColClientHolder {
 
 
     /**
-     * Gets the contained <code>ImageLibrary</code>.
+     * Gets the contained {@code ImageLibrary}.
      * 
      * @return The image library;
      */
@@ -377,8 +377,8 @@ public final class MapViewer extends FreeColClientHolder {
      * units.  There are no problems related to nested calls with the
      * same unit.
      *
-     * @param unit The <code>Unit</code> to be hidden.
-     * @param sourceTile The source <code>Tile</code>.
+     * @param unit The {@code Unit} to be hidden.
+     * @param sourceTile The source {@code Tile}.
      * @param r The code to be executed.
      */
     void executeWithUnitOutForAnimation(final Unit unit,
@@ -428,8 +428,8 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Returns true if the given Unit is being animated.
      *
-     * @param unit an <code>Unit</code>
-     * @return a <code>boolean</code>
+     * @param unit an {@code Unit}
+     * @return a {@code boolean}
      */
     private boolean isOutForAnimation(final Unit unit) {
         return unitsOutForAnimation.containsKey(unit);
@@ -471,8 +471,8 @@ public final class MapViewer extends FreeColClientHolder {
      * area above the Tile, to include the space needed by any units
      * in the Tile.
      *
-     * @param tile The <code>Tile</code> on the screen.
-     * @return The bounds <code>Rectangle</code>.
+     * @param tile The {@code Tile} on the screen.
+     * @return The bounds {@code Rectangle}.
      */
     Rectangle calculateTileBounds(Tile tile) {
         Rectangle result = new Rectangle(0, 0, size.width, size.height);
@@ -489,12 +489,12 @@ public final class MapViewer extends FreeColClientHolder {
     }
 
     /**
-     * Gets the position of the given <code>Tile</code>
+     * Gets the position of the given {@code Tile}
      * on the drawn map.
      *
-     * @param t The <code>Tile</code> to check.
-     * @return The position of the given <code>Tile</code>, or
-     *     <code>null</code> if the <code>Tile</code> is not drawn on
+     * @param t The {@code Tile} to check.
+     * @return The position of the given {@code Tile}, or
+     *     {@code null} if the <code>Tile</code> is not drawn on
      *     the mapboard.
      */
     Point calculateTilePosition(Tile t) {
@@ -589,7 +589,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Sets the focus of the map.
      *
-     * @param focus The <code>Position</code> of the center tile of the
+     * @param focus The {@code Position} of the center tile of the
      *     displayed map.
      * @see #getFocus
      */
@@ -604,7 +604,7 @@ public final class MapViewer extends FreeColClientHolder {
      * raised.  If successful, the supplied position will either be at
      * the center of the left or right half of the map.
      *
-     * @param tile The <code>Tile</code> to display.
+     * @param tile The {@code Tile} to display.
      * @return Positive if the focus is on the right hand side, negative
      *     if on the left, zero on failure.
      * @see #getFocus
@@ -662,7 +662,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Position the map so that the supplied tile is displayed at the center.
      *
-     * @param pos The <code>Tile</code> to center at.
+     * @param pos The {@code Tile} to center at.
      */
     private void positionMap(Tile pos) {
         final Game game = getGame();
@@ -760,7 +760,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Scroll the map in the given direction.
      *
-     * @param direction The <code>Direction</code> to scroll in.
+     * @param direction The {@code Direction} to scroll in.
      * @return True if scrolling occurred.
      */
     boolean scrollMap(Direction direction) {
@@ -916,7 +916,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Gets the selected tile.
      *
-     * @return The <code>Tile</code> selected.
+     * @return The {@code Tile} selected.
      */
     Tile getSelectedTile() {
         return selectedTile;
@@ -929,13 +929,13 @@ public final class MapViewer extends FreeColClientHolder {
      * <ol>
      *   <li>If the tile contains a unit that can become active, then
      *       that unit will be set as the active unit.
-     *   <li>If not, the <code>selectedTile</code> will become the map focus.
+     *   <li>If not, the {@code selectedTile} will become the map focus.
      * </ol>
      *
      * If a unit is active and is located on the selected tile,
      * then nothing (except perhaps a map reposition) will happen.
      *
-     * @param newTile The <code>Tile</code>, the tile to be selected
+     * @param newTile The {@code Tile}, the tile to be selected
      * @return True if the focus was set.
      * @see #getSelectedTile
      * @see #setActiveUnit
@@ -980,8 +980,8 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Gets the unit that should be displayed on the given tile.
      *
-     * @param unitTile The <code>Tile</code> to check.
-     * @return The <code>Unit</code> to display or null if none found.
+     * @param unitTile The {@code Tile} to check.
+     * @return The {@code Unit} to display or null if none found.
      */
     private Unit findUnitInFront(Tile unitTile) {
         Unit result;
@@ -1052,7 +1052,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Gets the active unit.
      *
-     * @return The <code>Unit</code>.
+     * @return The {@code Unit}.
      * @see #setActiveUnit
      */
     Unit getActiveUnit() {
@@ -1062,7 +1062,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Sets the active unit.
      *
-     * @param activeUnit The new active <code>Unit</code>.
+     * @param activeUnit The new active {@code Unit}.
      * @return True if the focus was set.
      */
     boolean setActiveUnit(Unit activeUnit) {
@@ -1123,7 +1123,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Gets the path to be drawn on the map.
      *
      * @return The path that should be drawn on the map or
-     *     <code>null</code> if no path should be drawn.
+     *     {@code null} if no path should be drawn.
      */
     PathNode getGotoPath() {
         return gotoPath;
@@ -1135,7 +1135,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Dont use this directly, call the method in canvas!
      *
      * @param gotoPath The path that should be drawn on the map
-     *     or <code>null</code> if no path should be drawn.
+     *     or {@code null} if no path should be drawn.
      */
     void setGotoPath(PathNode gotoPath) {
         this.gotoPath = gotoPath;
@@ -1168,7 +1168,7 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Set the current active unit path.
      *
-     * @param path The current <code>PathNode</code>.
+     * @param path The current {@code PathNode}.
      */
     void setCurrentPath(PathNode path) {
         this.currentPath = path;
@@ -1229,7 +1229,7 @@ public final class MapViewer extends FreeColClientHolder {
      * Sets the ImageLibrary and calculates various items that depend
      * on tile size.
      *
-     * @param lib an <code>ImageLibrary</code> value
+     * @param lib an {@code ImageLibrary} value
      */
     private void setImageLibraryAndUpdateData(ImageLibrary lib) {
         this.lib = lib;
@@ -1695,7 +1695,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param extent The nominal height of the image.
      * @param padding Padding to add around the image.
      * @param backgroundColor The image background color.
-     * @return A suitable <code>BufferedImage</code>.
+     * @return A suitable {@code BufferedImage}.
      */
     private static BufferedImage createCapitalLabel(int extent, int padding,
                                                     Color backgroundColor) {
@@ -1733,11 +1733,11 @@ public final class MapViewer extends FreeColClientHolder {
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a <code>Graphics2D</code>
-     * @param text a <code>String</code>
-     * @param font a <code>Font</code>
-     * @param backgroundColor a <code>Color</code>
-     * @return an <code>BufferedImage</code>
+     * @param g a {@code Graphics2D}
+     * @param text a {@code String}
+     * @param font a {@code Font}
+     * @param backgroundColor a {@code Color}
+     * @return an {@code BufferedImage}
      */
     private static BufferedImage createLabel(Graphics2D g, String text,
                                              Font font, Color backgroundColor) {
@@ -1750,10 +1750,10 @@ public final class MapViewer extends FreeColClientHolder {
      * Creates an BufferedImage that shows the given text centred on a
      * translucent rounded rectangle with the given color.
      *
-     * @param g a <code>Graphics2D</code>
-     * @param textSpecs a <code>TextSpecification</code> array
-     * @param backgroundColor a <code>Color</code>
-     * @return a <code>BufferedImage</code>
+     * @param g a {@code Graphics2D}
+     * @param textSpecs a {@code TextSpecification} array
+     * @param backgroundColor a {@code Color}
+     * @return a {@code BufferedImage}
      */
     private static BufferedImage createLabel(Graphics2D g,
                                              TextSpecification[] textSpecs,
@@ -1810,7 +1810,7 @@ public final class MapViewer extends FreeColClientHolder {
      * @param padding Padding to add around the image.
      * @param backgroundColor The image background color.
      * @param expertMissionary True if the label should show expertise.
-     * @return A suitable <code>BufferedImage</code>.
+     * @return A suitable {@code BufferedImage}.
      */
     private static BufferedImage createReligiousMissionLabel(int extent,
             int padding, Color backgroundColor, boolean expertMissionary) {
@@ -1861,8 +1861,8 @@ public final class MapViewer extends FreeColClientHolder {
     /**
      * Display a path.
      *
-     * @param g The <code>Graphics2D</code> to display on.
-     * @param path The <code>PathNode</code> to display.
+     * @param g The {@code Graphics2D} to display on.
+     * @param path The {@code PathNode} to display.
      */
     private void displayPath(Graphics2D g, PathNode path) {
         final Font font = FontLibrary.createFont(FontLibrary.FontType.NORMAL,
@@ -2003,10 +2003,10 @@ public final class MapViewer extends FreeColClientHolder {
      * Draws the borders of a territory on the given Tile. The
      * territory is either a country or a region.
      *
-     * @param g a <code>Graphics2D</code>
-     * @param tile a <code>Tile</code>
-     * @param type a <code>BorderType</code>
-     * @param opaque a <code>boolean</code>
+     * @param g a {@code Graphics2D}
+     * @param tile a {@code Tile}
+     * @param type a {@code BorderType}
+     * @param opaque a {@code boolean}
      */
     private void displayTerritorialBorders(Graphics2D g, Tile tile, BorderType type, boolean opaque) {
         Player owner = tile.getOwner();

@@ -45,7 +45,7 @@ import net.sf.freecol.server.ai.MissionAIPlayer;
 
 
 /**
- * Mission for defending a <code>Settlement</code>.
+ * Mission for defending a {@code Settlement}.
  */
 public class DefendSettlementMission extends Mission {
 
@@ -63,12 +63,12 @@ public class DefendSettlementMission extends Mission {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
+     * @param aiUnit The {@code AIUnit} this mission
      *        is created for.
-     * @param settlement The <code>Settlement</code> to defend.
+     * @param settlement The {@code Settlement} to defend.
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
                                    Settlement settlement) {
@@ -76,11 +76,11 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Creates a new <code>DefendSettlementMission</code> and reads
+     * Creates a new {@code DefendSettlementMission} and reads
      * the given element.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -97,9 +97,9 @@ public class DefendSettlementMission extends Mission {
     /**
      * Extract a valid target for this mission from a path.
      *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from.
-     * @return A target for a <code>DefendSettlementMission</code>, or null
+     * @param aiUnit The {@code AIUnit} to perform the mission.
+     * @param path A {@code PathNode} to extract a target from.
+     * @return A target for a {@code DefendSettlementMission}, or null
      *     if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
@@ -113,8 +113,8 @@ public class DefendSettlementMission extends Mission {
     /**
      * Evaluate allocating a unit to the defence of a settlement.
      *
-     * @param aiUnit The <code>AIUnit</code> that is to defend.
-     * @param path A <code>PathNode</code> to take to the settlement.
+     * @param aiUnit The {@code AIUnit} that is to defend.
+     * @param path A {@code PathNode} to take to the settlement.
      * @return A value for such a mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
@@ -128,11 +128,11 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for finding the best colony
-     * <code>Tile</code>, optionally falling back to the nearest colony.
+     * Gets a {@code GoalDecider} for finding the best colony
+     * {@code Tile}, optionally falling back to the nearest colony.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @return A suitable <code>GoalDecider</code>.
+     * @param aiUnit The {@code AIUnit} that is searching.
+     * @return A suitable {@code GoalDecider}.
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit) {
         return new GoalDecider() {
@@ -159,7 +159,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * Finds a path to the best nearby settlement to defend.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param aiUnit The {@code AIUnit} to execute this mission.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A path to the new target, or null if none found.
@@ -178,7 +178,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * Finds a path to the best nearby settlement to defend.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param aiUnit The {@code AIUnit} that is searching.
      * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
@@ -192,7 +192,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * Why would a DefendSettlementMission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
@@ -208,8 +208,8 @@ public class DefendSettlementMission extends Mission {
     /**
      * Why is this mission invalid with a given settlement target?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param settlement The potential target <code>Settlement</code>.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param settlement The potential target {@code Settlement}.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidSettlementReason(AIUnit aiUnit,
@@ -220,7 +220,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -235,8 +235,8 @@ public class DefendSettlementMission extends Mission {
     /**
      * Why would this mission be invalid with the given AI unit and location?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The {@code Location} to check.
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {

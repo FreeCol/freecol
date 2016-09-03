@@ -33,9 +33,9 @@ public class FindSettlementAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>FindSettlementAction</code>.
+     * Creates a new {@code FindSettlementAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public FindSettlementAction(FreeColClient freeColClient) {
         super(freeColClient, id);

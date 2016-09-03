@@ -51,8 +51,8 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
     /**
      * Creates a new listener for mouse movement.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param canvas The <code>Canvas</code> to listen on.
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @param canvas The {@code Canvas} to listen on.
      */
     public CanvasMouseMotionListener(FreeColClient freeColClient,
                                      Canvas canvas) {

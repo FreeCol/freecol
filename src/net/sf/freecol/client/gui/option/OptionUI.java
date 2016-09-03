@@ -61,7 +61,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     /**
      * Constructor.
      *
-     * @param option The <code>Option</code> to display.
+     * @param option The {@code Option} to display.
      * @param editable True if the option should be editable.
      */
     public OptionUI(T option, boolean editable) {
@@ -104,10 +104,10 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     /**
      * Get an option UI for a given option.
      *
-     * @param gui The <code>GUI</code> to use.
-     * @param option The <code>Option</code> to check.
+     * @param gui The {@code GUI} to use.
+     * @param option The {@code Option} to check.
      * @param editable Should the result be editable.
-     * @return A suitable <code>OptionUI</code>, or null if none found.
+     * @return A suitable {@code OptionUI}, or null if none found.
      */
     public static OptionUI getOptionUI(GUI gui, Option option, boolean editable) {
         if (option instanceof BooleanOption) {
@@ -166,10 +166,10 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
     }
 
     /**
-     * Get the <code>Component</code> used to set the value of the
+     * Get the {@code Component} used to set the value of the
      * Option.
      *
-     * @return a <code>JComponent</code> value
+     * @return a {@code JComponent} value
      */
     public abstract JComponent getComponent();
 

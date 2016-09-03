@@ -122,7 +122,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * The next available identifier that can be given to a new
-     * <code>FreeColGameObject</code>.
+     * {@code FreeColGameObject}.
      */
     protected int nextId = 1;
 
@@ -220,7 +220,7 @@ public class Game extends FreeColGameObject {
     /**
      * Constructor used by the ServerGame constructor.
      *
-     * @param specification The <code>Specification</code> for this game.
+     * @param specification The {@code Specification} for this game.
      */
     protected Game(Specification specification) {
         this();
@@ -233,7 +233,7 @@ public class Game extends FreeColGameObject {
      * Instantiate an uninitialized FreeColGameObject within this game.
      *
      * @param <T> The actual return type.
-     * @param returnClass The required <code>FreeColObject</code> class.
+     * @param returnClass The required {@code FreeColObject} class.
      * @param server Create a server object if possible.
      * @return The new uninitialized object, or null on error.
      */
@@ -249,7 +249,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get the difficulty level of this game.
      *
-     * @return An <code>OptionGroup</code> containing the difficulty settings.
+     * @return An {@code OptionGroup} containing the difficulty settings.
      */
     public final OptionGroup getDifficultyOptionGroup() {
         return specification.getDifficultyOptionGroup();
@@ -258,7 +258,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the game options associated with this game.
      *
-     * @return An <code>OptionGroup</code> containing the game options.
+     * @return An {@code OptionGroup} containing the game options.
      */
     public OptionGroup getGameOptions() {
         return specification.getGameOptions();
@@ -267,7 +267,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the game options associated with this game.
      *
-     * @param go An <code>OptionGroup</code> containing the game options.
+     * @param go An {@code OptionGroup} containing the game options.
      */
     public void setGameOptions(OptionGroup go) {
         specification.setGameOptions(go);
@@ -276,7 +276,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the map generator options associated with this game.
      *
-     * @return An <code>OptionGroup</code> containing the map
+     * @return An {@code OptionGroup} containing the map
      *     generator options.
      */
     public OptionGroup getMapGeneratorOptions() {
@@ -286,7 +286,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the map generator options associated with this game.
      *
-     * @param mgo An <code>OptionGroup</code> containing the map
+     * @param mgo An {@code OptionGroup} containing the map
      *     generator options.
      */
     public void setMapGeneratorOptions(OptionGroup mgo) {
@@ -303,7 +303,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the <code>FreeColGameObject</code> with the given identifier.
+     * Gets the {@code FreeColGameObject} with the given identifier.
      *
      * @param id The object identifier.
      * @return The game object, or null if not found.
@@ -321,7 +321,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the <code>FreeColGameObject</code> with the specified
+     * Gets the {@code FreeColGameObject} with the specified
      * identifier and class.
      *
      * @param <T> The actual return type.
@@ -340,12 +340,12 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Registers a new <code>FreeColGameObject</code> with a given
+     * Registers a new {@code FreeColGameObject} with a given
      * identifier.
      *
      * @param id The object identifier.
-     * @param fcgo The <code>FreeColGameObject</code> to add to this
-     *     <code>Game</code>.
+     * @param fcgo The {@code FreeColGameObject} to add to this
+     *     {@code Game}.
      * @exception IllegalArgumentException If either the identifier or
      *     object are null.
      */
@@ -371,7 +371,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Removes the <code>FreeColGameObject</code> with the specified
+     * Removes the {@code FreeColGameObject} with the specified
      * identifier.
      *
      * @param id The object identifier.
@@ -402,7 +402,7 @@ public class Game extends FreeColGameObject {
      * Use this routine when the object should already be present in the game.
      *
      * @param id The object identifier.
-     * @return The <code>Location</code> if any.
+     * @return The {@code Location} if any.
      */
     public Location findFreeColLocation(String id) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
@@ -410,17 +410,17 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets an <code>Iterator</code> over every registered
-     * <code>FreeColGameObject</code>.
+     * Gets an {@code Iterator} over every registered
+     * {@code FreeColGameObject}.
      *
-     * This <code>Iterator</code> should be iterated once in a while
-     * since it cleans the <code>FreeColGameObject</code> cache.  Very
+     * This {@code Iterator} should be iterated once in a while
+     * since it cleans the {@code FreeColGameObject} cache.  Very
      * few routines call this any more, so there is a thresholded call
      * in removeFreeColGameObject to ensure the cache is still
      * cleaned.  Reconsider this if the situation changes.
      *
-     * @return An <code>Iterator</code> containing every registered
-     *     <code>FreeColGameObject</code>.
+     * @return An {@code Iterator} containing every registered
+     *     {@code FreeColGameObject}.
      */
     public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
         return new Iterator<FreeColGameObject>() {
@@ -476,9 +476,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get an <code>Iterable</code> over the <code>FreeColGameObjects</code>.
+     * Get an {@code Iterable} over the <code>FreeColGameObjects</code>.
      *
-     * @return A suitable <code>Iterable</code>.
+     * @return A suitable {@code Iterable}.
      */
     public Iterable<FreeColGameObject> getFreeColGameObjects() {
         return new Iterable<FreeColGameObject>() {
@@ -493,7 +493,7 @@ public class Game extends FreeColGameObject {
      * Gets the unique identifier for this game. 
      * A game UUID persists in save game files.
      *
-     * @return The game <code>UUID</code>.
+     * @return The game {@code UUID}.
      */
     public UUID getUUID () {
        return uuid;
@@ -502,7 +502,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get all the players in the game.
      *
-     * @return The list of <code>Player</code>s.
+     * @return The list of {@code Player}s.
      */
     public List<Player> getPlayerList() {
         return this.players;
@@ -511,7 +511,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get all the players in the game as a stream.
      *
-     * @return The list of <code>Player</code>s.
+     * @return The list of {@code Player}s.
      */
     public Stream<Player> getPlayers() {
         return this.players.stream();
@@ -520,7 +520,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sort the players list.
      *
-     * @param comparator The <code>Comparator</code> to sort with.
+     * @param comparator The {@code Comparator} to sort with.
      */
     public void sortPlayers(Comparator<Player> comparator) {
         Collections.sort(this.players, comparator);
@@ -529,8 +529,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get live players in the game.
      *
-     * @param other An optional <code>Player</code> to omit.
-     * @return The list of live <code>Player</code>s.
+     * @param other An optional {@code Player} to omit.
+     * @return The list of live {@code Player}s.
      */
     public List<Player> getPlayerList(Predicate<Player> predicate) {
         return transform(this.players, predicate);
@@ -539,18 +539,18 @@ public class Game extends FreeColGameObject {
     /**
      * Get live players in the game.
      *
-     * @param other An optional <code>Player</code> to omit.
-     * @return The stream of live <code>Player</code>s.
+     * @param other An optional {@code Player} to omit.
+     * @return The stream of live {@code Player}s.
      */
     public Stream<Player> getPlayers(Predicate<Player> predicate) {
         return getPlayerList(predicate).stream();
     }
 
     /**
-     * Get a <code>Player</code> identified by its nation.
+     * Get a {@code Player} identified by its nation.
      *
-     * @param nation The <code>Nation</code> to search for.
-     * @return The <code>Player</code> of the given nation, or null if
+     * @param nation The {@code Nation} to search for.
+     * @return The {@code Player} of the given nation, or null if
      *     not found.
      */
     public Player getPlayerByNation(Nation nation) {
@@ -558,10 +558,10 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get a <code>Player</code> identified by its nation identifier.
+     * Get a {@code Player} identified by its nation identifier.
      *
      * @param nationId The nation identifier to search for.
-     * @return The <code>Player</code> of the given nation, or null if
+     * @return The {@code Player} of the given nation, or null if
      *     not found.
      */
     public Player getPlayerByNationId(String nationId) {
@@ -572,8 +572,8 @@ public class Game extends FreeColGameObject {
      * Get a list of the live players in the game, optionally
      * excluding supplied ones.
      *
-     * @param exclude The <code>Player</code>s to exclude.
-     * @return A list of live <code>Player</code>s, without the excluded ones.
+     * @param exclude The {@code Player}s to exclude.
+     * @return A list of live {@code Player}s, without the excluded ones.
      */
     public List<Player> getLivePlayerList(final Player... exclude) {
         final Predicate<Player> livePred = p ->
@@ -585,8 +585,8 @@ public class Game extends FreeColGameObject {
      * Get a stream of the live players in the game, optionally excluding
      * supplied ones.
      *
-     * @param exclude The <code>Player</code>s to exclude.
-     * @return A stream of live <code>Player</code>s, without the
+     * @param exclude The {@code Player}s to exclude.
+     * @return A stream of live {@code Player}s, without the
      *     excluded ones.
      */
     public Stream<Player> getLivePlayers(final Player... exclude) {
@@ -596,8 +596,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get a list of the live European players in this game.
      *
-     * @param exclude <code>Player</code>s to exclude.
-     * @return A list of live European <code>Player</code>s in this game,
+     * @param exclude {@code Player}s to exclude.
+     * @return A list of live European {@code Player}s in this game,
      *     without the excluded ones.
      */
     public List<Player> getLiveEuropeanPlayerList(final Player... exclude) {
@@ -610,8 +610,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get a stream of the live European players in this game.
      *
-     * @param exclude <code>Player</code>s to exclude.
-     * @return A stream of live European <code>Player</code>s in this game,
+     * @param exclude {@code Player}s to exclude.
+     * @return A stream of live European {@code Player}s in this game,
      *     without the excluded ones.
      */
     public Stream<Player> getLiveEuropeanPlayers(final Player... exclude) {
@@ -621,8 +621,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get a list of the live native players in this game.
      *
-     * @param exclude <code>Player</code>s to exclude.
-     * @return A list of live native <code>Player</code>s in this game.
+     * @param exclude {@code Player}s to exclude.
+     * @return A list of live native {@code Player}s in this game.
      */
     public List<Player> getLiveNativePlayerList(final Player... exclude) {
         final Predicate<Player> nativePred = p ->
@@ -634,8 +634,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get a stream of the live native players in this game.
      *
-     * @param exclude <code>Player</code>s to exclude.
-     * @return A stream of live native <code>Player</code>s in this game.
+     * @param exclude {@code Player}s to exclude.
+     * @return A stream of live native {@code Player}s in this game.
      */
     public Stream<Player> getLiveNativePlayers(final Player... exclude) {
         return getLiveNativePlayerList(exclude).stream();
@@ -644,7 +644,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the next current player.
      *
-     * @return The <code>Player</code> whose turn follows the current player.
+     * @return The {@code Player} whose turn follows the current player.
      */
     public Player getNextPlayer() {
         return getPlayerAfter(currentPlayer);
@@ -653,9 +653,9 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the live player after the given player.
      *
-     * @param beforePlayer The <code>Player</code> before the
-     *     <code>Player</code> to be returned.
-     * @return The <code>Player</code> after the <code>beforePlayer</code>
+     * @param beforePlayer The {@code Player} before the
+     *     {@code Player} to be returned.
+     * @return The {@code Player} after the <code>beforePlayer</code>
      *     in the list which determines the order each player becomes the
      *     current player.
      * @see #getNextPlayer
@@ -685,8 +685,8 @@ public class Game extends FreeColGameObject {
     /**
      * Gets a player specified by a name.
      *
-     * @param name The name identifying the <code>Player</code>.
-     * @return The <code>Player</code> or null if none found.
+     * @param name The name identifying the {@code Player}.
+     * @return The {@code Player} or null if none found.
      */
     public Player getPlayerByName(String name) {
         return find(players, matchKeyEquals(name, Player::getName));
@@ -705,7 +705,7 @@ public class Game extends FreeColGameObject {
     /**
      * Adds the specified player to the game.
      *
-     * @param player The <code>Player</code> to add.
+     * @param player The {@code Player} to add.
      * @return True if the player was added.
      */
     public boolean addPlayer(Player player) {
@@ -724,7 +724,7 @@ public class Game extends FreeColGameObject {
     /**
      * Removes the specified player from the game.
      *
-     * @param player The <code>Player</code> to remove.
+     * @param player The {@code Player} to remove.
      * @return True if the player was removed.
      */
     public boolean removePlayer(Player player) {
@@ -744,7 +744,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the unknown enemy player, which is used for privateers.
      *
-     * @return The unknown enemy <code>Player</code>.
+     * @return The unknown enemy {@code Player}.
      */
     public Player getUnknownEnemy() {
         return unknownEnemy;
@@ -753,7 +753,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the unknown enemy player.
      *
-     * @param player The <code>Player</code> to serve as the unknown enemy.
+     * @param player The {@code Player} to serve as the unknown enemy.
      */
     public void setUnknownEnemy(Player player) {
         this.unknownEnemy = player;
@@ -763,7 +763,7 @@ public class Game extends FreeColGameObject {
      * Get the client player this thread is operating for.  If in the server
      * there will be none.
      *
-     * @return The client <code>Player</code>.
+     * @return The client {@code Player}.
      */
     public Player getClientPlayer() {
         return (clientUserName == null) ? null
@@ -809,7 +809,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the current player.
      *
-     * @param newCurrentPlayer The new current <code>Player</code>.
+     * @param newCurrentPlayer The new current {@code Player}.
      */
     public void setCurrentPlayer(Player newCurrentPlayer) {
         this.currentPlayer = newCurrentPlayer;
@@ -818,7 +818,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the map that is being used in this game.
      *
-     * @return The game <code>Map</code>.
+     * @return The game {@code Map}.
      */
     public Map getMap() {
         return map;
@@ -827,7 +827,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the game map.
      *
-     * @param newMap The new <code>Map</code> to use.
+     * @param newMap The new {@code Map} to use.
      */
     public void setMap(Map newMap) {
         if (this.map != newMap) {
@@ -843,7 +843,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get the current nation options.
      *
-     * @return The current <code>NationOptions</code>.
+     * @return The current {@code NationOptions}.
      */
     public final NationOptions getNationOptions() {
         return nationOptions;
@@ -852,7 +852,7 @@ public class Game extends FreeColGameObject {
     /**
      * Set the current nation options.
      *
-     * @param newNationOptions The new <code>NationOptions</code> value.
+     * @param newNationOptions The new {@code NationOptions} value.
      */
     public final void setNationOptions(final NationOptions newNationOptions) {
         this.nationOptions = newNationOptions;
@@ -861,7 +861,7 @@ public class Game extends FreeColGameObject {
     /**
      * Find an available (i.e. vacant) nation.
      *
-     * @return A vacant <code>Nation</code> or null if none found.
+     * @return A vacant {@code Nation} or null if none found.
      */
     public Nation getVacantNation() {
         Entry<Nation, NationState> entry
@@ -873,7 +873,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get the currently available nations.
      *
-     * @return A list of available <code>Nation</code>s.
+     * @return A list of available {@code Nation}s.
      */
     public final List<Nation> getVacantNations() {
         return transform(nationOptions.getNations().entrySet(),
@@ -893,7 +893,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the current turn in this game.
      *
-     * @return The current <code>Turn</code>.
+     * @return The current {@code Turn}.
      */
     public Turn getTurn() {
         return turn;
@@ -902,7 +902,7 @@ public class Game extends FreeColGameObject {
     /**
      * Sets the current turn in this game.
      *
-     * @param newTurn The new <code>Turn</code> to set.
+     * @param newTurn The new {@code Turn} to set.
      */
     public void setTurn(Turn newTurn) {
         turn = newTurn;
@@ -920,7 +920,7 @@ public class Game extends FreeColGameObject {
     /**
      * Get the combat model in this game.
      *
-     * @return The <code>CombatModel</code>.
+     * @return The {@code CombatModel}.
      */
     public final CombatModel getCombatModel() {
         return combatModel;
@@ -929,7 +929,7 @@ public class Game extends FreeColGameObject {
     /**
      * Set the game combat model.
      *
-     * @param newCombatModel The new <code>CombatModel</code> value.
+     * @param newCombatModel The new {@code CombatModel} value.
      */
     public final void setCombatModel(final CombatModel newCombatModel) {
         this.combatModel = newCombatModel;
@@ -973,9 +973,9 @@ public class Game extends FreeColGameObject {
     }
         
     /**
-     * Sets the <code>FreeColGameObjectListener</code> attached to this game.
+     * Sets the {@code FreeColGameObjectListener} attached to this game.
      *
-     * @param fcgol The new <code>FreeColGameObjectListener</code>.
+     * @param fcgol The new {@code FreeColGameObjectListener}.
      */
     public void setFreeColGameObjectListener(FreeColGameObjectListener fcgol) {
         freeColGameObjectListener = fcgol;
@@ -985,7 +985,7 @@ public class Game extends FreeColGameObject {
      * Notify a listener (if any) of a new game object.
      *
      * @param id The object identifier.
-     * @param fcgo The new <code>FreeColGameObject</code>.
+     * @param fcgo The new {@code FreeColGameObject}.
      */
     public void notifySetFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (freeColGameObjectListener != null) {
@@ -1007,9 +1007,9 @@ public class Game extends FreeColGameObject {
     /**
      * Notify a listener (if any) of that a game object has changed owner.
      *
-     * @param source The <code>FreeColGameObject</code> that changed owner.
-     * @param oldOwner The old owning <code>Player</code>.
-     * @param newOwner The new owning <code>Player</code>.
+     * @param source The {@code FreeColGameObject} that changed owner.
+     * @param oldOwner The old owning {@code Player}.
+     * @param newOwner The new owning {@code Player}.
      */
     public void notifyOwnerChanged(FreeColGameObject source,
                                    Player oldOwner, Player newOwner) {
@@ -1023,9 +1023,9 @@ public class Game extends FreeColGameObject {
      * Mainly useful in the client, informing the player that it has
      * gained or lost an ownable.
      *
-     * @param o The <code>Ownable</code> that may have changed.
+     * @param o The {@code Ownable} that may have changed.
      * @param oldOwner The previous (possible unchanged) owning
-     *     <code>Player</code>.
+     *     {@code Player}.
      */
     public void checkOwners(Ownable o, Player oldOwner) {
         Player newOwner = o.getOwner();
@@ -1054,8 +1054,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get all the colonies in the game.
      *
-     * @param player An optional <code>Player</code> to omit.
-     * @return A stream of all the <code>Colony</code>s in the game.
+     * @param player An optional {@code Player} to omit.
+     * @return A stream of all the {@code Colony}s in the game.
      */
     public Stream<Colony> getAllColonies(Player player) {
         return flatten(getLiveEuropeanPlayerList(player), Player::getColonies);
@@ -1064,8 +1064,8 @@ public class Game extends FreeColGameObject {
     /**
      * Get a list of all the colonies in the game.
      *
-     * @param player An optional <code>Player</code> to omit.
-     * @return A list of all the <code>Colony</code>s in the game.
+     * @param player An optional {@code Player} to omit.
+     * @return A list of all the {@code Colony}s in the game.
      */
     public List<Colony> getAllColoniesList(Player player) {
         return toList(getAllColonies(player));
@@ -1074,9 +1074,9 @@ public class Game extends FreeColGameObject {
     /**
      * Finds a settlement by name.
      *
-     * @param name The name of the <code>Settlement</code>.
-     * @return The <code>Settlement</code> found, or <code>null</code>
-     *     if there is no known <code>Settlement</code> with the
+     * @param name The name of the {@code Settlement}.
+     * @return The {@code Settlement} found, or <code>null</code>
+     *     if there is no known {@code Settlement} with the
      *     specified name (the settlement might not be visible to a client).
      */
     public Settlement getSettlementByName(String name) {
@@ -1087,7 +1087,7 @@ public class Game extends FreeColGameObject {
     /**
      * Helper function to get the source object of a message in this game.
      *
-     * @param message The <code>ModelMessage</code> to find the object in.
+     * @param message The {@code ModelMessage} to find the object in.
      * @return The source object.
      */
     public FreeColGameObject getMessageSource(ModelMessage message) {
@@ -1098,7 +1098,7 @@ public class Game extends FreeColGameObject {
      * Helper function to get the object to display with a message in
      * this game.
      *
-     * @param message The <code>ModelMessage</code> to find the object in.
+     * @param message The {@code ModelMessage} to find the object in.
      * @return An object to display.
      */
     public FreeColObject getMessageDisplay(ModelMessage message) {
@@ -1118,7 +1118,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets the statistics of this game.
      *
-     * @return A <code>Map</code> of the statistics.
+     * @return A {@code Map} of the statistics.
      */
     public java.util.Map<String, String> getStatistics() {
         java.util.Map<String, String> stats = new HashMap<>();

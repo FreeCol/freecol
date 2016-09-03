@@ -62,7 +62,7 @@ public final class ServerListPanel extends FreeColPanel {
     /**
      * Creates a panel to display the meta-server.
      * 
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param connectController The controller responsible for creating new
      *     connections.
      */
@@ -128,7 +128,7 @@ public final class ServerListPanel extends FreeColPanel {
     /**
      * Initializes the data that is displayed in this panel.
      * 
-     * @param servers A list of <code>ServerInfo</code>-objects to be
+     * @param servers A list of {@code ServerInfo}-objects to be
      *            displayed.
      */
     public void initialize(List<ServerInfo> servers) {
@@ -220,7 +220,7 @@ class ServerListTableModel extends AbstractTableModel {
     /**
      * Sets the items that should be contained by this model.
      * 
-     * @param items The <code>ArrayList</code> containing the items.
+     * @param items The {@code ArrayList} containing the items.
      */
     public void setItems(List<ServerInfo> items) {
         this.items = items;
@@ -229,8 +229,8 @@ class ServerListTableModel extends AbstractTableModel {
     /**
      * Gets the given item.
      * 
-     * @param row The row-number identifying a <code>ServerInfo</code>-line.
-     * @return The <code>ServerInfo</code>.
+     * @param row The row-number identifying a {@code ServerInfo}-line.
+     * @return The {@code ServerInfo}.
      */
     public ServerInfo getItem(int row) {
         return items.get(row);

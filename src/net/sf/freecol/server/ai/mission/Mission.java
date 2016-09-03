@@ -95,13 +95,13 @@ public abstract class Mission extends AIObject {
 
 
     /**
-     * Creates a mission for the given <code>AIUnit</code>.
+     * Creates a mission for the given {@code AIUnit}.
      *
      * Note that missions are attached to their units, and thus do
      * not need AI ids, hence the plain superclass constructor.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
      */
     protected Mission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain);
@@ -111,14 +111,14 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Creates a mission for the given <code>AIUnit</code> and target.
+     * Creates a mission for the given {@code AIUnit} and target.
      *
      * Note that missions are attached to their units, and thus do
      * not need AI ids, hence the plain superclass constructor.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param target The initial target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} this mission is created for.
+     * @param target The initial target {@code Location}.
      */
     protected Mission(AIMain aiMain, AIUnit aiUnit, Location target) {
         this(aiMain, aiUnit);
@@ -133,7 +133,7 @@ public abstract class Mission extends AIObject {
     /**
      * Gets the AI-unit this mission has been created for.
      *
-     * @return The <code>AIUnit</code>.
+     * @return The {@code AIUnit}.
      */
     public final AIUnit getAIUnit() {
         return aiUnit;
@@ -142,7 +142,7 @@ public abstract class Mission extends AIObject {
     /**
      * Gets the unit this mission has been created for.
      *
-     * @return The <code>Unit</code>.
+     * @return The {@code Unit}.
      */
     public final Unit getUnit() {
         return (aiUnit == null) ? null : aiUnit.getUnit();
@@ -151,7 +151,7 @@ public abstract class Mission extends AIObject {
     /**
      * Convenience accessor for the owning player.
      *
-     * @return The <code>Player</code> that owns the mission unit.
+     * @return The {@code Player} that owns the mission unit.
      */
     protected final Player getPlayer() {
         return (getUnit() == null) ? null : getUnit().getOwner();
@@ -160,7 +160,7 @@ public abstract class Mission extends AIObject {
     /**
      * Convenience accessor for the owning AI player.
      *
-     * @return The <code>AIPlayer</code>.
+     * @return The {@code AIPlayer}.
      */
     protected final MissionAIPlayer getAIPlayer() {
         return (MissionAIPlayer)getAIMain().getAIPlayer(getUnit().getOwner());
@@ -169,7 +169,7 @@ public abstract class Mission extends AIObject {
     /**
      * Convenience accessor for the owning European AI player.
      *
-     * @return The <code>EuropeanAIPlayer</code>.
+     * @return The {@code EuropeanAIPlayer}.
      */
     protected final EuropeanAIPlayer getEuropeanAIPlayer() {
         Player player = getUnit().getOwner();
@@ -183,7 +183,7 @@ public abstract class Mission extends AIObject {
     /**
      * Convenience accessor for the unit/player PRNG.
      *
-     * @return A <code>Random</code> to use.
+     * @return A {@code Random} to use.
      */
     protected final Random getAIRandom() {
         return aiUnit.getAIRandom();
@@ -211,7 +211,7 @@ public abstract class Mission extends AIObject {
     /**
      * Is a unit able to perform a mission of a particular type?
      *
-     * @param unit The <code>Unit</code> to check.
+     * @param unit The {@code Unit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidUnitReason(Unit unit) {
@@ -225,7 +225,7 @@ public abstract class Mission extends AIObject {
     /**
      * Is an AI unit able to perform a mission of a particular type?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidAIUnitReason(AIUnit aiUnit) {
@@ -239,7 +239,7 @@ public abstract class Mission extends AIObject {
      * Is an AI unable to perform a new mission because it already has
      * a valid, non-onetime mission?
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param aiUnit The {@code AIUnit} to test.
      * @return "mission-exists" if a valid mission is found, or null
      *     if none found.
      */
@@ -254,7 +254,7 @@ public abstract class Mission extends AIObject {
     /**
      * Is a target a valid mission target?
      *
-     * @param target The target <code>Location</code> to check.
+     * @param target The target {@code Location} to check.
      * @return A reason for the target to be invalid, or null if none found.
      */
     public static String invalidTargetReason(Location target) {
@@ -266,8 +266,8 @@ public abstract class Mission extends AIObject {
     /**
      * Is a target a valid mission target?
      *
-     * @param target The target <code>Location</code> to check.
-     * @param owner A <code>Player</code> that should own
+     * @param target The target {@code Location} to check.
+     * @param owner A {@code Player} that should own
      *     the target.
      * @return A reason for the target to be invalid, or null if none found.
      */
@@ -285,7 +285,7 @@ public abstract class Mission extends AIObject {
     /**
      * Is there a reason to invalidate mission to move a transportable?
      *
-     * @param t The <code>TransportableAIObject</code> to check.
+     * @param t The {@code TransportableAIObject} to check.
      * @return A reason for the transport to be invalid, or null if
      *     none found.
      */
@@ -329,8 +329,8 @@ public abstract class Mission extends AIObject {
     /**
      * Is another player a valid attack target?
      *
-     * @param aiUnit The <code>AIUnit</code> that will attack.
-     * @param other The <code>Player</code> to attack.
+     * @param aiUnit The {@code AIUnit} that will attack.
+     * @param other The {@code Player} to attack.
      * @return A reason why the attack would be invalid, or null if none found.
      */
     public static String invalidAttackReason(AIUnit aiUnit, Player other) {
@@ -363,7 +363,7 @@ public abstract class Mission extends AIObject {
      * Implementations should usually start by calling this routine
      * (i.e. Mission.invalidReason(AIUnit)).
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
@@ -382,8 +382,8 @@ public abstract class Mission extends AIObject {
      * invalidAIUnitReason() or this routine if the target checking is
      * trivial.
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The target <code>Location</code> to check.
+     * @param aiUnit The {@code AIUnit} to check.
+     * @param loc The target {@code Location} to check.
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
@@ -397,8 +397,8 @@ public abstract class Mission extends AIObject {
     /**
      * State where a unit is.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return This <code>Mission</code>.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return This {@code Mission}.
      */
     protected Mission lbAt(LogBuilder lb) {
         final Unit unit = getUnit();
@@ -409,10 +409,10 @@ public abstract class Mission extends AIObject {
     /**
      * State that the unit has made an attack.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param what What is being attacked (a <code>Unit</code> or
-     *     <code>Settlement</code>).
-     * @return This <code>Mission</code>.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param what What is being attacked (a {@code Unit} or
+     *     {@code Settlement}).
+     * @return This {@code Mission}.
      */
     protected Mission lbAttack(LogBuilder lb, Location what) {
         lb.add(", attacking ", what);
@@ -422,8 +422,8 @@ public abstract class Mission extends AIObject {
     /**
      * State that the unit is dodging.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return This <code>Mission</code>.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return This {@code Mission}.
      */
     protected Mission lbDodge(LogBuilder lb) {
         final Unit unit = getUnit();
@@ -435,12 +435,12 @@ public abstract class Mission extends AIObject {
     /**
      * State that this mission has completed successfully.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @param cont If true, the mission should continue, otherwise drop the
      *     mission.
      * @param reasons Reasons for the successful completion.
-     * @return The current <code>Mission</code> of the unit, which may
-     *     now be different from <code>this</code>.
+     * @return The current {@code Mission} of the unit, which may
+     *     now be different from {@code this}.
      */
     protected Mission lbDone(LogBuilder lb, boolean cont, Object... reasons) {
         lb.add(", COMPLETED: ", reasons);
@@ -450,9 +450,9 @@ public abstract class Mission extends AIObject {
     /**
      * Drop the current mission.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @param reasons Optional reasons to drop the mission.
-     * @return Null, which is now the current <code>Mission</code> of
+     * @return Null, which is now the current {@code Mission} of
      *     this unit.
      */
     protected Mission lbDrop(LogBuilder lb, Object... reasons) {
@@ -463,12 +463,12 @@ public abstract class Mission extends AIObject {
     /**
      * The current mission has failed.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @param cont If true, the mission should continue, otherwise drop the
      *     mission.
      * @param reasons Reasons for the successful completion.
-     * @return The current <code>Mission</code> of the unit, which may
-     *     not be different from <code>this</code>.
+     * @return The current {@code Mission} of the unit, which may
+     *     not be different from {@code this}.
      */
     protected Mission lbFail(LogBuilder lb, boolean cont, Object... reasons) {
         lb.add(", FAILED: ", reasons);
@@ -478,9 +478,9 @@ public abstract class Mission extends AIObject {
     /**
      * State that a bad move has occurred.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param mt The bad <code>MoveType</code>.
-     * @return This <code>Mission</code>.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param mt The bad {@code MoveType}.
+     * @return This {@code Mission}.
      */     
     protected Mission lbMove(LogBuilder lb, Unit.MoveType mt) {
         lb.add(", bad move type at ", getUnit().getLocation(), ": ", mt);
@@ -490,8 +490,8 @@ public abstract class Mission extends AIObject {
     /**
      * State that the mission has been retargeted.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return This <code>Mission</code>.
+     * @param lb A {@code LogBuilder} to log to.
+     * @return This {@code Mission}.
      */
     protected Mission lbRetarget(LogBuilder lb) {
         lb.add(", retargeted ", getTarget());
@@ -501,9 +501,9 @@ public abstract class Mission extends AIObject {
     /**
      * State that the unit is waiting for something.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @param reasons Reasons for the wait.
-     * @return This <code>Mission</code>.
+     * @return This {@code Mission}.
      */
     protected Mission lbWait(LogBuilder lb, Object... reasons) {
         lb.add(reasons);
@@ -518,11 +518,11 @@ public abstract class Mission extends AIObject {
      * can not find a target with the normal path finding routines,
      * and thus should consider targets that may require a carrier.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param gd The <code>GoalDecider</code> that selects targets.
+     * @param aiUnit The {@code AIUnit} that is searching.
+     * @param gd The {@code GoalDecider} that selects targets.
      * @param radius A maximum radius from the unit location to search within.
      * @param deferOK If true, fall back to the nearest port to Europe.
-     * @return The best target <code>Tile</code> found, or null if none.
+     * @return The best target {@code Tile} found, or null if none.
      */
     protected static Location findCircleTarget(final AIUnit aiUnit,
                                                final GoalDecider gd,
@@ -542,8 +542,8 @@ public abstract class Mission extends AIObject {
      * We have been blocked on the way to a target.  Is it valid to
      * attack the blockage, or should it just be avoided?
      *
-     * @param aiUnit The <code>AIUnit</code> that was blocked.
-     * @param target The target <code>Location</code>.
+     * @param aiUnit The {@code AIUnit} that was blocked.
+     * @param target The target {@code Location}.
      * @return The blockage to attack, or null if not.
      */
     public static Location resolveBlockage(AIUnit aiUnit, Location target) {
@@ -565,7 +565,7 @@ public abstract class Mission extends AIObject {
      * Moves a unit one step randomly.
      *
      * @param logMe A string to log the random number generation with.
-     * @param direction An optional preferred <code>Direction</code>.
+     * @param direction An optional preferred {@code Direction}.
      * @return The direction of the move, or null if no move was made.
      */
     protected Direction moveRandomly(String logMe, Direction direction) {
@@ -605,7 +605,7 @@ public abstract class Mission extends AIObject {
      * Useful for missions where the unit might be in Europe, but should
      * go to a safe spot in the New World and proceed from there.
      *
-     * @param player The <code>Player</code> that is searching.
+     * @param player The {@code Player} that is searching.
      * @return A good settlement to restart a Mission from.
      */
     protected static Settlement getBestSettlement(Player player) {
@@ -651,10 +651,10 @@ public abstract class Mission extends AIObject {
      *   and are not performed here, the calling mission code must
      *   handle them.
      *
-     * @param target The destination <code>Location</code>.
-     * @param costDecider The <code>CostDecider</code> to use in any path
+     * @param target The destination {@code Location}.
+     * @param costDecider The {@code CostDecider} to use in any path
      *     finding.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return The type of move the unit stopped at.
      */
     protected MoveType travelToTarget(Location target, CostDecider costDecider,
@@ -856,8 +856,8 @@ public abstract class Mission extends AIObject {
      * Follow a path that is on the map (except perhaps the last node)
      * and does not use a carrier.
      *
-     * @param path The <code>PathNode</code> to follow.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param path The {@code PathNode} to follow.
+     * @param lb A {@code LogBuilder} to log to.
      * @return The type of move the unit stopped at.
      */
     private MoveType followMapPath(PathNode path, LogBuilder lb) {
@@ -907,8 +907,8 @@ public abstract class Mission extends AIObject {
      * Retarget a mission because of some problem.
      *
      * @param reason The reason for the retarget.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The current <code>Mission</code>, which has been set to
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The current {@code Mission}, which has been set to
      *     null on failure to retarget.
      */
     public Mission retargetMission(String reason, LogBuilder lb) {
@@ -1016,8 +1016,8 @@ public abstract class Mission extends AIObject {
     /**
      * Performs the mission.
      *
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @return The <code>Mission</code> to continue with, or null
+     * @param lb A {@code LogBuilder} to log to.
+     * @return The {@code Mission} to continue with, or null
      *     if the current mission has completed.
      */
     public abstract Mission doMission(LogBuilder lb);

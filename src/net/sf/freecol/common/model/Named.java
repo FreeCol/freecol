@@ -31,7 +31,7 @@ public interface Named {
      * Try to avoid using this directly except in i18n-related routines
      * or to implement itself in more complext objects.
      *
-     * @return The name of the <code>Named</code>.
+     * @return The name of the {@code Named}.
      */
     public String getNameKey();
 }

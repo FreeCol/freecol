@@ -137,7 +137,7 @@ public class CollectionUtils {
      *
      * @param <T> The map value collection member type.
      * @param <K> The map key type.
-     * @param map The <code>Map</code> to add to.
+     * @param map The {@code Map} to add to.
      * @param key The key with which to look up the list in the map.
      * @param value The value to append.
      */
@@ -244,7 +244,7 @@ public class CollectionUtils {
      * Are all members of a collection the same (in the sense of ==).
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to examine.
+     * @param c The {@code Collection} to examine.
      * @return True if all members are the same.
      */
     public static <T> boolean allSame(final Collection<T> c) {
@@ -261,7 +261,7 @@ public class CollectionUtils {
      * Rotate a list by N places.
      *
      * @param <T> The list member type.
-     * @param list The <code>List</code> to rotate.
+     * @param list The {@code List} to rotate.
      * @param n The number of places to rotate by (positive or negative).
      */
     public static <T> void rotate(final List<T> list, int n) {
@@ -285,7 +285,7 @@ public class CollectionUtils {
      * Reverse a list.
      *
      * @param <T> The list member type.
-     * @param list The <code>List</code> to reverse.
+     * @param list The {@code List} to reverse.
      */
     public static <T> void reverse(final List<T> list) {
         final int len = list.size();
@@ -331,7 +331,7 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to extract entries from.
+     * @param map The {@code Map} to extract entries from.
      * @return A list of entries from the map sorted by key.
      */
     public static <K extends Comparable<? super K>,V> List<Entry<K,V>>
@@ -344,8 +344,8 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to extract entries from.
-     * @param comparator A <code>Comparator</code> for the values.
+     * @param map The {@code Map} to extract entries from.
+     * @param comparator A {@code Comparator} for the values.
      * @return A list of entries from the map sorted by key.
      */
     public static <K,V> List<Entry<K,V>>
@@ -359,7 +359,7 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to extract entries from.
+     * @param map The {@code Map} to extract entries from.
      * @return A list of entries from the map sorted by key.
      */
     public static <K,V extends Comparable<? super V>> List<Entry<K,V>>
@@ -372,8 +372,8 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to extract entries from.
-     * @param comparator A <code>Comparator</code> for the values.
+     * @param map The {@code Map} to extract entries from.
+     * @param comparator A {@code Comparator} for the values.
      * @return A list of entries from the map sorted by value.
      */
     public static <K,V> List<Entry<K,V>>
@@ -389,7 +389,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if all members pass the predicate test.
      */
     public static <T> boolean all(T[] array, Predicate<? super T> predicate) {
@@ -401,8 +401,8 @@ public class CollectionUtils {
      * Do all members of an collection match a predicate?
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param c The {@code Collection} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if all members pass the predicate test.
      */
     public static <T> boolean all(Collection<T> c,
@@ -414,8 +414,8 @@ public class CollectionUtils {
      * Do all members of an stream match a predicate?
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if all members pass the predicate test.
      */
     public static <T> boolean all(Stream<T> stream,
@@ -427,8 +427,8 @@ public class CollectionUtils {
      * Implementation of all().
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if all members pass the predicate test.
      */
     private static <T> boolean all_internal(Stream<T> stream,
@@ -462,7 +462,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if any member passes the predicate test.
      */
     public static <T> boolean any(T[] array, Predicate<? super T> predicate) {
@@ -473,7 +473,7 @@ public class CollectionUtils {
      * Is a collection non-empty?
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to test.
+     * @param c The {@code Collection} to test.
      * @return True if the collection is non-empty.
      */
     public static <T> boolean any(Collection<T> c) {
@@ -484,8 +484,8 @@ public class CollectionUtils {
      * Does any member of a collection match a predicate?
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param c The {@code Collection} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if any member passes the predicate test.
      */
     public static <T> boolean any(Collection<T> c,
@@ -497,7 +497,7 @@ public class CollectionUtils {
      * Is a stream non-empty?
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
+     * @param stream The {@code Stream} to test.
      * @return True if the stream is non-empty.
      */
     public static <T> boolean any(Stream<T> stream) {
@@ -508,8 +508,8 @@ public class CollectionUtils {
      * Does any member of a stream match a predicate?
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if any member passes the predicate test.
      */
     public static <T> boolean any(Stream<T> stream,
@@ -521,8 +521,8 @@ public class CollectionUtils {
      * Implementation of any().
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if any member passes the predicate test.
      */
     private static <T> boolean any_internal(Stream<T> stream,
@@ -535,7 +535,7 @@ public class CollectionUtils {
      *
      * @param <T> The argument type to be converted to int.
      * @param f The integer valued function to cache.
-     * @return A caching <code>ToIntFunction</code>.
+     * @return A caching {@code ToIntFunction}.
      */
     public static <T> ToIntFunction<T> cacheInt(Function<T, Integer> f) {
         return t -> new CachingFunction<T, Integer>(f).apply(t);
@@ -546,7 +546,7 @@ public class CollectionUtils {
      *
      * @param <T> The argument type to be converted to int.
      * @param f The integer valued function to use in comparison.
-     * @return A caching <code>Comparator</code>.
+     * @return A caching {@code Comparator}.
      */
     public static <T> Comparator<T> cachingIntComparator(Function<T, Integer> f) {
         return Comparator.comparingInt(cacheInt(f));
@@ -557,7 +557,7 @@ public class CollectionUtils {
      *
      * @param <T> The argument type to be converted to double.
      * @param f The double valued function to cache.
-     * @return A caching <code>ToDoubleFunction</code>.
+     * @return A caching {@code ToDoubleFunction}.
      */
     public static <T> ToDoubleFunction<T> cacheDouble(Function<T, Double> f) {
         return t -> new CachingFunction<T, Double>(f).apply(t);
@@ -568,7 +568,7 @@ public class CollectionUtils {
      *
      * @param <T> The argument type to be converted to double.
      * @param f The double valued function to use in comparison.
-     * @return A caching <code>Comparator</code>.
+     * @return A caching {@code Comparator}.
      */
     public static <T> Comparator<T> cachingDoubleComparator(Function<T, Double> f) {
         return Comparator.comparingDouble(cacheDouble(f));
@@ -577,8 +577,8 @@ public class CollectionUtils {
     /**
      * Concatenate streams.
      *
-     * @param s0 The first <code>Stream</code>.
-     * @param streams The <code>Stream</code>s to concatenate (nulls ignored).
+     * @param s0 The first {@code Stream}.
+     * @param streams The {@code Stream}s to concatenate (nulls ignored).
      * @return The concatenated stream.
      */
     @SafeVarargs
@@ -607,7 +607,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to check.
-     * @param predicate A <code>Predicate</code> to test with.
+     * @param predicate A {@code Predicate} to test with.
      * @return The number of items that matched.
      */
     public static <T> int count(T[] array,
@@ -619,7 +619,7 @@ public class CollectionUtils {
      * Count the number of members of a collection that match a predicate.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
+     * @param c The {@code Collection} to check.
      * @return The number of items that matched.
      */
     public static <T> int count(Collection<T> c) {
@@ -630,8 +630,8 @@ public class CollectionUtils {
      * Count the number of members of a collection that match a predicate.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param predicate A <code>Predicate</code> to test with.
+     * @param c The {@code Collection} to check.
+     * @param predicate A {@code Predicate} to test with.
      * @return The number of items that matched.
      */
     public static <T> int count(Collection<T> c,
@@ -643,7 +643,7 @@ public class CollectionUtils {
      * Count the number of members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
+     * @param stream The {@code Stream} to check.
      * @return The number of items that matched.
      */
     public static <T> int count(Stream<T> stream) {
@@ -654,8 +654,8 @@ public class CollectionUtils {
      * Count the number of members of a stream that match a predicate.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to test with.
      * @return The number of items that matched.
      */
     public static <T> int count(Stream<T> stream,
@@ -667,8 +667,8 @@ public class CollectionUtils {
      * Implement count().
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to test with.
      * @return The number of items that matched.
      */
     private static <T> int count_internal(Stream<T> stream,
@@ -679,8 +679,8 @@ public class CollectionUtils {
     /**
      * Create a stream of files from a directory.
      *
-     * @param dir The <code>File</code> that hopefully is a directory.
-     * @return A stream of <code>File</code>s.
+     * @param dir The {@code File} that hopefully is a directory.
+     * @return A stream of {@code File}s.
      */
     public static Stream<File> fileStream(File dir) {
         File[] files;
@@ -693,9 +693,9 @@ public class CollectionUtils {
     /**
      * Create a stream of files from a directory, that each match a predicate.
      *
-     * @param dir The <code>File</code> that hopefully is a directory.
-     * @param predicate The <code>Predicate</code> to match with.
-     * @return A stream of matching <code>File</code>s.
+     * @param dir The {@code File} that hopefully is a directory.
+     * @param predicate The {@code Predicate} to match with.
+     * @return A stream of matching {@code File}s.
      */
     public static Stream<File> fileStream(File dir,
                                           Predicate<? super File> predicate) {
@@ -707,7 +707,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param predicate A {@code Predicate} to match with.
      * @return The item found, or null if not found.
      */
     public static <T> T find(T[] array, Predicate<? super T> predicate) {
@@ -719,7 +719,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param predicate A {@code Predicate} to match with.
      * @param fail The result to return on failure.
      * @return The item found, or fail if not found.
      */
@@ -732,8 +732,8 @@ public class CollectionUtils {
      * Simple stream search for the first item that matches a predicate.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param c The {@code Collection} to search.
+     * @param predicate A {@code Predicate} to match with.
      * @return The item found, or null if not found.
      */
     public static <T> T find(Collection<T> c, Predicate<? super T> predicate) {
@@ -744,8 +744,8 @@ public class CollectionUtils {
      * Simple stream search for the first item that matches a predicate.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param c The {@code Collection} to search.
+     * @param predicate A {@code Predicate} to match with.
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
@@ -758,8 +758,8 @@ public class CollectionUtils {
      * Simple stream search for the first item that matches a predicate.
      *
      * @param <T> The stream member type.
-     * @param stream A <code>Stream</code> to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param stream A {@code Stream} to search.
+     * @param predicate A {@code Predicate} to match with.
      * @return The item found, or null if not found.
      */
     public static <T> T find(Stream<T> stream,
@@ -771,8 +771,8 @@ public class CollectionUtils {
      * Simple stream search for the first item that matches a predicate.
      *
      * @param <T> The stream member type.
-     * @param stream A <code>Stream</code> to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param stream A {@code Stream} to search.
+     * @param predicate A {@code Predicate} to match with.
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
@@ -785,8 +785,8 @@ public class CollectionUtils {
      * Implement find().
      *
      * @param <T> The stream member type.
-     * @param stream A <code>Stream</code> to search.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param stream A {@code Stream} to search.
+     * @param predicate A {@code Predicate} to match with.
      * @param fail The value to return if nothing is found.
      * @return The item found, or fail if not found.
      */
@@ -800,7 +800,7 @@ public class CollectionUtils {
      * Get the first item of an array.
      *
      * @param <T> The array member type.
-     * @param array The <code>Collection</code> to search.
+     * @param array The {@code Collection} to search.
      * @return The first item, or null on failure.
      */
     public static <T> T first(T[] array) {
@@ -811,7 +811,7 @@ public class CollectionUtils {
     /**
      * Get the first item of a collection.
      *
-     * @param c The <code>Collection</code> to search.
+     * @param c The {@code Collection} to search.
      * @return The first item, or null on failure.
      */
     public static <T> T first(Collection<T> c) {
@@ -822,7 +822,7 @@ public class CollectionUtils {
     /**
      * Get the first item of a stream.
      *
-     * @param stream The <code>Stream</code> to search.
+     * @param stream The {@code Stream} to search.
      * @return The first item, or null on failure.
      */
     public static <T> T first(Stream<T> stream) {
@@ -832,7 +832,7 @@ public class CollectionUtils {
     /**
      * Implement first().
      *
-     * @param stream The <code>Stream</code> to search.
+     * @param stream The {@code Stream} to search.
      * @param fail The value to return on failure.
      * @return The first item, or fail on failure.
      */
@@ -846,7 +846,7 @@ public class CollectionUtils {
      * @param <T> The array member type.
      * @param <R> The resulting stream member type.
      * @param array The array to flatten.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(T[] array,
@@ -860,8 +860,8 @@ public class CollectionUtils {
      * @param <T> The array member type.
      * @param <R> The resulting stream member type.
      * @param array The array to flatten.
-     * @param predicate A <code>Predicate</code> to filter the collection with.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param predicate A {@code Predicate} to filter the collection with.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(T[] array,
@@ -875,8 +875,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param c The <code>Collection</code> to flatten.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param c The {@code Collection} to flatten.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(Collection<T> c,
@@ -889,9 +889,9 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param c The <code>Collection</code> to flatten.
-     * @param predicate A <code>Predicate</code> to filter the collection with.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param c The {@code Collection} to flatten.
+     * @param predicate A {@code Predicate} to filter the collection with.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped collection.
      */
     public static <T, R> Stream<R> flatten(Collection<T> c,
@@ -905,8 +905,8 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting stream member type.
-     * @param stream The <code>Stream</code> to flatten.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param stream The {@code Stream} to flatten.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped stream.
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
@@ -920,9 +920,9 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting stream member type.
-     * @param stream The <code>Stream</code> to flatten.
-     * @param predicate A <code>Predicate</code> to filter the collection with.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param stream The {@code Stream} to flatten.
+     * @param predicate A {@code Predicate} to filter the collection with.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped stream.
      */
     public static <T, R> Stream<R> flatten(Stream<T> stream,
@@ -937,9 +937,9 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting stream member type.
-     * @param stream The <code>Stream</code> to flatten.
-     * @param predicate A <code>Predicate</code> to filter the collection with.
-     * @param mapper A mapping <code>Function</code> to apply.
+     * @param stream The {@code Stream} to flatten.
+     * @param predicate A {@code Predicate} to filter the collection with.
+     * @param mapper A mapping {@code Function} to apply.
      * @return A stream of the mapped stream.
      */
     private static <T, R> Stream<R> flatten_internal(Stream<T> stream,
@@ -953,8 +953,8 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to apply to.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param map The {@code Map} to apply to.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Consumer<Entry<K,V>> consumer) {
@@ -968,9 +968,9 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param map The <code>Map</code> to apply to.
-     * @param predicate The <code>Predicate</code> to match.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param map The {@code Map} to apply to.
+     * @param predicate The {@code Predicate} to match.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <K,V> void forEachMapEntry(Map<K,V> map,
                                              Predicate<Entry<K,V>> predicate,
@@ -985,7 +985,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to apply to.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(T[] array,
                                    Consumer<? super T> consumer) {
@@ -999,8 +999,8 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to apply to.
-     * @param predicate A <code>Predicate</code> to gate the application.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param predicate A {@code Predicate} to gate the application.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(T[] array,
                                    Predicate<? super T> predicate,
@@ -1014,8 +1014,8 @@ public class CollectionUtils {
      * Apply a consumer to the members of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to apply to.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param c The {@code Collection} to apply to.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(Collection<T> c,
                                    Consumer<? super T> consumer) {
@@ -1028,9 +1028,9 @@ public class CollectionUtils {
      * Apply a consumer to the members of a collection that match a predicate.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to apply to.
-     * @param predicate A <code>Predicate</code> to gate the application.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param c The {@code Collection} to apply to.
+     * @param predicate A {@code Predicate} to gate the application.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(Collection<T> c,
                                    Predicate<? super T> predicate,
@@ -1044,8 +1044,8 @@ public class CollectionUtils {
      * Apply a consumer to the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to apply to.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param stream The {@code Stream} to apply to.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(Stream<T> stream,
                                    Consumer<? super T> consumer) {
@@ -1058,9 +1058,9 @@ public class CollectionUtils {
      * Apply a consumer to the members of a stream that match a predicate.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to apply to.
-     * @param predicate A <code>Predicate</code> to gate the application.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param stream The {@code Stream} to apply to.
+     * @param predicate A {@code Predicate} to gate the application.
+     * @param consumer A {@code Consumer} to apply.
      */
     public static <T> void forEach(Stream<T> stream,
                                    Predicate<? super T> predicate,
@@ -1074,9 +1074,9 @@ public class CollectionUtils {
      * Implement forEach.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to apply to.
-     * @param predicate A <code>Predicate</code> to gate the application.
-     * @param consumer A <code>Consumer</code> to apply.
+     * @param stream The {@code Stream} to apply to.
+     * @param predicate A {@code Predicate} to gate the application.
+     * @param consumer A {@code Consumer} to apply.
      */
     private static <T> void forEach_internal(Stream<T> stream,
                                              Predicate<? super T> predicate,
@@ -1089,7 +1089,7 @@ public class CollectionUtils {
      * not null.
      *
      * @param <T> The input type.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T> Predicate<T> isNotNull() {
         return (T t) -> t != null;
@@ -1102,7 +1102,7 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <V> A type to transform to.
      * @param mapper A function to transform the input type.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T,V> Predicate<T> isNotNull(Function<? super T,V> mapper) {
         return (T t) -> mapper.apply(t) != null;
@@ -1113,7 +1113,7 @@ public class CollectionUtils {
      * null.
      *
      * @param <T> The input type.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T> Predicate<T> isNull() {
         return (T t) -> t == null;
@@ -1126,7 +1126,7 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <V> A type to transform to.
      * @param mapper A function to transform the input type.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T,V> Predicate<T> isNull(Function<? super T,V> mapper) {
         return (T t) -> mapper.apply(t) == null;
@@ -1136,8 +1136,8 @@ public class CollectionUtils {
      * Convenience function to convert a stream to an iterable.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to convert.
-     * @return The suitable <code>Iterable</code>.
+     * @param stream The {@code Stream} to convert.
+     * @return The suitable {@code Iterable}.
      */
     public static <T> Iterable<T> iterable(final Stream<T> stream) {
         return new Iterable<T>() {
@@ -1151,8 +1151,8 @@ public class CollectionUtils {
      * @param <T> The array member type.
      * @param <R> The resulting stream member type.
      * @param array The array to search.
-     * @param mapper A mapping <code>Function</code> to apply.
-     * @return The resulting <code>Stream</code>.
+     * @param mapper A mapping {@code Function} to apply.
+     * @return The resulting {@code Stream}.
      */
     public static <T,R> Stream<R> map(T[] array,
         Function<? super T,? extends R> mapper) {
@@ -1164,9 +1164,9 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting stream member type.
-     * @param c The <code>Collection</code> to search.
-     * @param mapper A mapping <code>Function</code> to apply.
-     * @return The resulting <code>Stream</code>.
+     * @param c The {@code Collection} to search.
+     * @param mapper A mapping {@code Function} to apply.
+     * @return The resulting {@code Stream}.
      */
     public static <T,R> Stream<R> map(Collection<T> c,
         Function<? super T,? extends R> mapper) {
@@ -1176,9 +1176,9 @@ public class CollectionUtils {
     /**
      * Apply a mapping to a stream.
      *
-     * @param stream The <code>Stream</code> to map.
-     * @param mapper A mapping <code>Function</code> to apply.
-     * @return The resulting <code>Stream</code>.
+     * @param stream The {@code Stream} to map.
+     * @param mapper A mapping {@code Function} to apply.
+     * @return The resulting {@code Stream}.
      */
     public static <T,R> Stream<R> map(Stream<T> stream,
         Function<? super T,? extends R> mapper) {
@@ -1189,9 +1189,9 @@ public class CollectionUtils {
     /**
      * Implement map.
      *
-     * @param stream The <code>Stream</code> to map.
-     * @param mapper A mapping <code>Function</code> to apply.
-     * @return The resulting <code>Stream</code>.
+     * @param stream The {@code Stream} to map.
+     * @param mapper A mapping {@code Function} to apply.
+     * @return The resulting {@code Stream}.
      */
     private static <T,R> Stream<R> map_internal(Stream<T> stream,
         Function<? super T,? extends R> mapper) {
@@ -1204,7 +1204,7 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <K> The key type.
      * @param key The key to match.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T, K> Predicate<T> matchKey(final K key) {
         return t -> t == key;
@@ -1217,7 +1217,7 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <K> The key type.
      * @param key The key to match.
-     * @return A suitable <code>Predicate</code>.
+     * @return A suitable {@code Predicate}.
      */
     public static <T, K> Predicate<T> matchKeyEquals(final K key) {
         return t -> Utils.equals(t, key);
@@ -1230,8 +1230,8 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <K> The key type.
      * @param key The key to match.
-     * @param mapper The mapper <code>Function</code> to apply.
-     * @return A suitable <code>Predicate</code>.
+     * @param mapper The mapper {@code Function} to apply.
+     * @return A suitable {@code Predicate}.
      */
     public static <T, K> Predicate<T> matchKey(final K key,
                                                Function<T, K> mapper) {
@@ -1245,8 +1245,8 @@ public class CollectionUtils {
      * @param <T> The input type.
      * @param <K> The key type.
      * @param key The key to match.
-     * @param mapper The mapper <code>Function</code> to apply.
-     * @return A suitable <code>Predicate</code>.
+     * @param mapper The mapper {@code Function} to apply.
+     * @return A suitable {@code Predicate}.
      */
     public static <T, K> Predicate<T> matchKeyEquals(final K key,
                                                      Function<T, K> mapper) {
@@ -1258,7 +1258,7 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(T[] array, ToIntFunction<T> tif) {
@@ -1270,8 +1270,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(T[] array, Predicate<? super T> predicate,
@@ -1283,8 +1283,8 @@ public class CollectionUtils {
      * Find the maximum int value in a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Collection<T> c, ToIntFunction<T> tif) {
@@ -1295,9 +1295,9 @@ public class CollectionUtils {
      * Find the maximum int value in a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Collection<T> c, Predicate<? super T> predicate,
@@ -1309,8 +1309,8 @@ public class CollectionUtils {
      * Find the maximum int value in a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Stream<T> stream, ToIntFunction<T> tif) {
@@ -1322,9 +1322,9 @@ public class CollectionUtils {
      * Find the maximum int value in a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     public static <T> int max(Stream<T> stream, Predicate<? super T> predicate,
@@ -1337,9 +1337,9 @@ public class CollectionUtils {
      * Implement max.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The maximum value found, or zero if the input is empty.
      */
     private static <T> int max_internal(Stream<T> stream,
@@ -1355,7 +1355,7 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to maximize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(T[] array, Comparator<? super T> comparator) {
@@ -1368,9 +1368,9 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to maximize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param c The {@code Collection} to maximize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(T[] array, Predicate<? super T> predicate,
@@ -1383,8 +1383,8 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to maximize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param c The {@code Collection} to maximize from.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Collection<T> c,
@@ -1397,9 +1397,9 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to maximize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param c The {@code Collection} to maximize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Collection<T> c,
@@ -1413,8 +1413,8 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to maximize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to maximize from.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Stream<T> stream,
@@ -1428,9 +1428,9 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param stream The <code>Stream</code> to maximize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to maximize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     public static <T> T maximize(Stream<T> stream,
@@ -1444,9 +1444,9 @@ public class CollectionUtils {
      * Implement maximize.
      *
      * @param <T> The collection member type.
-     * @param stream The <code>Stream</code> to maximize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to maximize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
      */
     private static <T> T maximize_internal(Stream<T> stream,
@@ -1460,8 +1460,8 @@ public class CollectionUtils {
      * Find the minimum int value in an array.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(T[] array, ToIntFunction<T> tif) {
@@ -1472,9 +1472,9 @@ public class CollectionUtils {
      * Find the minimum int value in an array.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(T[] array, Predicate<? super T> predicate,
@@ -1486,8 +1486,8 @@ public class CollectionUtils {
      * Find the minimum int value in a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Collection<T> c, ToIntFunction<T> tif) {
@@ -1498,9 +1498,9 @@ public class CollectionUtils {
      * Find the minimum int value in a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Collection<T> c, Predicate<? super T> predicate,
@@ -1512,8 +1512,8 @@ public class CollectionUtils {
      * Find the minimum int value in a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Stream<T> stream, ToIntFunction<T> tif) {
@@ -1525,9 +1525,9 @@ public class CollectionUtils {
      * Find the minimum int value in a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(Stream<T> stream,
@@ -1541,9 +1541,9 @@ public class CollectionUtils {
      * Implement min.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to check.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param stream The {@code Stream} to check.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
     private static <T> int min_internal(Stream<T> stream,
@@ -1559,7 +1559,7 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to minimize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(T[] array,
@@ -1574,8 +1574,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to minimize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(T[] array, Predicate<? super T> predicate,
@@ -1588,8 +1588,8 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to minimize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param c The {@code Collection} to minimize from.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Collection<T> c,
@@ -1602,9 +1602,9 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to minimize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param c The {@code Collection} to minimize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Collection<T> c,
@@ -1618,8 +1618,8 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to minimize from.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to minimize from.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Stream<T> stream,
@@ -1633,9 +1633,9 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to minimize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to minimize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     public static <T> T minimize(Stream<T> stream,
@@ -1649,9 +1649,9 @@ public class CollectionUtils {
      * Implement minimize.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to minimize from.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param comparator A <code>Comparator</code> to compare with.
+     * @param stream The {@code Stream} to minimize from.
+     * @param predicate A {@code Predicate} to match with.
+     * @param comparator A {@code Comparator} to compare with.
      * @return The minimal value found, or null if none present.
      */
     private static <T> T minimize_internal(Stream<T> stream,
@@ -1677,7 +1677,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if no member passes the predicate test.
      */
     public static <T> boolean none(T[] array, Predicate<? super T> predicate) {
@@ -1688,7 +1688,7 @@ public class CollectionUtils {
      * Is a collection empty?
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to test.
+     * @param c The {@code Collection} to test.
      * @return True if the collection is null or empty.
      */
     public static <T> boolean none(Collection<T> c) {
@@ -1699,8 +1699,8 @@ public class CollectionUtils {
      * Do none of the members of a collection match a predicate?
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param c The {@code Collection} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if no member passes the predicate test.
      */
     public static <T> boolean none(Collection<T> c,
@@ -1712,7 +1712,7 @@ public class CollectionUtils {
      * Is a stream null or empty?
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
+     * @param stream The {@code Stream} to test.
      * @return True if the stream is null or empty.
      */
     public static <T> boolean none(Stream<T> stream) {
@@ -1723,8 +1723,8 @@ public class CollectionUtils {
      * Do none of the members of a stream match a predicate?
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if no member passes the predicate test.
      */
     public static <T> boolean none(Stream<T> stream,
@@ -1736,8 +1736,8 @@ public class CollectionUtils {
      * Implementation of none().
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to test.
-     * @param predicate The <code>Predicate</code> to test with.
+     * @param stream The {@code Stream} to test.
+     * @param predicate The {@code Predicate} to test with.
      * @return True if no member passes the predicate test.
      */
     private static <T> boolean none_internal(Stream<T> stream,
@@ -1750,7 +1750,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to multiply.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(T[] array, ToDoubleFunction<T> tdf) {
@@ -1762,8 +1762,8 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to multiply.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(T[] array, Predicate<? super T> predicate,
@@ -1775,8 +1775,8 @@ public class CollectionUtils {
      * Take the product of a collection.
      *
      * @param <T> The stream member type.
-     * @param c The <code>Collection</code> to multiply.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param c The {@code Collection} to multiply.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(Collection<T> c,
@@ -1788,9 +1788,9 @@ public class CollectionUtils {
      * Take the product of a collection.
      *
      * @param <T> The stream member type.
-     * @param c The <code>Collection</code> to multiply.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param c The {@code Collection} to multiply.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(Collection<T> c,
@@ -1803,8 +1803,8 @@ public class CollectionUtils {
      * Take the product of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to multiply.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param stream The {@code Stream} to multiply.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(Stream<T> stream,
@@ -1817,9 +1817,9 @@ public class CollectionUtils {
      * Take the product of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to multiply.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param stream The {@code Stream} to multiply.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product(Stream<T> stream,
@@ -1833,8 +1833,8 @@ public class CollectionUtils {
      * Take the product of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to multiply.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members to double.
+     * @param stream The {@code Stream} to multiply.
+     * @param tdf A {@code ToDoubleFunction} to convert members to double.
      * @return The product of the values found.
      */
     public static <T> double product_internal(Stream<T> stream,
@@ -1849,8 +1849,8 @@ public class CollectionUtils {
      * Special case to remove objects from a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to remove from.
-     * @param predicate A <code>Predicate</code> to match with.
+     * @param c The {@code Collection} to remove from.
+     * @param predicate A {@code Predicate} to match with.
      * @return True if anything was removed.
      */
     public static <T> boolean removeInPlace(Collection<T> c,
@@ -1871,8 +1871,8 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param c The <code>Map</code> to remove from.
-     * @param predicate A <code>Predicate</code> to match map entries with.
+     * @param c The {@code Map} to remove from.
+     * @param predicate A {@code Predicate} to match map entries with.
      * @return True if anything was removed.
      */
     public static <K,V> boolean removeInPlace(Map<K,V> map,
@@ -1905,7 +1905,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to convert.
-     * @param comparator A <code>Comparator</code> to sort with.
+     * @param comparator A {@code Comparator} to sort with.
      * @return A list of the stream contents.
      */
     public static <T> List<T> sort(T[] array, Comparator<? super T> comparator) {
@@ -1916,7 +1916,7 @@ public class CollectionUtils {
      * Convenience function to convert a collection to a sorted list.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to convert.
+     * @param c The {@code Collection} to convert.
      * @return A list of the stream contents.
      */
     public static <T extends Comparable<? super T>> List<T> sort(Collection<T> c) {
@@ -1928,8 +1928,8 @@ public class CollectionUtils {
      * Convenience function to convert a collection to a map.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to convert.
-     * @param comparator A <code>Comparator</code> to sort with.
+     * @param c The {@code Collection} to convert.
+     * @param comparator A {@code Comparator} to sort with.
      * @return A map of the stream contents.
      */
     public static <T> List<T> sort(Collection<T> c,
@@ -1941,7 +1941,7 @@ public class CollectionUtils {
      * Convenience function to collect a stream to a list.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
+     * @param stream The {@code Stream} to collect.
      * @return A list of the stream contents.
      */
     public static <T extends Comparable<? super T>> List<T> sort(Stream<T> stream) {
@@ -1954,8 +1954,8 @@ public class CollectionUtils {
      * Convenience function to collect a stream to a list.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @param comparator A <code>Comparator</code> to sort with.
+     * @param stream The {@code Stream} to collect.
+     * @param comparator A {@code Comparator} to sort with.
      * @return A list of the stream contents.
      */
     public static <T> List<T> sort(Stream<T> stream,
@@ -1968,8 +1968,8 @@ public class CollectionUtils {
      * Implement sorted.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
-     * @param comparator A <code>Comparator</code> to sort with.
+     * @param stream The {@code Stream} to collect.
+     * @param comparator A {@code Comparator} to sort with.
      * @return A list of the stream contents.
      */
     private static <T> List<T> sort_internal(Stream<T> stream,
@@ -1982,7 +1982,7 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to sum.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     public static <T> int sum(T[] array, ToIntFunction<T> tif) {
@@ -1994,8 +1994,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     public static <T> int sum(T[] array, Predicate<? super T> predicate,
@@ -2007,8 +2007,8 @@ public class CollectionUtils {
      * Take the sum of the members of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to sum.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param c The {@code Collection} to sum.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     public static <T> int sum(Collection<T> c, ToIntFunction<T> tif) {
@@ -2019,9 +2019,9 @@ public class CollectionUtils {
      * Take the sum of the members of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to map the stream to int with.
+     * @param c The {@code Collection} to sum.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The sum of the values found.
      */
     public static <T> int sum(Collection<T> c, Predicate<? super T> predicate,
@@ -2033,8 +2033,8 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param stream The {@code Stream} to sum.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     public static <T> int sum(Stream<T> stream, ToIntFunction<T> tif) {
@@ -2046,9 +2046,9 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param stream The {@code Stream} to sum.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     public static <T> int sum(Stream<T> stream, Predicate<? super T> predicate,
@@ -2061,9 +2061,9 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tif A <code>ToIntFunction</code> to convert members to an int.
+     * @param stream The {@code Stream} to sum.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tif A {@code ToIntFunction} to convert members to an int.
      * @return The sum of the values found.
      */
     private static <T> int sum_internal(Stream<T> stream,
@@ -2077,7 +2077,7 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to sum.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     * @param tdf A {@code ToDoubleFunction} to convert members
      *     to a double.
      * @return The sum of the values found.
      */
@@ -2090,8 +2090,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param array The array to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tdf A <code>ToDoubleFunction</code> to map the stream to
+     * @param predicate A {@code Predicate} to match with.
+     * @param tdf A {@code ToDoubleFunction} to map the stream to
      *     double with.
      * @return The sum of the values found.
      */
@@ -2105,8 +2105,8 @@ public class CollectionUtils {
      * Take the sum of the members of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to sum.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     * @param c The {@code Collection} to sum.
+     * @param tdf A {@code ToDoubleFunction} to convert members
      *     to a double.
      * @return The sum of the values found.
      */
@@ -2119,9 +2119,9 @@ public class CollectionUtils {
      * Take the sum of the members of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to sum.
-     * @param predicate A <code>Predicate</code> to match with.
-     * @param tdf A <code>ToDoubleFunction</code> to map the stream to
+     * @param c The {@code Collection} to sum.
+     * @param predicate A {@code Predicate} to match with.
+     * @param tdf A {@code ToDoubleFunction} to map the stream to
      *     double with.
      * @return The sum of the values found.
      */
@@ -2135,8 +2135,8 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param tdf A <code>ToDoubleFunction</code> to convert members
+     * @param stream The {@code Stream} to sum.
+     * @param tdf A {@code ToDoubleFunction} to convert members
      *     to a double.
      * @return The sum of the values found.
      */
@@ -2150,9 +2150,9 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param predicate A <code>Predicate</code> to select members.
-     * @param tdf A <code>ToIntFunction</code> to convert members to a double.
+     * @param stream The {@code Stream} to sum.
+     * @param predicate A {@code Predicate} to select members.
+     * @param tdf A {@code ToIntFunction} to convert members to a double.
      * @return The sum of the values found.
      */
     public static <T> double sumDouble(Stream<T> stream,
@@ -2166,9 +2166,9 @@ public class CollectionUtils {
      * Take the sum of the members of a stream.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to sum.
-     * @param predicate A <code>Predicate</code> to select members.
-     * @param tdf A <code>ToIntFunction</code> to convert members to a double.
+     * @param stream The {@code Stream} to sum.
+     * @param predicate A {@code Predicate} to select members.
+     * @param tdf A {@code ToIntFunction} to convert members to a double.
      * @return The sum of the values found.
      */
     private static <T> double sumDouble_internal(Stream<T> stream,
@@ -2204,7 +2204,7 @@ public class CollectionUtils {
      * Convenience function to convert a collection to a list.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to convert.
+     * @param c The {@code Collection} to convert.
      * @return A map of the stream contents.
      */
     public static <T> List<T> toList(Collection<T> c) {
@@ -2215,7 +2215,7 @@ public class CollectionUtils {
      * Convenience function to collect a stream to a list.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
+     * @param stream The {@code Stream} to collect.
      * @return A list of the stream contents.
      */
     public static <T> List<T> toList(Stream<T> stream) {
@@ -2227,7 +2227,7 @@ public class CollectionUtils {
      * Implement toList.
      *
      * @param <T> The stream member type.
-     * @param stream The <code>Stream</code> to collect.
+     * @param stream The {@code Stream} to collect.
      * @return A list of the stream contents.
      */
     private static <T> List<T> toList_internal(Stream<T> stream) {
@@ -2251,8 +2251,8 @@ public class CollectionUtils {
     /**
      * Convert an iterator to a stream.
      *
-     * @param iterator The <code>Iterator</code> to convert.
-     * @return The resulting <code>Stream</code>.
+     * @param iterator The {@code Iterator} to convert.
+     * @return The resulting {@code Stream}.
      */
     public static <T> Stream<T> toStream(Iterator<T> iterator) {
         return toStream(() -> iterator);
@@ -2261,8 +2261,8 @@ public class CollectionUtils {
     /**
      * Convert an iterable to a stream.
      *
-     * @param iterable The <code>Iterable</code> to convert.
-     * @return The resulting <code>Stream</code>.
+     * @param iterable The {@code Iterable} to convert.
+     * @return The resulting {@code Stream}.
      */
     public static <T> Stream<T> toStream(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
@@ -2273,7 +2273,7 @@ public class CollectionUtils {
      *
      * @param <T> The array member type.
      * @param array The array to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param predicate A {@code Predicate} to select the items.
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(T[] array,
@@ -2289,7 +2289,7 @@ public class CollectionUtils {
      * @param <T> The array member type.
      * @param <R> The resulting collection member type.
      * @param array The array to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
      * @return The result of collecting the mapped predicate matches.
      */
@@ -2307,9 +2307,9 @@ public class CollectionUtils {
      * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
      * @param array The array to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to collect the items.
+     * @param collector A {@code Collector} to collect the items.
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(T[] array,
@@ -2326,9 +2326,9 @@ public class CollectionUtils {
      * @param <T> The array member type.
      * @param <R> The resulting collection member type.
      * @param array The array to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort the items.
+     * @param comparator A {@code Comparator} to sort the items.
      * @return A list of sorted mapped predicate matches.
      */
     public static <T,R> List<R> transform(T[] array,
@@ -2343,8 +2343,8 @@ public class CollectionUtils {
      * Transform the contents of a collection.
      *
      * @param <T> The collection member type.
-     * @param c The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param c The {@code Collection} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(Collection<T> c,
@@ -2358,8 +2358,8 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param c The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param c The {@code Collection} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
      * @return The result of collecting the mapped predicate matches.
      */
@@ -2375,10 +2375,10 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param c The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param c The {@code Collection} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort the results.
+     * @param comparator A {@code Comparator} to sort the results.
      * @return A list of sorted mapped predicate matches.
      */
     public static <T,R> List<R> transform(Collection<T> c,
@@ -2395,10 +2395,10 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
-     * @param c The <code>Collection</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param c The {@code Collection} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
+     * @param collector A {@code Collector} to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(Collection<T> c,
@@ -2413,8 +2413,8 @@ public class CollectionUtils {
      * Transform the contents of a stream.
      *
      * @param <T> The stream type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param stream The {@code Stream} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @return The result of collecting the predicate matches.
      */
     public static <T> List<T> transform(Stream<T> stream,
@@ -2429,8 +2429,8 @@ public class CollectionUtils {
      *
      * @param <T> The stream member type.
      * @param <R> The resulting collection member type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param stream The {@code Stream} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
      * @return The result of collecting the mapped predicate matches.
      */
@@ -2447,10 +2447,10 @@ public class CollectionUtils {
      *
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param stream The {@code Stream} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator A <code>Comparator</code> to sort the results.
+     * @param comparator A {@code Comparator} to sort the results.
      * @return A list of sorted mapped predicate matches.
      */
     public static <T,R> List<R> transform(Stream<T> stream,
@@ -2468,10 +2468,10 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param stream The {@code Stream} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param collector A <code>Collector</code> to aggregate the results.
+     * @param collector A {@code Collector} to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
     public static <T,R,C> C transform(Stream<T> stream,
@@ -2488,12 +2488,12 @@ public class CollectionUtils {
      * @param <T> The stream member type.
      * @param <R> The resulting collection member type.
      * @param <C> The resulting collection type.
-     * @param stream The <code>Stream</code> to transform.
-     * @param predicate A <code>Predicate</code> to select the items.
+     * @param stream The {@code Stream} to transform.
+     * @param predicate A {@code Predicate} to select the items.
      * @param mapper A function to transform the selected items.
-     * @param comparator An optional <code>Comparator</code> to sort
+     * @param comparator An optional {@code Comparator} to sort
      *     the results.
-     * @param collector A <code>Collector</code> to aggregate the results.
+     * @param collector A {@code Collector} to aggregate the results.
      * @return The result of collecting the mapped predicate matches.
      */
     private static <T,R,C> C transform_internal(Stream<T> stream,

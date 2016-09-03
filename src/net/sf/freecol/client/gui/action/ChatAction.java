@@ -35,9 +35,9 @@ public class ChatAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>ChatAction</code>.
+     * Creates a new {@code ChatAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ChatAction(FreeColClient freeColClient) {
         super(freeColClient, id);

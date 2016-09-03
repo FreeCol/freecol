@@ -48,7 +48,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * A wrapper for <code>XMLStreamWriter</code> and potentially an
+ * A wrapper for {@code XMLStreamWriter} and potentially an
  * underlying stream.  Adds on many useful utilities for writing
  * XML and FreeCol values.
  *
@@ -120,15 +120,15 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
 
     /**
-     * Creates a new <code>FreeColXMLWriter</code>.
+     * Creates a new {@code FreeColXMLWriter}.
      *
-     * @param outputStream The <code>OutputStream</code> to create
-     *     an <code>FreeColXMLWriter</code> for.
-     * @param scope The <code>WriteScope</code> to use for FreeCol
+     * @param outputStream The {@code OutputStream} to create
+     *     an {@code FreeColXMLWriter} for.
+     * @param scope The {@code WriteScope} to use for FreeCol
      *     object writes.
      * @param indent If true, produce indented output if supported.
      * @exception IOException if there is a problem while creating the
-     *     <code>FreeColXMLWriter</code>.
+     *     {@code FreeColXMLWriter}.
      */
     public FreeColXMLWriter(OutputStream outputStream, WriteScope scope,
                             boolean indent) throws IOException {
@@ -136,41 +136,41 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     }
 
     /**
-     * Creates a new <code>FreeColXMLWriter</code>.
+     * Creates a new {@code FreeColXMLWriter}.
      *
-     * @param writer A <code>Writer</code> to create an
-     *     <code>FreeColXMLWriter</code> for.
+     * @param writer A {@code Writer} to create an
+     *     {@code FreeColXMLWriter} for.
      * @exception IOException if there is a problem while creating the
-     *     <code>FreeColXMLWriter</code>.
+     *     {@code FreeColXMLWriter}.
      */
     public FreeColXMLWriter(Writer writer) throws IOException {
         this(writer, WriteScope.toSave());
     }
 
     /**
-     * Creates a new <code>FreeColXMLWriter</code>.
+     * Creates a new {@code FreeColXMLWriter}.
      *
-     * @param writer A <code>Writer</code> to create an
-     *     <code>FreeColXMLWriter</code> for.
-     * @param scope The <code>WriteScope</code> to use for FreeCol
+     * @param writer A {@code Writer} to create an
+     *     {@code FreeColXMLWriter} for.
+     * @param scope The {@code WriteScope} to use for FreeCol
      *     object writes.
      * @exception IOException if there is a problem while creating the
-     *     <code>FreeColXMLWriter</code>.
+     *     {@code FreeColXMLWriter}.
      */
     public FreeColXMLWriter(Writer writer, WriteScope scope) throws IOException {
         this(writer, scope, false);
     }
 
     /**
-     * Creates a new <code>FreeColXMLWriter</code>.
+     * Creates a new {@code FreeColXMLWriter}.
      *
-     * @param writer A <code>Writer</code> to create an
-     *     <code>FreeColXMLWriter</code> for.
-     * @param scope The <code>WriteScope</code> to use for FreeCol
+     * @param writer A {@code Writer} to create an
+     *     {@code FreeColXMLWriter} for.
+     * @param scope The {@code WriteScope} to use for FreeCol
      *     object writes.
      * @param indent If true, produce indented output if supported.
      * @exception IOException if there is a problem while creating the
-     *     <code>FreeColXMLWriter</code>.
+     *     {@code FreeColXMLWriter}.
      */
     public FreeColXMLWriter(Writer writer, WriteScope scope,
                             boolean indent) throws IOException {
@@ -192,9 +192,9 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
 
 
     /**
-     * Get the <code>XMLOutputFactory</code> to create the output stream with.
+     * Get the {@code XMLOutputFactory} to create the output stream with.
      *
-     * @return An <code>XMLOutputFactory</code>.
+     * @return An {@code XMLOutputFactory}.
      */
     private XMLOutputFactory getFactory() {
         return XMLOutputFactory.newInstance();
@@ -212,14 +212,14 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
     /**
      * Set the write scope prevailing on this stream.
      *
-     * @param writeScope The new <code>WriteScope</code>.
+     * @param writeScope The new {@code WriteScope}.
      */     
     public void setWriteScope(WriteScope writeScope) {
         this.writeScope = writeScope;
     }
 
     /**
-     * Closes both the <code>XMLStreamWriter</code> and
+     * Closes both the {@code XMLStreamWriter} and
      * the underlying stream if any.
      *
      * Implement interface Closeable.
@@ -300,7 +300,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Write an enum attribute to the stream.
      *
      * @param attributeName The attribute name.
-     * @param value The <code>Enum</code> to write.
+     * @param value The {@code Enum} to write.
      * @exception XMLStreamException if a write error occurs.
      */
     public void writeAttribute(String attributeName, Enum<?> value) throws XMLStreamException {
@@ -312,7 +312,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Write an Object attribute to the stream.
      *
      * @param attributeName The attribute name.
-     * @param value The <code>Object</code> to write.
+     * @param value The {@code Object} to write.
      * @exception XMLStreamException if a write error occurs.
      */
     public void writeAttribute(String attributeName, Object value) throws XMLStreamException {
@@ -323,7 +323,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Write the identifier attribute of a non-null FreeColObject to the stream.
      *
      * @param attributeName The attribute name.
-     * @param value The <code>FreeColObject</code> to write the identifier of.
+     * @param value The {@code FreeColObject} to write the identifier of.
      * @exception XMLStreamException if a write error occurs.
      */
     public void writeAttribute(String attributeName, FreeColObject value) throws XMLStreamException {
@@ -336,7 +336,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      * Write the identifier attribute of a non-null Location to the stream.
      *
      * @param attributeName The attribute name.
-     * @param value The <code>Location</code> to write the identifier of.
+     * @param value The {@code Location} to write the identifier of.
      * @exception XMLStreamException if a write error occurs.
      */
     public void writeLocationAttribute(String attributeName, Location value) throws XMLStreamException {

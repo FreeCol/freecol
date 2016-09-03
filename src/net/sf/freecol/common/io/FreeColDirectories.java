@@ -217,7 +217,7 @@ public class FreeColDirectories {
     /**
      * Check a directory for read and write access.
      *
-     * @param dir The <code>File</code> that must be a usable directory.
+     * @param dir The {@code File} that must be a usable directory.
      * @return Null on success, an error message key on failure.
      */
     public static String checkDir(File dir) {
@@ -246,7 +246,7 @@ public class FreeColDirectories {
      * The intent is to ignore XDG on negative, migrate on zero, and use
      * on positive.
      *
-     * @param dirs An array of <code>File</code> to be filled in with the
+     * @param dirs An array of {@code File} to be filled in with the
      *     XDG directory if it is present or created.
      * @return The XDG compliance state.
      */
@@ -305,7 +305,7 @@ public class FreeColDirectories {
     /**
      * Is the specified file a writable directory?
      *
-     * @param f The <code>File</code> to check.
+     * @param f The {@code File} to check.
      * @return True if the file is a writable directory.
      */
     private static boolean isGoodDirectory(File f) {
@@ -316,7 +316,7 @@ public class FreeColDirectories {
      * Create the given directory if it does not exist, otherwise expect
      * it to be writable.
      *
-     * @param dir The <code>File</code> specifying the required directory.
+     * @param dir The {@code File} specifying the required directory.
      * @return The required directory, or null on failure.
      */
     private static File requireDir(File dir) {
@@ -338,7 +338,7 @@ public class FreeColDirectories {
      * - Zero if a migration is needed.
      * - Positive if no migration is needed.
      *
-     * @param dirs An array of <code>File</code> to be filled in with the
+     * @param dirs An array of {@code File} to be filled in with the
      *     MacOSX freecol directories if present or created.
      * @return The migration state.
      */
@@ -406,7 +406,7 @@ public class FreeColDirectories {
      * - Zero if a migration is needed.
      * - Positive if no migration is needed.
      *
-     * @param dirs An array of <code>File</code> to be filled in with the
+     * @param dirs An array of {@code File} to be filled in with the
      *     Windows freecol directories if present or created.
      * @return The migration state.
      */
@@ -469,7 +469,7 @@ public class FreeColDirectories {
     /**
      * Insist that a directory either already exists, or is created.
      *
-     * @param file A <code>File</code> specifying where to make the directory.
+     * @param file A {@code File} specifying where to make the directory.
      * @return True if the directory is now there.
      */
     private static boolean insistDirectory(File file) {
@@ -814,7 +814,7 @@ public class FreeColDirectories {
      * may be either from a recent arbitrary user operation or an
      * autosave function.)
      *
-     * @return The recent save game <code>File</code>, or null if not found.
+     * @return The recent save game {@code File}, or null if not found.
      */
     public static File getLastSaveGameFile() {
         return maximize(flatten(Stream.of(FreeColDirectories.getSaveDirectory(),

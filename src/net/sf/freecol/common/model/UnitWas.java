@@ -50,7 +50,7 @@ public class UnitWas implements Comparable<UnitWas> {
     /**
      * Record the state of a unit.
      *
-     * @param unit The <code>Unit</code> to remember.
+     * @param unit The {@code Unit} to remember.
      */
     public UnitWas(Unit unit) {
         this.unit = unit;

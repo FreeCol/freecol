@@ -43,7 +43,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
      */
     public ClientOptionsDialog(FreeColClient freeColClient, JFrame frame) {

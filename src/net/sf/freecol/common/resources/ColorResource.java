@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A <code>Resource</code> wrapping a <code>Color</code>.
+ * A {@code Resource} wrapping a <code>Color</code>.
  * 
  * @see Resource
  * @see Color
@@ -50,7 +50,7 @@ public class ColorResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *     resource.
      */
     public ColorResource(URI resourceLocator) { //throws Exception {
@@ -63,9 +63,9 @@ public class ColorResource extends Resource {
 
 
     /**
-     * Gets the <code>Color</code> represented by this resource.
+     * Gets the {@code Color} represented by this resource.
      *
-     * @return The <code>Color</code> in it's original size.
+     * @return The {@code Color} in it's original size.
      */
     public Color getColor() {
         return this.color;
@@ -84,12 +84,12 @@ public class ColorResource extends Resource {
     }
 
     /**
-     * Returns the <code>Color</code> identified by the given
+     * Returns the {@code Color} identified by the given
      * string. This is either a hexadecimal integer prefixed with
      * "0x", or the name of a field of the Color class.
      *
-     * @param colorName a <code>String</code> value
-     * @return a <code>Color</code> value
+     * @param colorName a {@code String} value
+     * @return a {@code Color} value
      */
     public static Color getColor(String colorName) {
         if (isHexString(colorName)) {

@@ -57,7 +57,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     public static final int HUGE_CARGO_SIZE = 100 * CARGO_SIZE;
 
     /**
-     * The list of Goods stored in this <code>GoodsContainer</code>.
+     * The list of Goods stored in this {@code GoodsContainer}.
      *
      * Always accessed synchronized (except I/O).
      */
@@ -65,7 +65,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     /** 
      * The previous list of Goods stored in this
-     * <code>GoodsContainer</code>.
+     * {@code GoodsContainer}.
      *
      * Always accessed synchronized and *after synchronized(storedGoods)*.
      * This is only touched rarely so the extra lock is tolerable.
@@ -73,16 +73,16 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     private final Map<GoodsType, Integer> oldStoredGoods = new HashMap<>();
 
-    /** The location for this <code>GoodsContainer</code>. */
+    /** The location for this {@code GoodsContainer}. */
     private Location parent = null;
 
 
     /**
-     * Creates an empty <code>GoodsContainer</code>.
+     * Creates an empty {@code GoodsContainer}.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param parent The <code>Location</code> this
-     *     <code>GoodsContainer</code> contains goods for.
+     * @param game The enclosing {@code Game}.
+     * @param parent The {@code Location} this
+     *     {@code GoodsContainer} contains goods for.
      */
     public GoodsContainer(Game game, Location parent) {
         super(game);
@@ -91,9 +91,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Create a new <code>GoodsContainer</code>.
+     * Create a new {@code GoodsContainer}.
      *
-     * @param game The enclosing <code>Game</code>.
+     * @param game The enclosing {@code Game}.
      * @param id The object identifier.
      */
     public GoodsContainer(Game game, String id) {
@@ -104,7 +104,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Set the goods location.
      *
-     * @param location The <code>Location</code> to set.
+     * @param location The {@code Location} to set.
      */
     public void setLocation(Location location) {
         if (location == null) {
@@ -114,7 +114,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Checks if the specified <code>Goods</code> is in this container.
+     * Checks if the specified {@code Goods} is in this container.
      *
      * @param T The base type of the goods.
      * @param g The goods to test the presence of.
@@ -128,7 +128,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Gets the amount of one type of goods in this container.
      *
-     * @param type The <code>GoodsType</code> being looked for.
+     * @param type The {@code GoodsType} being looked for.
      * @return The amount of this type of goods in this container.
      */
     public int getGoodsCount(GoodsType type) {
@@ -142,7 +142,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Gets the amount of one type of goods at the beginning of the turn.
      *
-     * @param type The <code>GoodsType</code> being looked for.
+     * @param type The {@code GoodsType} being looked for.
      * @return The amount of this type of goods in this container at
      *     the beginning of the turn
      */
@@ -170,7 +170,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * Note: negative amounts are allowed.
      *
-     * @param type The <code>GoodsType</code> to add.
+     * @param type The {@code GoodsType} to add.
      * @param amount The amount of goods to add.
      * @return True if the addition succeeds.
      */
@@ -199,7 +199,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param T The base type of the goods.
      * @param goods The goods to remove from this container.
-     * @return The <code>Goods</code> actually removed.
+     * @return The {@code Goods} actually removed.
      */
     public <T extends AbstractGoods> Goods removeGoods(T goods) {
         return removeGoods(goods.getType(), goods.getAmount());
@@ -208,8 +208,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Removes all goods of a given type from this goods container.
      *
-     * @param type The <code>GoodsType</code> to remove.
-     * @return The <code>Goods</code> actually removed.
+     * @param type The {@code GoodsType} to remove.
+     * @return The {@code Goods} actually removed.
      */
     public Goods removeGoods(GoodsType type) {
         return removeGoods(type, INFINITY);
@@ -218,9 +218,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Removes goods by type and amount from this goods container.
      *
-     * @param type The <code>GoodsType</code> to remove.
+     * @param type The {@code GoodsType} to remove.
      * @param amount The amount of goods to remove.
-     * @return The <code>Goods</code> actually removed, which may have a
+     * @return The {@code Goods} actually removed, which may have a
      *     lower actual amount, or null if nothing removed.
      */
     public Goods removeGoods(GoodsType type, int amount) {
@@ -246,7 +246,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Set the amount of goods in this container.
      *
-     * @param goodsType The <code>GoodsType</code> to set the amount of.
+     * @param goodsType The {@code GoodsType} to set the amount of.
      * @param newAmount The new amount.
      */
     public void setAmount(GoodsType goodsType, int newAmount) {
@@ -337,9 +337,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     /**
      * Gets a list containing all holds of goods in this goods container.
-     * Each <code>Goods</code> returned has a maximum amount of CARGO_SIZE.
+     * Each {@code Goods} returned has a maximum amount of CARGO_SIZE.
      *
-     * @return A list of <code>Goods</code>.
+     * @return A list of {@code Goods}.
      */
     public List<Goods> getGoods() {
         final Game game = getGame();
@@ -359,10 +359,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     /**
      * Gets a list of all goods in this goods container.
-     * There is only one <code>Goods</code> for each distinct
-     * <code>GoodsType</code>.
+     * There is only one {@code Goods} for each distinct
+     * {@code GoodsType}.
      *
-     * @return A list of <code>Goods</code>.
+     * @return A list of {@code Goods}.
      */
     public List<Goods> getCompactGoods() {
         final Game game = getGame();
@@ -489,7 +489,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Write a storage container to a stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @param tag The element tag.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem writing to
@@ -551,7 +551,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Read a storage container from a stream.
      *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @param xr The {@code FreeColXMLReader} to read from.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem reading from
      *     the stream.

@@ -53,7 +53,7 @@ public final class RecruitPanel extends FreeColPanel {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public RecruitPanel(FreeColClient freeColClient) {
         super(freeColClient, new MigLayout("wrap 1", "", ""));

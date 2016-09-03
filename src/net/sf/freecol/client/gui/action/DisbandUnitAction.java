@@ -33,9 +33,9 @@ public class DisbandUnitAction extends UnitAction {
 
 
     /**
-     * Creates a new <code>DisbandUnitAction</code>.
+     * Creates a new {@code DisbandUnitAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public DisbandUnitAction(FreeColClient freeColClient) {
         super(freeColClient, id);

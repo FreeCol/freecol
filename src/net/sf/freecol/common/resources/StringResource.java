@@ -23,7 +23,7 @@ import java.net.URI;
 
 
 /**
- * A <code>Resource</code> wrapping an <code>String</code>.
+ * A {@code Resource} wrapping an <code>String</code>.
  * @see Resource
  */
 public class StringResource extends Resource {
@@ -33,7 +33,7 @@ public class StringResource extends Resource {
     /**
      * Do not use directly.
      *
-     * @param resourceLocator The <code>URI</code> used when loading this
+     * @param resourceLocator The {@code URI} used when loading this
      *      resource.
      */
     public StringResource(URI resourceLocator) {
@@ -51,7 +51,7 @@ public class StringResource extends Resource {
 
 
     /**
-     * Gets the <code>String</code> represented by this resource.
+     * Gets the {@code String} represented by this resource.
      *
      * @return The string resource.
      */

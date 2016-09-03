@@ -43,7 +43,7 @@ public class ColonyWas {
     /**
      * Record the state of a colony.
      *
-     * @param colony The <code>Colony</code> to remember.
+     * @param colony The {@code Colony} to remember.
      */
     public ColonyWas(Colony colony) {
         this.colony = colony;

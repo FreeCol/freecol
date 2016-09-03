@@ -54,9 +54,9 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The enclosing <code>FreeColClient</code>.
+     * @param freeColClient The enclosing {@code FreeColClient}.
      * @param frame The owner frame.
-     * @param goodsType The <code>GoodsType</code> to select an amount of.
+     * @param goodsType The {@code GoodsType} to select an amount of.
      * @param available The amount of goods available.
      * @param defaultAmount The amount to select to start with.
      * @param pay If true, check the player has sufficient funds.

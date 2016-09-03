@@ -123,9 +123,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>ColonyTradeItemPanel</code> instance.
+         * Creates a new {@code ColonyTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> source.
+         * @param source The {@code Player} source.
          */
         public ColonyTradeItemPanel(Player source) {
             this.source = source;
@@ -155,7 +155,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         private void update(DiplomaticTrade dt) {
             if (!source.isEuropean()) return;
@@ -225,9 +225,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>GoldTradeItemPanel</code> instance.
+         * Creates a new {@code GoldTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> that is trading.
+         * @param source The {@code Player} that is trading.
          * @param gold The maximum amount of gold to trade.
          */
         public GoldTradeItemPanel(Player source, int gold) {
@@ -261,7 +261,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         public void update(DiplomaticTrade dt) {
             int gold = dt.getGoldGivenBy(source);
@@ -325,11 +325,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>GoodsTradeItemPanel</code> instance.
+         * Creates a new {@code GoodsTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> nominally in possession of the
+         * @param source The {@code Player} nominally in possession of the
          *     goods (this may be totally fictional).
-         * @param allGoods The <code>Goods</code> to trade.
+         * @param allGoods The {@code Goods} to trade.
          */
         public GoodsTradeItemPanel(Player source, List<Goods> allGoods) {
             this.source = source;
@@ -359,7 +359,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         public void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
@@ -453,10 +453,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>InciteTradeItemPanel</code> instance.
+         * Creates a new {@code InciteTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> that is trading.
-         * @param other The <code>Player</code> negotiated with.
+         * @param source The {@code Player} that is trading.
+         * @param other The {@code Player} negotiated with.
          */
         public InciteTradeItemPanel(Player source, Player other) {
             this.source = source;
@@ -492,7 +492,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         public void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
@@ -573,10 +573,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>StanceTradeItemPanel</code> instance.
+         * Creates a new {@code StanceTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> offering the stance change.
-         * @param target The <code>Player</code> to consider the stance change.
+         * @param source The {@code Player} offering the stance change.
+         * @param target The {@code Player} to consider the stance change.
          */
         public StanceTradeItemPanel(Player source, Player target) {
             this.source = source;
@@ -603,7 +603,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Select the item with a given stance.
          *
-         * @param stance The <code>Stance</code> to select.
+         * @param stance The {@code Stance} to select.
          */
         private void setSelectedValue(Stance stance) {
             for (int i = 0; i < stanceBox.getItemCount(); i++) {
@@ -616,7 +616,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel with a given trade.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         public void update(DiplomaticTrade dt) {
             stanceBox.removeAllItems();
@@ -690,11 +690,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
         /**
-         * Creates a new <code>UnitTradeItemPanel</code> instance.
+         * Creates a new {@code UnitTradeItemPanel} instance.
          *
-         * @param source The <code>Player</code> nominally in posession of the
+         * @param source The {@code Player} nominally in posession of the
          *     unit (this may be totally fictional).
-         * @param allUnits The <code>Unit</code>s to trade.
+         * @param allUnits The {@code Unit}s to trade.
          */
         public UnitTradeItemPanel(Player source, List<Unit> allUnits) {
             this.source = source;
@@ -724,7 +724,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         /**
          * Update this panel with a given trade.
          *
-         * @param dt The <code>DiplomaticTrade</code> to update with.
+         * @param dt The {@code DiplomaticTrade} to update with.
          */
         private void update(DiplomaticTrade dt) {
             // Remove all action listeners, so the update has no
@@ -813,15 +813,15 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
 
     /**
-     * Creates a new <code>NegotiationDialog</code> instance.
+     * Creates a new {@code NegotiationDialog} instance.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param our Our <code>FreeColGameObject</code> that is negotiating.
-     * @param other The other <code>FreeColGameObject</code>.
-     * @param agreement The <code>DiplomaticTrade</code> agreement that
+     * @param our Our {@code FreeColGameObject} that is negotiating.
+     * @param other The other {@code FreeColGameObject}.
+     * @param agreement The {@code DiplomaticTrade} agreement that
      *     is being negotiated.
-     * @param comment An optional <code>StringTemplate</code>
+     * @param comment An optional {@code StringTemplate}
      *     commentary message.
      */
     public NegotiationDialog(FreeColClient freeColClient, JFrame frame,
@@ -1024,8 +1024,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * *might* be in the other player's store.  Therefore they have a
      * bogus location (i.e. not the actual goods container).
      *
-     * @param gl The <code>GoodsLocation</code> for the goods.
-     * @return A list of storable <code>Goods</code>.
+     * @param gl The {@code GoodsLocation} for the goods.
+     * @return A list of storable {@code Goods}.
      */
     private List<Goods> getAnyGoods(GoodsLocation gl) {
         final Game game = getGame();
@@ -1037,8 +1037,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     /**
      * Get a list of units to offer that are associated with a given unit.
      *
-     * @param unit The <code>Unit</code> that is trading.
-     * @return A list of <code>Unit</code>s.
+     * @param unit The {@code Unit} that is trading.
+     * @return A list of {@code Unit}s.
      */
     private List<Unit> getUnitUnitList(Unit unit) {
         List<Unit> ul = new ArrayList<>();
@@ -1095,8 +1095,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     /**
      * Gets a trade item button for a given item.
      *
-     * @param item The <code>TradeItem</code> to make a button for.
-     * @return A new <code>JButton</code> for the item.
+     * @param item The {@code TradeItem} to make a button for.
+     * @return A new {@code JButton} for the item.
      */
     private JButton getTradeItemButton(TradeItem item) {
         JButton button = new JButton(new RemoveAction(item));
@@ -1144,7 +1144,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     /**
      * Remove trade items of a given type.
      *
-     * @param itemClass The class of <code>TradeItem</code> to remove.
+     * @param itemClass The class of {@code TradeItem} to remove.
      */
     public void removeTradeItems(Class<? extends TradeItem> itemClass) {
         this.agreement.removeType(itemClass);
@@ -1152,10 +1152,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     /**
-     * Adds a <code>ColonyTradeItem</code> to the list of TradeItems.
+     * Adds a {@code ColonyTradeItem} to the list of TradeItems.
      *
-     * @param source The sourced <code>Player</code>.
-     * @param colony The <code>Colony</code> to add.
+     * @param source The sourced {@code Player}.
+     * @param colony The {@code Colony} to add.
      */
     public void addColonyTradeItem(Player source, Colony colony) {
         final Player player = getMyPlayer();
@@ -1167,9 +1167,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     /**
-     * Adds a <code>GoldTradeItem</code> to the list of TradeItems.
+     * Adds a {@code GoldTradeItem} to the list of TradeItems.
      *
-     * @param source The source <code>Player</code>.
+     * @param source The source {@code Player}.
      * @param amount The amount of gold.
      */
     public void addGoldTradeItem(Player source, int amount) {
@@ -1182,10 +1182,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     /**
-     * Adds a <code>GoodsTradeItem</code> to the list of TradeItems.
+     * Adds a {@code GoodsTradeItem} to the list of TradeItems.
      *
-     * @param source The source <code>Player</code>.
-     * @param goods The <code>Goods</code> to add.
+     * @param source The source {@code Player}.
+     * @param goods The {@code Goods} to add.
      */
     public void addGoodsTradeItem(Player source, Goods goods) {
         final Player player = getMyPlayer();
@@ -1196,10 +1196,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     /**
-     * Add an <code>InciteTradeItem</code> to the list of trade items.
+     * Add an {@code InciteTradeItem} to the list of trade items.
      *
-     * @param source The source <code>Player</code>.
-     * @param victim The <code>Player</code> to be attacked.
+     * @param source The source {@code Player}.
+     * @param victim The {@code Player} to be attacked.
      */
     public void addInciteTradeItem(Player source, Player victim) {
         final Player player = getMyPlayer();
@@ -1213,7 +1213,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     /**
      * Trade a stance change between the players.
      *
-     * @param stance The <code>Stance</code> to trade.
+     * @param stance The {@code Stance} to trade.
      */
     public void addStanceTradeItem(Stance stance) {
         final Player player = getMyPlayer();
@@ -1224,10 +1224,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
     /**
-     * Adds a <code>UnitTradeItem</code> to the list of TradeItems.
+     * Adds a {@code UnitTradeItem} to the list of TradeItems.
      *
-     * @param source The source <code>Player</code>.
-     * @param unit The <code>Unit</code> to add.
+     * @param source The source {@code Player}.
+     * @param unit The {@code Unit} to add.
      */
     public void addUnitTradeItem(Player source, Unit unit) {
         final Player player = getMyPlayer();

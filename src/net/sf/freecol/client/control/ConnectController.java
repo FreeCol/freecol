@@ -75,9 +75,9 @@ public final class ConnectController extends FreeColClientHolder {
 
 
     /**
-     * Creates a new <code>ConnectController</code>.
+     * Creates a new {@code ConnectController}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ConnectController(FreeColClient freeColClient) {
         super(freeColClient);
@@ -123,9 +123,9 @@ public final class ConnectController extends FreeColClientHolder {
      *
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
-     * @param spec The <code>Specification</code> to use in this game.
+     * @param spec The {@code Specification} to use in this game.
      * @param port The TCP port to use for the public socket.
-     * @return A new <code>FreeColServer</code> or null on error.
+     * @return A new {@code FreeColServer} or null on error.
      */
     private FreeColServer startServer(boolean publicServer,
         boolean singlePlayer, Specification spec, int port) {
@@ -155,11 +155,11 @@ public final class ConnectController extends FreeColClientHolder {
      * will work here.
      *
      * @param host The name of the machine running the
-     *     <code>FreeColServer</code>.
+     *     {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
-     * @param query The <code>DOMMessage</code> query to send.
+     * @param query The {@code DOMMessage} query to send.
      * @param replyTag The expected tag of the reply, or null for anything.
-     * @param err An optional <code>StringTemplate</code> override for any
+     * @param err An optional {@code StringTemplate} override for any
      *     error messages.
      * @return The reply message matching the specified tag, or null on error.
      */
@@ -199,7 +199,7 @@ public final class ConnectController extends FreeColClientHolder {
      *
      * @param user The name of the player to use.
      * @param host The name of the machine running the
-     *            <code>FreeColServer</code>.
+     *            {@code FreeColServer}.
      * @param port The port to use when connecting to the host.
      * @return Null if the login succeeds, otherwise an error message template.
      */
@@ -270,7 +270,7 @@ public final class ConnectController extends FreeColClientHolder {
     /**
      * Starts a multiplayer server and connects to it.
      *
-     * @param specification The <code>Specification</code> for the game.
+     * @param specification The {@code Specification} for the game.
      * @param publicServer Whether to make the server public.
      * @param port The port in which the server should listen for new clients.
      * @return True if the game is started successfully.
@@ -367,7 +367,7 @@ public final class ConnectController extends FreeColClientHolder {
      *
      * FIXME: connect client/server directly (not using network-classes)
      *
-     * @param spec The <code>Specification</code> for the game.
+     * @param spec The {@code Specification} for the game.
      * @param skip Skip the start game panel.
      * @return True if the game starts successfully.
      */

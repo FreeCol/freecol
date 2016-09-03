@@ -38,7 +38,7 @@ public final class LAFUtilities {
      * {@link JComponent#getClientProperty(Object) client property}
      * from the given component.
      *
-     * Currently only <code>RenderingHints.KEY_TEXT_ANTIALIASING</code>
+     * Currently only {@code RenderingHints.KEY_TEXT_ANTIALIASING}
      * is supported. Antialiasing is enabled explicitly if the text size
      * is larger or equal to 16.
      *

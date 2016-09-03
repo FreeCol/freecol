@@ -38,12 +38,12 @@ public class StanceTradeItem extends TradeItem {
 
         
     /**
-     * Creates a new <code>StanceTradeItem</code> instance.
+     * Creates a new {@code StanceTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param source The source <code>Player</code>.
-     * @param destination The destination <code>Player</code>.
-     * @param stance The <code>Stance</code> to trade.
+     * @param game The enclosing {@code Game}.
+     * @param source The source {@code Player}.
+     * @param destination The destination {@code Player}.
+     * @param stance The {@code Stance} to trade.
      */
     public StanceTradeItem(Game game, Player source, Player destination,
                            Stance stance) {
@@ -54,10 +54,10 @@ public class StanceTradeItem extends TradeItem {
     }
 
     /**
-     * Creates a new <code>StanceTradeItem</code> instance.
+     * Creates a new {@code StanceTradeItem} instance.
      *
-     * @param game The enclosing <code>Game</code>.
-     * @param xr A <code>FreeColXMLReader</code> to read from.
+     * @param game The enclosing {@code Game}.
+     * @param xr A {@code FreeColXMLReader} to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
     public StanceTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {

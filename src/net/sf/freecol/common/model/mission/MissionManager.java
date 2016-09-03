@@ -61,8 +61,8 @@ public class MissionManager {
     /**
      * Returns true if the given String is a known mission tag.
      *
-     * @param tag a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @param tag a {@code String} value
+     * @return a {@code boolean} value
      */
     public static boolean isMissionTag(String tag) {
         return missionMap.containsKey(tag);
@@ -72,9 +72,9 @@ public class MissionManager {
      * Returns a new Mission read from the input stream if possible,
      * and null if not.
      *
-     * @param game a <code>Game</code> value
-     * @param xr a <code>FreeColXMLReader</code> value
-     * @return a <code>Mission</code> value
+     * @param game a {@code Game} value
+     * @param xr a {@code FreeColXMLReader} value
+     * @return a {@code Mission} value
      * @exception XMLStreamException if an error occurs
      */
     public static Mission getMission(Game game,

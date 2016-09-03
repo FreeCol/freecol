@@ -59,8 +59,8 @@ public interface ServerModelObject {
      * Executes new-turn actions for this server object.
      *
      * @param random A pseudo-random number source.
-     * @param lb A <code>LogBuilder</code> to log to.
-     * @param cs A <code>ChangeSet</code> to update.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
      */
     public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs);
 } 

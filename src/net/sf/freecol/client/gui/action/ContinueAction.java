@@ -36,9 +36,9 @@ public class ContinueAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>ContinueAction</code>.
+     * Creates a new {@code ContinueAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ContinueAction(FreeColClient freeColClient) {
         super(freeColClient, id);

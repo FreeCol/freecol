@@ -42,7 +42,7 @@ public final class GUIMessage {
      * The constructor to use.
      *
      * @param message The actual message.
-     * @param color The <code>Color</code> in which to display this
+     * @param color The {@code Color} in which to display this
      *     message.
      */
     public GUIMessage(String message, Color color) {
@@ -63,7 +63,7 @@ public final class GUIMessage {
     /**
      * Gets the message's Color.
      *
-     * @return The message <code>Color</code>.
+     * @return The message {@code Color}.
      */
     public Color getColor() {
         return color;

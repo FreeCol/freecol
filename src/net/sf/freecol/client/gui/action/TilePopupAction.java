@@ -33,9 +33,9 @@ public class TilePopupAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>TilePopupAction</code>.
+     * Creates a new {@code TilePopupAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public TilePopupAction(FreeColClient freeColClient) {
         super(freeColClient, id);

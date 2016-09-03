@@ -59,7 +59,7 @@ public class ScrollThread extends Thread {
     /**
      * Sets the direction in which this ScrollThread will scroll.
      * 
-     * @param d The <code>Direction</code> in which this ScrollThread
+     * @param d The {@code Direction} in which this ScrollThread
      *     will scroll.
      */
     public void setDirection(Direction d) {

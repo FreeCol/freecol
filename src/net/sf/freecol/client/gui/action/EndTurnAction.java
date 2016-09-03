@@ -35,9 +35,9 @@ public class EndTurnAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>EndTurnAction</code>.
+     * Creates a new {@code EndTurnAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public EndTurnAction(FreeColClient freeColClient) {
         super(freeColClient, id);

@@ -59,9 +59,9 @@ import net.sf.freecol.common.util.LogBuilder;
 
 /**
  * Objects of this class describes the plan the AI has for a
- * <code>Colony</code>.
+ * {@code Colony}.
  *
- * A <code>ColonyPlan</code> contains a list of
+ * A {@code ColonyPlan} contains a list of
  * {@link WorkLocationPlan}s which suggests the food and non-food
  * production of each {@link WorkLocation}, and a list of
  * {@link BuildableType}s to build.  It takes account of the available
@@ -179,10 +179,10 @@ public class ColonyPlan {
 
 
     /**
-     * Creates a new <code>ColonyPlan</code>.
+     * Creates a new {@code ColonyPlan}.
      *
      * @param aiMain The main AI-object.
-     * @param colony The colony to make a <code>ColonyPlan</code> for.
+     * @param colony The colony to make a {@code ColonyPlan} for.
      */
     public ColonyPlan(AIMain aiMain, Colony colony) {
         if (aiMain == null) throw new IllegalArgumentException("Null AIMain");
@@ -227,9 +227,9 @@ public class ColonyPlan {
 
     /**
      * Gets a copy of the current list of buildable types associated
-     * with this <code>ColonyPlan</code>.
+     * with this {@code ColonyPlan}.
      *
-     * @return A copy of the of <code>BuildableType</code>s list.
+     * @return A copy of the of {@code BuildableType}s list.
      */
     public List<BuildableType> getBuildableTypes() {
         return transform(buildPlans, alwaysTrue(), bp -> bp.type);
@@ -239,7 +239,7 @@ public class ColonyPlan {
      * Gets the best buildable type from this plan that can currently
      * be built by the colony.
      *
-     * @return The best current <code>BuildableType</code>.
+     * @return The best current {@code BuildableType}.
      */
     public BuildableType getBestBuildableType() {
         BuildPlan bp = find(buildPlans, p -> colony.canBuild(p.type));
@@ -260,7 +260,7 @@ public class ColonyPlan {
 
     /**
      * Gets the food-producing and non-autoproducing work location
-     * plans associated with this <code>ColonyPlan</code>.
+     * plans associated with this {@code ColonyPlan}.
      *
      * @return A list of food producing plans.
      */
@@ -271,7 +271,7 @@ public class ColonyPlan {
 
     /**
      * Gets the non-food-producing/non-autoproducing work location
-     * plans associated with this <code>ColonyPlan</code>.
+     * plans associated with this {@code ColonyPlan}.
      *
      * @return A list of non-food producing plans.
      */
@@ -283,8 +283,8 @@ public class ColonyPlan {
     /**
      * Refines this plan given the colony choice of what to build.
      *
-     * @param build The <code>BuildableType</code> to be built (may be null).
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param build The {@code BuildableType} to be built (may be null).
+     * @param lb A {@code LogBuilder} to log to.
      */
     public void refine(BuildableType build, LogBuilder lb) {
         List<GoodsType> required
@@ -580,8 +580,8 @@ public class ColonyPlan {
     /**
      * Finds a build plan for this type.
      *
-     * @param type The <code>BuildableType</code> to search for.
-     * @return A <code>BuildPlan</code> with this type, or null if not found.
+     * @param type The {@code BuildableType} to search for.
+     * @return A {@code BuildPlan} with this type, or null if not found.
      */
     private BuildPlan findBuildPlan(BuildableType type) {
         return find(buildPlans, bp -> bp.type == type);
@@ -590,7 +590,7 @@ public class ColonyPlan {
     /**
      * Adds or improves the priority of a buildable in a list.
      *
-     * @param type The <code>BuildableType</code> to use.
+     * @param type The {@code BuildableType} to use.
      * @param weight The relative weight of this class of buildable with
      *     respect to other buildable classes.
      * @param support The support for this buildable within its class.
@@ -615,8 +615,8 @@ public class ColonyPlan {
      * Given a buildable that improves production of a goods type,
      * prioritize it.
      *
-     * @param type The <code>BuildableType</code> to consider.
-     * @param goodsType The <code>GoodsType</code> improved by the buildable.
+     * @param type The {@code BuildableType} to consider.
+     * @param goodsType The {@code GoodsType} improved by the buildable.
      * @return True if this type was prioritized.
      */
     private boolean prioritizeProduction(BuildableType type,
@@ -939,9 +939,9 @@ public class ColonyPlan {
     /**
      * Tries to swap an expert unit for another doing its job.
      *
-     * @param expert The expert <code>Unit</code>.
-     * @param others A list of other <code>Unit</code>s to test against.
-     * @param colony The <code>Colony</code> the units are working in.
+     * @param expert The expert {@code Unit}.
+     * @param others A list of other {@code Unit}s to test against.
+     * @param colony The {@code Colony} the units are working in.
      * @return The unit that was replaced by the expert, or null if none.
      */
     private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
@@ -971,8 +971,8 @@ public class ColonyPlan {
     /**
      * Finds a plan on a list that produces a given goods type.
      *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param plans The list of <code>WorkLocationPlan</code>s to check.
+     * @param goodsType The {@code GoodsType} to produce.
+     * @param plans The list of {@code WorkLocationPlan}s to check.
      * @return The first plan found that produces the goods type, or null
      *     if none found.
      */
@@ -995,9 +995,9 @@ public class ColonyPlan {
      *
      * Public for the benefit of the test suite.
      *
-     * @param wl The <code>WorkLocation</code> to work at.
-     * @param goodsType The <code>GoodsType</code> to make.
-     * @param workers A list of potential <code>Unit</code>s to try.
+     * @param wl The {@code WorkLocation} to work at.
+     * @param goodsType The {@code GoodsType} to make.
+     * @param workers A list of potential {@code Unit}s to try.
      * @return The best worker for the job.
      */
     public static Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
@@ -1112,10 +1112,10 @@ public class ColonyPlan {
      * Equips a unit for a role, trying all possibilities if a military role
      * was called for.
      *
-     * @param spec The <code>Specification</code> defining the roles.
-     * @param unit The <code>Unit</code> to equip if possible.
-     * @param role The <code>Role</code> for the unit to take.
-     * @param colony The <code>Colony</code> storing the equipment.
+     * @param spec The {@code Specification} defining the roles.
+     * @param unit The {@code Unit} to equip if possible.
+     * @param role The {@code Role} for the unit to take.
+     * @param colony The {@code Colony} storing the equipment.
      * @return True if the unit was equipped.
      */
     private static boolean fullEquipUnit(Specification spec, Unit unit,
@@ -1130,9 +1130,9 @@ public class ColonyPlan {
     /**
      * Tries to apply a colony plan given a list of workers.
      *
-     * @param workers A list of <code>Unit</code>s to assign.
+     * @param workers A list of {@code Unit}s to assign.
      * @param preferScout Prefer to make scouts rather than soldiers.
-     * @param lb A <code>LogBuilder</code> to log to.
+     * @param lb A {@code LogBuilder} to log to.
      * @return A scratch colony with the workers in place.
      */
     public Colony assignWorkers(List<Unit> workers, boolean preferScout,
@@ -1487,7 +1487,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      * Gets a concise textual description of a location associated with
      * the colony.  No i18n here, this is for debugging purposes.
      *
-     * @param loc The <code>Location</code> to describe.
+     * @param loc The {@code Location} to describe.
      * @return The text description.
      */
     private String locationDescription(Location loc) {

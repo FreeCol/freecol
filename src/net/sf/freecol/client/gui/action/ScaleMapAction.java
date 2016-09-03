@@ -37,9 +37,9 @@ public class ScaleMapAction extends FreeColAction {
 
 
     /**
-     * Creates a new <code>ScaleMapAction</code>.
+     * Creates a new {@code ScaleMapAction}.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      */
     public ScaleMapAction(FreeColClient freeColClient) {
         super(freeColClient, id);

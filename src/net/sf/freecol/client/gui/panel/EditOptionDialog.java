@@ -39,9 +39,9 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     /**
      * Create an EditOptionDialog.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param freeColClient The {@code FreeColClient} for the game.
      * @param frame The owner frame.
-     * @param option The <code>Option</code> to operate on.
+     * @param option The {@code Option} to operate on.
      */
     public EditOptionDialog(FreeColClient freeColClient, JFrame frame, Option option) {
         super(freeColClient, frame);

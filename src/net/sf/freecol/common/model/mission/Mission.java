@@ -59,7 +59,7 @@ public interface Mission {
      * Attempts to carry out the mission and returns an appropriate
      * MissionState.
      *
-     * @return a <code>MissionState</code> value
+     * @return a {@code MissionState} value
      */
     public MissionState doMission();
 
@@ -70,7 +70,7 @@ public interface Mission {
      * if the Unit this mission was assigned to was destroyed or
      * changed owner, for example.
      *
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public boolean isValid();
 
@@ -78,7 +78,7 @@ public interface Mission {
     /**
      * Return the Unit this mission was assigned to.
      *
-     * @return an <code>Unit</code> value
+     * @return an {@code Unit} value
      */
     public Unit getUnit();
 
@@ -86,7 +86,7 @@ public interface Mission {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @param xw The {@code FreeColXMLWriter} to write to.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */

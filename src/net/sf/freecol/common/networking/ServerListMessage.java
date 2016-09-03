@@ -53,7 +53,7 @@ public class ServerListMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ServerListMessage</code>.  Used to generate
+     * Create a new {@code ServerListMessage}.  Used to generate
      * a request for servers.
      */
     public ServerListMessage() {
@@ -61,10 +61,10 @@ public class ServerListMessage extends DOMMessage {
     }
 
     /**
-     * Create a new <code>ServerListMessage</code> from a
-     * <code>MetaRegister</code>.  Used to generate the reply.
+     * Create a new {@code ServerListMessage} from a
+     * {@code MetaRegister}.  Used to generate the reply.
      *
-     * @param mr The <code>MetaRegister</code> to query for servers.
+     * @param mr The {@code MetaRegister} to query for servers.
      */
     public ServerListMessage(MetaRegister mr) {
         super(getTagName());
@@ -74,11 +74,11 @@ public class ServerListMessage extends DOMMessage {
     }
         
     /**
-     * Create a new <code>ServerListMessage</code> from a
+     * Create a new {@code ServerListMessage} from a
      * supplied element.  Used to read the reply.
      *
-     * @param game The <code>Game</code> this message belongs to.
-     * @param element The <code>Element</code> to use to create the message.
+     * @param game The {@code Game} this message belongs to.
+     * @param element The {@code Element} to use to create the message.
      */
     public ServerListMessage(Game game, Element element) {
         super(getTagName());
@@ -92,8 +92,8 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Convert an element to a server.
      *
-     * @param e The <code>Element</code> to examine.
-     * @return A new <code>MetaItem</code> describing a server.
+     * @param e The {@code Element} to examine.
+     * @return A new {@code MetaItem} describing a server.
      */     
     private static MetaItem elementToServer(Element e) {
         MetaItem mi = new MetaItem();
@@ -111,8 +111,8 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Convert a ServerInfo record to a message.
      *
-     * @param si The <code>ServerInfo</code> to convert.
-     * @return A new <code>DOMMessage</code>.
+     * @param si The {@code ServerInfo} to convert.
+     * @return A new {@code DOMMessage}.
      */
     private static DOMMessage serverInfoToMessage(ServerInfo si) {
         return new DOMMessage(si.getTagName(),
@@ -132,7 +132,7 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Get the server information.
      *
-     * @return The list of <code>ServerInfo</code>.
+     * @return The list of {@code ServerInfo}.
      */
     public List<ServerInfo> getServers() {
         return this.servers;
@@ -141,8 +141,8 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Add information about a server.
      *
-     * @param <T> The <code>ServerInfo</code> type to add.
-     * @param si The <code>ServerInfo</code> to add.
+     * @param <T> The {@code ServerInfo} type to add.
+     * @param si The {@code ServerInfo} to add.
      */
     public <T extends ServerInfo> void addServer(T si) {
         this.servers.add(si);
@@ -152,9 +152,9 @@ public class ServerListMessage extends DOMMessage {
     /**
      * Handle a "serverList"-message.
      *
-     * @param server The <code>FreeColServer</code> handling the message.
-     * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> message was received on.
+     * @param server The {@code FreeColServer} handling the message.
+     * @param player The {@code Player} the message applies to.
+     * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
     public Element handle(FreeColServer server, Player player,
