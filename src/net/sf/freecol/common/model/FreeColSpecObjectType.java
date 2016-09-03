@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Scope;
+import net.sf.freecol.common.model.Scoped;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -53,7 +54,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * need them and there they may be omitted.
  */
 public abstract class FreeColSpecObjectType extends FreeColSpecObject
-    implements Named {
+    implements Named, Scoped {
 
     /** Whether the type is abstract, or can be instantiated. */
     private boolean abstractType;
@@ -123,65 +124,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
 
     /**
-     * Get the scopes applicable to this effect.
-     *
-     * @return A list of <code>Scope</code>s.
-     */
-    public final List<Scope> getScopeList() {
-        return (this.scopes == null) ? Collections.<Scope>emptyList()
-            : this.scopes;
-    }
-
-    /**
-     * Get the scopes applicable to this effect as a stream.
-     *
-     * @return A stream of <code>Scope</code>s.
-     */
-    public final Stream<Scope> getScopes() {
-        return (this.scopes == null) ? Stream.<Scope>empty()
-            : getScopeList().stream();
-    }
-
-    /**
-     * Set the scopes for this object.
-     *
-     * @param scopes A list of new <code>Scope</code>s.
-     */
-    public final void setScopes(List<Scope> scopes) {
-        this.scopes = scopes;
-    }
-
-    /**
-     * Add a scope.
-     *
-     * @param scope The <code>Scope</code> to add.
-     */
-    protected void addScope(Scope scope) {
-        if (this.scopes == null) this.scopes = new ArrayList<>();
-        this.scopes.add(scope);
-    }
-
-    /**
-     * Remove a scope.
-     *
-     * @param scope The <code>Scope</code> to remove.
-     */
-    protected void removeScope(Scope scope) {
-        if (this.scopes != null) this.scopes.remove(scope);
-    }
-
-    /**
-     * Does at least one of this effect's scopes apply to an object.
-     *
-     * @param object The <code>FreeColObject</code> to check.
-     * @return True if this effect applies.
-     */
-    public boolean appliesTo(FreeColObject object) {
-        return (this.scopes == null || this.scopes.isEmpty()) ? true
-            : any(this.scopes, s -> s.appliesTo(object));
-    }
-
-    /**
      * Gets the index of this FreeColSpecObjectType.
      *
      * The index imposes a total ordering consistent with equals on
@@ -233,6 +175,49 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     @Override
     public final String getNameKey() {
         return Messages.nameKey(getId());
+    }
+
+
+    // Interface Scoped, and scope support
+
+    /**
+     * {@inheritDoc}
+     */
+    public final List<Scope> getScopeList() {
+        return (this.scopes == null) ? Collections.<Scope>emptyList()
+            : this.scopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Stream<Scope> getScopes() {
+        return (this.scopes == null) ? Stream.<Scope>empty()
+            : this.scopes.stream();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final void setScopes(List<Scope> scopes) {
+        this.scopes = scopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addScope(Scope scope) {
+        if (this.scopes == null) this.scopes = new ArrayList<>();
+        this.scopes.add(scope);
+    }
+
+    /**
+     * Remove a scope.
+     *
+     * @param scope The <code>Scope</code> to remove.
+     */
+    protected void removeScope(Scope scope) {
+        if (this.scopes != null) this.scopes.remove(scope);
     }
 
 
