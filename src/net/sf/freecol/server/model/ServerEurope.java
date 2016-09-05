@@ -259,25 +259,6 @@ public class ServerEurope extends Europe implements ServerModelObject {
     }
 
     /**
-     * New turn for this colony tile.
-     *
-     * FIXME: give Europe a shipyard and remove this?
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        logger.finest("ServerEurope.csNewTurn, for " + this);
-
-        for (Unit unit : transform(getUnits(),
-                                   u -> u.isNaval() && u.isDamaged())) {
-            ((ServerUnit)unit).csRepairUnit(cs);
-        }
-    }
-
-    /**
      * Equip a unit for a specific role.
      *
      * @param unit The {@code Unit} to equip.
@@ -301,6 +282,27 @@ public class ServerEurope extends Europe implements ServerModelObject {
         return ret;
     }
 
+
+    // Implement ServerModelObject
+
+    /**
+     * New turn for this colony tile.
+     *
+     * FIXME: give Europe a shipyard and remove this?
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        logger.finest("ServerEurope.csNewTurn, for " + this);
+
+        for (Unit unit : transform(getUnits(),
+                                   u -> u.isNaval() && u.isDamaged())) {
+            ((ServerUnit)unit).csRepairUnit(cs);
+        }
+    }
 
     /**
      * Returns the tag name of the root element representing this object.

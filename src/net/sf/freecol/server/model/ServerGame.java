@@ -332,30 +332,6 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
     /**
-     * Build the updates for a new turn for all the players in this game.
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        lb.add("GAME ", getId(), ", ");
-        for (Player player : getLivePlayerList()) {
-            ((ServerPlayer)player).csNewTurn(random, lb, cs);
-        }
-
-        final Specification spec = getSpecification();
-        Event succession = spec.getEvent("model.event.spanishSuccession");
-        if (succession != null && !getSpanishSuccession()) {
-            ServerPlayer loser = csSpanishSuccession(cs, lb, succession);
-            // TODO: send update to loser.  It will not see anything
-            // because it is no longer a live player.
-            // if (loser != null) sendElement(loser, cs);
-        }
-    }
-
-    /**
      * Checks for and if necessary performs the War of Spanish
      * Succession changes.
      *
@@ -493,6 +469,43 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
 
+    // Implement ServerModelObject
+
+    /**
+     * Build the updates for a new turn for all the players in this game.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add("GAME ", getId(), ", ");
+        for (Player player : getLivePlayerList()) {
+            ((ServerPlayer)player).csNewTurn(random, lb, cs);
+        }
+
+        final Specification spec = getSpecification();
+        Event succession = spec.getEvent("model.event.spanishSuccession");
+        if (succession != null && !getSpanishSuccession()) {
+            ServerPlayer loser = csSpanishSuccession(cs, lb, succession);
+            // TODO: send update to loser.  It will not see anything
+            // because it is no longer a live player.
+            // if (loser != null) sendElement(loser, cs);
+        }
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "serverGame".
+     */
+    @Override
+    public String getServerXMLElementTagName() {
+        return "serverGame";
+    }
+
+
     // Interface Object
 
     /**
@@ -503,18 +516,5 @@ public class ServerGame extends Game implements ServerModelObject {
         // ServerGame does not add any significant fields, so Game.equals
         // suffices.
         return super.equals(o);
-    }
-
-
-    // Serialization
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "serverGame".
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverGame";
     }
 }

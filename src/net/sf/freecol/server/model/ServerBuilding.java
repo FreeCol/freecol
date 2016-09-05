@@ -72,24 +72,6 @@ public class ServerBuilding extends Building implements ServerModelObject {
 
 
     /**
-     * New turn for this building.
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        BuildingType type = getType();
-
-        if (canTeach()) csTeach(cs);
-
-        if (type.hasAbility(Ability.REPAIR_UNITS)) {
-            csRepairUnits(cs);
-        }
-    }
-
-    /**
      * Teach all the units in this school.
      *
      * @param cs A {@code ChangeSet} to update.
@@ -248,6 +230,27 @@ public class ServerBuilding extends Building implements ServerModelObject {
                         .addNamed("%building%", this)
                         .addName("%colony%", getColony().getName()));
             }
+        }
+    }
+
+
+    // Implement ServerModelObject
+
+    /**
+     * New turn for this building.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        BuildingType type = getType();
+
+        if (canTeach()) csTeach(cs);
+
+        if (type.hasAbility(Ability.REPAIR_UNITS)) {
+            csRepairUnits(cs);
         }
     }
 

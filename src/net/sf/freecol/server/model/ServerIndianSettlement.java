@@ -222,95 +222,6 @@ public class ServerIndianSettlement extends IndianSettlement
     }
 
     /**
-     * New turn for this native settlement.
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        lb.add(this);
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
-
-        // Produce goods.
-        List<GoodsType> goodsList = spec.getGoodsTypeList();
-        for (GoodsType g : goodsList) {
-            addGoods(g.getStoredAs(), getTotalProductionOf(g));
-        }
-
-        // Consume goods.
-        for (GoodsType g : goodsList) {
-            consumeGoods(g, getConsumptionOf(g));
-        }
-
-        // Now check the food situation
-        int storedFood = getGoodsCount(spec.getPrimaryFoodType());
-        if (storedFood <= 0 && getUnitCount() > 0) {
-            Unit victim = getRandomMember(logger, "Choose starver",
-                                          getUnits(), random);
-            cs.addRemove(See.only(owner), this, victim);//-vis(owner)
-            victim.dispose();
-            lb.add(" FAMINE");
-        }
-        if (getUnitCount() <= 0) {
-            if (tile.isEmpty()) {
-                lb.add(" COLLAPSED, ");
-                owner.csDisposeSettlement(this, cs);//+vis(owner)
-                return;
-            }
-            tile.getFirstUnit().setLocation(this);//-vis,til: safe in settlement
-        }
-
-        // Check for new resident.
-        // Alcohol also contributes to create children.
-        GoodsType foodType = spec.getPrimaryFoodType();
-        GoodsType rumType = spec.getGoodsType("model.goods.rum");
-        List<UnitType> unitTypes
-            = spec.getUnitTypesWithAbility(Ability.BORN_IN_INDIAN_SETTLEMENT);
-        if (!unitTypes.isEmpty()
-            && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
-                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)) {
-            if (ownedUnits.size() <= getType().getMaximumSize()) {
-                // Allow one more brave than the initially generated
-                // number.  This is more than sufficient. Do not
-                // increase the amount without discussing it on the
-                // developer's mailing list first.
-                UnitType type = getRandomMember(logger, "Choose birth",
-                                                unitTypes, random);
-                Unit unit = new ServerUnit(getGame(), getTile(), owner,
-                                           type);//-vis: safe within settlement
-                consumeGoods(rumType, FOOD_PER_COLONIST/4);
-                // New units quickly go out of their city and start annoying.
-                addOwnedUnit(unit);
-                unit.setHomeIndianSettlement(this);
-                lb.add(" new ", unit);
-            }
-            // Consume the food anyway
-            consumeGoods(foodType, FOOD_PER_COLONIST);
-        }
-
-        // Try to breed horses
-        // FIXME: Make this generic.
-        GoodsType horsesType = spec.getGoodsType("model.goods.horses");
-        // FIXME: remove this
-        GoodsType grainType = spec.getGoodsType("model.goods.grain");
-        int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
-        if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
-            && foodProdAvail > 0) {
-            int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
-            addGoods(horsesType, nHorses);
-            lb.add(" bred ", nHorses, " horses");
-        }
-
-        getGoodsContainer().removeAbove(getWarehouseCapacity());
-        updateWantedGoods();
-        cs.add(See.only(owner), this);
-        lb.add(", ");
-    }
-
-    /**
      * Convenience function to remove an amount of goods.
      *
      * @param type The {@code GoodsType} to remove.
@@ -589,6 +500,98 @@ public class ServerIndianSettlement extends IndianSettlement
                 .addName("%settlement%", getName()));
     }
         
+
+    // Implement ServerModelObject
+
+    /**
+     * New turn for this native settlement.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add(this);
+        ServerPlayer owner = (ServerPlayer) getOwner();
+        Specification spec = getSpecification();
+
+        // Produce goods.
+        List<GoodsType> goodsList = spec.getGoodsTypeList();
+        for (GoodsType g : goodsList) {
+            addGoods(g.getStoredAs(), getTotalProductionOf(g));
+        }
+
+        // Consume goods.
+        for (GoodsType g : goodsList) {
+            consumeGoods(g, getConsumptionOf(g));
+        }
+
+        // Now check the food situation
+        int storedFood = getGoodsCount(spec.getPrimaryFoodType());
+        if (storedFood <= 0 && getUnitCount() > 0) {
+            Unit victim = getRandomMember(logger, "Choose starver",
+                                          getUnits(), random);
+            cs.addRemove(See.only(owner), this, victim);//-vis(owner)
+            victim.dispose();
+            lb.add(" FAMINE");
+        }
+        if (getUnitCount() <= 0) {
+            if (tile.isEmpty()) {
+                lb.add(" COLLAPSED, ");
+                owner.csDisposeSettlement(this, cs);//+vis(owner)
+                return;
+            }
+            tile.getFirstUnit().setLocation(this);//-vis,til: safe in settlement
+        }
+
+        // Check for new resident.
+        // Alcohol also contributes to create children.
+        GoodsType foodType = spec.getPrimaryFoodType();
+        GoodsType rumType = spec.getGoodsType("model.goods.rum");
+        List<UnitType> unitTypes
+            = spec.getUnitTypesWithAbility(Ability.BORN_IN_INDIAN_SETTLEMENT);
+        if (!unitTypes.isEmpty()
+            && (getGoodsCount(foodType) + 4 * getGoodsCount(rumType)
+                > FOOD_PER_COLONIST + KEEP_RAW_MATERIAL)) {
+            if (ownedUnits.size() <= getType().getMaximumSize()) {
+                // Allow one more brave than the initially generated
+                // number.  This is more than sufficient. Do not
+                // increase the amount without discussing it on the
+                // developer's mailing list first.
+                UnitType type = getRandomMember(logger, "Choose birth",
+                                                unitTypes, random);
+                Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                           type);//-vis: safe within settlement
+                consumeGoods(rumType, FOOD_PER_COLONIST/4);
+                // New units quickly go out of their city and start annoying.
+                addOwnedUnit(unit);
+                unit.setHomeIndianSettlement(this);
+                lb.add(" new ", unit);
+            }
+            // Consume the food anyway
+            consumeGoods(foodType, FOOD_PER_COLONIST);
+        }
+
+        // Try to breed horses
+        // FIXME: Make this generic.
+        GoodsType horsesType = spec.getGoodsType("model.goods.horses");
+        // FIXME: remove this
+        GoodsType grainType = spec.getGoodsType("model.goods.grain");
+        int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
+        if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
+            && foodProdAvail > 0) {
+            int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);
+            addGoods(horsesType, nHorses);
+            lb.add(" bred ", nHorses, " horses");
+        }
+
+        getGoodsContainer().removeAbove(getWarehouseCapacity());
+        updateWantedGoods();
+        cs.add(See.only(owner), this);
+        lb.add(", ");
+    }
+
     /**
      * Gets the tag name of the root element representing this object.
      *

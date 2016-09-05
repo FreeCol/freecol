@@ -216,193 +216,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
 
     /**
-     * New turn for this unit.
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        lb.add(this);
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
-        Location loc = getLocation();
-        boolean locDirty = false;
-        boolean unitDirty = false;
-
-        // Attrition.  Do it first as the unit might die.
-        if (getType().hasMaximumAttrition() && loc instanceof Tile
-            && !((Tile)loc).hasSettlement()) {
-            int attrition = getAttrition() + 1;
-            setAttrition(attrition);
-            if (attrition > getType().getMaximumAttrition()) {
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                     "model.unit.attrition", this)
-                        .addStringTemplate("%unit%", getLabel())
-                        .addStringTemplate("%location%",
-                            loc.getLocationLabelFor(owner)));
-                cs.add(See.perhaps(), (Tile)loc);
-                cs.addRemove(See.perhaps().always(owner), loc, 
-                             this);//-vis(owner)
-                this.dispose();
-                owner.invalidateCanSeeTiles();//+vis(owner)
-                lb.add(", ");
-                return;
-            }
-        } else {
-            setAttrition(0);
-        }
-
-        // Check for experience-promotion.
-        GoodsType produce;
-        UnitType learn;
-        UnitChange uc;
-        if (isInColony()
-            && (produce = getWorkType()) != null
-            && (learn = spec.getExpertForProducing(produce)) != null
-            && learn != getType()
-            && (uc = getUnitChange(UnitChangeType.EXPERIENCE,learn)) != null) {
-            int maximumExperience = getType().getMaximumExperience();
-            int maxValue = (100 * maximumExperience) / uc.probability;
-            if (maxValue > 0
-                && randomInt(logger, "Experience", random, maxValue)
-                < Math.min(getExperience(), maximumExperience)) {
-                StringTemplate oldName = getLabel();
-                changeType(learn);//-vis: safe within colony
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                     "model.unit.experience", getColony(), this)
-                        .addStringTemplate("%oldName%", oldName)
-                        .addStringTemplate("%unit%", getLabel())
-                        .addName("%colony%", getColony().getName()));
-                lb.add(" experience upgrade to ", getType());
-                unitDirty = true;
-            }
-        }
-
-        // Update moves left.
-        if (isInMission()) {
-            getTile().updateIndianSettlement(owner);
-            setMovesLeft(0);
-        } else if (isDamaged()) {
-            setMovesLeft(0);
-        } else {
-            setMovesLeft(getInitialMovesLeft());
-        }
-
-        if (getWorkLeft() > 0) {
-            unitDirty = true;
-            switch (getState()) {
-            case IMPROVING:
-                // Has the improvement been completed already? Do nothing.
-                TileImprovement ti = getWorkImprovement();
-                if (ti == null // Another unit on the tile completed it first
-                    || ti.isComplete()) {
-                    setState(UnitState.ACTIVE);
-                    setWorkLeft(-1);
-                } else {
-                    // Otherwise do work
-                    int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
-                        ? 2 : 1;
-                    int turns = ti.getTurnsToComplete();
-                    if ((turns -= amount) < 0) turns = 0;
-                    ti.setTurnsToComplete(turns);
-                    setWorkLeft(turns);
-                    if (ti.isRoad() && ti.isComplete()) {
-                        ti.updateRoadConnections(true);
-                        for (Tile t : transform(loc.getTile().getSurroundingTiles(1,1),
-                                                Tile::hasRoad)) {
-                            cs.add(See.perhaps(), t);
-                        }
-                        locDirty = true;
-                    }
-                }
-                break;
-            default:
-                setWorkLeft(getWorkLeft() - 1);
-                break;
-            }
-
-            if (loc instanceof HighSeas && getOwner().isREF()) {
-                // Swift travel to America for the REF
-                setWorkLeft(0);
-            }
-        }
-
-        if (getState() == UnitState.SKIPPED) {
-            setState(UnitState.ACTIVE);
-            unitDirty = true;
-        }
-
-        if (getWorkLeft() <= 0) {
-            if (getLocation() instanceof HighSeas) {
-                final Europe europe = owner.getEurope();
-                final Location dst = getDestination();
-                Location result = resolveDestination();
-                if (result == europe) {
-                    lb.add(" arrives in Europe");
-                    if (getTradeRoute() == null) {
-                        setDestination(null);
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                             "model.unit.arriveInEurope",
-                                             europe, this)
-                                .addNamed("%europe%", europe));
-                    }
-                    setState(UnitState.ACTIVE);
-                    setLocation(europe);//-vis: safe/Europe
-                    cs.add(See.only(owner), owner.getHighSeas());
-                    locDirty = true;
-                } else {
-                    if (!(result instanceof Tile)) {
-                        logger.warning("Unit has unsupported destination: "
-                            + dst + " -> " + result);
-                        result = getEntryLocation().getTile();
-                    }
-                    Tile tile = result.getTile().getSafeTile(owner, random);
-                    lb.add(" arrives in America at ", tile);
-                    if (dst != null) {
-                        lb.add(" sailing for ", dst);
-                        if (dst instanceof Map) setDestination(null);
-                    }
-                    csMove(tile, random, cs);
-                    locDirty = unitDirty = false; // loc update present
-                }
-            } else {
-                switch (getState()) {
-                case ACTIVE: case FORTIFIED: case SENTRY: case IN_COLONY:
-                    break; // These states are stable
-                case IMPROVING:
-                    csImproveTile(random, cs);
-                    setWorkImprovement(null);
-                    locDirty = true;
-                    break;
-                case FORTIFYING:
-                    setState(UnitState.FORTIFIED);
-                    unitDirty = true;
-                    break;
-                case SKIPPED: default:
-                    lb.add(" work completed, bad state: ", getState());
-                    setState(UnitState.ACTIVE);
-                    unitDirty = true;
-                    break;
-                }
-            }
-        }
-
-        if (locDirty) {
-            cs.add(See.perhaps(), (FreeColGameObject)getLocation());
-        } else if (unitDirty) {
-            cs.add(See.perhaps(), this);
-        } else {
-            cs.addPartial(See.only(owner), this, "movesLeft");
-        }
-        lb.add(", ");
-    }
-
-    /**
      * Completes a tile improvement.
      *
      * +til: Resolves the change of appearance.
@@ -1074,7 +887,194 @@ public class ServerUnit extends Unit implements ServerModelObject {
     }
 
 
-    // Serialization
+    // Implement ServerModelObject
+
+    /**
+     * New turn for this unit.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add(this);
+        ServerPlayer owner = (ServerPlayer) getOwner();
+        Specification spec = getSpecification();
+        Location loc = getLocation();
+        boolean locDirty = false;
+        boolean unitDirty = false;
+
+        // Attrition.  Do it first as the unit might die.
+        if (getType().hasMaximumAttrition() && loc instanceof Tile
+            && !((Tile)loc).hasSettlement()) {
+            int attrition = getAttrition() + 1;
+            setAttrition(attrition);
+            if (attrition > getType().getMaximumAttrition()) {
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                     "model.unit.attrition", this)
+                        .addStringTemplate("%unit%", getLabel())
+                        .addStringTemplate("%location%",
+                            loc.getLocationLabelFor(owner)));
+                cs.add(See.perhaps(), (Tile)loc);
+                cs.addRemove(See.perhaps().always(owner), loc, 
+                             this);//-vis(owner)
+                this.dispose();
+                owner.invalidateCanSeeTiles();//+vis(owner)
+                lb.add(", ");
+                return;
+            }
+        } else {
+            setAttrition(0);
+        }
+
+        // Check for experience-promotion.
+        GoodsType produce;
+        UnitType learn;
+        UnitChange uc;
+        if (isInColony()
+            && (produce = getWorkType()) != null
+            && (learn = spec.getExpertForProducing(produce)) != null
+            && learn != getType()
+            && (uc = getUnitChange(UnitChangeType.EXPERIENCE,learn)) != null) {
+            int maximumExperience = getType().getMaximumExperience();
+            int maxValue = (100 * maximumExperience) / uc.probability;
+            if (maxValue > 0
+                && randomInt(logger, "Experience", random, maxValue)
+                < Math.min(getExperience(), maximumExperience)) {
+                StringTemplate oldName = getLabel();
+                changeType(learn);//-vis: safe within colony
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                     "model.unit.experience", getColony(), this)
+                        .addStringTemplate("%oldName%", oldName)
+                        .addStringTemplate("%unit%", getLabel())
+                        .addName("%colony%", getColony().getName()));
+                lb.add(" experience upgrade to ", getType());
+                unitDirty = true;
+            }
+        }
+
+        // Update moves left.
+        if (isInMission()) {
+            getTile().updateIndianSettlement(owner);
+            setMovesLeft(0);
+        } else if (isDamaged()) {
+            setMovesLeft(0);
+        } else {
+            setMovesLeft(getInitialMovesLeft());
+        }
+
+        if (getWorkLeft() > 0) {
+            unitDirty = true;
+            switch (getState()) {
+            case IMPROVING:
+                // Has the improvement been completed already? Do nothing.
+                TileImprovement ti = getWorkImprovement();
+                if (ti == null // Another unit on the tile completed it first
+                    || ti.isComplete()) {
+                    setState(UnitState.ACTIVE);
+                    setWorkLeft(-1);
+                } else {
+                    // Otherwise do work
+                    int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
+                        ? 2 : 1;
+                    int turns = ti.getTurnsToComplete();
+                    if ((turns -= amount) < 0) turns = 0;
+                    ti.setTurnsToComplete(turns);
+                    setWorkLeft(turns);
+                    if (ti.isRoad() && ti.isComplete()) {
+                        ti.updateRoadConnections(true);
+                        for (Tile t : transform(loc.getTile().getSurroundingTiles(1,1),
+                                                Tile::hasRoad)) {
+                            cs.add(See.perhaps(), t);
+                        }
+                        locDirty = true;
+                    }
+                }
+                break;
+            default:
+                setWorkLeft(getWorkLeft() - 1);
+                break;
+            }
+
+            if (loc instanceof HighSeas && getOwner().isREF()) {
+                // Swift travel to America for the REF
+                setWorkLeft(0);
+            }
+        }
+
+        if (getState() == UnitState.SKIPPED) {
+            setState(UnitState.ACTIVE);
+            unitDirty = true;
+        }
+
+        if (getWorkLeft() <= 0) {
+            if (getLocation() instanceof HighSeas) {
+                final Europe europe = owner.getEurope();
+                final Location dst = getDestination();
+                Location result = resolveDestination();
+                if (result == europe) {
+                    lb.add(" arrives in Europe");
+                    if (getTradeRoute() == null) {
+                        setDestination(null);
+                        cs.addMessage(See.only(owner),
+                            new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                             "model.unit.arriveInEurope",
+                                             europe, this)
+                                .addNamed("%europe%", europe));
+                    }
+                    setState(UnitState.ACTIVE);
+                    setLocation(europe);//-vis: safe/Europe
+                    cs.add(See.only(owner), owner.getHighSeas());
+                    locDirty = true;
+                } else {
+                    if (!(result instanceof Tile)) {
+                        logger.warning("Unit has unsupported destination: "
+                            + dst + " -> " + result);
+                        result = getEntryLocation().getTile();
+                    }
+                    Tile tile = result.getTile().getSafeTile(owner, random);
+                    lb.add(" arrives in America at ", tile);
+                    if (dst != null) {
+                        lb.add(" sailing for ", dst);
+                        if (dst instanceof Map) setDestination(null);
+                    }
+                    csMove(tile, random, cs);
+                    locDirty = unitDirty = false; // loc update present
+                }
+            } else {
+                switch (getState()) {
+                case ACTIVE: case FORTIFIED: case SENTRY: case IN_COLONY:
+                    break; // These states are stable
+                case IMPROVING:
+                    csImproveTile(random, cs);
+                    setWorkImprovement(null);
+                    locDirty = true;
+                    break;
+                case FORTIFYING:
+                    setState(UnitState.FORTIFIED);
+                    unitDirty = true;
+                    break;
+                case SKIPPED: default:
+                    lb.add(" work completed, bad state: ", getState());
+                    setState(UnitState.ACTIVE);
+                    unitDirty = true;
+                    break;
+                }
+            }
+        }
+
+        if (locDirty) {
+            cs.add(See.perhaps(), (FreeColGameObject)getLocation());
+        } else if (unitDirty) {
+            cs.add(See.perhaps(), this);
+        } else {
+            cs.addPartial(See.only(owner), this, "movesLeft");
+        }
+        lb.add(", ");
+    }
 
     /**
      * Returns the tag name of the root element representing this object.

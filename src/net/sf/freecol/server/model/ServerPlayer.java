@@ -1423,150 +1423,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
     }
 
-    /**
-     * New turn for this player.
-     *
-     * @param random A {@code Random} number source.
-     * @param lb A {@code LogBuilder} to log to.
-     * @param cs A {@code ChangeSet} to update.
-     */
-    @Override
-    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
-        lb.add("PLAYER ", getName(), ": ");
-        final Game game = getGame();
-
-        // Settlements
-        List<Settlement> settlements = getSettlementList();
-        int newSoL = 0, newImmigration = getImmigration();
-        for (Settlement settlement : settlements) {
-            ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
-            newSoL += settlement.getSoL();
-        }
-        newImmigration = getImmigration() - newImmigration;
-
-        int numberOfColonies = settlements.size();
-        if (numberOfColonies > 0) {
-            newSoL = newSoL / numberOfColonies;
-            if (oldSoL / 10 != newSoL / 10) {
-                String key = (newSoL > oldSoL)
-                    ? "model.player.soLIncrease"
-                    : "model.player.soLDecrease";
-                cs.addMessage(See.only(this),
-                    new ModelMessage(MessageType.SONS_OF_LIBERTY, key, this)
-                        .addAmount("%oldSoL%", oldSoL)
-                        .addAmount("%newSoL%", newSoL));
-            }
-            oldSoL = newSoL; // Remember SoL for check changes at next turn.
-        }
-
-        // Europe.
-        if (europe != null) {
-            ((ServerModelObject) europe).csNewTurn(random, lb, cs);
-            modifyImmigration(europe.getImmigration(newImmigration));
-        }
-        // Units.
-        for (Unit unit : getUnitList()) {
-            try {
-                ((ServerModelObject) unit).csNewTurn(random, lb, cs);
-            } catch (ClassCastException e) {
-                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(), e);
-            }
-        }
-
-        if (isEuropean()) { // Update liberty and immigration
-            // Auto-emigrate if selection not allowed.
-            if (hasAbility(Ability.SELECT_RECRUIT)) {
-                cs.addPartial(See.only(this), this, "immigration");
-            } else {
-                while (checkEmigrate()) {
-                    csEmigrate(MigrationType.getUnspecificSlot(),
-                               MigrationType.NORMAL, random, cs);
-                }
-            }
-            cs.addPartial(See.only(this), this, "liberty");
-
-            if (getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)) {
-                csPayUpkeep(random, cs);
-            }
-
-            int probability = getSpecification().getInteger(GameOptions.NATURAL_DISASTERS);
-            if (probability > 0) {
-                csNaturalDisasters(random, cs, probability);
-            }
-
-            if (isRebel() && interventionBells
-                >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
-                interventionBells = Integer.MIN_VALUE;
-                
-                // Enter near a port.
-                List<Colony> ports = getPorts();
-                Colony port = getRandomMember(logger, "Intervention port",
-                                              ports, random);
-                Tile portTile = port.getTile();
-                Tile entry = game.getMap().searchCircle(portTile,
-                    GoalDeciders.getSimpleHighSeasGoalDecider(),
-                    portTile.getHighSeasCount()+1).getSafeTile(this, random);
-                
-                // Create the force.
-                // @compat 0.10.5
-                // We used to nullify the monarch when declaring independence.
-                // There are saved games out there where this happened
-                // (see BR#2435).  Defend against NPE.
-                Force ivf = null;
-                if (getMonarch() != null
-                // end @compat 0.10.5
-                    && (ivf = getMonarch().getInterventionForce()) != null) {
-                    List<Unit> land = createUnits(ivf.getLandUnitsList(),
-                                                  entry);//-vis(this)
-                    List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
-                                                   entry);//-vis(this)
-                    List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
-                    for (Unit unit : leftOver) {
-                        // no use for left over units
-                        logger.warning("Disposing of left over unit " + unit);
-                        unit.setLocationNoUpdate(null);//-vis: safe, off map
-                        unit.dispose();//-vis: safe, never sighted
-                    }
-                    Set<Tile> tiles = exploreForUnit(naval.get(0));
-                    if (!tiles.contains(entry)) tiles.add(entry);
-                    invalidateCanSeeTiles();//+vis(this)
-                    cs.add(See.perhaps(), tiles);
-                    cs.addMessage(See.only(this),
-                        new ModelMessage(MessageType.DEFAULT,
-                                         "model.player.interventionForceArrives",
-                                         this));
-                    logger.info("Intervention force ("
-                        + naval.size() + " naval, "
-                        + land.size() + " land, "
-                        + leftOver.size() + " left over) arrives at " + entry
-                        + "(for " + port.getName() + ")");
-                }
-            }
-        }
-
-        // Update stances
-        while (!stanceDirty.isEmpty()) {
-            ServerPlayer s = stanceDirty.remove(0);
-            Stance sta = getStance(s);
-            boolean war = sta == Stance.WAR;
-            if (sta == Stance.UNCONTACTED) continue;
-            for (Player p : game.getLiveEuropeanPlayerList(this)) {
-                ServerPlayer sp = (ServerPlayer) p;
-                if (p == s || !p.hasContacted(this)
-                    || !p.hasContacted(s)) continue;
-                if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
-                    || war) {
-                    cs.addStance(See.only(sp), this, sta, s);
-                    cs.addMessage(See.only(sp),
-                        new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
-                                         sta.getOtherStanceChangeKey(), this)
-                            .addStringTemplate("%attacker%", getNationLabel())
-                            .addStringTemplate("%defender%", s.getNationLabel()));
-                }
-            }
-        }
-    }
-
     public void csPayUpkeep(Random random, ChangeSet cs) {
         final Specification spec = getSpecification();
         final Disaster bankruptcy = spec.getDisaster(Disaster.BANKRUPTCY);
@@ -4439,7 +4295,164 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
     }
 
 
-    // Serialization
+    // Implement ServerModelObject
+
+    /**
+     * New turn for this player.
+     *
+     * @param random A {@code Random} number source.
+     * @param lb A {@code LogBuilder} to log to.
+     * @param cs A {@code ChangeSet} to update.
+     */
+    @Override
+    public void csNewTurn(Random random, LogBuilder lb, ChangeSet cs) {
+        lb.add("PLAYER ", getName(), ": ");
+        final Game game = getGame();
+
+        // Settlements
+        List<Settlement> settlements = getSettlementList();
+        int newSoL = 0, newImmigration = getImmigration();
+        for (Settlement settlement : settlements) {
+            ((ServerModelObject)settlement).csNewTurn(random, lb, cs);
+            newSoL += settlement.getSoL();
+        }
+        newImmigration = getImmigration() - newImmigration;
+
+        int numberOfColonies = settlements.size();
+        if (numberOfColonies > 0) {
+            newSoL = newSoL / numberOfColonies;
+            if (oldSoL / 10 != newSoL / 10) {
+                String key = (newSoL > oldSoL)
+                    ? "model.player.soLIncrease"
+                    : "model.player.soLDecrease";
+                cs.addMessage(See.only(this),
+                    new ModelMessage(MessageType.SONS_OF_LIBERTY, key, this)
+                        .addAmount("%oldSoL%", oldSoL)
+                        .addAmount("%newSoL%", newSoL));
+            }
+            oldSoL = newSoL; // Remember SoL for check changes at next turn.
+        }
+
+        // Europe.
+        if (europe != null) {
+            ((ServerModelObject) europe).csNewTurn(random, lb, cs);
+            modifyImmigration(europe.getImmigration(newImmigration));
+        }
+        // Units.
+        for (Unit unit : getUnitList()) {
+            try {
+                ((ServerModelObject) unit).csNewTurn(random, lb, cs);
+            } catch (ClassCastException e) {
+                logger.log(Level.SEVERE, "Not a ServerUnit: " + unit.getId(), e);
+            }
+        }
+
+        if (isEuropean()) { // Update liberty and immigration
+            // Auto-emigrate if selection not allowed.
+            if (hasAbility(Ability.SELECT_RECRUIT)) {
+                cs.addPartial(See.only(this), this, "immigration");
+            } else {
+                while (checkEmigrate()) {
+                    csEmigrate(MigrationType.getUnspecificSlot(),
+                               MigrationType.NORMAL, random, cs);
+                }
+            }
+            cs.addPartial(See.only(this), this, "liberty");
+
+            if (getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)) {
+                csPayUpkeep(random, cs);
+            }
+
+            int probability = getSpecification().getInteger(GameOptions.NATURAL_DISASTERS);
+            if (probability > 0) {
+                csNaturalDisasters(random, cs, probability);
+            }
+
+            if (isRebel() && interventionBells
+                >= getSpecification().getInteger(GameOptions.INTERVENTION_BELLS)) {
+                interventionBells = Integer.MIN_VALUE;
+                
+                // Enter near a port.
+                List<Colony> ports = getPorts();
+                Colony port = getRandomMember(logger, "Intervention port",
+                                              ports, random);
+                Tile portTile = port.getTile();
+                Tile entry = game.getMap().searchCircle(portTile,
+                    GoalDeciders.getSimpleHighSeasGoalDecider(),
+                    portTile.getHighSeasCount()+1).getSafeTile(this, random);
+                
+                // Create the force.
+                // @compat 0.10.5
+                // We used to nullify the monarch when declaring independence.
+                // There are saved games out there where this happened
+                // (see BR#2435).  Defend against NPE.
+                Force ivf = null;
+                if (getMonarch() != null
+                // end @compat 0.10.5
+                    && (ivf = getMonarch().getInterventionForce()) != null) {
+                    List<Unit> land = createUnits(ivf.getLandUnitsList(),
+                                                  entry);//-vis(this)
+                    List<Unit> naval = createUnits(ivf.getNavalUnitsList(),
+                                                   entry);//-vis(this)
+                    List<Unit> leftOver = loadShips(land, naval, random);//-vis(this)
+                    for (Unit unit : leftOver) {
+                        // no use for left over units
+                        logger.warning("Disposing of left over unit " + unit);
+                        unit.setLocationNoUpdate(null);//-vis: safe, off map
+                        unit.dispose();//-vis: safe, never sighted
+                    }
+                    Set<Tile> tiles = exploreForUnit(naval.get(0));
+                    if (!tiles.contains(entry)) tiles.add(entry);
+                    invalidateCanSeeTiles();//+vis(this)
+                    cs.add(See.perhaps(), tiles);
+                    cs.addMessage(See.only(this),
+                        new ModelMessage(MessageType.DEFAULT,
+                                         "model.player.interventionForceArrives",
+                                         this));
+                    logger.info("Intervention force ("
+                        + naval.size() + " naval, "
+                        + land.size() + " land, "
+                        + leftOver.size() + " left over) arrives at " + entry
+                        + "(for " + port.getName() + ")");
+                }
+            }
+        }
+
+        // Update stances
+        while (!stanceDirty.isEmpty()) {
+            ServerPlayer s = stanceDirty.remove(0);
+            Stance sta = getStance(s);
+            boolean war = sta == Stance.WAR;
+            if (sta == Stance.UNCONTACTED) continue;
+            for (Player p : game.getLiveEuropeanPlayerList(this)) {
+                ServerPlayer sp = (ServerPlayer) p;
+                if (p == s || !p.hasContacted(this)
+                    || !p.hasContacted(s)) continue;
+                if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
+                    || war) {
+                    cs.addStance(See.only(sp), this, sta, s);
+                    cs.addMessage(See.only(sp),
+                        new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
+                                         sta.getOtherStanceChangeKey(), this)
+                            .addStringTemplate("%attacker%", getNationLabel())
+                            .addStringTemplate("%defender%", s.getNationLabel()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "serverPlayer"
+     */
+    @Override
+    public String getServerXMLElementTagName() {
+        return "serverPlayer";
+    }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -4452,15 +4465,5 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
             .append(' ').append(this.connection)
             .append(']');
         return sb.toString();
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "serverPlayer"
-     */
-    @Override
-    public String getServerXMLElementTagName() {
-        return "serverPlayer";
     }
 }

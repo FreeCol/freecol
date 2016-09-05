@@ -68,6 +68,36 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
 
 
     /**
+     * This method is called only when a new turn is beginning.  It
+     * will reduce the quantity of the bonus {@code Resource}
+     * that is on the given tile, if any and if applicable.
+     *
+     * @param tile The {@code Tile} to check for a resource.
+     * @param goodsType The {@code GoodsType} the goods type to expend.
+     * @param unitType The {@code UnitType} doing the production.
+     * @return The {@code Resource} if it is exhausted by this
+     *     call (so it can be used in a message), otherwise null.
+     */
+    private Resource expendResource(Tile tile, GoodsType goodsType,
+                                    UnitType unitType) {
+        if (!tile.hasResource()) return null;
+
+        Resource resource = tile.getResource();
+        if (resource.isUnlimited()) return null;
+
+        if (resource.useQuantity(goodsType, unitType,
+                                 tile.getPotentialProduction(goodsType, unitType)) == 0) {
+            tile.cacheUnseen();//+til
+            tile.removeResource();//-til
+            return resource;
+        }
+        return null;
+    }
+
+
+    // Implement ServerModelObject
+
+    /**
      * New turn for this colony tile.
      *
      * @param random A {@code Random} number source.
@@ -100,33 +130,6 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         }
     }
 
-    /**
-     * This method is called only when a new turn is beginning.  It
-     * will reduce the quantity of the bonus {@code Resource}
-     * that is on the given tile, if any and if applicable.
-     *
-     * @param tile The {@code Tile} to check for a resource.
-     * @param goodsType The {@code GoodsType} the goods type to expend.
-     * @param unitType The {@code UnitType} doing the production.
-     * @return The {@code Resource} if it is exhausted by this
-     *     call (so it can be used in a message), otherwise null.
-     */
-    private Resource expendResource(Tile tile, GoodsType goodsType,
-                                    UnitType unitType) {
-        if (!tile.hasResource()) return null;
-
-        Resource resource = tile.getResource();
-        if (resource.isUnlimited()) return null;
-
-        if (resource.useQuantity(goodsType, unitType,
-                                 tile.getPotentialProduction(goodsType, unitType)) == 0) {
-            tile.cacheUnseen();//+til
-            tile.removeResource();//-til
-            return resource;
-        }
-        return null;
-    }
-    
     /**
      * Returns the tag name of the root element representing this object.
      *
