@@ -221,9 +221,6 @@ public class AbstractUnit extends FreeColObject {
     private static final String NUMBER_TAG = "number";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -233,9 +230,6 @@ public class AbstractUnit extends FreeColObject {
         xw.writeAttribute(NUMBER_TAG, number);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -248,9 +242,6 @@ public class AbstractUnit extends FreeColObject {
         number = xr.getAttribute(NUMBER_TAG, 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -259,9 +250,6 @@ public class AbstractUnit extends FreeColObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

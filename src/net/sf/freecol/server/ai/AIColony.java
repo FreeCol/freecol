@@ -1420,9 +1420,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // end @compat
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -1461,9 +1458,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -1474,9 +1468,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                  Colony.class, (Colony)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -1490,9 +1481,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (getColony() != null) uninitialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
@@ -1535,9 +1523,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

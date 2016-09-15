@@ -299,9 +299,6 @@ public final class Limit extends FreeColSpecObjectType {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -309,9 +306,6 @@ public final class Limit extends FreeColSpecObjectType {
         xw.writeAttribute(OPERATOR_TAG, operator);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -321,9 +315,6 @@ public final class Limit extends FreeColSpecObjectType {
         rightHandSide.toXML(xw, RIGHT_HAND_SIDE_TAG);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -332,9 +323,6 @@ public final class Limit extends FreeColSpecObjectType {
                                    Operator.class, (Operator)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -358,9 +346,6 @@ public final class Limit extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -369,9 +354,6 @@ public final class Limit extends FreeColSpecObjectType {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

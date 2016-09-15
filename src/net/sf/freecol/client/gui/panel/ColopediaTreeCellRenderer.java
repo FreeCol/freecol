@@ -44,9 +44,6 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value,
         boolean selected, boolean expanded, boolean leaf, int row,

@@ -460,9 +460,6 @@ public class StringTemplate extends FreeColObject {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -505,9 +502,6 @@ public class StringTemplate extends FreeColObject {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -538,9 +532,6 @@ public class StringTemplate extends FreeColObject {
     private static final String TEMPLATE_TYPE_TAG = "templateType";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -552,9 +543,6 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -576,9 +564,6 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -589,9 +574,6 @@ public class StringTemplate extends FreeColObject {
         defaultId = xr.getAttribute(DEFAULT_ID_TAG, (String)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -601,9 +583,6 @@ public class StringTemplate extends FreeColObject {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -620,9 +599,6 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -665,9 +641,6 @@ public class StringTemplate extends FreeColObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

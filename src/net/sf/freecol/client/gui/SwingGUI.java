@@ -166,9 +166,6 @@ public class SwingGUI extends GUI {
 
     // Initialization related methods
 
-    /** 
-     * {@inheritDoc}
-     */
     @Override
     public void installLookAndFeel(String fontName) throws FreeColException {
         FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
@@ -179,9 +176,6 @@ public class SwingGUI extends GUI {
         Utility.initStyleContext(font);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void quit() {
         if (canvas != null) {
@@ -189,9 +183,6 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /** 
-     * {@inheritDoc}
-     */
     @Override
     public void initializeInGame() {
         canvas.initializeInGame();
@@ -199,17 +190,11 @@ public class SwingGUI extends GUI {
             .getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setupMouseListeners() {
         canvas.setupMouseListeners();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void displaySplashScreen(final InputStream splashStream) {
         splash = null;
@@ -230,9 +215,6 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void hideSplashScreen() {
         if (splash != null) {
@@ -242,9 +224,6 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showOpeningVideo(final String userMsg) {
         canvas.closeMenus();
@@ -354,9 +333,6 @@ public class SwingGUI extends GUI {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void startGUI(final Dimension desiredWindowSize) {
         final ClientOptions opts = getClientOptions();
@@ -420,17 +396,11 @@ public class SwingGUI extends GUI {
         logger.info("Starting in Move Units View Mode");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void changeWindowedMode() {
         canvas.changeWindowedMode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void startMapEditorGUI() {
         canvas.startMapEditorGUI();
@@ -439,9 +409,6 @@ public class SwingGUI extends GUI {
 
     // Non-trivial public routines.
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void activateGotoPath() {
         Unit unit = getActiveUnit();
@@ -468,9 +435,6 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clearGotoPath() {
         Unit unit = getActiveUnit();
@@ -480,9 +444,6 @@ public class SwingGUI extends GUI {
         canvas.stopGoto();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void displayChatMessage(Player player, String message,
                                    boolean privateChat) {
@@ -490,36 +451,24 @@ public class SwingGUI extends GUI {
             player.getName() + ": " + message, player.getNationColor()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void refresh() {
         mapViewer.forceReposition();
         canvas.refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void refreshTile(Tile tile) {
         if (tile.getX() >= 0 && tile.getY() >= 0) {
             canvas.repaint(mapViewer.calculateTileBounds(tile));
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void resetMenuBar() {
         getFreeColClient().updateActions();
         canvas.resetMenuBar();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void resetMapZoom() {
         super.resetMapZoom();
@@ -527,25 +476,16 @@ public class SwingGUI extends GUI {
         refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canZoomInMap() {
         return !mapViewer.isAtMaxMapScale();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canZoomOutMap() {
         return !mapViewer.isAtMinMapScale();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void zoomInMap() {
         super.zoomInMap();
@@ -553,9 +493,6 @@ public class SwingGUI extends GUI {
         refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void zoomOutMap() {
         super.zoomOutMap();
@@ -563,9 +500,6 @@ public class SwingGUI extends GUI {
         refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean setActiveUnit(Unit unit) {
         boolean result = mapViewer.setActiveUnit(unit);
@@ -577,9 +511,6 @@ public class SwingGUI extends GUI {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateMenuBar() {
         getFreeColClient().updateActions();
@@ -605,9 +536,6 @@ public class SwingGUI extends GUI {
         return false;
     }
         
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void animateUnitAttack(Unit attacker, Unit defender,
                                   Tile attackerTile, Tile defenderTile,
@@ -617,9 +545,6 @@ public class SwingGUI extends GUI {
                               attackerTile, defenderTile, success);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void animateUnitMove(Unit unit, Tile srcTile, Tile dstTile) {
         requireFocus(srcTile);
@@ -629,9 +554,6 @@ public class SwingGUI extends GUI {
 
     // MapControls handling
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enableMapControls(boolean enable) {
         // Always instantiate in game.
@@ -660,9 +582,6 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateMapControls() {
         if (mapControls != null) mapControls.update();
@@ -674,52 +593,34 @@ public class SwingGUI extends GUI {
         mapControls.addToComponent(canvas);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void zoomInMapControls() {
         if (mapControls == null) return;
         mapControls.zoomIn();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void zoomOutMapControls() {
         if (mapControls == null) return;
         mapControls.zoomOut();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canZoomInMapControls() {
         return mapControls != null && mapControls.canZoomInMapControls();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canZoomOutMapControls() {
         return mapControls != null && mapControls.canZoomOutMapControls();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void miniMapToggleViewControls() {
         if (mapControls == null) return;
         mapControls.toggleView();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void miniMapToggleFogOfWarControls() {
         if (mapControls == null) return;
@@ -729,18 +630,12 @@ public class SwingGUI extends GUI {
 
     // Dialogs that return values
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean confirm(String textKey, String okKey, String cancelKey) {
         return canvas.showConfirmDialog(null, Messages.message(textKey),
             null, okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean confirm(Tile tile, StringTemplate template,
                            String okKey, String cancelKey) {
@@ -748,9 +643,6 @@ public class SwingGUI extends GUI {
             Utility.localizedTextArea(template), null, okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean confirm(Tile tile, StringTemplate template, Unit unit,
                            String okKey, String cancelKey) {
@@ -760,9 +652,6 @@ public class SwingGUI extends GUI {
             okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean confirm(Tile tile, StringTemplate template,
                            Settlement settlement,
@@ -773,9 +662,6 @@ public class SwingGUI extends GUI {
             okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean confirm(Tile tile, StringTemplate template,
                            GoodsType goodsType,
@@ -786,17 +672,11 @@ public class SwingGUI extends GUI {
             okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> confirmDeclaration() {
         return canvas.showConfirmDeclarationDialog();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T getChoice(Tile tile, Object explain,
                            String cancelKey, List<ChoiceItem<T>> choices) {
@@ -804,9 +684,6 @@ public class SwingGUI extends GUI {
             null, cancelKey, choices);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T getChoice(Tile tile, Object explain, Unit unit,
                            String cancelKey, List<ChoiceItem<T>> choices) {
@@ -815,9 +692,6 @@ public class SwingGUI extends GUI {
             cancelKey, choices);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T getChoice(Tile tile, Object explain, Settlement settlement,
                            String cancelKey, List<ChoiceItem<T>> choices) {
@@ -826,9 +700,6 @@ public class SwingGUI extends GUI {
             cancelKey, choices);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T getChoice(Tile tile, Object explain, GoodsType goodsType,
                            String cancelKey, List<ChoiceItem<T>> choices) {
@@ -837,9 +708,6 @@ public class SwingGUI extends GUI {
             cancelKey, choices);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T getChoice(Tile tile, Object explain, Nation nation,
                            String cancelKey, List<ChoiceItem<T>> choices) {
@@ -848,9 +716,6 @@ public class SwingGUI extends GUI {
             cancelKey, choices);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getInput(Tile tile, StringTemplate template,
                            String defaultValue,
@@ -862,33 +727,21 @@ public class SwingGUI extends GUI {
 
     // Trivial delegations to Canvas
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void closeMainPanel() {
         canvas.closeMainPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void closeMenus() {
         canvas.closeMenus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void closeStatusPanel() {
         canvas.closeStatusPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean containsInGameComponents() {
         return canvas.containsInGameComponents();
@@ -926,72 +779,45 @@ public class SwingGUI extends GUI {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public LoadingSavegameInfo getLoadingSavegameInfo() {
         return canvas.getLoadingSavegameDialog().getInfo();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isClientOptionsDialogShowing() {
         return canvas!=null && canvas.isClientOptionsDialogShowing();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean onClosingErrorPanel(Runnable callback) {
         return canvas != null && canvas.onClosingErrorPanel(callback);
     }
         
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMapboardActionsEnabled() {
         return canvas!=null && canvas.isMapboardActionsEnabled();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void paintImmediatelyCanvasIn(Rectangle rectangle) {
         canvas.paintImmediately(rectangle);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void paintImmediatelyCanvasInItsBounds() {
         canvas.paintImmediately(canvas.getBounds());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void refreshPlayersTable() {
         canvas.refreshPlayersTable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void removeFromCanvas(Component component) {
         canvas.remove(component);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeInGameComponents() {
         canvas.removeInGameComponents();
@@ -1001,17 +827,11 @@ public class SwingGUI extends GUI {
         canvas.removeTradeRoutePanel(panel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void requestFocusForSubPanel() {
         canvas.getShowingSubPanel().requestFocus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean requestFocusInWindow() {
         return canvas.requestFocusInWindow();
@@ -1025,18 +845,12 @@ public class SwingGUI extends GUI {
         canvas.restoreSavedSize(comp, size);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void returnToTitle() {
         canvas.returnToTitle();
         playSound("sound.intro.general");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showAboutPanel() {
         canvas.showAboutPanel();
@@ -1050,35 +864,23 @@ public class SwingGUI extends GUI {
         canvas.showBuildQueuePanel(colony, callBack);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
                                        DialogHandler<List<Goods>> handler) {
         canvas.showCaptureGoodsDialog(unit, gl, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showChatPanel() {
         canvas.showChatPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showChooseFoundingFatherDialog(final List<FoundingFather> ffs,
                 DialogHandler<FoundingFather> handler) {
         canvas.showChooseFoundingFatherDialog(ffs, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showClientOptionsDialog() {
         OptionGroup group = null;
@@ -1094,17 +896,11 @@ public class SwingGUI extends GUI {
         if (!getFreeColClient().isInGame()) showMainPanel(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void showForeignColony(Settlement settlement) {
         canvas.showForeignColony(settlement);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showColonyPanel(Colony colony, Unit unit) {
         canvas.showColonyPanel(colony, unit);
@@ -1114,9 +910,6 @@ public class SwingGUI extends GUI {
         return canvas.showColonyPanel(colony, unit);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showColopediaPanel(String nodeId) {
         canvas.showColopediaPanel(nodeId);
@@ -1126,9 +919,6 @@ public class SwingGUI extends GUI {
         return canvas.showColorChooserPanel(al);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showCompactLabourReport() {
         canvas.showCompactLabourReport();
@@ -1138,17 +928,11 @@ public class SwingGUI extends GUI {
         canvas.showCompactLabourReport(unitData);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDeclarationPanel() {
         canvas.showDeclarationPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup showDifficultyDialog() {
         final Specification spec = getSpecification();
@@ -1161,26 +945,17 @@ public class SwingGUI extends GUI {
         return canvas.showDifficultyDialog(spec, group, group.isEditable());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showDumpCargoDialog(Unit unit,
                                     DialogHandler<List<Goods>> handler) {
         canvas.showDumpCargoDialog(unit, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean showEditOptionDialog(Option option) {
         return canvas.showEditOptionDialog(option);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showEmigrationDialog(final Player player,
                                      final boolean fountainOfYouth,
@@ -1188,74 +963,47 @@ public class SwingGUI extends GUI {
         canvas.showEmigrationDialog(player, fountainOfYouth, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showEndTurnDialog(final List<Unit> units,
                                   DialogHandler<Boolean> handler) {
         canvas.showEndTurnDialog(units, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void showErrorMessage(String message, Runnable callback) {
         canvas.showErrorMessage(message, callback);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showEuropePanel() {
         canvas.showEuropePanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showEventPanel(String header, String image, String footer) {
         canvas.showEventPanel(header, image, footer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showFindSettlementPanel() {
         canvas.showFindSettlementPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup showGameOptionsDialog(boolean editable, boolean custom) {
         return canvas.showGameOptionsDialog(editable, custom);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showHighScoresPanel(String messageId, List<HighScore> scores) {
         canvas.showHighScoresPanel(messageId, scores);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         canvas.showIndianSettlementPanel(indianSettlement);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(String messageId) {
         super.showInformationMessage(messageId);
@@ -1263,18 +1011,12 @@ public class SwingGUI extends GUI {
                                       StringTemplate.key(messageId));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(StringTemplate template) {
         super.showInformationMessage(template);
         canvas.showInformationMessage(null, null, null, template);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(Settlement displayObject,
                                        StringTemplate template) {
@@ -1288,9 +1030,6 @@ public class SwingGUI extends GUI {
         canvas.showInformationMessage(displayObject, tile, icon, template);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(Unit displayObject,
                                        StringTemplate template) {
@@ -1304,9 +1043,6 @@ public class SwingGUI extends GUI {
         canvas.showInformationMessage(displayObject, tile, icon, template);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(Tile displayObject,
                                        StringTemplate template) {
@@ -1314,9 +1050,6 @@ public class SwingGUI extends GUI {
         canvas.showInformationMessage(displayObject, displayObject, null, template);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(FreeColObject displayObject,
                                        String messageId) {
@@ -1324,9 +1057,6 @@ public class SwingGUI extends GUI {
         canvas.showInformationMessage(displayObject, StringTemplate.key(messageId));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showInformationMessage(FreeColObject displayObject,
                                        StringTemplate template) {
@@ -1334,9 +1064,6 @@ public class SwingGUI extends GUI {
         canvas.showInformationMessage(displayObject, template);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File showLoadDialog(File directory) {
         return canvas.showLoadDialog(directory, null);
@@ -1346,58 +1073,37 @@ public class SwingGUI extends GUI {
         return canvas.showLoadDialog(directory, fileFilters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean showLoadingSavegameDialog(boolean publicServer,
                                              boolean singlePlayer) {
         return canvas.showLoadingSavegameDialog(publicServer, singlePlayer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showLogFilePanel() {
         canvas.showLogFilePanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showMainPanel(String userMsg) {
         canvas.showMainPanel(userMsg);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup showMapGeneratorOptionsDialog(boolean editable) {
         return canvas.showMapGeneratorOptionsDialog(editable);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Dimension showMapSizeDialog() {
         return canvas.showMapSizeDialog();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showModelMessages(List<ModelMessage> modelMessages) {
         canvas.showModelMessages(modelMessages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showMonarchDialog(final MonarchAction action,
                                   StringTemplate template, String monarchKey,
@@ -1405,9 +1111,6 @@ public class SwingGUI extends GUI {
         canvas.showMonarchDialog(action, template, monarchKey, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showNamingDialog(StringTemplate template,
                                       final String defaultName,
@@ -1416,9 +1119,6 @@ public class SwingGUI extends GUI {
         canvas.showNamingDialog(template, defaultName, unit, handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showFirstContactDialog(final Player player, final Player other,
                                        final Tile tile, int settlementCount,
@@ -1427,9 +1127,6 @@ public class SwingGUI extends GUI {
                                       handler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DiplomaticTrade showNegotiationDialog(FreeColGameObject our,
                                                      FreeColGameObject other,
@@ -1438,41 +1135,26 @@ public class SwingGUI extends GUI {
         return canvas.showNegotiationDialog(our, other, agreement, comment);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showNewPanel() {
         canvas.showNewPanel(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showNewPanel(Specification specification) {
         canvas.showNewPanel(specification);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showSpyColonyPanel(final Tile tile) {
         canvas.showSpyColonyPanel(tile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Parameters showParametersDialog() {
         return canvas.showParametersDialog();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean showPreCombatDialog(Unit attacker,
                                        FreeColGameObject defender, Tile tile) {
@@ -1487,65 +1169,41 @@ public class SwingGUI extends GUI {
         canvas.showRecruitPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportCargoPanel() {
         canvas.showReportCargoPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportColonyPanel() {
         canvas.showReportColonyPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportContinentalCongressPanel() {
         canvas.showReportContinentalCongressPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportEducationPanel() {
         canvas.showReportEducationPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportExplorationPanel() {
         canvas.showReportExplorationPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportForeignAffairPanel() {
         canvas.showReportForeignAffairPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportHistoryPanel() {
         canvas.showReportHistoryPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportIndianPanel() {
         canvas.showReportIndianPanel();
@@ -1558,73 +1216,46 @@ public class SwingGUI extends GUI {
                                            colonies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportLabourPanel() {
         canvas.showReportLabourPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportMilitaryPanel() {
         canvas.showReportMilitaryPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportNavalPanel() {
         canvas.showReportNavalPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportProductionPanel() {
         canvas.showReportProductionPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportReligiousPanel() {
         canvas.showReportReligiousPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportRequirementsPanel() {
         canvas.showReportRequirementsPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportTradePanel() {
         canvas.showReportTradePanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showReportTurnPanel(List<ModelMessage> messages) {
         canvas.showReportTurnPanel(messages);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File showSaveDialog(File directory, String defaultName) {
         return canvas.showSaveDialog(directory, null, defaultName);
@@ -1635,17 +1266,11 @@ public class SwingGUI extends GUI {
         return canvas.showSaveDialog(directory, fileFilters, defaultName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Dimension showScaleMapSizeDialog() {
         return canvas.showScaleMapSizeDialog();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int showSelectAmountDialog(GoodsType goodsType, int available,
                                       int defaultAmount, boolean needToPay) {
@@ -1653,18 +1278,12 @@ public class SwingGUI extends GUI {
                                              defaultAmount, needToPay);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int showSelectTributeAmountDialog(StringTemplate question,
                                              int maximum) {
         return canvas.showSelectTributeAmountDialog(question, maximum);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location showSelectDestinationDialog(Unit unit) {
         return canvas.showSelectDestinationDialog(unit);
@@ -1674,27 +1293,18 @@ public class SwingGUI extends GUI {
         canvas.showServerListPanel(serverList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showStartGamePanel(Game game, Player player,
                                    boolean singlePlayerMode) {
         canvas.showStartGamePanel(game, player, singlePlayerMode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showStatisticsPanel(Map<String, String> serverStats,
                                     Map<String, String> clientStats) {
         canvas.showStatisticsPanel(serverStats, clientStats);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showStatusPanel(String message) {
         canvas.showStatusPanel(message);
@@ -1704,9 +1314,6 @@ public class SwingGUI extends GUI {
         canvas.showTilePanel(tile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showTilePopUpAtSelectedTile() {
         Tile tile = mapViewer.getSelectedTile();
@@ -1714,9 +1321,6 @@ public class SwingGUI extends GUI {
         canvas.showTilePopup(tile, point.x+mapViewer.getTileWidth(), point.y);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showTradeRoutePanel(Unit unit) {
         canvas.showTradeRoutePanel(unit);
@@ -1731,9 +1335,6 @@ public class SwingGUI extends GUI {
         canvas.showTrainPanel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showVictoryDialog(DialogHandler<Boolean> handler) {
         canvas.showVictoryDialog(handler);
@@ -1754,17 +1355,11 @@ public class SwingGUI extends GUI {
 
     // Trivial delegations to MapViewer
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void centerActiveUnit() {
         mapViewer.centerActiveUnit();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void changeViewMode(int newViewMode) {
         mapViewer.changeViewMode(newViewMode);
@@ -1782,17 +1377,11 @@ public class SwingGUI extends GUI {
         mapViewer.executeWithUnitOutForAnimation(unit, sourceTile, r);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Unit getActiveUnit() {
         return mapViewer==null ? null : mapViewer.getActiveUnit();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getFocus() {
         return mapViewer.getFocus();
@@ -1802,9 +1391,6 @@ public class SwingGUI extends GUI {
         return mapViewer.getImageLibrary().getScaleFactor();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getSelectedTile() {
         return mapViewer.getSelectedTile();
@@ -1818,17 +1404,11 @@ public class SwingGUI extends GUI {
         return mapViewer.calculateTilePosition(tile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getViewMode() {
         return mapViewer.getViewMode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setFocus(Tile tileToFocus) {
         mapViewer.setFocus(tileToFocus);
@@ -1841,9 +1421,6 @@ public class SwingGUI extends GUI {
         canvas.paintImmediately(0, 0, size.width, size.height);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean setSelectedTile(Tile newTileToSelect) {
         boolean result = mapViewer.setSelectedTile(newTileToSelect);
@@ -1852,9 +1429,6 @@ public class SwingGUI extends GUI {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void toggleViewMode() {
         mapViewer.toggleViewMode();

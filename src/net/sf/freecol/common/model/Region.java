@@ -104,9 +104,6 @@ public class Region extends FreeColGameObject implements Nameable {
 
         // Interface Named
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getNameKey() {
             return Messages.nameKey("model." + getKey());
@@ -458,17 +455,11 @@ public class Region extends FreeColGameObject implements Nameable {
 
     // Implement Nameable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName() {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setName(final String newName) {
         this.name = newName;
@@ -492,9 +483,6 @@ public class Region extends FreeColGameObject implements Nameable {
     // end @compat 0.11.3
     
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -530,9 +518,6 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -547,9 +532,6 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -582,9 +564,6 @@ public class Region extends FreeColGameObject implements Nameable {
                                           Region.class, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -593,9 +572,6 @@ public class Region extends FreeColGameObject implements Nameable {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -610,9 +586,6 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -625,9 +598,6 @@ public class Region extends FreeColGameObject implements Nameable {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

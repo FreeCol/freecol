@@ -44,9 +44,6 @@ public class FindSettlementAction extends MapboardAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showFindSettlementPanel();

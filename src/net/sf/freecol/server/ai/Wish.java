@@ -173,9 +173,6 @@ public abstract class Wish extends ValuedAIObject {
     private static final String TRANSPORTABLE_TAG = "transportable";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -190,9 +187,6 @@ public abstract class Wish extends ValuedAIObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

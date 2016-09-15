@@ -193,9 +193,6 @@ public abstract class NationType extends FreeColSpecObjectType {
     private static final String SETTLEMENT_TAG = "settlement";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -205,9 +202,6 @@ public abstract class NationType extends FreeColSpecObjectType {
         xw.writeAttribute(AGGRESSION_TAG, aggression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -217,9 +211,6 @@ public abstract class NationType extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -236,9 +227,6 @@ public abstract class NationType extends FreeColSpecObjectType {
                                      AggressionLevel.class, parent.aggression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -263,9 +251,6 @@ public abstract class NationType extends FreeColSpecObjectType {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();

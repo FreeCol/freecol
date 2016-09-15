@@ -262,9 +262,6 @@ public class Turn {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof Turn) {
@@ -273,17 +270,11 @@ public class Turn {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return turn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return String.valueOf(turn);

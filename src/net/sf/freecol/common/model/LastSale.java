@@ -114,9 +114,6 @@ public final class LastSale extends FreeColObject {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -135,9 +132,6 @@ public final class LastSale extends FreeColObject {
     private static final String WHEN_TAG = "when";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -147,9 +141,6 @@ public final class LastSale extends FreeColObject {
         xw.writeAttribute(PRICE_TAG, price);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -159,9 +150,6 @@ public final class LastSale extends FreeColObject {
         price = xr.getAttribute(PRICE_TAG, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -172,9 +160,6 @@ public final class LastSale extends FreeColObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

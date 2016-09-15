@@ -280,9 +280,6 @@ public final class InGameInputHandler extends ClientInputHandler {
 
     // Override ClientInputHandler
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Element handle(Connection connection, Element element) {
         if (element == null) return null;

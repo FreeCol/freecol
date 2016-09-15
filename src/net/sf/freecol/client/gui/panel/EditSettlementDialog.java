@@ -178,9 +178,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
     // Interface ItemListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void itemStateChanged(ItemEvent e) {
         Player player = getOwnerPlayer();
@@ -197,9 +194,6 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
     // Override FreeColDialog
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public IndianSettlement getResponse() {
         final Specification spec = freeColClient.getGame().getSpecification();

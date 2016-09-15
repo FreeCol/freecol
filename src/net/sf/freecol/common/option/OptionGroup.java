@@ -580,9 +580,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     // Interface Option
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup clone() {
         OptionGroup result = new OptionGroup(this.getId(), getSpecification());
@@ -593,17 +590,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup getValue() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void setValue(OptionGroup value) {
@@ -619,9 +610,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setValue(String valueString, String defaultValueString) {
         // No op.  Needed to avoid endless warnings from parent implementation.
@@ -630,9 +618,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     // Override AbstractOption
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void generateChoices() {
         for (Option o : options) {
@@ -642,9 +627,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isNullValueOK() {
         return true;
@@ -653,9 +635,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean save(File file) {
         boolean ret = false;
@@ -678,9 +657,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     private static final String VISIBLE_TAG = "visible";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -690,9 +666,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         xw.writeAttribute(VISIBLE_TAG, visible);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -700,9 +673,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         for (Option o : options) o.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -712,9 +682,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         visible = xr.getAttribute(VISIBLE_TAG, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Do *not* clear containers.
@@ -723,9 +690,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         String optionId = xr.readId();
@@ -742,9 +706,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -756,9 +717,6 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

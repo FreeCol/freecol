@@ -78,9 +78,6 @@ public final class SaveDialog extends FreeColDialog<File> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File getResponse() {
         if (responded()) {

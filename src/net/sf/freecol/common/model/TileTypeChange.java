@@ -130,9 +130,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compareTo(FreeColObject fco) {
         int cmp = 0;
@@ -151,9 +148,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof TileTypeChange) {
@@ -162,9 +156,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         return super.equals(other);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -183,9 +174,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
     private static final String VALUE_TAG = "value";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // No id, so no super.writeAttributes().
@@ -195,9 +183,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         xw.writeAttribute(TO_TAG, this.to);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -213,9 +198,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // No id, so no super.readAttributes().
@@ -226,9 +208,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
         to = xr.getType(spec, TO_TAG, TileType.class, (TileType)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();

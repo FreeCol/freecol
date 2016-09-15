@@ -301,9 +301,6 @@ public final class TradeRoutePanel extends FreeColPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -334,9 +331,6 @@ public final class TradeRoutePanel extends FreeColPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         this.listModel.clear();

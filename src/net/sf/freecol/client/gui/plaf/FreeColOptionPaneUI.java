@@ -136,9 +136,6 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
 
     // Override BasicOptionPaneUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Container createButtonArea() {
         Object[] buttons = getButtons();
@@ -158,9 +155,6 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         return bottom;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addButtonComponents(Container container, Object[] buttons,
                                        int initialIndex) {
@@ -209,9 +203,6 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
         container.setPreferredSize(prefer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void selectInitialValue(JOptionPane op) {
         if (initialFocusComponent != null) {
@@ -229,9 +220,6 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
 
     // Override ComponentUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void paint(Graphics g, JComponent c) {
         if (c.isOpaque()) {

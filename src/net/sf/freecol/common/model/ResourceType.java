@@ -90,9 +90,6 @@ public final class ResourceType extends FreeColSpecObjectType {
     private static final String MINIMUM_VALUE_TAG = "minimum-value";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -103,9 +100,6 @@ public final class ResourceType extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -114,9 +108,6 @@ public final class ResourceType extends FreeColSpecObjectType {
         minValue = xr.getAttribute(MINIMUM_VALUE_TAG, -1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

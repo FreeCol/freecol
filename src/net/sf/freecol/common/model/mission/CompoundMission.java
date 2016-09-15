@@ -127,9 +127,6 @@ public class CompoundMission extends AbstractMission {
             : false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MissionState doMission() {
         MissionState state = missions.get(index).doMission();
@@ -155,9 +152,6 @@ public class CompoundMission extends AbstractMission {
     private final static String INDEX_TAG = "index";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -165,9 +159,6 @@ public class CompoundMission extends AbstractMission {
         xw.writeAttribute(INDEX_TAG, index);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -177,9 +168,6 @@ public class CompoundMission extends AbstractMission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -188,9 +176,6 @@ public class CompoundMission extends AbstractMission {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -202,9 +187,6 @@ public class CompoundMission extends AbstractMission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return "TODO!"; }
 }

@@ -289,17 +289,11 @@ public class TradeRoute extends FreeColGameObject
 
     // Interface Nameable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final String getName() {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void setName(final String newName) {
         this.name = newName;
@@ -308,17 +302,11 @@ public class TradeRoute extends FreeColGameObject
 
     // Interface Ownable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Player getOwner() {
         return this.owner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void setOwner(final Player newOwner) {
         this.owner = newOwner;
@@ -332,9 +320,6 @@ public class TradeRoute extends FreeColGameObject
     private static final String SILENT_TAG = "silent";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -346,9 +331,6 @@ public class TradeRoute extends FreeColGameObject
         xw.writeAttribute(SILENT_TAG, isSilent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -356,9 +338,6 @@ public class TradeRoute extends FreeColGameObject
         for (TradeRouteStop stop : this.stops) stop.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -371,9 +350,6 @@ public class TradeRoute extends FreeColGameObject
         this.silent = xr.getAttribute(SILENT_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -382,9 +358,6 @@ public class TradeRoute extends FreeColGameObject
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -397,9 +370,6 @@ public class TradeRoute extends FreeColGameObject
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -412,9 +382,6 @@ public class TradeRoute extends FreeColGameObject
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

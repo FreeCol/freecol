@@ -169,18 +169,12 @@ public class Tension implements Named {
 
     // Implement Named
 
-    /**
-     * {@inheritDoc}
-     */
     public String getNameKey() {
         return Messages.nameKey("model." + getKey());
     }
     
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getLevel().toString();

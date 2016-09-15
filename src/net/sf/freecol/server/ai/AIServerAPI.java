@@ -54,14 +54,8 @@ public class AIServerAPI extends ServerAPI {
 
     // Implement ServerAPI
     
-    /**
-     * {@inheritDoc}
-     */
     protected void doClientProcessingFor(Element reply) {}
 
-    /**
-     * {@inheritDoc}
-     */
     public Connection getConnection() {
         return (this.owner == null) ? null : this.owner.getConnection();
     }

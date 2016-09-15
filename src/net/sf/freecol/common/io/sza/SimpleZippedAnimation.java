@@ -103,17 +103,11 @@ public final class SimpleZippedAnimation implements Iterable<AnimationEvent> {
             return this.image.getHeight(null);
         }
         
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Image getImage() {
             return this.image;
         }
         
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getDurationInMs() {
             return this.durationInMs;

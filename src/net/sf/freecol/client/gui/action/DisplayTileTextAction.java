@@ -75,9 +75,6 @@ public class DisplayTileTextAction extends SelectableAction {
 
     // Override SelectableAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean shouldBeSelected() {
         return super.shouldBeEnabled()
@@ -90,9 +87,6 @@ public class DisplayTileTextAction extends SelectableAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (((JRadioButtonMenuItem)ae.getSource()).isSelected()) {

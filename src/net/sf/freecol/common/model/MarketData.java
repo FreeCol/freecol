@@ -400,9 +400,6 @@ public class MarketData extends FreeColGameObject {
     private static final String TRADED_TAG = "traded";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -424,9 +421,6 @@ public class MarketData extends FreeColGameObject {
         xw.writeAttribute(TRADED_TAG, traded);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -454,9 +448,6 @@ public class MarketData extends FreeColGameObject {
         oldPrice = costToBuy;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -476,9 +467,6 @@ public class MarketData extends FreeColGameObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -178,9 +178,6 @@ public abstract class UnitPanel extends MigPanel
 
     // Interface PropertyChangeListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         logger.finest(getName() + " change " + event.getPropertyName()
@@ -192,9 +189,6 @@ public abstract class UnitPanel extends MigPanel
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

@@ -48,9 +48,6 @@ public class UnitListOption extends ListOption<AbstractUnit> {
         super(id, specification);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public UnitListOption clone() {
         UnitListOption ret = new UnitListOption(getId(), getSpecification());
@@ -61,9 +58,6 @@ public class UnitListOption extends ListOption<AbstractUnit> {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

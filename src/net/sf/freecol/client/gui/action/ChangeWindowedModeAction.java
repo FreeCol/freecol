@@ -45,9 +45,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
     // Override SelectableAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean shouldBeSelected() {
         final GUI gui = getGUI();
@@ -58,9 +55,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean shouldBeEnabled() {
         final GUI gui = getGUI();
@@ -71,9 +65,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         GUI gui = getGUI();

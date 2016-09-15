@@ -51,25 +51,16 @@ public final class TextOptionUI extends OptionUI<TextOption>  {
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JTextField getComponent() {
         return box;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValue(box.getText());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         box.setText(getOption().getValue());

@@ -83,9 +83,6 @@ public class ConceptDetailPanel extends FreeColPanel
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName() {
         return Messages.getName(id);
@@ -93,9 +90,6 @@ public class ConceptDetailPanel extends FreeColPanel
 
     // Implement ColopediaDetailPanel
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         final Function<String, DefaultMutableTreeNode> mapper = concept -> {
@@ -112,9 +106,6 @@ public class ConceptDetailPanel extends FreeColPanel
                     getName(), null)));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (this.id.equals(id)) return;

@@ -277,9 +277,6 @@ public class SettlementType extends FreeColSpecObjectType {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -307,9 +304,6 @@ public class SettlementType extends FreeColSpecObjectType {
         xw.writeAttribute(CONVERT_THRESHOLD_TAG, convertThreshold);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -327,9 +321,6 @@ public class SettlementType extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -407,9 +398,6 @@ public class SettlementType extends FreeColSpecObjectType {
             convertThreshold = xr.getAttribute(CONVERT_THRESHOLD_TAG, convertThreshold);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -421,9 +409,6 @@ public class SettlementType extends FreeColSpecObjectType {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -440,9 +425,6 @@ public class SettlementType extends FreeColSpecObjectType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

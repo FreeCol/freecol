@@ -346,9 +346,6 @@ public final class InfoPanel extends FreeColPanel {
 
         // Interface PropertyChangeListener
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             update();
@@ -556,9 +553,6 @@ public final class InfoPanel extends FreeColPanel {
 
     // Override JComponent
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void paintComponent(Graphics graphics) {
         if (this.skin != null) graphics.drawImage(this.skin, 0, 0, null);

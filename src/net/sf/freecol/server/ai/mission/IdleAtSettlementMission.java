@@ -87,31 +87,19 @@ public class IdleAtSettlementMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getTransportDestination
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getBaseTransportPriority() {
         return MINIMUM_TRANSPORT_PRIORITY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTarget() {
         return (isSafe()) ? null : findTarget();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTarget(Location target) {}
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location findTarget() {
         if (isSafe()) return null;
@@ -122,25 +110,16 @@ public class IdleAtSettlementMission extends Mission {
             : Location.upLoc(path.getLastNode().getLocation());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isOneTime() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         return invalidAIUnitReason(getAIUnit());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -186,9 +165,6 @@ public class IdleAtSettlementMission extends Mission {
     // Serialization
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

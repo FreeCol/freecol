@@ -80,18 +80,12 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 
     // Implement ColopediaDetailPanel
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getId(),
             new ArrayList<>(getSpecification().getUnitTypeList()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;

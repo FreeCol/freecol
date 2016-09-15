@@ -763,9 +763,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return this.player.getNation().getRulerNameKey();
@@ -774,9 +771,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
@@ -829,9 +823,6 @@ public final class Monarch extends FreeColGameObject implements Named {
     // end @compat 0.11.5
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -846,9 +837,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -861,9 +849,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -876,9 +861,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         displeasure = xr.getAttribute(DISPLEASURE_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -889,9 +871,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -935,9 +914,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

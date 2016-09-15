@@ -117,17 +117,11 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JPanel getComponent() {
         return panel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         File f = (fileField.getText() == null
@@ -136,9 +130,6 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
         getOption().setValue(f);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         File file = getOption().getValue();

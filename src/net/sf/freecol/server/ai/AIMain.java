@@ -446,9 +446,6 @@ public class AIMain extends FreeColObject
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Specification getSpecification() {
         return getGame().getSpecification();
@@ -470,9 +467,6 @@ public class AIMain extends FreeColObject
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // Does not have an identifier, so no need for
@@ -481,9 +475,6 @@ public class AIMain extends FreeColObject
         xw.writeAttribute(NEXT_ID_TAG, nextId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -518,9 +509,6 @@ public class AIMain extends FreeColObject
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         nextId = xr.getAttribute(NEXT_ID_TAG, -1);
@@ -529,9 +517,6 @@ public class AIMain extends FreeColObject
         // end @compat
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -540,9 +525,6 @@ public class AIMain extends FreeColObject
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -624,9 +606,6 @@ public class AIMain extends FreeColObject
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -133,9 +133,6 @@ public class NewUnitPanel extends FreeColPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         String command = ae.getActionCommand();
@@ -153,9 +150,6 @@ public class NewUnitPanel extends FreeColPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

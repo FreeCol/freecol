@@ -223,9 +223,6 @@ public class Message {
         return null; // do nothing
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return document.getDocumentElement().toString();

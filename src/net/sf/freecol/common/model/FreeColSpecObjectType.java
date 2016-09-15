@@ -169,9 +169,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final String getNameKey() {
         return Messages.nameKey(getId());
@@ -180,32 +177,20 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
     // Interface Scoped, and scope support
 
-    /**
-     * {@inheritDoc}
-     */
     public final List<Scope> getScopeList() {
         return (this.scopes == null) ? Collections.<Scope>emptyList()
             : this.scopes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public final Stream<Scope> getScopes() {
         return (this.scopes == null) ? Stream.<Scope>empty()
             : this.scopes.stream();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public final void setScopes(List<Scope> scopes) {
         this.scopes = scopes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void addScope(Scope scope) {
         if (this.scopes == null) this.scopes = new ArrayList<>();
         this.scopes.add(scope);
@@ -223,9 +208,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final FeatureContainer getFeatureContainer() {
         if (this.featureContainer == null) {
@@ -249,9 +231,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
     public static final String PRESERVE_TAG = "preserve";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -263,9 +242,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         for (Scope scope : getScopeList()) scope.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -273,9 +249,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         this.abstractType = xr.getAttribute(ABSTRACT_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -287,9 +260,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -328,9 +298,6 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getId();

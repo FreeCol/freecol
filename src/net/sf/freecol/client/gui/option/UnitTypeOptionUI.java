@@ -41,9 +41,6 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
     private static class ChoiceRenderer
         extends FreeColComboBoxRenderer<UnitType> {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setLabelValues(JLabel label, UnitType value) {
             label.setText((value == null) ? Messages.message("none")
@@ -77,25 +74,16 @@ public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JComboBox getComponent() {
         return box;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValue((UnitType) box.getSelectedItem());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         box.setSelectedItem(getOption().getValue());

@@ -133,9 +133,6 @@ public class ReportPanel extends FreeColPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -153,9 +150,6 @@ public class ReportPanel extends FreeColPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

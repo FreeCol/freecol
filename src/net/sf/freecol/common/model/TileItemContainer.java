@@ -521,9 +521,6 @@ public class TileItemContainer extends FreeColGameObject {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
@@ -572,9 +569,6 @@ public class TileItemContainer extends FreeColGameObject {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -582,9 +576,6 @@ public class TileItemContainer extends FreeColGameObject {
         xw.writeAttribute(TILE_TAG, tile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -594,9 +585,6 @@ public class TileItemContainer extends FreeColGameObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -605,9 +593,6 @@ public class TileItemContainer extends FreeColGameObject {
                                         Tile.class, (Tile)null, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -616,9 +601,6 @@ public class TileItemContainer extends FreeColGameObject {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
@@ -649,9 +631,6 @@ public class TileItemContainer extends FreeColGameObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -661,9 +640,6 @@ public class TileItemContainer extends FreeColGameObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -513,9 +513,6 @@ public final class Ability extends Feature {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -526,9 +523,6 @@ public final class Ability extends Feature {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -540,9 +534,6 @@ public final class Ability extends Feature {
     // Serialization
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -550,9 +541,6 @@ public final class Ability extends Feature {
         xw.writeAttribute(VALUE_TAG, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -560,9 +548,6 @@ public final class Ability extends Feature {
         value = xr.getAttribute(VALUE_TAG, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -574,9 +559,6 @@ public final class Ability extends Feature {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

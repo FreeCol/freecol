@@ -362,9 +362,6 @@ public final class BuildingType extends BuildableType {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -404,9 +401,6 @@ public final class BuildingType extends BuildableType {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
         protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -441,9 +435,6 @@ public final class BuildingType extends BuildableType {
         xw.writeAttribute(REBEL_FACTOR_TAG, this.rebelFactor);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -454,9 +445,6 @@ public final class BuildingType extends BuildableType {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -535,9 +523,6 @@ public final class BuildingType extends BuildableType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -563,9 +548,6 @@ public final class BuildingType extends BuildableType {
         // end @compat 0.11.6
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

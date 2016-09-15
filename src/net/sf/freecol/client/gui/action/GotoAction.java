@@ -47,9 +47,6 @@ public class GotoAction extends UnitAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && !getGUI().isShowingSubPanel();
@@ -58,9 +55,6 @@ public class GotoAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Unit unit = getGUI().getActiveUnit();

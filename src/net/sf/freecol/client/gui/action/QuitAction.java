@@ -44,9 +44,6 @@ public class QuitAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         freeColClient.askToQuit();

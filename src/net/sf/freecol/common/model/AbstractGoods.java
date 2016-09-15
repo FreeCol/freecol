@@ -240,9 +240,6 @@ public class AbstractGoods extends FreeColObject implements Named {
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return getType().getNameKey();
@@ -251,9 +248,6 @@ public class AbstractGoods extends FreeColObject implements Named {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -264,9 +258,6 @@ public class AbstractGoods extends FreeColObject implements Named {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -275,9 +266,6 @@ public class AbstractGoods extends FreeColObject implements Named {
         return hash;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return AbstractGoods.toString(this);
@@ -305,9 +293,6 @@ public class AbstractGoods extends FreeColObject implements Named {
             + ((goodsType == null) ? "(null)" : goodsType.getSuffix());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public String getXMLTagName() {
         return null; // AbstractGoods are never serialized directly
     }

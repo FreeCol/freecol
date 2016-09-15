@@ -64,50 +64,32 @@ public class GoldTradeItem extends TradeItem {
 
     // Interface TradeItem
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValid() {
         return gold >= 0 && getSource().checkGold(gold);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isUnique() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.template(Messages.descriptionKey("model.tradeItem.gold"))
             .addAmount("%amount%", gold);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getGold() {
         return gold;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setGold(int gold) {
         this.gold = gold;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public int evaluateFor(Player player) {
         return (!isValid()) ? Integer.MIN_VALUE : getGold();
     }
@@ -115,9 +97,6 @@ public class GoldTradeItem extends TradeItem {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof GoldTradeItem) {
@@ -127,9 +106,6 @@ public class GoldTradeItem extends TradeItem {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -142,9 +118,6 @@ public class GoldTradeItem extends TradeItem {
     private static final String GOLD_TAG = "gold";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -152,9 +125,6 @@ public class GoldTradeItem extends TradeItem {
         xw.writeAttribute(GOLD_TAG, gold);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -162,9 +132,6 @@ public class GoldTradeItem extends TradeItem {
         gold = xr.getAttribute(GOLD_TAG, UNDEFINED);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -172,9 +139,6 @@ public class GoldTradeItem extends TradeItem {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

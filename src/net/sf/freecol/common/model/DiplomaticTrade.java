@@ -386,9 +386,6 @@ public class DiplomaticTrade extends FreeColGameObject {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     public boolean isInternable() {
         return false;
     }
@@ -403,9 +400,6 @@ public class DiplomaticTrade extends FreeColGameObject {
     private static final String VERSION_TAG = "version";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -421,9 +415,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         xw.writeAttribute(VERSION_TAG, this.version);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -431,9 +422,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         for (TradeItem item : this.items) item.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -453,9 +441,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         this.version = xr.getAttribute(VERSION_TAG, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -464,9 +449,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -495,9 +477,6 @@ public class DiplomaticTrade extends FreeColGameObject {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -513,9 +492,6 @@ public class DiplomaticTrade extends FreeColGameObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

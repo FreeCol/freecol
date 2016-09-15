@@ -352,9 +352,6 @@ public class PathNode {
         }
     }
            
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(256);

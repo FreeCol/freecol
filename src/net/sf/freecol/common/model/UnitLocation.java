@@ -257,9 +257,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<FreeColGameObject> getDisposables() {
         synchronized (this.units) {
@@ -268,9 +265,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeResources() {
         synchronized (this.units) {
@@ -285,33 +279,21 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     //   FreeColObject.getId()
     // Does not implement getRank()
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getTile() {
         return null; // Override this where it becomes meaningful.
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.key(getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return getLocationLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -338,9 +320,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -357,9 +336,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean contains(Locatable locatable) {
         if (!(locatable instanceof Unit)) return false;
@@ -368,17 +344,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canAdd(Locatable locatable) {
         return getNoAddReason(locatable) == NoAddReason.NONE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getUnitCount() {
         synchronized (this.units) {
@@ -386,9 +356,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Unit> getUnits() {
         synchronized (this.units) {
@@ -396,9 +363,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Unit> getUnitList() {
         synchronized (this.units) {
@@ -407,25 +371,16 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Settlement getSettlement() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Colony getColony() {
         // Final as this will always work if getSettlement() does.
@@ -433,9 +388,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return (settlement instanceof Colony) ? (Colony)settlement : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final IndianSettlement getIndianSettlement() {
         // Final as this will always work if getSettlement() does.
@@ -543,9 +495,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -564,9 +513,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -575,9 +521,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();

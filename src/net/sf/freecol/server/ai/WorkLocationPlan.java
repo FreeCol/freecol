@@ -108,9 +108,6 @@ public class WorkLocationPlan extends AIObject {
     // WorkLocationPlans are not currently saved so this is a no-op.
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -121,9 +118,6 @@ public class WorkLocationPlan extends AIObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -44,9 +44,6 @@ public class CenterAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().centerActiveUnit();

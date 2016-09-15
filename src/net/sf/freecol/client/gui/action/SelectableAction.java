@@ -113,9 +113,6 @@ public abstract class SelectableAction extends MapboardAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         final Player player = getFreeColClient().getMyPlayer();
@@ -123,9 +120,6 @@ public abstract class SelectableAction extends MapboardAction {
             && player != null && player.getNewModelMessages().isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update() {
         super.update();

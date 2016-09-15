@@ -108,9 +108,6 @@ public class Effect extends FreeColSpecObjectType {
     private static final String PROBABILITY_TAG = "probability";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -118,9 +115,6 @@ public class Effect extends FreeColSpecObjectType {
         xw.writeAttribute(PROBABILITY_TAG, probability);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -128,9 +122,6 @@ public class Effect extends FreeColSpecObjectType {
         probability = xr.getAttribute(PROBABILITY_TAG, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -141,9 +132,6 @@ public class Effect extends FreeColSpecObjectType {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

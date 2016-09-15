@@ -89,9 +89,6 @@ public class StringOption extends AbstractOption<String> {
 
     // Interface Option.
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringOption clone() {
         StringOption result = new StringOption(getId(), getSpecification());
@@ -100,17 +97,11 @@ public class StringOption extends AbstractOption<String> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getValue() {
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setValue(String value) {
         final String oldValue = this.value;
@@ -125,9 +116,6 @@ public class StringOption extends AbstractOption<String> {
 
     // Override AbstractOption
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         setValue((valueString != null) ? valueString : defaultValueString);
@@ -139,9 +127,6 @@ public class StringOption extends AbstractOption<String> {
     private static final String CHOICE_TAG = "choice";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -149,9 +134,6 @@ public class StringOption extends AbstractOption<String> {
         xw.writeAttribute(VALUE_TAG, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -165,9 +147,6 @@ public class StringOption extends AbstractOption<String> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -176,9 +155,6 @@ public class StringOption extends AbstractOption<String> {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -192,9 +168,6 @@ public class StringOption extends AbstractOption<String> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -208,9 +181,6 @@ public class StringOption extends AbstractOption<String> {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

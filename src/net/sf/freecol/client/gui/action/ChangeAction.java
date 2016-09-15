@@ -55,17 +55,11 @@ public class ChangeAction extends UnitAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && getGUI().getActiveUnit().hasTile();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void update() {
         super.update();
@@ -85,9 +79,6 @@ public class ChangeAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Unit unit = getGUI().getActiveUnit();

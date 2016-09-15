@@ -81,17 +81,11 @@ public final class DummyConnection extends Connection {
         return otherConnection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isAlive() {
         return this.otherConnection != null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void close() {
         // Do nothing.
@@ -153,9 +147,6 @@ public final class DummyConnection extends Connection {
         return reply;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "[DummyConnection " + getName() + "]";

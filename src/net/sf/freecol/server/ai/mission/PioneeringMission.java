@@ -472,25 +472,16 @@ public class PioneeringMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getTransportDestination, isOneTime
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getBaseTransportPriority() {
         return NORMAL_TRANSPORT_PRIORITY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTarget() {
         return target;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTarget(Location target) {
         if (target == null
@@ -502,17 +493,11 @@ public class PioneeringMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 10, true);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         // Prevent invalidation for improvements that are just completing.
@@ -525,9 +510,6 @@ public class PioneeringMission extends Mission {
         return invalidReason(getAIUnit(), getTarget());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Mission lbFail(LogBuilder lb, boolean cont, Object... reasons) {
         if (hasTools() && getUnit().getColony() != null) {
@@ -536,9 +518,6 @@ public class PioneeringMission extends Mission {
         return super.lbFail(lb, false, reasons);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -758,9 +737,6 @@ public class PioneeringMission extends Mission {
     private static final String TARGET_TAG = "target";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -775,9 +751,6 @@ public class PioneeringMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -793,9 +766,6 @@ public class PioneeringMission extends Mission {
             : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

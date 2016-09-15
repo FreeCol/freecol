@@ -778,9 +778,6 @@ public abstract class FreeColObject
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -791,9 +788,6 @@ public abstract class FreeColObject
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return Utils.hashCode(this.id);
@@ -1204,9 +1198,6 @@ public abstract class FreeColObject
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getClass().getName() + ":" + getId();

@@ -161,9 +161,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
     // Interface Option
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AudioMixerOption clone() {
         AudioMixerOption result = new AudioMixerOption(getSpecification());
@@ -171,17 +168,11 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final MixerWrapper getValue() {
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void setValue(MixerWrapper newValue) {
         final MixerWrapper oldValue = this.value;
@@ -196,9 +187,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     // Override AbstractOption
     // generateChoices() is effectively done in the audioMixers initialization.
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         MixerWrapper mw = null;
@@ -216,9 +204,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     // Serialization
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -228,9 +213,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

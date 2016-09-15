@@ -232,9 +232,6 @@ public class Scope extends FreeColObject {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -282,9 +279,6 @@ public class Scope extends FreeColObject {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -313,9 +307,6 @@ public class Scope extends FreeColObject {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // Scopes do not have ids, no super.writeAttributes().
@@ -345,9 +336,6 @@ public class Scope extends FreeColObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // Scopes do not have ids, no super.readAttributes().
@@ -387,9 +375,6 @@ public class Scope extends FreeColObject {
         methodValue = xr.getAttribute(METHOD_VALUE_TAG, (String)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -406,9 +391,6 @@ public class Scope extends FreeColObject {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

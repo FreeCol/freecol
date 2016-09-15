@@ -62,9 +62,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
 
     // Interface Option
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public BooleanOption clone() {
         BooleanOption result = new BooleanOption(getId(), getSpecification());
@@ -72,17 +69,11 @@ public class BooleanOption extends AbstractOption<Boolean> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Boolean getValue() {
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setValue(Boolean value) {
         final boolean oldValue = this.value;
@@ -97,9 +88,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
 
     // Override AbstractOption
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         setValue(Boolean.valueOf((valueString != null) ? valueString
@@ -110,9 +98,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
     // Serialization
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -120,9 +105,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
         xw.writeAttribute(VALUE_TAG, Boolean.toString(value));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -132,9 +114,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

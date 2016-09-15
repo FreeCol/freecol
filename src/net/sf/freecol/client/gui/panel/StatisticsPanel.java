@@ -87,17 +87,11 @@ public final class StatisticsPanel extends FreeColPanel {
 
         // AbstractTableModel
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Class<?> getColumnClass(int column) {
             return String.class;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getColumnName(int column) {
             return Messages.message(columnNames[column]);
@@ -114,25 +108,16 @@ public final class StatisticsPanel extends FreeColPanel {
 
         // Interface TableModel
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getRowCount() {
             return data[NAME_COLUMN].length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Object getValueAt(int row, int column) {
             if ((row < getRowCount()) && (column < getColumnCount())

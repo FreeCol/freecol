@@ -113,9 +113,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // Override Object
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean equals(Object other) {
             if (other instanceof TargetTuple) {
@@ -124,9 +121,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             return super.equals(other);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int hashCode() {
             int hash = super.hashCode();
@@ -517,9 +511,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Stance determineStance(Player other) {
         final Player player = getPlayer();
@@ -531,9 +522,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             : super.determineStance(other);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void giveNormalMissions(LogBuilder lb) {
         final Player player = getPlayer();
@@ -834,9 +822,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     // AI Player interface
     // Inherit everything from EuropeanAIPlayer except the following overrides.
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void startWorking() {
         final Player player = getPlayer();
@@ -867,9 +852,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {

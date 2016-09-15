@@ -129,9 +129,6 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
         } 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Dimension getResponse() {
         Object value = getValue();

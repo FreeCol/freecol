@@ -49,9 +49,6 @@ public class LoadAction extends MapboardAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         final Unit carrier = getGUI().getActiveUnit();
@@ -64,9 +61,6 @@ public class LoadAction extends MapboardAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Unit unit = getGUI().getActiveUnit();

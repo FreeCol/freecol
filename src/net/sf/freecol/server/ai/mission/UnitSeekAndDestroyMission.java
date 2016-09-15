@@ -380,17 +380,11 @@ public class UnitSeekAndDestroyMission extends Mission {
     // Implement Mission
     //   Inherit dispose, isOneTime
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getBaseTransportPriority() {
         return NORMAL_TRANSPORT_PRIORITY - 5;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTransportDestination() {
         if (!isValid()) return null;
@@ -398,17 +392,11 @@ public class UnitSeekAndDestroyMission extends Mission {
         return (getUnit().shouldTakeTransportTo(loc)) ? loc : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTarget() {
         return target;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTarget(Location target) {
         if (target == null
@@ -433,25 +421,16 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 4, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -541,9 +520,6 @@ public class UnitSeekAndDestroyMission extends Mission {
     private static final String TARGET_TAG = "target";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -553,9 +529,6 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -563,9 +536,6 @@ public class UnitSeekAndDestroyMission extends Mission {
         target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

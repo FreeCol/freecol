@@ -110,25 +110,16 @@ public class WorkInsideColonyMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getTransportDestination, isOneTime
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getBaseTransportPriority() {
         return NORMAL_TRANSPORT_PRIORITY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTarget() {
         return colony;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTarget(Location target) {
         if (target instanceof Colony) {
@@ -136,25 +127,16 @@ public class WorkInsideColonyMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location findTarget() {
         return getTarget();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -192,9 +174,6 @@ public class WorkInsideColonyMission extends Mission {
     private static final String COLONY_TAG = "colony";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -202,9 +181,6 @@ public class WorkInsideColonyMission extends Mission {
         xw.writeAttribute(COLONY_TAG, colony);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -213,9 +189,6 @@ public class WorkInsideColonyMission extends Mission {
                                  Colony.class, (Colony)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

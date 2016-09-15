@@ -139,23 +139,14 @@ public final class EuropePanel extends PortPanel {
 
         // Interface DropTarget
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Unit unit) {
             return unit.isNaval() && !unit.isDamaged();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Goods goods) {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof UnitLabel)) {
@@ -205,9 +196,6 @@ public final class EuropePanel extends PortPanel {
             return c;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public int suggested(GoodsType type) { return -1; } // N/A
     }
 
@@ -237,40 +225,25 @@ public final class EuropePanel extends PortPanel {
 
         // Interface DropTarget
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Goods goods) {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public Component add(Component comp, boolean editState) {
             Component c = add(comp);
             update();
             return c;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public int suggested(GoodsType type) { return -1; } // N/A
 
 
         // Override Container
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void remove(Component comp) {
             update();
@@ -307,25 +280,16 @@ public final class EuropePanel extends PortPanel {
         }
 
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void removePropertyChangeListeners() {
             europe.removePropertyChangeListener(this);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean accepts(Unit unit) {
             if (!unit.isNaval()) return false;
@@ -379,23 +343,14 @@ public final class EuropePanel extends PortPanel {
 
         // Interface DropTarget
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Unit unit) {
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean accepts(Goods goods) {
             return true;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -432,9 +387,6 @@ public final class EuropePanel extends PortPanel {
             return comp;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public int suggested(GoodsType type) {
             return -1; // No good choice
         }
@@ -442,9 +394,6 @@ public final class EuropePanel extends PortPanel {
 
         // Override Container
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void remove(Component comp) {
             // Don't remove market labels.
@@ -497,9 +446,6 @@ public final class EuropePanel extends PortPanel {
 
         // Implement TransactionListener
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
@@ -512,9 +458,6 @@ public final class EuropePanel extends PortPanel {
             add(Messages.message(t1) + "\n" + Messages.message(t2));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void logSale(GoodsType goodsType, int amount,
                             int price, int tax) {
@@ -833,9 +776,6 @@ public final class EuropePanel extends PortPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -868,9 +808,6 @@ public final class EuropePanel extends PortPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

@@ -66,50 +66,32 @@ public class UnitTradeItem extends TradeItem {
 
     // Interface TradeItem
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isValid() {
         return unit.getOwner() == getSource()
             && unit.getType().isAvailableTo(getDestination());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isUnique() {
         return false;
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLabel() {
         return unit.getLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Unit getUnit() {
         return unit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public int evaluateFor(Player player) {
         final Unit unit = getUnit();
         return (!isValid()) ? Integer.MIN_VALUE : unit.evaluateFor(player);
@@ -118,9 +100,6 @@ public class UnitTradeItem extends TradeItem {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof UnitTradeItem) {
@@ -130,9 +109,6 @@ public class UnitTradeItem extends TradeItem {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -145,9 +121,6 @@ public class UnitTradeItem extends TradeItem {
     private static final String UNIT_TAG = "unit";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -155,9 +128,6 @@ public class UnitTradeItem extends TradeItem {
         xw.writeAttribute(UNIT_TAG, unit);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -166,9 +136,6 @@ public class UnitTradeItem extends TradeItem {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -176,9 +143,6 @@ public class UnitTradeItem extends TradeItem {
         unit = xr.getAttribute(getGame(), UNIT_TAG, Unit.class, (Unit)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

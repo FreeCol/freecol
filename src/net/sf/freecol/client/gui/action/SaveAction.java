@@ -44,9 +44,6 @@ public class SaveAction extends FreeColAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         if (freeColClient.isMapEditor()) return true;
@@ -59,9 +56,6 @@ public class SaveAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (!freeColClient.isMapEditor()) {

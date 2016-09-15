@@ -196,9 +196,6 @@ public class ConstructionPanel extends MigPanel
 
     // Interface PropertyChangeListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         update();

@@ -209,9 +209,6 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
 
     // Override OptionsDialog
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();

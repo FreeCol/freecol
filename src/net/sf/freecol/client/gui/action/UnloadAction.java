@@ -68,9 +68,6 @@ public class UnloadAction extends MapboardAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         final Unit carrier = getUnit();
@@ -85,9 +82,6 @@ public class UnloadAction extends MapboardAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Unit carrier = getUnit();

@@ -94,9 +94,6 @@ public class ImprovementMission extends AbstractMission {
         this.improvement = newImprovement;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MissionState doMission() {
         // FIXME: get rid of magic numbers: either add a pioneerWork
@@ -141,9 +138,6 @@ public class ImprovementMission extends AbstractMission {
     private static final String IMPROVEMENT_TAG = "improvement";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -152,9 +146,6 @@ public class ImprovementMission extends AbstractMission {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -163,9 +154,6 @@ public class ImprovementMission extends AbstractMission {
                                                TileImprovement.class, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -4454,9 +4454,6 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);

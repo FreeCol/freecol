@@ -44,9 +44,6 @@ public class ZoomInAction extends FreeColAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) return false;
@@ -59,9 +56,6 @@ public class ZoomInAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().zoomInMap();

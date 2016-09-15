@@ -196,9 +196,6 @@ public class CreateMissionAtSettlementGoal extends Goal {
         //FIXME
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 }

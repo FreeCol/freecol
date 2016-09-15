@@ -61,9 +61,6 @@ public abstract class CurrentPlayerNetworkRequestHandler
             : player.equals(game.getCurrentPlayer());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Element handle(Connection conn, Element element) {
         final ServerPlayer serverPlayer = getFreeColServer().getPlayer(conn);

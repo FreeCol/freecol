@@ -536,9 +536,6 @@ public class ServerRegion extends Region {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);

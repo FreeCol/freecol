@@ -45,9 +45,6 @@ public class ReportLabourAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)

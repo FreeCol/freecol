@@ -73,17 +73,11 @@ public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {
 
     // Implement OptionUpdater
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValueRank(getComponent().getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         getComponent().setValue(getOption().getValueRank());

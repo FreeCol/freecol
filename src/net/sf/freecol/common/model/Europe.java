@@ -253,9 +253,6 @@ public class Europe extends UnitLocation
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
@@ -263,9 +260,6 @@ public class Europe extends UnitLocation
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
         return (getOwner() == player) ? this : null;
@@ -283,17 +277,11 @@ public class Europe extends UnitLocation
     //   UnitLocation.getGoodsContainer
     //   UnitLocation.getSettlement
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.key(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(Locatable locatable) {
         boolean result = super.add(locatable);
@@ -305,34 +293,22 @@ public class Europe extends UnitLocation
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Goods) return true; // Can always land goods.
         return super.canAdd(locatable);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location up() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getRank() {
         return Location.LOCATION_RANK_EUROPE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toShortString() {
         return "Europe";
@@ -347,9 +323,6 @@ public class Europe extends UnitLocation
     //   UnitLocation.getNoAddReason
     //   UnitLocation.getUnitCapacity
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int priceGoods(List<AbstractGoods> goods) {
         Player player = getOwner();
@@ -367,9 +340,6 @@ public class Europe extends UnitLocation
         return price;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equipForRole(Unit unit, Role role, int roleCount) {
         throw new RuntimeException("Only valid in the server.");
@@ -378,9 +348,6 @@ public class Europe extends UnitLocation
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return getOwner().getEuropeNameKey();
@@ -389,17 +356,11 @@ public class Europe extends UnitLocation
 
     // Interface Ownable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Player getOwner() {
         return owner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
@@ -408,26 +369,17 @@ public class Europe extends UnitLocation
 
     // Interface TradeLocation
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getGoodsCount(GoodsType goodsType) {
         return GoodsContainer.HUGE_CARGO_SIZE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
@@ -437,9 +389,6 @@ public class Europe extends UnitLocation
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeResources() {
         Player owner = getOwner();
@@ -454,9 +403,6 @@ public class Europe extends UnitLocation
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Ability> getAbilities(String id, FreeColSpecObjectType fcgot,
                                         Turn turn) {
@@ -483,9 +429,6 @@ public class Europe extends UnitLocation
     // end @compat 0.10.0
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -499,9 +442,6 @@ public class Europe extends UnitLocation
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -537,9 +477,6 @@ public class Europe extends UnitLocation
     // @compat 0.10.7
     private boolean clearRecruitables = true;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -567,9 +504,6 @@ public class Europe extends UnitLocation
                                           LOWER_CAP_INITIAL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -594,9 +528,6 @@ public class Europe extends UnitLocation
         // end @compat
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -635,17 +566,11 @@ public class Europe extends UnitLocation
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "Europe";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

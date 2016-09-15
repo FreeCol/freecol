@@ -76,9 +76,6 @@ public class ServerEurope extends Europe implements ServerModelObject {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equipForRole(Unit unit, Role role, int roleCount) {
         if (!unit.roleIsAvailable(role)) return false;

@@ -184,9 +184,6 @@ public class EquipmentType extends BuildableType {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = 1;
@@ -196,9 +193,6 @@ public class EquipmentType extends BuildableType {
         return 37 * result + ((getId() == null) ? 0 : getId().hashCode());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -235,9 +229,6 @@ public class EquipmentType extends BuildableType {
     // end @compat
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -249,9 +240,6 @@ public class EquipmentType extends BuildableType {
         xw.writeAttribute(ROLE_TAG, role);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -277,9 +265,6 @@ public class EquipmentType extends BuildableType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -292,9 +277,6 @@ public class EquipmentType extends BuildableType {
                           getSpecification().getDefaultRole());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -311,9 +293,6 @@ public class EquipmentType extends BuildableType {
         militaryEquipment = any(getModifiers(), militaryPred);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -343,9 +322,6 @@ public class EquipmentType extends BuildableType {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

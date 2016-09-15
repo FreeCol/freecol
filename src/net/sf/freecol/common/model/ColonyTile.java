@@ -286,26 +286,17 @@ public class ColonyTile extends WorkLocation {
     //   final WorkLocation getColony
     //   final int getRank
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabel() {
         return (workTile == null) ? null
             : workTile.getColonyTileLocationLabel(getColony());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location up() {
         return getColony();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toShortString() {
         return getColony().getName()
@@ -321,18 +312,12 @@ public class ColonyTile extends WorkLocation {
     //   UnitLocation.clearUnitList
     //   UnitLocation.equipForRole
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         NoAddReason reason = super.getNoAddReason(locatable);
         return (reason != NoAddReason.NONE) ? reason : getNoWorkReason();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getUnitCapacity() {
         return (isColonyCenterTile()) ? 0 : UNIT_CAPACITY;
@@ -341,33 +326,21 @@ public class ColonyTile extends WorkLocation {
 
     // Interface WorkLocation
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLabel() {
         return (workTile == null) ? null : workTile.getLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isAvailable() {
         return isCurrent() || getOwner().canClaimForSettlement(getWorkTile());
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isCurrent() {
         return getWorkTile().getOwningSettlement() == getColony();
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NoAddReason getNoWorkReason() {
         Tile tile = getWorkTile();
@@ -402,33 +375,21 @@ public class ColonyTile extends WorkLocation {
             : NoAddReason.WRONG_TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public int getLevel() {
         return 0; // Level not meaningful for colony tiles
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canAutoProduce() {
         return isColonyCenterTile();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         final Tile workTile = getWorkTile();
         return workTile != null && workTile.canProduce(goodsType, unitType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getBaseProduction(ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
@@ -437,9 +398,6 @@ public class ColonyTile extends WorkLocation {
             : tile.getBaseProduction(productionType, goodsType, unitType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
@@ -469,9 +427,6 @@ public class ColonyTile extends WorkLocation {
             : Stream.<Modifier>empty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (workTile == null || workTile.getType() == null
@@ -480,25 +435,16 @@ public class ColonyTile extends WorkLocation {
             : workTile.getType().getAvailableProductionTypes(unattended);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public float getCompetenceFactor() {
         return 1.0f;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public float getRebelFactor() {
         return 1.0f;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getClaimTemplate() {
         return (isColonyCenterTile()) ? super.getClaimTemplate()
@@ -512,9 +458,6 @@ public class ColonyTile extends WorkLocation {
     private static final String WORK_TILE_TAG = "workTile";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -522,9 +465,6 @@ public class ColonyTile extends WorkLocation {
         xw.writeAttribute(WORK_TILE_TAG, workTile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -533,9 +473,6 @@ public class ColonyTile extends WorkLocation {
                                             Tile.class, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -546,9 +483,6 @@ public class ColonyTile extends WorkLocation {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

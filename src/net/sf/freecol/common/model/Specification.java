@@ -109,25 +109,16 @@ public final class Specification {
             super(id);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void toXML(FreeColXMLWriter xw) {
             throw new RuntimeException("Can not happen");
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String toString() {
             return getId();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getXMLTagName() { return "source"; }
     };

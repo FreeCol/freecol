@@ -44,9 +44,6 @@ public class MapEditorAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         freeColClient.getMapEditorController().startMapEditor();

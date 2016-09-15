@@ -44,9 +44,6 @@ public abstract class Number implements Selector {
      */
     public abstract Category getCategory(double selector);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getKey(String selector, String template) {
         try {

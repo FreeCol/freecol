@@ -47,9 +47,6 @@ public class BuildColonyAction extends UnitAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) return false;
@@ -64,9 +61,6 @@ public class BuildColonyAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         igc().buildColony(getGUI().getActiveUnit());

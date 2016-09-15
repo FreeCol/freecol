@@ -227,9 +227,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
 
     // Interface TradeLocation
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getGoodsCount(GoodsType goodsType) {
         return (location instanceof TradeLocation)
@@ -237,9 +234,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
             : 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
@@ -247,9 +241,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
             : 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
         return (location instanceof TradeLocation)
@@ -260,9 +251,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isInternable() {
         return false;
@@ -275,17 +263,11 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     private static final String LOCATION_TAG = "location";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         xw.writeLocationAttribute(LOCATION_TAG, location);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         for (GoodsType cargoType : cargo) {
@@ -298,17 +280,11 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         location = xr.getLocationAttribute(getGame(), LOCATION_TAG, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -317,9 +293,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -337,9 +310,6 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);

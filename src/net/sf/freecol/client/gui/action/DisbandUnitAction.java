@@ -46,9 +46,6 @@ public class DisbandUnitAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         igc().disbandUnit(getGUI().getActiveUnit());

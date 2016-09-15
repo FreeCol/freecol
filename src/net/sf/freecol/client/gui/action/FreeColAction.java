@@ -402,9 +402,6 @@ public abstract class FreeColAction extends AbstractAction
         xr.closeTag(getTagName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getName();

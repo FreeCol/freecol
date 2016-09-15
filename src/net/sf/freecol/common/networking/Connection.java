@@ -564,9 +564,6 @@ public class Connection implements Closeable {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);

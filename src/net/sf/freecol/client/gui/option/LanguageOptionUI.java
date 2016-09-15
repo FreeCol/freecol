@@ -59,25 +59,16 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JComboBox getComponent() {
         return box;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValue((Language)box.getSelectedItem());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         box.setSelectedItem(getOption().getValue());

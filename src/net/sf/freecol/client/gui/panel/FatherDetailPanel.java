@@ -68,9 +68,6 @@ public class FatherDetailPanel
 
     // Implelement ColopediaDetailPanel
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         final Specification spec = getSpecification();
@@ -101,9 +98,6 @@ public class FatherDetailPanel
         root.add(parent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         try {

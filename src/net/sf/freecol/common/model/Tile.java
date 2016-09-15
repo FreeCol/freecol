@@ -2113,9 +2113,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //   UnitLocation.getUnitList
     //   UnitLocation.getGoodsContainer
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getTile() {
         return this;
@@ -2137,18 +2134,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             .addStringTemplate("%location%", location);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabel() {
         return (settlement != null) ? settlement.getLocationLabel()
             : getDetailedLocationLabel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return (settlement != null) ? settlement.getLocationLabelFor(player)
@@ -2193,9 +2184,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof TileItem) {
@@ -2206,9 +2194,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -2221,26 +2206,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location up() {
         return (hasSettlement()) ? getSettlement()
             : this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getRank() {
         return getX() + getY() * getMap().getWidth();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
@@ -2253,9 +2229,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         if (getGame().isInClient()) {
@@ -2275,9 +2248,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     // Interface Ownable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Player getOwner() {
         return owner;
@@ -2296,9 +2266,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeResources() {
         if (settlement != null) {
@@ -2312,17 +2279,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super.disposeResources();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
@@ -2339,9 +2300,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Ability> getAbilities(String id,
                                         FreeColSpecObjectType fcgot,
@@ -2374,9 +2332,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     // end @compat 0.11.3
     
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
         // Special override of tile output serialization that handles
@@ -2422,9 +2377,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         xw.writeEndElement();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -2477,9 +2429,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         // Show tile contents (e.g. enemy units) if not scoped to a
@@ -2534,9 +2483,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -2607,9 +2553,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -2632,9 +2575,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // end @compat 0.10.1
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -2741,9 +2681,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // end @compat 0.10.x
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -2755,9 +2692,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

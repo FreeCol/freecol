@@ -291,9 +291,6 @@ public class LostCityRumour extends TileItem {
 
     // Interface Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return Messages.nameKey("model.lostCityRumour");
@@ -302,25 +299,16 @@ public class LostCityRumour extends TileItem {
 
     // Interface TileItem
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final int getZIndex() {
         return Tile.RUMOUR_ZINDEX;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return !tileType.isWater();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
         // Just return the given potential, since lost cities do not
@@ -329,42 +317,27 @@ public class LostCityRumour extends TileItem {
         return potential;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
         return Stream.<Modifier>empty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isNatural() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isComplete() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Layer getLayer() {
         return Layer.NATIVES;
@@ -373,9 +346,6 @@ public class LostCityRumour extends TileItem {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         return (type == RumourType.NO_SUCH_RUMOUR) ? -1 : 1;
@@ -389,9 +359,6 @@ public class LostCityRumour extends TileItem {
     private static final String TYPE_TAG = "type";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -407,9 +374,6 @@ public class LostCityRumour extends TileItem {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -428,9 +392,6 @@ public class LostCityRumour extends TileItem {
         name = xr.getAttribute(NAME_TAG, (String)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -187,41 +187,26 @@ public class AIGoods extends TransportableAIObject {
 
     // Implement TransportableAIObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Locatable getTransportLocatable() {
         return getGoods();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTransportSource() {
         return (goods == null) ? null : goods.getLocation();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTransportDestination() {
         return this.destination;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTransportDestination(Location destination) {
         this.destination = destination;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
         if (dst == null) dst = Location.upLoc(getTransportDestination());
@@ -233,50 +218,32 @@ public class AIGoods extends TransportableAIObject {
         return path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public PathNode getIntermediatePath(Unit carrier, Location dst) {
         return null; // NYI
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean carriableBy(Unit carrier) {
         return carrier.couldCarry(getGoods());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canMove() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean leaveTransport() {
         return leaveTransport(null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean leaveTransport(Direction direction) {
         if (direction != null) return false;
         return leaveTransport(goods.getAmount());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean joinTransport(Unit carrier, Direction direction) {
         if (direction != null) return false;
@@ -302,9 +269,6 @@ public class AIGoods extends TransportableAIObject {
         return !failed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
@@ -384,9 +348,6 @@ public class AIGoods extends TransportableAIObject {
     private static final String DESTINATION_TAG = "destination";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -396,9 +357,6 @@ public class AIGoods extends TransportableAIObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -406,9 +364,6 @@ public class AIGoods extends TransportableAIObject {
         if (goods != null) goods.toXML(xw);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -418,9 +373,6 @@ public class AIGoods extends TransportableAIObject {
         destination = xr.getLocationAttribute(game, DESTINATION_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
@@ -428,9 +380,6 @@ public class AIGoods extends TransportableAIObject {
         if (getGoods() != null) uninitialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -447,9 +396,6 @@ public class AIGoods extends TransportableAIObject {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
@@ -462,9 +408,6 @@ public class AIGoods extends TransportableAIObject {
         return lb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

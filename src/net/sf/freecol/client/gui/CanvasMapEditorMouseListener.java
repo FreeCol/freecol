@@ -101,9 +101,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
     // Implement MouseListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
         if (getMap() == null) return;
@@ -119,9 +116,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mousePressed(MouseEvent e) {
         if (getMap() == null || !e.getComponent().isEnabled()) return;
@@ -165,9 +159,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (getMap() == null
@@ -235,24 +226,15 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         canvas.requestFocus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseEntered(MouseEvent e) {} // Ignore for now.
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseExited(MouseEvent e) {} // Ignore for now.
 
 
     // Implement MouseMotionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseDragged(MouseEvent e) {
         if (getMap() == null) return;
@@ -267,9 +249,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         getGUI().refresh();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseMoved(MouseEvent e) {
         if (getMap() == null || e.getY() < AUTO_SCROLL_SPACE) return;

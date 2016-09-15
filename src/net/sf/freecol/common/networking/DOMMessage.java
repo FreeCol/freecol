@@ -943,9 +943,6 @@ public class DOMMessage {
 
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getElement().toString();

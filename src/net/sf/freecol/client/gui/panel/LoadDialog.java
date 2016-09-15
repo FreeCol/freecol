@@ -80,9 +80,6 @@ public final class LoadDialog extends FreeColDialog<File> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public File getResponse() {
         File value = (File)getValue();

@@ -1403,9 +1403,6 @@ public final class Canvas extends JDesktopPane {
 
     // Override JComponent
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void paintComponent(Graphics g) {
         updateSizes();
@@ -1487,9 +1484,6 @@ public final class Canvas extends JDesktopPane {
 
     // Override Container
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Component comp) {
         removeFromCanvas(comp);

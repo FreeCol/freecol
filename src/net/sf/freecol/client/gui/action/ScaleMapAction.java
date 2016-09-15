@@ -104,9 +104,6 @@ public class ScaleMapAction extends FreeColAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
@@ -118,9 +115,6 @@ public class ScaleMapAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Dimension ms = getGUI().showScaleMapSizeDialog();

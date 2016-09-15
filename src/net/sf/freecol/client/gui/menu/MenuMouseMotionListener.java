@@ -53,17 +53,11 @@ public class MenuMouseMotionListener extends AbstractCanvasListener
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseDragged(MouseEvent e) {
         //Do nothing
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void mouseMoved(MouseEvent e) {
         performAutoScrollIfActive(e);

@@ -42,9 +42,6 @@ public abstract class MapboardAction extends FreeColAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled()  

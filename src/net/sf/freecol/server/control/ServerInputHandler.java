@@ -135,9 +135,6 @@ public abstract class ServerInputHandler extends FreeColServerHolder
 
     // Implement MessageHandler
 
-    /**
-     * {@inheritDoc}
-     */
     public final Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();

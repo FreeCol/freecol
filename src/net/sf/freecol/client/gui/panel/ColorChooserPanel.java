@@ -74,9 +74,6 @@ public final class ColorChooserPanel extends FreeColPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

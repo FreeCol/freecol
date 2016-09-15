@@ -178,9 +178,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
 
     // Override AbstractOption
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isNullValueOK() {
         return true;
@@ -194,9 +191,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
     private static final String TEMPLATE_TAG = "template";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -204,9 +198,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         xw.writeAttribute(MAXIMUM_NUMBER_TAG, maximumNumber);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         if (template != null) {
@@ -222,9 +213,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -232,9 +220,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         maximumNumber = xr.getAttribute(MAXIMUM_NUMBER_TAG, 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -243,9 +228,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override @SuppressWarnings("unchecked")
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -284,9 +266,6 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);

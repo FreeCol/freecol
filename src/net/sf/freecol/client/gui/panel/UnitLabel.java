@@ -352,9 +352,6 @@ public final class UnitLabel extends JLabel
 
     // Interface Draggable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isOnCarrier() {
         return unit != null && unit.isOnCarrier();
@@ -363,9 +360,6 @@ public final class UnitLabel extends JLabel
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Game game = freeColClient.getGame();

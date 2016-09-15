@@ -437,9 +437,6 @@ public class TileImprovement extends TileItem implements Named {
 
     // Interface Named
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return (type == null) ? null : type.getNameKey();
@@ -448,25 +445,16 @@ public class TileImprovement extends TileItem implements Named {
 
     // Interface TileItem
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final int getZIndex() {
         return type.getZIndex();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return type.isTileTypeAllowed(tileType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
@@ -486,9 +474,6 @@ public class TileImprovement extends TileItem implements Named {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         // TileImprovements provide bonuses, but do *not* allow a tile
@@ -496,9 +481,6 @@ public class TileImprovement extends TileItem implements Named {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
@@ -513,25 +495,16 @@ public class TileImprovement extends TileItem implements Named {
             : Stream.<Modifier>empty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isNatural() {
         return type.isNatural();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isComplete() {
         return turnsToComplete <= 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Layer getLayer() {
         return Layer.RIVERS;
@@ -540,9 +513,6 @@ public class TileImprovement extends TileItem implements Named {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
@@ -591,9 +561,6 @@ public class TileImprovement extends TileItem implements Named {
     private static final String VIRTUAL_TAG = "virtual";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -611,9 +578,6 @@ public class TileImprovement extends TileItem implements Named {
         if (virtual) xw.writeAttribute(VIRTUAL_TAG, virtual);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -677,9 +641,6 @@ public class TileImprovement extends TileItem implements Named {
         connected = getConnectionsFromStyle();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -692,9 +653,6 @@ public class TileImprovement extends TileItem implements Named {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

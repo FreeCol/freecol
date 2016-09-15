@@ -431,9 +431,6 @@ public abstract class AIPlayer extends AIObject {
     private static final String RANDOM_STATE_TAG = "randomState";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -441,9 +438,6 @@ public abstract class AIPlayer extends AIObject {
         xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(aiRandom));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -459,9 +453,6 @@ public abstract class AIPlayer extends AIObject {
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);

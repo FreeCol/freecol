@@ -44,9 +44,6 @@ public class ReportTurnAction extends FreeColAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         igc().displayTurnReportMessages();

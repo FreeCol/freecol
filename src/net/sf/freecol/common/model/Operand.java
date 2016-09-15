@@ -293,9 +293,6 @@ public class Operand extends Scope {
 
     // Interface Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         return this == o
@@ -306,9 +303,6 @@ public class Operand extends Scope {
                 && super.equals(o));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -329,9 +323,6 @@ public class Operand extends Scope {
     // end @compat 0.11.3
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -345,9 +336,6 @@ public class Operand extends Scope {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -374,9 +362,6 @@ public class Operand extends Scope {
         if (val != INFINITY) this.value = val;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         if (this.value != null) return Integer.toString(value);

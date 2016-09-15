@@ -194,9 +194,6 @@ public final class DifficultyDialog extends OptionsDialog
 
     // Override OptionsDialog
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();

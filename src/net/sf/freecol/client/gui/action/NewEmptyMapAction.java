@@ -48,9 +48,6 @@ public class NewEmptyMapAction extends MapboardAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         return freeColClient.isMapEditor();
@@ -59,9 +56,6 @@ public class NewEmptyMapAction extends MapboardAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Dimension size = getGUI().showMapSizeDialog();

@@ -156,9 +156,6 @@ public class RebelToolTip extends JToolTip {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         super.removeNotify();

@@ -1344,42 +1344,27 @@ public class TransportMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getBaseTransportPriority, isOneTime
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getTransportDestination() {
         return null; // Can not transport a carrier unit.
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getTarget() {
         return target;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setTarget(Location target) {
         this.target = target;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location findTarget() {
         // A noop.  The target is defined by the cargoes.
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
@@ -1390,9 +1375,6 @@ public class TransportMission extends Mission {
             : invalidCargoReason(cargo);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -1470,9 +1452,6 @@ public class TransportMission extends Mission {
     // end @compat
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -1482,9 +1461,6 @@ public class TransportMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         final AIUnit aiCarrier = getAIUnit();
@@ -1500,9 +1476,6 @@ public class TransportMission extends Mission {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -1510,9 +1483,6 @@ public class TransportMission extends Mission {
         target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -1521,9 +1491,6 @@ public class TransportMission extends Mission {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -1554,9 +1521,6 @@ public class TransportMission extends Mission {
         return lb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

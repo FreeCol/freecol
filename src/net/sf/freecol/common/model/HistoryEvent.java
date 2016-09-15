@@ -73,9 +73,6 @@ public class HistoryEvent extends StringTemplate {
         
         // Implement Named
 
-        /**
-         * {@inheritDoc}
-         */
         public String getNameKey() {
             return Messages.nameKey("model." + getKey());
         }
@@ -205,9 +202,6 @@ public class HistoryEvent extends StringTemplate {
 
     // Interface Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -220,9 +214,6 @@ public class HistoryEvent extends StringTemplate {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -242,9 +233,6 @@ public class HistoryEvent extends StringTemplate {
     private static final String TURN_TAG = "turn";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -258,9 +246,6 @@ public class HistoryEvent extends StringTemplate {
         xw.writeAttribute(SCORE_TAG, this.score);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -275,9 +260,6 @@ public class HistoryEvent extends StringTemplate {
         score = xr.getAttribute(SCORE_TAG, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -292,9 +274,6 @@ public class HistoryEvent extends StringTemplate {
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

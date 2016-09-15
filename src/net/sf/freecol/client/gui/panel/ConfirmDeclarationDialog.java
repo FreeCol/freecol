@@ -83,9 +83,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
 
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String getUIClassID() {
             return "ColorButtonUI";
@@ -103,9 +100,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
 
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setLabelValues(JLabel c, T value) {
             c.setText(Messages.message(prefix + value.toString()));
@@ -388,9 +382,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         ColorButton button = (ColorButton)ae.getSource();
@@ -404,9 +395,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     // Interface ItemListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void itemStateChanged(ItemEvent e) {
         Background newBackground
@@ -428,9 +416,6 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
 
     // Override FreeColDialog
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> getResponse() {
         Object value = getValue();

@@ -69,9 +69,6 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
         initializeInputDialog(frame, modal, panel, null, okKey, cancelKey);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getInputValue() {
         return textField.getText();
@@ -80,9 +77,6 @@ public final class FreeColStringInputDialog extends FreeColInputDialog<String> {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void requestFocus() {
         this.textField.requestFocus();

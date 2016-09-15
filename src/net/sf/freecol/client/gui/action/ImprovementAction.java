@@ -55,9 +55,6 @@ public class ImprovementAction extends UnitAction {
 
     // Override FreeColAction
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
@@ -74,9 +71,6 @@ public class ImprovementAction extends UnitAction {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Unit unit = getGUI().getActiveUnit();

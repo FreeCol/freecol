@@ -139,9 +139,6 @@ public class GotoAdjacentGoal extends Goal {
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 }

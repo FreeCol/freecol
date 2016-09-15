@@ -154,9 +154,6 @@ public final class AboutPanel extends FreeColPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String url = ae.getActionCommand();

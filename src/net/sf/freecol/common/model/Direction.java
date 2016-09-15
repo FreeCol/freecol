@@ -243,9 +243,6 @@ public enum Direction implements Named {
 
     // Implement Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return Messages.nameKey("model." + getKey());

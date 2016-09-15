@@ -179,9 +179,6 @@ public class Resource extends TileItem {
 
     // Implement Named
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNameKey() {
         return getType().getNameKey();
@@ -190,25 +187,16 @@ public class Resource extends TileItem {
 
     // Interface TileItem
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final int getZIndex() {
         return Tile.RESOURCE_ZINDEX;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isTileTypeAllowed(TileType tileType) {
         return tileType.canHaveResourceType(getType());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int applyBonus(GoodsType goodsType, UnitType unitType,
                           int potential) {
@@ -219,9 +207,6 @@ public class Resource extends TileItem {
                 : quantity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) return false;
@@ -231,9 +216,6 @@ public class Resource extends TileItem {
             getProductionModifiers(goodsType, unitType)) > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
@@ -241,25 +223,16 @@ public class Resource extends TileItem {
             : getType().getModifiers(goodsType.getId(), unitType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isNatural() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isComplete() {
         return true;
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Layer getLayer() {
         return Layer.RESOURCES;
@@ -268,9 +241,6 @@ public class Resource extends TileItem {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         return (type == null) ? -1 : 1;
@@ -284,9 +254,6 @@ public class Resource extends TileItem {
     private static final String TYPE_TAG = "type";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -298,9 +265,6 @@ public class Resource extends TileItem {
         xw.writeAttribute(QUANTITY_TAG, quantity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -316,18 +280,12 @@ public class Resource extends TileItem {
         quantity = xr.getAttribute(QUANTITY_TAG, 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return (quantity == UNLIMITED) ? getType().getId()
             : Integer.toString(quantity) + " " + getType().getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -237,9 +237,6 @@ public final class StartGamePanel extends FreeColPanel {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -306,9 +303,6 @@ public final class StartGamePanel extends FreeColPanel {
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         // Do not propagate to superclass.  This panel is reused so
@@ -322,17 +316,11 @@ public final class StartGamePanel extends FreeColPanel {
         if (chat != null) chat.removeActionListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void requestFocus() {
         start.requestFocus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);

@@ -64,25 +64,16 @@ public final class IntegerOptionUI extends OptionUI<IntegerOption>  {
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JComponent getComponent() {
         return spinner;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValue((Integer) spinner.getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         spinner.setValue(getOption().getValue());

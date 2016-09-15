@@ -168,9 +168,6 @@ public class WorkerWish extends Wish {
     private static final String UNIT_TYPE_TAG = "unitType";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -180,9 +177,6 @@ public class WorkerWish extends Wish {
         xw.writeAttribute(EXPERT_NEEDED_TAG, expertNeeded);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -202,9 +196,6 @@ public class WorkerWish extends Wish {
         expertNeeded = xr.getAttribute(EXPERT_NEEDED_TAG, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
@@ -212,9 +203,6 @@ public class WorkerWish extends Wish {
         if (unitType != null) uninitialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);
@@ -225,9 +213,6 @@ public class WorkerWish extends Wish {
         return lb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

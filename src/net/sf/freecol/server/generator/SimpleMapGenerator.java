@@ -125,9 +125,6 @@ public class SimpleMapGenerator implements MapGenerator {
             return map.getTile(xy[0], xy[1]);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public String toString() {
             return player + " territory at " + region;
@@ -1077,9 +1074,6 @@ public class SimpleMapGenerator implements MapGenerator {
 
     // Implement MapGenerator
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map createEmptyMap(int width, int height, LogBuilder lb) {
         recache(false); // Reload the options and specification
@@ -1088,9 +1082,6 @@ public class SimpleMapGenerator implements MapGenerator {
             .createMap(new LandMap(width, height), lb);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map createMap(LogBuilder lb) {
         recache(true); // Reload the options and specification

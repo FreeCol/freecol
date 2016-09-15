@@ -524,9 +524,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                                           needToPay);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         int srcActions = getSourceActions(comp);

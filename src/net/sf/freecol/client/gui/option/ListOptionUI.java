@@ -179,33 +179,21 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final JLabel getJLabel() {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JPanel getComponent() {
         return this.panel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setValue(getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         model.clear();
@@ -216,9 +204,6 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
     // Interface ListSelectionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {

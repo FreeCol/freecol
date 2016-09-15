@@ -156,33 +156,21 @@ public abstract class AIObject extends FreeColObject {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Specification getSpecification() {
         return getAIMain().getSpecification();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void setSpecification(Specification specification) {
         throw new RuntimeException("Can not set specification");
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Game getGame() {
         return getAIMain().getGame();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void setGame(Game game) {
         throw new RuntimeException("Can not set game");

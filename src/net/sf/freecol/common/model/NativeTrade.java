@@ -257,9 +257,6 @@ public class NativeTrade extends FreeColGameObject {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     public boolean isInternable() {
         return false;
     }
@@ -275,9 +272,6 @@ public class NativeTrade extends FreeColGameObject {
     private static final String UNIT_TAG = "unit";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -295,9 +289,6 @@ public class NativeTrade extends FreeColGameObject {
         xw.writeAttribute(UNIT_TAG, this.unit);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -308,9 +299,6 @@ public class NativeTrade extends FreeColGameObject {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
@@ -330,9 +318,6 @@ public class NativeTrade extends FreeColGameObject {
         this.unit = xr.getAttribute(game, UNIT_TAG, Unit.class, (Unit)null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
@@ -341,9 +326,6 @@ public class NativeTrade extends FreeColGameObject {
         super.readChildren(xr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -362,9 +344,6 @@ public class NativeTrade extends FreeColGameObject {
         }
     }
         
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -386,9 +365,6 @@ public class NativeTrade extends FreeColGameObject {
         return sb.append(" ]]").toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

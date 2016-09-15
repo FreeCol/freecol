@@ -192,9 +192,6 @@ public final class CanvasMouseListener extends FreeColClientHolder
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         doubleClickTimer.stop();

@@ -530,9 +530,6 @@ public final class UnitType extends BuildableType implements Consumer {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -623,9 +620,6 @@ public final class UnitType extends BuildableType implements Consumer {
     private static final String UPGRADE_TAG = "upgrade";
     // end @compat 0.11.6
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -673,9 +667,6 @@ public final class UnitType extends BuildableType implements Consumer {
         xw.writeAttribute(PRIORITY_TAG, priority);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -703,9 +694,6 @@ public final class UnitType extends BuildableType implements Consumer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -808,9 +796,6 @@ public final class UnitType extends BuildableType implements Consumer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -861,9 +846,6 @@ public final class UnitType extends BuildableType implements Consumer {
         // end @compat
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -907,17 +889,11 @@ public final class UnitType extends BuildableType implements Consumer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

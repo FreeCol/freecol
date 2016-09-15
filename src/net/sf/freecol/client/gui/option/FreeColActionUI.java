@@ -164,9 +164,6 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == recordButton) {
@@ -260,9 +257,6 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
         // Interface ActionListener
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             if (!hasFocus()) stopBlinking();
@@ -283,25 +277,16 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
 
     // Implement OptionUI
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JPanel getComponent() {
         return panel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateOption() {
         getOption().setAccelerator(keyStroke);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reset() {
         keyStroke = getOption().getAccelerator();

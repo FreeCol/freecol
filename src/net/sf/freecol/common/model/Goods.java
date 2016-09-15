@@ -136,26 +136,17 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     // Interface Locatable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Location getLocation() {
         return this.location;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean setLocation(Location location) {
         this.location = location;
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isInEurope() {
         return (this.location instanceof Europe)
@@ -163,17 +154,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
                 && ((Unit)this.location).isInEurope());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Tile getTile() {
         return (this.location == null) ? null : this.location.getTile();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSpaceTaken() {
         return 1;
@@ -182,9 +167,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     // Interface Ownable
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Player getOwner() {
         return (this.location instanceof Ownable)
@@ -192,9 +174,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
             : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
@@ -203,33 +182,21 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Specification getSpecification() {
         return getGame().getSpecification();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setSpecification(Specification specification) {
         throw new RuntimeException("Can not set specification");
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Game getGame() {
         return this.game;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setGame(Game game) {
         throw new RuntimeException("Can not set game");
@@ -238,9 +205,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     
     // Override Object
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof Goods) {
@@ -250,9 +214,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -267,9 +228,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     private static final String TYPE_TAG = "type";
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -283,9 +241,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -304,9 +259,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         this.location = xr.getLocationAttribute(game, LOCATION_TAG, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

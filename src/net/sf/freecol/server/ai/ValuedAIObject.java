@@ -103,9 +103,6 @@ public abstract class ValuedAIObject extends AIObject {
 
     // Override FreeColObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -120,9 +117,6 @@ public abstract class ValuedAIObject extends AIObject {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -130,9 +124,6 @@ public abstract class ValuedAIObject extends AIObject {
         xw.writeAttribute(VALUE_TAG, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

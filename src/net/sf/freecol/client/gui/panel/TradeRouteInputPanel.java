@@ -145,25 +145,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private class CargoHandler extends TransferHandler {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected Transferable createTransferable(JComponent c) {
             return new ImageSelection((CargoLabel) c);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getSourceActions(JComponent c) {
             return COPY_OR_MOVE;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean importData(JComponent target, Transferable data) {
             if (!canImport(target, data.getTransferDataFlavors()))
@@ -191,9 +182,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void exportDone(JComponent source, Transferable data,
                                   int action) {
@@ -238,9 +226,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             setOpaque(true);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Component getListCellRendererComponent(JList<? extends String> list,
                                                       String value,
@@ -280,9 +265,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             addMouseListener(TradeRouteInputPanel.this.dropListener);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void setEnabled(boolean enable) {
             super.setEnabled(enable);
@@ -307,25 +289,16 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
         // Interface Transferable
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Object getTransferData(DataFlavor flavor) {
             return (flavor == STOP_FLAVOR) ? stops : null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public DataFlavor[] getTransferDataFlavors() {
             return new DataFlavor[] { STOP_FLAVOR };
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             return flavor == STOP_FLAVOR;
@@ -337,17 +310,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
      */
     private class StopListHandler extends TransferHandler {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
             return any(flavors, matchKeyEquals(STOP_FLAVOR));
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList)c;
@@ -359,17 +326,11 @@ public final class TradeRouteInputPanel extends FreeColPanel
             return new StopListTransferable(stops);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int getSourceActions(JComponent c) {
             return MOVE;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean importData(JComponent target, Transferable data) {
             JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
@@ -395,9 +356,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
             return false;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         protected void exportDone(JComponent source, Transferable data,
                                   int action) {
@@ -431,9 +389,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
         }
 
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Component getListCellRendererComponent(JList<? extends TradeRouteStop> list,
                                                       TradeRouteStop value,
@@ -739,9 +694,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -765,9 +717,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
     // Interface ListSelectionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
@@ -785,9 +734,6 @@ public final class TradeRouteInputPanel extends FreeColPanel
 
     // Override Component
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeNotify() {
         this.cargoHandler = null;

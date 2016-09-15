@@ -92,9 +92,6 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
         initializeDialog(frame, DialogType.QUESTION, modal, obj, icon, c);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getResponse() {
         if (responded()) {

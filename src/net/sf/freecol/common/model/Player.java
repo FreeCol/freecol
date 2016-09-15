@@ -199,9 +199,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Implement Iterator
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public boolean hasNext() {
             // Try to find a unit that still satisfies the predicate.
@@ -217,17 +214,11 @@ public class Player extends FreeColGameObject implements Nameable {
             return !units.isEmpty();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public Unit next() {
             return (hasNext()) ? units.remove(0) : null;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void remove() {
             next(); // Ignore value
@@ -3186,9 +3177,6 @@ public class Player extends FreeColGameObject implements Nameable {
         
         // Implement Named
 
-        /**
-         * {@inheritDoc}
-         */
         public String getNameKey() {
             return Messages.nameKey("model." + getKey());
         }        
@@ -3842,9 +3830,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
     // Override FreeColGameObject
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
@@ -3872,9 +3857,6 @@ public class Player extends FreeColGameObject implements Nameable {
     // Override FreeColObject
     //
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final FeatureContainer getFeatureContainer() {
         return featureContainer;
@@ -3916,9 +3898,6 @@ public class Player extends FreeColGameObject implements Nameable {
     // end @compat
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -3981,9 +3960,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -4096,9 +4072,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -4168,9 +4141,6 @@ public class Player extends FreeColGameObject implements Nameable {
                                                 true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -4210,9 +4180,6 @@ public class Player extends FreeColGameObject implements Nameable {
         recalculateBellsBonus(); // Bells bonuses depend on tax
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -4289,17 +4256,11 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return nationId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

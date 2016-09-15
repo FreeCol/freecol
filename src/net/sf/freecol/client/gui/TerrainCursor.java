@@ -96,9 +96,6 @@ public class TerrainCursor implements ActionListener  {
 
     // Interface ActionListener
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         active = !active;
