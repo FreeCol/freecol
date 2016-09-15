@@ -2457,7 +2457,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * a missionary from a given player.
      *
      * @param p The {@code Player}.
-     * @return A list of the <code>IndianSettlement<code>s with a matching
+     * @return A list of the {@code IndianSettlement}s with a matching
      *     missionary.
      */
     public List<IndianSettlement> getIndianSettlementsWithMissionaryList(Player p) {
@@ -2472,7 +2472,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * a missionary from a given player.
      *
      * @param p The {@code Player}.
-     * @return A stream of the <code>IndianSettlement<code>s with a matching
+     * @return A stream of the {@code IndianSettlement}s with a matching
      *     missionary.
      */
     public Stream<IndianSettlement> getIndianSettlementsWithMissionary(Player p) {
