@@ -42,7 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
 /**
- * A {@code Resource} wrapping an <code>Image</code>.
+ * A {@code Resource} wrapping an {@code Image}.
  * @see Resource
  */
 public class ImageResource extends Resource

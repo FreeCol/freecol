@@ -49,13 +49,13 @@ public abstract class Settlement extends GoodsLocation
 
     public static final int FOOD_PER_COLONIST = 200;
 
-    /** The {@code Player} owning this <code>Settlement</code>. */
+    /** The {@code Player} owning this {@code Settlement}. */
     protected Player owner;
 
     /** The name of the Settlement. */
     private String name;
 
-    /** The {@code Tile} where this <code>Settlement</code> is located. */
+    /** The {@code Tile} where this {@code Settlement} is located. */
     protected Tile tile;
 
     /** The type of settlement. */

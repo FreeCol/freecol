@@ -154,7 +154,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * Constructor for ServerColony.
      *
      * @param game The enclosing {@code Game}.
-     * @param owner The {@code Player} owning this <code>Colony</code>.
+     * @param owner The {@code Player} owning this {@code Colony}.
      * @param name The name of the new {@code Colony}.
      * @param tile The containing {@code Tile}.
      */

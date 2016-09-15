@@ -494,7 +494,7 @@ public final class MapViewer extends FreeColClientHolder {
      *
      * @param t The {@code Tile} to check.
      * @return The position of the given {@code Tile}, or
-     *     {@code null} if the <code>Tile</code> is not drawn on
+     *     {@code null} if the {@code Tile} is not drawn on
      *     the mapboard.
      */
     Point calculateTilePosition(Tile t) {

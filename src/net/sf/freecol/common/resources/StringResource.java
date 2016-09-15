@@ -23,7 +23,7 @@ import java.net.URI;
 
 
 /**
- * A {@code Resource} wrapping an <code>String</code>.
+ * A {@code Resource} wrapping an {@code String}.
  * @see Resource
  */
 public class StringResource extends Resource {

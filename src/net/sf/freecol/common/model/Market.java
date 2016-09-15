@@ -473,7 +473,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Sets the owner of this {@code Market}.
      *
-     * @param owner The {@code Player} to own this <code>Market</code>.
+     * @param owner The {@code Player} to own this {@code Market}.
      */
     @Override
     public void setOwner(Player owner) {

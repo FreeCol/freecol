@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A {@code Resource} wrapping a <code>Font</code>.
+ * A {@code Resource} wrapping a {@code Font}.
  *
  * @see Resource
  * @see Font

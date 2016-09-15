@@ -127,16 +127,16 @@ public interface Location extends ObjectWithId {
     public List<Unit> getUnitList();
 
     /**
-     * Gets the {@code GoodsContainer} this <code>Location</code> use
+     * Gets the {@code GoodsContainer} this {@code Location} use
      * for storing it's goods.
      *
-     * @return The {@code GoodsContainer} or <code>null</code> if the
+     * @return The {@code GoodsContainer} or {@code null} if the
      *     {@code Location} cannot store any goods.
      */
     public GoodsContainer getGoodsContainer();
 
     /**
-     * Gets the {@code Settlement} this <code>Location</code> is
+     * Gets the {@code Settlement} this {@code Location} is
      * located in.
      *
      * @return The associated {@code Settlement}, or null if none.

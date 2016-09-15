@@ -252,7 +252,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Sets a keyboard accelerator.
      *
-     * @param accelerator The {@code KeyStroke}. Using <code>null</code>
+     * @param accelerator The {@code KeyStroke}. Using {@code null}
      *            is the same as disabling the keyboard accelerator.
      */
     public final void setAccelerator(KeyStroke accelerator) {
@@ -262,7 +262,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Gets the keyboard accelerator for this option.
      *
-     * @return The {@code KeyStroke} or <code>null</code> if the
+     * @return The {@code KeyStroke} or {@code null} if the
      *         keyboard accelerator is disabled.
      */
     public final KeyStroke getAccelerator() {
@@ -300,7 +300,7 @@ public abstract class FreeColAction extends AbstractAction
 
     /**
      * Creates a {@code String} that keeps the attributes given
-     * {@code KeyStroke}. This <code>String</code> can be used to
+     * {@code KeyStroke}. This {@code String} can be used to
      * store the key stroke in an XML-file.
      *
      * @param keyStroke The {@code KeyStroke}.

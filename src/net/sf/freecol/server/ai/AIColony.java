@@ -181,7 +181,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
 
     /**
-     * Gets the {@code Colony} this <code>AIColony</code> controls.
+     * Gets the {@code Colony} this {@code AIColony} controls.
      *
      * @return The {@code Colony}.
      */

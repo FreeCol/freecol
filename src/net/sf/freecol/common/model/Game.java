@@ -476,7 +476,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get an {@code Iterable} over the <code>FreeColGameObjects</code>.
+     * Get an {@code Iterable} over the {@code FreeColGameObjects}.
      *
      * @return A suitable {@code Iterable}.
      */
@@ -655,7 +655,7 @@ public class Game extends FreeColGameObject {
      *
      * @param beforePlayer The {@code Player} before the
      *     {@code Player} to be returned.
-     * @return The {@code Player} after the <code>beforePlayer</code>
+     * @return The {@code Player} after the {@code beforePlayer}
      *     in the list which determines the order each player becomes the
      *     current player.
      * @see #getNextPlayer
@@ -1075,7 +1075,7 @@ public class Game extends FreeColGameObject {
      * Finds a settlement by name.
      *
      * @param name The name of the {@code Settlement}.
-     * @return The {@code Settlement} found, or <code>null</code>
+     * @return The {@code Settlement} found, or {@code null}
      *     if there is no known {@code Settlement} with the
      *     specified name (the settlement might not be visible to a client).
      */

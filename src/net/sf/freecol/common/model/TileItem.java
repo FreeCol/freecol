@@ -30,7 +30,7 @@ import net.sf.freecol.common.model.Map.Layer;
 
 
 /**
- * Represents a {@code TileItem} item on a <code>Tile</code>.
+ * Represents a {@code TileItem} item on a {@code Tile}.
  */
 public abstract class TileItem extends FreeColGameObject
     implements Locatable, Named {

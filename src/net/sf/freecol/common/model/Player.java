@@ -438,7 +438,7 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Initiates a new {@code Player} from an <code>Element</code> and
+     * Initiates a new {@code Player} from an {@code Element} and
      * registers this {@code Player} at the specified game.
      *
      * @param game The enclosing {@code Game}.
@@ -2492,7 +2492,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Find a {@code Settlement} by name.
      *
      * @param name The name of the {@code Settlement}.
-     * @return The {@code Settlement}, or <code>null</code> if not found.
+     * @return The {@code Settlement}, or {@code null} if not found.
      **/
     public Settlement getSettlementByName(String name) {
         return (isIndian()) ? getIndianSettlementByName(name)

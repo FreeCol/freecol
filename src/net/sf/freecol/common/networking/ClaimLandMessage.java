@@ -56,7 +56,7 @@ public class ClaimLandMessage extends DOMMessage {
      * Create a new {@code ClaimLandMessage}.
      *
      * @param tile The {@code Tile} to claim.
-     * @param claimant The {@code Unit} or <code>Settlement</code>
+     * @param claimant The {@code Unit} or {@code Settlement}
      *     claiming the tile.
      * @param price The price to pay for the tile, negative if stealing.
      */

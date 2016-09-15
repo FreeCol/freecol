@@ -55,7 +55,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Create an empty {@code TileItemContainer}.
      *
      * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} this <code>TileItemContainer</code>
+     * @param tile The {@code Tile} this {@code TileItemContainer}
      *     contains {@code TileItems} for.
      */
     public TileItemContainer(Game game, Tile tile) {
@@ -71,7 +71,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Create a new {@code TileItemContainer} from an existing template.
      *
      * @param game The enclosing {@code Game}.
-     * @param tile The {@code Tile} this <code>TileItemContainer</code>
+     * @param tile The {@code Tile} this {@code TileItemContainer}
      *     contains {@code TileItems} for.
      * @param template A {@code TileItemContainer} to copy.
      * @param layer A maximum allowed {@code Layer}.

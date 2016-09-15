@@ -44,7 +44,7 @@ public interface GoalDecider {
     /**
      * Gets the {@code PathNode} containing the goal.
      *
-     * @return The {@code PathNode} where the <code>Tile</code>
+     * @return The {@code PathNode} where the {@code Tile}
      *     returned by {@code pathNode.getTile()} is the goal.
      */
     public PathNode getGoal();
@@ -67,7 +67,7 @@ public interface GoalDecider {
      * @param pathNode The {@code PathNode} where the
      *     {@code Tile} returned by
      *     {@code pathNode.getTile()} is the tile to be checked.
-     * @return {@code true} if the <code>PathNode</code> was
+     * @return {@code true} if the {@code PathNode} was
      *     either a goal or a sub goal and {@code false}
      *     otherwise. The goal should be returned by {@link #getGoal()}
      *     right after a call to this method, if this method returns

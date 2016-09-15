@@ -24,7 +24,7 @@ import java.net.URI;
 
 
 /**
- * A {@code Resource} wrapping a <code>Video</code>.
+ * A {@code Resource} wrapping a {@code Video}.
  * 
  * @see Resource
  * @see Video

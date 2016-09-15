@@ -791,14 +791,14 @@ public class Unit extends GoodsLocation
     /**
      * Gets the unit role.
      *
-     * @return The {@code Role} of this <code>Unit</code>.
+     * @return The {@code Role} of this {@code Unit}.
      */
     public Role getRole() {
         return role;
     }
 
     /**
-     * Sets the {@code Role} of this <code>Unit</code>.
+     * Sets the {@code Role} of this {@code Unit}.
      *
      * @param role The new {@code Role}.
      */
@@ -1575,7 +1575,7 @@ public class Unit extends GoodsLocation
     /**
      * Get the destination of this unit.
      *
-     * @return The destination {@code Location} of this <code>Unit</code>.
+     * @return The destination {@code Location} of this {@code Unit}.
      */
     public Location getDestination() {
         return destination;
@@ -2018,7 +2018,7 @@ public class Unit extends GoodsLocation
      * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param target The {@code Tile} this <code>Unit</code> will move
+     * @param target The {@code Tile} this {@code Unit} will move
      *            onto.
      * @return The cost of moving this unit onto the given {@code Tile}.
      */
@@ -2028,14 +2028,14 @@ public class Unit extends GoodsLocation
 
     /**
      * Gets the cost of moving this {@code Unit} from the given
-     * {@code Tile} onto the given <code>Tile</code>. A call to
+     * {@code Tile} onto the given {@code Tile}. A call to
      * {@link #getMoveType(Tile, Tile, int)} will return
      * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param from The {@code Tile} this <code>Unit</code> will
+     * @param from The {@code Tile} this {@code Unit} will
      *     move from.
-     * @param target The {@code Tile} this <code>Unit</code> will
+     * @param target The {@code Tile} this {@code Unit} will
      *     move onto.
      * @param ml The amount of moves this Unit has left.
      * @return The cost of moving this unit onto the given {@code Tile}.

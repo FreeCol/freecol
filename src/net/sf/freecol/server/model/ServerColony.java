@@ -85,7 +85,7 @@ public class ServerColony extends Colony implements ServerModelObject {
      * Creates a new ServerColony.
      *
      * @param game The {@code Game} in which this object belongs.
-     * @param owner The {@code Player} owning this <code>Colony</code>.
+     * @param owner The {@code Player} owning this {@code Colony}.
      * @param name The name of the new {@code Colony}.
      * @param tile The location of the {@code Colony}.
      */

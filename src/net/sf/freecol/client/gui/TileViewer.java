@@ -197,7 +197,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
+     * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * Draws the terrain and improvements.
      *
      * @param tile The Tile to draw.
@@ -225,7 +225,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
+     * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      *
      * @param tile The {@code Tile} to draw.
      * @return The image.
@@ -249,7 +249,7 @@ public final class TileViewer extends FreeColClientHolder {
     }
 
     /**
-     * Create a {@code BufferedImage} and draw a <code>Tile</code> on it.
+     * Create a {@code BufferedImage} and draw a {@code Tile} on it.
      * The visualization of the {@code Tile} also includes information
      * from the corresponding {@code ColonyTile} of the given
      * {@code Colony}.
@@ -257,7 +257,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param tile The {@code Tile} to draw.
      * @param colony The {@code Colony} to create the visualization
      *      of the {@code Tile} for. This object is also used to
-     *      get the {@code ColonyTile} for the given <code>Tile</code>.
+     *      get the {@code ColonyTile} for the given {@code Tile}.
      * @return The image.
      */
     BufferedImage createColonyTileImage(Tile tile, Colony colony) {
@@ -315,7 +315,7 @@ public final class TileViewer extends FreeColClientHolder {
      * @param tile The {@code Tile} to draw.
      * @param colony The {@code Colony} to create the visualization
      *      of the {@code Tile} for. This object is also used to
-     *      get the {@code ColonyTile} for the given <code>Tile</code>.
+     *      get the {@code ColonyTile} for the given {@code Tile}.
      * @param overlayImage The BufferedImage of the tile overlay.
      */
     private void displayColonyTile(Graphics2D g, Tile tile, Colony colony,

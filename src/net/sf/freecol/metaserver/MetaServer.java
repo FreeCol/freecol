@@ -188,7 +188,7 @@ public final class MetaServer extends Thread {
     }
 
     /**
-     * Gets a {@code Connection} identified by a <code>Socket</code>.
+     * Gets a {@code Connection} identified by a {@code Socket}.
      * 
      * @param socket The {@code Socket} that identifies the
      *            {@code Connection}

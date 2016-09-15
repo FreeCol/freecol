@@ -571,7 +571,7 @@ public class Map extends FreeColGameObject implements Location {
 
     /**
      * Gets the direction a unit needs to move in
-     * order to get from {@code t1} to <code>t2</code>
+     * order to get from {@code t1} to {@code t2}
      *
      * @param t1 The tile to move from.
      * @param t2 The target tile if moving from {@code t1}
@@ -1915,7 +1915,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets an {@code Iterator} of every <code>Tile</code> on the map.
+     * Gets an {@code Iterator} of every {@code Tile} on the map.
      *
      * @return An {@code Iterator} for the whole map.
      */

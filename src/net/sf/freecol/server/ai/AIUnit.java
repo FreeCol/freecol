@@ -137,7 +137,7 @@ public class AIUnit extends TransportableAIObject {
 
 
     /**
-     * Gets the {@code Unit} this <code>AIUnit</code> controls.
+     * Gets the {@code Unit} this {@code AIUnit} controls.
      *
      * @return The {@code Unit}.
      */

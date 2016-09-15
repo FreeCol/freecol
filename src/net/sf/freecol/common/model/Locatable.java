@@ -44,15 +44,15 @@ public interface Locatable {
     /**
      * Is this locatable in Europe.
      *
-     * @return True if the {@code Locatable} is in <code>Europe</code>.
+     * @return True if the {@code Locatable} is in {@code Europe}.
      */
     public boolean isInEurope();
 
     /**
-     * Get the {@code Tile} where this <code>Locatable</code> is
-     * located, or {@code null} if it is in <code>Europe</code>.
+     * Get the {@code Tile} where this {@code Locatable} is
+     * located, or {@code null} if it is in {@code Europe}.
      *
-     * @return The {@code Tile} where this <code>Locatable</code>
+     * @return The {@code Tile} where this {@code Locatable}
      *     is located, if any.
      */
     public Tile getTile();

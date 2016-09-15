@@ -205,7 +205,7 @@ public class FreeColDataFile {
      * Creates a {@code ResourceMapping} from the available
      * resource files.
      *
-     * @return A {@code ResourceMapping} or <code>null</code>
+     * @return A {@code ResourceMapping} or {@code null}
      *     there is no resource mapping file.
      */
     public ResourceMapping getResourceMapping() {

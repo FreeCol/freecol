@@ -461,7 +461,7 @@ public final class FreeColClient {
     /**
      * Gets the {@code FreeColServer} started by the client.
      *
-     * @return The {@code FreeColServer} or <code>null</code> if no
+     * @return The {@code FreeColServer} or {@code null} if no
      *     server has been started.
      */
     public FreeColServer getFreeColServer() {

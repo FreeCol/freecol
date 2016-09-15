@@ -96,7 +96,7 @@ public abstract class Wish extends ValuedAIObject {
     }
 
     /**
-     * Assigns a {@code TransportableAIObject} to this <code>Wish</code>.
+     * Assigns a {@code TransportableAIObject} to this {@code Wish}.
      *
      * @param transportable The {@code TransportableAIObject}
      *     which should realize this wish.

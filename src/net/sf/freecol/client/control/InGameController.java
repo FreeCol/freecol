@@ -295,7 +295,7 @@ public final class InGameController extends FreeColClientHolder {
      *
      * @param player The {@code Player} that is claiming.
      * @param tile The {@code Tile} to claim.
-     * @param claimant The {@code Unit} or <code>Colony</code> claiming.
+     * @param claimant The {@code Unit} or {@code Colony} claiming.
      * @param price The price required.
      * @return True if the claim succeeded.
      */
@@ -2969,7 +2969,7 @@ public final class InGameController extends FreeColClientHolder {
      * Called from ColonyPanel.ASingleTilePanel, UnitLabel and work()
      *
      * @param tile The {@code Tile} to claim.
-     * @param claimant The {@code Unit} or <code>Colony</code> claiming.
+     * @param claimant The {@code Unit} or {@code Colony} claiming.
      * @return True if the claim succeeded.
      */
     public boolean claimTile(Tile tile, FreeColGameObject claimant) {
@@ -5006,7 +5006,7 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * Moves a {@code Unit} to a <code>WorkLocation</code>.
+     * Moves a {@code Unit} to a {@code WorkLocation}.
      *
      * Called from ColonyPanel.tryWork, UnitLabel
      *

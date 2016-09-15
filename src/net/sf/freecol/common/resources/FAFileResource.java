@@ -25,7 +25,7 @@ import java.net.URL;
 
 
 /**
- * A {@code Resource} wrapping a <code>FAFile</code>.
+ * A {@code Resource} wrapping a {@code FAFile}.
  *
  * @see Resource
  * @see FAFile

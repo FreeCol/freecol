@@ -1200,7 +1200,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Get any panel this {@code Canvas} is displaying.
      *
-     * @return A {@code Component} the <code>Canvas</code> is
+     * @return A {@code Component} the {@code Canvas} is
      *         displaying, or null if none found.
      */
     Component getShowingSubPanel() {
@@ -1254,7 +1254,7 @@ public final class Canvas extends JDesktopPane {
      * Note that the previous implementation could throw exceptions
      * in some cases, thus the change.
      *
-     * @return {@code true} if the <code>Canvas</code> is displaying an
+     * @return {@code true} if the {@code Canvas} is displaying an
      *         internal frame.
      */
     public boolean isShowingSubPanel() {

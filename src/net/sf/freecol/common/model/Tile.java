@@ -278,7 +278,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param t The new {@code TileType} for this <code>Tile</code>.
+     * @param t The new {@code TileType} for this {@code Tile}.
      */
     public void setType(TileType t) {
         type = t;
@@ -377,7 +377,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the owning settlement for this tile.
      *
-     * @return The {@code Settlement} that owns this <code>Tile</code>.
+     * @return The {@code Settlement} that owns this {@code Tile}.
      * @see #setOwner
      */
     public Settlement getOwningSettlement() {
@@ -389,7 +389,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * -til: Changes appearance.
      *
-     * @param owner The {@code Settlement} to own this <code>Tile</code>.
+     * @param owner The {@code Settlement} to own this {@code Tile}.
      * @see #getOwner
      */
     public void setOwningSettlement(Settlement owner) {
@@ -1475,7 +1475,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Is this tile under active use?
      *
-     * @return True if a {@code Colony} is using this <code>Tile</code>.
+     * @return True if a {@code Colony} is using this {@code Tile}.
      */
     public boolean isInUse() {
         return getOwningSettlement() instanceof Colony
@@ -1743,7 +1743,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Sort possible goods types according to potential.
      *
-     * @param unit the {@code Unit} to work on this <code>Tile</code>
+     * @param unit the {@code Unit} to work on this {@code Tile}
      * @return A list of goods, highest potential production first.
      */
     public List<AbstractGoods> getSortedPotential(Unit unit) {
@@ -1920,7 +1920,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     /**
      * Updates the information about the native settlement on this
-     * {@code Tile} for the given <code>Player</code>.
+     * {@code Tile} for the given {@code Player}.
      *
      * @param player The {@code Player}.
      */
@@ -2079,7 +2079,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Gets the unit that is occupying the tile.
      *
-     * @return The {@code Unit} that is occupying this <code>Tile</code>.
+     * @return The {@code Unit} that is occupying this {@code Tile}.
      * @see #isOccupied()
      */
     public Unit getOccupyingUnit() {

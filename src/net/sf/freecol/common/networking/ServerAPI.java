@@ -458,7 +458,7 @@ public abstract class ServerAPI {
      * Server query-response to claim a tile.
      *
      * @param tile The {@code Tile} to claim.
-     * @param claimant The {@code Unit} or <code>Settlement</code> that is
+     * @param claimant The {@code Unit} or {@code Settlement} that is
      *     claiming the tile.
      * @param price The amount to pay.
      * @return True if the server interaction succeeded.

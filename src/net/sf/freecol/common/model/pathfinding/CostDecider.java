@@ -43,7 +43,7 @@ public interface CostDecider {
      * @param newLocation The {@code Location} we are moving to.
      * @param movesLeftBefore The moves left to the unit prior to moving.
      * @return The cost of moving the given unit from the
-     *     {@code oldLocation} to the <code>newLocation</code>.
+     *     {@code oldLocation} to the {@code newLocation}.
      */
     public int getCost(Unit unit, Location oldLocation, Location newLocation,
                        int movesLeftBefore);

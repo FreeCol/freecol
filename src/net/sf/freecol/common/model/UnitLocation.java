@@ -36,7 +36,7 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
- * The {@code UnitLocation} is a place where a <code>Unit</code>
+ * The {@code UnitLocation} is a place where a {@code Unit}
  * can be put.  The UnitLocation can not store any other Locatables,
  * such as {@link Goods}, or {@link TileItem}s.
  *

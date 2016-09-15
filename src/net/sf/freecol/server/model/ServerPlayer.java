@@ -1494,14 +1494,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Apply the effects of the given {@code Disaster} to the
-     * given {@code Colony}, or the <code>Player</code> if the
-     * {@code Colony} is <code>null</code>, and return a list of
+     * given {@code Colony}, or the {@code Player} if the
+     * {@code Colony} is {@code null}, and return a list of
      * appropriate {@code ModelMessage}s. Note that a disaster
      * might have no effect on a particular colony. In that case, the
      * returned list is empty.
      *
      * @param random A {@code Random} number source.
-     * @param colony A {@code Colony}, or <code>null</code>.
+     * @param colony A {@code Colony}, or {@code null}.
      * @param disaster A {@code Disaster} value.
      * @param cs A {@code ChangeSet} to update.
      * @return A list of {@code ModelMessage}s, possibly empty.

@@ -30,7 +30,7 @@ public interface Ownable {
     /**
      * Gets the owner of this {@code Ownable}.
      *
-     * @return The {@code Player} controlling this <code>Ownable</code>.
+     * @return The {@code Player} controlling this {@code Ownable}.
      */
     public Player getOwner();
 

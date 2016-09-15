@@ -207,7 +207,7 @@ public final class InfoPanel extends FreeColPanel {
         }
 
         /**
-         * Gets the {@code Tile} in which this <code>InfoPanel</code>
+         * Gets the {@code Tile} in which this {@code InfoPanel}
          * is displaying information about.
          *
          * @return The {@code Tile} or <i>null</i> if no

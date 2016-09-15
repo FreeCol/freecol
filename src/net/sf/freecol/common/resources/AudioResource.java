@@ -26,7 +26,7 @@ import net.sf.freecol.common.sound.SoundPlayer;
 
 
 /**
- * A {@code Resource} wrapping a <code>File</code> containing sounds.
+ * A {@code Resource} wrapping a {@code File} containing sounds.
  *
  * @see Resource
  */

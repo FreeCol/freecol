@@ -69,7 +69,7 @@ public class PathNode {
      * @param movesLeft The number of moves remaining at this point in
      *      the path.
      * @param turns The number of turns it takes to reach this
-     *      {@code PathNode}'s <code>Tile</code> from the start
+     *      {@code PathNode}'s {@code Tile} from the start
      *      of the path.
      * @param onCarrier Whether the path is still using a carrier.
      * @param previous The previous {@code PathNode} in the path.
@@ -96,9 +96,9 @@ public class PathNode {
     }
 
     /**
-     * Gets the {@code Tile} of this <code>PathNode</code>.
+     * Gets the {@code Tile} of this {@code PathNode}.
      *
-     * @return The {@code Tile} this <code>PathNode</code>
+     * @return The {@code Tile} this {@code PathNode}
      *     represents in the path, if any.
      */
     public Tile getTile() {
@@ -126,7 +126,7 @@ public class PathNode {
 
     /**
      * Gets the number of turns it will take to reach this
-     * {@code PathNode}'s <code>Tile</code> in the path.
+     * {@code PathNode}'s {@code Tile} in the path.
      *
      * @return The number of turns, using zero for the first
      *     move. {@code -1} is returned if the number of turns
@@ -138,7 +138,7 @@ public class PathNode {
 
     /**
      * Sets the number of turns it will take to reach this
-     * {@code PathNode}'s <code>Tile</code> in the path.
+     * {@code PathNode}'s {@code Tile} in the path.
      *
      * @param turns The new number of turns.
      */
@@ -195,7 +195,7 @@ public class PathNode {
      * Gets the direction to move in order to get to this path node.
      *
      * @return The direction to move on the map in order to get to the
-     *     {@code Tile} returned by this <code>PathNode</code>'s
+     *     {@code Tile} returned by this {@code PathNode}'s
      *     {@link #getTile}, or null if there is no previous node or either
      *     this or the previous node location is not on the map.
      */

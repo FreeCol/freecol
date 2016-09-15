@@ -58,7 +58,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     /**
      * The object we are trying to destroy. This can be a
-     * either {@code Settlement} or a <code>Unit</code>.
+     * either {@code Settlement} or a {@code Unit}.
      */
     private Location target, transportTarget;
 
@@ -69,7 +69,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param aiMain The main AI-object.
      * @param aiUnit The {@code AIUnit} this mission is created for.
      * @param target The object we are trying to destroy.  This can be
-     *     either a {@code Settlement} or a <code>Unit</code>.
+     *     either a {@code Settlement} or a {@code Unit}.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
                                      Location target) {

@@ -50,7 +50,7 @@ class BaseCostDecider implements CostDecider {
      * @param newLocation The {@code Location} we are moving to.
      * @param movesLeftBefore The moves left before making the move.
      * @return The cost of moving the given unit from the
-     *      {@code oldLocation} to the <code>newLocation</code>.
+     *      {@code oldLocation} to the {@code newLocation}.
      */    
     @Override
     public int getCost(final Unit unit, final Location oldLocation,

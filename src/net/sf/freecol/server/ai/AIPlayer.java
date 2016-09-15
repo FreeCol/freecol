@@ -117,7 +117,7 @@ public abstract class AIPlayer extends AIObject {
 
 
     /**
-     * Gets the {@code Player} this <code>AIPlayer</code> is
+     * Gets the {@code Player} this {@code AIPlayer} is
      * controlling.
      *
      * @return The {@code Player}.

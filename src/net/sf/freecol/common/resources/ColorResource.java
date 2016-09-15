@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A {@code Resource} wrapping a <code>Color</code>.
+ * A {@code Resource} wrapping a {@code Color}.
  * 
  * @see Resource
  * @see Color

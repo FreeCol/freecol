@@ -47,7 +47,7 @@ public class UnloadAction extends MapboardAction {
 
     /**
      * Creates an action for unloading the {@code Unit}
-     * provided.  If the {@code Unit} is <code>null</code>, then
+     * provided.  If the {@code Unit} is {@code null}, then
      * the currently selected unit is used instead.
      *
      * @param freeColClient The {@code FreeColClient} for the game.

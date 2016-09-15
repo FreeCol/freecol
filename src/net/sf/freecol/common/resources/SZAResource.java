@@ -29,7 +29,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
 /**
- * A {@code Resource} wrapping a <code>SimpleZippedAnimation</code>.
+ * A {@code Resource} wrapping a {@code SimpleZippedAnimation}.
  * 
  * @see Resource
  * @see SimpleZippedAnimation

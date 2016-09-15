@@ -145,7 +145,7 @@ public final class ImageLibrary {
 
     /**
      * The scale factor used when creating this
-     * {@code ImageLibrary}.  The value <code>1</code> is used if
+     * {@code ImageLibrary}.  The value {@code 1} is used if
      * this object is not a result of a scaling operation.
      */
     private final float scaleFactor;

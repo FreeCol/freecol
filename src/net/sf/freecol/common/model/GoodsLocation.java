@@ -150,7 +150,7 @@ public abstract class GoodsLocation extends UnitLocation {
 
     /**
      * Gets an list of all the goods in this location.  There is only
-     * one {@code Goods} for each <code>GoodsType</code>, thus the
+     * one {@code Goods} for each {@code GoodsType}, thus the
      * amount of goods may exceed CARGO_SIZE.
      *
      * @return A list of goods.

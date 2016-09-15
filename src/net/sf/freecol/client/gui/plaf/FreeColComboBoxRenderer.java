@@ -42,7 +42,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 
 /**
  * A {@code ListCellRenderer} to be used by
- * {@code FreeColListUI} and <code>JComboBox</code>es that
+ * {@code FreeColListUI} and {@code JComboBox}es that
  * display {@code ObjectWithId} values.
  */
 public class FreeColComboBoxRenderer<T>
