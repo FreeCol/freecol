@@ -1376,7 +1376,11 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
+<<<<<<< HEAD
+     * @param array An array of T.
+=======
      * @param array The array to maximize from.
+>>>>>>> fee3ea1553b32d7dfeecab8bc2d6617cb2ecb612
      * @param predicate A {@code Predicate} to match with.
      * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.

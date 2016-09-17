@@ -220,7 +220,11 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Get the tiles visible from this settlement.
      *
-     * A set of visible tiles.
+<<<<<<< HEAD
+     * @return A collection of visible tiles.
+=======
+     * @return A set of visible tiles.
+>>>>>>> fee3ea1553b32d7dfeecab8bc2d6617cb2ecb612
      */
     public Set<Tile> getVisibleTiles() {
         final Tile tile = getTile();

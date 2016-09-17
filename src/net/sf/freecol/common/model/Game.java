@@ -527,20 +527,20 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get live players in the game.
+     * Get players in the game.
      *
-     * @param predicate An optional {@code Player} to omit.
-     * @return The list of live {@code Player}s.
+     * @param predicate A {@code Predicate} to select suitable players with.
+     * @return A list of {@code Player}s.
      */
     public List<Player> getPlayerList(Predicate<Player> predicate) {
         return transform(this.players, predicate);
     }
 
     /**
-     * Get live players in the game.
+     * Get players in the game.
      *
-     * @param predicate An optional {@code Player} to omit.
-     * @return The stream of live {@code Player}s.
+     * @param predicate A {@code Predicate} to select suitable players with.
+     * @return The stream of {@code Player}s.
      */
     public Stream<Player> getPlayers(Predicate<Player> predicate) {
         return getPlayerList(predicate).stream();
