@@ -1363,6 +1363,7 @@ public final class Specification {
      *
      * Needed by the test suite.
      *
+     * @param id The id of the {@link UnitType} that can change.
      * @param from The {@code UnitType} that can change.
      * @param to The {@code UnitType} to change to.
      * @param prob The percentage chance of the change occurring.

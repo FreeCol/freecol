@@ -577,6 +577,7 @@ public class CollectionUtils {
     /**
      * Concatenate streams.
      *
+     * @param <T> Generic type of {@link Stream}
      * @param s0 The first {@code Stream}.
      * @param streams The {@code Stream}s to concatenate (nulls ignored).
      * @return The concatenated stream.
@@ -811,6 +812,7 @@ public class CollectionUtils {
     /**
      * Get the first item of a collection.
      *
+     * @param <T> Generic type T
      * @param c The {@code Collection} to search.
      * @return The first item, or null on failure.
      */
@@ -822,6 +824,7 @@ public class CollectionUtils {
     /**
      * Get the first item of a stream.
      *
+     * @param <T> Generic type T
      * @param stream The {@code Stream} to search.
      * @return The first item, or null on failure.
      */
@@ -832,6 +835,7 @@ public class CollectionUtils {
     /**
      * Implement first().
      *
+     * @param <T> Generic type T
      * @param stream The {@code Stream} to search.
      * @param fail The value to return on failure.
      * @return The first item, or fail on failure.
@@ -1176,6 +1180,8 @@ public class CollectionUtils {
     /**
      * Apply a mapping to a stream.
      *
+     * @param <T> Generic type T
+     * @param <R> Generic type R
      * @param stream The {@code Stream} to map.
      * @param mapper A mapping {@code Function} to apply.
      * @return The resulting {@code Stream}.
@@ -1189,6 +1195,8 @@ public class CollectionUtils {
     /**
      * Implement map.
      *
+     * @param <T> Generic type T
+     * @param <R> Generic type R
      * @param stream The {@code Stream} to map.
      * @param mapper A mapping {@code Function} to apply.
      * @return The resulting {@code Stream}.
@@ -1368,6 +1376,7 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
+     * @param array An array of T.
      * @param predicate A {@code Predicate} to match with.
      * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
@@ -1458,6 +1467,7 @@ public class CollectionUtils {
     /**
      * Find the minimum int value in an array.
      *
+     * @param array An array of T.
      * @param <T> The collection member type.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
@@ -1472,6 +1482,7 @@ public class CollectionUtils {
      * @param <T> The collection member type.
      * @param predicate A {@code Predicate} to match with.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
+     * @param array An array of T.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(T[] array, Predicate<? super T> predicate,
@@ -1829,6 +1840,7 @@ public class CollectionUtils {
     /**
      * Take the product of the members of a stream.
      *
+     * @param predicate A {@code Predicate} to match with.
      * @param <T> The stream member type.
      * @param stream The {@code Stream} to multiply.
      * @param tdf A {@code ToDoubleFunction} to convert members to double.
@@ -2247,6 +2259,7 @@ public class CollectionUtils {
     /**
      * Convert an iterator to a stream.
      *
+     * @param <T> A {@link Stream}
      * @param iterator The {@code Iterator} to convert.
      * @return The resulting {@code Stream}.
      */
@@ -2257,6 +2270,7 @@ public class CollectionUtils {
     /**
      * Convert an iterable to a stream.
      *
+     * @param <T> A {@link Stream}
      * @param iterable The {@code Iterable} to convert.
      * @return The resulting {@code Stream}.
      */

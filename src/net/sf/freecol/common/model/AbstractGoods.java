@@ -231,6 +231,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     /**
      * A predicate maker to match by type.
      *
+     * @param key The key of type {@link GoodsType}
      * @return A suitable {@code Predicate}.
      */
     public static final Predicate<? super AbstractGoods> matches(final GoodsType key) {

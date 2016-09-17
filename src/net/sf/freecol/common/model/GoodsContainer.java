@@ -116,7 +116,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Checks if the specified {@code Goods} is in this container.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param g The goods to test the presence of.
      * @return True if there is enough of the specified goods present that it
      *     can be removed without error.
@@ -157,7 +157,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Adds goods to this goods container.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The goods to add.
      * @return True if the addition succeeds.
      */
@@ -197,7 +197,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Removes goods from this goods container.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The goods to remove from this container.
      * @return The {@code Goods} actually removed.
      */

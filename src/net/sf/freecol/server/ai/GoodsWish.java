@@ -163,7 +163,7 @@ public class GoodsWish extends Wish {
     /**
      * Does some specified goods satisfy this wish?
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The goods to test.
      * @return True if the goods type matches and amount is not less than
      *     that requested.

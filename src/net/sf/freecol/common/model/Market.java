@@ -246,7 +246,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the price of a given goods when the {@code Player} sells.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The {@code Goods} to evaluate.
      * @return The price.
      */

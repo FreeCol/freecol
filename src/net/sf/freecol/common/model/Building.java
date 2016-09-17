@@ -141,6 +141,8 @@ public class Building extends WorkLocation
      * *multiplicative* modifiers, as this would capture the master blacksmith
      * doubling.
      *
+     * @param id The String identifier
+     * @param turn The turn number of type {@link Turn}
      * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */

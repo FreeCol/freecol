@@ -87,7 +87,7 @@ public class NativeTradeItem extends GoodsTradeItem {
     /**
      * Has a price been set for this item?
      *
-     * @param True if a price has been set.
+     * @return True if a price has been set.
      */
     public boolean priceIsSet() {
         return this.price != PRICE_UNSET;

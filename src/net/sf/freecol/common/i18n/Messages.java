@@ -468,6 +468,7 @@ public class Messages {
     /**
      * A predicate maker to match by message name.
      *
+     * @param key The name of the message.
      * @return A suitable {@code Predicate}.
      */
     public static final Predicate<String> matchesName(String key) {
@@ -477,6 +478,7 @@ public class Messages {
     /**
      * A predicate maker to match named types.
      *
+     * @param key The name of the type.
      * @return A suitable {@code Predicate}.
      */
     public static final Predicate<Named> matchesNamed(String key) {

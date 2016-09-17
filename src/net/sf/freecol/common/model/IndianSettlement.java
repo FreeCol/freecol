@@ -701,7 +701,6 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
 
-
     /**
      * Gets the amount of gold this {@code IndianSettlment}
      * is willing to pay for the given {@code Goods}.
@@ -710,7 +709,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The goods to price.
      * @return The price.
      */
@@ -880,7 +879,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * server, since the settlement's {@link GoodsContainer}
      * is hidden from the clients.
      *
-     * @param T The base type of the goods.
+     * @param <T> The base type of the goods.
      * @param goods The goods to price.
      * @return The price.
      */

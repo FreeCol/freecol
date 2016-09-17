@@ -1952,6 +1952,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *
      * @param goodsType The {@code GoodsType} to produce.
      * @param unitType An optional {@code UnitType} to do the work.
+     * @param wl The {@link WorkLocation}
      * @return A stream of suitable {@code Modifier}s.
      */
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,

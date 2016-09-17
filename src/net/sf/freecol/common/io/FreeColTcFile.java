@@ -82,7 +82,7 @@ public class FreeColTcFile extends FreeColModFile {
 
     /**
      * Helper to filter suitable file candidates to be made into
-     * FreeColTcFiles with {@see FreeColTcFile::make}
+     * FreeColTcFiles with {@link #make(File)}
      *
      * @param f The {@code File} to examine.
      * @return True if the file is suitable.

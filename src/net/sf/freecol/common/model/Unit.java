@@ -3702,6 +3702,7 @@ public class Unit extends GoodsLocation
      * Designed for message unpacking where the identifier should not
      * be trusted.
      *
+     * @param <T> The {@link Settlement}
      * @param settlementId The identifier of the
      *     {@code Settlement} to be found.
      * @return The settlement corresponding to the settlementId argument.
