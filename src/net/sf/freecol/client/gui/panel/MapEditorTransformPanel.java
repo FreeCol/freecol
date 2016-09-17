@@ -195,7 +195,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Ripped out of ResourceTransform to dodge the name clash with
      * CollectionUtils.transform which we want to use here.
      *
-     * @param resource A list of {@code ResourceType}s to choose from.
+     * @param resources A list of {@code ResourceType}s to choose from.
      * @return The chosen {@code ResourceType}.
      */
     private ResourceType getResourceChoice(List<ResourceType> resources) {

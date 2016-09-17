@@ -64,7 +64,6 @@ public class PlunderType extends FreeColSpecObjectType {
     /**
      * Gets the plunder range available for the supplied unit.
      *
-     * @param unit The {@code Unit} to check.
      * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunder() {

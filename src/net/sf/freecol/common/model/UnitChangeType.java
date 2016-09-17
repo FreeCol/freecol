@@ -209,7 +209,6 @@ public class UnitChangeType extends FreeColSpecObjectType {
      * Get a specific unit change for this unit change type, a
      * source unit type to change, and an optional destination unit type.
      *
-     * @param id The identifier for the required change type.
      * @param fromType The {@code UnitType} to change from.
      * @param toType An optional {@code UnitType} to change to.
      * @return The {@code UnitChange} found, or null if the

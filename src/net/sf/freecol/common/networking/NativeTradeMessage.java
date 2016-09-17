@@ -53,7 +53,6 @@ public class NativeTradeMessage extends DOMMessage {
      * @param unit The {@code Unit} performing the trade.
      * @param is The {@code IndianSettlement} where the
      *     trade occurs.
-     * @param action The {@code NativeTradeAction} to use.
      */
     public NativeTradeMessage(Unit unit, IndianSettlement is) {
         this(NativeTradeAction.OPEN, new NativeTrade(unit, is));
@@ -63,9 +62,8 @@ public class NativeTradeMessage extends DOMMessage {
      * Create a new {@code NativetradeMessage} with the
      * supplied unit and native settlement.
      *
-     * @param unit The {@code Unit} performing the session.
-     * @param is The {@code IndianSettlement} where the
-     *     session occurs.
+     * @param action The {@code NativeTradeAction}
+     * @param nt The {@code NativeTrade}
      */
     public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
         super(getTagName());

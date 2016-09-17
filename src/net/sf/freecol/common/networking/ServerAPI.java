@@ -675,8 +675,7 @@ public abstract class ServerAPI {
     /**
      * Server query-response to close a session for a trade.
      *
-     * @param unit The {@code Unit} that is trading.
-     * @param is The {@code IndianSettlement} that is trading.
+     * @param nt The {@code NativeTrade}
      * @return True if the server interaction succeeded.
      */
     public boolean endNativeTradeSession(NativeTrade nt) {

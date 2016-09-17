@@ -700,6 +700,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             || unit.hasGoodsCargo();
     }
 
+
+
     /**
      * Gets the amount of gold this {@code IndianSettlment}
      * is willing to pay for the given {@code Goods}.

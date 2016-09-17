@@ -1368,7 +1368,6 @@ public class CollectionUtils {
      * to a given comparison.
      *
      * @param <T> The collection member type.
-     * @param c The {@code Collection} to maximize from.
      * @param predicate A {@code Predicate} to match with.
      * @param comparator A {@code Comparator} to compare with.
      * @return The maximal value found, or null if none present.
@@ -1460,7 +1459,6 @@ public class CollectionUtils {
      * Find the minimum int value in an array.
      *
      * @param <T> The collection member type.
-     * @param c The {@code Collection} to check.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
      */
@@ -1472,7 +1470,6 @@ public class CollectionUtils {
      * Find the minimum int value in an array.
      *
      * @param <T> The collection member type.
-     * @param c The {@code Collection} to check.
      * @param predicate A {@code Predicate} to match with.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
      * @return The minimum value found, or zero if the input is empty.
@@ -1871,7 +1868,6 @@ public class CollectionUtils {
      *
      * @param <K> The map key type.
      * @param <V> The map value type.
-     * @param c The {@code Map} to remove from.
      * @param predicate A {@code Predicate} to match map entries with.
      * @return True if anything was removed.
      */

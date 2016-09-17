@@ -141,7 +141,6 @@ public class Building extends WorkLocation
      * *multiplicative* modifiers, as this would capture the master blacksmith
      * doubling.
      *
-     * @param goodsType The {@code GoodsType} to produce.
      * @param unitType The optional {@code UnitType} to produce them.
      * @return A stream of the applicable modifiers.
      */

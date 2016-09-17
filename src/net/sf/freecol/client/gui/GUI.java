@@ -1138,7 +1138,7 @@ public class GUI extends FreeColClientHolder {
      * with optional extra debug information.
      *
      * @param template The {@code StringTemplate} containing the message.
-     * @param messsage Optional extra debug information.
+     * @param message Optional extra debug information.
      */
     public final void showErrorMessage(StringTemplate template,
                                        String message) {
@@ -1150,7 +1150,7 @@ public class GUI extends FreeColClientHolder {
      * with optional extra debug information and an optional callback.
      *
      * @param template The {@code StringTemplate} containing the message.
-     * @param messsage Optional extra debug information.
+     * @param message Optional extra debug information.
      * @param callback Optional routine to run when the error panel is closed.
      */
     public final void showErrorMessage(StringTemplate template, String message,

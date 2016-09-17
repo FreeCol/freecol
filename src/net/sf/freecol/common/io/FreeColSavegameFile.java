@@ -133,7 +133,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * Helper to filter suitable file candidates to be made into
      * FreeColSaveGameFiles.
      *
-     * @param The {@code File} to examine.
+     * @param f The {@code File} to examine.
      * @return True if the file is suitable.
      */
     public static boolean fileFilter(File f) {

@@ -144,7 +144,7 @@ public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
      * Helper to filter suitable file candidates to be made into
      * FreeColModFiles with {@see FreeColModFile::make}
      *
-     * @param The {@code File} to examine.
+     * @param f The {@code File} to examine.
      * @return True if the file is suitable.
      */
     public static boolean fileFilter(File f) {

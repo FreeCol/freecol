@@ -1340,7 +1340,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a unit change for this unit.
      *
-     * @param id The identifier for the required change type.
+     * @param change The identifier for the required change type.
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
      */
@@ -1351,7 +1351,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a unit change for this unit.
      *
-     * @param id The identifier for the required change type.
+     * @param change The identifier for the required change type.
      * @param toType A {@code UnitType} to change to.
      * @return The {@code UnitChange} found, or null if the
      *     change is impossible.
@@ -1368,7 +1368,7 @@ public class Unit extends GoodsLocation
     /**
      * Get a unit change for this unit, including the ownership check.
      *
-     * @param id The identifier for the required change type.
+     * @param change The identifier for the required change type.
      * @param toType A {@code UnitType} to change to.
      * @param player The expected {@code Player} that will own the unit.
      * @return The {@code UnitChange} found, or null if the
