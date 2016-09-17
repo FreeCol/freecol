@@ -88,7 +88,7 @@ import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
- * Utilities for in game debug support.
+ * Utilities for in-game debug support.
  *
  * Several client GUI features have optional debug routines.  These
  * routines are typically quite special in that they need to intrusive
