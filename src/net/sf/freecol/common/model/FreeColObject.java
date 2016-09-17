@@ -847,7 +847,6 @@ public abstract class FreeColObject
      *
      * @param file The {@code File} to write to.
      * @return True if the save proceeded without error.
-     * @exception FileNotFoundException if unable to open the file.
      */
     public boolean save(File file) {
         return save(file, WriteScope.toSave());

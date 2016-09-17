@@ -651,10 +651,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
 
-    // Override FreeColObject
-
     /**
+     * Override FreeColObject
+     *
      * {@inheritDoc}
+     * @exception Logger if unable to open the file.
      */
     @Override
     public boolean save(File file) {
