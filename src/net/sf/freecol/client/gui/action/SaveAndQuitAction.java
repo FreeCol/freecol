@@ -44,6 +44,9 @@ public class SaveAndQuitAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (freeColClient.isMapEditor()) {

@@ -56,6 +56,9 @@ public class FreeColTcFile extends FreeColModFile {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResourceMapping getResourceMapping() {
         ResourceMapping result = new ResourceMapping();

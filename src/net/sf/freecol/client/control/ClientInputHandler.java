@@ -114,6 +114,9 @@ public abstract class ClientInputHandler extends FreeColClientHolder
 
     // Implement MessageHandler
 
+    /**
+     * {@inheritDoc}
+     */
     public Element handle(Connection connection, Element element) {
         if (element == null) return null;
         final String tag = element.getTagName();

@@ -412,6 +412,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
     // end @compat 0.11.6
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -442,6 +445,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         xw.writeAttribute(EXPOSE_RESOURCE_PERCENT_TAG, exposeResourcePercent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -474,6 +480,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -518,6 +527,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
             exposeResourcePercent = xr.getAttribute(EXPOSE_RESOURCE_PERCENT_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -530,6 +542,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         super.readChildren(xr);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -577,6 +592,9 @@ public final class TileImprovementType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

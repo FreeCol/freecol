@@ -135,6 +135,9 @@ public abstract class PortPanel extends FreeColPanel {
 
     // Override JComponent
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TransferHandler getTransferHandler() {
         return defaultTransferHandler;
@@ -142,6 +145,9 @@ public abstract class PortPanel extends FreeColPanel {
 
 
     // Override Component
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

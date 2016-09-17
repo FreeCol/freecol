@@ -105,6 +105,9 @@ public final class DeclarationPanel extends FreeColPanel {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -122,6 +125,9 @@ public final class DeclarationPanel extends FreeColPanel {
 
     // Override JComponent
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics g) {
         Image image = ResourceManager.getImage("image.flavor.Declaration");
@@ -268,6 +274,9 @@ public final class DeclarationPanel extends FreeColPanel {
 
         // Override JComponent
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics g) {
             if (points == null || points.length == 0) {

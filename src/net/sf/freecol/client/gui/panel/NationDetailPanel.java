@@ -59,6 +59,9 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
     // Implement ColopediaDetailPanel
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         List<Nation> nations = new ArrayList<>();
@@ -67,6 +70,9 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
         super.addSubTrees(root, nations);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;

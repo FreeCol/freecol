@@ -105,6 +105,9 @@ public final class PlayersTable extends JTable {
 
         // Implement DefaultCellEditor
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getCellEditorValue() {
             return ((JComboBox)getComponent()).getSelectedItem();
@@ -130,6 +133,9 @@ public final class PlayersTable extends JTable {
 
         // Implement TableCellRenderer
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -179,6 +185,9 @@ public final class PlayersTable extends JTable {
 
         // Implement TableCellRenderer
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -218,6 +227,9 @@ public final class PlayersTable extends JTable {
 
         // Implement AbstractCellEditor
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {
@@ -274,6 +286,9 @@ public final class PlayersTable extends JTable {
 
         // Implement TableCellEditor
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -296,6 +311,9 @@ public final class PlayersTable extends JTable {
 
         // Implement TableCellEditor
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -314,6 +332,9 @@ public final class PlayersTable extends JTable {
 
         // Implement ListCellEditor<NationState>
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getListCellRendererComponent(JList<? extends NationState> list,
                                                       NationState value,
@@ -339,6 +360,9 @@ public final class PlayersTable extends JTable {
 
         // Implement TableCellRenderer
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellRendererComponent(JTable table,
             Object value, boolean isSelected, boolean hasFocus,
@@ -376,6 +400,9 @@ public final class PlayersTable extends JTable {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getTableCellEditorComponent(JTable table,
             Object value, boolean isSelected, int row, int column) {

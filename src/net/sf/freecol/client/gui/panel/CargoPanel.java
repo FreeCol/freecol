@@ -174,14 +174,23 @@ public class CargoPanel extends FreeColPanel
 
     // Interface DropTarget
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean accepts(Unit unit) {
         return carrier.canAdd(unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean accepts(Goods goods) {
         return carrier.canAdd(goods);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Component add(Component comp, boolean editState) {
         if (carrier == null) return null;
 
@@ -231,6 +240,9 @@ public class CargoPanel extends FreeColPanel
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int suggested(GoodsType type) {
         return carrier.getLoadableAmount(type);
     }
@@ -249,6 +261,9 @@ public class CargoPanel extends FreeColPanel
 
     // Override JLabel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "CargoPanelUI";
@@ -257,6 +272,9 @@ public class CargoPanel extends FreeColPanel
 
     // Override Container
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(Component comp) {
         if (comp instanceof UnitLabel) {
@@ -273,6 +291,9 @@ public class CargoPanel extends FreeColPanel
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

@@ -358,6 +358,9 @@ public abstract class TransportableAIObject extends ValuedAIObject {
     private static final String TRANSPORT_TAG = "transport";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -370,6 +373,9 @@ public abstract class TransportableAIObject extends ValuedAIObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

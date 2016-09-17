@@ -80,27 +80,42 @@ public class ColonyTradeItem extends TradeItem {
 
     // Interface TradeItem
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid() {
         return colonyId != null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isUnique() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.template(Messages.descriptionKey("model.tradeItem.colony"))
             .addName("%colony%", colonyName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Colony getColony(Game game) {
         return game.getFreeColGameObject(colonyId, Colony.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int evaluateFor(Player player) {
         final Colony colony = getColony(player.getGame());
         return (colony == null || !getSource().owns(colony))
@@ -111,6 +126,9 @@ public class ColonyTradeItem extends TradeItem {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof ColonyTradeItem) {
@@ -121,6 +139,9 @@ public class ColonyTradeItem extends TradeItem {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -135,6 +156,9 @@ public class ColonyTradeItem extends TradeItem {
     private static final String COLONY_NAME_TAG = "colonyName";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -144,6 +168,9 @@ public class ColonyTradeItem extends TradeItem {
         xw.writeAttribute(COLONY_NAME_TAG, colonyName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -153,6 +180,9 @@ public class ColonyTradeItem extends TradeItem {
         colonyName = xr.getAttribute(COLONY_NAME_TAG, (String)null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -161,6 +191,9 @@ public class ColonyTradeItem extends TradeItem {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

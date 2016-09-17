@@ -150,6 +150,9 @@ public final class GoodsLabel extends AbstractGoodsLabel
 
     // Implement Draggable
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isOnCarrier() {
         Goods goods = getGoods();

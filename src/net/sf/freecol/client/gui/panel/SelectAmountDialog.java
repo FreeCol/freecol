@@ -108,6 +108,9 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
         initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Integer getInputValue() {
         Object value = this.comboBox.getSelectedItem();
@@ -117,6 +120,9 @@ public final class SelectAmountDialog extends FreeColInputDialog<Integer> {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.comboBox.requestFocus();

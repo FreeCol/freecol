@@ -222,6 +222,9 @@ public abstract class TradeItem extends FreeColGameObject {
 
     // Override FreeColGameObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isInternable() {
         return false;
@@ -230,6 +233,9 @@ public abstract class TradeItem extends FreeColGameObject {
     
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof TradeItem) {
@@ -240,6 +246,9 @@ public abstract class TradeItem extends FreeColGameObject {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -254,6 +263,9 @@ public abstract class TradeItem extends FreeColGameObject {
     private static final String SOURCE_TAG = "source";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -263,6 +275,9 @@ public abstract class TradeItem extends FreeColGameObject {
         xw.writeAttribute(DESTINATION_TAG, this.destination);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

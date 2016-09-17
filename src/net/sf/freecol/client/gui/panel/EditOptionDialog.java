@@ -56,6 +56,9 @@ public class EditOptionDialog extends FreeColConfirmDialog {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean getResponse() {
         Boolean result = super.getResponse();

@@ -46,6 +46,9 @@ public class DeclareIndependenceAction extends MapboardAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         Player p = freeColClient.getMyPlayer();
@@ -56,6 +59,9 @@ public class DeclareIndependenceAction extends MapboardAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         igc().declareIndependence();

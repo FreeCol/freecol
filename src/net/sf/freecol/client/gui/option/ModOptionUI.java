@@ -41,6 +41,9 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     private static class BoxRenderer
         extends FreeColComboBoxRenderer<FreeColModFile> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void setLabelValues(JLabel label, FreeColModFile value) {
             if (value != null) {
@@ -52,6 +55,9 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
     private static class ModOptionRenderer
         extends FreeColComboBoxRenderer<ModOption> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void setLabelValues(JLabel label, ModOption value) {
             FreeColModFile modFile = value.getValue();
@@ -110,21 +116,33 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListCellRenderer getListCellRenderer() {
         return new ModOptionRenderer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         getOption().setValue((FreeColModFile)this.box.getSelectedItem());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JComboBox getComponent() {
         return this.box;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         this.box.setSelectedItem(getOption().getValue());

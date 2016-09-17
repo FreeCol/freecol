@@ -51,6 +51,9 @@ public class ContinueAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         File lastSave = FreeColDirectories.getLastSaveGameFile();

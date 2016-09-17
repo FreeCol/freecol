@@ -116,6 +116,9 @@ public final class RecruitPanel extends FreeColPanel {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -138,6 +141,9 @@ public final class RecruitPanel extends FreeColPanel {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

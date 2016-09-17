@@ -53,6 +53,9 @@ public class ModListOption extends ListOption<FreeColModFile> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModListOption clone() {
         ModListOption ret = new ModListOption(getId(), getSpecification());
@@ -63,6 +66,9 @@ public class ModListOption extends ListOption<FreeColModFile> {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

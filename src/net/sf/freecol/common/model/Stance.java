@@ -185,6 +185,9 @@ public enum Stance implements Named {
     
     // Implement Named
 
+    /**
+     * {@inheritDoc}
+     */
     public String getNameKey() {
         return Messages.nameKey("model." + getKey());
     }

@@ -549,6 +549,9 @@ public final class GoodsType extends FreeColSpecObjectType {
     private static final String ZERO_PRODUCTION_FACTOR_TAG = "zero-production-factor";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -596,6 +599,9 @@ public final class GoodsType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -613,6 +619,9 @@ public final class GoodsType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -659,6 +668,9 @@ public final class GoodsType extends FreeColSpecObjectType {
             DEFAULT_ZERO_PRODUCTION_FACTOR);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -677,6 +689,9 @@ public final class GoodsType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

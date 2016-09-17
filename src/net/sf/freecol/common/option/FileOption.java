@@ -52,6 +52,9 @@ public class FileOption extends AbstractOption<File> {
 
     // Interface Option
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FileOption clone() {
         FileOption result = new FileOption(getSpecification());
@@ -59,11 +62,17 @@ public class FileOption extends AbstractOption<File> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public File getValue() {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setValue(File value) {
         final File oldValue = this.value;
@@ -78,11 +87,17 @@ public class FileOption extends AbstractOption<File> {
 
     // Override AbstractOption
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isNullValueOK() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         if (valueString != null) {
@@ -98,6 +113,9 @@ public class FileOption extends AbstractOption<File> {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -107,6 +125,9 @@ public class FileOption extends AbstractOption<File> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -116,6 +137,9 @@ public class FileOption extends AbstractOption<File> {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

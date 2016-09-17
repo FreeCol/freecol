@@ -62,6 +62,9 @@ public class TextOption extends AbstractOption<String> {
 
     // Interface Option.
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TextOption clone() {
         TextOption result = new TextOption(getId(), getSpecification());
@@ -69,11 +72,17 @@ public class TextOption extends AbstractOption<String> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getValue() {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setValue(String value) {
         final String oldValue = this.value;
@@ -88,6 +97,9 @@ public class TextOption extends AbstractOption<String> {
 
     // Override AbstractOption
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         setValue((valueString != null) ? valueString : defaultValueString);
@@ -99,6 +111,9 @@ public class TextOption extends AbstractOption<String> {
     private static final String CHOICE_TAG = "choice";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -106,6 +121,9 @@ public class TextOption extends AbstractOption<String> {
         xw.writeAttribute(VALUE_TAG, value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -115,6 +133,9 @@ public class TextOption extends AbstractOption<String> {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

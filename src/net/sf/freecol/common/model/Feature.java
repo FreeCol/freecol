@@ -260,6 +260,9 @@ public abstract class Feature extends FreeColSpecObject
 
     // Interface Named
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNameKey() {
         return Messages.nameKey(getId());
@@ -268,20 +271,32 @@ public abstract class Feature extends FreeColSpecObject
 
     // Interface Scoped, and scope support
 
+    /**
+     * {@inheritDoc}
+     */
     public final List<Scope> getScopeList() {
         return (this.scopes == null) ? Collections.<Scope>emptyList()
             : new ArrayList<>(this.scopes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final Stream<Scope> getScopes() {
         return (this.scopes == null) ? Stream.<Scope>empty()
             : getScopeList().stream();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void setScopes(List<Scope> scopes) {
         this.scopes = scopes;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addScope(Scope scope) {
         if (this.scopes == null) this.scopes = new ArrayList<>();
         this.scopes.add(scope);
@@ -299,6 +314,9 @@ public abstract class Feature extends FreeColSpecObject
     
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -335,6 +353,9 @@ public abstract class Feature extends FreeColSpecObject
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -359,6 +380,9 @@ public abstract class Feature extends FreeColSpecObject
     private static final String TEMPORARY_TAG = "temporary";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -384,6 +408,9 @@ public abstract class Feature extends FreeColSpecObject
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -391,6 +418,9 @@ public abstract class Feature extends FreeColSpecObject
         for (Scope scope : getScopeList()) scope.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -415,6 +445,9 @@ public abstract class Feature extends FreeColSpecObject
         temporary = xr.getAttribute(TEMPORARY_TAG, false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -423,6 +456,9 @@ public abstract class Feature extends FreeColSpecObject
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();

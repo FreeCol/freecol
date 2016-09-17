@@ -110,6 +110,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
         // Implement Comparable<Language>
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int compareTo(Language l) {
             return toString().compareTo(l.toString());
@@ -117,6 +120,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
         // Override Object
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -128,12 +134,18 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             int hash = super.hashCode();
             return 31 * hash + Utils.hashCode(this.key);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             if (Messages.AUTOMATIC.equals(getKey())) {
@@ -234,6 +246,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     // Interface Option
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LanguageOption clone() {
         LanguageOption result = new LanguageOption(getSpecification());
@@ -241,11 +256,17 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final Language getValue() {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void setValue(final Language newValue) {
         final Language oldValue = this.value;
@@ -259,6 +280,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
 
     // Override AbstractOption
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
         Language l = null;
@@ -278,6 +302,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -285,6 +312,9 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         xw.writeAttribute(VALUE_TAG, getValue().getKey());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

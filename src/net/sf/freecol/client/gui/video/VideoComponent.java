@@ -149,6 +149,9 @@ public class VideoComponent extends JPanel {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         applet.stop();

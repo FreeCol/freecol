@@ -509,6 +509,9 @@ public final class NewPanel extends FreeColPanel
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final ConnectController cc = getFreeColClient().getConnectController();
@@ -572,6 +575,9 @@ public final class NewPanel extends FreeColPanel
 
     // Interface ItemListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void itemStateChanged(ItemEvent e) {
         update();

@@ -157,6 +157,9 @@ public class ServerInfo {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return name + "(" + address + ":" + port + ") " + currentlyPlaying 

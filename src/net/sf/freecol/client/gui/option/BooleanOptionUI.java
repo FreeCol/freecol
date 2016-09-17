@@ -61,16 +61,25 @@ public final class BooleanOptionUI extends OptionUI<BooleanOption>  {
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JCheckBox getComponent() {
         return box;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         getOption().setValue(box.isSelected());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         box.setSelected(getOption().getValue());

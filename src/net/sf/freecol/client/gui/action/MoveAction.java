@@ -65,6 +65,9 @@ public class MoveAction extends MapboardAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) { 
         switch (getGUI().getViewMode()) {

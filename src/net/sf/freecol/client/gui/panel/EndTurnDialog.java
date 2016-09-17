@@ -79,6 +79,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
                 .getLocationLabelFor(unit.getOwner()));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return name;
@@ -105,6 +108,9 @@ public final class EndTurnDialog extends FreeColConfirmDialog {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getListCellRendererComponent(JList<? extends UnitWrapper> list,
                                                       UnitWrapper value,

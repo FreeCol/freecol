@@ -186,6 +186,9 @@ public class UnitWas implements Comparable<UnitWas> {
 
     // Implement Comparable<UnitWas>
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compareTo(UnitWas uw) {
         // Order by decreasing capacity of the location the unit is to
@@ -210,6 +213,9 @@ public class UnitWas implements Comparable<UnitWas> {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof UnitWas) {
@@ -218,6 +224,9 @@ public class UnitWas implements Comparable<UnitWas> {
         return super.equals(other);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -232,6 +241,9 @@ public class UnitWas implements Comparable<UnitWas> {
         return 37 * hash + Utils.hashCode(colony);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         Tile tile = colony.getTile();

@@ -47,6 +47,9 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
         setOpaque(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Component getTableCellRendererComponent(JTable table, Object color,
         boolean isSelected, boolean hasFocus, int row, int column) {

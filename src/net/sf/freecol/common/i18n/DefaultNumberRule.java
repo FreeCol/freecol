@@ -72,6 +72,9 @@ public class DefaultNumberRule extends Number {
         return rules.get(category);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Category getCategory(double input) {
         return find(Category.values(),

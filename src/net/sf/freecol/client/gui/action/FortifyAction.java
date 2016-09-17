@@ -47,6 +47,9 @@ public class FortifyAction extends UnitAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && getGUI().getActiveUnit()
@@ -56,6 +59,9 @@ public class FortifyAction extends UnitAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         igc().changeState(getGUI().getActiveUnit(),

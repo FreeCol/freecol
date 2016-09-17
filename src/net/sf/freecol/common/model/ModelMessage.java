@@ -83,6 +83,9 @@ public class ModelMessage extends StringTemplate {
 
         // Implement Named
 
+        /**
+         * {@inheritDoc}
+         */
         public String getNameKey() {
             return Messages.nameKey("model." + getKey());
         }
@@ -372,6 +375,9 @@ public class ModelMessage extends StringTemplate {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -384,6 +390,9 @@ public class ModelMessage extends StringTemplate {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -400,6 +409,9 @@ public class ModelMessage extends StringTemplate {
     private static final String SOURCE_TAG = "source";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -413,6 +425,9 @@ public class ModelMessage extends StringTemplate {
         xw.writeAttribute(HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -427,6 +442,9 @@ public class ModelMessage extends StringTemplate {
         beenDisplayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -439,6 +457,9 @@ public class ModelMessage extends StringTemplate {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

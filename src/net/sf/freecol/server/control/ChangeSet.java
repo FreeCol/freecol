@@ -195,6 +195,9 @@ public class ChangeSet {
             return this;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(64);
@@ -422,9 +425,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(64);
@@ -504,6 +513,9 @@ public class ChangeSet {
             element.setAttribute(key, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -561,9 +573,15 @@ public class ChangeSet {
             return (Element) doc.importNode(element, true);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -679,9 +697,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -714,6 +738,9 @@ public class ChangeSet {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean matches(FreeColGameObject fcgo) {
             return this.fcgo == fcgo;
@@ -777,9 +804,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -837,6 +870,9 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -877,11 +913,17 @@ public class ChangeSet {
             return ChangePriority.CHANGE_EARLY.getPriority();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isNotifiable(ServerPlayer serverPlayer) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addPlayer");
@@ -889,9 +931,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -980,9 +1028,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1042,9 +1096,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1109,9 +1169,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1176,9 +1242,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1241,9 +1313,15 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
@@ -1312,6 +1390,9 @@ public class ChangeSet {
             return element;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void attachToElement(Element element) {} // Noop
 
@@ -1825,6 +1906,9 @@ public class ChangeSet {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

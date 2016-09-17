@@ -197,6 +197,9 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     // Interface PropertyChangeListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
@@ -209,11 +212,17 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
 
     // Override JComponent
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JToolTip createToolTip() {
         return new BuildingToolTip(freeColClient, building);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics g) {
         ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
@@ -240,6 +249,9 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
             this.number = number;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics g) {
             getIcon().paintIcon(null, g, 0, 0);

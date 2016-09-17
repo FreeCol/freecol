@@ -252,17 +252,26 @@ public class DefendSettlementMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getTransportDestination, isOneTime
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getBaseTransportPriority() {
         return (getTransportDestination() == null) ? 0
             : NORMAL_TRANSPORT_PRIORITY + 5;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTarget() {
         return target;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTarget(Location target) {
         if (target == null || target instanceof Settlement) {
@@ -270,16 +279,25 @@ public class DefendSettlementMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location findTarget() {
         return findTarget(getAIUnit(), 4, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -407,6 +425,9 @@ public class DefendSettlementMission extends Mission {
     private static final String SETTLEMENT_TAG = "settlement";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -416,6 +437,9 @@ public class DefendSettlementMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -424,6 +448,9 @@ public class DefendSettlementMission extends Mission {
                                  Settlement.class, (Settlement)null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

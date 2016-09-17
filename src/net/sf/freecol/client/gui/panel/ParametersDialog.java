@@ -129,6 +129,9 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Parameters getResponse() {
         Object value = getValue();
@@ -143,6 +146,9 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.inputD.requestFocus();

@@ -290,11 +290,17 @@ public class TileImprovementPlan extends ValuedAIObject {
     private static final String TYPE_TAG = "type";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (validate()) toXML(xw, getXMLTagName());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -308,6 +314,9 @@ public class TileImprovementPlan extends ValuedAIObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -327,6 +336,9 @@ public class TileImprovementPlan extends ValuedAIObject {
                                  Tile.class, (Tile)null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
@@ -334,6 +346,9 @@ public class TileImprovementPlan extends ValuedAIObject {
         if (type != null && target != null) uninitialized = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -346,6 +361,9 @@ public class TileImprovementPlan extends ValuedAIObject {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

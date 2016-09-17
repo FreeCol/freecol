@@ -51,6 +51,9 @@ public class DebugAction extends FreeColAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean shouldBeEnabled() {
         return !FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS);
@@ -59,6 +62,9 @@ public class DebugAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (shouldBeEnabled()) {

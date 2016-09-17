@@ -1126,6 +1126,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Game game = getGame();

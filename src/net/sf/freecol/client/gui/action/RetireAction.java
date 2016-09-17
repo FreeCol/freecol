@@ -45,6 +45,9 @@ public class RetireAction extends FreeColAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         Player player = freeColClient.getMyPlayer();
@@ -56,6 +59,9 @@ public class RetireAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         freeColClient.retire();

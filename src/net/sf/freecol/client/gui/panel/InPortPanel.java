@@ -43,6 +43,9 @@ public abstract class InPortPanel extends UnitPanel {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void selectLabel() {
         // Keep the previous selected unit if possible, otherwise default
@@ -73,6 +76,9 @@ public abstract class InPortPanel extends UnitPanel {
 
     // Override JLabel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "InPortPanelUI";

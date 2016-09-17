@@ -67,6 +67,9 @@ public class TerrainDetailPanel
 
     // Implement ColopediaDetailPanel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode node
@@ -86,6 +89,9 @@ public class TerrainDetailPanel
         root.add(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;

@@ -46,6 +46,9 @@ public class ChatAction extends FreeColAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
@@ -57,6 +60,9 @@ public class ChatAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showChatPanel();

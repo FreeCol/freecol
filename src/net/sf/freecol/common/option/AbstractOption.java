@@ -154,6 +154,9 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
 
     // Interface Option
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
 
@@ -180,6 +183,9 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
     protected static final String DEFAULT_VALUE_TAG = "defaultValue";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

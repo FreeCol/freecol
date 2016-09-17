@@ -142,6 +142,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
             // Interface Transferable
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Object getTransferData(DataFlavor flavor)
                 throws UnsupportedFlavorException {
@@ -149,11 +152,17 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 throw new UnsupportedFlavorException(flavor);
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public DataFlavor[] getTransferDataFlavors() {
                 return supportedFlavors;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
                 return any(supportedFlavors, matchKeyEquals(flavor));
@@ -167,6 +176,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         
         // Override TransferHandler
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean importData(JComponent comp, Transferable data) {
             if (!canImport(comp, data.getTransferDataFlavors())) return false;
@@ -308,6 +320,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void exportDone(JComponent source, Transferable data, 
                                   int action) {
@@ -316,12 +331,18 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             updateAllLists();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean canImport(JComponent comp, DataFlavor[] flavors) {
             return flavors != null
                 && any(flavors, matchKeyEquals(BUILD_LIST_FLAVOR));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected Transferable createTransferable(JComponent comp) {
             
@@ -331,6 +352,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             return new BuildablesTransferable(this.source.getSelectedValuesList());
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getSourceActions(JComponent comp) {
             return (comp == BuildQueuePanel.this.unitList) ? COPY : MOVE;
@@ -349,6 +373,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void mousePressed(MouseEvent e) {
             if (!this.enabled && e.getClickCount() == 1 && !e.isConsumed()) {
@@ -410,6 +437,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getListCellRendererComponent(JList<? extends BuildableType> list,
                         BuildableType value,
@@ -998,6 +1028,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String FAIL = "FAIL";
@@ -1035,6 +1068,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     // Interface ItemListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == this.compactBox) {

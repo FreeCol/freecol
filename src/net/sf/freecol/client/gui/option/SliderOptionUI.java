@@ -63,21 +63,33 @@ public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final JLabel getJLabel() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JSlider getComponent() {
         return slider;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         getOption().setValue(slider.getValue());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         slider.setValue(getOption().getValue());

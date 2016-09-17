@@ -47,6 +47,9 @@ public class DisplayBordersAction extends SelectableAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         setSelected(((JCheckBoxMenuItem)ae.getSource()).isSelected());

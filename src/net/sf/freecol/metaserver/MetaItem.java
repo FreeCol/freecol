@@ -31,6 +31,9 @@ public class MetaItem extends ServerInfo {
     private long lastUpdated;
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update(String name, String address, int port,
                        int slotsAvailable, int currentlyPlaying,

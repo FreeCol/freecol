@@ -47,6 +47,9 @@ public class ShowMainAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (!getGUI().confirmStopGame()) return;

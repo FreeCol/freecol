@@ -281,6 +281,9 @@ public class Nation extends FreeColSpecObjectType {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -298,6 +301,9 @@ public class Nation extends FreeColSpecObjectType {
         if (color != null) xw.writeAttribute(COLOR_TAG, color.getRGB());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -329,6 +335,9 @@ public class Nation extends FreeColSpecObjectType {
         if (rgb != UNDEFINED) setColor(new Color(rgb));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

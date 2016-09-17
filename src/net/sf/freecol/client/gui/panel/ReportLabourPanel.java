@@ -98,6 +98,9 @@ public final class ReportLabourPanel extends ReportPanel {
     private static class LabourUnitPanelRenderer
         implements ListCellRenderer<LabourUnitPanel> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getListCellRendererComponent(JList<? extends LabourUnitPanel> list,
                                                       LabourUnitPanel value,
@@ -218,6 +221,9 @@ public final class ReportLabourPanel extends ReportPanel {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();

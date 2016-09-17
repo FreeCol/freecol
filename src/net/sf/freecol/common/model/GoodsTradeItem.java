@@ -66,6 +66,9 @@ public class GoodsTradeItem extends TradeItem {
 
     // Interface TradeItem
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid() {
         return goods != null && goods.getType() != null
@@ -74,26 +77,41 @@ public class GoodsTradeItem extends TradeItem {
             && getSource().owns((Ownable)goods.getLocation());
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isUnique() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLabel() {
         return goods.getLabel(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Goods getGoods() {
         return goods;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setGoods(Goods goods) {
         this.goods = goods;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
         final Goods goods = getGoods();
@@ -110,6 +128,9 @@ public class GoodsTradeItem extends TradeItem {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof GoodsTradeItem) {
@@ -119,6 +140,9 @@ public class GoodsTradeItem extends TradeItem {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -128,6 +152,9 @@ public class GoodsTradeItem extends TradeItem {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -135,6 +162,9 @@ public class GoodsTradeItem extends TradeItem {
         goods.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -143,6 +173,9 @@ public class GoodsTradeItem extends TradeItem {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
@@ -156,6 +189,9 @@ public class GoodsTradeItem extends TradeItem {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -165,6 +201,9 @@ public class GoodsTradeItem extends TradeItem {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -42,6 +42,9 @@ public abstract class UnitAction extends MapboardAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()

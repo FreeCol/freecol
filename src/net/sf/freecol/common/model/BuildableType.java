@@ -244,7 +244,10 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     public static final String REQUIRED_POPULATION_TAG = "required-population";
 
 
-   @Override
+   /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -253,6 +256,9 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -283,6 +289,9 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         for (Limit limit : getLimits()) limit.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -291,6 +300,9 @@ public abstract class BuildableType extends FreeColSpecObjectType {
                                              DEFAULT_REQUIRED_POPULATION);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         if (xr.shouldClearContainers()) {
@@ -302,6 +314,9 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();

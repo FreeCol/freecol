@@ -250,21 +250,33 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     // Override FreeColObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Specification getSpecification() {
         return (this.game == null) ? null : this.game.getSpecification();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSpecification(Specification specification) {
         throw new RuntimeException("Can not set specification");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Game getGame() {
         return this.game;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setGame(Game game) {
         if (game == null) throw new RuntimeException("Null game");
@@ -274,6 +286,9 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -287,6 +302,9 @@ public abstract class FreeColGameObject extends FreeColObject {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -297,6 +315,9 @@ public abstract class FreeColGameObject extends FreeColObject {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -304,6 +325,9 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (xr.shouldIntern()) internId(getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         this.initialized = true;

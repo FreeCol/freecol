@@ -1025,11 +1025,17 @@ public abstract class Mission extends AIObject {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (isValid()) toXML(xw, getXMLTagName());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // This routine might look redundant, but if you let it
@@ -1039,6 +1045,9 @@ public abstract class Mission extends AIObject {
         // identifiers.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // This routine might look redundant, but if you let it
@@ -1047,6 +1056,9 @@ public abstract class Mission extends AIObject {
         // attribute.  Missions do not have ids.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);

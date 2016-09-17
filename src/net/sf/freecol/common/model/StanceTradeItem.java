@@ -67,31 +67,49 @@ public class StanceTradeItem extends TradeItem {
 
     // Interface TradeItem
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid() {
         return stance != null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isUnique() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.key(stance);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stance getStance() {
         return stance;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setStance(Stance stance) {
         this.stance = stance;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int evaluateFor(Player player) {
         final Stance stance = getStance();
         final double ratio = player.getStrengthRatio(getOther(player), false);
@@ -116,6 +134,9 @@ public class StanceTradeItem extends TradeItem {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof StanceTradeItem) {
@@ -125,6 +146,9 @@ public class StanceTradeItem extends TradeItem {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -137,6 +161,9 @@ public class StanceTradeItem extends TradeItem {
     private static final String STANCE_TAG = "stance";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -144,6 +171,9 @@ public class StanceTradeItem extends TradeItem {
         xw.writeAttribute(STANCE_TAG, stance);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -152,6 +182,9 @@ public class StanceTradeItem extends TradeItem {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -159,6 +192,9 @@ public class StanceTradeItem extends TradeItem {
         stance = xr.getAttribute(STANCE_TAG, Stance.class, (Stance)null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

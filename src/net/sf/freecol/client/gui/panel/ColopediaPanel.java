@@ -223,6 +223,9 @@ public final class ColopediaPanel extends FreeColPanel
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -236,6 +239,9 @@ public final class ColopediaPanel extends FreeColPanel
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

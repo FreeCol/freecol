@@ -55,6 +55,9 @@ public final class CornerMapControls extends MapControls {
 
     public class MiniMapPanel extends JPanel {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics graphics) {
             if (miniMapSkin != null) {
@@ -84,6 +87,9 @@ public final class CornerMapControls extends MapControls {
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
 
+                /**
+                 * {@inheritDoc}
+                 */
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Unit unit = getGUI().getActiveUnit();

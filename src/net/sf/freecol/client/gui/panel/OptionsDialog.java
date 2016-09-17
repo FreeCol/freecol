@@ -251,6 +251,9 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
     // Override FreeColDialog
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OptionGroup getResponse() {
         OptionGroup value = super.getResponse();

@@ -440,6 +440,9 @@ public class HighScore extends FreeColObject {
 
     // Override FreeColObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -476,6 +479,9 @@ public class HighScore extends FreeColObject {
     // end @compat
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // HighScores do not have ids, no super.writeAttributes().
@@ -512,6 +518,9 @@ public class HighScore extends FreeColObject {
         xw.writeAttribute(COLONIES_TAG, nColonies);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // HighScores do not have ids, no super.readAttributes().
@@ -582,6 +591,9 @@ public class HighScore extends FreeColObject {
         nColonies = xr.getAttribute(COLONIES_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

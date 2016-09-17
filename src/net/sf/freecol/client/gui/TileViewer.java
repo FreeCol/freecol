@@ -91,6 +91,9 @@ public final class TileViewer extends FreeColClientHolder {
 
         // Override Object
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean equals(Object other) {
             if (other instanceof SortableImage) {
@@ -99,6 +102,9 @@ public final class TileViewer extends FreeColClientHolder {
             return super.equals(other);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             int hash = super.hashCode();

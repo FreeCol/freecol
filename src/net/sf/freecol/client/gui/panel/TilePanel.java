@@ -220,6 +220,9 @@ public final class TilePanel extends FreeColPanel {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -233,6 +236,9 @@ public final class TilePanel extends FreeColPanel {
 
     // Override JPanel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getUIClassID() {
         return "TilePanelUI";

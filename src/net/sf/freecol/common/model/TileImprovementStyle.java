@@ -151,6 +151,9 @@ public class TileImprovementStyle {
     }
 
         
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return style;

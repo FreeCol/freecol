@@ -100,6 +100,9 @@ public class HighSeas extends UnitLocation {
 
     // Override FreeColGameObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
         return player.getEurope();
@@ -120,21 +123,33 @@ public class HighSeas extends UnitLocation {
     //   UnitLocation.getGoodsContainer
     //   UnitLocation.getSettlement
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLocationLabel() {
         return StringTemplate.key("model.tile.highSeas.name");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location up() {
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getRank() {
         return Location.LOCATION_RANK_HIGHSEAS;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toShortString() {
         return "HighSeas";
@@ -147,6 +162,9 @@ public class HighSeas extends UnitLocation {
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         return (locatable instanceof Unit && ((Unit)locatable).isNaval())
@@ -160,6 +178,9 @@ public class HighSeas extends UnitLocation {
     private static final String DESTINATION_TAG = "destination";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -173,6 +194,9 @@ public class HighSeas extends UnitLocation {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -181,6 +205,9 @@ public class HighSeas extends UnitLocation {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
@@ -197,11 +224,17 @@ public class HighSeas extends UnitLocation {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return getId();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

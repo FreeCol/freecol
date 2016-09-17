@@ -65,6 +65,9 @@ public final class UserConnectionHandler extends ServerInputHandler {
 
     // Implement InputHandler
 
+    /**
+     * {@inheritDoc}
+     */
     protected Element logout(
         @SuppressWarnings("unused") Connection connection,
         @SuppressWarnings("unused") Element element) {

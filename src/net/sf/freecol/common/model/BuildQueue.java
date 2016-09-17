@@ -187,6 +187,9 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
     // Interface Consumer
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
@@ -194,16 +197,25 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             : current.getRequiredGoodsList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getPriority() {
         return this.priority;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasAbility(String id) {
         return Ability.CONSUME_ALL_OR_NOTHING.equals(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<Modifier> getModifiers(String id) {
         return Stream.<Modifier>empty();
@@ -212,6 +224,9 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);

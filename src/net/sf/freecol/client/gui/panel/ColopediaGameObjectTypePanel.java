@@ -288,6 +288,9 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

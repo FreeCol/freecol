@@ -290,11 +290,17 @@ public class IndianDemandMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getBaseTransportPriority, isOneTime
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTransportDestination() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTarget() {
         return (this.demanded && this.succeeded)
@@ -302,6 +308,9 @@ public class IndianDemandMission extends Mission {
             : this.colony;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTarget(Location target) {
         if (target instanceof Colony) {
@@ -309,16 +318,25 @@ public class IndianDemandMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location findTarget() {
         return getTarget();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -436,6 +454,9 @@ public class IndianDemandMission extends Mission {
     private static final String SUCCEEDED_TAG = "succeeded";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -449,6 +470,9 @@ public class IndianDemandMission extends Mission {
         xw.writeAttribute(SUCCEEDED_TAG, this.succeeded);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -461,6 +485,9 @@ public class IndianDemandMission extends Mission {
         this.succeeded = xr.getAttribute(SUCCEEDED_TAG, false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

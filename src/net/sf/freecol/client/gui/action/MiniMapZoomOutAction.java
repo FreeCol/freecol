@@ -58,6 +58,9 @@ public class MiniMapZoomOutAction extends MapboardAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && getGUI().canZoomOutMapControls();
@@ -66,6 +69,9 @@ public class MiniMapZoomOutAction extends MapboardAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().zoomOutMapControls();

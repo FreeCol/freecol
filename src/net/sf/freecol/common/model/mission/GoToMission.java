@@ -114,6 +114,9 @@ public class GoToMission extends AbstractMission {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MissionState doMission() {
         // FIXME: do we need access to the InGameController?
@@ -152,6 +155,9 @@ public class GoToMission extends AbstractMission {
     private static final String DESTINATION_TAG = "destination";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -161,6 +167,9 @@ public class GoToMission extends AbstractMission {
         xw.writeAttribute(BLOCKED_COUNT_TAG, blockedCount);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -171,6 +180,9 @@ public class GoToMission extends AbstractMission {
         blockedCount = xr.getAttribute(BLOCKED_COUNT_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

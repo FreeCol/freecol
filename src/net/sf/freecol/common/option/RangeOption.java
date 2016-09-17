@@ -101,6 +101,9 @@ public class RangeOption extends SelectOption {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

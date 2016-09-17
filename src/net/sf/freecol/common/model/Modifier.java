@@ -537,6 +537,9 @@ public class Modifier extends Feature {
 
     // Override FreeColObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compareTo(FreeColObject other) {
         int cmp = 0;
@@ -558,6 +561,9 @@ public class Modifier extends Feature {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -573,6 +579,9 @@ public class Modifier extends Feature {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -595,6 +604,9 @@ public class Modifier extends Feature {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -614,6 +626,9 @@ public class Modifier extends Feature {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -644,6 +659,9 @@ public class Modifier extends Feature {
         modifierIndex = xr.getAttribute(INDEX_TAG, DEFAULT_MODIFIER_INDEX);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
@@ -666,6 +684,9 @@ public class Modifier extends Feature {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

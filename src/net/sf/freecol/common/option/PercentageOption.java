@@ -48,6 +48,9 @@ public class PercentageOption extends IntegerOption {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -56,6 +59,9 @@ public class PercentageOption extends IntegerOption {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

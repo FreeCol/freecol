@@ -2178,6 +2178,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     // AIPlayer interface
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Stance determineStance(Player other) {
         final Player player = getPlayer();
@@ -2193,6 +2196,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             : super.determineStance(other);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeAIColony(AIColony aic) {
         final Colony colony = aic.getColony();
@@ -2234,6 +2240,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startWorking() {
         final Player player = getPlayer();
@@ -2308,6 +2317,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         workerWishes.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<AIUnit> doMissions(List<AIUnit> aiUnits, LogBuilder lb) {
         lb.add("\n  Do missions:");
@@ -2379,6 +2391,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {
@@ -2405,6 +2420,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType goods, int gold, Boolean accept) {
@@ -2413,6 +2431,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return !"conquest".equals(getAIAdvantage());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TradeStatus acceptDiplomaticTrade(DiplomaticTrade agreement) {
         final Player player = getPlayer();
@@ -2539,12 +2560,18 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NativeTradeAction handleTrade(NativeTradeAction action,
                                          NativeTrade nt) {
         return NativeTradeAction.NAK_INVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -2552,6 +2579,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         sessionRegister.put(goldKey, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int buyProposition(Unit unit, Settlement settlement, Goods goods,
                               int gold) {
@@ -2600,6 +2630,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int sellProposition(Unit unit, Settlement settlement, Goods goods, 
                                int gold) {
@@ -2619,6 +2652,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return (netProfits * percentage) / 100;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean acceptTax(int tax) {
         boolean ret = true;
@@ -2682,11 +2718,17 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
         return ret;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean acceptMercenaries() {
         return getPlayer().isAtWar() || "conquest".equals(getAIAdvantage());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FoundingFather selectFoundingFather(List<FoundingFather> ffs) {
         final int age = getGame().getAge();
@@ -2716,6 +2758,9 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 }

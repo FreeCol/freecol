@@ -151,6 +151,9 @@ public class NationSummary extends FreeColObject {
     private static final String TAX_TAG = "tax";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -180,6 +183,9 @@ public class NationSummary extends FreeColObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -203,6 +209,9 @@ public class NationSummary extends FreeColObject {
         tax = xr.getAttribute(TAX_TAG, -1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -255,6 +255,9 @@ public class FoundingFather extends FreeColSpecObjectType {
     private static final String WEIGHT_TAG = "weight";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -266,6 +269,9 @@ public class FoundingFather extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -293,6 +299,9 @@ public class FoundingFather extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -305,6 +314,9 @@ public class FoundingFather extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -317,6 +329,9 @@ public class FoundingFather extends FreeColSpecObjectType {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -341,6 +356,9 @@ public class FoundingFather extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

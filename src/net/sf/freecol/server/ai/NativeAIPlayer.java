@@ -725,6 +725,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startWorking() {
         final Player player = getPlayer();
@@ -766,6 +769,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         lb.log(logger, Level.FINEST);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
                              int value) {
@@ -793,6 +799,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NativeTradeAction handleTrade(NativeTradeAction action,
                                          NativeTrade nt) {
@@ -867,6 +876,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getId()
@@ -874,6 +886,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         sessionRegister.put(goldKey, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int buyProposition(Unit unit, Settlement settlement,
                               Goods goods, int gold) {
@@ -932,6 +947,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
         return gold;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int sellProposition(Unit unit, Settlement settlement,
                                Goods goods, int gold) {
@@ -998,6 +1016,9 @@ public class NativeAIPlayer extends MissionAIPlayer {
 
     // Serialization
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 }

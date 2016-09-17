@@ -94,6 +94,9 @@ public final class MainPanel extends FreeColPanel {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         // The actions are handled implicitly by the JButton/FreeColActions

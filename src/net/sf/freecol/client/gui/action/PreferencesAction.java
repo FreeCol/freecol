@@ -44,6 +44,9 @@ public class PreferencesAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showClientOptionsDialog();

@@ -44,6 +44,9 @@ public class ReportProductionAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showReportProductionPanel();

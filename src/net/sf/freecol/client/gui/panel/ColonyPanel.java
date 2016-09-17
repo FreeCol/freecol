@@ -792,6 +792,9 @@ public final class ColonyPanel extends PortPanel
 
     // Override PortPanel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnitLabel != unitLabel) {
@@ -815,6 +818,9 @@ public final class ColonyPanel extends PortPanel
         inPortPanel.repaint();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean setSelectedUnit(Unit unit) {
         return ((unit.isCarrier()) ? inPortPanel.setSelectedUnit(unit)
@@ -931,6 +937,9 @@ public final class ColonyPanel extends PortPanel
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Colony colony = getColony();
@@ -1004,6 +1013,9 @@ public final class ColonyPanel extends PortPanel
 
     // Interface PropertyChangeListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         final Colony colony = getColony();
@@ -1065,6 +1077,9 @@ public final class ColonyPanel extends PortPanel
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         if (colony == null) return; // Been here already
@@ -1123,6 +1138,9 @@ public final class ColonyPanel extends PortPanel
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void update() {
             super.update();
@@ -1254,6 +1272,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override JLabel
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getUIClassID() {
             return "PopulationPanelUI";
@@ -1262,6 +1283,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override Component
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void removeNotify() {
             super.removeNotify();
@@ -1289,6 +1313,9 @@ public final class ColonyPanel extends PortPanel
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void initialize() {
             super.initialize();
@@ -1299,6 +1326,9 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void cleanup() {
             super.cleanup();
@@ -1306,6 +1336,9 @@ public final class ColonyPanel extends PortPanel
             removeAll();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void addPropertyChangeListeners() {
             final Colony colony = getColony();
@@ -1315,6 +1348,9 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void removePropertyChangeListeners() {
             final Colony colony = getColony();
@@ -1329,14 +1365,23 @@ public final class ColonyPanel extends PortPanel
 
         // Interface DropTarget
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             return !unit.isCarrier();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Goods goods) {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Component add(Component comp, boolean editState) {
             Container oldParent = comp.getParent();
             if (editState) {
@@ -1369,11 +1414,17 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int suggested(GoodsType type) { return -1; } // N/A
 
 
         // Override JPanel
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getUIClassID() {
             return "OutsideColonyPanelUI";
@@ -1397,6 +1448,9 @@ public final class ColonyPanel extends PortPanel
         }
 
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void initialize() {
             super.initialize();
@@ -1407,6 +1461,9 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void addPropertyChangeListeners() {
             Unit selected = getSelectedUnit();
@@ -1415,6 +1472,9 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected void removePropertyChangeListeners() {
             Unit selected = getSelectedUnit();
@@ -1426,11 +1486,17 @@ public final class ColonyPanel extends PortPanel
 
         // extend UnitPanel
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean accepts(Unit unit) {
             return unit.isCarrier();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void selectLabel() {
             removePropertyChangeListeners();
@@ -1525,14 +1591,23 @@ public final class ColonyPanel extends PortPanel
 
         // Interface DropTarget
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             return false;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Goods goods) {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (!(comp instanceof GoodsLabel)) {
@@ -1546,6 +1621,9 @@ public final class ColonyPanel extends PortPanel
             return add(comp);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int suggested(GoodsType type) {
             Colony colony = getColony();
             return colony.getWarehouseCapacity() - colony.getGoodsCount(type);
@@ -1554,6 +1632,9 @@ public final class ColonyPanel extends PortPanel
 
         // Interface PropertyChangeListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
@@ -1569,6 +1650,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override JPanel
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getUIClassID() {
             return "WarehousePanelUI";
@@ -1577,6 +1661,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override Component
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void removeNotify() {
             super.removeNotify();
@@ -1645,6 +1732,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override JPanel
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String getUIClassID() {
             return "BuildingsPanelUI";
@@ -1653,6 +1743,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override Component
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void removeNotify() {
             super.removeNotify();
@@ -1691,6 +1784,9 @@ public final class ColonyPanel extends PortPanel
             }
 
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void initialize() {
                 if (ColonyPanel.this.isEditable()) {
@@ -1702,6 +1798,9 @@ public final class ColonyPanel extends PortPanel
                 }
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void cleanup() {
                 super.cleanup();
@@ -1712,6 +1811,9 @@ public final class ColonyPanel extends PortPanel
                 removeAll();
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void update() {
                 super.update();
@@ -1744,14 +1846,23 @@ public final class ColonyPanel extends PortPanel
 
             // Interface DropTarget
 
+            /**
+             * {@inheritDoc}
+             */
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public boolean accepts(Goods goods) {
                 return false;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -1766,11 +1877,17 @@ public final class ColonyPanel extends PortPanel
                 return null;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public int suggested(GoodsType type) { return -1; } // N/A
 
 
             // Interface PropertyChangeListener
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 super.propertyChange(event);
@@ -1862,6 +1979,9 @@ public final class ColonyPanel extends PortPanel
 
         // Override JComponent
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void paintComponent(Graphics g) {
             final Colony colony = getColony();
@@ -2082,14 +2202,23 @@ public final class ColonyPanel extends PortPanel
 
             // Interface DropTarget
 
+            /**
+             * {@inheritDoc}
+             */
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public boolean accepts(Goods goods) {
                 return false;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public Component add(Component comp, boolean editState) {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
@@ -2107,11 +2236,17 @@ public final class ColonyPanel extends PortPanel
                 return comp;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             public int suggested(GoodsType type) { return -1; } // N/A
 
 
             // Interface PropertyChangeListener
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();

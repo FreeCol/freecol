@@ -69,6 +69,9 @@ public final class ColorCellEditor extends AbstractCellEditor
 
     // Implement TableCellEditor
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
         boolean hasFocus, int row, int column) {
@@ -79,6 +82,9 @@ public final class ColorCellEditor extends AbstractCellEditor
 
     // Override CellEditor
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getCellEditorValue() {
         return this.currentColor;
@@ -86,6 +92,9 @@ public final class ColorCellEditor extends AbstractCellEditor
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();

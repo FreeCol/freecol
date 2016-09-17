@@ -65,6 +65,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
             return this.goods;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return Messages.message(this.goods.getLabel());
@@ -79,6 +82,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
             //setForeground(UIManager.getColor("List.textForeground"));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getListCellRendererComponent(JList<? extends GoodsItem> list,
                                                       GoodsItem value,
@@ -210,6 +216,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
     // Implement FreeColDialog
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Goods> getResponse() {
         Object value = getValue();

@@ -66,11 +66,17 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
     // Implement ColopediaDetailPanel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         super.addSubTrees(root, getSpecification().getGoodsTypeList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;

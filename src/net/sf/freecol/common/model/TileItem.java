@@ -155,11 +155,17 @@ public abstract class TileItem extends FreeColGameObject
 
     // Interface Locatable
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getLocation() {
         return tile;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean setLocation(Location newLocation) {
         if (newLocation == null || newLocation instanceof Tile) {
@@ -169,16 +175,25 @@ public abstract class TileItem extends FreeColGameObject
         throw new IllegalArgumentException("newLocation is not a Tile");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isInEurope() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tile getTile() {
         return tile;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getSpaceTaken() {
         return 0;
@@ -186,12 +201,18 @@ public abstract class TileItem extends FreeColGameObject
 
     // Interface Named
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public abstract String getNameKey();
 
 
     // Override FreeColGameObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);

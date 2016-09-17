@@ -101,6 +101,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Interface ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             agreement.remove(item);
@@ -192,6 +195,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Implement ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -269,6 +275,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Implement ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -294,6 +303,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         private class GoodsBoxRenderer extends JLabel
             implements ListCellRenderer<Goods> {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Component getListCellRendererComponent(JList<? extends Goods> list,
                 Goods value, int index, boolean isSelected,
@@ -390,6 +402,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Interface ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -415,6 +430,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         private class InciteBoxRenderer extends JLabel
             implements ListCellRenderer<Player> {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Component getListCellRendererComponent(JList<? extends Player> list,
                 Player value, int index, boolean isSelected,
@@ -501,6 +519,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Implement ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -532,6 +553,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         private class StanceBoxRenderer extends JLabel
             implements ListCellRenderer<Stance> {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Component getListCellRendererComponent(JList<? extends Stance> list,
                 Stance value, int index, boolean isSelected,
@@ -617,6 +641,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Interface ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -642,6 +669,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         private class UnitBoxRenderer extends JLabel
             implements ListCellRenderer<Unit> {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Component getListCellRendererComponent(JList<? extends Unit> list,
                 Unit value, int index, boolean isSelected,
@@ -731,6 +761,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
         // Interface ActionListener
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void actionPerformed(ActionEvent ae) {
             final String command = ae.getActionCommand();
@@ -971,6 +1004,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DiplomaticTrade getResponse() {
         Object value = getValue();
@@ -1205,6 +1241,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

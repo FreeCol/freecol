@@ -183,17 +183,26 @@ public class IndianBringGiftMission extends Mission {
     // Mission interface
     //   Inherit dispose, getBaseTransportPriority, isOneTime
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTransportDestination() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTarget() {
         return (this.collected) ? this.colony
             : getUnit().getHomeIndianSettlement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTarget(Location target) {
         if (target instanceof Colony) {
@@ -201,16 +210,25 @@ public class IndianBringGiftMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location findTarget() {
         return getTarget();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         return invalidReason(getAIUnit(), this.colony);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -311,6 +329,9 @@ public class IndianBringGiftMission extends Mission {
     private static final String COLONY_TAG = "colony";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -322,6 +343,9 @@ public class IndianBringGiftMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -332,6 +356,9 @@ public class IndianBringGiftMission extends Mission {
                                       Colony.class, (Colony)null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

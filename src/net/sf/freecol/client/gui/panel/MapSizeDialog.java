@@ -71,6 +71,9 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
         initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Dimension getInputValue() {
         int width, height;
@@ -87,6 +90,9 @@ public final class MapSizeDialog extends FreeColInputDialog<Dimension> {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.inputWidth.requestFocus();

@@ -205,6 +205,9 @@ public class UnitTypeChange extends FreeColSpecObjectType {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // UnitTypeChange do not have ids, no super.writeAttributes().
@@ -224,6 +227,9 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // UnitTypeChange do not have ids, no super.readAttributes().
@@ -264,6 +270,9 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         // end @compat 0.11.6
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -276,6 +285,9 @@ public class UnitTypeChange extends FreeColSpecObjectType {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

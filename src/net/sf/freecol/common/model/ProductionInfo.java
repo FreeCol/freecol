@@ -172,6 +172,9 @@ public class ProductionInfo {
         result.replace(length - 2, length, "\n");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();

@@ -73,29 +73,47 @@ public class UnitWanderMission extends Mission {
     // Implement Mission
     //   Inherit dispose, getBaseTransportPriority, getTransportDestination
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTarget() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTarget(Location target) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location findTarget() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isOneTime() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         return invalidAIUnitReason(getAIUnit());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -111,6 +129,9 @@ public class UnitWanderMission extends Mission {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

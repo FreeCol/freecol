@@ -117,6 +117,9 @@ public class SelectOption extends IntegerOption {
 
     // Interface Option
     
+    /**
+     * {@inheritDoc}
+     */
     public void setValue(Integer value) {
         Set<Integer> keys = getItemValues().keySet();
         if (keys.isEmpty()) return; // May not have been read yet
@@ -141,6 +144,9 @@ public class SelectOption extends IntegerOption {
     private static final String LOCALIZED_LABELS_TAG = "localizedLabels";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -148,6 +154,9 @@ public class SelectOption extends IntegerOption {
         xw.writeAttribute(LOCALIZED_LABELS_TAG, localizedLabels);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -163,6 +172,9 @@ public class SelectOption extends IntegerOption {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -170,6 +182,9 @@ public class SelectOption extends IntegerOption {
         localizedLabels = xr.getAttribute(LOCALIZED_LABELS_TAG, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // We can not set the value until we have read the select options
@@ -186,6 +201,9 @@ public class SelectOption extends IntegerOption {
         setValue(value, defaultValue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -200,6 +218,9 @@ public class SelectOption extends IntegerOption {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -210,6 +231,9 @@ public class SelectOption extends IntegerOption {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

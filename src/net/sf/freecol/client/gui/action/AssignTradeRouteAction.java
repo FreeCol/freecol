@@ -45,6 +45,9 @@ public class AssignTradeRouteAction extends UnitAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
@@ -57,6 +60,9 @@ public class AssignTradeRouteAction extends UnitAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         Unit unit = getGUI().getActiveUnit();

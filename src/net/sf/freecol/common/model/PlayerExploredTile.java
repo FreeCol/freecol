@@ -193,6 +193,9 @@ public class PlayerExploredTile extends FreeColGameObject {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -218,6 +221,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -239,6 +245,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -289,6 +298,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         // end @compat
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -307,6 +319,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         }           
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
@@ -335,6 +350,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

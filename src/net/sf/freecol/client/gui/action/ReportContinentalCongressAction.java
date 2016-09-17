@@ -44,6 +44,9 @@ public class ReportContinentalCongressAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showReportContinentalCongressPanel();

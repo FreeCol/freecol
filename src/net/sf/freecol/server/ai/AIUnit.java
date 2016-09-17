@@ -534,22 +534,34 @@ public class AIUnit extends TransportableAIObject {
     
     // Implement TransportableAIObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getTransportPriority() {
         return (hasMission()) ? super.getTransportPriority() : 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Locatable getTransportLocatable() {
         return unit;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTransportSource() {
         return (unit == null || unit.isDisposed()) ? null
             : unit.getLocation();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTransportDestination() {
         return (unit == null || unit.isDisposed() || !hasMission())
@@ -557,6 +569,9 @@ public class AIUnit extends TransportableAIObject {
             : mission.getTransportDestination();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
         if (dst == null) {
@@ -585,26 +600,41 @@ public class AIUnit extends TransportableAIObject {
         return path;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PathNode getIntermediatePath(Unit carrier, Location dst) {
         return null; // NYI
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTransportDestination(Location destination) {
         throw new RuntimeException("AI unit transport destination set by mission.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean carriableBy(Unit carrier) {
         return carrier.couldCarry(unit);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canMove() {
         return unit.getMovesLeft() > 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean leaveTransport() {
         if (!unit.isOnCarrier()) return true; // Harmless error
@@ -681,6 +711,9 @@ public class AIUnit extends TransportableAIObject {
         return leaveTransport(tile.getDirection((best != null) ? best : safe));
     }               
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean leaveTransport(Direction direction) {
         if (!unit.isOnCarrier()) return false;
@@ -697,6 +730,9 @@ public class AIUnit extends TransportableAIObject {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
@@ -711,6 +747,9 @@ public class AIUnit extends TransportableAIObject {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
@@ -770,6 +809,9 @@ public class AIUnit extends TransportableAIObject {
     // end @compat
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -779,6 +821,9 @@ public class AIUnit extends TransportableAIObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -794,6 +839,9 @@ public class AIUnit extends TransportableAIObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
@@ -801,6 +849,9 @@ public class AIUnit extends TransportableAIObject {
         if (unit != null) uninitialized = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
@@ -868,11 +919,17 @@ public class AIUnit extends TransportableAIObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return (unit == null) ? "AIUnit-null" : unit.toString("AIUnit ");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

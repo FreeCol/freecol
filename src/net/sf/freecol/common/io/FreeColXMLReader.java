@@ -280,6 +280,9 @@ public class FreeColXMLReader extends StreamReaderDelegate
                 "EntityReference", "Namespace", "NotationDeclaration",
                 "ProcessingInstruction", "Space", "StartDocument",
                 "StartElement" });
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int nextTag() throws XMLStreamException {
         int tag = super.nextTag();

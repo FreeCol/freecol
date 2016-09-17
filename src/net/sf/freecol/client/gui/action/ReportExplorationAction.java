@@ -44,6 +44,9 @@ public class ReportExplorationAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         freeColClient.getGUI().showReportExplorationPanel();

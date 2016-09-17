@@ -73,6 +73,9 @@ public final class SelectTributeAmountDialog
         initializeInputDialog(frame, true, panel, null, "ok", "cancel");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Integer getInputValue() {
         int result;
@@ -87,6 +90,9 @@ public final class SelectTributeAmountDialog
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.input.requestFocus();

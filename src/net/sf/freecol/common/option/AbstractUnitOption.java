@@ -122,6 +122,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     // Interface Option
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractUnitOption clone() {
         final Specification spec = getSpecification();
@@ -138,11 +141,17 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractUnit getValue() {
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setValue(AbstractUnit value) {
         final Specification spec = getSpecification();
@@ -171,11 +180,17 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     // Override AbstractOption
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isNullValueOK() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void generateChoices() {
         unitType.generateChoices();
@@ -191,6 +206,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     private static final String UNIT_TYPE_TAG = "unitType";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -202,6 +220,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         unitType.toXML(xw, UNIT_TYPE_TAG);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
@@ -215,6 +236,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         setValue(au);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -238,6 +262,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -246,6 +273,9 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

@@ -229,6 +229,9 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String command = ae.getActionCommand();
@@ -242,6 +245,9 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();
@@ -264,6 +270,9 @@ public abstract class FreeColPanel extends MigPanel implements ActionListener {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         // The OK button requests focus if it exists.

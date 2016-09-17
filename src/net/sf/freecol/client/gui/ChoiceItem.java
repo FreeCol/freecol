@@ -119,6 +119,9 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         return this.enabled;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return text;
@@ -203,6 +206,9 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
     // Interface Comparable
 
+    /** 
+     * {@inheritDoc}
+     */
     @Override
     public int compareTo(ChoiceItem<T> other) {
         return (this.text == null) ? -1 : (other.text == null) ? 1
@@ -211,6 +217,9 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -222,6 +231,9 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();

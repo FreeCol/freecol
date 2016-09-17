@@ -184,6 +184,9 @@ public class BuildingToolTip extends JToolTip {
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

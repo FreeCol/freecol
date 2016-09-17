@@ -44,6 +44,9 @@ public class ReportReligionAction extends FreeColAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         getGUI().showReportReligiousPanel();

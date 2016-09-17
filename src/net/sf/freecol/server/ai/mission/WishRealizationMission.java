@@ -115,6 +115,9 @@ public class WishRealizationMission extends Mission {
     // Implement Mission
     //   Inherit getTransportDestination, isOneTime
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
         if (this.wish != null) {
@@ -124,32 +127,50 @@ public class WishRealizationMission extends Mission {
         super.dispose();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getBaseTransportPriority() {
         return NORMAL_TRANSPORT_PRIORITY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getTarget() {
         return (this.wish == null) ? null : this.wish.getDestination();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTarget(Location target) {
         // Ignored, target is set by wish
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location findTarget() {
         return getTarget();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String invalidReason() {
         return (this.wish == null) ? "wish-null"
             : invalidReason(getAIUnit(), getTarget());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mission doMission(LogBuilder lb) {
         lb.add(tag);
@@ -219,6 +240,9 @@ public class WishRealizationMission extends Mission {
     // end @compat
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -226,6 +250,9 @@ public class WishRealizationMission extends Mission {
         xw.writeAttribute(WISH_TAG, wish);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -251,6 +278,9 @@ public class WishRealizationMission extends Mission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

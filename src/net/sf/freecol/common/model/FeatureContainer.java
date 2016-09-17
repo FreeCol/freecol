@@ -495,6 +495,9 @@ public final class FeatureContainer {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(256);

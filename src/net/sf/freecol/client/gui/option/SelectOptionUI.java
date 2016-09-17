@@ -63,16 +63,25 @@ public final class SelectOptionUI extends OptionUI<SelectOption> {
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JComponent getComponent() {
         return box;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         getOption().setValue(box.getSelectedIndex());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         box.setSelectedIndex(getOption().getValue());

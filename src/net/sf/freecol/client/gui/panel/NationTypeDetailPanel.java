@@ -71,6 +71,9 @@ public class NationTypeDetailPanel
 
     // Implement ColopediaDetailPanel
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addSubTrees(DefaultMutableTreeNode root) {
         DefaultMutableTreeNode parent
@@ -88,6 +91,9 @@ public class NationTypeDetailPanel
         root.add(parent);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;

@@ -61,6 +61,9 @@ public class NationOptions extends FreeColSpecObject {
 
         // Implement Named
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final String getNameKey() {
             return Messages.nameKey("model." + getKey());
@@ -91,6 +94,9 @@ public class NationOptions extends FreeColSpecObject {
 
         // Implement Named
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public final String getNameKey() {
             return Messages.nameKey("model." + getKey());
@@ -198,6 +204,9 @@ public class NationOptions extends FreeColSpecObject {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // The nation options do not use the FreeColObject attributes, so
@@ -206,6 +215,9 @@ public class NationOptions extends FreeColSpecObject {
         xw.writeAttribute(NATIONAL_ADVANTAGES_TAG, nationalAdvantages);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -221,6 +233,9 @@ public class NationOptions extends FreeColSpecObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // The nation options do not use the FreeColObject attributes, so
@@ -230,6 +245,9 @@ public class NationOptions extends FreeColSpecObject {
             Advantages.class, Advantages.SELECTABLE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -238,6 +256,9 @@ public class NationOptions extends FreeColSpecObject {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -279,6 +300,9 @@ public class NationOptions extends FreeColSpecObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
@@ -290,6 +314,9 @@ public class NationOptions extends FreeColSpecObject {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

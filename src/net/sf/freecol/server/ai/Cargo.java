@@ -625,6 +625,9 @@ public class Cargo {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         LogBuilder lb = new LogBuilder(64);

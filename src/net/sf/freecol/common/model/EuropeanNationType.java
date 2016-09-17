@@ -145,6 +145,9 @@ public class EuropeanNationType extends NationType {
     private static final String UNIT_TAG = "unit";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -152,6 +155,9 @@ public class EuropeanNationType extends NationType {
         xw.writeAttribute(REF_TAG, ref);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -191,6 +197,9 @@ public class EuropeanNationType extends NationType {
         xw.writeEndElement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -203,6 +212,9 @@ public class EuropeanNationType extends NationType {
         ref = xr.getAttribute(REF_TAG, parent.ref);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -221,6 +233,9 @@ public class EuropeanNationType extends NationType {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
@@ -247,6 +262,9 @@ public class EuropeanNationType extends NationType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

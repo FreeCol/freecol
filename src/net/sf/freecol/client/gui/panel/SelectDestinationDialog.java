@@ -287,6 +287,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             super(player);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int compare(Destination choice1, Destination choice2) {
             return compareNames(choice1.location, choice2.location);
@@ -299,6 +302,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             super(player);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int compare(Destination choice1, Destination choice2) {
             int result = choice1.turns - choice2.turns;
@@ -310,6 +316,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private static class LocationRenderer
         extends FreeColComboBoxRenderer<Destination> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void setLabelValues(JLabel label, Destination value) {
             if (value.icon != null) label.setIcon(value.icon);
@@ -558,6 +567,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     // Interface ListSelectionListener
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
@@ -567,6 +579,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     // Implement FreeColDialog
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Location getResponse() {
         Object value = getValue();
@@ -580,6 +595,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();
@@ -590,6 +608,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         this.comparatorBox = null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.destinationList.requestFocus();

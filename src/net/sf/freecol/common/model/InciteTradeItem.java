@@ -67,28 +67,43 @@ public class InciteTradeItem extends TradeItem {
 
     // Interface TradeItem
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isValid() {
         return this.victim != null && this.victim != getSource()
             && this.victim != getDestination();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isUnique() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLabel() {
         return StringTemplate.template(Messages.descriptionKey("model.tradeItem.incite"))
             .addStringTemplate("%nation%", this.victim.getNationLabel());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Player getVictim() {
         return this.victim;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int evaluateFor(Player player) {
         final Player victim = getVictim();
         switch (player.getStance(victim)) {
@@ -106,6 +121,9 @@ public class InciteTradeItem extends TradeItem {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof InciteTradeItem) {
@@ -115,6 +133,9 @@ public class InciteTradeItem extends TradeItem {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -127,6 +148,9 @@ public class InciteTradeItem extends TradeItem {
     private static final String VICTIM_TAG = "victim";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -134,6 +158,9 @@ public class InciteTradeItem extends TradeItem {
         xw.writeAttribute(VICTIM_TAG, this.victim);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -142,6 +169,9 @@ public class InciteTradeItem extends TradeItem {
                                                Player.class, (Player)null, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(16);
@@ -150,6 +180,9 @@ public class InciteTradeItem extends TradeItem {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

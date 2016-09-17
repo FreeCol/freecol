@@ -144,6 +144,9 @@ public class Event extends FreeColSpecObjectType {
     // end @compat 0.11.3
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -157,6 +160,9 @@ public class Event extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -164,6 +170,9 @@ public class Event extends FreeColSpecObjectType {
         for (Limit limit : getLimits()) limit.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -178,6 +187,9 @@ public class Event extends FreeColSpecObjectType {
             scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -188,6 +200,9 @@ public class Event extends FreeColSpecObjectType {
         super.readChildren(xr);
     }        
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -208,6 +223,9 @@ public class Event extends FreeColSpecObjectType {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

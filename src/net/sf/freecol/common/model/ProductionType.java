@@ -342,6 +342,9 @@ public class ProductionType extends FreeColSpecObject {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -356,6 +359,9 @@ public class ProductionType extends FreeColSpecObject {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -387,6 +393,9 @@ public class ProductionType extends FreeColSpecObject {
     // end @compat 0.11.3
 
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // ProductionType does not need an id.
@@ -401,6 +410,9 @@ public class ProductionType extends FreeColSpecObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -430,6 +442,9 @@ public class ProductionType extends FreeColSpecObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // ProductionType does not need an id.
@@ -447,6 +462,9 @@ public class ProductionType extends FreeColSpecObject {
         // end @compat 0.11.3
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -456,6 +474,9 @@ public class ProductionType extends FreeColSpecObject {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
@@ -488,6 +509,9 @@ public class ProductionType extends FreeColSpecObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(64);
@@ -518,6 +542,9 @@ public class ProductionType extends FreeColSpecObject {
         return result.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

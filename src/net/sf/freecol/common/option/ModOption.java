@@ -66,6 +66,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
 
     // Interface Option
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModOption clone() {
         ModOption result = new ModOption(getSpecification());
@@ -103,6 +106,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
 
     // Override AbstractOption
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void setValue(String valueString, String defaultValueString) throws XMLStreamException {
         String id = (valueString != null) ? valueString : defaultValueString;
@@ -113,6 +119,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         setValue(fcmf);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isNullValueOK() {
         return true;
@@ -121,6 +130,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
 
     // Override Object
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -132,6 +144,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -142,6 +157,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -151,6 +169,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
@@ -158,6 +179,9 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         return sb.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getXMLTagName() { return getTagName(); }
 

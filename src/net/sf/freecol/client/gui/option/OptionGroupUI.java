@@ -215,6 +215,9 @@ public final class OptionGroupUI extends MigPanel
 
     // Implement OptionUpdater
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         for (OptionUpdater optionUpdater : optionUpdaters) {
@@ -222,6 +225,9 @@ public final class OptionGroupUI extends MigPanel
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         for (OptionUpdater optionUpdater : optionUpdaters) {

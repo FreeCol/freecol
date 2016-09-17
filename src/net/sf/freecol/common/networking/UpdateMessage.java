@@ -97,6 +97,9 @@ public class UpdateMessage extends DOMMessage {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName())

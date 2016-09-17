@@ -174,6 +174,9 @@ public abstract class GoodsLocation extends UnitLocation {
     //    UnitLocation.getSettlement
     // Does not implement getRank
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(Locatable locatable) {
         return (locatable instanceof Goods)
@@ -181,6 +184,9 @@ public abstract class GoodsLocation extends UnitLocation {
             : super.add(locatable);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean remove(Locatable locatable) {
         return (locatable instanceof Goods) 
@@ -188,6 +194,9 @@ public abstract class GoodsLocation extends UnitLocation {
             : super.remove(locatable);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(Locatable locatable) {
         return (locatable instanceof Goods)
@@ -195,6 +204,9 @@ public abstract class GoodsLocation extends UnitLocation {
             : super.contains(locatable);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final GoodsContainer getGoodsContainer() {
         // Marked final, as this is where the goods container is.
@@ -210,6 +222,9 @@ public abstract class GoodsLocation extends UnitLocation {
     //   UnitLocation.priceGoods
     //   UnitLocation.equipForRole
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Goods) {
@@ -263,6 +278,9 @@ public abstract class GoodsLocation extends UnitLocation {
 
     // Override FreeColObject
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Stream<FreeColGameObject> getDisposables() {
         Stream<FreeColGameObject> up = super.getDisposables();
@@ -274,6 +292,9 @@ public abstract class GoodsLocation extends UnitLocation {
     // Serialization
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -281,6 +302,9 @@ public abstract class GoodsLocation extends UnitLocation {
         if (goodsContainer != null) goodsContainer.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
@@ -289,6 +313,9 @@ public abstract class GoodsLocation extends UnitLocation {
         super.readChildren(xr);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();

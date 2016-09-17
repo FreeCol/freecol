@@ -113,6 +113,9 @@ public class UpdateGameOptionsMessage extends DOMMessage {
 
     // Override DOMMessage
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName())

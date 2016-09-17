@@ -426,6 +426,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
 
     // Interface PropertyChangeListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         // Let the defaultCloseOperation handle the closing if the
@@ -444,6 +447,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
 
     // Override Dialog
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setVisible(boolean val) {
         if (val) this.pane.selectInitialValue();
@@ -453,6 +459,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();
@@ -470,6 +479,9 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         if (this.pane != null

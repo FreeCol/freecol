@@ -62,6 +62,9 @@ public final class ReportNavalPanel extends ReportUnitPanel {
 
     // Implement ReportUnitPanel
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void gatherData() {
         for (Unit unit : transform(getMyPlayer().getUnits(),
@@ -70,6 +73,9 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addREFUnits() {
         final Specification spec = getSpecification();
@@ -90,6 +96,9 @@ public final class ReportNavalPanel extends ReportUnitPanel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addOwnUnits() {
         final Player player = getMyPlayer();

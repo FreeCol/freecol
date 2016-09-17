@@ -115,11 +115,17 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final JLabel getJLabel() {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JPanel getComponent() {
         return panel;

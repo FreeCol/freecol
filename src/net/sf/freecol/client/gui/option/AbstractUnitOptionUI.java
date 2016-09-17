@@ -141,16 +141,25 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
 
     // Implement OptionUI
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ListCellRenderer getListCellRenderer() {
         return new AbstractUnitRenderer();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JPanel getComponent() {
         return panel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOption() {
         typeUI.updateOption();
@@ -162,6 +171,9 @@ public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>
         getOption().setValue(new AbstractUnit(type, roleId, number));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         typeUI.reset();

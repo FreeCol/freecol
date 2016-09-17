@@ -92,6 +92,9 @@ public class ForestMaker {
 
         // Override Object
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean equals(Object other) {
             if (other instanceof ImageLocation) {
@@ -100,6 +103,9 @@ public class ForestMaker {
             return super.equals(other);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             int hash = super.hashCode();

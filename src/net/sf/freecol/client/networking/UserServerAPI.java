@@ -148,6 +148,9 @@ public class UserServerAPI extends ServerAPI {
 
     // Implement ServerAPI
     
+    /**
+     * {@inheritDoc}
+     */
     protected void doClientProcessingFor(Element reply) {
         String sound = reply.getAttribute("sound");
         if (sound != null && !sound.isEmpty()) {
@@ -155,6 +158,9 @@ public class UserServerAPI extends ServerAPI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Connection getConnection() {
         return this.clientConnection;
     }

@@ -175,6 +175,9 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     private static final String UNIT_TAG = "unit";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -187,6 +190,9 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);

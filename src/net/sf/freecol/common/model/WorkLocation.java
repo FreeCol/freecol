@@ -661,17 +661,26 @@ public abstract class WorkLocation extends UnitLocation
     //   UnitLocation.getUnitCount
     //   UnitLocation.getGoodsContainer
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
         return (getOwner() == player) ? getLocationLabel()
             : getColony().getLocationLabelFor(player);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final Tile getTile() {
         return colony.getTile();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean add(final Locatable locatable) {
         NoAddReason reason = getNoAddReason(locatable);
@@ -697,6 +706,9 @@ public abstract class WorkLocation extends UnitLocation
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
@@ -716,11 +728,17 @@ public abstract class WorkLocation extends UnitLocation
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final Settlement getSettlement() {
         return colony;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final int getRank() {
         return Location.getRank(getTile());
@@ -735,6 +753,9 @@ public abstract class WorkLocation extends UnitLocation
     //   UnitLocation.getUnitCapacity
     //   UnitLocation.equipForRole
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         return (locatable instanceof Unit && ((Unit)locatable).isPerson())
@@ -929,6 +950,9 @@ public abstract class WorkLocation extends UnitLocation
     private static final String COLONY_TAG = "colony";
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
@@ -936,6 +960,9 @@ public abstract class WorkLocation extends UnitLocation
         xw.writeAttribute(COLONY_TAG, colony);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
@@ -943,6 +970,9 @@ public abstract class WorkLocation extends UnitLocation
         if (productionType != null) productionType.toXML(xw);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
@@ -951,6 +981,9 @@ public abstract class WorkLocation extends UnitLocation
                                           Colony.class, (Colony)null, true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();

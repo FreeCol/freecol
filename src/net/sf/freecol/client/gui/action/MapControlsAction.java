@@ -47,6 +47,9 @@ public class MapControlsAction extends SelectableAction {
 
     // Override FreeColAction
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update() {
         super.update();
@@ -57,6 +60,9 @@ public class MapControlsAction extends SelectableAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         setSelected(((AbstractButton)ae.getSource()).isSelected());

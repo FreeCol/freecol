@@ -66,6 +66,9 @@ public final class FindSettlementPanel extends FreeColPanel
     private static class SettlementRenderer
         extends FreeColComboBoxRenderer<Settlement> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public void setLabelValues(JLabel label, Settlement value) {
             StringTemplate template = StringTemplate
@@ -220,6 +223,9 @@ public final class FindSettlementPanel extends FreeColPanel
 
     // Interface ListSelectionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Settlement settlement = this.settlementList.getSelectedValue();
@@ -231,11 +237,17 @@ public final class FindSettlementPanel extends FreeColPanel
 
     // Override Component
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void requestFocus() {
         this.settlementList.requestFocus();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeNotify() {
         super.removeNotify();

@@ -47,6 +47,9 @@ public class SkipUnitAction extends UnitAction {
 
     // Interface ActionListener
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void actionPerformed(ActionEvent ae) {
         final Unit unit = getGUI().getActiveUnit();
