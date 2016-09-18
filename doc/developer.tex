@@ -31,7 +31,7 @@ using the class "GameOptions".
 
 (Note that if you add a game option, add a default value setting in
 FreeColServer.fixGameOptions so that use of the option does not break
-old games.  The same applies to client-options,
+old games. The same applies to client-options,
 in ClientOptions.fixClientOptions.)
 
 The big exception to this rule is the our client-server model that
@@ -59,12 +59,12 @@ You may find available tasks in the bug and feature request trackers
 --- just grab any task you are planning to do (in the immediate
 future) by posting a comment telling that you intend to do this task.
 Please create a new bug report/feature request for tasks that are not
-listed here (and before you start working on them).  Please remember
+listed here (and before you start working on them). Please remember
 to post a comment when you are done, or if you are unable to complete
 the work.
 
 Major changes to the code should be discussed on the developer's
-mailing list before they are implemented.  This is to ensure that your
+mailing list before they are implemented. This is to ensure that your
 work will not be in vain if somebody else knows a better way of doing
 it.
 % [Currently moot, we have no working roadmap] 
@@ -101,12 +101,12 @@ a bug tracker item should be updated while you are working:
 
 \item If you are unable to complete the item: assign it back to
   ``None'' and make a comment describing any problems relevant for
-  another developer.  The milestone of open bugs should be ``Current''.
+  another developer. The milestone of open bugs should be ``Current''.
 
 \item If you successfully commit a fix for a bug, set the milestone to
   ``Fixed-trunk'', the status to ``Closed'' if you are certain of the
   fix, or ``Pending-Fixed'' if there is some uncertainty and/or
-  further comment is welcome.  Please also write a comment telling
+  further comment is welcome. Please also write a comment telling
   that the work is done, and it is helpful to refer to any commit/s
   where relevant changes occurred.
 \end{enumerate}
@@ -162,10 +162,10 @@ You can (and should) subscribe to this list
 \hypertarget{Git}{\section{Git}}
 
 Git is the tool we are using to manage the changes within our source
-code tree.  This system makes it possible for all developers to have
+code tree. This system makes it possible for all developers to have
 their own full copy of the project, and supports synchronization
 between the central version of the code (`the repository') and the
-local copies.  Git also makes it possible to undo changes that were
+local copies. Git also makes it possible to undo changes that were
 previously committed to the repository.
 
 \href{http://www.freecol.org/documentation/git.html}{This page}
@@ -173,7 +173,7 @@ describes how you can start using Git and get a working copy of the
 code (without commit privileges).
 
 You can use \verb+git pull+ for updating an existing working
-copy.  Changes can only be applied by those who have write-access, so
+copy. Changes can only be applied by those who have write-access, so
 you may need to either send the changes to the developer mailing list
 or use the patch tracking system.
 
@@ -184,7 +184,7 @@ We use the \textit{Apache Ant} build system for compiling the
 game. You can get a copy of this program
 \href{http://ant.apache.org}{here}. After it has been installed, you
 simply type \verb+ant+ in the top directory of your "working copy" in
-order to compile the game.  The file \verb+FreeCol.jar+ will then be
+order to compile the game. The file \verb+FreeCol.jar+ will then be
 generated, and you can start the game simply by writing:
 
 \verb+java -Xmx256M -jar FreeCol.jar+
@@ -274,7 +274,7 @@ directories to your path environment variable.
 
 If the build went succesfull; congratulations. Open the project folder
 in the file system, and you will see 'FreeCol.jar' in the root
-folder. Since this is an executable jar file, you can double click it
+folder. Since this is an executable jar file, you can double-click it
 and launch the game right away. Enjoy.
 
 
@@ -347,7 +347,7 @@ There is also some additional documentation
 \hypertarget{Quality of code}{\section{Quality of code}}
 
 First of all, your code will be read and modified by several
-different developers.  Therefore it is important to create a
+different developers. Therefore it is important to create a
 block of JavaDoc documentation with all methods/classes/packages
 you implement.
 
@@ -355,10 +355,10 @@ You should also spend more time thinking about the overall
 structure than when you are working alone.
 
 Please read the \href{http://java.sun.com/docs/codeconv/}{Java Code
-  Conventions}.  This will only take about 15 minutes and will really
+  Conventions}. This will only take about 15 minutes and will really
 help you write beautiful code.
 
-And one more thing.  Please configure your editor in such a way
+And one more thing. Please configure your editor in such a way
 that code indentations result in the insertion of 4 spaces, and avoid
 using tabs.
 
@@ -367,24 +367,24 @@ using tabs.
 
 You will obviously need to have installed \texttt{ant} to do the
 build, and \texttt{git} to make the commits, however this will be
-normal for a developer.  To generate the online manual you will also
+normal for a developer. To generate the online manual you will also
 need \texttt{htlatex}, and \texttt{pdflatex} for the print manual.
 You can avoid these requirements by setting the ant properties
 \texttt{online.manual.is.up.to.date} and
 \texttt{print.manual.is.up.to.date} respectively, however this is not
-recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
+recommended for a release. Uploads to sourceforge use \texttt{sftp}.
 
 \begin{itemize}
 
 \item Make sure that all relevant changes have been committed to the
-  branch you are about to release.  If you plan to upload the manual
+  branch you are about to release. If you plan to upload the manual
   and/or JavaDoc, regenerate it (with \verb+ant manual+ and
   \verb+ant javadoc+), and fix any JavaDoc errors.
 
 \item Merge translations from trunk if the release is not made from
-  trunk, with \verb+ant merge-translations+.  Skip this step if the
+  trunk, with \verb+ant merge-translations+. Skip this step if the
   localization files are essentially the same as the ones in trunk (we
-  try to ensure this).  Make sure they are up to date, however.
+  try to ensure this). Make sure they are up to date, however.
 
 \item Lately we release from the git master and continue to work from
   there, so there is no urgent need to create a special release branch.
@@ -399,35 +399,35 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   0.9.0-alpha2 with the correct version, of course). It might be
   necessary to increase the memory available for ant, for example by
   setting the environment variable
-  \verb|ANT_OPTS="-Xms256m -Xmx256m"|.  Errors in language packs only
+  \verb|ANT_OPTS="-Xms256m -Xmx256m"|. Errors in language packs only
   apply to the installer and need not delay the overall release.
 
 \item Install one of the generated packages and verify that you can
   play normally for at least five turns (the java installer can be run
   from the command line with \texttt{java -cp
     freecol-\emph{version}-installer.jar
-    com.izforge.izpack.installer.Installer}).  Other good tests
+    com.izforge.izpack.installer.Installer}). Other good tests
   include loading a saved game and running the game in debug mode for
-  a hundred turns or so.  It might also be a good idea to compile the
+  a hundred turns or so. It might also be a good idea to compile the
   game from one of the source packages.
 
 \item \verb+ant dist+ will change the \verb+FREECOL_VERSION+ constant
   in FreeCol.java and the \verb+fcversion+ macro in
-  \texttt{doc/version.sty} to the release version.  Commit these changes.
+  \texttt{doc/version.sty} to the release version. Commit these changes.
 
-\item Upload the packages to \verb+sftp://frs.sourceforge.net/+.  A
+\item Upload the packages to \verb+sftp://frs.sourceforge.net/+. A
   script \verb|bin/release.sh| is provided that does this job,
-  including rebuilding and uploading the manual and JavaDoc.  
+  including rebuilding and uploading the manual and JavaDoc. 
 
 \item Write a release announcement (see previous versions for
-  comparison).  Include information on savegame compatibility with
-  previous FreeCol versions on all messages.  Recent practice is to
+  comparison). Include information on savegame compatibility with
+  previous FreeCol versions on all messages. Recent practice is to
   keep the announcement brief but refer to a detailed ``Release Notes''
   page on the sourceforge freecol wiki.
 
 \item The \texttt{freecol.org} website is in transition to a new
   format, and the master copy lives in the git tree in the
-  \texttt{www.freecol.org} top-level directory.  To update the
+  \texttt{www.freecol.org} top-level directory. To update the
   website, for now, you will need to add a new
   \texttt{www.freecol.org/news/freecol-}\emph{version}\texttt{-released.html}
   file and edit the following files:
@@ -456,7 +456,7 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   \begin{itemize}
     \item Our mailing lists: developers, translators and users.
       Beware that you may have to be subscribed to some lists to be
-      able to post.  The addresses are:
+      able to post. The addresses are:
       \texttt{freecol-\{developers,translators,users\}@lists.sourceforge.net}
     \item The FreeCol
       \href{https://sourceforge.net/p/freecol/discussion/141200/}{forum}.
@@ -465,15 +465,15 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
   \end{itemize}
 
 \item Consider revising the preamble to the ``Bugs'' page,
-  particularly the ``Known Common Problems'' section.  Go to ``Admin /
+  particularly the ``Known Common Problems'' section. Go to ``Admin /
   Tools / Bugs / Options'' to make changes.
 
 \item Go to the bug tracker and create a new milestone (``Edit
   Milestones'') called ``Fixed\_\emph{release}''
-  (e.g. ``Fixed\_0.10.2'').  Select the ``Fixed\_trunk'' group and do
+  (e.g. ``Fixed\_0.10.2''). Select the ``Fixed\_trunk'' group and do
   a mass edit (the pencil icon in the top right of the bug tracker
-  list) and move all bugs to the new milestone.  Repeat for the
-  ``Pending\_Fixed'' group.  Do the corresponding action in other
+  list) and move all bugs to the new milestone. Repeat for the
+  ``Pending\_Fixed'' group. Do the corresponding action in other
   ticket categories that have distinct release milestones.
 
 \item Start a new wiki page for the release notes for the next
@@ -485,23 +485,23 @@ recommended for a release.  Uploads to sourceforge use \texttt{sftp}.
 \hypertarget{Missing features}{\chapter{Missing features}}
 
 We know that FreeCol does not yet emulate all features of the original
-game.  However there are several features which are inevitably
+game. However there are several features which are inevitably
 different to Colonization due to FreeCol being a multiplayer game ---
 interactions with other European players being the obvious example.
 Similarly we do not attempt to exactly emulate the graphical look and
 feel of Colonization, although no displayed information should be lost.
 
 Otherwise, any missing feature from Colonization is considered to be a
-bug.  Please report such omissions on the
+bug. Please report such omissions on the
 \href{https://sourceforge.net/p/freecol/pending-features-for-freecol/}{pending
   features} tracker.
 
 Since we do not have access to the source code of the original game,
-we can only guess at the algorithms used.  This is particularly true
-in complex, detailed areas such as production and combat.  In some
-cases, players have reverse-engineered the algorithm.  If you know of
+we can only guess at the algorithms used. This is particularly true
+in complex, detailed areas such as production and combat. In some
+cases, players have reverse-engineered the algorithm. If you know of
 some calcuation in FreeCol that differs from that of the original
-game, please tell us about it.  There is an effort underway to
+game, please tell us about it. There is an effort underway to
 completely document Colonization's production amounts
 \href{https://sourceforge.net/p/freecol/wiki/WWC1D\%20-\%20resource\%20output\%20v2/}{here}.
 
@@ -517,8 +517,8 @@ editor, but at the moment, the most effective option is to edit the file
 specification.xml directly. This file defines the abilities of units,
 founding fathers, buildings, terrain types, goods and equipment, for
 example. You can find this file in the \textit{data/freecol}
-directory.  Try to avoid overriding the base Colonization-compatible
-rules in \textit{data/classic}.  For a small self-contained rule
+directory. Try to avoid overriding the base Colonization-compatible
+rules in \textit{data/classic}. For a small self-contained rule
 change, another option is to build a \emph{mod} --- see the Mods
 section following.
 
@@ -546,7 +546,7 @@ the result with the command \verb$ant validate$.
 \hypertarget{Modifiers and Abilities}{\section{Modifiers and Abilities}}
 
 Most of the objects defined by the rule set can be customized via
-modifiers and abilities.  Abilities are usually boolean values
+modifiers and abilities. Abilities are usually boolean values
 (``true'' or ``false''). If the value is not explicitly stated, it
 defaults to true. If an ability is not present, it defaults to
 false. Modifiers define a bonus or penalty to be applied to a numeric
@@ -976,45 +976,45 @@ The building increases the capacity of the warehouse.
 \hypertarget{Mods}{\chapter{Mods}}
 
 FreeCol packages a number of simple modifications to the FreeCol rules
-and resources, generally known as \emph{mods}.  The standard mods live
-in \texttt{.../data/mods}.  Users can add their own mods to a
+and resources, generally known as \emph{mods}. The standard mods live
+in \texttt{.../data/mods}. Users can add their own mods to a
 \texttt{mods} directory under their main data directory.
 
 A mod consists of a directory that includes at minimum a file
 \texttt{mod.xml}, a file \texttt{FreeColMessages.properties}, and
-other files that implement the required changes.  \texttt{mod.xml}
+other files that implement the required changes. \texttt{mod.xml}
 simply contains: \texttt{<mod id="}\emph{identifier}\texttt{" />}
 where the identifier is some unique name (distinct from other existing
-mods).  The \texttt{FreeColMessages.properties} file should contain at
+mods). The \texttt{FreeColMessages.properties} file should contain at
 minimum entries for \texttt{mod.}\emph{identifier}\texttt{.name} 
 and \texttt{mod.}\emph{identifier}\texttt{.shortDescription}, so that
-the mod selection dialog can display the mod correctly.  Other
+the mod selection dialog can display the mod correctly. Other
 messages needed by the mod belong in \texttt{ModMessages.properties}.
 The difference between these is that
 \texttt{FreeColMessages.properties} is always loaded so that the mod
 name and description can appear in the mod selection dialog, but
 \texttt{ModMessages.properties} is only loaded if the mod is selected.
 
-Many mods define extra resources.  If so, a
+Many mods define extra resources. If so, a
 \texttt{resources.properties} file will be needed, and similarly files
-for the resources involved.  For example, the ``example'' mod defines
+for the resources involved. For example, the ``example'' mod defines
 a ``milkmaid'' unit, which needs an image, so the example mod
 directory contains an image file for the milkmaid, and a reference to
 this file in \texttt{resources.properties}.
 
-Most mods change the specification.  This is done in a
-\texttt{specification.xml} file.  This file is in the same general
+Most mods change the specification. This is done in a
+\texttt{specification.xml} file. This file is in the same general
 format as the existing freecol rule sets, but does not attempt to
-provide a comprehensive set.  The first non-comment line should be:
+provide a comprehensive set. The first non-comment line should be:
 \texttt{<freecol-specification id="}\emph{identifier}\texttt{">}.
 Note that mods typically do not specify which ruleset they extend.
 
 When modifying a specification, expect additional elements you provide
 to be applied additively, but attributes of an existing element are
 cleared unless a special \texttt{preserve="true"} attribute is
-present.  If you need to delete or redefine an element, respecify it
+present. If you need to delete or redefine an element, respecify it
 in context with just its \texttt{id} and \texttt{delete="true"}
-attributes.  So for example, in the freecol ruleset we need to remove
+attributes. So for example, in the freecol ruleset we need to remove
 the \texttt{model.modifier.minimumColonySize} modifier from the
 stockade building, which is done as follows:
 
@@ -1024,7 +1024,7 @@ stockade building, which is done as follows:
     </building-type>
 \end{verbatim}
 
-Note that not all elements take a \texttt{delete} tag yet.  You may
+Note that not all elements take a \texttt{delete} tag yet. You may
 need to read or modify the source to be certain a mod will work.
 
 \hypertarget{Resources}{\chapter{Resources}}

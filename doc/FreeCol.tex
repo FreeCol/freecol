@@ -190,7 +190,7 @@ The following differences between the ``Classic'' rule set and the
   trained yourself. This feature is off by default in the Classic
   rule set and on by default in the FreeCol rule set.
 \item In the FreeCol ruleset, Francisco de Coronado grants full
-  ongoing visibility of foreign colonies and their surroundings.  Classic
+  ongoing visibility of foreign colonies and their surroundings. Classic
   rules do not grant ongoing or surroundings visibility, and show
   revealed colonies as having size of one.
 \end{itemize}
@@ -239,7 +239,7 @@ unit of gold) in order to simulate gold rushes.
 
 You can download a system independent installer, which should install
 FreeCol and set up the required shortcuts on your desktop. If
-everything works as planned, you will only need to double click the
+everything works as planned, you will only need to double-click the
 icon in order to start the game. If this is not the case, then please
 read the following paragraphs.
 
@@ -254,7 +254,7 @@ defined in the file to match the location of the freecol icon.
 \hypertarget{System Requirements}{\section{System Requirements}}
 
 FreeCol is written in Java. In order to run, it requires a Java
-Virtual Machine.  FreeCol should run on any platform on which a Java
+Virtual Machine. FreeCol should run on any platform on which a Java
 Virtual Machine compatible with Sun Java 8 or higher is available.
 
 FreeCol is known to work with \href{http://java.sun.com/}{Oracle Java}
@@ -263,7 +263,7 @@ recent versions of Windows, Linux, and Mac OS X. If you are using
 FreeCol on a different platform, we would like to hear about it.
 
 FreeCol requires at least 256 MB memory, although some systems slow
-down badly and require 512MB.  FreeCol works best with a screen
+down badly and require 512MB. FreeCol works best with a screen
 resolution of at least 1024x768 pixels. It should also be possible to
 play the game with a screen resolution of 1024x600 pixels, although
 some panels will look a bit cramped. You can play the game with an
@@ -292,7 +292,7 @@ command \verb$java -Xmx512M -jar FreeCol.jar$.
 
 If something goes wrong, please open a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
-  FreeCol}. Use the command \verb$ant -projecthelp$ to find out
+ FreeCol}. Use the command \verb$ant -projecthelp$ to find out
 about other kinds of things you can build (this manual, for
 example). Note that you will require additional software to build the
 manual, however.
@@ -338,7 +338,7 @@ options:
 \item\verb$--version$ Display the version number.
 \item\verb$--default-locale LOCALE$ Specify a locale.
 \item\verb$--freecol-data DIR$ Specify the directory that contains
-  FreeCol's data files.  In general, you will only need to use this if
+  FreeCol's data files. In general, you will only need to use this if
   you have installed a modified copy of FreeCol's data files.
 \item\verb$--advantages ADVANTAGES$ Set the European nation advantages
   type, which must be one of \texttt{Selected} (each nation may choose
@@ -357,12 +357,12 @@ options:
   font specifier (e.g. Arial-BOLD-12).
 \item\verb$--full-screen$ Run FreeCol in full screen mode.
 \item\verb$--load-savegame SAVEGAME_FILE$ Load the given
-  savegame.  This is particularly useful in combination with the client
+  savegame. This is particularly useful in combination with the client
   option \hyperlink{show savegame settings}{show savegame settings}.
 \item\verb$--log-file FILE$ Override the location of the log file.
 \item\verb$--name NAME$ Specify a player name.
 \item\verb$--no-intro$ Skip the introductory video.
-\item\verb$--no-sound$ Run FreeCol without sound.  Note that the game
+\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
   does not yet contain background music, so the only sounds you will
   hear will be special effects.
 \item\verb$--no-splash$ Skip the splash screen.
@@ -374,30 +374,30 @@ options:
 \item\verb$--splash FILE$ Specify the location of the splash screen file.
 \item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
   server should wait for a player to answer a question (e.g. demands
-  from natives).  This is `infinite' by default in single player mode,
+  from natives). This is `infinite' by default in single player mode,
   and 60 seconds in multiplayer.
 \item\verb$--user-cache-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user cache directory to save
-  temporary files such as the log file.  If the specified directory does not
+  temporary files such as the log file. If the specified directory does not
   exist this option will be ignored.
 \item\verb$--user-config-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user configuration directory to load
-  client and custom options.  You can use this in order to run the
-  game from a USB stick\index{USB stick}, for example.  Please note
+  client and custom options. You can use this in order to run the
+  game from a USB stick\index{USB stick}, for example. Please note
   that specifying a client options file on the command line will override
-  the options directory.  If the specified directory does not
+  the options directory. If the specified directory does not
   exist this option will be ignored.
 \item\verb$--user-data-directory DIRECTORY$ Use the given directory
   instead of your default FreeCol user data directory to load and save
-  games, and user mods.  You can use this in order to run the
-  game from a USB stick\index{USB stick}, for example.  Please note
+  games, and user mods. You can use this in order to run the
+  game from a USB stick\index{USB stick}, for example. Please note
   that specifying a save game file on the command line will override
-  the save game directory.  If the specified directory does not
+  the save game directory. If the specified directory does not
   exist FreeCol will exit.
 \item\verb$--windowed [WIDTHxHEIGHT]$ Run FreeCol in windowed mode,
-  and optionally explicitly set the window width and height.  If the
+  and optionally explicitly set the window width and height. If the
   size is not specified FreeCol will attempt to use as much space as
-  possible without overlapping menu bars et al.  Window size
+  possible without overlapping menu bars et al. Window size
   determination is not always correct for all combinations of
   operating systems and window systems, hence the ability to
   explicitly set the size.
@@ -411,12 +411,12 @@ information:
 \item\verb$--check-savegame SAVEGAME_FILE$ Check the integrity of a saved game,
   exit with status equal to the result of the check.
 \item\verb$--debug [MODES]$ Start the game in (non-scoring)
-  debugging mode.  The optional argument is a comma separated list of
+  debugging mode. The optional argument is a comma separated list of
   the debug modes: `menus' (enables the debug menu and extra entries
   in popups and panels), `init' (generates a starting colony), `comms'
   (massive client-server communications tracing), `desync' (check for
   client-server desynchronization at start and end of the player's
-  turn) and `paths' (more infomation is displayed on goto paths).  It
+  turn) and `paths' (more infomation is displayed on goto paths). It
   defaults to `menus' if null.
 \item\verb$--debug-run TURNS[,SAVENAME]$ Run in debug `menus' mode
   for the specified number of turns, then optionally save the game to
@@ -819,7 +819,7 @@ is used as a secondary key, and vice versa.
 \end{itemize}
 
 Beware that some Java implementations have bugs that cause high CPU
-load and very slow performance if animation is enabled.  If this
+load and very slow performance if animation is enabled. If this
 happens, either disable animation or experiment with the
 \texttt{-Dsun.java2d.pmoffscreen=false} Java command line option.
 
@@ -1051,7 +1051,7 @@ order is only available if the unit is able to build colonies and the
 tile it is on will support a colony, for example. The unload order is
 only available if the unit is carrying goods. You can unload the goods
 anywhere, but if you are not in Europe or in a colony, the goods will
-be lost.  You can use this feature to dump unwanted cargo\index{dump
+be lost. You can use this feature to dump unwanted cargo\index{dump
   cargo} in order to avoid the \hyperlink{Cargo Penalty}{cargo
   penalty}.
 
@@ -1190,7 +1190,7 @@ The minimap in the lower left corner of the screen shows you a more
 abstract view of the map than the main map. Different types of terrain
 are distinguished by colour, and units and settlements are also
 represented by dots in the colour of the nation that owns them. You
-can use the minimap to navigate around the map quickly.  Either click
+can use the minimap to navigate around the map quickly. Either click
 on the minimap to center the view on a certain point, or drag the
 white frame around. Zoom buttons to the left and to the right of the
 minimap allow you to zoom into and out of the view.
@@ -1232,9 +1232,9 @@ are unable to) use the keyboard shortcuts.
 The main map shows you the New World in greater detail. You can see
 the different types of terrain, forested and otherwise, hills,
 mountains, rivers, and, of course, the various units and settlements
-of the native and European players.  Sometimes units will be all
+of the native and European players. Sometimes units will be all
 grey---this shows the position of the unit when you could last see
-that tile, but does not guarantee that the unit is still there.  Left
+that tile, but does not guarantee that the unit is still there. Left
 click on a tile in order to center the main map, or on a unit in order
 to select it (a \hyperlink{display options}{display option} allows you
 to decide whether the map should always centre on the selected unit,
@@ -1261,13 +1261,13 @@ Blue   & +2 & 100\% SoL\\
 
 \vskip5mm
 
-Left click on a colony in order to open the \hyperlink{colony
+left-click on a colony in order to open the \hyperlink{colony
   panel}{colony panel}. If there is an active unit outside of the
-colony on the same tile, then a single left click will select the unit
-instead. In this case, a double click will still open the colony
+colony on the same tile, then a single left-click will select the unit
+instead. In this case, a double-click will still open the colony
 panel.
 
-Right clicking on an empty tile, will either display some information
+right-clicking on an empty tile, will either display some information
 on that tile if no unit is selected, or open a pop-up menu that
 additionally allows you to send the selected unit to this tile. If the
 tile contains some of your units, the menu will also enable you to
@@ -1453,7 +1453,7 @@ all types of experts are available in Europe.
 
 Units present in Europe can also be armed, mounted, equipped with
 tools or blessed as missionaries in Europe. In order to select one of
-these actions, you need to right click on the unit. Note that you will
+these actions, you need to right-click on the unit. Note that you will
 have to pay for the arms, horses or tools required to equip your
 units. Blessing a missionary, however, is free.
 
@@ -1472,7 +1472,7 @@ The figure \ref{colony_panel_fig} represents the Colony panel.
   \end{center}
 \end{figure}
 
-To view a colony's panel, left click on it from the main screen. In
+To view a colony's panel, left-click on it from the main screen. In
 this panel, colonists can be assigned to cultivate tiles surrounding
 the colony, to work in buildings, defend the colony against attackers
 or wait outside of the colony.
@@ -1488,11 +1488,11 @@ left and a scroll pane displaying the buildings of the colony to the
 right. You can drag and drop a unit on a tile or a building. Buildings
 only ever produce a single type of goods. The tiles surrounding the
 colony can produce several kinds of goods, however. If the unit is not
-producing the right kind of goods, you can right click on the unit to
+producing the right kind of goods, you can right-click on the unit to
 select a different kind of work. If a tile has a red border, then it
 can not be used---it is either assigned to another colony or
 settlement, or is occupied by a hostile unit, or is a water tile which
-can not be used until you have built \hyperlink{Dock}{docks}.  Note
+can not be used until you have built \hyperlink{Dock}{docks}. Note
 that if you drag a unit onto a tile owned by the natives you may be
 offered the chance to purchase the land.
 
@@ -1557,7 +1557,7 @@ wagon train
 
 You can drag and drop colonists to and from buildings, tiles
 surrounding the colony, ships and the area outside of the colony. You
-can also use the right click menu of any unit to assign it to a work
+can also use the right-click menu of any unit to assign it to a work
 place, equip it, or place it outside of the colony (unless it already
 is outside of the colony).
 
@@ -1735,7 +1735,7 @@ higher prices.
 
 \Goods{Food} is the single most important good, since all your
 colonists consume two units of food each turn. If this demand can not
-be met, some of your colonists will starve to death.  On the other
+be met, some of your colonists will starve to death. On the other
 hand, a colony that has accumulated 200 units of food will produce a
 new \hyperlink{Free Colonist}{Free Colonist}. Unfortunately, buying
 food in Europe is always expensive, and colonial foodstuffs fetch only
@@ -1850,7 +1850,7 @@ for a long time until a sufficient number of goods becomes available.
 As soon as a ship or wagon train reaches the last destination of the
 trade route, it will continue at the first destination.
 
-The behaviour of trade routes can sometimes be confusing.  To see
+The behaviour of trade routes can sometimes be confusing. To see
 exactly what each unit with a trade route is doing, enable the
 \texttt{Goods Movement} message type, but beware that there can be
 many messages of this type.
@@ -1862,7 +1862,7 @@ arrive there (although this is imperfect as it can be defeated by
 unplanned interuptions to the path of the transporting unit).
 Furthermore, this option enables an additional `Import Level' setting
 on the warehouse dialog, that allows you to specify the maximum amount
-of goods that will be imported to the colony.  This feature is new,
+of goods that will be imported to the colony. This feature is new,
 and should be considered experimental.
 
 \hypertarget{Resources}{\section{Special Resources}}
@@ -1878,26 +1878,26 @@ particularly valuable.
 The New World is by no means an uninhabited country. Various tribes of
 Indians already live there, and make use of the land. When your
 colonists arrive, you will have to decide whether you will attempt to
-peacefully coexist with the natives, or to wage war.  Beware that
+peacefully coexist with the natives, or to wage war. Beware that
 their culture is unlike that of Europe, and whenever your peoples come
 into contact there is a tendency for misunderstandings and offence,
-which manifests in increasing tension and eventual violence.  Native
+which manifests in increasing tension and eventual violence. Native
 chiefs are often well-intentioned, but do not completely control their
 hot headed warriors, so be alert for raids from even nominally
 peaceful settlements.
 
 The native culture is strongly conservationist, which means that
 building colonies and improving the surrounding lands will inevitably
-cause some degree of alarm.  The further your colonies are from native
+cause some degree of alarm. The further your colonies are from native
 settlements, the less alarm they cause, and doubly so for the native
-capital.  Similarly, the larger your colonies get, the greater the
+capital. Similarly, the larger your colonies get, the greater the
 alarm caused.
 
 The \hyperlink{France}{French} player has the advantage of generating only
 half the alarm among the natives. The \hyperlink{Spain}{Spanish}
 player has the advantage of greater military efficiency against the
 natives. Your choice of \hyperlink{Home Country}{Home Country} may
-influence your strategy--- or vice versa.  
+influence your strategy--- or vice versa.
 
 Small Native Settlements use the tile they are built on and all the
 adjacent tiles, just like your \hyperlink{Colonies}{Colonies} do, and
@@ -1911,18 +1911,18 @@ nation colour.
 Your colonists can not use tiles that are already used by natives. If
 they attempt to do so, the natives will demand some gold for the
 land. You must then decide whether to pay their price, take the land
-away from the by force, or to leave the land alone.  Naturally, the
+away from the by force, or to leave the land alone. Naturally, the
 natives will not be pleased if you take the land away from them. As
-soon as \hyperlink{Peter Minuit}{Peter Minuit} has joined the
+soon as \hyperlink{Peter Minuit}{Peter Minuit} joins the
 \hyperlink{Continental Congress}{Continental Congress}, however, the
-natives no longer demand payment for their land nor become immediately
-displeased if it is taken.  Note though that every tile you own makes
+natives neither demand payment for their land nor become immediately
+displeased if it is taken. Note though that every tile you own makes
 your colony look more threatening.
 
 A special case exists for the center tile of the colonies you found.
 In the ``classic'' ruleset and/or by default in when playing under the
 ``Very Easy'' difficulty level the center tile does not have to be
-paid for.  ``Easy'' difficulty restricts this to only apply to a
+paid for. ``Easy'' difficulty restricts this to only apply to a
 single colony, ``Normal'' to a single colony and requires the tribe
 you are stealing land to have not been contacted, and other levels
 require payment as usual.
@@ -1951,7 +1951,7 @@ some gold, or tell you about nearby lands. If your Scout is not a
 Scouts are always welcome to revisit friendly settlements which will
 update the skill and goods information, but the special benefits are
 only available to the first scout (of any nation) that visits (or any
-unit, if the ``Chief contact'' option is set).  Settlements which are
+unit, if the ``Chief contact'' option is set). Settlements which are
 unscouted to the best of your knowledge are decorated with a dollar
 sign on the settlement tile popup and Indian Advisor.
 
@@ -1978,24 +1978,24 @@ heresy. If he is successful, the natives will burn down the old
 mission and your missionary establishes a new one.
 
 Note that the missionary will always remain in the settlement. He is
-effectively lost to you.  The presence of a mission is shown by a
-second small rectangle with a cross on it.  A black cross denotes an expert
+effectively lost to you. The presence of a mission is shown by a
+second small rectangle with a cross on it. A black cross denotes an expert
 missionary, and the background colour of the rectangle is that of the
 nation that created the mission.
 
 There is also a third rectangle shown on native settlements that you
-have contacted.  This will contain an exclamation mark if your scouts
+have contacted. This will contain an exclamation mark if your scouts
 have visited it and spoken to the chief, or a question mark if it has
-been contacted in some other way.  The background colour will be that
-of the nation that is causing that settlement the most alarm.  If your
+been contacted in some other way. The background colour will be that
+of the nation that is causing that settlement the most alarm. If your
 nation is the most alarming, the rectangle may be partially filled,
 giving a rough measure of the amount of alarm you have generated.
 
 Good native relations are most helpful at the start of the game when
-you have relatively few military units.  As the game progresses the
+you have relatively few military units. As the game progresses the
 natives pose less of a threat, due to your colonies becoming more
 heavily fortified and defended by artillery (artillery is particularly
-effective against native raiders).  It usually takes many years before
+effective against native raiders). It usually takes many years before
 all out war breaks out with your neighbouring tribes, but it is
 very difficult to completely avoid.
 
@@ -2150,7 +2150,7 @@ the colonists' support for the \hyperlink{Sons of Liberty}{Sons of
   Liberty}. If more than 50\% of the colonists support the Sons of
 Liberty, they all produce one additional unit of goods, and if support
 for the Sons of Liberty increases to 100 \%, they even produce two
-additional units.  Colonies which have room for more colonists without
+additional units. Colonies which have room for more colonists without
 reducing the production bonus are distinguished on the map by the
 colony size appearing in italic font.
 
@@ -2217,7 +2217,7 @@ colony:
 
 \item The \Building{Tobacconist's House}, which can be upgraded to a
   \Building{Tobacconist's Shop}, is used to produce
-  \hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}.  Once
+  \hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}. Once
   the colony's population has reached 8, it can be further upgraded to
   a \Building{Cigar Factory}, provided that \hyperlink{Adam
   Smith}{Adam Smith} has joined the \hyperlink{Continental
@@ -2357,7 +2357,7 @@ ships, you will need to produce \hyperlink{Hammers}{Hammers}, which
 represent work being done. Hammers are made from
 \hyperlink{Lumber}{Lumber}, so you need to produce lumber, either by
 cutting down forests, or by placing a colonist on a forested tile next
-to your colony and ordering him to work as a lumberjack (right click
+to your colony and ordering him to work as a lumberjack (right-click
 on the unit to give it orders). Then you can place a colonist in the
 \hyperlink{Carpenter's House}{Carpenter's House} in order to convert
 the lumber to Hammers.
@@ -2679,7 +2679,7 @@ The \Unit{Wagon Train}, which has to be built in one of your colonies,
 can be used to transport up to 200 units of goods over land and to
 trade with native settlements, and foreign colonies if \hyperlink{Jan
 de Witt}{Jan de Witt} has joined the \hyperlink{Continental
-Congress}{Continental Congress}.  There is a limit on the number of
+Congress}{Continental Congress}. There is a limit on the number of
 wagon trains you can build--- it may not exceed the number of colonies
 you have (plus the ``Settlement limit modifier'' game option which
 defaults to zero).
@@ -2814,10 +2814,10 @@ colony, however.
 The \hyperlink{Schoolhouse}{Schoolhouse} and its upgrades, the
 \hyperlink{College}{College} and the
 \hyperlink{University}{University}, allow you to train your units
-yourself by placing a skilled unit in one of these buildings.  If a
+yourself by placing a skilled unit in one of these buildings. If a
 suitable student exists in the colony it will automatically appear
 next to the teacher in the building, as well as continuing to perform
-its current task.  Note that the Master Sugar Planter, the Master
+its current task. Note that the Master Sugar Planter, the Master
 Cotton Planter, the Master Tobacco Planter, the Master Fur Trader,
 the Master Distiller, the Master Weaver, the Master Tobacconist, the
 Master Blacksmith and the Master Gunsmith all require at least a
@@ -2833,7 +2833,7 @@ that units in colonies with a production bonus learn faster, and units
 in colonies with a production penalty require more time to learn.
 
 A Free Colonist can learn any skill or profession in this manner, but
-Petty Criminals and Indentured Servants can not.  However, a Petty
+Petty Criminals and Indentured Servants can not. However, a Petty
 Criminal may become an Indentured Servant, and an Indentured Servant
 may become a Free Colonist through education. Any colonist placed in a
 schoolhouse, college or university is able to provide this kind of
@@ -2891,8 +2891,8 @@ A Dragoon that loses a battle will be demoted to a Soldier, and a
 Soldier that loses a battle will be demoted to an unarmed colonist. An
 unarmed colonist that loses a battle is either captured, if the
 attacker is a European Player, or slaughtered, if the attacker is a
-Native Player.  If an unarmed unit is defending a colony, the colony
-is captured if the unit loses a battle.  \hyperlink{Wagon Train}{Wagon
+Native Player. If an unarmed unit is defending a colony, the colony
+is captured if the unit loses a battle. \hyperlink{Wagon Train}{Wagon
   Trains} and \hyperlink{Treasure Train}{Treasure Trains} may also be
 captured by a European Player and destroyed by a Native Player. Native
 units that lose a battle are always slaughtered.
@@ -3017,7 +3017,7 @@ stop, became New York. With the election of Peter Stuyvesant, the
 construction of \hyperlink{Custom House}{custom houses} becomes
 possible. \Wikipedia{Peter_Stuyvesant}
 
-\Father{Jan de Witt} (1625--1672) was a great Dutch statesmen.  He
+\Father{Jan de Witt} (1625--1672) was a great Dutch statesmen. He
 represented the merchants and a encouraged industry and commerce. He
 also negotiated several important treaties for the Dutch to end wars
 with England. As soon as Jan de Witt is a member of the Continental
@@ -3044,7 +3044,7 @@ Continental Congress, all existing colonies become visible on the
 map. \Wikipedia{Francisco_Vazquez_de_Coronado}
 
 \Father{Hernando de Soto} (1496--1542) was the first European to
-explore Florida and the southeastern US.  He also held a prominent
+explore Florida and the southeastern US. He also held a prominent
 role in conquests of Central America. If Hernando de Soto is a member
 of the Continental Congress, the exploration of \hyperlink{Lost City
 Rumours}{Lost City Rumours} never yields a wholly negative result, and all land
@@ -3052,14 +3052,14 @@ units have an extended sight radius. \Wikipedia{Hernando_de_Soto_(explorer)}
 
 \Father{Henry Hudson} (1565--1611) was an English navigator who
 explored and mapped a large area of the northeastern North American
-continent.  Many waterways in that region are named in his honour. His
+continent. Many waterways in that region are named in his honour. His
 original goal was to find the famed Northwest Passage. The election of
 Henry Hudson to the Continental Congress doubles the output of all
 \hyperlink{Expert Fur Trapper}{Fur Trappers}. \Wikipedia{Henry_Hudson}
 
 \Father{Robert La Salle} (1643--1687) was the first European to travel
 the length of the Mississippi river, while on a mission to set up
-numerous trading posts along its banks.  He later claimed the whole
+numerous trading posts along its banks. He later claimed the whole
 basin as Louisiana in honor of the French King. Later, he explored
 several of the Great Lakes. If Robert La Salle is a member of the
 Continental Congress, all colonies gain a stockade as soon as their
@@ -3113,8 +3113,8 @@ Liberty Bell production in colonies by
 \Father{Pocahontas} (1595--1617) was a peacemaker between early
 Jamestown settlers and the Native Americans. She is credited with
 sending food and other supplies to starving colonists there during
-harsh times.  She later converted to Christianity and married an
-Englishman.  When Pocahontas joins the Continental Congress, all
+harsh times. She later converted to Christianity and married an
+Englishman. When Pocahontas joins the Continental Congress, all
 tension levels between you and natives are removed and Indian alarm is
 generated half as fast. \Wikipedia{Pocahontas}
 
@@ -3221,13 +3221,13 @@ World at this time, then the Treaty of Utrecht event can not occur.
 of Independence}}
 
 As soon as 50\% of your entire population support the Sons of Liberty,
-you can declare the independence of your colonies.  Your
+you can declare the independence of your colonies. Your
 \hyperlink{Monarch}{Monarch} will not be amused and will send the
 \hyperlink{Royal Expeditionary Force}{Royal Expeditionary Force} to
 quell the insurrection. In order to gain independence, you must defeat
 the Royal Expeditionary Force by capturing or destroying nearly all of
 their land forces and by taking back any colonies they might have
-captured. You do not need to destroy the fleet.  However, you do need
+captured. You do not need to destroy the fleet. However, you do need
 to maintain at least one independent colony that is on the coast and
 accessible from Europe---if the Royal Expeditionary Force captures
 all your coastal colonies you have lost.
@@ -3246,8 +3246,8 @@ new free nation will no longer be subject to the whims of a monarch.
 Your \hyperlink{Custom House}{Custom House} will continue to operate,
 trading now with all comers instead of just your former nation, and
 therefore the external tax rate will be fixed at zero, with no threat of
-boycotts.  However, you will no longer be able to sail to your former
-home port.  Future versions may implement sailing to all European ports.
+boycotts. However, you will no longer be able to sail to your former
+home port. Future versions may implement sailing to all European ports.
 
 
 
@@ -3269,10 +3269,10 @@ a computer opponent. If this happens to you, you can generally
 reconnect to the server by using the reconnect option in the
 \hyperlink{game menu}{game menu} or by pressing \verb$ctrl-r$.
 
-A reconnect is often an indication of a bug.  If you report a
+A reconnect is often an indication of a bug. If you report a
 reconnect problem, more detail is available in the java log file
 (usually called \texttt{FreeCol.log}) which is very helpful to the
-developers if attached to the bug report.  The log file can sometimes
+developers if attached to the bug report. The log file can sometimes
 be large enough to exceed the attachment limit at SourceForge, in
 which case feel free to omit the bulk of the file---the critical
 information is likely to be near the end (in the form of a
@@ -3280,10 +3280,10 @@ java exception message), but you should always retain the first few
 lines which contain the FreeCol version and system information.
 
 Possibly the most frequently reported type of bug amounts to ``A
-computer player did something stupid''.  This is only too well
-understood.  The FreeCol AI players are weak, and blatantly cheat to
+computer player did something stupid''. This is only too well
+understood. The FreeCol AI players are weak, and blatantly cheat to
 compensate (which can be partly controlled by the `AI-Cheating'
-difficulty options).  We hope one day that the FreeCol AI players will
+difficulty options). We hope one day that the FreeCol AI players will
 be interesting and challenging opponents without having to cheat,
 but much work needs to be done to get there.
 
