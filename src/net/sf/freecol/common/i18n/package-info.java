@@ -1,5 +1,6 @@
 /**
- * <h1>FreeCol internationalisation</h1>
+ * <h1>FreeCol Internationalisation package</h1>
+ *
  * <p>This package contains the FreeCol support for internationalisation
  *     (translation).
  * <p>The {@link net.sf.freecol.common.i18n.Messages} class provides the API to
@@ -8,11 +9,11 @@
  *     <span style="font-weight: bold; color: darkred;">new</span> AbstractAction( Messages.message(<span style="color: blue;">"cancel"</span>) )
  * </p>
  * ..whereupon the Messages class will look for a file called:
- * <P style="font-family: monospace; margin-left: 40px;">
+ * <p style="font-family: monospace; margin-left: 40px;">
  *     FreeColMessages<span style="color: green;">[_la[_CO]]</span>.properties
  * </p>
- * ..where <span style="font-family: monospace;">_la</span> and <span style="font-family: monospace;">_CO</span> are
- * the language and country codes from the locale.  The most specific file will be loaded.  With a United States locale,
+ * <p>..where <span style="font-family: monospace;">_la</span> and <span style="font-family: monospace;">_CO</span> are
+ * the language and country codes from the locale. The most specific file will be loaded. With a United States locale,
  * <span style="font-family: monospace;">Messages</span> will
  * look for <span style="font-family: monospace;">FreeColMessages_en_US.properties</span> first, then
  * <span style="font-family: monospace;">FreeColMessages_en.properties</span> and finally

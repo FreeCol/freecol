@@ -1,51 +1,81 @@
 /**
- * This is the main client package.
+ * <h1>FreeCol Client Package</h1>
+ * 
+ * <p>This is the main client package.</p>
  *
- * <br><br>
+ * <h2>survey of Thread objects in the FreeCol client</h2>
+ * 
+ * <p>This is the way threads were used when this was written:</p>
+ * 
+ * <h3>Anonymous sub-classes of Thread</h3>
  *
- * <H1>survey of Thread objects in the FreeCol client</H1>
- * This is the way threads were used when this was written:
- * <H2>anonymous sub-classes of Thread</H2>
- * <UL>
- * <LI> Canvas (client shutdown hook)
- * <LI> ConnectController (loading game)
- * <LI> FreeCol (server shutdown hook)
- * <LI> InGameController (save game, choose founding father)
- * <LI> ReceivingThread (urgent messages)
- * </UL>
- * (the shutdown hooks don't really count as they're not a normal use of a thread)
- * <H2>named sub-classes of Thread</H2>
- * <UL>
- * <LI> Canvas (ChatDisplayThread, TakeFocusThread)
- * <LI> CanvasMouseMotionListener (ScrollThread)
- * <LI> MetaServer
- * <LI> ReceivingThread
- * <LI> Server
- * <LI> SoundPlayer (SoundPlayer)
- * </UL>
- * <P>Some code in FreeCol that does real work is run on the AWT thread.  The AWT
+ *  <UL>
+ *      <li>Canvas (client shutdown hook)</li>
+ *      <li>ConnectController (loading game)</li>
+ *      <li>FreeCol (server shutdown hook)</li>
+ *      <li>InGameController (save game, choose Founding Father)</li>
+ *      <li>ReceivingThread (urgent messages)</li>
+ *  </UL>
+ *  
+ * <p>(The shutdown hooks don't really count as they're not a normal use of a thread.)</p>
+ * 
+ * <h3>Named sub-classes of Thread</h3>
+ * 
+ *  <UL>
+ *      <li>Canvas (ChatDisplayThread, TakeFocusThread)</li>
+ *      <li>CanvasMouseMotionListener (ScrollThread)</li>
+ *      <li>MetaServer</li>
+ *      <li>ReceivingThread</li>
+ *      <li>Server</li>
+ *      <li>SoundPlayer (SoundPlayer)</li>
+ *  </UL>
+ *  
+ * <p>Some code in FreeCol that does real work is run on the AWT thread. The AWT
  * thread is used to paint the user interface and to notify the application of user
- * interface events.  When the AWT thread is busy, Java user interfaces look like
- * grey boxes.  Users often report this as a "hang" or a "crash".
- * <P>This can be avoided by only using the AWT thread for things that must be run
- * on it (such as to update the state of the user interface objects (JTable, etc.).  Technically, all Swing methods should be invoked on the AWT thread).
- * <P>What follows is not an invention, rather something that worked well on other
- * projects.
- * <H1>The three-thread model of a GUI application</H1>
- * The three threads are:
- * <OL>
- * <LI> the AWT thread
- * <LI> the network thread
- * <LI> the work thread
- * </OL>
- * <H2>the AWT thread</H2>
- * The AWT thread is started by Java and runs all callbacks (such as MouseListener).  When a callback is invoked, the AWT thread does the work if it involves only manipulating Swing objects, otherwise it queues a job for the work thread.  All Swing objects should be manipulated on the AWT thread.  This is done as normal with invokeLater(Runnable).  The behaviour ensures that the AWT thread is always ready to paint when the Operating System uncovers an application window.
- * <H2>the network thread</H2>
- * The network thread is blocked listening most of the time.  When it wakes up, it may interact with the work thread (typically by queueing a message that has been received) and then goes straight back to listening.  This behaviour improves the throughput of the link.
- * <H2>the work thread</H2>
- * The work thread is idle most of the time and does jobs for the other threads when they are queued.
- * <H2>advantages</H2>
- * <P>The model is very simple and because the only places in the code where synchronization is required are where the AWT or network threads interact with the work thread, no synchronization is required over the rest of the code, which saves typing, is easier to understand and faster.
- * <CENTER><SMALL>$Revision$</SMALL></CENTER>
+ * interface events. When the AWT thread is busy, Java user interfaces look like
+ * grey boxes. Users often report this as a "hang" or a "crash".</p>
+ * 
+ * <p>This can be avoided by only using the AWT thread for things that must be run
+ * on it (such as to update the state of the user interface objects (JTable, etc.). 
+ * Technically, all Swing methods should be invoked on the AWT thread).</p>
+ * 
+ * <p>What follows is not an invention, rather something that worked well on other
+ * projects.</p>
+ * 
+ * <h2>The three-thread model of a GUI application</h2>
+ *
+ * <p>The three threads are:</p>
+ *
+ *  <OL>
+ *      <li>the AWT thread</li>
+ *      <li>the network thread</li>
+ *      <li>the work thread</li>
+ *  </OL>
+ *
+ * <h3>the AWT thread</h3>
+ *
+ * <p>The AWT thread is started by Java and runs all callbacks (such as MouseListener). When a callback is invoked, the
+ * AWT thread does the work if it involves only manipulating Swing objects, otherwise it queues a job for the work
+ * thread. All Swing objects should be manipulated on the AWT thread. This is done as normal with invokeLater(Runnable).
+ * The behaviour ensures that the AWT thread is always ready to paint when the Operating System uncovers an application
+ * window.</p>
+ *
+ * <h3>The network thread</h3>
+ *
+ * <p>The network thread is blocked from listening most of the time. When it wakes up, it may interact with the work
+ * thread (typically by queueing a message that has been received) and then goes straight back to listening. This
+ * behaviour improves the throughput of the link.</p>
+ *
+ * <h3>The work thread</h3>
+ *
+ * <p>The work thread is idle most of the time and does jobs for the other threads when they are queued.</p>
+ *
+ * <h3>Advantages</h3>
+ *
+ * <p>The model is very simple and because the only places in the code where synchronization is required are where the
+ * AWT or network threads interact with the work thread, no synchronization is required over the rest of the code, which
+ * saves typing, is easier to understand and faster.</p>
+ *
+ * <p style="text-align: center; font-weight: bold;">$Revision$</p>
  */
 package net.sf.freecol.client;

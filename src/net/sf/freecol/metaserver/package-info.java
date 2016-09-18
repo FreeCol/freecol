@@ -1,7 +1,8 @@
 /**
- * This package contains an implementation of a meta server.
- * <br><br>
- * The entry point for the meta server is
- * {@link net.sf.freecol.metaserver.MetaServer}.
+ * <h1>FreeCol Meta server</h1>
+ *
+ * <p>This package contains an implementation of a meta server.</p>
+ *
+ * <p>The entry point for the meta server is {@link net.sf.freecol.metaserver.MetaServer}.</p>
  */
 package net.sf.freecol.metaserver;
