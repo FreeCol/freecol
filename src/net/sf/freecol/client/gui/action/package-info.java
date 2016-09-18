@@ -16,5 +16,7 @@
  * in order to define a key binding. The value of the accelerator must be
  * unique and must be valid Java KeyStroke Strings, as described
  * <a href="https://docs.oracle.com/javase/8/docs/api/javax/swing/KeyStroke.html#getKeyStroke-java.lang.String-">here</a>.</p>
+ *
+ * @since 0.4.0
  */
 package net.sf.freecol.client.gui.action;
