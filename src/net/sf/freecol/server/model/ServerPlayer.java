@@ -3133,15 +3133,16 @@ outer:  for (Effect effect : effects) {
      */
     private void csDemoteUnit(Unit winner, Unit loser, ChangeSet cs) {
         final Specification spec = getSpecification();
-        ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
-        StringTemplate loserNation = loser.getApparentOwnerName();
-        StringTemplate loserLocation = loser.getLocation()
+        final ServerPlayer loserPlayer = (ServerPlayer)loser.getOwner();
+        final StringTemplate loserNation = loser.getApparentOwnerName();
+        final StringTemplate loserLocation = loser.getLocation()
             .getLocationLabelFor(loserPlayer);
-        StringTemplate loserLabel = loser.getLabel();
-        ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        StringTemplate winnerNation = winner.getApparentOwnerName();
-        StringTemplate winnerLocation = winner.getLocation()
+        final StringTemplate loserLabel = loser.getLabel();
+        final ServerPlayer winnerPlayer = (ServerPlayer)winner.getOwner();
+        final StringTemplate winnerNation = winner.getApparentOwnerName();
+        final StringTemplate winnerLocation = winner.getLocation()
             .getLocationLabelFor(winnerPlayer);
+        final String suffix = loser.getType().getSuffix(); // pre-demotion value
         String key;
         
         UnitChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
@@ -3153,7 +3154,7 @@ outer:  for (Effect effect : effects) {
         loser.changeType(uc.to);//-vis(loserPlayer)
         loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
-        key = "combat.unitDemoted.enemy." + loser.getType().getSuffix();
+        key = "combat.unitDemoted.enemy." + suffix;
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              key, winner)
@@ -3163,7 +3164,7 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%enemyNation%", loserNation)
                 .addStringTemplate("%oldName%", loserLabel)
                 .addStringTemplate("%enemyUnit%", loser.getLabel()));
-        key = "combat.unitDemoted.ours." + loser.getType().getSuffix();
+        key = "combat.unitDemoted.ours." + suffix;
         cs.addMessage(See.only(loserPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                              key, loser)
