@@ -21,5 +21,8 @@
  *      <li>The {@link net.sf.freecol.client.gui.menu.FreeColMenuBar} is the menu bar that is
  *          displayed on top corner of the {@code Canvas}.</li>
  * </ul>
+ *
+ * @since 0.2.0
+ *
  */
 package net.sf.freecol.client.gui;

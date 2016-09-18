@@ -12,5 +12,7 @@
  *
  * @see "java.util.logging.Logger"
  *
+ * @since 0.2.1
+ *
  */
 package net.sf.freecol.common.logging;

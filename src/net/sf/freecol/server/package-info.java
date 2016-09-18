@@ -10,5 +10,7 @@
  * <p>The main class of the model is {@link net.sf.freecol.common.model.Game}. All
  * {@link net.sf.freecol.common.model.Player} objects in the server's game model are
  * {@link net.sf.freecol.server.model.ServerPlayer} objects.</p>
+ *
+ * @since 0.2.1
  */
 package net.sf.freecol.server;

@@ -10,5 +10,6 @@
  *
  * @see net.sf.freecol.client.gui.plaf.FreeColLookAndFeel FreeColLookAndFeel
  *
+ * @since 0.2.1
  */
 package net.sf.freecol.client.gui.plaf;

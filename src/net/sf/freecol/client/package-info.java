@@ -77,5 +77,7 @@
  * saves typing, is easier to understand and faster.</p>
  *
  * <p style="text-align: center; font-weight: bold;">$Revision$</p>
+ *
+ * @since 0.2.0
  */
 package net.sf.freecol.client;

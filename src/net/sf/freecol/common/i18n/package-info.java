@@ -48,5 +48,7 @@
  * <div style="text-align: center; font-size: small; color: darkgray;">
  *     $Revision$ $Date$
  * </div>
+ *
+ * @since 0.2.1 As part of the Client package
  */
 package net.sf.freecol.common.i18n;

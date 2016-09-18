@@ -8,5 +8,6 @@
  * <p>This is the method for playing sounds (provided you have got access to the pointers):<br>
  * <span style="font-family: monospace; margin-left: 40px;">soundController.playSound(ILLEGAL_MOVE);</span>
  *
+ * @since 0.2.1 As part of the Client.GUI package.
  */
 package net.sf.freecol.common.sound;
