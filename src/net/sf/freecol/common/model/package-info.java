@@ -28,5 +28,6 @@
  * net.sf.freecol.common.model.Specification Specification}, which
  * is loaded from an XML file when the game starts up.</p>
  *
+ * @since 0.2.1
  */
 package net.sf.freecol.common.model;

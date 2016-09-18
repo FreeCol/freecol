@@ -37,6 +37,7 @@ import net.sf.freecol.FreeCol;
  * Class for converting FreeCol Savegames (fsg-files).
  * 
  * @see #getFSGConverter()
+ * @since 0.5.2
  */
 public class FSGConverter {
 
