@@ -1467,7 +1467,6 @@ public class CollectionUtils {
     /**
      * Find the minimum int value in an array.
      *
-     * @param array An array of T.
      * @param <T> The collection member type.
      * @param array The array to minimize from.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
@@ -1484,7 +1483,6 @@ public class CollectionUtils {
      * @param array The array to minimize from.
      * @param predicate A {@code Predicate} to match with.
      * @param tif A {@code ToIntFunction} to map the stream to int with.
-     * @param array An array of T.
      * @return The minimum value found, or zero if the input is empty.
      */
     public static <T> int min(T[] array, Predicate<? super T> predicate,

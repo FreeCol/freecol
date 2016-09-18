@@ -3,7 +3,7 @@
  * <p>The actions are stored by the {@link net.sf.freecol.client.gui.action.ActionManager} and
  * are all subclasses of {@link net.sf.freecol.client.gui.action.FreeColAction}.</p>
  * <p>If you implement a new action, you must also add a corresponding
- * line to the {@link net.sf.freecol.client.gui.action.ActionManager#initializeActions(InGameController, ConnectController)}
+ * line to the {@link net.sf.freecol.client.gui.action.ActionManager}
  * method. Each action is identified by a short ID, such as
  * "quitAction". In order to provide localization, you must also add a
  * line to the localization file

@@ -72,7 +72,7 @@ import net.sf.freecol.common.util.LogBuilder;
  * extensive structure for making a trial assignment of workers in
  * {@link #assignWorkers}.
  *
- * {@link AIColony#rearrangeWorkers} is responsible for making
+ * {@link AIColony} is responsible for making
  * the real decisions.
  *
  * @see Colony
