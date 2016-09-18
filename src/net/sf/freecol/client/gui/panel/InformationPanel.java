@@ -48,6 +48,10 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class InformationPanel extends FreeColPanel {
 
+    /** Standard dimensions for the panel. */
+    private static final int BASE_WIDTH = 475, BASE_HEIGHT = 185;
+
+
     /**
      * Creates an information panel that shows the given texts and
      * images, and an "OK" button.
@@ -84,10 +88,11 @@ public class InformationPanel extends FreeColPanel {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]));
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    new Dimension(475-images[i].getIconWidth(), 185)));
+                    new Dimension(BASE_WIDTH - images[i].getIconWidth(),
+                                  BASE_HEIGHT)));
             } else {
                 textPanel.add(Utility.getDefaultTextArea(texts[i],
-                    new Dimension(475, 185)), "skip");
+                    new Dimension(BASE_WIDTH, BASE_HEIGHT)), "skip");
             }
             StringTemplate disp = displayLabel(fcos[i]);
             if (disp == null) continue;
