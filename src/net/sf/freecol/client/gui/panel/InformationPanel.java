@@ -45,11 +45,31 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * A general panel for information display.
+ * <p>
+ * Panel layout:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * | ----------------------------|
+ * |    skin image with person   |
+ * | ----------------------------|
+ * | images[i] | texts[i]        |
+ * | ----------------------------|
+ * |           | button (opt)    |
+ * | ----------------------------|
+ * |                    okButton |
+ * | ----------------------------|
+ * <p>
+ * Each group of images[i], texts[i] and the
+ *      accompanying button (if needed) is contained
+ *      within an inner layout, wrapped in a layout
+ *      created by {@link #createLayout(FreeColClient)}
+ *      which contains the skin background image with
+ *      the person at the top as well as the okButton
+ *      at the bottom.
  */
 public class InformationPanel extends FreeColPanel {
 
     /** Standard dimensions for the panel. */
-    private static final int BASE_WIDTH = 475, BASE_HEIGHT = 185;
+    private static final int BASE_WIDTH = 470, BASE_HEIGHT = 75;
 
 
     /**
@@ -75,6 +95,8 @@ public class InformationPanel extends FreeColPanel {
      * @param texts The texts to be displayed in the panel.
      * @param fcos The source {@code FreeColObject}s for the text.
      * @param images The images to be displayed in the panel.
+     *
+     * @see #createLayout(FreeColClient) For the outer layout
      */
     public InformationPanel(FreeColClient freeColClient, String[] texts,
                             FreeColObject[] fcos, ImageIcon[] images) {
@@ -103,7 +125,17 @@ public class InformationPanel extends FreeColPanel {
             button.addActionListener((ActionEvent ae) -> {
                     gui.displayObject(fco);
                 });
-            textPanel.add(button, "skip");
+            /*
+            If there is another text to display, we need to add
+                "gapbottom 25" into the .add(), which gives some
+                cushion between each text block
+            */
+            if ((i + 1) < texts.length) {
+                textPanel.add(button, "skip, gapbottom 25");
+            } else {
+                textPanel.add(button, "skip");
+            }
+
         }
 
         JScrollPane scrollPane = new JScrollPane(textPanel,
@@ -118,12 +150,21 @@ public class InformationPanel extends FreeColPanel {
         add(okButton, "tag ok");
     }
 
+    /**
+     * Creates the outer layout of the Information Panel.
+     *
+     * Called by {@link #InformationPanel(FreeColClient, String, FreeColObject, ImageIcon)}
+     *      and {@link #InformationPanel(FreeColClient, String[], FreeColObject[], ImageIcon[])}
+     *
+     * @param freeColClient The {@code FreeColClient} for the game.
+     * @return A new MigLayout containing the outer layout
+     */
     private static MigLayout createLayout(FreeColClient freeColClient) {
         BufferedImage skin = getSkin(freeColClient);
         int w = skin.getWidth();
         int h = skin.getHeight();
         return new MigLayout("wrap 1, insets " + (h-290) + " 10 10 10",
-                "[" + (w-2*10) + "]", "[240]20[20]");
+                "[" + (w-2*10) + "]", "[240]10[20]");
     }
 
     private static BufferedImage getSkin(FreeColClient freeColClient) {
