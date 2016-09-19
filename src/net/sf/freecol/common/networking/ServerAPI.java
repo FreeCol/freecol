@@ -250,12 +250,11 @@ public abstract class ServerAPI {
      *
      * @param game The current {@code Game}.
      * @param message A {@code DOMMessage} to send.
-     * @param tag The expected tag
      * @return True if the server interaction succeeded and an element
      *     with the expected tag was found in the reply, else false.
      */
-    private boolean askHandling(Game game, DOMMessage message, String tag) {
-        Element reply = askExpecting(game, message, tag);
+    private boolean askHandling(Game game, DOMMessage message) {
+        Element reply = askExpecting(game, message, null);
         if (reply == null) return false;
         resolve(handle(reply));
         return true;
@@ -271,7 +270,7 @@ public abstract class ServerAPI {
      */
     public boolean abandonColony(Colony colony) {
         return askHandling(colony.getGame(),
-            new AbandonColonyMessage(colony), null);
+                           new AbandonColonyMessage(colony));
     }
 
     /**
@@ -284,8 +283,8 @@ public abstract class ServerAPI {
      */
     public boolean answerMonarch(Game game, MonarchAction action,
                                  boolean accept) {
-        return askHandling(game, new MonarchActionMessage(action, null, "")
-            .setResult(accept), null);
+        return askHandling(game,
+            new MonarchActionMessage(action, null, "").setResult(accept));
     }
 
     /**
@@ -297,7 +296,7 @@ public abstract class ServerAPI {
      */
     public boolean askSkill(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new AskSkillMessage(unit, direction), null);
+                           new AskSkillMessage(unit, direction));
     }
 
     /**
@@ -309,7 +308,7 @@ public abstract class ServerAPI {
      */
     public boolean assignTeacher(Unit student, Unit teacher) {
         return askHandling(student.getGame(),
-            new AssignTeacherMessage(student, teacher), null);
+                           new AssignTeacherMessage(student, teacher));
     }
 
     /**
@@ -321,7 +320,7 @@ public abstract class ServerAPI {
      */
     public boolean assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
         return askHandling(unit.getGame(),
-            new AssignTradeRouteMessage(unit, tradeRoute), null);
+                           new AssignTradeRouteMessage(unit, tradeRoute));
     }
 
     /**
@@ -333,7 +332,7 @@ public abstract class ServerAPI {
      */
     public boolean attack(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new AttackMessage(unit, direction), null);
+                           new AttackMessage(unit, direction));
     }
 
     /**
@@ -345,7 +344,7 @@ public abstract class ServerAPI {
      */
     public boolean buildColony(String name, Unit unit) {
         return askHandling(unit.getGame(),
-            new BuildColonyMessage(name, unit), null);
+                           new BuildColonyMessage(name, unit));
     }
 
     /**
@@ -360,7 +359,7 @@ public abstract class ServerAPI {
     public boolean buyFromSettlement(Unit unit, IndianSettlement is,
                                      Goods goods, int gold) {
         return askHandling(unit.getGame(),
-            new BuyMessage(unit, is, goods, gold), null);
+                           new BuyMessage(unit, is, goods, gold));
     }
 
     /**
@@ -391,7 +390,7 @@ public abstract class ServerAPI {
      */
     public boolean cashInTreasureTrain(Unit unit) {
         return askHandling(unit.getGame(),
-            new CashInTreasureTrainMessage(unit), null);
+                           new CashInTreasureTrainMessage(unit));
     }
 
     /**
@@ -403,7 +402,7 @@ public abstract class ServerAPI {
      */
     public boolean changeState(Unit unit, UnitState state) {
         return askHandling(unit.getGame(),
-            new ChangeStateMessage(unit, state), null);
+                           new ChangeStateMessage(unit, state));
     }
 
     /**
@@ -416,7 +415,7 @@ public abstract class ServerAPI {
     public boolean changeWorkImprovementType(Unit unit,
                                              TileImprovementType type) {
         return askHandling(unit.getGame(),
-            new ChangeWorkImprovementTypeMessage(unit, type), null);
+                           new ChangeWorkImprovementTypeMessage(unit, type));
     }
 
     /**
@@ -428,7 +427,7 @@ public abstract class ServerAPI {
      */
     public boolean changeWorkType(Unit unit, GoodsType workType) {
         return askHandling(unit.getGame(),
-            new ChangeWorkTypeMessage(unit, workType), null);
+                           new ChangeWorkTypeMessage(unit, workType));
     }
 
     /**
@@ -465,7 +464,7 @@ public abstract class ServerAPI {
      */
     public boolean claimTile(Tile tile, FreeColGameObject claimant, int price) {
         return askHandling(tile.getGame(),
-            new ClaimLandMessage(tile, claimant, price), null);
+                           new ClaimLandMessage(tile, claimant, price));
     }
 
     /**
@@ -476,7 +475,7 @@ public abstract class ServerAPI {
      */
     public boolean clearSpeciality(Unit unit) {
         return askHandling(unit.getGame(),
-            new ClearSpecialityMessage(unit), null);
+                           new ClearSpecialityMessage(unit));
     }
 
     /**
@@ -498,7 +497,7 @@ public abstract class ServerAPI {
      */
     public boolean declareIndependence(Game game, String nation, String country) {
         return askHandling(game,
-            new DeclareIndependenceMessage(nation, country), null);
+                           new DeclareIndependenceMessage(nation, country));
     }
 
     /**
@@ -512,7 +511,7 @@ public abstract class ServerAPI {
      */
     public boolean declineMounds(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new DeclineMoundsMessage(unit, direction), null);
+                           new DeclineMoundsMessage(unit, direction));
     }
 
     /**
@@ -523,7 +522,7 @@ public abstract class ServerAPI {
      */
     public boolean deleteTradeRoute(TradeRoute tradeRoute) {
         return askHandling(tradeRoute.getGame(),
-            new DeleteTradeRouteMessage(tradeRoute), null);
+                           new DeleteTradeRouteMessage(tradeRoute));
     }
 
     /**
@@ -537,7 +536,7 @@ public abstract class ServerAPI {
     public boolean deliverGiftToSettlement(Unit unit, IndianSettlement is,
                                            Goods goods) {
         return askHandling(unit.getGame(),
-            new DeliverGiftMessage(unit, is, goods), null);
+                           new DeliverGiftMessage(unit, is, goods));
     }
 
     /**
@@ -550,7 +549,7 @@ public abstract class ServerAPI {
      */
     public boolean demandTribute(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new DemandTributeMessage(unit, direction), null);
+                           new DemandTributeMessage(unit, direction));
     }
 
     /**
@@ -632,7 +631,7 @@ public abstract class ServerAPI {
      */
     public boolean disbandUnit(Unit unit) {
         return askHandling(unit.getGame(),
-            new DisbandUnitMessage(unit), null);
+                           new DisbandUnitMessage(unit));
     }
 
     /**
@@ -643,7 +642,7 @@ public abstract class ServerAPI {
      */
     public boolean disembark(Unit unit) {
         return askHandling(unit.getGame(),
-            new DisembarkMessage(unit), null);
+                           new DisembarkMessage(unit));
     }
 
     /**
@@ -657,7 +656,7 @@ public abstract class ServerAPI {
      */
     public boolean embark(Unit unit, Unit carrier, Direction direction) {
         return askHandling(unit.getGame(),
-            new EmbarkMessage(unit, carrier, direction), null);
+                           new EmbarkMessage(unit, carrier, direction));
     }
 
     /**
@@ -669,7 +668,8 @@ public abstract class ServerAPI {
      * @return True if the client-server interaction succeeded.
      */
     public boolean emigrate(Game game, int slot) {
-        return askHandling(game, new EmigrateUnitMessage(slot), null);
+        return askHandling(game,
+                           new EmigrateUnitMessage(slot));
     }
 
     /**
@@ -680,8 +680,7 @@ public abstract class ServerAPI {
      */
     public boolean endNativeTradeSession(NativeTrade nt) {
         return askHandling(nt.getUnit().getGame(),
-            new NativeTradeMessage(NativeTrade.NativeTradeAction.CLOSE, nt),
-            null);
+            new NativeTradeMessage(NativeTrade.NativeTradeAction.CLOSE, nt));
     }
 
     /**
@@ -692,7 +691,7 @@ public abstract class ServerAPI {
      */
     public boolean endTurn(Game game) {
         return askHandling(game,
-            new DOMMessage("endTurn"), null);
+                           new DOMMessage("endTurn"));
     }
 
     /**
@@ -703,7 +702,7 @@ public abstract class ServerAPI {
      */
     public boolean enterRevengeMode(Game game) {
         return askHandling(game,
-            new DOMMessage("enterRevengeMode"), null);
+                           new DOMMessage("enterRevengeMode"));
     }
 
     /**
@@ -716,7 +715,7 @@ public abstract class ServerAPI {
      */
     public boolean equipUnitForRole(Unit unit, Role role, int roleCount) {
         return askHandling(unit.getGame(),
-            new EquipForRoleMessage(unit, role, roleCount), null);
+                           new EquipForRoleMessage(unit, role, roleCount));
     }
 
     /**
@@ -732,8 +731,7 @@ public abstract class ServerAPI {
     public boolean firstContact(Player player, Player other, Tile tile,
                                 boolean result) {
         return askHandling(player.getGame(),
-            new FirstContactMessage(player, other, tile).setResult(result),
-            null);
+            new FirstContactMessage(player, other, tile).setResult(result));
     }
 
     /**
@@ -746,8 +744,7 @@ public abstract class ServerAPI {
     public boolean getGoodsForSaleInSettlement(Unit unit,
                                                Settlement settlement) {
         return askHandling(unit.getGame(),
-            new GoodsForSaleMessage(unit, settlement, null),
-            null);
+                           new GoodsForSaleMessage(unit, settlement, null));
     }
 
     /**
@@ -759,7 +756,7 @@ public abstract class ServerAPI {
      */
     public boolean getHighScores(Game game, String key) {
         return askHandling(game,
-            new HighScoreMessage(key), null);
+                           new HighScoreMessage(key));
     }
 
     /**
@@ -771,8 +768,7 @@ public abstract class ServerAPI {
      */
     public boolean nationSummary(Player self, Player player) {
         return askHandling(self.getGame(),
-            new NationSummaryMessage(player),
-            null);
+                           new NationSummaryMessage(player));
     }
 
     /**
@@ -787,8 +783,7 @@ public abstract class ServerAPI {
     public boolean incite(Unit unit, IndianSettlement is, Player enemy,
                           int gold) {
         return askHandling(unit.getGame(),
-            new InciteMessage(unit, is, enemy, gold),
-            null);
+                           new InciteMessage(unit, is, enemy, gold));
     }
 
     /**
@@ -803,7 +798,7 @@ public abstract class ServerAPI {
     public boolean indianDemand(Unit unit, Colony colony,
                                 GoodsType type, int amount) {
         return askHandling(unit.getGame(),
-            new IndianDemandMessage(unit, colony, type, amount), null);
+                           new IndianDemandMessage(unit, colony, type, amount));
     }
             
     /**
@@ -815,7 +810,7 @@ public abstract class ServerAPI {
      */
     public boolean joinColony(Unit unit, Colony colony) {
         return askHandling(unit.getGame(),
-            new JoinColonyMessage(colony, unit), null);
+                           new JoinColonyMessage(colony, unit));
     }
 
     /**
@@ -827,7 +822,7 @@ public abstract class ServerAPI {
      */
     public boolean learnSkill(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new LearnSkillMessage(unit, direction), null);
+                           new LearnSkillMessage(unit, direction));
     }
 
     /**
@@ -842,7 +837,7 @@ public abstract class ServerAPI {
     public boolean loadGoods(Location loc, GoodsType type, int amount,
                              Unit carrier) {
         return askHandling(carrier.getGame(),
-            new LoadGoodsMessage(loc, type, amount, carrier), null);
+                           new LoadGoodsMessage(loc, type, amount, carrier));
     }
 
     /**
@@ -854,7 +849,7 @@ public abstract class ServerAPI {
      */
     public boolean login(String userName, String version) {
         return askHandling(null,
-            new LoginMessage(userName, version), null);
+                           new LoginMessage(userName, version));
     }
 
     /**
@@ -880,7 +875,7 @@ public abstract class ServerAPI {
      */
     public boolean loot(Unit winner, String defenderId, List<Goods> goods) {
         return askHandling(winner.getGame(),
-            new LootCargoMessage(winner, defenderId, goods), null);
+                           new LootCargoMessage(winner, defenderId, goods));
     }
 
     /**
@@ -894,7 +889,7 @@ public abstract class ServerAPI {
     public boolean missionary(Unit unit, Direction direction,
                               boolean denounce) {
         return askHandling(unit.getGame(),
-            new MissionaryMessage(unit, direction, denounce), null);
+                           new MissionaryMessage(unit, direction, denounce));
     }
 
     /**
@@ -906,7 +901,7 @@ public abstract class ServerAPI {
      */
     public boolean move(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new MoveMessage(unit, direction), null);
+                           new MoveMessage(unit, direction));
     }
 
     /**
@@ -918,7 +913,7 @@ public abstract class ServerAPI {
      */
     public boolean moveTo(Unit unit, Location destination) {
         return askHandling(unit.getGame(),
-            new MoveToMessage(unit, destination), null);
+                           new MoveToMessage(unit, destination));
     }
 
     /**
@@ -930,7 +925,7 @@ public abstract class ServerAPI {
      */
     public boolean nativeGift(Unit unit, Colony colony) {
         return askHandling(unit.getGame(),
-            new NativeGiftMessage(unit, colony), null);
+                           new NativeGiftMessage(unit, colony));
     }
 
     /**
@@ -942,7 +937,7 @@ public abstract class ServerAPI {
      */
     public boolean newLandName(Unit unit, String name) {
         return askHandling(unit.getGame(),
-            new NewLandNameMessage(unit, name), null);
+                           new NewLandNameMessage(unit, name));
     }
 
     /**
@@ -954,7 +949,7 @@ public abstract class ServerAPI {
      */
     public boolean newNativeTradeSession(Unit unit, IndianSettlement is) {
         return askHandling(unit.getGame(),
-            new NativeTradeMessage(unit, is), null);
+                           new NativeTradeMessage(unit, is));
     }
 
     /**
@@ -969,7 +964,7 @@ public abstract class ServerAPI {
     public boolean newRegionName(Region region, Tile tile, Unit unit, 
                                  String name) {
         return askHandling(unit.getGame(),
-            new NewRegionNameMessage(region, tile, unit, name), null);
+                           new NewRegionNameMessage(region, tile, unit, name));
     }
 
     /**
@@ -980,7 +975,7 @@ public abstract class ServerAPI {
      */
     public boolean newTradeRoute(Game game) {
         return askHandling(game,
-            new NewTradeRouteMessage(), null);
+                           new NewTradeRouteMessage());
     }
 
     /**
@@ -992,7 +987,7 @@ public abstract class ServerAPI {
      */
     public boolean payArrears(Game game, GoodsType type) {
         return askHandling(game,
-            new PayArrearsMessage(type), null);
+                           new PayArrearsMessage(type));
     }
 
     /**
@@ -1003,7 +998,7 @@ public abstract class ServerAPI {
      */
     public boolean payForBuilding(Colony colony) {
         return askHandling(colony.getGame(),
-            new PayForBuildingMessage(colony), null);
+                           new PayForBuildingMessage(colony));
     }
 
     /**
@@ -1014,7 +1009,7 @@ public abstract class ServerAPI {
      */
     public boolean putOutsideColony(Unit unit) {
         return askHandling(unit.getGame(),
-            new PutOutsideColonyMessage(unit), null);
+                           new PutOutsideColonyMessage(unit));
     }
 
     /**
@@ -1031,7 +1026,7 @@ public abstract class ServerAPI {
         RearrangeColonyMessage message
             = new RearrangeColonyMessage(colony, workers, scratch);
         return (message.isEmpty()) ? true
-            : askHandling(colony.getGame(), message, null);
+            : askHandling(colony.getGame(), message);
     }
 
     /**
@@ -1043,7 +1038,7 @@ public abstract class ServerAPI {
      */
     public boolean rename(FreeColGameObject object, String name) {
         return askHandling(object.getGame(),
-            new RenameMessage(object, name), null);
+                           new RenameMessage(object, name));
     }
 
     /**
@@ -1063,7 +1058,7 @@ public abstract class ServerAPI {
      */
     public boolean retire(Game game) {
         return askHandling(game,
-            new DOMMessage("retire"), null);
+                           new DOMMessage("retire"));
     }
 
     /**
@@ -1077,8 +1072,7 @@ public abstract class ServerAPI {
      */
     public boolean scoutSettlement(Unit unit, Direction direction) {
         return askHandling(unit.getGame(),
-            new ScoutIndianSettlementMessage(unit, direction),
-            null);
+                           new ScoutIndianSettlementMessage(unit, direction));
     }
    
     /**
@@ -1090,8 +1084,7 @@ public abstract class ServerAPI {
      */
     public boolean scoutSpeakToChief(Unit unit, IndianSettlement is) {
         return askHandling(unit.getGame(),
-            new ScoutSpeakToChiefMessage(unit, is, null),
-            null);
+                           new ScoutSpeakToChiefMessage(unit, is, null));
     }
 
     /**
@@ -1126,7 +1119,7 @@ public abstract class ServerAPI {
     public boolean sellToSettlement(Unit unit, IndianSettlement is,
                                     Goods goods, int gold) {
         return askHandling(unit.getGame(),
-            new SellMessage(unit, is, goods, gold), null);
+                           new SellMessage(unit, is, goods, gold));
     }
 
     /**
@@ -1139,7 +1132,7 @@ public abstract class ServerAPI {
     public boolean setAvailable(Nation nation, NationState state) {
         return askHandling(null, new DOMMessage("setAvailable",
                 "nation", nation.getId(),
-                "state", state.toString()), null);
+                "state", state.toString()));
     }
 
     /**
@@ -1152,7 +1145,7 @@ public abstract class ServerAPI {
     public boolean setBuildQueue(Colony colony,
                                  List<BuildableType> buildQueue) {
         return askHandling(colony.getGame(),
-            new SetBuildQueueMessage(colony, buildQueue), null);
+                           new SetBuildQueueMessage(colony, buildQueue));
     }
 
     /**
@@ -1166,7 +1159,7 @@ public abstract class ServerAPI {
     public boolean setColor(Nation nation, Color color) {
         return askHandling(null, new DOMMessage("setColor",
                 "nation", nation.getId(),
-                "color", Integer.toString(color.getRGB())), null);
+                "color", Integer.toString(color.getRGB())));
     }
 
     /**
@@ -1178,7 +1171,7 @@ public abstract class ServerAPI {
      */
     public boolean setCurrentStop(Unit unit, int index) {
         return askHandling(unit.getGame(),
-            new SetCurrentStopMessage(unit, index), null);
+                           new SetCurrentStopMessage(unit, index));
     }
 
     /**
@@ -1191,7 +1184,7 @@ public abstract class ServerAPI {
      */
     public boolean setDestination(Unit unit, Location destination) {
         return askHandling(unit.getGame(),
-            new SetDestinationMessage(unit, destination), null);
+                           new SetDestinationMessage(unit, destination));
     }
 
     /**
@@ -1203,7 +1196,7 @@ public abstract class ServerAPI {
      */
     public boolean setGoodsLevels(Colony colony, ExportData data) {
         return askHandling(colony.getGame(),
-            new SetGoodsLevelsMessage(colony, data), null);
+                           new SetGoodsLevelsMessage(colony, data));
     }
 
     /**
@@ -1215,7 +1208,7 @@ public abstract class ServerAPI {
      */
     public boolean setNation(Nation nation) {
         return askHandling(null, new DOMMessage("setNation",
-                "value", nation.getId()), null);
+                "value", nation.getId()));
     }
 
     /**
@@ -1227,7 +1220,7 @@ public abstract class ServerAPI {
      */
     public boolean setNationType(NationType nationType) {
         return askHandling(null, new DOMMessage("setNationType",
-                "value", nationType.getId()), null);
+                "value", nationType.getId()));
     }
 
     /**
@@ -1238,7 +1231,8 @@ public abstract class ServerAPI {
      * @return True if the server interaction succeeded.
      */
     public boolean setReady(boolean ready) {
-        return send(new DOMMessage("ready", "value", Boolean.toString(ready)));
+        return send(new DOMMessage("ready",
+                "value", Boolean.toString(ready)));
     }
 
     /**
@@ -1250,7 +1244,7 @@ public abstract class ServerAPI {
      */
     public boolean spy(Unit unit, Settlement settlement) {
         return askHandling(unit.getGame(),
-            new SpySettlementMessage(unit, settlement), null);
+                           new SpySettlementMessage(unit, settlement));
     }
 
     /**
@@ -1271,7 +1265,7 @@ public abstract class ServerAPI {
      */
     public boolean trainUnitInEurope(Game game, UnitType type) {
         return askHandling(game,
-            new TrainUnitInEuropeMessage(type), null);
+                           new TrainUnitInEuropeMessage(type));
     }
 
     /**
@@ -1284,7 +1278,7 @@ public abstract class ServerAPI {
      */
     public boolean unloadGoods(GoodsType type, int amount, Unit carrier) {
         return askHandling(carrier.getGame(),
-            new UnloadGoodsMessage(type, amount, carrier), null);
+                           new UnloadGoodsMessage(type, amount, carrier));
     }
 
     /**
@@ -1319,7 +1313,7 @@ public abstract class ServerAPI {
      */
     public boolean updateTradeRoute(TradeRoute route) {
         return askHandling(route.getGame(),
-            new UpdateTradeRouteMessage(route), null);
+                           new UpdateTradeRouteMessage(route));
     }
 
     /**
@@ -1331,6 +1325,6 @@ public abstract class ServerAPI {
      */
     public boolean work(Unit unit, WorkLocation workLocation) {
         return askHandling(unit.getGame(),
-            new WorkMessage(unit, workLocation), null);
+                           new WorkMessage(unit, workLocation));
     }
 }
