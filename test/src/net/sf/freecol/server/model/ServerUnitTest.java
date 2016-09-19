@@ -94,9 +94,9 @@ public class ServerUnitTest extends FreeColTestCase {
     /**
      * Does a tile have a completed improvement of the given type?
      *
-     * @param tile The <code>Tile</code> to check.
-     * @param type The <code>TileImprovementType</code> to check.
-     * @return True if this <code>Tile</code> has the improvement type and
+     * @param tile The {@code Tile} to check.
+     * @param type The {@code TileImprovementType} to check.
+     * @return True if this {@code Tile} has the improvement type and
      *      it is complete.
      */
     private static boolean hasImprovement(Tile tile, TileImprovementType type) {

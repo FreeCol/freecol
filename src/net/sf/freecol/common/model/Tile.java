@@ -2377,7 +2377,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // 2. If there is no cached tile then it is unexplored, so
         //    write the minimal tile (id, x, y).
         // 3. Otherwise write the cached tile, which will either be a
-        //    copy or <code>this</code>.
+        //    copy or {@code this}.
         Player player = xw.getClientPlayer();
         Tile tile = (player == null) ? this : getCachedTile(player);
 
