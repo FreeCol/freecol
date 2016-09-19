@@ -43,9 +43,9 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * This is the About panel
- *  
- * Layout:
- *  
+ * <p>
+ * Panel Layout:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
  * | ---------------|
  * | apLogoLabel    |
  * | ---------------|
