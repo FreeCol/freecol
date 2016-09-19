@@ -3702,13 +3702,13 @@ public class Unit extends GoodsLocation
      * Designed for message unpacking where the identifier should not
      * be trusted.
      *
-     * @param <T> The {@link Settlement}
-     * @param settlementId The identifier of the
-     *     {@code Settlement} to be found.
+     * @param <T> The {@link Settlement} type.
+     * @param settlementId The identifier of the {@code Settlement} to find.
+     * @param returnClass The expected returned settlement class.
      * @return The settlement corresponding to the settlementId argument.
      */
     public <T extends Settlement> T getAdjacentSettlement(String settlementId,
-        Class<T> returnClass) {
+                                                          Class<T> returnClass) {
         Game game = getOwner().getGame();
 
         T ret = game.getFreeColGameObject(settlementId, returnClass);
