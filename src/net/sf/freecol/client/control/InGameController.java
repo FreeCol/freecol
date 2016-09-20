@@ -588,9 +588,10 @@ public final class InGameController extends FreeColClientHolder {
             try {
                 server.saveGame(file, getClientOptions(), getGUI().getActiveUnit());
                 result = true;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 getGUI().showErrorMessage(FreeCol.badFile("error.couldNotSave",
                                                           file));
+                logger.log(Level.WARNING, "Save fail", ioe);
             } finally {
                 getGUI().closeStatusPanel();
             }
