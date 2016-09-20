@@ -68,6 +68,9 @@ elif test -r "${BINDIR}/${FREECOLJAR}" ; then
 # - Is it in a likely linux FHS place?
 elif test -r "/usr/share/java/${FREECOLJAR}" ; then
     FCJAR="/usr/share/java/${FREECOLJAR}"
+# - Is it a FHS location but in its own subdirectory?
+elif test -r "/usr/share/java/freecol/${FREECOLJAR}" ; then
+    FCJAR="/usr/share/java/freecol/${FREECOLJAR}"
 # Give up.
 else
     echo "can not find ${FREECOLJAR}" >&2
