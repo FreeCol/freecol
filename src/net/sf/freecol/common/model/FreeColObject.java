@@ -181,8 +181,14 @@ public abstract class FreeColObject
         if (id != null) {
             int col = id.lastIndexOf(':');
             if (col >= 0) {
+                String s = id.substring(col + 1);
+                // @compat 0.11.6
+                // AI used to generate ids with <thing>:am<number>
+                // which changed to <thing>:am:<number>
+                if (s.startsWith("am")) s = s.substring(2);
+                // end @compat 0.11.6
                 try {
-                    return Integer.parseInt(id.substring(col + 1));
+                    return Integer.parseInt(s);
                 } catch (NumberFormatException nfe) {}
             }
         }
