@@ -1659,6 +1659,9 @@ public final class Canvas extends JDesktopPane {
      * @param unit The {@code Unit} capturing goods.
      * @param gl The list of {@code Goods} to choose from.
      * @param handler A {@code DialogHandler} for the dialog response.
+     *
+     * @see CaptureGoodsDialog
+     * @see SwingGUI#showCaptureGoodsDialog(Unit, List, DialogHandler)
      */
     void showCaptureGoodsDialog(Unit unit, List<Goods> gl,
                                 DialogHandler<List<Goods>> handler) {

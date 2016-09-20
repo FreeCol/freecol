@@ -55,15 +55,8 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.animation.Animations;
-import net.sf.freecol.client.gui.panel.ColonyPanel;
-import net.sf.freecol.client.gui.panel.ColorChooserPanel;
-import net.sf.freecol.client.gui.panel.CornerMapControls;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.CaptureGoodsDialog;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.Parameters;
-import net.sf.freecol.client.gui.panel.TradeRoutePanel;
-import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.client.gui.video.VideoListener;
@@ -1051,7 +1044,14 @@ public class SwingGUI extends GUI {
     }
 
     /**
-     * {@inheritDoc}
+     * Display the {@code CaptureGoodsDialog}.
+     *
+     * @param unit The {@code Unit} capturing goods.
+     * @param gl The list of {@code Goods} to choose from.
+     * @param handler A {@code DialogHandler} for the dialog response.
+     *
+     * @see CaptureGoodsDialog
+     * @see Canvas#showCaptureGoodsDialog(Unit, List, DialogHandler)
      */
     @Override
     public void showCaptureGoodsDialog(final Unit unit, List<Goods> gl,
