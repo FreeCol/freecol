@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.Mission;
 
 
@@ -376,6 +377,33 @@ public class AIGoods extends TransportableAIObject {
             result = -1;
         }
         return result;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AIGoods) {
+            AIGoods oa = (AIGoods)other;
+            return super.equals(oa)
+                && Utils.equals(this.goods, oa.goods)
+                && Utils.equals(this.destination, oa.destination);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.goods);
+        return 37 * hash + Utils.hashCode(this.destination);
     }
 
 

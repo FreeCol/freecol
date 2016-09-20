@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -185,6 +186,33 @@ public class GoodsWish extends Wish {
         int result = super.checkIntegrity(fix);
         if (goodsType == null || amountRequested <= 0) result = -1;
         return result;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof GoodsWish) {
+            GoodsWish og = (GoodsWish)other;
+            return super.equals(og)
+                && Utils.equals(this.goodsType, og.goodsType)
+                && this.amountRequested == og.amountRequested;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.goodsType);
+        return 37 * hash + this.amountRequested;
     }
 
 
