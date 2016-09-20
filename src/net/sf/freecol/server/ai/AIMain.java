@@ -122,7 +122,7 @@ public class AIMain extends FreeColObject
      * @return A unique identifier.
      */
     public String getNextId() {
-        String id = "am" + Integer.toString(nextId);
+        String id = "am:" + Integer.toString(nextId);
         nextId++;
         return id;
     }
@@ -488,7 +488,7 @@ public class AIMain extends FreeColObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (AIObject aio : sort(aiObjects.values())) {
+        for (AIObject aio : sort(getAIObjects())) {
             if (aio.checkIntegrity(false) < 0) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its

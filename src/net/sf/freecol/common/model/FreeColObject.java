@@ -179,7 +179,7 @@ public abstract class FreeColObject
      */
     public int getIdNumber() {
         if (id != null) {
-            int col = id.indexOf(':');
+            int col = id.lastIndexOf(':');
             if (col >= 0) {
                 try {
                     return Integer.parseInt(id.substring(col + 1));
@@ -211,7 +211,6 @@ public abstract class FreeColObject
         }
         int cmp = fco1.getIdType().compareTo(fco2.getIdType());
         if (cmp == 0) cmp = fco1.getIdNumber() - fco2.getIdNumber();
-        if (cmp == 0) cmp = fco1.hashCode() - fco2.hashCode();
         return cmp;
     }
 
@@ -783,7 +782,6 @@ public abstract class FreeColObject
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o instanceof FreeColObject) {
             FreeColObject fco = (FreeColObject)o;
             return Utils.equals(this.id, fco.id);
