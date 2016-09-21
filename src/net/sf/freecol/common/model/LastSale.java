@@ -108,24 +108,7 @@ public final class LastSale extends FreeColObject {
      * @return A key string.
      */
     public static String makeKey(Location where, GoodsType what) {
-        return where.getId() + "-" + what.getId();
-    }
-
-
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof LastSale) {
-            LastSale ls = (LastSale)other;
-            cmp = getWhen().getNumber() - ls.getWhen().getNumber();
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
+        return what.getId() + "-" + where.getId();
     }
 
 
