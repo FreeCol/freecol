@@ -529,7 +529,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * @param colony The enclosing {@code Colony}.
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient, new MigLayout("wrap 3", 
+        super(freeColClient, new MigLayout("wrap 3, debug",
                 "[260:][390:, fill][260:]", "[][][300:400:][]"));
 
         this.colony = colony;
@@ -717,7 +717,16 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             });
         return lockReason.size() == oldSize;
     }
-        
+
+    /**
+     * Update the list of available buildings to build
+     *
+     * This method will verify whether a building can be built by
+     *      checking against the following criteria:
+     *       * Does the Colony meet the population limit to build?
+     *       * Does the new building require a special circumstance,
+     *              such as a prerequisite unit or building?
+     */
     private void updateBuildingList() {
         final Specification spec = getSpecification();
         final DefaultListModel<BuildableType> current
@@ -787,6 +796,15 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
     }
 
+    /**
+     * Update the list of available units (ships, wagon, artillery) to build
+     *
+     * This method will verify whether a unit can be built by
+     *      checking against the following criteria:
+     *       * Does the Colony meet the population limit to build?
+     *       * Does the new building require a special circumstance,
+     *              such as a prerequisite unit or building?
+     */
     private void updateUnitList() {
         final Specification spec = getSpecification();
         final Turn turn = getGame().getTurn();
@@ -842,6 +860,11 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
     }
 
+    /**
+     * Update all the lists and buttons, using
+     *      {@link #updateBuildingList()} and
+     *      {@link #updateUnitList()}
+     */
     private void updateAllLists() {
         final DefaultListModel<BuildableType> current
             = (DefaultListModel<BuildableType>)this.buildQueueList.getModel();
@@ -888,6 +911,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     .addNamed("%buildable%", buildable)));
     }
 
+    /**
+     * Checks whether a specified {@code BuildingType} exists
+     *      within a colony
+     *
+     * @param buildingType
+     * @return boolean
+     */
     private boolean hasBuildingType(BuildingType buildingType) {
         if (this.colony.getBuilding(buildingType) == null) {
             return false;
@@ -1066,9 +1096,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
 
-    // Interface ItemListener
-
     /**
+     * Override {@link ItemListener} for this panel's use.
+     *      This function evaluates whether a the user has
+     *      clicked the {@link #compactBox} or the
+     *      {@link #showAllBox} has been checked.
+     *
      * {@inheritDoc}
      */
     @Override

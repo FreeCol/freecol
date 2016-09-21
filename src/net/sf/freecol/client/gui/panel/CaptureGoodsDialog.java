@@ -45,6 +45,22 @@ import net.sf.freecol.common.model.Unit;
 
 /**
  * Panel for choosing the goods to capture.
+ * <p>
+ * Panel Layout:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * | ----------------------------|
+ * |   captureGoodsDialog.title  |
+ * | ----------------------------|
+ * |    allButton | noneButton   |
+ * | ----------------------------|
+ * |        [] goodsList         |
+ * | ----------------------------|
+ * |                    okButton |
+ * | ----------------------------|
+ * <p>
+ * Each member of goodsList is a {@code GoodsItem} as a
+ *      checkbox and text combination, repeated as
+ *      needed.
  */
 public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
@@ -187,7 +203,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> {
 
 
     /**
-     * Update the components of the goods list.
+     * Update the components of the {@code goodsList}.
      */
     private void updateComponents() {
         int selectedCount = 0;
