@@ -66,7 +66,7 @@ elif test -r "${FREECOLJAR}" ; then
 elif test -r "${BINDIR}/${FREECOLJAR}" ; then
     FCJAR="${BINDIR}/${FREECOLJAR}"
 # - Is it in a likely linux FHS place?
-elif test -r "/usr/share/java/${FREECOLJAR}" ; then
+elif test -d "/usr/share/java/${FREECOLJAR}" ; then
     FCJAR="/usr/share/java/${FREECOLJAR}"
 # Give up.
 else
