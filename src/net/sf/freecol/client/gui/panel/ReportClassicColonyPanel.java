@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
@@ -60,8 +61,8 @@ public final class ReportClassicColonyPanel extends ReportPanel
      * to the order in the spec), then the FCO order.
      */
     private static final Comparator<Building> buildingTypeComparator
-        = Comparator.comparingInt((Building b) -> b.getType().getIndex())
-            .thenComparing(b -> b);
+        = Comparator.<Building>comparingInt(b -> b.getType().getIndex())
+            .thenComparing(FreeColObject.fcoComparator);
 
     private static final int COLONISTS_PER_ROW = 20;
     private static final int UNITS_PER_ROW = 14;
