@@ -1891,8 +1891,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         result.addAll(getBuildings());
         result.add(buildQueue);
         result.add(populationQueue);
-
-        Collections.sort(result, Consumer.COMPARATOR);
+        result.sort(Consumer.COMPARATOR);
         return result;
     }
 
@@ -2141,8 +2140,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     ti -> new TileImprovementSuggestion(ct.getWorkTile(),
                         ti, improve.applyAsInt(ti))));
         }
-        Collections.sort(result,
-            TileImprovementSuggestion.descendingAmountComparator);
+        result.sort(TileImprovementSuggestion.descendingAmountComparator);
         return result;
     }
 

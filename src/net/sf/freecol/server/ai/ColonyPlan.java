@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -813,7 +812,7 @@ public class ColonyPlan {
             bp.difficulty = Math.max(1.0f, Math.sqrt((double)difficulty));
         }
 
-        Collections.sort(buildPlans, buildPlanComparator);
+        buildPlans.sort(buildPlanComparator);
     }
 
     /**
@@ -871,7 +870,7 @@ public class ColonyPlan {
                 wp.getWorkLocation().getGenericPotential(wp.getGoodsType()))
             .thenComparing((WorkLocationPlan wp) ->
                 wp.getGoodsType(), GoodsType.goodsTypeComparator);
-        Collections.sort(workPlans, comp);
+        workPlans.sort(comp);
     }
 
     /**
@@ -895,7 +894,7 @@ public class ColonyPlan {
         }
 
         // Always add raw/building materials first.
-        Collections.sort(rawBuildingGoodsTypes, productionComparator);
+        rawBuildingGoodsTypes.sort(productionComparator);
         final ToIntFunction<GoodsType> indexer = gt ->
             rawBuildingGoodsTypes.indexOf(gt.getInputType());
         List<GoodsType> toAdd = new ArrayList<>();

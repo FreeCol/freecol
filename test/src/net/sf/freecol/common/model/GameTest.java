@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.FreeColException;
@@ -63,7 +62,7 @@ public class GameTest extends FreeColTestCase {
             }
         }
 
-        Collections.sort(players, Player.playerComparator);
+        players.sort(Player.playerComparator);
         game.sortPlayers(Player.playerComparator);
         assertEquals(spec().getNations().size() - counter,
                      count(game.getPlayers()));

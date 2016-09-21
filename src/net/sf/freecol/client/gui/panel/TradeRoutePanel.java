@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -273,7 +272,7 @@ public final class TradeRoutePanel extends FreeColPanel {
                 logger.warning("Dropped trade route: " + Messages.message(st));
             }
         }
-        Collections.sort(routes, tradeRouteComparator);
+        routes.sort(tradeRouteComparator);
 
         // Update the counts
         this.counts.clear();

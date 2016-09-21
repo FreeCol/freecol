@@ -23,7 +23,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
@@ -113,7 +112,7 @@ public final class ReportTurnPanel extends ReportPanel {
         // Sort if requested
         final Comparator<ModelMessage> comparator
             = options.getModelMessageComparator(game);
-        if (comparator != null) Collections.sort(this.messages, comparator);
+        if (comparator != null) this.messages.sort(comparator);
 
         Object source = this;
         ModelMessage.MessageType type = null;

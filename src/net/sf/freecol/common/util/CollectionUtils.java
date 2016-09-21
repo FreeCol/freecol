@@ -1974,7 +1974,7 @@ public class CollectionUtils {
     }
 
     /**
-     * Implement sorted.
+     * Implement sort.
      *
      * @param <T> The stream member type.
      * @param stream The {@code Stream} to collect.

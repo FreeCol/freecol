@@ -29,7 +29,7 @@ import java.awt.TexturePaint;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -299,7 +299,7 @@ public class ForestMaker {
                     }
 
                     // sort by y, x coordinate
-                    Collections.sort(trees);
+                    trees.sort(Comparator.naturalOrder());
                     for (ImageLocation imageLocation : trees) {
                         g.drawImage(imageLocation.image, imageLocation.x, imageLocation.y, null);
                     }

@@ -20,7 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sf.freecol.common.model.AbstractGoods;
@@ -73,7 +73,7 @@ public class RoleTest extends FreeColTestCase {
         roles.add(soldier);
         roles.add(dragoon);
         roles.add(mission);
-        Collections.sort(roles);
+        roles.sort(Comparator.naturalOrder());
         assertEquals(dragoon, roles.get(0));
         assertEquals(soldier, roles.get(1));
         assertEquals(mission, roles.get(2));

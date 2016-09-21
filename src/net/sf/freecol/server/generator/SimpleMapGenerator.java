@@ -21,7 +21,6 @@ package net.sf.freecol.server.generator;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -487,7 +486,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
 
         // Sort tiles from the edges of the map inward
-        Collections.sort(settlementTiles, Tile.edgeDistanceComparator);
+        settlementTiles.sort(Tile.edgeDistanceComparator);
 
         // Now place other settlements
         while (!settlementTiles.isEmpty() && !territories.isEmpty()) {
@@ -563,7 +562,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // For each missing skill...
         while (!expertsNeeded.isEmpty()) {
             UnitType neededSkill = expertsNeeded.remove(0);
-            Collections.sort(isList, descendingListLengthComparator);
+            isList.sort(descendingListLengthComparator);
             List<IndianSettlement> extras = isList.remove(0);
             UnitType extraSkill = extras.get(0).getLearnableSkill();
             List<RandomChoice<IndianSettlement>> choices = new ArrayList<>();

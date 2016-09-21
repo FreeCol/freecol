@@ -25,7 +25,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -400,8 +399,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             });
         this.comparatorBox.addItemListener((ItemEvent event) -> {
                 updateDestinationComparator();
-                Collections.sort(SelectDestinationDialog.this.destinations,
-                    SelectDestinationDialog.this.destinationComparator);
+                SelectDestinationDialog.this.destinations.sort(SelectDestinationDialog.this.destinationComparator);
                 updateDestinationList();
             });
         this.comparatorBox.setSelectedIndex(

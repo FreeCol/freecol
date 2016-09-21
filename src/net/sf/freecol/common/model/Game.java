@@ -23,7 +23,6 @@ import java.lang.ref.WeakReference;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -523,7 +522,7 @@ public class Game extends FreeColGameObject {
      * @param comparator The {@code Comparator} to sort with.
      */
     public void sortPlayers(Comparator<Player> comparator) {
-        Collections.sort(this.players, comparator);
+        this.players.sort(comparator);
     }
 
     /**

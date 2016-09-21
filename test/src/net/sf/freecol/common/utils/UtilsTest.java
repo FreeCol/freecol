@@ -20,7 +20,6 @@
 package net.sf.freecol.common.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.util.CollectionUtils;
@@ -63,9 +62,9 @@ public class UtilsTest extends FreeColTestCase {
         d.add(1.0);
         d.add(2.0);
         d.add(3.0);
-        Collections.sort(d, CollectionUtils.descendingDoubleComparator);
+        d.sort(CollectionUtils.descendingDoubleComparator);
         assertEquals(d.get(0), 3.0);
-        Collections.sort(d, CollectionUtils.ascendingDoubleComparator);
+        d.sort(CollectionUtils.ascendingDoubleComparator);
         assertEquals(d.get(0), 1.0);
         
         List<List<Object>> o = new ArrayList<>();
@@ -78,7 +77,7 @@ public class UtilsTest extends FreeColTestCase {
         o1.add(1);
         o2.add(1);o2.add(2);
         o3.add(1);o3.add(2);o3.add(3);
-        Collections.sort(o, CollectionUtils.descendingListLengthComparator);
+        o.sort(CollectionUtils.descendingListLengthComparator);
         assertEquals(o.get(0), o3);
     }
 }

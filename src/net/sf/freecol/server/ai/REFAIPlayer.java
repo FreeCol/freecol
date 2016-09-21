@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -221,7 +220,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                             : t.colony.getStockade().getLevel())) / 6.0)
                 * (1.0 + 0.01 * (twiddle[twidx++] - percentTwiddle));
         }
-        Collections.sort(targets);
+        targets.sort(Comparator.naturalOrder());
 
         LogBuilder lb = new LogBuilder(64);
         lb.add("REF found colony targets:");
@@ -356,7 +355,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     t.score *= 1.5; // Prefer invisible paths
                 }
             }
-            Collections.sort(targets); // Re-sort with new scores
+            targets.sort(Comparator.naturalOrder()); // Re-sort with new scores
         }
 
         // Give the land units seek-and-destroy missions for the
@@ -432,9 +431,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         }
 
         // Attack naval targets.
-        final Comparator<Unit> militaryStrength
+        final Comparator<Unit> militaryStrengthComparator
             = getGame().getCombatModel().getMilitaryStrengthComparator();
-        Collections.sort(rebelNavy, militaryStrength);
+        rebelNavy.sort(militaryStrengthComparator);
         Iterator<Unit> ui = rebelNavy.iterator();
         List<Tile> entries = new ArrayList<>();
         entries.add(rebel.getEntryLocation().getTile());
@@ -503,7 +502,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                         Tile tile = aiu.getUnit().getTile();
                         return tile.getDistanceTo(target.getTile());
                     });
-            for (AIUnit aiu : sort(naval, Comparator.comparingInt(targetDistance))) {
+            for (AIUnit aiu : sort(naval,
+                                   Comparator.comparingInt(targetDistance))) {
                 int distance = targetDistance.applyAsInt(aiu);
                 if ((m = getTransportMission(aiu)) != null) {
                     lb.add(" REQUIRED ", distance, " ", m);
@@ -800,7 +800,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 final Comparator<Location> portUnitComparator
                     = Comparator.comparing(loc -> idlers.get(loc),
                                            ascendingListLengthComparator);
-                Collections.sort(idlePorts, portUnitComparator);
+                idlePorts.sort(portUnitComparator);
                 boolean bad = false;
                 while (!bad && !todo.isEmpty()) {
                     for (Location l : idlePorts) {

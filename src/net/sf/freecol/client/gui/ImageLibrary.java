@@ -32,7 +32,7 @@ import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -570,7 +570,7 @@ public final class ImageLibrary {
             case 1:
                 return ResourceManager.getImage(keys.get(0), size);
             default:
-                Collections.sort(keys);
+                keys.sort(Comparator.naturalOrder());
                 return ResourceManager.getImage(
                     keys.get(Math.abs(id.hashCode() % count)), size);
         }

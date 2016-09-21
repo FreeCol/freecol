@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.Image;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;

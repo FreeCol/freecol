@@ -21,7 +21,7 @@ package net.sf.freecol.common.option;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -215,12 +215,12 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             }
             try {
                 languages.add(new Language(languageId,
-                                           Messages.getLocale(languageId)));
+                        Messages.getLocale(languageId)));
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to add: " + languageId, e);
             }
         }
-        Collections.sort(languages);
+        languages.sort(Comparator.naturalOrder());
         languages.add(0, DEFAULT_LANGUAGE);
     }
 

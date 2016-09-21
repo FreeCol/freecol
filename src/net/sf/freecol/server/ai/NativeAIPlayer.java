@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -330,7 +329,7 @@ public class NativeAIPlayer extends MissionAIPlayer {
         // Do we need more or less defenders?
         int needed = minimumDefence + threats.size();
         if (defenders.size() < needed) { // More needed, call some in.
-            Collections.sort(units, isComparator);
+            units.sort(isComparator);
             while (!units.isEmpty()) {
                 Unit u = units.remove(0);
                 AIUnit aiu = aiMain.getAIUnit(u);
@@ -342,15 +341,16 @@ public class NativeAIPlayer extends MissionAIPlayer {
                 }
             }
         } else if (defenders.size() > needed) { // Less needed, release them
-            Collections.sort(defenders, isComparator.reversed());
+            defenders.sort(isComparator.reversed());
             while (defenders.size() > needed) {
                 units.add(defenders.remove(0));
             }
         }
 
         // Sort threat tiles by threat value.
-        List<Tile> threatTiles = sort(threats.keySet(),
-            Comparator.comparingDouble(t -> threats.get(t)));
+        final Comparator<Tile> threatComp
+            = Comparator.<Tile>comparingDouble(t -> threats.get(t));
+        List<Tile> threatTiles = sort(threats.keySet(), threatComp);
 
         if (!defenders.isEmpty()) {
             lb.add(" defend with:");
