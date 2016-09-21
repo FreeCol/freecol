@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,6 +53,10 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class HighScore extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(HighScore.class.getName());
+
+    /** A comparator by ascending AI object value. */
+    public static final Comparator<? super HighScore> descendingScoreComparator
+        = Comparator.comparingInt(HighScore::getScore).reversed();
 
     /** The number of high scores to allow in the high scores list. */
     public static final int NUMBER_OF_HIGH_SCORES = 10;
@@ -324,7 +329,7 @@ public class HighScore extends FreeColObject {
         if (scores.size() > NUMBER_OF_HIGH_SCORES) {
             scores = scores.subList(0, NUMBER_OF_HIGH_SCORES - 1);
         }
-        Collections.sort(scores);
+        Collections.sort(scores, descendingScoreComparator);
     }
 
     /**
@@ -435,23 +440,6 @@ public class HighScore extends FreeColObject {
             ret = false;
         }
         return ret;
-    }
-
-
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof HighScore) {
-            HighScore hs = (HighScore)other;
-            cmp = hs.getScore() - getScore();
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
     }
 
 
