@@ -55,9 +55,12 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public final class ReportClassicColonyPanel extends ReportPanel
     implements ActionListener {
 
-    /** Compare buildings by their underlying type. */
+    /**
+     * Compare buildings by their underlying type index (which reduces
+     * to the order in the spec), then the FCO order.
+     */
     private static final Comparator<Building> buildingTypeComparator
-        = Comparator.comparing(Building::getType)
+        = Comparator.comparingInt((Building b) -> b.getType().getIndex())
             .thenComparing(b -> b);
 
     private static final int COLONISTS_PER_ROW = 20;

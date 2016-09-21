@@ -134,7 +134,7 @@ public abstract class FreeColSpecObjectType extends FreeColSpecObject
      *
      * @return The game object index.
      */
-    protected int getIndex() {
+    public int getIndex() {
         return this.index;
     }
 
