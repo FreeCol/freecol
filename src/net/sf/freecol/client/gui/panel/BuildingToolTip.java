@@ -163,7 +163,10 @@ public class BuildingToolTip extends JToolTip {
 
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && outputType != null) {
-            for (Modifier m : sort(building.getProductionModifiers(outputType, null))) {
+            List<Modifier> mods
+                = sort(building.getProductionModifiers(outputType, null),
+                       Modifier.ascendingModifierIndexComparator);
+            for (Modifier m : mods) {
                 JLabel[] mLabels = ModifierFormat.getModifierLabels(m, null,
                     game.getTurn());
                 for (int i = 0; i < mLabels.length; i++) {

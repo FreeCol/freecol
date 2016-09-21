@@ -100,7 +100,9 @@ public class WorkProductionPanel extends FreeColPanel {
         add(new JLabel(shortName));
         add(new JLabel(ModifierFormat.format(result)));
 
-        output(sort(wl.getProductionModifiers(workType, unitType)), unitType);
+        output(sort(wl.getProductionModifiers(workType, unitType),
+                    Modifier.ascendingModifierIndexComparator),
+               unitType);
 
         result = wl.getPotentialProduction(workType, unitType);
         if (result < 0.0f) {
@@ -131,7 +133,9 @@ public class WorkProductionPanel extends FreeColPanel {
             add(unattendedLabel, "span");
             add(Utility.localizedLabel(wl.getLabel()));
             add(new JLabel(ModifierFormat.format(result)));
-            output(sort(wl.getProductionModifiers(workType, null)), unitType);
+            output(sort(wl.getProductionModifiers(workType, null),
+                        Modifier.ascendingModifierIndexComparator),
+                   unitType);
         }
 
         add(okButton, "newline, span, tag ok");

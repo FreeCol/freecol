@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -39,6 +40,17 @@ import org.w3c.dom.Element;
  */
 public class Modifier extends Feature {
 
+    
+    /**
+     * Comparator to sort by ascending modifier index, then type, then
+     * source, then FCO order.
+     */
+    public static final Comparator<Modifier> ascendingModifierIndexComparator
+        = Comparator.<Modifier>comparingInt(Modifier::getModifierIndex)
+            .thenComparingInt(m -> m.getType().ordinal())
+            .thenComparing(FreeColObject.fcoComparator)
+            .thenComparing(Modifier::getSource, FreeColObject.fcoComparator);
+    
     public static final String AMPHIBIOUS_ATTACK
         = "model.modifier.amphibiousAttack";
     public static final String ARTILLERY_AGAINST_RAID
@@ -533,30 +545,6 @@ public class Modifier extends Feature {
         return true;
     }
     // end @compat 0.10.7
-
-
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof Modifier) {
-            Modifier modifier = (Modifier)other;
-            cmp = modifierIndex - modifier.modifierIndex;
-            if (cmp == 0) {
-                cmp = modifierType.ordinal() - modifier.modifierType.ordinal();
-            }
-            if (cmp == 0) {
-                cmp = FreeColObject.compareIds(getSource(), 
-                                               modifier.getSource());
-            }
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
-    }
 
 
     // Override Object

@@ -276,7 +276,8 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Collection<Modifier> mods) {
         return (mods == null || mods.isEmpty()) ? number
-            : applyModifiers_internal(number, turn, sort(mods));
+            : applyModifiers_internal(number, turn,
+                sort(mods, Modifier.ascendingModifierIndexComparator));
     }
 
     /**
@@ -290,7 +291,8 @@ public final class FeatureContainer {
     public static float applyModifiers(float number, Turn turn,
                                        Stream<Modifier> mods) {
         return (mods == null) ? number
-            : applyModifiers_internal(number, turn, sort(mods));
+            : applyModifiers_internal(number, turn,
+                sort(mods, Modifier.ascendingModifierIndexComparator));
     }
 
     /**

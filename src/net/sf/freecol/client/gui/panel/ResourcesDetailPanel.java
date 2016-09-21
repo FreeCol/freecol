@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
@@ -79,7 +80,8 @@ public class ResourcesDetailPanel
     public void buildDetail(String id, JPanel panel) {
         if (getId().equals(id)) return;
 
-        ResourceType type = getSpecification().getResourceType(id);
+        final Specification spec = getSpecification();
+        ResourceType type = spec.getResourceType(id);
         panel.setLayout(new MigLayout("wrap 2", "[]20[]"));
 
         JLabel name = Utility.localizedHeaderLabel(type, FontLibrary.FontSize.SMALL);
@@ -88,10 +90,11 @@ public class ResourcesDetailPanel
         panel.add(Utility.localizedLabel("colopedia.resource.bonusProduction"));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (Modifier modifier : sort(type.getModifiers())) {
+        List<Modifier> mods = sort(type.getModifiers(),
+                                   Modifier.ascendingModifierIndexComparator);
+        for (Modifier modifier : mods) {
             String text = ModifierFormat.getModifierAsString(modifier);
             if (modifier.hasScope()) {
-                final Specification spec = getSpecification();
                 String scopes = transform(modifier.getScopes(),
                                           isNotNull(Scope::getType),
                                           s -> Messages.getName(spec.findType(s.getType())),
@@ -99,7 +102,7 @@ public class ResourcesDetailPanel
                 if (!scopes.isEmpty()) text += " (" + scopes + ")";
             }
 
-            GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
+            GoodsType goodsType = spec.getGoodsType(modifier.getId());
             JButton goodsButton = getGoodsButton(goodsType, text);
             goodsPanel.add(goodsButton);
         }

@@ -74,8 +74,10 @@ public class PreCombatDialog extends FreeColConfirmDialog {
             = combatModel.getOffensiveModifiers(attacker, defender);
         final Set<Modifier> defenceModifiers
             = combatModel.getDefensiveModifiers(attacker, defender);
-        final List<Modifier> offence = sort(attackModifiers);
-        final List<Modifier> defence = sort(defenceModifiers);
+        final List<Modifier> offence
+            = sort(attackModifiers, Modifier.ascendingModifierIndexComparator);
+        final List<Modifier> defence
+            = sort(defenceModifiers, Modifier.ascendingModifierIndexComparator);
 
         MigPanel panel = new MigPanel(new MigLayout("wrap 6",
                 "[sg label]20[sg value, right]1px[sg percent]40"

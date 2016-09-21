@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -68,6 +69,14 @@ public abstract class FreeColObject
     implements Comparable<FreeColObject>, ObjectWithId {
 
     protected static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
+
+    /** Comparator by FCO identifier. */
+    public static final Comparator<? super FreeColObject> fcoComparator
+        = new Comparator<FreeColObject>() {
+                public int compare(FreeColObject fco1, FreeColObject fco2) {
+                    return FreeColObject.compareIds(fco1, fco2);
+                }
+            };
 
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
@@ -553,7 +562,7 @@ public abstract class FreeColObject
      * @return A list of modifiers.
      */
     public final List<Modifier> getSortedModifiers() {
-        return sort(getModifiers());
+        return sort(getModifiers(), Modifier.ascendingModifierIndexComparator);
     }
 
     /**
