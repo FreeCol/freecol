@@ -122,7 +122,7 @@ public class AIMain extends FreeColObject
      * @return A unique identifier.
      */
     public String getNextId() {
-        String id = "am:" + Integer.toString(nextId);
+        String id = Integer.toString(nextId);
         nextId++;
         return id;
     }
