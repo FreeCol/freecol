@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -636,20 +637,6 @@ public class Building extends WorkLocation
                                          Turn turn) {
         // Buildings have no modifiers independent of type
         return getType().getModifiers(id, fcgot, turn);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof Building) {
-            Building building = (Building)other;
-            cmp = getType().compareTo(building.getType());
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
     }
 
 

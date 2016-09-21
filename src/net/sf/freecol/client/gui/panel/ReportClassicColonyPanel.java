@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,11 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public final class ReportClassicColonyPanel extends ReportPanel
     implements ActionListener {
+
+    /** Compare buildings by their underlying type. */
+    private static final Comparator<Building> buildingTypeComparator
+        = Comparator.comparing(Building::getType)
+            .thenComparing(b -> b);
 
     private static final int COLONISTS_PER_ROW = 20;
     private static final int UNITS_PER_ROW = 14;
@@ -151,7 +157,8 @@ public final class ReportClassicColonyPanel extends ReportPanel
             JPanel buildingsPanel
                 = new JPanel(new GridLayout(0, BUILDINGS_PER_ROW));
             buildingsPanel.setOpaque(false);
-            for (Building building : sort(colony.getBuildings())) {
+            for (Building building : sort(colony.getBuildings(),
+                                          buildingTypeComparator)) {
                 if (building.getType().isAutomaticBuild()) continue;
                 JLabel buildingLabel = new JLabel(new ImageIcon(lib
                         .getSmallBuildingImage(building)));
