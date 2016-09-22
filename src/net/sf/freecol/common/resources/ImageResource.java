@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
@@ -49,6 +50,10 @@ public class ImageResource extends Resource
                            implements Resource.Preloadable, Resource.Cleanable {
 
     private static final Logger logger = Logger.getLogger(ImageResource.class.getName());
+
+    /** Comparator to compare buffered images by ascending size. */
+    private static final Comparator<BufferedImage> biComp
+        = Comparator.<BufferedImage>comparingInt(bi -> bi.getWidth() * bi.getHeight());
 
     private final Object loadingLock = new Object();
     private volatile BufferedImage image = null;
@@ -92,11 +97,8 @@ public class ImageResource extends Resource
                                          uri -> loadImage(uri),
                                          toListNoNulls());
                 if (baseImage != null) loadedImages.add(baseImage);
-                loadedImages.sort((img0, img1) ->
-                    img0.getWidth()*img0.getHeight() -
-                        img1.getWidth()*img1.getHeight());
-
-                image = baseImage != null ? baseImage : first(loadedImages);
+                loadedImages.sort(biComp);
+                image = (baseImage != null) ? baseImage : first(loadedImages);
             }
         }
     }
