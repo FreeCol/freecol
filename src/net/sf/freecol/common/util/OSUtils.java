@@ -33,28 +33,30 @@ public class OSUtils {
     /**
      * Launches the web browser based on a given operating system
      *
-     * @param os
+     * @param url The URL to launch
      * @throws IOException
      */
-    public static void LaunchBrowser(String os, String url) throws IOException {
-       String[] browser = GetBrowser(os, url);
+    final public static void LaunchBrowser(String url) throws IOException {
+        String os = GetOperatingSystem();
+        String[] browser = GetBrowser(os, url);
         if (browser != null) {
             try {
                 final Process exec = Runtime.getRuntime().exec(browser);
             } catch (IOException e) {
-                logger.log(Level.FINEST, "Web browswer failed to launch.", e);
+                logger.log(Level.FINEST, "Web browser failed to launch.", e);
             }
         }
     }
 
 
     /**
-     * Returns the browswer for a given operating system
+     * Returns the browser for a given operating system
      *
-     * @param os
+     * @param os The operating System
+     * @param url The URL to launch
      * @return
      */
-    private static String[] GetBrowser(String os, String url) {
+    final private static String[] GetBrowser(String os, String url) {
         String[] cmd = null;
         if (os == null) {
             // error, the operating system could not be determined
@@ -73,5 +75,16 @@ public class OSUtils {
         } else {
             return new String[]{"firefox", url};
         }
+    }
+
+
+    /**
+     * Function that returns the operating system
+     *
+     * @return os The string containing the Operating system
+     */
+    final public static String GetOperatingSystem() {
+        String os = System.getProperty("os.name");
+        return os;
     }
 }
