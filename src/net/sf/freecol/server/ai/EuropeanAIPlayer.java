@@ -1048,7 +1048,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @return The most urgent 10% of the available transportables.
      */
     public List<TransportableAIObject> getUrgentTransportables() {
-        List<TransportableAIObject> urgent = sort(transportSupply);
+        List<TransportableAIObject> urgent
+            = sort(transportSupply, ValuedAIObject.descendingValueComparator);
         // Do not let the list exceed 10% of all transports
         int urge = urgent.size();
         urge = Math.max(2, (urge + 5) / 10);
