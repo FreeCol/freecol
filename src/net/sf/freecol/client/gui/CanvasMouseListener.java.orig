@@ -181,8 +181,18 @@ public final class CanvasMouseListener extends FreeColClientHolder
             canvas.requestFocus();
             break;
         case MouseEvent.BUTTON2:
-            immediateGoto(tile);
+<<<<<<< HEAD
+            if (tile != null) {
+                Unit unit = canvas.getActiveUnit();
                 if (unit != null && !Objects.equals(unit.getTile(), tile)) {
+                    PathNode dragPath = unit.findPath(tile);
+                    canvas.startGoto();
+                    canvas.setGotoPath(dragPath);
+                }
+            }
+=======
+            immediateGoto(tile);
+>>>>>>> f5fc8dad3a894d61ed4b550eeb0737c971cf46a4
             break;
         case MouseEvent.BUTTON3:
             immediatePopup(tile, e.getX(), e.getY());
@@ -211,6 +221,13 @@ public final class CanvasMouseListener extends FreeColClientHolder
     @Override
     public void actionPerformed(ActionEvent ae) {
         doubleClickTimer.stop();
+<<<<<<< HEAD
+        Tile tile=canvas.convertToMapTile(centerX, centerY);
+        if(canvas.getViewMode() == GUI.MOVE_UNITS_MODE) {
+            // Clear goto order when active unit is on the tile
+            Unit unit=canvas.getActiveUnit();
+            if(unit != null && Objects.equals(unit.getTile(), tile)) {
+=======
         Tile tile = canvas.convertToMapTile(centerX, centerY);
         if (tile == null) return;
 
@@ -219,7 +236,8 @@ public final class CanvasMouseListener extends FreeColClientHolder
             // Clear goto order when active unit is on the tile, else
             // try to display a settlement.
             Unit unit = canvas.getActiveUnit();
-            if(unit != null && Objects.equals(unit.getTile(), tile)) {
+            if (unit != null && unit.getTile() == tile) {
+>>>>>>> f5fc8dad3a894d61ed4b550eeb0737c971cf46a4
                 igc().clearGotoOrders(unit);
                 canvas.updateCurrentPathForActiveUnit();
             } else {
