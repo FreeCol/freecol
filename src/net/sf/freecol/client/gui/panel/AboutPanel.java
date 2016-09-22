@@ -23,6 +23,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -39,6 +40,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FontLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.OSUtils;
 
 
 /**
@@ -163,29 +165,10 @@ public final class AboutPanel extends FreeColPanel {
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
             || MANUAL_URL.equals(url)) {
             String os = System.getProperty("os.name");
-            // FIXME: move this to OS utilities
-            String[] cmd = null;
-            if (os == null) {
-                // error, the operating system could not be determined
-                return;
-            } else if (os.toLowerCase().contains("mac")) {
-                // Apple Macintosh, Safari is the main browser
-                cmd = new String[] { "open" , "-a", "Safari", url };
-            } else if (os.toLowerCase().contains("windows")) {
-                // Microsoft Windows, use the default browser
-                cmd = new String[] { "rundll32.exe",
-                    "url.dll,FileProtocolHandler", url};
-            } else if (os.toLowerCase().contains("linux")) {
-                // GNU Linux, use xdg-utils to launch the default
-                // browser (portland.freedesktop.org)
-                cmd = new String[] { "xdg-open", url};
-            } else {
-                cmd = new String[] { "firefox", url};
-            }
             try {
-                Runtime.getRuntime().exec(cmd);
-            } catch (IOException x) {
-                // couldn't start browser
+                OSUtils.LaunchBrowser(os, url);
+            } catch (IOException e) {
+                logger.log(Level.FINEST, "Web browswer failed to launch.", e);
             }
         } else {
             super.actionPerformed(ae);
