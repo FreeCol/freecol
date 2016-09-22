@@ -164,12 +164,9 @@ public final class AboutPanel extends FreeColPanel {
         final String url = ae.getActionCommand();
         if (SITE_URL.equals(url) || PROJECT_URL.equals(url)
             || MANUAL_URL.equals(url)) {
-            try {
-                OSUtils.LaunchBrowser(url);
-            } catch (IOException e) {
-                logger.log(Level.FINEST, "Web browser failed to launch.", e);
-            }
-        } else {
+            OSUtils.LaunchBrowser(url);
+        }
+        else {
             super.actionPerformed(ae);
         }
     }

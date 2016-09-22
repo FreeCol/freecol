@@ -20,6 +20,7 @@
 package net.sf.freecol.common.util;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,16 +35,26 @@ public class OSUtils {
      * Launches the web browser based on a given operating system
      *
      * @param url The URL to launch
-     * @throws IOException
      */
-    final public static void LaunchBrowser(String url) throws IOException {
-        String os = GetOperatingSystem();
-        String[] browser = GetBrowser(os, url);
-        if (browser != null) {
-            try {
-                final Process exec = Runtime.getRuntime().exec(browser);
-            } catch (IOException e) {
-                logger.log(Level.FINEST, "Web browser failed to launch.", e);
+    final public static void LaunchBrowser(String url) {
+
+        // Use Desktop Class first
+        try {
+            URI uri = java.net.URI.create(url);
+            java.awt.Desktop.getDesktop().browse(uri);
+        } catch (IOException e) {
+
+            // If Desktop Class fails to launch browser, log the error
+            logger.log(Level.FINEST, "Web browser failed to launch via Desktop Class.", e);
+
+            // Use Runtime to launch browser
+            String[] browser = GetBrowserExecString(url);
+            if (browser != null) {
+                try {
+                    Runtime.getRuntime().exec(browser);
+                } catch (IOException re) {
+                    logger.log(Level.FINEST, "Web browser failed to launch via Runtime Class.", re);
+                }
             }
         }
     }
@@ -52,12 +63,11 @@ public class OSUtils {
     /**
      * Returns the browser for a given operating system
      *
-     * @param os The operating System
      * @param url The URL to launch
      * @return
      */
-    final private static String[] GetBrowser(String os, String url) {
-        String[] cmd = null;
+    final private static String[] GetBrowserExecString(String url) {
+        final String os = GetOperatingSystem();
         if (os == null) {
             // error, the operating system could not be determined
             return null;
@@ -67,13 +77,13 @@ public class OSUtils {
         } else if (os.toLowerCase().contains("windows")) {
             // Microsoft Windows, use the default browser
             return new String[] { "rundll32.exe",
-                    "url.dll,FileProtocolHandler", url};
+                    "url.dll,FileProtocolHandler", url };
         } else if (os.toLowerCase().contains("linux")) {
             // GNU Linux, use xdg-utils to launch the default
             // browser (portland.freedesktop.org)
-            return new String[] { "xdg-open", url};
+            return new String[] { "xdg-open", url };
         } else {
-            return new String[]{"firefox", url};
+            return new String[] { "firefox", url };
         }
     }
 
