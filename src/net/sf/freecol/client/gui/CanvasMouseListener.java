@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +41,7 @@ import net.sf.freecol.common.model.Unit;
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
 public final class CanvasMouseListener extends FreeColClientHolder
-    implements ActionListener, MouseListener {
+        implements ActionListener, MouseListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
 
@@ -79,8 +78,8 @@ public final class CanvasMouseListener extends FreeColClientHolder
             canvas.stopGoto();
             if (path != null) { // Move the unit
                 getFreeColClient().getInGameController()
-                    .goToTile(canvas.getActiveUnit(),
-                        path.getLastNode().getTile());
+                        .goToTile(canvas.getActiveUnit(),
+                                path.getLastNode().getTile());
             }
             return true;
         }
@@ -97,9 +96,9 @@ public final class CanvasMouseListener extends FreeColClientHolder
         Unit unit;
         PathNode path;
         if (tile != null
-            && (unit = canvas.getActiveUnit()) != null
-            && unit.getTile() != tile
-            && (path = unit.findPath(tile)) != null) {
+                && (unit = canvas.getActiveUnit()) != null
+                && unit.getTile() != tile
+                && (path = unit.findPath(tile)) != null) {
             canvas.startGoto();
             canvas.setGotoPath(path);
             flushGoto();
@@ -126,7 +125,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
     public void mouseClicked(MouseEvent e) {
         Tile tile;
         if (e.getClickCount() > 1
-            && (tile = canvas.convertToMapTile(e.getX(), e.getY())) != null) {
+                && (tile = canvas.convertToMapTile(e.getX(), e.getY())) != null) {
             immediateSettlement(tile);
         } else {
             canvas.requestFocus();
@@ -167,28 +166,27 @@ public final class CanvasMouseListener extends FreeColClientHolder
         Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
 
         switch (me) {
-        case MouseEvent.BUTTON1:
-            // Record initial click point for purposes of dragging,
-            // @see CanvasMouseMotionListener#mouseDragged.
-            canvas.setDragPoint(e.getX(), e.getY());
+            case MouseEvent.BUTTON1:
+                // Record initial click point for purposes of dragging,
+                // @see CanvasMouseMotionListener#mouseDragged.
+                canvas.setDragPoint(e.getX(), e.getY());
 
-            // New click sequence? Remember position to use when timer expires
-            if (!doubleClickTimer.isRunning()) {
-                centerX = e.getX();
-                centerY = e.getY();
-            }
-            doubleClickTimer.start();
-            canvas.requestFocus();
-            break;
-        case MouseEvent.BUTTON2:
-            immediateGoto(tile);
-                if (unit != null && !Objects.equals(unit.getTile(), tile)) {
-            break;
-        case MouseEvent.BUTTON3:
-            immediatePopup(tile, e.getX(), e.getY());
-            break;
-        default:
-            break;
+                // New click sequence? Remember position to use when timer expires
+                if (!doubleClickTimer.isRunning()) {
+                    centerX = e.getX();
+                    centerY = e.getY();
+                }
+                doubleClickTimer.start();
+                canvas.requestFocus();
+                break;
+            case MouseEvent.BUTTON2:
+                immediateGoto(tile);
+                break;
+            case MouseEvent.BUTTON3:
+                immediatePopup(tile, e.getX(), e.getY());
+                break;
+            default:
+                break;
         }
     }
 
@@ -201,7 +199,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
     public void mouseReleased(MouseEvent e) {
         flushGoto();
     }
- 
+
 
     // Interface ActionListener
 
@@ -215,19 +213,19 @@ public final class CanvasMouseListener extends FreeColClientHolder
         if (tile == null) return;
 
         switch (canvas.getViewMode()) {
-        case GUI.MOVE_UNITS_MODE:
-            // Clear goto order when active unit is on the tile, else
-            // try to display a settlement.
-            Unit unit = canvas.getActiveUnit();
-            if(unit != null && Objects.equals(unit.getTile(), tile)) {
-                igc().clearGotoOrders(unit);
-                canvas.updateCurrentPathForActiveUnit();
-            } else {
-                immediateSettlement(tile);
-            }
-            break;
-        case GUI.VIEW_TERRAIN_MODE: default:
-            break;
+            case GUI.MOVE_UNITS_MODE:
+                // Clear goto order when active unit is on the tile, else
+                // try to display a settlement.
+                Unit unit = canvas.getActiveUnit();
+                if (unit != null && unit.getTile() == tile) {
+                    igc().clearGotoOrders(unit);
+                    canvas.updateCurrentPathForActiveUnit();
+                } else {
+                    immediateSettlement(tile);
+                }
+                break;
+            case GUI.VIEW_TERRAIN_MODE: default:
+                break;
         }
         getGUI().setSelectedTile(tile);
     }
