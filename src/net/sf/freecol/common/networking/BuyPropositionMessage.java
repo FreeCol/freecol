@@ -30,6 +30,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when negotiating a purchase at an IndianSettlement.
@@ -141,7 +143,7 @@ public class BuyPropositionMessage extends DOMMessage {
                 .build(serverPlayer);
         }
         // Make sure we are trying to buy something that is there
-        if (goods.getLocation() != is) {
+        if (!Objects.equals(goods.getLocation(), is)) {
             return serverPlayer.clientError("Goods " + goods.getId()
                 + " are not in settlement " + this.settlementId)
                 .build(serverPlayer);

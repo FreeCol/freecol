@@ -29,6 +29,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when purchasing at an IndianSettlement.
@@ -135,7 +137,7 @@ public class BuyMessage extends DOMMessage {
         }
 
         // Make sure we are trying to buy something that is there
-        if (goods.getLocation() != is) {
+        if (!Objects.equals(goods.getLocation(), is)) {
             return serverPlayer.clientError("Goods " + goods
                 + " is not at settlement " + this.settlementId)
                 .build(serverPlayer);

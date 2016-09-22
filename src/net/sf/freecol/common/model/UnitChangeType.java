@@ -19,9 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -216,7 +214,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
      */
     public UnitChange getUnitChange(UnitType fromType, final UnitType toType) {
         return find(getUnitChanges(fromType),
-            ((toType == null) ? alwaysTrue() : uc -> uc.to == toType));
+            ((toType == null) ? alwaysTrue() : uc -> Objects.equals(uc.to, toType)));
     }
 
     // @compat 0.11.6

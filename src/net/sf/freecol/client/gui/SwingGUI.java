@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -461,7 +462,7 @@ public class SwingGUI extends GUI {
             Point pt = canvas.getMousePosition();
             if (pt != null) {
                 Tile tile = canvas.convertToMapTile(pt.x, pt.y);
-                if (tile != null && unit.getTile() != tile) {
+                if (tile != null && !Objects.equals(unit.getTile(), tile)) {
                     canvas.setGotoPath(unit.findPath(tile));
                 }
             }
@@ -598,7 +599,7 @@ public class SwingGUI extends GUI {
     public boolean requireFocus(Tile tile) {
         // Account for the ALWAYS_CENTER client option.
         boolean required = getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
-        if ((required && tile != getFocus()) || !mapViewer.onScreen(tile)) {
+        if ((required && !Objects.equals(tile, getFocus())) || !mapViewer.onScreen(tile)) {
             setFocusImmediately(tile);
             return true;
         }

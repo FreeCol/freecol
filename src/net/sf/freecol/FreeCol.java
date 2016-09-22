@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Handler;
@@ -314,7 +315,7 @@ public final class FreeCol {
             Locale clientLocale;
             if (clientLanguage != null
                 && !Messages.AUTOMATIC.equalsIgnoreCase(clientLanguage)
-                && (clientLocale = Messages.getLocale(clientLanguage)) != locale) {
+                && !Objects.equals(clientLocale = Messages.getLocale(clientLanguage), locale)) {
                 locale = clientLocale;
                 Messages.loadMessageBundle(locale);
                 logger.info("Loaded messages for " + locale);

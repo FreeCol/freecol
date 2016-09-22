@@ -19,11 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -305,7 +301,7 @@ public class ProductionType extends FreeColSpecObject {
     public static boolean canProduce(final GoodsType goodsType,
                                      Collection<ProductionType> types) {
         return any(flatten(types, ProductionType::getOutputs),
-            ag -> goodsType == ag.getType() && ag.getAmount() > 0);
+            ag -> Objects.equals(goodsType, ag.getType()) && ag.getAmount() > 0);
     }
 
     /**
@@ -334,7 +330,7 @@ public class ProductionType extends FreeColSpecObject {
      */
     public AbstractGoods getBestOutputFor(GoodsType goodsType) {
         final Predicate<AbstractGoods> typePred = ag ->
-            goodsType == null || ag.getType() == goodsType;
+            goodsType == null || Objects.equals(ag.getType(), goodsType);
         return maximize(getOutputs(), typePred,
                         AbstractGoods.ascendingAmountComparator);
     }

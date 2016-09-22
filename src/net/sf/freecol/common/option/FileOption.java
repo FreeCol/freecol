@@ -20,6 +20,7 @@
 package net.sf.freecol.common.option;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -78,7 +79,7 @@ public class FileOption extends AbstractOption<File> {
         final File oldValue = this.value;
         this.value = value;
 
-        if (value != oldValue) {
+        if (!Objects.equals(value, oldValue)) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;

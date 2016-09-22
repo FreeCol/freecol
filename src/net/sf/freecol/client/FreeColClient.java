@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -723,7 +724,7 @@ public final class FreeColClient {
      * @return The animation speed.
      */
     public int getAnimationSpeed(Player player) {
-        String key = (getMyPlayer() == player)
+        String key = (Objects.equals(getMyPlayer(), player))
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         return getClientOptions().getInteger(key);

@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -175,7 +176,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 MapEditorController ctlr
                     = getFreeColClient().getMapEditorController();
                 MapTransform newMapTransform = null;
-                if (ctlr.getMapTransform() != mt) {
+                if (!Objects.equals(ctlr.getMapTransform(), mt)) {
                     newMapTransform = mt;
                 }
                 ctlr.setMapTransform(newMapTransform);

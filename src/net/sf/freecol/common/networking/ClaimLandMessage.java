@@ -31,6 +31,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when the client requests claiming land.
@@ -113,7 +115,7 @@ public class ClaimLandMessage extends DOMMessage {
                                                         Settlement.class);
         } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
-            if (unit.getTile() != tile) {
+            if (!Objects.equals(unit.getTile(), tile)) {
                 return serverPlayer.clientError("Unit not at tile: "
                     + this.tileId)
                     .build(serverPlayer);
@@ -145,7 +147,7 @@ public class ClaimLandMessage extends DOMMessage {
         Settlement ownerSettlement = tile.getOwningSettlement();
         if (owner == null) { // unclaimed, always free
             price = 0;
-        } else if (owner == player) { // capture vacant colony tiles only
+        } else if (Objects.equals(owner, player)) { // capture vacant colony tiles only
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
                 return serverPlayer.clientError("Can not claim tile "
@@ -155,7 +157,7 @@ public class ClaimLandMessage extends DOMMessage {
             price = 0;
         } else if (owner.isEuropean()) {
             if (tile.getOwningSettlement() == null  // its not "nailed down"
-                || tile.getOwningSettlement() == settlement) { // pre-attached
+                || Objects.equals(tile.getOwningSettlement(), settlement)) { // pre-attached
                 price = 0;
             } else { // must fail
                 return serverPlayer.clientError("Can not claim tile " 

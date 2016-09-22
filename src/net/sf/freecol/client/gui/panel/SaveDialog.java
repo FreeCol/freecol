@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -85,7 +86,7 @@ public final class SaveDialog extends FreeColDialog<File> {
     public File getResponse() {
         if (responded()) {
             File value = (File)getValue();
-            return (value == cancelFile) ? null : value;
+            return (Objects.equals(value, cancelFile)) ? null : value;
         }
         return null;
     }

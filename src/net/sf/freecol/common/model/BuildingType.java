@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
@@ -523,7 +524,7 @@ public final class BuildingType extends BuildableType {
         }
         // end @compat
 
-        if (parent != this) { // Handle "extends" for super-type fields
+        if (!Objects.equals(parent, this)) { // Handle "extends" for super-type fields
             if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
                 setRequiredPopulation(parent.getRequiredPopulation());
             }

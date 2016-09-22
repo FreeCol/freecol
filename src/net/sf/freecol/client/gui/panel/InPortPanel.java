@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import java.util.Objects;
 
 import net.sf.freecol.common.model.Unit;
 
@@ -58,7 +59,7 @@ public abstract class InPortPanel extends UnitPanel {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;
                 Unit unit = label.getUnit();
-                if (unit == selectedUnit) {
+                if (Objects.equals(unit, selectedUnit)) {
                     portPanel.setSelectedUnitLabel(label);
                     return;
                 }

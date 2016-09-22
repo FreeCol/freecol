@@ -29,6 +29,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when delivering a gift to a Settlement.
@@ -149,7 +151,7 @@ public class DeliverGiftMessage extends DOMMessage {
         }
 
         // Make sure we are trying to deliver something that is there
-        if (this.goods.getLocation() != unit) {
+        if (!Objects.equals(this.goods.getLocation(), unit)) {
             return serverPlayer.clientError("Gift " + this.goods.getId()
                 + " is not with unit " + this.unitId)
                 .build(serverPlayer);

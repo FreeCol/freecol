@@ -20,18 +20,8 @@
 package net.sf.freecol.common.util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.DoubleBinaryOperator;
@@ -251,7 +241,7 @@ public class CollectionUtils {
         T datum = null;
         boolean first = true;
         for (T t : c) {
-            if (first) datum = t; else if (t != datum) return false;
+            if (first) datum = t; else if (!Objects.equals(t, datum)) return false;
             first = false;
         }
         return true;
@@ -1215,7 +1205,7 @@ public class CollectionUtils {
      * @return A suitable {@code Predicate}.
      */
     public static <T, K> Predicate<T> matchKey(final K key) {
-        return t -> t == key;
+        return t -> Objects.equals(t, key);
     }
 
     /**
@@ -1243,7 +1233,7 @@ public class CollectionUtils {
      */
     public static <T, K> Predicate<T> matchKey(final K key,
                                                Function<T, K> mapper) {
-        return t -> mapper.apply(t) == key;
+        return t -> Objects.equals(mapper.apply(t), key);
     }
 
     /**

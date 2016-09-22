@@ -36,10 +36,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -245,7 +242,7 @@ public final class MapViewer extends FreeColClientHolder {
                 Tile tile = activeUnit.getTile();
                 if(isTileVisible(tile))
                     gui.refreshTile(tile);
-                if(selectedTile != tile && isTileVisible(selectedTile))
+                if(!Objects.equals(selectedTile, tile) && isTileVisible(selectedTile))
                     gui.refreshTile(selectedTile);
             } else if(isTileVisible(selectedTile))
                 gui.refreshTile(selectedTile);
@@ -947,7 +944,7 @@ public final class MapViewer extends FreeColClientHolder {
         selectedTile = newTile;
 
         if (viewMode == GUI.MOVE_UNITS_MODE) {
-            if (activeUnit == null || activeUnit.getTile() != newTile) {
+            if (activeUnit == null || !Objects.equals(activeUnit.getTile(), newTile)) {
                 // select a unit on the selected tile
                 Unit unitInFront = findUnitInFront(newTile);
                 if (unitInFront != null) {
@@ -989,7 +986,7 @@ public final class MapViewer extends FreeColClientHolder {
         if (unitTile == null || unitTile.isEmpty()) {
             result = null;
 
-        } else if (activeUnit != null && activeUnit.getTile() == unitTile) {
+        } else if (activeUnit != null && Objects.equals(activeUnit.getTile(), unitTile)) {
             result = activeUnit;
 
         } else if (unitTile.hasSettlement()) {
@@ -1602,7 +1599,7 @@ public final class MapViewer extends FreeColClientHolder {
                                         backgroundColor.getBlue(), 128);
             TextSpecification[] specs = new TextSpecification[1];
             if (settlement instanceof Colony
-                && settlement.getOwner() == player) {
+                && Objects.equals(settlement.getOwner(), player)) {
                 Colony colony = (Colony) settlement;
                 BuildableType buildable = colony.getCurrentlyBuilding();
                 if (buildable != null) {
@@ -2033,12 +2030,12 @@ public final class MapViewer extends FreeColClientHolder {
                 Direction next2 = next.getNextDirection();
                 if (otherTile == null
                     || (type == BorderType.COUNTRY && !owner.owns(otherTile))
-                    || (type == BorderType.REGION && otherTile.getRegion() != region)) {
+                    || (type == BorderType.REGION && !Objects.equals(otherTile.getRegion(), region))) {
                     Tile tile1 = tile.getNeighbourOrNull(next);
                     Tile tile2 = tile.getNeighbourOrNull(next2);
                     if (tile2 == null
                         || (type == BorderType.COUNTRY && !owner.owns(tile2))
-                        || (type == BorderType.REGION && tile2.getRegion() != region)) {
+                        || (type == BorderType.REGION && !Objects.equals(tile2.getRegion(), region))) {
                         // small corner
                         path.lineTo(borderPoints.get(next).x,
                                     borderPoints.get(next).y);
@@ -2057,7 +2054,7 @@ public final class MapViewer extends FreeColClientHolder {
                         }
                         if (tile1 != null
                             && ((type == BorderType.COUNTRY && owner.owns(tile1))
-                                || (type == BorderType.REGION && tile1.getRegion() == region))) {
+                                || (type == BorderType.REGION && Objects.equals(tile1.getRegion(), region)))) {
                             // short straight line
                             path.lineTo(borderPoints.get(next).x,
                                         borderPoints.get(next).y);

@@ -19,18 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -538,9 +527,9 @@ public class Map extends FreeColGameObject implements Location {
      */
     public static final boolean isSameLocation(Location l1, Location l2) {
         return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
+            : (Objects.equals(l1, l2)) ? true
             : (l1.getTile() == null) ? false
-            : l1.getTile() == l2.getTile();
+            : Objects.equals(l1.getTile(), l2.getTile());
     }
 
     /**
@@ -553,7 +542,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public static final boolean isSameContiguity(Location l1, Location l2) {
         return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
+            : (Objects.equals(l1, l2)) ? true
             : (l1.getTile() == null || l2.getTile() == null) ? false
             : l1.getTile().isConnectedTo(l2.getTile());
     }            
@@ -731,7 +720,7 @@ public class Map extends FreeColGameObject implements Location {
                 if (carrier == null) {
                     throw new IllegalArgumentException("Null carrier when"
                         + " starting on high seas: " + unit);
-                } else if (carrier != start) {
+                } else if (!Objects.equals(carrier, start)) {
                     throw new IllegalArgumentException("Wrong carrier when"
                         + " starting on high seas: " + unit
                         + "/" + carrier + " != " + start);
@@ -1024,7 +1013,7 @@ public class Map extends FreeColGameObject implements Location {
                 path.previous = new PathNode(realStart, unit.getMovesLeft(),
                     0, carrier != null, null, path);
                 path = path.previous;
-                if (carrier != null && unit.getLocation() != carrier) {
+                if (carrier != null && !Objects.equals(unit.getLocation(), carrier)) {
                     path.previous = new PathNode(realStart, unit.getMovesLeft(),
                         0, false, null, path);
                     path = path.previous;
@@ -1402,7 +1391,7 @@ public class Map extends FreeColGameObject implements Location {
             ? ((start.hasSettlement()
                     && start.getSettlement().isConnectedPort()
                     && unit != null
-                    && unit.getLocation() == carrier) ? carrier : unit)
+                    && Objects.equals(unit.getLocation(), carrier)) ? carrier : unit)
             : offMapUnit;
         if (lb != null) lb.add("Search trace(unit=", unit,
             ", from=", start,
@@ -1412,7 +1401,7 @@ public class Map extends FreeColGameObject implements Location {
         // Create the start node and put it on the open list.
         final PathNode firstNode = new PathNode(start,
             ((currentUnit != null) ? currentUnit.getMovesLeft() : -1),
-            0, carrier != null && currentUnit == carrier, null, null);
+            0, carrier != null && Objects.equals(currentUnit, carrier), null, null);
         f.put(start.getId(), (searchHeuristic == null) ? 0
             : searchHeuristic.getValue(start));
         openMap.put(start.getId(), firstNode);
@@ -1478,7 +1467,7 @@ public class Map extends FreeColGameObject implements Location {
                 // If the new tile is the tile we just visited, skip it.
                 if (lb != null) lb.add("\n    ", moveTile);
                 if (currentNode.previous != null
-                    && currentNode.previous.getTile() == moveTile) {
+                    && Objects.equals(currentNode.previous.getTile(), moveTile)) {
                     if (lb != null) lb.add(" prev");
                     continue;
                 }
@@ -1542,7 +1531,7 @@ public class Map extends FreeColGameObject implements Location {
                         default:
                             break;
                         }
-                        if (!unitMove && unit == currentUnit) {
+                        if (!unitMove && Objects.equals(unit, currentUnit)) {
                             // This search can never succeed if the unit
                             // can not reach the goal, except if there is
                             // a carrier involved that might still succeed.
@@ -2172,7 +2161,7 @@ public class Map extends FreeColGameObject implements Location {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < maxDistanceToEdge && x < width
                      && isValid(x, y)
-                     && (t = getTile(x, y)).getType() == ocean; x++) {
+                     && Objects.equals((t = getTile(x, y)).getType(), ocean); x++) {
                 Tile other = getLandWithinDistance(x, y,
                     distToLandFromHighSeas);
                 if (other == null) {
@@ -2188,7 +2177,7 @@ public class Map extends FreeColGameObject implements Location {
             }
             for (int x = 0; x < maxDistanceToEdge && x < width
                      && isValid(width-1-x, y)
-                     && (t = getTile(width-1-x, y)).getType() == ocean; x++) {
+                     && Objects.equals((t = getTile(width - 1 - x, y)).getType(), ocean); x++) {
                 Tile other = getLandWithinDistance(width-1-x, y,
                     distToLandFromHighSeas);
                 if (other == null) {

@@ -19,15 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -625,10 +618,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             = getSpecification().getTileType("model.tile.greatRiver");
         final TileType ocean
             = getSpecification().getTileType("model.tile.ocean");
-        boolean ret = getType() == greatRiver;
+        boolean ret = Objects.equals(getType(), greatRiver);
         for (Tile t : getSurroundingTiles(1)) {
-            if (t.getType() == ocean) return false;
-            ret |= t.getType() == greatRiver;
+            if (Objects.equals(t.getType(), ocean)) return false;
+            ret |= Objects.equals(t.getType(), greatRiver);
         }
         return ret;
     }
@@ -817,7 +810,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             tileItemContainer = new TileItemContainer(getGame(), this);
         }
         TileItem added = tileItemContainer.tryAddTileItem(item);
-        return added == item;
+        return Objects.equals(added, item);
     }
 
     /**
@@ -890,7 +883,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         TileImprovement river = getRiver();
         if (river == null) return null;
         TileImprovement result = removeTileItem(river);
-        if (result == river) river.updateRiverConnections(null);
+        if (Objects.equals(result, river)) river.updateRiverConnections(null);
         return result;
     }
 
@@ -1129,7 +1122,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getColonyTileLocationLabel(Colony colony) {
         Tile ct = colony.getTile();
         StringTemplate t = StringTemplate.template("model.tile.nameLocation");
-        if (ct == this) {
+        if (Objects.equals(ct, this)) {
             t.addStringTemplate("%location%",
                 StringTemplate.key("colonyCenter"));
         } else {
@@ -1317,7 +1310,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (radius <= 0) radius = INFINITY;
         Map map = getGame().getMap();
         for (Tile t : map.getCircleTiles(this, true, radius)) {
-            if (t == this
+            if (Objects.equals(t, this)
                 || (same && !isConnectedTo(t))) continue;
             Settlement settlement = t.getSettlement();
             if (settlement != null
@@ -1337,8 +1330,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A vacant {@code Tile} near this one.
      */
     public Tile getSafeTile(Player player, Random random) {
-        if ((getFirstUnit() == null || getFirstUnit().getOwner() == player)
-            && (!hasSettlement() || getSettlement().getOwner() == player)) {
+        if ((getFirstUnit() == null || Objects.equals(getFirstUnit().getOwner(), player))
+            && (!hasSettlement() || Objects.equals(getSettlement().getOwner(), player))) {
             return this;
         }
 
@@ -1350,9 +1343,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
             for (Tile t : tiles) {
                 if ((t.getFirstUnit() == null
-                        || t.getFirstUnit().getOwner() == player)
+                        || Objects.equals(t.getFirstUnit().getOwner(), player))
                     && (t.getSettlement() == null
-                        || t.getSettlement().getOwner() == player)) {
+                        || Objects.equals(t.getSettlement().getOwner(), player))) {
                     return t;
                 }
             }
@@ -1557,14 +1550,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                     + t.getPotentialProduction(e.getKey(),
                         spec.getDefaultUnitType(owner))));
             Player tileOwner = t.getOwner();
-            if (owner == tileOwner) {
+            if (Objects.equals(owner, tileOwner)) {
                 if (t.getOwningSettlement() != null) {
                     // we are using newTile
                     ownedBySelf = true;
                 } else {
                     for (Tile ownTile : t.getSurroundingTiles(1)) {
                         Colony colony = ownTile.getColony();
-                        if (colony != null && colony.getOwner() == owner) {
+                        if (colony != null && Objects.equals(colony.getOwner(), owner)) {
                             // newTile can be used from an own colony
                             ownedBySelf = true;
                             break;
@@ -1683,7 +1676,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private int getMaximumPotential(GoodsType goodsType, UnitType unitType,
                                     TileType tileType) {
         float potential = tileType.getPotentialProduction(goodsType, unitType);
-        if (tileType == getType()) { // Handle the resource in the noop case
+        if (Objects.equals(tileType, getType())) { // Handle the resource in the noop case
             Resource resource = (tileItemContainer == null) ? null
                 : tileItemContainer.getResource();
             if (resource != null) {
@@ -1912,7 +1905,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public void cacheUnseen(Player player, Tile copied) {
         if (cachedTiles == null) return;
         for (Player p : transform(getGame().getLiveEuropeanPlayers(player),
-                p -> !p.canSee(this) && getCachedTile(p) == this)) {
+                p -> !p.canSee(this) && Objects.equals(getCachedTile(p), this))) {
             if (copied == null) copied = getTileToCache();
             setCachedTile(p, copied);
         }
@@ -2088,7 +2081,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (getOwningSettlement() != null) {
             owner = getOwningSettlement().getOwner();
         }
-        return (owner != null && unit != null && unit.getOwner() != owner
+        return (owner != null && unit != null && !Objects.equals(unit.getOwner(), owner)
             && unit.getOwner().atWarWith(owner))
             ? find(getUnits(), Unit::isOffensiveUnit)
             : null;
@@ -2185,8 +2178,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
-            return removeTileItem((TileItem)locatable)
-                == locatable;//-til
+            return Objects.equals(removeTileItem((TileItem) locatable), locatable);//-til
 
         } else {
             return super.remove(locatable);
@@ -2502,7 +2494,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Tile t = getCachedTile(p);
                 if (t == null) continue;
 
-                if (t == this && getIndianSettlement() != null) {
+                if (Objects.equals(t, this) && getIndianSettlement() != null) {
                     // Always save client view of native settlements
                     // because of the hidden information.
                     t = getTileToCache();
@@ -2514,9 +2506,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
                 xw.writeAttribute(PLAYER_TAG, p);
 
-                xw.writeAttribute(COPIED_TAG, t != this);
+                xw.writeAttribute(COPIED_TAG, !Objects.equals(t, this));
 
-                if (t != this) {
+                if (!Objects.equals(t, this)) {
                     // Only write copied tiles, with limited scope.
                     FreeColXMLWriter.WriteScope scope = xw.getWriteScope();
                     xw.setWriteScope(FreeColXMLWriter.WriteScope.toClient(p));
@@ -2622,10 +2614,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (getSettlement() != null) {
             Settlement settlement = getSettlement();
             Player owner = settlement.getOwner();
-            if (owner != null && getOwner() != owner) {
+            if (owner != null && !Objects.equals(getOwner(), owner)) {
                 this.owner = owner;
             }
-            if (this.owningSettlement != settlement) {
+            if (!Objects.equals(this.owningSettlement, settlement)) {
                 this.owningSettlement = settlement;
             }
         }

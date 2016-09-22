@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -157,15 +158,15 @@ public class Introspector {
             }
         } else {
             if (argType.isPrimitive()) {
-                if (argType == Integer.TYPE) {
+                if (Objects.equals(argType, Integer.TYPE)) {
                     argType = Integer.class;
-                } else if (argType == Boolean.TYPE) {
+                } else if (Objects.equals(argType, Boolean.TYPE)) {
                     argType = Boolean.class;
-                } else if (argType == Float.TYPE) {
+                } else if (Objects.equals(argType, Float.TYPE)) {
                     argType = Float.class;
-                } else if (argType == Double.TYPE) {
+                } else if (Objects.equals(argType, Double.TYPE)) {
                     argType = Double.class;
-                } else if (argType == Character.TYPE) {
+                } else if (Objects.equals(argType, Character.TYPE)) {
                     argType = Character.class;
                 } else {
                     throw new IllegalArgumentException("Need compatible class for primitive " + argType.getName());
@@ -194,7 +195,7 @@ public class Introspector {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
 
-        if (fieldType == String.class) {
+        if (Objects.equals(fieldType, String.class)) {
             try {
                 return (String) getMethod.invoke(obj);
             } catch (IllegalAccessException | IllegalArgumentException
@@ -251,7 +252,7 @@ public class Introspector {
         Class<?> fieldType = getMethodReturnType(getMethod);
         Method setMethod = getSetMethod(fieldType);
 
-        if (fieldType == String.class) {
+        if (Objects.equals(fieldType, String.class)) {
             try {
                 setMethod.invoke(obj, value);
             } catch (IllegalAccessException | IllegalArgumentException

@@ -21,12 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
@@ -311,7 +306,7 @@ public final class TradeRoutePanel extends FreeColPanel {
         final TradeRoute route = getRoute();
         switch (command) {
         case DEASSIGN:
-            if (this.unit != null && route == this.unit.getTradeRoute()) {
+            if (this.unit != null && Objects.equals(route, this.unit.getTradeRoute())) {
                 igc().clearOrders(this.unit);
             }
             getGUI().removeFromCanvas(this);

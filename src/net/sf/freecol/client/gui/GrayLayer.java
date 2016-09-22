@@ -26,6 +26,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.Objects;
 
 import javax.swing.ImageIcon;
 
@@ -157,7 +158,7 @@ public class GrayLayer extends Component {
      * @param player The {@code Player} for status information.
      */
     public void setPlayer(Player player) {
-        if (this.player == player) return;
+        if (Objects.equals(this.player, player)) return;
         this.player = player;
         repaint();
     }

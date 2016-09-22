@@ -26,6 +26,7 @@ import java.awt.event.MouseListener;
 import javax.swing.TransferHandler;
 
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit;
@@ -88,7 +89,7 @@ public abstract class PortPanel extends FreeColPanel {
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;
-                if (label.getUnit() == unit) {
+                if (Objects.equals(label.getUnit(), unit)) {
                     setSelectedUnitLabel(label);
                     return true;
                 }

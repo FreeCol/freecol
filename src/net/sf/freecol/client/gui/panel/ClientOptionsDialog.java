@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JFrame;
 
@@ -68,7 +69,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
         OptionGroup value = super.getResponse();
         if (value == null) {
             ; // Cancelled
-        } else if (value == resetCookie) {
+        } else if (Objects.equals(value, resetCookie)) {
             load(FreeColDirectories.getBaseClientOptionsFile());
             getOptionUI().updateOption();
             saveDefaultOptions();

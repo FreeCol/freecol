@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -129,7 +130,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
                 ? Utility.localizedLabel(StringTemplate
                     .template("report.continentalCongress.elected")
                     .addStringTemplate("%turn%", turn.getLabel()))
-                : (father == currentFather)
+                : (Objects.equals(father, currentFather))
                 ? Utility.localizedLabel("report.continentalCongress.recruiting")
                 : Utility.localizedLabel("report.continentalCongress.available"));
             if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {

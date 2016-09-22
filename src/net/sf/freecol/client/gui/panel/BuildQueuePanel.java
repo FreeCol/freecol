@@ -31,15 +31,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -212,9 +205,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                 // - no minimum index for the buildable is found
                 if (!(object instanceof BuildableType)
                     || (object instanceof UnitType
-                        && target == BuildQueuePanel.this.buildingList)
+                        && Objects.equals(target, BuildQueuePanel.this.buildingList))
                     || (object instanceof BuildingType
-                        && target == BuildQueuePanel.this.unitList)
+                        && Objects.equals(target, BuildQueuePanel.this.unitList))
                     || getMinimumIndex((BuildableType)object) < 0)
                     return false;
                 queue.add((BuildableType)object);
@@ -222,8 +215,8 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
             // Handle the cases where the BQL is not the target.
             boolean isOrderingQueue = false;
-            if (this.source == bql) {
-                if (target != bql) {
+            if (Objects.equals(this.source, bql)) {
+                if (!Objects.equals(target, bql)) {
                     // Dragging out of build queue => just remove the element.
                     // updateAllLists takes care of the rest.
                     DefaultListModel sourceModel
@@ -238,7 +231,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             } else {
                 // Can only drag from the Building and Unit lists to
                 // the build queue, so require that to be the target.
-                if (target != bql && target.getParent() != bql) return false;
+                if (!Objects.equals(target, bql) && !Objects.equals(target.getParent(), bql)) return false;
             }
 
             // Now that the BQL is the target, grab its model (fully
@@ -253,7 +246,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             if (isOrderingQueue) {
                 // Find previous position
                 for (int i = 0; i < targetModel.getSize(); i++) {
-                    if (targetModel.getElementAt(i) == queue.get(0)) {
+                    if (Objects.equals(targetModel.getElementAt(i), queue.get(0))) {
                         prevPos = i;
                         break;
                     }
@@ -357,7 +350,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
          */
         @Override
         public int getSourceActions(JComponent comp) {
-            return (comp == BuildQueuePanel.this.unitList) ? COPY : MOVE;
+            return (Objects.equals(comp, BuildQueuePanel.this.unitList)) ? COPY : MOVE;
         }
     }
 
@@ -551,9 +544,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     DefaultListModel<BuildableType> model
                         = (DefaultListModel<BuildableType>)bql.getModel();
                     JList<? extends BuildableType> btl
-                        = (ae.getSource() == BuildQueuePanel.this.unitList)
+                        = (Objects.equals(ae.getSource(), BuildQueuePanel.this.unitList))
                         ? BuildQueuePanel.this.unitList
-                        : (ae.getSource() == BuildQueuePanel.this.buildingList)
+                        : (Objects.equals(ae.getSource(), BuildQueuePanel.this.buildingList))
                         ? BuildQueuePanel.this.buildingList
                         : null;
                     if (btl != null) {
@@ -688,9 +681,9 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      *     null on error.
      */
     private JList<? extends BuildableType> convertJComp(JComponent comp) {
-        return (comp == this.unitList) ? this.unitList
-            : (comp == this.buildQueueList) ? this.buildQueueList
-            : (comp == this.buildingList) ? this.buildingList
+        return (Objects.equals(comp, this.unitList)) ? this.unitList
+            : (Objects.equals(comp, this.buildQueueList)) ? this.buildQueueList
+            : (Objects.equals(comp, this.buildingList)) ? this.buildingList
             : null;
     }
 
@@ -783,7 +776,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             Building colonyBuilding = this.colony.getBuilding(bt);
             BuildingType up = bt.getUpgradesFrom();
             if (up != null && !current.contains(up)
-                && (colonyBuilding == null || colonyBuilding.getType() != up)) {
+                && (colonyBuilding == null || !Objects.equals(colonyBuilding.getType(), up))) {
                 reasons.add(Messages.getName(up));
             }
 
@@ -921,7 +914,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     private boolean hasBuildingType(BuildingType buildingType) {
         if (this.colony.getBuilding(buildingType) == null) {
             return false;
-        } else if (colony.getBuilding(buildingType).getType() == buildingType) {
+        } else if (Objects.equals(colony.getBuilding(buildingType).getType(), buildingType)) {
             return true;
         } else if (buildingType.getUpgradesTo() != null) {
             return hasBuildingType(buildingType.getUpgradesTo());
@@ -956,7 +949,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
                     .getBuilding((BuildingType)buildableType);
             BuildingType buildingType = (building == null) ? null
                 : building.getType();
-            if (buildingType == upgradesFrom) return 0;
+            if (Objects.equals(buildingType, upgradesFrom)) return 0;
             for (int index = 0; index < buildQueue.getSize(); index++) {
                 if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
                     return index + 1;
@@ -982,7 +975,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             // check for building in queue that allows builting this unit
             for (int index = 0; index < buildQueue.getSize(); index++) {
                 BuildableType toBuild = buildQueue.getElementAt(index);
-                if (toBuild == buildableType) continue;
+                if (Objects.equals(toBuild, buildableType)) continue;
                 if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
                     return buildQueueLastPos;
                 }
@@ -1012,7 +1005,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
             for (int index = 0; index < buildQueue.getSize(); index++) {
                 BuildableType toBuild = buildQueue.getElementAt(index);
                 
-                if (toBuild == buildableType) continue;
+                if (Objects.equals(toBuild, buildableType)) continue;
 
                 if (!canBuild && !foundUpgradesFrom
                     && upgradesFrom.equals(toBuild)) {
@@ -1064,7 +1057,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         final String FAIL = "FAIL";
-        if (this.colony.getOwner() == getMyPlayer()) {
+        if (Objects.equals(this.colony.getOwner(), getMyPlayer())) {
             String command = ae.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(this
                     .buildQueueList);
@@ -1106,10 +1099,10 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      */
     @Override
     public void itemStateChanged(ItemEvent event) {
-        if (event.getSource() == this.compactBox) {
+        if (Objects.equals(event.getSource(), this.compactBox)) {
             updateDetailView();
             updateCompact(this.compactBox.isSelected());
-        } else if (event.getSource() == this.showAllBox) {
+        } else if (Objects.equals(event.getSource(), this.showAllBox)) {
             updateAllLists();
             updateLists(this.showAllBox.isSelected());
         }

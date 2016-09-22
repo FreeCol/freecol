@@ -25,6 +25,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -182,7 +183,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         if (startPoint == null) startPoint = endPoint;
         drawBox(component, startPoint, endPoint);
         Tile start = canvas.convertToMapTile(startPoint.x, startPoint.y);
-        Tile end = (startPoint == endPoint) ? start
+        Tile end = (Objects.equals(startPoint, endPoint)) ? start
             : canvas.convertToMapTile(endPoint.x, endPoint.y);
 
         // edit 2 more conditions in if statement.  we need to

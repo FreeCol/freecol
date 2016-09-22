@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -113,7 +114,7 @@ public final class ReportProductionPanel extends ReportPanel {
             final FreeColClient fcc = getFreeColClient();
             final Function<GoodsType, Set<BuildingType>> mapper = gt ->
                 transform(spec.getBuildingTypeList(),
-                          bt -> (gt == bt.getProducedGoodsType()
+                          bt -> (Objects.equals(gt, bt.getProducedGoodsType())
                               || bt.hasModifier(gt.getId())),
                           BuildingType::getFirstLevel, Collectors.toSet());
             List<Set<BuildingType>> basicBuildingTypes

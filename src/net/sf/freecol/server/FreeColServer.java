@@ -25,14 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.function.Predicate;
@@ -1314,7 +1308,7 @@ public final class FreeColServer {
      */
     public ServerPlayer getPlayer(Connection connection) {
         return (ServerPlayer)find(game.getPlayers(),
-            p -> ((ServerPlayer)p).getConnection() == connection);
+            p -> Objects.equals(((ServerPlayer) p).getConnection(), connection));
     }
 
     /**

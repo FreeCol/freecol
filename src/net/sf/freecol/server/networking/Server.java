@@ -25,6 +25,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -183,7 +184,7 @@ public final class Server extends Thread {
     public void sendToAll(DOMMessage message, Connection exceptConnection) {
         Element element = message.toXMLElement();
         for (Connection conn : transform(connections.values(),
-                                         c -> c != exceptConnection)) {
+                                         c -> !Objects.equals(c, exceptConnection))) {
             if (conn.isAlive()) {
                 try {
                     conn.sendAndWait(element);

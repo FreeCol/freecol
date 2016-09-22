@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import javax.xml.stream.XMLStreamException;
@@ -183,7 +184,7 @@ public class Force extends FreeColSpecObject {
         final UnitType unitType = au.getType(spec);
         final int n = au.getNumber();
         final Predicate<AbstractUnit> matchPred = a ->
-            spec.getUnitType(a.getId()) == unitType
+                Objects.equals(spec.getUnitType(a.getId()), unitType)
                 && a.getRoleId().equals(au.getRoleId());
 
         if (unitType.hasAbility(Ability.NAVAL_UNIT)) {

@@ -19,11 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -754,7 +750,7 @@ public class SimpleCombatModel extends CombatModel {
                         done = true;
 
                     } else if (colony.getUnitCount() > 1
-                        || loser.getLocation() == tile) {
+                        || Objects.equals(loser.getLocation(), tile)) {
                         loserMustDie = true;
                         done = false; // Treat as ordinary combat
 

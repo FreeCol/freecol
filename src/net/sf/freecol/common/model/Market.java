@@ -19,10 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -487,7 +484,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (player == getOwner()) ? getOwner().getEurope() : null;
+        return (Objects.equals(player, getOwner())) ? getOwner().getEurope() : null;
     }
 
 

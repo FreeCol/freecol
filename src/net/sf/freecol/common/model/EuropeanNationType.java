@@ -19,9 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -225,7 +223,7 @@ public class EuropeanNationType extends NationType {
         final Specification spec = getSpecification();
         EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);
-        if (parent != this) {
+        if (!Objects.equals(parent, this)) {
             forEachMapEntry(parent.startingUnitMap, e ->
                 startingUnitMap.put(e.getKey(), new HashMap<>(e.getValue())));
         }

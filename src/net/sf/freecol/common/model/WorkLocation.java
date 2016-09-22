@@ -19,11 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
@@ -326,7 +322,7 @@ public abstract class WorkLocation extends UnitLocation
         // would actually improve production.
         final UnitType better = (expert != null) ? expert
             : spec.getDefaultUnitType(owner);
-        if (unit != null && better == unit.getType()) return null;
+        if (unit != null && Objects.equals(better, unit.getType())) return null;
         int delta = getPotentialProduction(goodsType, better);
         if (unit != null) {
             delta -= getPotentialProduction(goodsType, unit.getType());
@@ -564,7 +560,7 @@ public abstract class WorkLocation extends UnitLocation
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit, GoodsType goodsType) {
-        if (unit == null || unit.getWorkType() != goodsType) return 0;
+        if (unit == null || !Objects.equals(unit.getWorkType(), goodsType)) return 0;
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
         return Math.max(0,
@@ -666,7 +662,7 @@ public abstract class WorkLocation extends UnitLocation
      */
     @Override
     public StringTemplate getLocationLabelFor(Player player) {
-        return (getOwner() == player) ? getLocationLabel()
+        return (Objects.equals(getOwner(), player)) ? getLocationLabel()
             : getColony().getLocationLabelFor(player);
     }
 

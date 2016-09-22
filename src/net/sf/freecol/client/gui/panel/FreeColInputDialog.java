@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -99,7 +100,7 @@ public abstract class FreeColInputDialog<T> extends FreeColDialog<T> {
     public T getResponse() {
         if (responded()) {
             Object value = getValue();
-            if (value == this.options.get(0)) return getInputValue();
+            if (Objects.equals(value, this.options.get(0))) return getInputValue();
         }
         return null;
     }

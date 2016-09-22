@@ -27,6 +27,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when making first contact between players.
@@ -154,7 +156,7 @@ public class FirstContactMessage extends DOMMessage {
             return serverPlayer.clientError("Invalid other player: "
                 + this.otherId)
                 .build(serverPlayer);
-        } else if (otherPlayer == serverPlayer) {
+        } else if (Objects.equals(otherPlayer, serverPlayer)) {
             return serverPlayer.clientError("First contact with self!?!")
                 .build(serverPlayer);
         }

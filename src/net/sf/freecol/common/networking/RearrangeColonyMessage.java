@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColObject;
@@ -159,8 +160,8 @@ public class RearrangeColonyMessage extends DOMMessage {
         for (Unit u : workers) {
             Unit su = scratch.getCorresponding(u);
             if (u.getLocation().getId().equals(su.getLocation().getId())
-                && u.getWorkType() == su.getWorkType()
-                && u.getRole() == su.getRole()
+                && Objects.equals(u.getWorkType(), su.getWorkType())
+                && Objects.equals(u.getRole(), su.getRole())
                 && u.getRoleCount() == su.getRoleCount()) continue;
             addChange(u,
                 (Location)colony.getCorresponding((FreeColObject)su.getLocation()),

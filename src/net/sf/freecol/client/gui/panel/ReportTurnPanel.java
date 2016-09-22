@@ -22,11 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -122,7 +118,7 @@ public final class ReportTurnPanel extends ReportPanel {
             switch (groupBy) {
             case ClientOptions.MESSAGES_GROUP_BY_SOURCE:
                 FreeColGameObject messageSource = game.getMessageSource(message);
-                if (messageSource != source) {
+                if (!Objects.equals(messageSource, source)) {
                     source = messageSource;
                     reportPanel.add(getHeadline(messageSource), "newline 20, skip");
                 }

@@ -19,11 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -329,9 +325,9 @@ public class Role extends BuildableType {
         } else if (role2 == null) {
             return false;
         } else {
-            return role1 == role2
-                || role1.getDowngrade() == role2
-                || role2.getDowngrade() == role1;
+            return Objects.equals(role1, role2)
+                || Objects.equals(role1.getDowngrade(), role2)
+                || Objects.equals(role2.getDowngrade(), role1);
         }
     }
 
@@ -352,7 +348,7 @@ public class Role extends BuildableType {
     public static List<AbstractGoods> getGoodsDifference(Role from,
         int fromCount, Role to, int toCount) {
         List<AbstractGoods> result = new ArrayList<>();
-        if (from != to && !(from == null && to.isDefaultRole())) {
+        if (!Objects.equals(from, to) && !(from == null && to.isDefaultRole())) {
             List<AbstractGoods> fromGoods = (from == null)
                 ? new ArrayList<AbstractGoods>()
                 : from.getRequiredGoodsList(fromCount);

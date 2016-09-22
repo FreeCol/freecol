@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -95,7 +96,7 @@ public class ColonyTile extends WorkLocation {
      * @return True if this is the colony center tile.
      */
     public boolean isColonyCenterTile() {
-        return this.workTile == getTile();
+        return Objects.equals(this.workTile, getTile());
     }
 
     /**
@@ -193,7 +194,7 @@ public class ColonyTile extends WorkLocation {
         final Tile tile = getWorkTile();
         final Colony colony = getColony();
         if (tile == null  // Colony has not claimed the tile
-            || tile.getOwningSettlement() != colony // Not our tile
+            || !Objects.equals(tile.getOwningSettlement(), colony) // Not our tile
             || tile.hasTileImprovement(ti)) // Pointless work
             return 0;
 
@@ -362,7 +363,7 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public boolean isCurrent() {
-        return getWorkTile().getOwningSettlement() == getColony();
+        return Objects.equals(getWorkTile().getOwningSettlement(), getColony());
     }
     
     /**
@@ -378,7 +379,7 @@ public class ColonyTile extends WorkLocation {
             : (!getColony().hasAbility(Ability.PRODUCE_IN_WATER)
                 && !tile.isLand())
             ? NoAddReason.MISSING_ABILITY
-            : (tile.getOwningSettlement() == getColony())
+            : (Objects.equals(tile.getOwningSettlement(), getColony()))
             ? NoAddReason.NONE
             : ((claim = getOwner().canClaimForSettlementReason(tile))
                 == NoClaimReason.NONE)

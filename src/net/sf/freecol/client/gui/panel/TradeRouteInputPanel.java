@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -208,7 +209,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
                             .stopListModel.get(stopIndex);
                         List<GoodsType> cargo = new ArrayList<>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
-                            if (cargo.get(index) == label.getType()) {
+                            if (Objects.equals(cargo.get(index), label.getType())) {
                                 cargo.remove(index);
                                 break;
                             }
@@ -312,7 +313,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public Object getTransferData(DataFlavor flavor) {
-            return (flavor == STOP_FLAVOR) ? stops : null;
+            return (Objects.equals(flavor, STOP_FLAVOR)) ? stops : null;
         }
 
         /**
@@ -328,7 +329,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
          */
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return flavor == STOP_FLAVOR;
+            return Objects.equals(flavor, STOP_FLAVOR);
         }
     }
 
@@ -374,7 +375,7 @@ public final class TradeRouteInputPanel extends FreeColPanel
         public boolean importData(JComponent target, Transferable data) {
             JList<TradeRouteStop> stl = TradeRouteInputPanel.this.stopList;
             if (canImport(target, data.getTransferDataFlavors())
-                && target == stl
+                && Objects.equals(target, stl)
                 && data instanceof StopListTransferable) {
                 List<TradeRouteStop> stops
                     = ((StopListTransferable)data).getStops();

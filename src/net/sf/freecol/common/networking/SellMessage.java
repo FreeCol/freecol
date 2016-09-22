@@ -29,6 +29,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when selling at an IndianSettlement.
@@ -135,7 +137,7 @@ public class SellMessage extends DOMMessage {
         }
 
         // Make sure we are trying to sell something that is there
-        if (this.goods.getLocation() != unit) {
+        if (!Objects.equals(this.goods.getLocation(), unit)) {
             return serverPlayer.clientError("Goods " + this.goods.getId()
                 + " is not with unit " + this.unitId)
                 .build(serverPlayer);

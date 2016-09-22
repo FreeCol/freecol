@@ -26,6 +26,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -157,7 +158,7 @@ public final class ProductionLabel extends AbstractGoodsLabel {
         // TODO: make this highly specific hack more generic
         final GoodsType horses = freeColClient.getGame().getSpecification()
             .getGoodsType("model.goods.horses");
-        this.maxIcons = (ag.getType() == horses) ? 1
+        this.maxIcons = (Objects.equals(ag.getType(), horses)) ? 1
             : options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         this.displayNumber = options
             .getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);

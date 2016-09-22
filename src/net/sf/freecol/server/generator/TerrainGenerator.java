@@ -19,12 +19,7 @@
 
 package net.sf.freecol.server.generator;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -473,11 +468,11 @@ public class TerrainGenerator {
         Tile tile = null;
         while ((tile = map.getRandomLandTile(random)) != null) {
             // Can not be high ground already
-            if (tile.getType() != hills && tile.getType() != mountains
+            if (!Objects.equals(tile.getType(), hills) && !Objects.equals(tile.getType(), mountains)
                 
                 // Not too close to a mountain range as this would
                 // defeat the purpose of adding random hills
-                && none(tile.getSurroundingTiles(1, 3), t -> t.getType() == mountains)
+                && none(tile.getSurroundingTiles(1, 3), t -> Objects.equals(t.getType(), mountains))
 
                 // Do not add hills too close to the ocean/lake, as
                 // this helps with good locations for building
@@ -541,7 +536,7 @@ public class TerrainGenerator {
                 counter++;
                 for (Tile neighbour : nextTile.getSurroundingTiles(1)) {
                     if (!neighbour.isLand()
-                        || neighbour.getType() == mountains) continue;
+                        || Objects.equals(neighbour.getType(), mountains)) continue;
                     int r = randomInt(logger, "MSiz", random, 8);
                     if (r == 0) {
                         neighbour.setType(mountains);

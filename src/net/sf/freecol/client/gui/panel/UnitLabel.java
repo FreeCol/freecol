@@ -28,6 +28,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -263,7 +264,7 @@ public final class UnitLabel extends JLabel
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
             setEnabled(true);
-        } else if (unit.getOwner() != player
+        } else if (!Objects.equals(unit.getOwner(), player)
             && unit.getColony() == null) {
             setEnabled(true);
         } else {
@@ -388,9 +389,9 @@ public final class UnitLabel extends JLabel
                 if (!igc.claimTile(colonyTile.getWorkTile(),
                                    unit.getColony())) break;
             }
-            if (colonyTile != unit.getLocation()) igc.work(unit, colonyTile);
+            if (!Objects.equals(colonyTile, unit.getLocation())) igc.work(unit, colonyTile);
             if ((gt = spec.getGoodsType(args[2])) != null
-                && unit.getWorkType() != gt) {
+                && !Objects.equals(unit.getWorkType(), gt)) {
                 igc.changeWorkType(unit, gt);
             }
             break;
@@ -398,9 +399,9 @@ public final class UnitLabel extends JLabel
             if (args.length < 3) break;
             Building building
                 = game.getFreeColGameObject(args[1], Building.class);
-            if (building != unit.getLocation()) igc.work(unit, building);
+            if (!Objects.equals(building, unit.getLocation())) igc.work(unit, building);
             if ((gt = spec.getGoodsType(args[2])) != null
-                && unit.getWorkType() != gt) {
+                && !Objects.equals(unit.getWorkType(), gt)) {
                 igc.changeWorkType(unit, gt);
             }
             break;

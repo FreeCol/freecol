@@ -34,6 +34,8 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 
 /**
  * The message sent when executing a diplomatic trade.
@@ -299,15 +301,15 @@ public class DiplomacyMessage extends DOMMessage {
         } else if (recipientPlayer == null) {
             return serverPlayer.clientError("Null recipient in agreement.")
                 .build(serverPlayer);
-        } else if (senderPlayer != (Player)serverPlayer) {
+        } else if (!Objects.equals(senderPlayer, (Player) serverPlayer)) {
             return serverPlayer.clientError("Sender is not our player: "
                 + senderPlayer.getId())
                 .build(serverPlayer);
-        } else if (recipientPlayer != otherPlayer) {
+        } else if (!Objects.equals(recipientPlayer, otherPlayer)) {
             return serverPlayer.clientError("Recipient is not other player: "
                 + recipientPlayer.getId())
                 .build(serverPlayer);
-        } else if (senderPlayer == refPlayer || recipientPlayer == refPlayer) {
+        } else if (Objects.equals(senderPlayer, refPlayer) || Objects.equals(recipientPlayer, refPlayer)) {
             return serverPlayer.clientError("The REF does not negotiate: "
                 + refPlayer.getId())
                 .build(serverPlayer);

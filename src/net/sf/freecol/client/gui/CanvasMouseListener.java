@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -149,7 +150,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         case MouseEvent.BUTTON2:
             if (tile != null) {
                 Unit unit = canvas.getActiveUnit();
-                if (unit != null && unit.getTile() != tile) {
+                if (unit != null && !Objects.equals(unit.getTile(), tile)) {
                     PathNode dragPath = unit.findPath(tile);
                     canvas.startGoto();
                     canvas.setGotoPath(dragPath);
@@ -202,7 +203,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
         if(canvas.getViewMode() == GUI.MOVE_UNITS_MODE) {
             // Clear goto order when active unit is on the tile
             Unit unit=canvas.getActiveUnit();
-            if(unit != null && unit.getTile() == tile) {
+            if(unit != null && Objects.equals(unit.getTile(), tile)) {
                 igc().clearGotoOrders(unit);
                 canvas.updateCurrentPathForActiveUnit();
             } else {

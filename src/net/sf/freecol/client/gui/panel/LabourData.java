@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
@@ -493,7 +494,7 @@ public class LabourData {
     }
 
     private void incrementOutsideWorker(UnitData expert, Unit unit, UnitData workingAs, LocationData.Getter getter) {
-        if (unit.getType() == workingAs.unitType) {
+        if (Objects.equals(unit.getType(), workingAs.unitType)) {
             getter.getLocationData(expert).workingProfessionals.colonists++;
         } else {
             getter.getLocationData(expert).workingAmateurs++;
@@ -530,7 +531,7 @@ public class LabourData {
         UnitData workingAs = experts.get(currentlyWorking);
         if (workingAs == null) {
             ; // pass
-        } else if (workingAs.getUnitType() == unit.getType()) {
+        } else if (Objects.equals(workingAs.getUnitType(), unit.getType())) {
             colonyData.getWorkingProfessionals().addProduction(production);
         } else {
             colonyData.workingAmateurs++;

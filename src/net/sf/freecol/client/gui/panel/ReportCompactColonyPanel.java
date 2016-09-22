@@ -23,14 +23,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -252,7 +246,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
             final Predicate<Unit> couldWorkPred = u -> {
                 WorkLocation wl = u.getWorkLocation();
                 return wl != null && (wl.getWorkFor(u) == null
-                        || wl.getWorkFor(u) != u.getWorkType());
+                        || !Objects.equals(wl.getWorkFor(u), u.getWorkType()));
             };
             this.couldWork.addAll(transform(this.notWorking, couldWorkPred,
                                             Unit::getType));
@@ -598,9 +592,9 @@ public final class ReportCompactColonyPanel extends ReportPanel
             n = 0;
             boolean center = false; 
             for (TileImprovementSuggestion tis : s.tileSuggestions) {
-                if (tis.tileImprovementType == ti) {
+                if (Objects.equals(tis.tileImprovementType, ti)) {
                     n++;
-                    if (tis.tile == s.colony.getTile()) center = true;
+                    if (Objects.equals(tis.tile, s.colony.getTile())) center = true;
                 }
             }
             if (n > 0) {
@@ -610,8 +604,7 @@ public final class ReportCompactColonyPanel extends ReportPanel
                     if (any(tis.tile.getUnits(),
                             u -> (u.getState() == Unit.UnitState.IMPROVING
                                 && u.getWorkImprovement() != null
-                                && u.getWorkImprovement().getType()
-                                    == tis.tileImprovementType))) {
+                                && Objects.equals(u.getWorkImprovement().getType(), tis.tileImprovementType)))) {
                         c = cWarn; // Work is underway
                     }
                     t = stpld("report.colony.tile." + ti.getSuffix()

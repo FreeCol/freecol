@@ -21,6 +21,7 @@ package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -97,7 +98,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         final FreeColModFile oldValue = this.value;
         this.value = value;
         setId(value.getId());
-        if (isDefined && value != oldValue) {
+        if (isDefined && !Objects.equals(value, oldValue)) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;

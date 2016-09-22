@@ -19,13 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -447,7 +441,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (player == getOwner()) ? this : getTile();
+        return (Objects.equals(player, getOwner())) ? this : getTile();
     }
 
     // Override FreeColObject
@@ -583,7 +577,7 @@ public abstract class Settlement extends GoodsLocation
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Unit) {
             // Tighter ownership test now possible.
-            if (((Unit)locatable).getOwner() != getOwner()) {
+            if (!Objects.equals(((Unit) locatable).getOwner(), getOwner())) {
                 return NoAddReason.OWNED_BY_ENEMY;
             }
         } else if (locatable instanceof Goods) {

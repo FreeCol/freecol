@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
@@ -110,7 +111,7 @@ public class UnitWas implements Comparable<UnitWas> {
 
         FreeColGameObject oldFcgo = (FreeColGameObject)loc;
         FreeColGameObject newFcgo = (FreeColGameObject)newLoc;
-        if (loc != newLoc) {
+        if (!Objects.equals(loc, newLoc)) {
             oldFcgo.firePropertyChange(change(oldFcgo), unit, null);
             if (newLoc != null) {
                 newFcgo.firePropertyChange(change(newFcgo), null, unit);
@@ -118,17 +119,17 @@ public class UnitWas implements Comparable<UnitWas> {
             ret = true;
         }
         if (colony != null) {
-            if (type != newType && newType != null) {
+            if (!Objects.equals(type, newType) && newType != null) {
                 String pc = ColonyChangeEvent.UNIT_TYPE_CHANGE.toString();
                 colony.firePropertyChange(pc, type, newType);
                 ret = true;
-            } else if (role != newRole && newRole != null) {
+            } else if (!Objects.equals(role, newRole) && newRole != null) {
                 String pc = Tile.UNIT_CHANGE;
                 colony.firePropertyChange(pc, role.toString(),
                                           newRole.toString());
                 ret = true;
             }
-            if (work != newWork) {
+            if (!Objects.equals(work, newWork)) {
                 if (work != null && oldFcgo != null && workAmount != 0) {
                     oldFcgo.firePropertyChange(work.getId(), workAmount, 0);
                 }
@@ -143,7 +144,7 @@ public class UnitWas implements Comparable<UnitWas> {
                 ret = true;
             }
         }
-        if (role != newRole && newRole != null) {
+        if (!Objects.equals(role, newRole) && newRole != null) {
             unit.firePropertyChange(Unit.ROLE_CHANGE, role, newRole);
             ret = true;
         } else if (roleCount != newRoleCount && newRoleCount >= 0) {

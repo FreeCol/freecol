@@ -21,6 +21,7 @@ package net.sf.freecol.client.control;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -649,17 +650,17 @@ public final class InGameInputHandler extends ClientInputHandler {
             = new FirstContactMessage(game, element);
 
         final Player player = message.getPlayer(game);
-        if (player == null || player != getMyPlayer()) {
+        if (player == null || !Objects.equals(player, getMyPlayer())) {
             logger.warning("firstContact with bad player: " + player);
             return null;
         }
         final Player other = message.getOtherPlayer(game);
-        if (other == null || other == player || !other.isIndian()) {
+        if (other == null || Objects.equals(other, player) || !other.isIndian()) {
             logger.warning("firstContact with bad other player: " + other);
             return null;
         }
         final Tile tile = message.getTile(game);
-        if (tile != null && tile.getOwner() != other) {
+        if (tile != null && !Objects.equals(tile.getOwner(), other)) {
             logger.warning("firstContact with bad tile: " + tile);
             return null;
         }
@@ -704,7 +705,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         }
         final String highScore = element.getAttribute("highScore");
 
-        if (winner == getMyPlayer()) {
+        if (Objects.equals(winner, getMyPlayer())) {
             invokeLater(() -> { igc().victory(highScore); });
         }
         return null;
@@ -1113,7 +1114,7 @@ public final class InGameInputHandler extends ClientInputHandler {
         boolean visibilityChange = false;
         
         for (FreeColGameObject fcgo : message.getObjects()) {
-            if ((fcgo instanceof Player && (fcgo == player))
+            if ((fcgo instanceof Player && (Objects.equals(fcgo, player)))
                 || ((fcgo instanceof Settlement || fcgo instanceof Unit)
                     && player.owns((Ownable)fcgo))) {
                 visibilityChange = true;//-vis(player)

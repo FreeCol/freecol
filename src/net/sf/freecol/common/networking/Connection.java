@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -374,7 +375,7 @@ public class Connection implements Closeable {
         final String tag = element.getTagName();
         int networkReplyId = this.receivingThread.getNextNetworkReplyId();
 
-        if (Thread.currentThread() == this.receivingThread) {
+        if (Objects.equals(Thread.currentThread(), this.receivingThread)) {
             throw new IOException("wait(ReceivingThread) for: " + tag);
         }
 

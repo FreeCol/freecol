@@ -26,12 +26,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -529,7 +526,7 @@ public class GUI extends FreeColClientHolder {
         Player enemy;
         if (target.hasSettlement()) {
             enemy = target.getSettlement().getOwner();
-        } else if (target == attacker.getTile()) {
+        } else if (Objects.equals(target, attacker.getTile())) {
             // Fortify on tile owned by another nation
             enemy = target.getOwner();
             if (enemy == null) return true;

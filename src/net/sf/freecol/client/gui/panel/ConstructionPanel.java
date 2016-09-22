@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -94,7 +95,7 @@ public class ConstructionPanel extends MigPanel
 
 
     public void setColony(Colony newColony) {
-        if (newColony != colony) {
+        if (!Objects.equals(newColony, colony)) {
             cleanup();
             this.colony = newColony;
             initialize();

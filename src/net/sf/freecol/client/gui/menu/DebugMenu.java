@@ -25,6 +25,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -159,7 +160,7 @@ public class DebugMenu extends JMenu {
         for (Player p : game.getLiveEuropeanPlayerList()) {
             final JRadioButtonMenuItem cv2
                 = Utility.localizedRadioButtonMenuItem(p.getCountryLabel(),
-                    FreeColDebugger.debugDisplayColonyValuePlayer() == p);
+                    Objects.equals(FreeColDebugger.debugDisplayColonyValuePlayer(), p));
             cv2.setOpaque(false);
             //cv2.setMnemonic(KeyEvent.VK_C);
             cvpMenu.add(cv2);

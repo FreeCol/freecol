@@ -21,6 +21,7 @@ package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -147,7 +148,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         final UnitType oldValue = this.value;
         this.value = value;
         
-        if (value != oldValue && isDefined) {
+        if (!Objects.equals(value, oldValue) && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;

@@ -20,6 +20,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -82,7 +83,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
         for (Unit teacher : getUnitList()) {
             Unit student = teacher.getStudent();
 
-            if (student != null && student.getTeacher() != teacher) {
+            if (student != null && !Objects.equals(student.getTeacher(), teacher)) {
                 // Sanitation, make sure we have the proper
                 // teacher/student relation.
                 logger.warning("Bogus teacher/student assignment.");
