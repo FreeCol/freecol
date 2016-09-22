@@ -1943,8 +1943,13 @@ public final class ColonyPanel extends PortPanel
                 for (int y = 0; y < 3; y++) {
                     if (tiles[x][y] == null) continue;
                     ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
-                    ASingleTilePanel aSTP = new ASingleTilePanel(colonyTile,
-                                                                 x, y);
+                    if (colonyTile == null) {
+                        logger.warning("Null colony tile for " + getColony()
+                            + " on " + tiles[x][y] + " at " + x + "," + y);
+                        continue;
+                    }
+                    ASingleTilePanel aSTP
+                        = new ASingleTilePanel(colonyTile, x, y);
                     aSTP.initialize();
                     add(aSTP, Integer.valueOf(layer++));
                 }
@@ -2014,10 +2019,6 @@ public final class ColonyPanel extends PortPanel
              */
             public ASingleTilePanel(ColonyTile colonyTile, int x, int y) {
                 this.colonyTile = colonyTile;
-                if (colonyTile == null) {
-                    logger.warning("Null colony tile for " + getColony()
-                        + " " + x + "," + y);
-                }
 
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);

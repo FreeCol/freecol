@@ -320,6 +320,7 @@ public final class TileViewer extends FreeColClientHolder {
         displayTile(g, tile, overlayImage);
 
         ColonyTile colonyTile = colony.getColonyTile(tile);
+        if (colonyTile == null) return;
         switch (colonyTile.getNoWorkReason()) {
         case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
             break;
