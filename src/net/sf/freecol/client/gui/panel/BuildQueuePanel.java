@@ -908,7 +908,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * Checks whether a specified {@code BuildingType} exists
      *      within a colony
      *
-     * @param buildingType
+     * @param buildingType The {@code BuildingType} to check
      * @return boolean
      */
     private boolean hasBuildingType(BuildingType buildingType) {
