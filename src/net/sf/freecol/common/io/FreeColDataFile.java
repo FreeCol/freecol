@@ -112,8 +112,8 @@ public class FreeColDataFile {
             e.printStackTrace();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading data file.", e);
-            return expected;
         }
+        return expected;
     }
 
     /**
