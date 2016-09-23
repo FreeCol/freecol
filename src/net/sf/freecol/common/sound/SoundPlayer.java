@@ -111,7 +111,7 @@ public class SoundPlayer {
     private void setMixer(MixerWrapper mw) {
         try {
             mixer = AudioSystem.getMixer(mw.getMixerInfo());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "Could not set mixer", e);
             mixer = null;
         }
@@ -263,10 +263,12 @@ public class SoundPlayer {
                 : min + 0.5f * (max - min) * (float)Math.log10(vol);
             try {
                 control.setValue(gain);
-                logger.finest("Using volume " + vol + "%, "
-                    + control.getUnits() + "=" + gain
-                    + " control=" + type);
-            } catch (Exception e) {
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("Using volume " + vol + "%, "
+                        + control.getUnits() + "=" + gain
+                        + " control=" + type);
+                }
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Could not set volume "
                     + " (control=" + type + " in [" + min + "," + max + "])"
                     + " to " + gain + control.getUnits(), e);

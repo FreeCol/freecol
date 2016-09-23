@@ -351,7 +351,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);

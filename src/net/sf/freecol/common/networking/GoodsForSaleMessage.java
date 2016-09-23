@@ -121,7 +121,7 @@ public class GoodsForSaleMessage extends DOMMessage {
         Unit unit;
         try {
             unit = getUnit(player);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -129,7 +129,7 @@ public class GoodsForSaleMessage extends DOMMessage {
         IndianSettlement is;
         try {
             is = getSettlement(unit);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

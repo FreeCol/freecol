@@ -92,7 +92,7 @@ public class AttackMessage extends DOMMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -100,7 +100,7 @@ public class AttackMessage extends DOMMessage {
         Tile tile;
         try {
             tile = unit.getNeighbourTile(this.directionString);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

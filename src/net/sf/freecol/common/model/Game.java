@@ -1101,7 +1101,7 @@ public class Game extends FreeColGameObject {
         if (o == null) {
             try {
                 o = getSpecification().findType(id);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 o = null; // Ignore
             }
         }

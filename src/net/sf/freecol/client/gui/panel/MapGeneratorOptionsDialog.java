@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -194,13 +195,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 mapButton.setToolTipText(properties.getProperty("map.width")
                     + "\u00D7"
                     + properties.getProperty("map.height"));
-            } catch (Exception e) {
+            } catch (IOException|RuntimeException e) {
                 logger.log(Level.WARNING, "Unable to load savegame.", e);
                 return null;
             }
             mapButton.setHorizontalTextPosition(JButton.CENTER);
             mapButton.setVerticalTextPosition(JButton.BOTTOM);
-        } catch (Exception e) {
+        } catch (IOException|RuntimeException e) {
             logger.log(Level.WARNING, "Failed to read thumbnail.", e);
         }
         return mapButton;

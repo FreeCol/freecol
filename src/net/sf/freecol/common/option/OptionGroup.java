@@ -661,7 +661,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         boolean ret = false;
         try {
             ret = this.save(file, null, true);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "Save OptionGroup(" + getId()
                 + ") to " + file.getPath() + " crashed", e);
             return false;

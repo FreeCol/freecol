@@ -403,7 +403,7 @@ final class ReceivingThread extends Thread {
                     disconnect("Unexpected IO failure");
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "Unexpected exception.", e);
         } finally {
             askToStop();

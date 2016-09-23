@@ -505,7 +505,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Enum.valueOf(returnClass,
                                       attrib.toUpperCase(Locale.US));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.warning(attributeName + " is not a "
                     + defaultValue.getClass().getName() + ": " + attrib);
             }

@@ -193,7 +193,7 @@ public class IndianDemandMessage extends DOMMessage {
                         .build(serverPlayer);
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -201,7 +201,7 @@ public class IndianDemandMessage extends DOMMessage {
         Colony colony;
         try {
             colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

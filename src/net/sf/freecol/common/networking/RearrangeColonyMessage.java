@@ -235,7 +235,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         Colony colony;
         try {
             colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

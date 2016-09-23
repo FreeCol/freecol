@@ -357,6 +357,8 @@ public final class Specification {
     private void load(FreeColXMLReader xr) {
         try {
             readFromXML(xr);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException("Error parsing specification", e);
         }

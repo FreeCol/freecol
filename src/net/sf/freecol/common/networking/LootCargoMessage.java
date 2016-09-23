@@ -129,7 +129,7 @@ public class LootCargoMessage extends DOMMessage {
         Unit winner;
         try {
             winner = getUnit(game);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

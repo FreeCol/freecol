@@ -112,7 +112,7 @@ public class NewLandNameMessage extends DOMMessage {
         Unit unit;
         try {
             unit = getUnit(player);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

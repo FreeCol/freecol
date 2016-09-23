@@ -153,7 +153,7 @@ public class FreeColDebugger {
                 DebugMode mode = Enum.valueOf(DebugMode.class,
                                               s.toUpperCase(Locale.US));
                 enableDebugMode(mode);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.warning("Unrecognized debug mode: " + optionValue);
                 return false;
             }
@@ -361,7 +361,9 @@ public class FreeColDebugger {
             fos = new FileOutputStream("/tmp/freecol.debug", true);
             prs = new PrintStream(fos, true, "UTF-8");
             prs.println(msg);
-        } catch (IOException ex) {
+        } catch (FileNotFoundException e) {
+            ; // Ignore failure
+        } catch (UnsupportedEncodingException ex) {
             ; // Ignore failure
         } finally {
             try {

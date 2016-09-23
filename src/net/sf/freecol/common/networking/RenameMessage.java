@@ -91,7 +91,7 @@ public class RenameMessage extends DOMMessage {
         FreeColGameObject fcgo;
         try {
             fcgo = player.getOurFreeColGameObject(this.id, FreeColGameObject.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

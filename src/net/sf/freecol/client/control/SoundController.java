@@ -69,7 +69,7 @@ public class SoundController {
                         //+ "/, volume " + volume.getValue().toString());
                     this.soundPlayer = new SoundPlayer((AudioMixerOption)amo,
                                                        (PercentageOption)vo);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     // #3168279 reports an undocumented NPE thrown by
                     // AudioSystem.getMixer(null).  Workaround this and other
                     // such failures by just disabling sound.

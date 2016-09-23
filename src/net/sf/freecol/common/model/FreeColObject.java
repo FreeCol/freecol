@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -782,8 +783,8 @@ public abstract class FreeColObject
         if (methodName != null && returnClass != null) {
             try {
                 return Introspector.invokeMethod(this, methodName, returnClass);
-            } catch (Exception ex) {
-                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
+            } catch (IllegalAccessException|NoSuchMethodException|InvocationTargetException|RuntimeException e) {
+                logger.log(Level.WARNING, "Invoke failed: " + methodName, e);
             }
         }
         return defaultValue;
@@ -985,6 +986,8 @@ public abstract class FreeColObject
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
         ) {
             ret = xr.copy(game, returnClass);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
         }
@@ -1096,6 +1099,8 @@ public abstract class FreeColObject
 
             xw.writeEndElement();
 
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Partial write failed for "
                        + theClass.getName(), e);
@@ -1207,6 +1212,8 @@ public abstract class FreeColObject
                 Introspector intro = new Introspector(theClass, name);
                 intro.setter(this, xr.getAttributeValue(i));
 
+            } catch (Introspector.IntrospectorException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not set field " + name, e);
             }

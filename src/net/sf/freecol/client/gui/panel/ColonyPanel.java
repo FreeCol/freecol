@@ -1257,7 +1257,7 @@ public final class ColonyPanel extends PortPanel
                 royalistShield.setIcon(new ImageIcon(
                     lib.getSmallerMiscIconImage(other)));
                 add(royalistShield, "bottom");
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
             }
 

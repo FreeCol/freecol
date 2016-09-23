@@ -131,7 +131,7 @@ public class InciteMessage extends DOMMessage {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -139,7 +139,7 @@ public class InciteMessage extends DOMMessage {
         IndianSettlement is;
         try {
             is = getSettlement(unit);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

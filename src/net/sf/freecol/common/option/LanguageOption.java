@@ -216,7 +216,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             try {
                 languages.add(new Language(languageId,
                                            Messages.getLocale(languageId)));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Failed to add: " + languageId, e);
             }
         }

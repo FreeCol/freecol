@@ -199,7 +199,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         setSubcomponentsNotOpaque(this.pane);
         try { // Layout failures might not get logged.
             pack();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "Packing failure", e);
         }
         setLocationRelativeTo(frame);

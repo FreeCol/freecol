@@ -113,7 +113,7 @@ public class SetBuildQueueMessage extends DOMMessage {
         Colony colony;
         try {
             colony = getColony(player);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -125,7 +125,7 @@ public class SetBuildQueueMessage extends DOMMessage {
         List<BuildableType> buildQueue;
         try {
             buildQueue = getQueue(spec);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

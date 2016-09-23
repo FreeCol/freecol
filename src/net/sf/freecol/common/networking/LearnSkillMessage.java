@@ -93,7 +93,7 @@ public class LearnSkillMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -101,7 +101,7 @@ public class LearnSkillMessage extends DOMMessage {
         Tile tile;
         try {
             tile = unit.getNeighbourTile(this.directionString);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

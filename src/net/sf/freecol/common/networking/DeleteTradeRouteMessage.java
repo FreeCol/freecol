@@ -83,7 +83,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
         try {
             tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
                 TradeRoute.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

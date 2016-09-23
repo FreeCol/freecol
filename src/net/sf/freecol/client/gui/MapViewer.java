@@ -1153,7 +1153,7 @@ public final class MapViewer extends FreeColClientHolder {
         } else {
             try {
                 path = activeUnit.findPath(activeUnit.getDestination());
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Path fail", e);
                 path = null;
                 activeUnit.setDestination(null);

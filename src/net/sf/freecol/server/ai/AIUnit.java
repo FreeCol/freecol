@@ -662,7 +662,7 @@ public class AIUnit extends TransportableAIObject {
                 && (direction = tile.getDirection(path.next.getTile())) != null) {
                 try {
                     return leaveTransport(direction);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     logger.log(Level.WARNING, "Leave transport crash for "
                         + this + "/" + unit.getMovesLeft(), e);
                 }

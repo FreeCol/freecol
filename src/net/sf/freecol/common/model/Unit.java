@@ -1495,7 +1495,7 @@ public class Unit extends GoodsLocation
             // doesn't work as expected
             return getGame().getSpecification().getNation(ethnicity)
                 .getType().isIndian();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
     }

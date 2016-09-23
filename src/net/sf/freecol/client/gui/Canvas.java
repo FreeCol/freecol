@@ -592,7 +592,7 @@ public final class Canvas extends JDesktopPane {
 
         try {
             super.add(comp, (i == null) ? JLayeredPane.DEFAULT_LAYER : i);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
                 + ") failed.", e);
         }
@@ -817,13 +817,13 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
                 return null;
             }
-        } catch (Exception e) {}
+        } catch (RuntimeException e) {}
 
         String className = comp.getClass().getName();
         try {
             return new Point(co.getInteger(className + ".x"),
                              co.getInteger(className + ".y"));
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return null;
         }
     }
@@ -842,13 +842,13 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) {
                 return null;
             }
-        } catch (Exception e) {}
+        } catch (RuntimeException e) {}
 
         String className = comp.getClass().getName();
         try {
             return new Dimension(co.getInteger(className + ".w"),
                                  co.getInteger(className + ".h"));
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return null;
         }
     }
@@ -938,7 +938,7 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) return;
-        } catch (Exception e) {}
+        } catch (RuntimeException e) {}
 
         String className = comp.getClass().getName();
         saveInteger(className, ".x", position.x);
@@ -955,7 +955,7 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) return;
-        } catch (Exception e) {}
+        } catch (RuntimeException e) {}
 
         String className = comp.getClass().getName();
         saveInteger(className, ".w", size.width);
@@ -1285,7 +1285,7 @@ public final class Canvas extends JDesktopPane {
             // crashes here deep in the java libraries.
             try {
                 super.remove(comp);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Java crash", e);
             }
         }
@@ -1727,7 +1727,7 @@ public final class Canvas extends JDesktopPane {
         if (panel == null) {
             try {
                 panel = new ColonyPanel(freeColClient, colony);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 try {
                     logger.log(Level.WARNING, "Exception in ColonyPanel for "
                         + colony.getId(), e);
@@ -2622,7 +2622,7 @@ public final class Canvas extends JDesktopPane {
             compact = freeColClient.getClientOptions()
                 .getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             compact = false;
         }
         ReportPanel r = (compact)

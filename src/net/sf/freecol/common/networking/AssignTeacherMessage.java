@@ -91,7 +91,7 @@ public class AssignTeacherMessage extends DOMMessage {
         Unit student;
         try {
             student = player.getOurFreeColGameObject(this.studentId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -99,7 +99,7 @@ public class AssignTeacherMessage extends DOMMessage {
         Unit teacher;
         try {
             teacher = player.getOurFreeColGameObject(this.teacherId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

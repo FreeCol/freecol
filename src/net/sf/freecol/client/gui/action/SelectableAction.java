@@ -64,7 +64,7 @@ public abstract class SelectableAction extends MapboardAction {
         if (co != null && optionId != null) {
             try {
                 return co.getBoolean(optionId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.log(Level.WARNING, "Failure with option: " + optionId, e);
             }
         }

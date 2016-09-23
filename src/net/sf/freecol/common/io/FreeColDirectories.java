@@ -482,7 +482,7 @@ public class FreeColDirectories {
         } else {
             try {
                 ret = file.mkdir();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 ret = false;
                 System.err.println("Could not make directory " + file.getPath()
                     + ": " + e.getMessage());

@@ -103,7 +103,7 @@ public class EmbarkMessage extends DOMMessage {
         ServerUnit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -111,7 +111,7 @@ public class EmbarkMessage extends DOMMessage {
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -141,7 +141,7 @@ public class EmbarkMessage extends DOMMessage {
             Tile destinationTile = null;
             try {
                 destinationTile = unit.getNeighbourTile(this.directionString);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 return serverPlayer.clientError(e.getMessage())
                     .build(serverPlayer);
             }

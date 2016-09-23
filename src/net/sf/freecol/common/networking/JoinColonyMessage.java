@@ -90,7 +90,7 @@ public class JoinColonyMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -98,7 +98,7 @@ public class JoinColonyMessage extends DOMMessage {
         Colony colony;
         try {
             colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

@@ -211,7 +211,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 logger.warning("Unknown message type: " + tag);
                 break;
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "AI input handler for " + serverPlayer
                 + " caught error handling " + tag, e);
         }
@@ -508,7 +508,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 public void run() {
                     try {
                         getAIPlayer().startWorking();
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         logger.log(Level.SEVERE, "AI player failed while working!", e);
                     }
                     AIMessage.askEndTurn(getAIPlayer());

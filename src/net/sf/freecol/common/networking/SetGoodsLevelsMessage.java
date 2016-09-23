@@ -90,7 +90,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(this.colonyId,
                                                     Colony.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

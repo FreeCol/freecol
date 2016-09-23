@@ -2349,7 +2349,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }

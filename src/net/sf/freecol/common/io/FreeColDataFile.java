@@ -108,6 +108,8 @@ public class FreeColDataFile {
                 name = en.substring(0, index + 1);
             }
             return name;
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while reading data file.", e);
             return expected;

@@ -92,7 +92,7 @@ public class WorkMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

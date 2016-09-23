@@ -117,7 +117,7 @@ public class Introspector {
 
         try {
             ret = method.getReturnType();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new IntrospectorException(theClass.getName()
                 + "." + method.getName() + " return type.", e);
         }

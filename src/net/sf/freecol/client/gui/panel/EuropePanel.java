@@ -40,6 +40,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -490,7 +491,7 @@ public final class EuropePanel extends PortPanel {
             try {
                 if (doc.getLength() > 0) text = "\n\n" + text;
                 doc.insertString(doc.getLength(), text, null);
-            } catch (Exception e) {
+            } catch (BadLocationException e) {
                 logger.log(Level.WARNING, "Transaction log update failure", e);
             }
         }

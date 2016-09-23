@@ -83,7 +83,7 @@ public class DisembarkMessage extends DOMMessage {
         ServerUnit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

@@ -26,6 +26,7 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -111,6 +112,9 @@ public class ImageResource extends Resource
                 return image;
             logger.log(Level.WARNING, "Failed to load image from: "
                 + uri);
+        } catch (MalformedURLException e) {
+            logger.log(Level.WARNING, "URL is incorrect: "
+                    + uri, e);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to load image from: "
                 + uri, e);

@@ -89,7 +89,7 @@ public class SetDestinationMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(this.unitId,
                                                         Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

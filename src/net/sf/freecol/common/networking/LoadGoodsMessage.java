@@ -116,7 +116,7 @@ public class LoadGoodsMessage extends DOMMessage {
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

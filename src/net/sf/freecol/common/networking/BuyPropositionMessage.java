@@ -124,7 +124,7 @@ public class BuyPropositionMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -138,7 +138,7 @@ public class BuyPropositionMessage extends DOMMessage {
         try {
             is = unit.getAdjacentSettlement(this.settlementId,
                                             IndianSettlement.class);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }

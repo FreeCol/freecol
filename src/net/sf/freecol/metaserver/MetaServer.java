@@ -112,7 +112,7 @@ public final class MetaServer extends Thread {
             public void run() {
                 try {
                     mr.removeDeadServers();
-                } catch (Exception ex) {
+                } catch (RuntimeException ex) {
                     logger.log(Level.WARNING, "Could not remove servers.", ex);
                 }
             }
