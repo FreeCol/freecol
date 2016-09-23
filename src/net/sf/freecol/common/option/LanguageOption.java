@@ -205,7 +205,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             String languageId
                 = nam.substring(Messages.MESSAGE_FILE_PREFIX.length(),
                     nam.length() - Messages.MESSAGE_FILE_SUFFIX.length());
-            if ("".equals(languageId)) { // FreeColMessages.properties
+            if (languageId != null && languageId.isEmpty()) { // FreeColMessages.properties
                 languageId = "en";
             } else if ("_qqq".equals(languageId)) { // qqq is explanations only
                 continue;
