@@ -38,7 +38,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 public abstract class AIObject extends FreeColObject {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
+    private static final Logger logger = Logger.getLogger(AIObject.class.getName());
 
     /** The AI this object exists within. */
     private final AIMain aiMain;

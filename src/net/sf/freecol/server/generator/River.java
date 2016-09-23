@@ -41,7 +41,7 @@ import static net.sf.freecol.common.util.RandomUtils.*;
  */
 public class River {
 
-    private static final Logger logger = Logger.getLogger(SimpleMapGenerator.class.getName());
+    private static final Logger logger = Logger.getLogger(River.class.getName());
 
     private final TileImprovementType riverType;
 
