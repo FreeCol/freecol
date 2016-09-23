@@ -223,7 +223,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      *
      * @see #transform(Tile)
      */
-    public abstract class MapTransform implements IMapTransform {
+    public abstract static class MapTransform implements IMapTransform {
 
         /**
          * A panel with information about this transformation.
