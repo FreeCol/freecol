@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,8 +33,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Direction;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
@@ -1127,7 +1125,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             t.addStringTemplate("%location%",
                 StringTemplate.key("colonyCenter"));
         } else {
-            Direction d = getMap().getDirection(ct, this);
+            Direction d = Map.getDirection(ct, this);
             if (d == null) return null;
             t.addNamed("%location%", d);
         }
@@ -1163,7 +1161,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     if the other tile is not a neighbour.
      */
     public Direction getDirection(Tile tile) {
-        return getMap().getDirection(this, tile);
+        return Map.getDirection(this, tile);
     }
 
     /**
@@ -2129,8 +2127,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A {@code StringTemplate} stating that the location
      *     is nearby.
      */
-    public StringTemplate getNearLocationLabel(Direction direction,
-                                               StringTemplate location) {
+    public static StringTemplate getNearLocationLabel(Direction direction,
+                                                      StringTemplate location) {
         return StringTemplate.template("model.tile.nearLocation")
             .addNamed("%direction%", direction)
             .addStringTemplate("%location%", location);

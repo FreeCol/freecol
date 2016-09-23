@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -87,7 +85,6 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
-import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -102,8 +99,6 @@ import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
-import net.sf.freecol.server.ai.ValuedAIObject;
-import net.sf.freecol.server.ai.WorkerWish;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -745,7 +740,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private void bringGifts(LogBuilder lb) {
+    private static void bringGifts(LogBuilder lb) {
         return;
     }
 
@@ -756,7 +751,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private void demandTribute(LogBuilder lb) {
+    private static void demandTribute(LogBuilder lb) {
         return;
     }
 
@@ -870,7 +865,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param oldTarget The old target {@code Location}.
      * @param lb A {@code LogBuilder} to log to.
      */
-    public void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
+    public static void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
         final AIUnit aiCarrier = aiu.getTransport();
         final Mission newMission = aiu.getMission();
         final Location newTarget = (newMission == null) ? null
@@ -898,7 +893,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *     transportable is already aboard a carrier, and there is a
      *     well defined source and destination location.
      */
-    private boolean requestsTransport(TransportableAIObject t) {
+    private static boolean requestsTransport(TransportableAIObject t) {
         return t.getTransport() == null
             && t.getTransportDestination() != null
             && t.getTransportSource() != null
@@ -912,7 +907,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param t The {@code TransportableAIObject} to check.
      * @return True if all is well.
      */
-    private boolean checkTransport(TransportableAIObject t) {
+    private static boolean checkTransport(TransportableAIObject t) {
         AIUnit aiCarrier = t.getTransport();
         if (aiCarrier == null) return false;
         TransportMission tm = aiCarrier.getMission(TransportMission.class);
@@ -1596,8 +1591,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param agreement The {@code DiplomaticTrade} to reset.
      * @return The {@code TradeStatus} for the agreement.
      */
-    private TradeStatus rejectAgreement(TradeItem stance,
-                                        DiplomaticTrade agreement) {
+    private static TradeStatus rejectAgreement(TradeItem stance,
+                                               DiplomaticTrade agreement) {
         if (stance == null) return TradeStatus.REJECT_TRADE;
         
         agreement.clear();

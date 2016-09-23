@@ -132,7 +132,7 @@ public class Introspector {
      * @return A conversion function, or null on error.
      * @exception NoSuchMethodException if no converter is found.
      */
-    private Method getToStringConverter(Class<?> argType)
+    private static Method getToStringConverter(Class<?> argType)
         throws NoSuchMethodException {
         return (argType.isEnum()) ? argType.getMethod("name")
             : String.class.getMethod("valueOf", argType);
@@ -147,7 +147,7 @@ public class Introspector {
      * @param argType A {@code Class} to find a converter for.
      * @return A conversion function, or null on error.
      */
-    private Method getFromStringConverter(Class<?> argType) {
+    private static Method getFromStringConverter(Class<?> argType) {
         Method method;
 
         if (argType.isEnum()) {

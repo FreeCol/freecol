@@ -181,7 +181,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @param tile The {@code Tile} to attack into.
      * @return True if an attack can be launched.
      */
-    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
+    public static boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
         // Insist the attacker exists.
         if (attacker == null) return false;
 

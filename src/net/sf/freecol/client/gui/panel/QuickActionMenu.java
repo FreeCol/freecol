@@ -22,9 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -261,7 +259,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return true;
     }
 
-    private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
+    private static List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
         final Comparator<JMenuItem> comp
             = Comparator.comparingInt((JMenuItem k) -> map.get(k))
                 .reversed()

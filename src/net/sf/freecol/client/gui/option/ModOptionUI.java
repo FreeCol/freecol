@@ -86,7 +86,7 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
 
         DefaultComboBoxModel<FreeColModFile> model
             = new DefaultComboBoxModel<>();
-        for (FreeColModFile choice : option.getChoices()) {
+        for (FreeColModFile choice : ModOption.getChoices()) {
             model.addElement(choice);
         }
         this.box = new JComboBox<>();

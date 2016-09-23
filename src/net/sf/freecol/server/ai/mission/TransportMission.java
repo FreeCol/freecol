@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
@@ -441,7 +440,7 @@ public class TransportMission extends Mission {
      * @param ts The list of {@code Cargo}s to unwrap.
      * @return The unwrapped list of cargoes.
      */
-    private List<Cargo> unwrapCargoes(List<Cargo> ts) {
+    private static List<Cargo> unwrapCargoes(List<Cargo> ts) {
         for (int i = 0; i < ts.size(); i++) {
             Cargo t = ts.get(i);
             if (t.hasWrapped()) {

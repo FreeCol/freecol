@@ -157,7 +157,7 @@ public final class CornerMapControls extends MapControls {
      * @param canvas The {@code Canvas} to add to.
      * @param component The component to add.
      */
-    private void addToCanvas(Canvas canvas, Component component) {
+    private static void addToCanvas(Canvas canvas, Component component) {
         try {
             canvas.add(component, CONTROLS_LAYER);
         } catch (RuntimeException e) {

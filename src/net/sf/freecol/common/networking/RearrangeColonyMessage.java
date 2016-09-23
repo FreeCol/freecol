@@ -20,7 +20,6 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,23 +96,23 @@ public class RearrangeColonyMessage extends DOMMessage {
             return this;
         }
 
-        public String unitKey(int i) {
+        public static String unitKey(int i) {
             return "x" + i + "unit";
         }
 
-        public String locKey(int i) {
+        public static String locKey(int i) {
             return "x" + i + "loc";
         }
 
-        public String workKey(int i) {
+        public static String workKey(int i) {
             return "x" + i + "work";
         }
 
-        public String roleKey(int i) {
+        public static String roleKey(int i) {
             return "x" + i + "role";
         }
 
-        public String roleCountKey(int i) {
+        public static String roleCountKey(int i) {
             return "x" + i + "count";
         }
 
@@ -282,13 +281,13 @@ public class RearrangeColonyMessage extends DOMMessage {
             FreeColObject.ARRAY_SIZE_TAG, Integer.toString(arrangements.size()));
         int i = 0;
         for (Arrangement uc : arrangements) {
-            result.setAttribute(uc.unitKey(i), uc.unit.getId());
-            result.setAttribute(uc.locKey(i), uc.loc.getId());
+            result.setAttribute(Arrangement.unitKey(i), uc.unit.getId());
+            result.setAttribute(Arrangement.locKey(i), uc.loc.getId());
             if (uc.work != null) {
-                result.setAttribute(uc.workKey(i), uc.work.getId());
+                result.setAttribute(Arrangement.workKey(i), uc.work.getId());
             }
-            result.setAttribute(uc.roleKey(i), uc.role.toString());
-            result.setAttribute(uc.roleCountKey(i), String.valueOf(uc.roleCount));
+            result.setAttribute(Arrangement.roleKey(i), uc.role.toString());
+            result.setAttribute(Arrangement.roleCountKey(i), String.valueOf(uc.roleCount));
             i++;
         }
         return result.toXMLElement();

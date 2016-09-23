@@ -169,7 +169,7 @@ public final class DifficultyDialog extends OptionsDialog
     /**
      * Initialize the XML file filter.
      */
-    private void initializeFilters() {
+    private static void initializeFilters() {
         synchronized (filters) {
             if (filters[0] == null) {
                 String desc = Messages.message("filter.xml");

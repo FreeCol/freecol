@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -182,7 +183,7 @@ public class MonarchActionMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         // Try to resolve the action.
-        return server.getInGameController()
+        return InGameController
             .monarchAction(serverPlayer, action, getResult())
             .build(serverPlayer);
     }

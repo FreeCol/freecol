@@ -92,7 +92,7 @@ public class SoundPlayer {
             // sound system.  It was buggy and appears to be
             // unmaintained since 2009.  So now for ogg we have our
             // own jorbis-based decoder.
-            in = new OggVorbisDecoderFactory().getOggStream(file);
+            in = OggVorbisDecoderFactory.getOggStream(file);
         } else {
             in = AudioSystem.getAudioInputStream(file);
         }

@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.Comparator;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -95,7 +94,7 @@ public class ReportPanel extends FreeColPanel {
         reportPanel.doLayout();
     }
 
-    private Border createBorder() {
+    private static Border createBorder() {
         return new EmptyBorder(20, 20, 20, 20);
     }
 
@@ -114,7 +113,7 @@ public class ReportPanel extends FreeColPanel {
         return unitLabel;
     }
 
-    protected String getLocationLabelFor(Unit unit) {
+    protected static String getLocationLabelFor(Unit unit) {
         if (unit.getDestination() instanceof Map) {
             return Messages.message("sailingToAmerica");
         } else if (unit.getDestination() instanceof Europe) {

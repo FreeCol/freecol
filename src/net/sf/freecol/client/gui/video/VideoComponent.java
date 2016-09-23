@@ -95,7 +95,7 @@ public class VideoComponent extends JPanel {
     }
 
 
-    private Border createBorder() {
+    private static Border createBorder() {
         return FreeColImageBorder.imageBorder;
     }
 

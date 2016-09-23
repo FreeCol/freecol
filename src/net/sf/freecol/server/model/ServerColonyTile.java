@@ -78,8 +78,8 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
      * @return The {@code Resource} if it is exhausted by this
      *     call (so it can be used in a message), otherwise null.
      */
-    private Resource expendResource(Tile tile, GoodsType goodsType,
-                                    UnitType unitType) {
+    private static Resource expendResource(Tile tile, GoodsType goodsType,
+                                           UnitType unitType) {
         if (!tile.hasResource()) return null;
 
         Resource resource = tile.getResource();

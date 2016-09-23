@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -83,7 +84,7 @@ public class PayArrearsMessage extends DOMMessage {
             .getGoodsType(this.goodsTypeId);
 
         // Proceed to pay.
-        return server.getInGameController()
+        return InGameController
             .payArrears(serverPlayer, goodsType)
             .build(serverPlayer);
     }

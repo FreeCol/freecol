@@ -360,7 +360,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param index The index to test.
      * @return True if the index is in range.
      */
-    private boolean validWantedGoodsIndex(int index) {
+    private static boolean validWantedGoodsIndex(int index) {
         return 0 <= index && index < WANTED_GOODS_COUNT;
     }
     
@@ -924,7 +924,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param type The {@code GoodsType} to consider.
      * @return True if the settlement would sell the goods.
      */
-    public boolean willSell(GoodsType type) {
+    public static boolean willSell(GoodsType type) {
         return !type.isTradeGoods();
     }
 

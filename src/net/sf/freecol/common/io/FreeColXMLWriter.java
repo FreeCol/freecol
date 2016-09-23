@@ -197,7 +197,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
      *
      * @return An {@code XMLOutputFactory}.
      */
-    private XMLOutputFactory getFactory() {
+    private static XMLOutputFactory getFactory() {
         return XMLOutputFactory.newInstance();
     }
 

@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -53,7 +54,7 @@ public class ChatAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && !freeColClient.isSinglePlayer()
-            && (!getGUI().isShowingSubPanel() || getGame() != null
+            && (!GUI.isShowingSubPanel() || getGame() != null
                 && !freeColClient.currentPlayerIsMyPlayer());
     }
 

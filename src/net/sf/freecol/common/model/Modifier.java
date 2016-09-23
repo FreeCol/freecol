@@ -498,7 +498,7 @@ public class Modifier extends Feature {
      * @param type The {@code ModifierType}.
      * @return The result of applying the value to the base.
      */
-    private float apply(float base, float value, ModifierType type) {
+    private static float apply(float base, float value, ModifierType type) {
         switch (type) {
         case ADDITIVE:
             return base + value;

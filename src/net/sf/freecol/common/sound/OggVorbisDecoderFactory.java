@@ -455,7 +455,7 @@ public class OggVorbisDecoderFactory {
      * @return A new {@code AudioInputStream} to decode the input.
      * @exception IOException if unable to open the stream.
      */
-    public AudioInputStream getOggStream(File file) throws IOException {
+    public static AudioInputStream getOggStream(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);
         return new OggVorbisAudioInputStream(new OggStream(fis));
     }

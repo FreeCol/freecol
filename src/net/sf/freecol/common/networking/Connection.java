@@ -19,13 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
@@ -35,7 +32,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
@@ -43,13 +39,11 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -307,8 +301,8 @@ public class Connection implements Closeable {
      * @return A new {@code StringWriter} containing the element, or
      *     null if the element could not be transformed.
      */
-    private StringWriter elementToStringWriter(Transformer transformer,
-                                               Element element) {
+    private static StringWriter elementToStringWriter(Transformer transformer,
+                                                      Element element) {
         StringWriter sw = new StringWriter(BUFFER_SIZE);
         DOMSource source = new DOMSource(element);
         try {

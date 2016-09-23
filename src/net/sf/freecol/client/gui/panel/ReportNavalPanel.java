@@ -56,7 +56,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
             && unitType.isAvailableTo(getMyPlayer());
     }
 
-    private boolean reportable(Unit unit) {
+    private static boolean reportable(Unit unit) {
         return unit.isNaval();
     }
 

@@ -48,7 +48,7 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     public LanguageOptionUI(final LanguageOption option, boolean editable) {
         super(option, editable);
 
-        Language[] languages = option.getChoices().toArray(new Language[0]);
+        Language[] languages = LanguageOption.getChoices().toArray(new Language[0]);
         box.setModel(new DefaultComboBoxModel<>(languages));
         box.setSelectedItem(option.getValue());
         box.setRenderer(new FreeColComboBoxRenderer<Language>("", false));

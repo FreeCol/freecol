@@ -22,7 +22,6 @@ package net.sf.freecol.common.option;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -230,7 +229,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * @param key The key to search for.
      * @return The corresponding language, or null if none found.
      */
-    private Language getLanguage(String key) {
+    private static Language getLanguage(String key) {
         return find(languages, l -> key.equals(l.getKey()));
     }
 
@@ -239,7 +238,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      *
      * @return A list of the available languages.
      */
-    public List<Language> getChoices() {
+    public static List<Language> getChoices() {
         return new ArrayList<>(languages);
     }
 

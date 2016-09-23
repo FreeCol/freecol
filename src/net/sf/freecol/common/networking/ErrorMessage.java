@@ -142,8 +142,8 @@ public class ErrorMessage extends DOMMessage {
      *
      * @return Null.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public static Element handle(FreeColServer server, Player player,
+                                 Connection connection) {
         // Not needed, error messages are only sent by the server
         return null;
     }

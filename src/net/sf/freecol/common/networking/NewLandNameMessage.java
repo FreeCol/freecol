@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -134,7 +135,7 @@ public class NewLandNameMessage extends DOMMessage {
         }
 
         // Set name.
-        return server.getInGameController()
+        return InGameController
             .setNewLandName(serverPlayer, unit, this.newLandName)
             .build(serverPlayer);
     }

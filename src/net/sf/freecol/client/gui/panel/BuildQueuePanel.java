@@ -32,7 +32,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +70,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Named;
@@ -923,7 +921,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
         }
     }
 
-    private List<BuildableType> getBuildableTypes(JList<? extends BuildableType> list) {
+    private static List<BuildableType> getBuildableTypes(JList<? extends BuildableType> list) {
         List<BuildableType> result = new ArrayList<>();
         if (list == null) return result;
         ListModel<? extends BuildableType> model = list.getModel();

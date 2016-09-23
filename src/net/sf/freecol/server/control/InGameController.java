@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -36,7 +35,6 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -98,7 +96,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -109,7 +106,6 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
-import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
@@ -384,8 +380,8 @@ public final class InGameController extends Controller {
      * @param amount The amount of goods to move.
      * @param dst The new {@code GoodsLocation}.
      */
-    private void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
-                           GoodsLocation dst) {
+    private static void moveGoods(GoodsLocation src, GoodsType goodsType, int amount,
+                                  GoodsLocation dst) {
         src.getGoodsContainer().saveState();
         src.removeGoods(goodsType, amount);
         if (dst != null) {
@@ -430,8 +426,8 @@ public final class InGameController extends Controller {
      * @param teleport If true, teleport the REF in.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csLaunchREF(ServerPlayer serverPlayer, boolean teleport,
-                             ChangeSet cs) {
+    private static void csLaunchREF(ServerPlayer serverPlayer, boolean teleport,
+                                    ChangeSet cs) {
         // Set the REF player entry location from the rebels.  Note
         // that the REF units will have their own unit-specific entry
         // locations set by their missions.  This just flags that the
@@ -539,7 +535,7 @@ public final class InGameController extends Controller {
         cs.add(See.only(independent), independent.exploreMap(true));
     }
 
-    private StringTemplate unitTemplate(String base, List<Unit> units) {
+    private static StringTemplate unitTemplate(String base, List<Unit> units) {
         StringTemplate template = StringTemplate.label(base);
         for (Unit u : units) {
             template.addStringTemplate(u.getLabel(Unit.UnitLabelType.PLAIN));
@@ -1064,8 +1060,8 @@ public final class InGameController extends Controller {
      * @param teacher The teacher {@code Unit}.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet assignTeacher(ServerPlayer serverPlayer, Unit student,
-                                   Unit teacher) {
+    public static ChangeSet assignTeacher(ServerPlayer serverPlayer, Unit student,
+                                          Unit teacher) {
         Unit oldStudent = teacher.getStudent();
         Unit oldTeacher = student.getTeacher();
 
@@ -1095,8 +1091,8 @@ public final class InGameController extends Controller {
      * @param tradeRoute The {@code TradeRoute} to assign.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
-                                      TradeRoute tradeRoute) {
+    public static ChangeSet assignTradeRoute(ServerPlayer serverPlayer, Unit unit,
+                                             TradeRoute tradeRoute) {
         // If clearing a trade route and the unit is at sea, set
         // the destination to the next stop.  Otherwise just clear
         // the destination.
@@ -1492,8 +1488,8 @@ public final class InGameController extends Controller {
      * @param type The new {@code GoodsType} to produce.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet changeWorkType(ServerPlayer serverPlayer, Unit unit,
-                                    GoodsType type) {
+    public static ChangeSet changeWorkType(ServerPlayer serverPlayer, Unit unit,
+                                           GoodsType type) {
         if (!Objects.equals(unit.getWorkType(), type)) {
             unit.setExperience(0);
             unit.changeWorkType(type);
@@ -1561,7 +1557,7 @@ public final class InGameController extends Controller {
      * @param unit The {@code Unit} to clear the speciality of.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
+    public static ChangeSet clearSpeciality(ServerPlayer serverPlayer, Unit unit) {
         UnitChange uc = unit.getUnitChange(UnitChangeType.CLEAR_SKILL);
         if (uc == null) {
             return serverPlayer.clientError("Can not clear unit speciality: "
@@ -1877,8 +1873,8 @@ public final class InGameController extends Controller {
      * @param tradeRoute The {@code TradeRoute} to delete.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet deleteTradeRoute(ServerPlayer serverPlayer,
-                                      TradeRoute tradeRoute) {
+    public static ChangeSet deleteTradeRoute(ServerPlayer serverPlayer,
+                                             TradeRoute tradeRoute) {
         List<Unit> dropped = serverPlayer.removeTradeRoute(tradeRoute);
 
         // Trade route change is entirely internal
@@ -2749,7 +2745,7 @@ public final class InGameController extends Controller {
      *
      * @return A list of {@code HighScore}.
      */
-    public List<HighScore> getHighScores() {
+    public static List<HighScore> getHighScores() {
         return HighScore.loadHighScores();
     }
 
@@ -3098,8 +3094,8 @@ public final class InGameController extends Controller {
      * @param result The player response.
      * @return A {@code ChangeSet} containing the response.
      */
-    public ChangeSet monarchAction(ServerPlayer serverPlayer,
-                                   MonarchAction action, boolean result) {
+    public static ChangeSet monarchAction(ServerPlayer serverPlayer,
+                                          MonarchAction action, boolean result) {
         MonarchSession session = Session.lookup(MonarchSession.class,
             serverPlayer.getId(), "");
         if (session == null) {
@@ -3411,7 +3407,7 @@ public final class InGameController extends Controller {
      * @param type The {@code GoodsType} to pay the arrears for.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet payArrears(ServerPlayer serverPlayer, GoodsType type) {
+    public static ChangeSet payArrears(ServerPlayer serverPlayer, GoodsType type) {
         int arrears = serverPlayer.getArrears(type);
         if (arrears <= 0) {
             return serverPlayer.clientError("No arrears for pay for: "
@@ -3498,7 +3494,7 @@ public final class InGameController extends Controller {
      * @param unit The {@code Unit} to be put out.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
+    public static ChangeSet putOutsideColony(ServerPlayer serverPlayer, Unit unit) {
         Tile tile = unit.getTile();
         Colony colony = unit.getColony();
         if (unit.isInColony()) tile.cacheUnseen();//+til
@@ -3925,8 +3921,8 @@ public final class InGameController extends Controller {
      * @param index The stop index.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet setCurrentStop(ServerPlayer serverPlayer, Unit unit,
-                                    int index) {
+    public static ChangeSet setCurrentStop(ServerPlayer serverPlayer, Unit unit,
+                                           int index) {
         TradeRoute tr = unit.getTradeRoute();
         if (tr == null) {
             return serverPlayer.clientError("Unit has no trade route to set stop for.");
@@ -3950,8 +3946,8 @@ public final class InGameController extends Controller {
      * @param destination The {@code Location} to set as destination.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet setDestination(ServerPlayer serverPlayer, Unit unit,
-                                    Location destination) {
+    public static ChangeSet setDestination(ServerPlayer serverPlayer, Unit unit,
+                                           Location destination) {
         if (unit.getTradeRoute() != null) {
             // Override destination to bring the unit to port.
             if (destination == null && unit.isAtSea()) {
@@ -3974,8 +3970,8 @@ public final class InGameController extends Controller {
      * @param exportData The new {@code ExportData}.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet setGoodsLevels(ServerPlayer serverPlayer, Colony colony,
-                                    ExportData exportData) {
+    public static ChangeSet setGoodsLevels(ServerPlayer serverPlayer, Colony colony,
+                                           ExportData exportData) {
         colony.setExportData(exportData);
         return new ChangeSet().add(See.only(serverPlayer), colony);
     }
@@ -3989,8 +3985,8 @@ public final class InGameController extends Controller {
      * @param name The new land name.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet setNewLandName(ServerPlayer serverPlayer, Unit unit,
-                                    String name) {
+    public static ChangeSet setNewLandName(ServerPlayer serverPlayer, Unit unit,
+                                           String name) {
         ChangeSet cs = new ChangeSet();
 
         // Special case of a welcome from an adjacent native unit,
@@ -4045,8 +4041,8 @@ public final class InGameController extends Controller {
      * @param settlement The {@code Settlement} to spy on.
      * @return A {@code ChangeSet} encapsulating this action.
      */
-    public ChangeSet spySettlement(ServerPlayer serverPlayer, Unit unit,
-                                   Settlement settlement) {
+    public static ChangeSet spySettlement(ServerPlayer serverPlayer, Unit unit,
+                                          Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
         cs.addSpy(See.only(serverPlayer), unit, settlement);

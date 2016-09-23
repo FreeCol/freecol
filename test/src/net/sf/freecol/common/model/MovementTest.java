@@ -158,8 +158,8 @@ public class MovementTest extends FreeColTestCase {
         Tile tile2 = tile1.getNeighbourOrNull(Direction.NE);
         tile1.setExplored(dutch, true);
         tile2.setExplored(dutch, true);
-        assertEquals(Direction.NE, map.getDirection(tile1, tile2));
-        assertEquals(Direction.SW, map.getDirection(tile2, tile1));
+        assertEquals(Direction.NE, Map.getDirection(tile1, tile2));
+        assertEquals(Direction.SW, Map.getDirection(tile2, tile1));
 
         TileImprovement river1 = tile1.addRiver(1, "0101");
         assertTrue(river1.isRiver());

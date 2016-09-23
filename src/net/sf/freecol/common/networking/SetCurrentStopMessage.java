@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -115,7 +116,7 @@ public class SetCurrentStopMessage extends DOMMessage {
         }
 
         // Valid, set.
-        return server.getInGameController()
+        return InGameController
             .setCurrentStop(serverPlayer, serverUnit, count)
             .build(serverPlayer);
     }

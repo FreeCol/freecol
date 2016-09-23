@@ -46,9 +46,9 @@ import net.sf.freecol.client.gui.FreeColFrame;
 public class FreeColMenuTest implements ActionListener, ItemListener {
     JTextArea output;
     JScrollPane scrollPane;
-    final String newline = "\n";
+    static final String newline = "\n";
 
-    public JMenuBar createMenuBar() {
+    public static JMenuBar createMenuBar() {
         JMenuBar menuBar = null;
 
         FreeColClient client = new FreeColClient(null, null);
@@ -105,7 +105,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
     }
 
     // Returns just the class name -- no package info.
-    protected String getClassName(Object o) {
+    protected static String getClassName(Object o) {
         String classString = o.getClass().getName();
         int dotIndex = classString.lastIndexOf('.');
         return classString.substring(dotIndex+1);
@@ -143,7 +143,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
 
         //Create and set up the content pane.
         FreeColMenuTest demo = new FreeColMenuTest();
-        frame.setJMenuBar(demo.createMenuBar());
+        frame.setJMenuBar(FreeColMenuTest.createMenuBar());
         frame.setContentPane(demo.createContentPane());
 
         //Display the window.

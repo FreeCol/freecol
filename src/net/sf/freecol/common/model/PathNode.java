@@ -20,7 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -204,7 +203,7 @@ public class PathNode {
             || previous.getTile() == null
             || getTile() == null) return null;
         Tile prev = previous.getTile();
-        return prev.getMap().getDirection(prev, getTile());
+        return Map.getDirection(prev, getTile());
     }
 
     /**

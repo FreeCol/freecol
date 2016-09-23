@@ -23,7 +23,6 @@ package net.sf.freecol.server.model;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
@@ -647,7 +646,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param tile The {@code Tile} to activate sentries on.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csActivateSentries(Tile tile, ChangeSet cs) {
+    private static void csActivateSentries(Tile tile, ChangeSet cs) {
         for (Unit u : transform(tile.getUnits(),
                                 matchKey(UnitState.SENTRY, Unit::getState))) {
             u.setState(UnitState.ACTIVE);

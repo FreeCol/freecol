@@ -135,14 +135,14 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
         Player.makeContact(incaPlayer, dutchPlayer);
 
-        assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
+        assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", MissionAIPlayer.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
 
         incaPlayer.setTension(dutchPlayer, new Tension(Tension.Level.HATEFUL.getLimit()));
-        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
+        assertTrue("Target should be valid for UnitSeekAndDestroyMission", MissionAIPlayer.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
 
         incaPlayer.setStance(dutchPlayer, Stance.WAR);
         dutchPlayer.setStance(incaPlayer, Stance.WAR);
-        assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
+        assertTrue("Target should be valid for UnitSeekAndDestroyMission", MissionAIPlayer.isTargetValidForSeekAndDestroy(brave, soldier.getTile()));
     }
 
     public void testAssignDefendSettlementMission() {

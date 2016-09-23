@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.logging.Logger;
@@ -32,8 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -3555,7 +3552,7 @@ public class Unit extends GoodsLocation
      *
      * @param feature The {@code Feature} to add.
      */
-    public void addFeature(Feature feature) {
+    public static void addFeature(Feature feature) {
         throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
     }
 
@@ -4397,7 +4394,7 @@ public class Unit extends GoodsLocation
         Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
-        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
+        if (xr.shouldIntern()) Game.checkOwners(this, oldOwner);
 
         UnitType oldUnitType = unitType;
         unitType = xr.getType(spec, UNIT_TYPE_TAG,

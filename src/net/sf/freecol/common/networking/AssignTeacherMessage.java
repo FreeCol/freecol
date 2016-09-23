@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -131,7 +132,7 @@ public class AssignTeacherMessage extends DOMMessage {
         }
 
         // Proceed to assign.
-        return server.getInGameController()
+        return InGameController
             .assignTeacher(serverPlayer, student, teacher)
             .build(serverPlayer);
     }

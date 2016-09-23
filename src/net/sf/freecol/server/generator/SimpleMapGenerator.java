@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
@@ -41,7 +40,6 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -59,7 +57,6 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -67,7 +64,6 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -622,7 +618,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param tile The {@code Tile} to examine.
      * @return True if this tile is suitable.
      */
-    private boolean suitableForNativeSettlement(Tile tile) {
+    private static boolean suitableForNativeSettlement(Tile tile) {
         if (!tile.getType().canSettle()) return false;
         int good = 0, n = 0;
         for (Tile t : tile.getSurroundingTiles(1)) {
@@ -662,8 +658,8 @@ public class SimpleMapGenerator implements MapGenerator {
      * @param territories The list of {@code Territory}s to choose from.
      * @return The closest {@code Territory} found, or null if none.
      */
-    private Territory getClosestTerritory(final Tile tile,
-                                          List<Territory> territories) {
+    private static Territory getClosestTerritory(final Tile tile,
+                                                 List<Territory> territories) {
         final Map map = tile.getMap();
         final Comparator<Territory> comp = Comparator.comparingInt(t ->
             map.getDistance(tile, t.getCenterTile(map)));
@@ -906,8 +902,8 @@ public class SimpleMapGenerator implements MapGenerator {
         }
     }
 
-    private Tile findTileFor(Map map, int row, int start, boolean startAtSea,
-                             LogBuilder lb) {
+    private static Tile findTileFor(Map map, int row, int start, boolean startAtSea,
+                                    LogBuilder lb) {
         Tile tile = null;
         Tile seas = null;
         int offset = (start == 0) ? 1 : -1;

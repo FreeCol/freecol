@@ -52,7 +52,7 @@ public class DefendSettlementMission extends Mission {
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
     /** The tag for this mission. */
-    private final String tag = "AI defender";
+    private static final String tag = "AI defender";
 
     // FIXME: This is unused, delete?
     /** Maximum number of turns to travel to the settlement. */

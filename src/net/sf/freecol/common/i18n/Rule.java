@@ -85,7 +85,7 @@ public class Rule {
         conditions.add(parseCondition(tokens));
     }
 
-    private List<Relation> parseCondition(List<String> input) {
+    private static List<Relation> parseCondition(List<String> input) {
         List<String> tokens = new ArrayList<>();
         List<Relation> result = new ArrayList<>();
         for (String token : input) {

@@ -87,8 +87,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if no defender is provided.
      */
-    public boolean combatIsAttackMeasurement(FreeColGameObject attacker,
-                                             FreeColGameObject defender) {
+    public static boolean combatIsAttackMeasurement(FreeColGameObject attacker,
+                                                    FreeColGameObject defender) {
         return attacker instanceof Unit && defender == null;
     }
 
@@ -99,8 +99,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if no attacker is provided.
      */
-    public boolean combatIsDefenceMeasurement(FreeColGameObject attacker,
-                                              FreeColGameObject defender) {
+    public static boolean combatIsDefenceMeasurement(FreeColGameObject attacker,
+                                                     FreeColGameObject defender) {
         return attacker == null && defender instanceof Unit;
     }
 
@@ -111,8 +111,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if the combat is a normal attack.
      */
-    public boolean combatIsAttack(FreeColGameObject attacker,
-                                  FreeColGameObject defender) {
+    public static boolean combatIsAttack(FreeColGameObject attacker,
+                                         FreeColGameObject defender) {
         return attacker instanceof Unit && defender instanceof Unit;
     }
 
@@ -126,8 +126,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if the combat is a client-side attack on a settlement.
      */
-    public boolean combatIsSettlementAttack(FreeColGameObject attacker,
-                                            FreeColGameObject defender) {
+    public static boolean combatIsSettlementAttack(FreeColGameObject attacker,
+                                                   FreeColGameObject defender) {
         return attacker instanceof Unit && defender instanceof Settlement;
     }
 
@@ -138,8 +138,8 @@ public abstract class CombatModel {
      * @param defender The defender.
      * @return True if the combat is a bombardment.
      */
-    public boolean combatIsBombard(FreeColGameObject attacker,
-                                   FreeColGameObject defender) {
+    public static boolean combatIsBombard(FreeColGameObject attacker,
+                                          FreeColGameObject defender) {
         return attacker instanceof Settlement && defender instanceof Unit
             && ((Unit)defender).isNaval();
     }
@@ -168,8 +168,8 @@ public abstract class CombatModel {
      * @param defender The defender object.
      * @return True if the attack is a war of independence battle for a colony.
      */
-    public boolean combatIsWarOfIndependence(FreeColGameObject attacker,
-                                             FreeColGameObject defender) {
+    public static boolean combatIsWarOfIndependence(FreeColGameObject attacker,
+                                                    FreeColGameObject defender) {
         if (attacker instanceof Unit
             && defender instanceof Ownable) {
             Player aPlayer = ((Unit)attacker).getOwner();

@@ -40,7 +40,6 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -779,7 +778,7 @@ public final class Canvas extends JDesktopPane {
      *     first parent that is an internal frame.  Returns
      *     {@code null} if no internal frame is found.
      */
-    private JInternalFrame getInternalFrame(final Component c) {
+    private static JInternalFrame getInternalFrame(final Component c) {
         Component temp = c;
 
         while (temp != null && !(temp instanceof JInternalFrame)) {

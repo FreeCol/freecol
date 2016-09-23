@@ -21,7 +21,6 @@ package net.sf.freecol.server.generator;
 
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
@@ -105,7 +104,7 @@ public class TerrainGenerator {
     // Utilities
 
     // FIXME: this might be useful elsewhere, too
-    private int limitToRange(int value, int lower, int upper) {
+    private static int limitToRange(int value, int lower, int upper) {
         return Math.max(lower, Math.min(value, upper));
     }
 
@@ -641,7 +640,7 @@ public class TerrainGenerator {
      * @param lb A {@code LogBuilder} to log to.
      * @return A list of created {@code ServerRegion}s.
      */
-    private List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
+    private static List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.

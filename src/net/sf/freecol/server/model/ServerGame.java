@@ -261,7 +261,7 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @param random A pseudo-random number source.
      */
-    public void randomize(Random random) {
+    public static void randomize(Random random) {
         if (random != null) NameCache.requireCitiesOfCibola(random);
     }
 

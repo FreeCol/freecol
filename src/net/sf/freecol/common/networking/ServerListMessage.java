@@ -157,8 +157,8 @@ public class ServerListMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public static Element handle(FreeColServer server, Player player,
+                                 Connection connection) {
         // Not needed, serverList messages are handled trivially in
         // metaregister.NetworkHandler.
         return null;

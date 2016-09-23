@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -99,7 +100,7 @@ public class SetDestinationMessage extends DOMMessage {
             : game.findFreeColLocation(this.destinationId);
 
         // Set destination
-        return server.getInGameController()
+        return InGameController
             .setDestination(serverPlayer, unit, destination)
             .build(serverPlayer);
     }

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -166,7 +165,7 @@ public class UnitWas implements Comparable<UnitWas> {
     }
 
     // FIXME: fix this non-OO nastiness
-    private String change(FreeColGameObject fcgo) {
+    private static String change(FreeColGameObject fcgo) {
         return (fcgo instanceof Tile) ? Tile.UNIT_CHANGE
             : (fcgo instanceof Europe) ? Europe.UNIT_CHANGE
             : (fcgo instanceof ColonyTile) ? ColonyTile.UNIT_CHANGE
@@ -176,7 +175,7 @@ public class UnitWas implements Comparable<UnitWas> {
     }
 
     // FIXME: fix this non-OO nastiness
-    private int getAmount(Location location, GoodsType goodsType) {
+    private static int getAmount(Location location, GoodsType goodsType) {
         if (goodsType == null) return 0;
         if (location instanceof WorkLocation) {
             ProductionInfo info = ((WorkLocation)location).getProductionInfo();

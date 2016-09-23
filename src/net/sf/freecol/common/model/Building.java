@@ -21,11 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
@@ -227,7 +224,7 @@ public class Building extends WorkLocation
      * @param available The list of available goods to query.
      * @return The goods amount, or zero if none found.
      */
-    private int getAvailable(GoodsType type, List<AbstractGoods> available) {
+    private static int getAvailable(GoodsType type, List<AbstractGoods> available) {
         return AbstractGoods.getCount(type, available);
     }
 

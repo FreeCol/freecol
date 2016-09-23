@@ -84,7 +84,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         panel.add(button2);
 
         cbox.add(super.getJLabel());
-        cbox.setModel(new DefaultComboBoxModel<>(getOption().getChoices()
+        cbox.setModel(new DefaultComboBoxModel<>(AudioMixerOption.getChoices()
                 .toArray(new MixerWrapper[0])));
         reset();
         cbox.setEnabled(editable);

@@ -152,7 +152,7 @@ public class AIMain extends FreeColObject
      * @param fcgo The {@code FreeColGameObject} to test.
      * @return True if a corresponding AI object is needed.
      */
-    private boolean shouldHaveAIObject(FreeColGameObject fcgo) {
+    private static boolean shouldHaveAIObject(FreeColGameObject fcgo) {
         return (fcgo instanceof Colony) ? true
             : (fcgo instanceof Player)  ? ((Player)fcgo).isAI()
             : (fcgo instanceof Unit)    ? true

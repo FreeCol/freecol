@@ -244,7 +244,7 @@ public class River {
      * @param tile A map tile.
      * @return true if the given tile is next to a river, lake or sea.
      */
-    public boolean isNextToWater(Tile tile) {
+    public static boolean isNextToWater(Tile tile) {
         return any(Direction.longSides,
             d -> {
                 Tile t = tile.getNeighbourOrNull(d);

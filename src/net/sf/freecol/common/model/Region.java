@@ -442,7 +442,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param key The key to check.
      * @return A valid key or null if already null or invalid.
      */
-    private String fixRegionKey(String key) {
+    private static String fixRegionKey(String key) {
         if (key == null) return key;
         for (String r : predefinedRegionKeys) {
             if (key.equals(r)) {

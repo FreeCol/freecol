@@ -30,7 +30,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -46,7 +45,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -944,7 +942,7 @@ public class ColonyPlan {
      * @param colony The {@code Colony} the units are working in.
      * @return The unit that was replaced by the expert, or null if none.
      */
-    private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
+    private static Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
         final Role oldRole = expert.getRole();
         final int oldRoleCount = expert.getRoleCount();
         final GoodsType work = expert.getType().getExpertProduction();
@@ -976,8 +974,8 @@ public class ColonyPlan {
      * @return The first plan found that produces the goods type, or null
      *     if none found.
      */
-    private WorkLocationPlan findPlan(GoodsType goodsType,
-                                      List<WorkLocationPlan> plans) {
+    private static WorkLocationPlan findPlan(GoodsType goodsType,
+                                             List<WorkLocationPlan> plans) {
         return find(plans, wlp -> wlp.getGoodsType() == goodsType);
     }
 

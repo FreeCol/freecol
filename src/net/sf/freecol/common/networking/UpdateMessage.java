@@ -91,8 +91,8 @@ public class UpdateMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
-    public Element handle(FreeColServer server, Player player,
-                          Connection connection) {
+    public static Element handle(FreeColServer server, Player player,
+                                 Connection connection) {
         // Only sent by the server to the clients.
         return null;
     }

@@ -178,11 +178,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         paintMap(graphics);
      }
 
-    private Color getMinimapEconomicColor(TileType type) {
+    private static Color getMinimapEconomicColor(TileType type) {
         return ResourceManager.getColor("color.economic.MiniMap." + type.getId());
     }
 
-    private Color getMinimapPoliticsColor(TileType type) {
+    private static Color getMinimapPoliticsColor(TileType type) {
         return ResourceManager.getColor("color.politics.MiniMap." + type.getId());
     }
 

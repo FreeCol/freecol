@@ -24,6 +24,7 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -96,7 +97,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         }
 
         // Proceed to set.
-        return server.getInGameController()
+        return InGameController
             .setGoodsLevels(serverPlayer, colony, this.data)
             .build(serverPlayer);
     }

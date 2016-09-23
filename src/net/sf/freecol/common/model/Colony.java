@@ -26,15 +26,13 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Occupation;
-import net.sf.freecol.common.model.Stance;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -353,9 +351,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return ret;
     }
 
-    private void accumulateChoices(Collection<GoodsType> workTypes,
-                                   Collection<GoodsType> tried,
-                                   List<Collection<GoodsType>> result) {
+    private static void accumulateChoices(Collection<GoodsType> workTypes,
+                                          Collection<GoodsType> tried,
+                                          List<Collection<GoodsType>> result) {
         workTypes.removeAll(tried);
         if (!workTypes.isEmpty()) {
             result.add(workTypes);
@@ -363,9 +361,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         }
     }
 
-    private void accumulateChoice(GoodsType workType,
-                                  Collection<GoodsType> tried,
-                                  List<Collection<GoodsType>> result) {
+    private static void accumulateChoice(GoodsType workType,
+                                         Collection<GoodsType> tried,
+                                         List<Collection<GoodsType>> result) {
         if (workType == null) return;
         accumulateChoices(workType.getEquivalentTypes(), tried, result);
     }

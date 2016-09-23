@@ -377,7 +377,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>>
         }
     }
 
-    private String[] getNumbers(int count) {
+    private static String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);

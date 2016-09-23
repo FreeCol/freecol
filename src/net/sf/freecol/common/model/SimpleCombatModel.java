@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Modifier.ModifierType;
 import net.sf.freecol.common.model.UnitChangeType.UnitChange;
@@ -122,7 +121,7 @@ public class SimpleCombatModel extends CombatModel {
      * @param lb The {@code LogBuilder} to log to.
      * @param modSet A set of {@code Modifiers} to log.
      */   
-    private void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
+    private static void logModifiers(LogBuilder lb, Set<Modifier> modSet) {
         lb.addCollection(" ",
             sort(modSet, Modifier.ascendingModifierIndexComparator));
     }
@@ -286,8 +285,8 @@ public class SimpleCombatModel extends CombatModel {
      * @param attacker The attacker.
      * @param result The set of modifiers to add to.
      */
-    private void addNavalOffensiveModifiers(Unit attacker,
-                                            Set<Modifier> result) {
+    private static void addNavalOffensiveModifiers(Unit attacker,
+                                                   Set<Modifier> result) {
         // Attack bonus
         final Specification spec = attacker.getSpecification();
         result.addAll(toList(spec.getModifiers(Modifier.ATTACK_BONUS)));
@@ -308,8 +307,8 @@ public class SimpleCombatModel extends CombatModel {
      * @param attacker The attacking {@code Unit}.
      * @param result The set of modifiers to add to.
      */
-    private void addPopularSupportBonus(Colony colony, Unit attacker,
-                                        Set<Modifier> result) {
+    private static void addPopularSupportBonus(Colony colony, Unit attacker,
+                                               Set<Modifier> result) {
         int bonus = colony.getSoL();
         if (bonus >= 0) {
             if (attacker.getOwner().isREF()) bonus = 100 - bonus;
@@ -479,8 +478,8 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender {@code Unit}.
      * @param result The set of modifiers to add to.
      */
-    private void addNavalDefensiveModifiers(Unit defender,
-                                            Set<Modifier> result) {
+    private static void addNavalDefensiveModifiers(Unit defender,
+                                                   Set<Modifier> result) {
         final Specification spec = defender.getSpecification();
 
         // Cargo penalty always applies
@@ -872,8 +871,8 @@ public class SimpleCombatModel extends CombatModel {
      * @param defender The defender.
      * @return True if the attack can be an ambush.
      */
-    private boolean isAmbush(FreeColGameObject attacker,
-                             FreeColGameObject defender) {
+    private static boolean isAmbush(FreeColGameObject attacker,
+                                    FreeColGameObject defender) {
         if (attacker instanceof Unit && defender instanceof Unit) {
             Unit attackerUnit = (Unit)attacker;
             Unit defenderUnit = (Unit)defender;

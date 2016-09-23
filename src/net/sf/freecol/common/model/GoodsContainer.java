@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -495,8 +494,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @exception XMLStreamException if there is a problem writing to
      *     the stream.
      */
-    private void writeStorage(FreeColXMLWriter xw, String tag,
-                              Map<GoodsType, Integer> storage) throws XMLStreamException {
+    private static void writeStorage(FreeColXMLWriter xw, String tag,
+                                     Map<GoodsType, Integer> storage) throws XMLStreamException {
         if (storage.isEmpty()) return;
 
         xw.writeStartElement(tag);

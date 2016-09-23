@@ -20,15 +20,13 @@
 package net.sf.freecol.common.model;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Tile;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -291,7 +289,7 @@ public abstract class Settlement extends GoodsLocation
         }
         setOwner(newOwner);//-til,-vis
 
-        getGame().checkOwners(this, oldOwner);
+        Game.checkOwners(this, oldOwner);
 
         for (Tile t : getOwnedTiles()) {
             t.changeOwnership(newOwner, this);//-til
@@ -782,7 +780,7 @@ public abstract class Settlement extends GoodsLocation
         Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
-        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
+        if (xr.shouldIntern()) Game.checkOwners(this, oldOwner);
 
         tile = xr.findFreeColGameObject(game, TILE_TAG,
                                         Tile.class, (Tile)null, true);

@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.FreeColClientHolder;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
@@ -124,7 +123,7 @@ public final class MapEditorController extends FreeColClientHolder {
      * @return A {@code Specification} to use in the map editor.
      * @throws IOException on failure to find the spec.
      */
-    public Specification getDefaultSpecification() throws IOException {
+    public static Specification getDefaultSpecification() throws IOException {
         return FreeCol.loadSpecification(FreeCol.getTCFile(), 
             FreeCol.getAdvantages(), FreeCol.getDifficulty());
     }
@@ -241,7 +240,7 @@ public final class MapEditorController extends FreeColClientHolder {
      *
      * @param game The {@code Game} to add native nations to.
      */
-    public void requireNativeNations(Game game) {
+    public static void requireNativeNations(Game game) {
         final Specification spec = game.getSpecification();
         for (Nation n : spec.getIndianNations()) {
             Player p = game.getPlayerByNation(n);

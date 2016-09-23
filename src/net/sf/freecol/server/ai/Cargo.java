@@ -442,7 +442,7 @@ public class Cargo {
      */
     public Direction getJoinDirection() {
         return (carrier.isInEurope() || plan.cwait == plan.twait) ? null
-            : carrier.getGame().getMap().getDirection(plan.twait.getTile(),
+            : Map.getDirection(plan.twait.getTile(),
                                                       plan.cwait.getTile());
     }
 

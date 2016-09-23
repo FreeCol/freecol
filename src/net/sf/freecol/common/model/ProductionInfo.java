@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -155,8 +154,8 @@ public class ProductionInfo {
         maximumConsumption.add(goods);
     }
 
-    private void append(StringBuilder result, String key,
-                        List<AbstractGoods> list) {
+    private static void append(StringBuilder result, String key,
+                               List<AbstractGoods> list) {
         if (list.isEmpty()) return;
 
         result.append(key).append(": ");

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -65,7 +64,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsTradeItem;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;
@@ -1041,7 +1039,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * @param unit The {@code Unit} that is trading.
      * @return A list of {@code Unit}s.
      */
-    private List<Unit> getUnitUnitList(Unit unit) {
+    private static List<Unit> getUnitUnitList(Unit unit) {
         List<Unit> ul = new ArrayList<>();
         if (unit != null) {
             if (unit.isCarrier()) {

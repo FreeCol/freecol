@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
@@ -493,7 +492,7 @@ public class LabourData {
         }
     }
 
-    private void incrementOutsideWorker(UnitData expert, Unit unit, UnitData workingAs, LocationData.Getter getter) {
+    private static void incrementOutsideWorker(UnitData expert, Unit unit, UnitData workingAs, LocationData.Getter getter) {
         if (Objects.equals(unit.getType(), workingAs.unitType)) {
             getter.getLocationData(expert).workingProfessionals.colonists++;
         } else {

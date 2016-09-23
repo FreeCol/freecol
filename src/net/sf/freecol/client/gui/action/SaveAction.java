@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -53,7 +54,7 @@ public class SaveAction extends FreeColAction {
 
         // In game
         if (!freeColClient.canSaveCurrentGame()) return false;
-        return !getGUI().isShowingSubPanel();
+        return !GUI.isShowingSubPanel();
     }
 
 

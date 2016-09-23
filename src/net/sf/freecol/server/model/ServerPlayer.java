@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -62,7 +61,6 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
@@ -79,7 +77,6 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
@@ -1663,14 +1660,14 @@ outer:  for (Effect effect : effects) {
         return messages;
     }
 
-    public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
+    public static Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
         return (buildings.isEmpty()) ? null
             : getRandomMember(logger, "Select building for effect",
                               buildings, random);
     }
 
-    public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
+    public static Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
         List<Unit> units = transform(colony.getAllUnitsList(),
                                      u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
@@ -2202,8 +2199,8 @@ outer:  for (Effect effect : effects) {
                          Random random,
                          ChangeSet cs) {
         CombatModel combatModel = getGame().getCombatModel();
-        boolean isAttack = combatModel.combatIsAttack(attacker, defender);
-        boolean isBombard = combatModel.combatIsBombard(attacker, defender);
+        boolean isAttack = CombatModel.combatIsAttack(attacker, defender);
+        boolean isBombard = CombatModel.combatIsBombard(attacker, defender);
         Unit attackerUnit = null;
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
@@ -2685,7 +2682,7 @@ outer:  for (Effect effect : effects) {
      * @param loser The {@code Unit} that dies.
      * @return An amount to raise tension by.
      */
-    private int getSlaughterTension(Unit loser) {
+    private static int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
@@ -2710,8 +2707,8 @@ outer:  for (Effect effect : effects) {
      * @param settlement The {@code Settlement} being defended.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csAutoequipUnit(Unit unit, Settlement settlement,
-                                 ChangeSet cs) {
+    private static void csAutoequipUnit(Unit unit, Settlement settlement,
+                                        ChangeSet cs) {
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         cs.addMessage(See.only(player),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -2727,8 +2724,8 @@ outer:  for (Effect effect : effects) {
      * @param is The {@code IndianSettlement} that was attacked.
      * @param cs The {@code ChangeSet} to update.
      */
-    private void csBurnMissions(Unit attacker, IndianSettlement is,
-                                ChangeSet cs) {
+    private static void csBurnMissions(Unit attacker, IndianSettlement is,
+                                       ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationLabel();
         ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
@@ -2772,8 +2769,8 @@ outer:  for (Effect effect : effects) {
      * @param random A pseudo-random number source.
      * @param cs The {@code ChangeSet} to update.
      */
-    private void csCaptureColony(Unit attacker, ServerColony colony,
-                                 Random random, ChangeSet cs) {
+    private static void csCaptureColony(Unit attacker, ServerColony colony,
+                                        Random random, ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
@@ -2939,7 +2936,7 @@ outer:  for (Effect effect : effects) {
      * @param loser A {@code Unit} to capture.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
+    private static void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationLabel();
         StringTemplate loserLocation = loser.getLocation()
@@ -3382,7 +3379,7 @@ outer:  for (Effect effect : effects) {
      * @param defender A naval {@code Unit} that evades the attacker.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
+    private static void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         Location attackerLocation = attacker.getLocation();
@@ -3415,8 +3412,8 @@ outer:  for (Effect effect : effects) {
      * @param defender A naval {@code Unit} that evades the attacker.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csEvadeBombard(Settlement settlement, Unit defender,
-                                ChangeSet cs) {
+    private static void csEvadeBombard(Settlement settlement, Unit defender,
+                                       ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defender.getApparentOwnerName();
@@ -3448,7 +3445,7 @@ outer:  for (Effect effect : effects) {
      * @param loser The losing naval {@code Unit}
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
+    private static void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         List<Goods> capture = loser.getGoodsList();
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
@@ -3468,7 +3465,7 @@ outer:  for (Effect effect : effects) {
      * @param defender The {@code Unit} that defended and loses equipment.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
+    private static void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationLabel();
         Settlement settlement = defender.getSettlement();
@@ -3731,7 +3728,7 @@ outer:  for (Effect effect : effects) {
      * @param winner The {@code Unit} that won and should be promoted.
      * @param cs A {@code ChangeSet} to update.
      */
-    private void csPromoteUnit(Unit winner, ChangeSet cs) {
+    private static void csPromoteUnit(Unit winner, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerLabel = winner.getLabel();
 

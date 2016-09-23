@@ -32,7 +32,6 @@ import java.util.jar.JarOutputStream;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.xml.stream.XMLStreamException;
@@ -57,7 +56,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -231,7 +229,7 @@ public final class FreeColServer {
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
         this.game = new ServerGame(specification);
         this.game.setNationOptions(new NationOptions(specification));
-        this.game.randomize(random);
+        ServerGame.randomize(random);
         
         this.inGameController = new InGameController(this, random);
         this.mapGenerator = new SimpleMapGenerator(game, random);
@@ -1136,7 +1134,7 @@ public final class FreeColServer {
      * @param game The {@code Game} to establish the enemy within.
      * @return The new unknown enemy {@code Player}.
      */
-    private ServerPlayer establishUnknownEnemy(Game game) {
+    private static ServerPlayer establishUnknownEnemy(Game game) {
         final Specification spec = game.getSpecification();
 
         ServerPlayer enemy = new ServerPlayer(game, false,

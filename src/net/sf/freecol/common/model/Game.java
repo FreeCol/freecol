@@ -1024,7 +1024,7 @@ public class Game extends FreeColGameObject {
      * @param oldOwner The previous (possible unchanged) owning
      *     {@code Player}.
      */
-    public void checkOwners(Ownable o, Player oldOwner) {
+    public static void checkOwners(Ownable o, Player oldOwner) {
         Player newOwner = o.getOwner();
         if (Objects.equals(oldOwner, newOwner)) return;
 

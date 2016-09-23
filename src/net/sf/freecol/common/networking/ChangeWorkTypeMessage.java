@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -110,7 +111,7 @@ public class ChangeWorkTypeMessage extends DOMMessage {
         }
 
         // Proceed to changeWorkType.
-        return server.getInGameController()
+        return InGameController
             .changeWorkType(serverPlayer, unit, type)
             .build(serverPlayer);
     }

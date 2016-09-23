@@ -65,7 +65,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
     public boolean shouldBeEnabled() {
         final GUI gui = getGUI();
         return super.shouldBeEnabled()
-            && !(gui == null || gui.isShowingSubPanel());
+            && !(gui == null || GUI.isShowingSubPanel());
     }
     
 

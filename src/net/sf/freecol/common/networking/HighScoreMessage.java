@@ -24,9 +24,8 @@ import java.util.List;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.control.InGameController;
 
 import org.w3c.dom.Element;
 
@@ -102,7 +101,7 @@ public class HighScoreMessage extends DOMMessage {
      * @return An update containing the high scores.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        this.scores.addAll(server.getInGameController().getHighScores());
+        this.scores.addAll(InGameController.getHighScores());
         return this.toXMLElement();
     }
 
