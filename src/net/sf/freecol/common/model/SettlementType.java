@@ -235,7 +235,7 @@ public class SettlementType extends FreeColSpecObjectType {
      * @return The warehouse capacity of this settlement.
      */
     public int getWarehouseCapacity() {
-        return GoodsContainer.CARGO_SIZE * getClaimableRadius();
+        return GoodsContainer.CARGO_SIZE * claimableRadius;
     }
 
     /**

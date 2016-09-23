@@ -53,7 +53,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param index The stop index.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.index = String.valueOf(index);
@@ -67,7 +67,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetCurrentStopMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.index = getStringAttribute(element, INDEX_TAG);
@@ -127,7 +127,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             INDEX_TAG, this.index).toXMLElement();
     }

@@ -79,8 +79,8 @@ public class LabourData {
         private int production;
 
         public void addProduction(int production) {
-            colonists = getColonists() + 1;
-            this.production = this.getProduction() + production;
+            colonists = colonists + 1;
+            this.production = this.production + production;
         }
 
         public int getColonists() {
@@ -209,7 +209,7 @@ public class LabourData {
          * @return the rows to display the unit data
          */
         public int getRowCount() {
-            boolean isSummary = getUnitData().isSummary();
+            boolean isSummary = unitData.isSummary();
 
             int rows = 0;
             if (workingProfessionals.getColonists() > 0) rows++;
@@ -308,16 +308,16 @@ public class LabourData {
         }
 
         public String getUnitName() {
-            return (isSummary()) ? null : Messages.getName(unitType);
+            return (summary) ? null : Messages.getName(unitType);
         }
 
         public boolean hasDetails() {
-            return getTotal().getRowCount() > 0;
+            return total.getRowCount() > 0;
         }
 
         public int getUnitSummaryRowCount() {
             //minimum 1 row to show the unit symbol
-            return Math.max(1, getTotal().getRowCount());
+            return Math.max(1, total.getRowCount());
         }
 
         public UnitType getUnitType() {
@@ -360,7 +360,7 @@ public class LabourData {
             if (summary) {
                 return null;
             }
-            return getUnitType().getExpertProduction();
+            return unitType.getExpertProduction();
         }
     }
 

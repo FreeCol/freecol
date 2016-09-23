@@ -217,8 +217,8 @@ public final class BuildingType extends BuildableType {
      */
     public BuildingType getFirstLevel() {
         BuildingType buildingType = this;
-        while (buildingType.getUpgradesFrom() != null) {
-            buildingType = buildingType.getUpgradesFrom();
+        while (buildingType.upgradesFrom != null) {
+            buildingType = buildingType.upgradesFrom;
         }
         return buildingType;
     }
@@ -229,7 +229,7 @@ public final class BuildingType extends BuildableType {
      * @return True if this building type is automatically built.
      */
     public boolean isAutomaticBuild() {
-        return !needsGoodsToBuild() && getUpgradesFrom() == null;
+        return !needsGoodsToBuild() && upgradesFrom == null;
     }
 
     /**

@@ -1615,7 +1615,7 @@ public final class Specification {
      * Clear all European advantages.  Implements the Advantages==NONE setting.
      */
     public void clearEuropeanNationalAdvantages() {
-        for (Nation n : getEuropeanNations()) {
+        for (Nation n : europeanNations) {
             n.setType(getDefaultNationType());
         }
     }
@@ -1637,7 +1637,7 @@ public final class Specification {
      * @return A stream of available {@code Role}s.
      */
     public Stream<Role> getRoles() {
-        return getRolesList().stream();
+        return this.roles.stream();
     }
 
     /**
@@ -2088,7 +2088,7 @@ public final class Specification {
         // Coronado gained an ability in freecol
         FoundingFather coronado
             = getFoundingFather("model.foundingFather.franciscoDeCoronado");
-        if ("freecol".equals(getId())
+        if ("freecol".equals(id)
             && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
@@ -2270,7 +2270,7 @@ public final class Specification {
         if (first(getAbilities(Ability.AMBUSH_TERRAIN)) == null){
             Ability ambush = new Ability(Ability.AMBUSH_TERRAIN, null, true);
             addAbility(ambush);
-            for (TileType tt : transform(getTileTypeList(), tt ->
+            for (TileType tt : transform(tileTypeList, tt ->
                     ((tt.isElevation() || tt.isForested())
                         && !tt.hasAbility(Ability.AMBUSH_TERRAIN)))) {
                 tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
@@ -2902,7 +2902,7 @@ public final class Specification {
         xw.writeStartElement(getTagName());
 
         // Add attributes
-        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, id);
         if (difficultyLevel != null) {
             xw.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
         }
@@ -3027,7 +3027,7 @@ public final class Specification {
 
             logger.info("Loading unit-change-types backward compatibility fragment: "
                 + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
-                + transform(getUnitChangeTypeList(), alwaysTrue(),
+                + transform(unitChangeTypeList, alwaysTrue(),
                             UnitChangeType::getId, Collectors.joining(" ")));
         }
     }

@@ -595,7 +595,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                     = game.getLocationClass(attrib);
                 if (c != null) {
                     fco = makeFreeColGameObject(game, attributeName, c,
-                        getReadScope() == ReadScope.SERVER);
+                        this.readScope == ReadScope.SERVER);
                 }
             }
             if (fco instanceof Location) return (Location)fco;
@@ -743,7 +743,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
                 T ret = game.newInstance(returnClass,
-                    getReadScope() == ReadScope.SERVER);
+                    this.readScope == ReadScope.SERVER);
                 if (ret == null) {
                     String err = "Failed to create " + returnClass.getName()
                         + " with id: " + id;

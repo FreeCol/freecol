@@ -65,7 +65,7 @@ public class SellMessage extends DOMMessage {
      */
     public SellMessage(Unit unit, IndianSettlement is, Goods goods,
                        int gold) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -81,7 +81,7 @@ public class SellMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SellMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -162,7 +162,7 @@ public class SellMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId,
             GOLD_TAG, this.goldString)

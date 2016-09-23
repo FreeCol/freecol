@@ -45,7 +45,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to update.
      */
     public UpdateTradeRouteMessage(TradeRoute tradeRoute) {
-        super(getTagName());
+        super(TAG);
 
         this.tradeRoute = tradeRoute;
     }
@@ -58,7 +58,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UpdateTradeRouteMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.tradeRoute = getChild(game, element, 0, false, TradeRoute.class);
     }
@@ -86,7 +86,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .add(this.tradeRoute).toXMLElement();
     }
 

@@ -163,7 +163,7 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean canBuy() {
-        return getBuy() && !atWar() && this.unit.getSpaceLeft() > 0;
+        return this.buy && !atWar() && this.unit.getSpaceLeft() > 0;
     }
     
     public void setBuy(boolean buy) {
@@ -175,7 +175,7 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean canSell() {
-        return getSell() && !atWar() && this.unit.hasGoodsCargo();
+        return this.sell && !atWar() && this.unit.hasGoodsCargo();
     }
     
     public void setSell(boolean sell) {
@@ -187,7 +187,7 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean canGift() {
-        return getGift() && this.unit.hasGoodsCargo();
+        return this.gift && this.unit.hasGoodsCargo();
     }
     
     public void setGift(boolean gift) {
@@ -212,7 +212,7 @@ public class NativeTrade extends FreeColGameObject {
     }
 
     public boolean hasNotTraded() {
-        return getBuy() && getSell() && getGift();
+        return this.buy && this.sell && this.gift;
     }
 
     public List<NativeTradeItem> getBuying() {
@@ -248,9 +248,9 @@ public class NativeTrade extends FreeColGameObject {
     public void mergeFromNatives(final NativeTrade nt) {
         if (isCompatible(nt)) {
             this.buying.clear();
-            this.buying.addAll(nt.getBuying());
+            this.buying.addAll(nt.buying);
             this.selling.clear();
-            this.selling.addAll(nt.getSelling());
+            this.selling.addAll(nt.selling);
         }
     }
 
@@ -369,12 +369,12 @@ public class NativeTrade extends FreeColGameObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getTagName())
-            .append(' ').append(getUnit().getId())
-            .append(' ').append(getIndianSettlement().getId())
-            .append(" buy=").append(getBuy())
-            .append(" sell=").append(getSell())
-            .append(" gift=").append(getGift())
-            .append(" count=").append(getCount())
+            .append(' ').append(this.unit.getId())
+            .append(' ').append(this.is.getId())
+            .append(" buy=").append(this.buy)
+            .append(" sell=").append(this.sell)
+            .append(" gift=").append(this.gift)
+            .append(" count=").append(this.count)
             .append(" buying[");
         for (NativeTradeItem nti : this.buying) {
             sb.append(' ').append(nti.toString());

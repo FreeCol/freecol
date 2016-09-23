@@ -53,7 +53,7 @@ public class RenameMessage extends DOMMessage {
      * @param newName The new name for the object.
      */
     public RenameMessage(FreeColGameObject object, String newName) {
-        super(getTagName());
+        super(TAG);
 
         this.id = object.getId();
         this.newName = newName;
@@ -67,7 +67,7 @@ public class RenameMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public RenameMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.id = getStringAttribute(element, NAMEABLE_TAG);
         this.newName = getStringAttribute(element, NAME_TAG);
@@ -113,7 +113,7 @@ public class RenameMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             NAMEABLE_TAG, this.id,
             NAME_TAG, this.newName).toXMLElement();
     }

@@ -183,8 +183,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
-            return getDistance(getX(), getY(),
-                               position.getX(), position.getY());
+            return getDistance(x, y,
+                    position.x, position.y);
         }
 
         /**

@@ -66,7 +66,7 @@ public class NativeTradeMessage extends DOMMessage {
      * @param nt The {@code NativeTrade}
      */
     public NativeTradeMessage(NativeTradeAction action, NativeTrade nt) {
-        super(getTagName());
+        super(TAG);
 
         this.action = action;
         this.nt = nt;
@@ -80,7 +80,7 @@ public class NativeTradeMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NativeTradeMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.action = getEnumAttribute(element, ACTION_TAG,
             NativeTradeAction.class, (NativeTradeAction)null);
@@ -111,7 +111,7 @@ public class NativeTradeMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         return server.getInGameController()
-            .nativeTrade(serverPlayer, getAction(), getNativeTrade())
+            .nativeTrade(serverPlayer, this.action, this.nt)
             .build(serverPlayer);
     }
 
@@ -122,8 +122,8 @@ public class NativeTradeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
-            ACTION_TAG, getAction().toString())
+        return new DOMMessage(TAG,
+            ACTION_TAG, this.action.toString())
             .add(this.nt).toXMLElement();
     }
 

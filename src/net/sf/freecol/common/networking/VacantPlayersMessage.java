@@ -47,7 +47,7 @@ public class VacantPlayersMessage extends DOMMessage {
      * Create a new {@code VacantPlayersMessage}.
      */
     public VacantPlayersMessage() {
-        super(getTagName());
+        super(TAG);
 
         this.vacantPlayers.clear();
     }
@@ -108,7 +108,7 @@ public class VacantPlayersMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .setArrayAttributes(this.vacantPlayers).toXMLElement();
     }
 

@@ -102,7 +102,7 @@ public class AIGoods extends TransportableAIObject {
                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = getGoods() == null;
+        uninitialized = goods == null;
     }
 
 
@@ -195,7 +195,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public Locatable getTransportLocatable() {
-        return getGoods();
+        return goods;
     }
 
     /**
@@ -227,7 +227,9 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
-        if (dst == null) dst = Location.upLoc(getTransportDestination());
+        if (dst == null) {
+            dst = Location.upLoc(this.destination);
+        }
 
         PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
             : (goods.getLocation() instanceof Unit) ? null
@@ -249,7 +251,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(getGoods());
+        return carrier.couldCarry(goods);
     }
 
     /**
@@ -432,7 +434,7 @@ public class AIGoods extends TransportableAIObject {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
 
-        if (getGoods() != null) uninitialized = false;
+        if (goods != null) uninitialized = false;
     }
 
     /**

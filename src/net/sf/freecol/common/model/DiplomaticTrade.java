@@ -204,7 +204,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public StringTemplate getSendMessage(Player player, Settlement settlement) {
         return StringTemplate.template("model.diplomaticTrade.send."
-            + getContext().getKey())
+            + this.context.getKey())
             .addStringTemplate("%nation%",
                 settlement.getOwner().getNationLabel())
             .addStringTemplate("%settlement%",
@@ -220,7 +220,7 @@ public class DiplomaticTrade extends FreeColGameObject {
      */
     public StringTemplate getReceiveMessage(Player player) {
         return StringTemplate.template("model.diplomaticTrade.receive."
-            + getContext().getKey())
+            + this.context.getKey())
             .addStringTemplate("%nation%", player.getNationLabel());
     }
 
@@ -503,13 +503,13 @@ public class DiplomaticTrade extends FreeColGameObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append('[').append(getId())
-            .append(' ').append(getContext())
-            .append(' ').append(getStatus())
-            .append(" from=").append(getSender().getId())
-            .append(" to=").append(getRecipient().getId())
-            .append(" version=").append(getVersion())
+            .append(' ').append(this.context)
+            .append(' ').append(this.status)
+            .append(" from=").append(this.sender.getId())
+            .append(" to=").append(this.recipient.getId())
+            .append(" version=").append(this.version)
             .append(" [");
-        for (TradeItem item : getTradeItems()) sb.append(' ').append(item);
+        for (TradeItem item : this.items) sb.append(' ').append(item);
         sb.append(" ]]");
         return sb.toString();
     }

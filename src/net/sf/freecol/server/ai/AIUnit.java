@@ -346,7 +346,7 @@ public class AIUnit extends TransportableAIObject {
     }
 
     public boolean isAvailableForWork(Colony colony) {
-        Mission m = getMission();
+        Mission m = this.mission;
         return (m == null
             || (m instanceof BuildColonyMission
                 && (Map.isSameLocation(m.getTarget(), colony.getTile())
@@ -368,21 +368,21 @@ public class AIUnit extends TransportableAIObject {
                     .getWorkInsideColonyMission(this, aiColony) == null) {
                 return false; 
             }
-            lb.add(", ", getMission());
+            lb.add(", ", this.mission);
             dropTransport();
         }
         return true;
     }
 
     public boolean tryPioneeringMission(LogBuilder lb) {
-        Mission m = getMission();
+        Mission m = this.mission;
         Location oldTarget = (m == null) ? null : m.getTarget();
         AIPlayer aiPlayer = getAIOwner();
 
         if(aiPlayer instanceof EuropeanAIPlayer) {
             EuropeanAIPlayer euaiPlayer = (EuropeanAIPlayer)getAIOwner();
             if (euaiPlayer.getPioneeringMission(this, null) != null) {
-                lb.add(", ", getMission());
+                lb.add(", ", this.mission);
                 euaiPlayer.updateTransport(this, oldTarget, lb);
                 return true;
             }
@@ -391,7 +391,7 @@ public class AIUnit extends TransportableAIObject {
     }
 
     public boolean trySomeUsefulMission(Colony colony, LogBuilder lb) {
-        Mission m = getMission();
+        Mission m = this.mission;
         if (m instanceof BuildColonyMission
             || m instanceof DefendSettlementMission
             || m instanceof MissionaryMission
@@ -501,7 +501,7 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getBuilderScore() {
-        Unit unit = getUnit();
+        Unit unit = this.unit;
         if (unit == null || BuildColonyMission.invalidReason(this) != null)
             return -1000;
         int ret = (!unit.hasDefaultRole()) ? 0
@@ -517,7 +517,7 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getPioneerScore() {
-        Unit unit = getUnit();
+        Unit unit = this.unit;
         return (unit == null) ? -1000 : unit.getPioneerScore();
     }
 
@@ -527,7 +527,7 @@ public class AIUnit extends TransportableAIObject {
      * @return An integer score.
      */
     public int getScoutScore() {
-        Unit unit = getUnit();
+        Unit unit = this.unit;
         return (unit == null) ? -1000 : unit.getScoutScore();
     }
 
@@ -647,7 +647,7 @@ public class AIUnit extends TransportableAIObject {
         if (tile == null) return false;
 
         // Try to go to the target location.
-        final Mission mission = getMission();
+        final Mission mission = this.mission;
         final Location target = (mission == null || !mission.isValid()) ? null
             : mission.getTarget();
         Direction direction;
@@ -754,7 +754,7 @@ public class AIUnit extends TransportableAIObject {
     public String invalidReason() {
         String reason = Mission.invalidTransportableReason(this);
         return (reason != null) ? reason
-            : (hasMission()) ? getMission().invalidReason()
+            : (hasMission()) ? this.mission.invalidReason()
             : null;
     }
 

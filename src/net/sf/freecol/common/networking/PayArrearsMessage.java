@@ -47,7 +47,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param type The {@code GoodsType} to pay arrears for.
      */
     public PayArrearsMessage(GoodsType type) {
-        super(getTagName());
+        super(TAG);
 
         this.goodsTypeId = type.getId();
     }
@@ -60,7 +60,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PayArrearsMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.goodsTypeId = getStringAttribute(element, GOODS_TYPE_TAG);
     }
@@ -95,7 +95,7 @@ public class PayArrearsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             GOODS_TYPE_TAG, this.goodsTypeId).toXMLElement();
     }
 

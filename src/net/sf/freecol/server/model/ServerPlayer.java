@@ -313,7 +313,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The resulting {@code DOMMessage}.
      */
     public DOMMessage ask(Game game, DOMMessage request) {
-        return (isConnected()) ? this.connection.ask(game, request) : null;
+        return (this.connected) ? this.connection.ask(game, request) : null;
     }
     
     /**
@@ -323,7 +323,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param request An {@code Element} containing the update.
      */
     private void askElement(Element request) {
-        if (!isConnected()) return;
+        if (!this.connected) return;
 
         while (request != null) {
             Element reply;
@@ -2156,7 +2156,7 @@ outer:  for (Effect effect : effects) {
         // Handle migration type specific changes.
         switch (type) {
         case FOUNTAIN:
-            setRemainingEmigrants(getRemainingEmigrants() - 1);
+            setRemainingEmigrants(remainingEmigrants - 1);
             break;
         case RECRUIT:
             modifyGold(-europe.getRecruitPrice());

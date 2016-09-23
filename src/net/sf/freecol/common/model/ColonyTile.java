@@ -191,7 +191,7 @@ public class ColonyTile extends WorkLocation {
      * @return A measure of improvement (negative is a bad idea).
      */
     public int improvedBy(TileImprovementType ti) {
-        final Tile tile = getWorkTile();
+        final Tile tile = workTile;
         final Colony colony = getColony();
         if (tile == null  // Colony has not claimed the tile
             || !Objects.equals(tile.getOwningSettlement(), colony) // Not our tile
@@ -310,8 +310,8 @@ public class ColonyTile extends WorkLocation {
     @Override
     public String toShortString() {
         return getColony().getName()
-            + "-" + getWorkTile().getType().getSuffix()
-            + "-" + getTile().getDirection(getWorkTile());
+            + "-" + workTile.getType().getSuffix()
+            + "-" + getTile().getDirection(workTile);
     }
 
 
@@ -355,7 +355,7 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public boolean isAvailable() {
-        return isCurrent() || getOwner().canClaimForSettlement(getWorkTile());
+        return isCurrent() || getOwner().canClaimForSettlement(workTile);
     }
     
     /**
@@ -363,7 +363,7 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public boolean isCurrent() {
-        return Objects.equals(getWorkTile().getOwningSettlement(), getColony());
+        return Objects.equals(workTile.getOwningSettlement(), getColony());
     }
     
     /**
@@ -371,7 +371,7 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public NoAddReason getNoWorkReason() {
-        Tile tile = getWorkTile();
+        Tile tile = workTile;
         NoClaimReason claim;
 
         return (isColonyCenterTile())
@@ -423,7 +423,7 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
-        final Tile workTile = getWorkTile();
+        final Tile workTile = this.workTile;
         return workTile != null && workTile.canProduce(goodsType, unitType);
     }
 
@@ -433,7 +433,7 @@ public class ColonyTile extends WorkLocation {
     @Override
     public int getBaseProduction(ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
-        Tile tile = getWorkTile();
+        Tile tile = workTile;
         return (tile == null) ? 0
             : tile.getBaseProduction(productionType, goodsType, unitType);
     }
@@ -446,7 +446,7 @@ public class ColonyTile extends WorkLocation {
                                                    UnitType unitType) {
         if (!canProduce(goodsType, unitType)) return Stream.<Modifier>empty();
 
-        final Tile workTile = getWorkTile();
+        final Tile workTile = this.workTile;
         final TileType type = workTile.getType();
         final String id = goodsType.getId();
         final Colony colony = getColony();
@@ -541,7 +541,7 @@ public class ColonyTile extends WorkLocation {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getId())
-            .append(' ').append(getWorkTile())
+            .append(' ').append(workTile)
             .append('/').append(getColony().getName())
             .append(']');
         return sb.toString();

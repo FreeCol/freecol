@@ -151,8 +151,8 @@ public class Building extends WorkLocation
         UnitType unitType, Turn turn) {
         final float competence = getCompetenceFactor();
         return (competence == 1.0f) // Floating comparison OK!
-            ? unitType.getModifiers(id, getType(), turn)
-            : map(unitType.getModifiers(id, getType(), turn),
+            ? unitType.getModifiers(id, buildingType, turn)
+            : map(unitType.getModifiers(id, buildingType, turn),
                 m -> {
                     return (m.getType() == Modifier.ModifierType.ADDITIVE)
                         ? new Modifier(m).setValue(m.getValue() * competence)
@@ -166,7 +166,7 @@ public class Building extends WorkLocation
      * @return True if this {@code Building} can have a higher level.
      */
     public boolean canBuildNext() {
-        return getColony().canBuild(getType().getUpgradesTo());
+        return getColony().canBuild(buildingType.getUpgradesTo());
     }
 
     /**
@@ -175,8 +175,8 @@ public class Building extends WorkLocation
      * @return True if this building can be damaged.
      */
     public boolean canBeDamaged() {
-        return !getType().isAutomaticBuild()
-            && !getColony().isAutomaticBuild(getType());
+        return !buildingType.isAutomaticBuild()
+            && !getColony().isAutomaticBuild(buildingType);
     }
 
     /**
@@ -189,7 +189,7 @@ public class Building extends WorkLocation
      */
     public List<Unit> downgrade() {
         if (!canBeDamaged()) return null;
-        List<Unit> ret = setType(getType().getUpgradesFrom());
+        List<Unit> ret = setType(buildingType.getUpgradesFrom());
         getColony().invalidateCache();
         return ret;
     }
@@ -204,7 +204,7 @@ public class Building extends WorkLocation
      */
     public List<Unit> upgrade() {
         if (!canBuildNext()) return null;
-        List<Unit> ret = setType(getType().getUpgradesTo());
+        List<Unit> ret = setType(buildingType.getUpgradesTo());
         getColony().invalidateCache();
         return ret;
     }
@@ -216,7 +216,7 @@ public class Building extends WorkLocation
      * @return True if unit type can be added to this building.
      */
     public boolean canAddType(UnitType unitType) {
-        return canBeWorked() && getType().canAdd(unitType);
+        return canBeWorked() && buildingType.canAdd(unitType);
     }
 
     /**
@@ -267,9 +267,9 @@ public class Building extends WorkLocation
                 if (available >= capacity) {
                     minimumRatio = maximumRatio = 0.0;
                 } else {
-                    int divisor = (int)getType().applyModifiers(0f, turn,
+                    int divisor = (int) buildingType.applyModifiers(0f, turn,
                         Modifier.BREEDING_DIVISOR);
-                    int factor = (int)getType().applyModifiers(0f, turn,
+                    int factor = (int) buildingType.applyModifiers(0f, turn,
                         Modifier.BREEDING_FACTOR);
                     int production = (available < goodsType.getBreedingNumber()
                         || divisor <= 0) ? 0
@@ -311,7 +311,7 @@ public class Building extends WorkLocation
             if (available < required
                 && hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && spec.getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
-                && ((minimumGoodsInput = getType()
+                && ((minimumGoodsInput = buildingType
                         .getExpertWithConnectionsProduction()
                         * count(getUnits(),
                             matchKey(getExpertUnitType(), Unit::getType)))
@@ -384,7 +384,7 @@ public class Building extends WorkLocation
     @Override
     public int evaluateFor(Player player) {
         return super.evaluateFor(player)
-            + sum(getType().getRequiredGoods(), ag -> ag.evaluateFor(player));
+            + sum(buildingType.getRequiredGoods(), ag -> ag.evaluateFor(player));
     }
         
 
@@ -425,7 +425,7 @@ public class Building extends WorkLocation
      */
     @Override
     public String toShortString() {
-        return getColony().getName() + "-" + getType().getSuffix();
+        return getColony().getName() + "-" + buildingType.getSuffix();
     }
 
 
@@ -443,7 +443,7 @@ public class Building extends WorkLocation
     public NoAddReason getNoAddReason(Locatable locatable) {
         NoAddReason reason = super.getNoAddReason(locatable);
         if (reason == NoAddReason.NONE) {
-            reason = getType().getNoAddReason(((Unit) locatable).getType());
+            reason = buildingType.getNoAddReason(((Unit) locatable).getType());
             if (reason == NoAddReason.NONE) reason = getNoWorkReason();
         }
         return reason;
@@ -454,7 +454,7 @@ public class Building extends WorkLocation
      */
     @Override
     public int getUnitCapacity() {
-        return getType().getWorkPlaces();
+        return buildingType.getWorkPlaces();
     }
 
 
@@ -507,7 +507,7 @@ public class Building extends WorkLocation
      * {@inheritDoc}
      */
     public int getLevel() {
-        return getType().getLevel(); // Delegate to type
+        return buildingType.getLevel(); // Delegate to type
     }
 
     /**
@@ -523,7 +523,7 @@ public class Building extends WorkLocation
      */
     @Override
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
-        final BuildingType type = getType();
+        final BuildingType type = buildingType;
         return type != null && type.canProduce(goodsType, unitType);
     }
 
@@ -533,9 +533,9 @@ public class Building extends WorkLocation
     @Override
     public int getBaseProduction(ProductionType productionType,
                                  GoodsType goodsType, UnitType unitType) {
-        final BuildingType type = getType();
+        final BuildingType type = buildingType;
         return (type == null) ? 0
-            : getType().getBaseProduction(productionType, goodsType, unitType);
+            : buildingType.getBaseProduction(productionType, goodsType, unitType);
     }
 
     /**
@@ -544,7 +544,7 @@ public class Building extends WorkLocation
     @Override
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
-        final BuildingType type = getType();
+        final BuildingType type = buildingType;
         final String id = (goodsType == null) ? null : goodsType.getId();
         final Colony colony = getColony();
         final Player owner = getOwner();
@@ -567,7 +567,7 @@ public class Building extends WorkLocation
     @Override
     public List<ProductionType> getAvailableProductionTypes(boolean unattended) {
         return (buildingType == null) ? Collections.<ProductionType>emptyList()
-            : getType().getAvailableProductionTypes(unattended);
+            : buildingType.getAvailableProductionTypes(unattended);
     }
 
     /**
@@ -575,7 +575,7 @@ public class Building extends WorkLocation
      */
     @Override
     public float getCompetenceFactor() {
-        return getType().getCompetenceFactor();
+        return buildingType.getCompetenceFactor();
     }
 
     /**
@@ -583,7 +583,7 @@ public class Building extends WorkLocation
      */
     @Override
     public float getRebelFactor() {
-        return getType().getRebelFactor();
+        return buildingType.getRebelFactor();
     }
 
 
@@ -602,7 +602,7 @@ public class Building extends WorkLocation
      */
     @Override
     public int getPriority() {
-        return getType().getPriority();
+        return buildingType.getPriority();
     }
 
 
@@ -613,7 +613,7 @@ public class Building extends WorkLocation
      */
     @Override
     public String getNameKey() {
-        return getType().getNameKey();
+        return buildingType.getNameKey();
     }
 
 
@@ -626,7 +626,7 @@ public class Building extends WorkLocation
     public Stream<Ability> getAbilities(String id, FreeColSpecObjectType type,
                                         Turn turn) {
         // Buildings have no abilities independent of their type (for now).
-        return getType().getAbilities(id, type, turn);
+        return buildingType.getAbilities(id, type, turn);
     }
 
     /**
@@ -636,7 +636,7 @@ public class Building extends WorkLocation
     public Stream<Modifier> getModifiers(String id, FreeColSpecObjectType fcgot,
                                          Turn turn) {
         // Buildings have no modifiers independent of type
-        return getType().getModifiers(id, fcgot, turn);
+        return buildingType.getModifiers(id, fcgot, turn);
     }
 
 

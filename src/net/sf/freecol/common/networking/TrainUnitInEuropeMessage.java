@@ -47,7 +47,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @param type The {@code UnitType} to train.
      */
     public TrainUnitInEuropeMessage(UnitType type) {
-        super(getTagName());
+        super(TAG);
 
         this.typeId = type.getId();
     }
@@ -60,7 +60,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public TrainUnitInEuropeMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.typeId = getStringAttribute(element, UNIT_TYPE_TAG);
     }
@@ -99,7 +99,7 @@ public class TrainUnitInEuropeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TYPE_TAG, typeId).toXMLElement();
     }
 

@@ -119,7 +119,7 @@ public abstract class AIObject extends FreeColObject {
      * to this object from the enclosing AIMain.
      */
     public void dispose() {
-        getAIMain().removeAIObject(getId());
+        aiMain.removeAIObject(getId());
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class AIObject extends FreeColObject {
      * @return True if this AIObject was disposed.
      */
     public final boolean isDisposed() {
-        return getAIMain().getAIObject(getId()) == null;
+        return aiMain.getAIObject(getId()) == null;
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class AIObject extends FreeColObject {
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        return (isUninitialized()) ? -1 : 1;
+        return (uninitialized) ? -1 : 1;
     }
 
 
@@ -161,7 +161,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final Specification getSpecification() {
-        return getAIMain().getSpecification();
+        return aiMain.getSpecification();
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final Game getGame() {
-        return getAIMain().getGame();
+        return aiMain.getGame();
     }
 
     /**

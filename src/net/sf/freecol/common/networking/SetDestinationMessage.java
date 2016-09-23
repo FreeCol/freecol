@@ -52,7 +52,7 @@ public class SetDestinationMessage extends DOMMessage {
      * @param destination The destination to set (may be null)
      */
     public SetDestinationMessage(Unit unit, Location destination) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.destinationId = (destination == null) ? null
@@ -66,7 +66,7 @@ public class SetDestinationMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetDestinationMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.destinationId = getStringAttribute(element, DESTINATION_TAG);
@@ -111,7 +111,7 @@ public class SetDestinationMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             DESTINATION_TAG, this.destinationId).toXMLElement();
     }

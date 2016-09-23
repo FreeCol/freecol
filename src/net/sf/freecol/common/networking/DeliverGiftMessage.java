@@ -59,7 +59,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param goods The {@code Goods} to deliverGift.
      */
     public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -74,7 +74,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -170,7 +170,7 @@ public class DeliverGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId)
             .add(this.goods).toXMLElement();

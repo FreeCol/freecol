@@ -176,7 +176,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         readFromXML(xr);
         addAIObjectWithId();
 
-        uninitialized = getColony() == null;
+        uninitialized = colony == null;
     }
 
 
@@ -1486,8 +1486,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         super.readChildren(xr);
         sortExportGoods();
-        
-        if (getColony() != null) uninitialized = false;
+
+        if (colony != null) uninitialized = false;
     }
 
     /**

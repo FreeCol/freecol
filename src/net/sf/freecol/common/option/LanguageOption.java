@@ -148,7 +148,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
          */
         @Override
         public String toString() {
-            if (Messages.AUTOMATIC.equals(getKey())) {
+            if (Messages.AUTOMATIC.equals(key)) {
                 return Messages.message("clientOptions.gui.languageOption.autoDetectLanguage");
             }
 
@@ -309,7 +309,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(VALUE_TAG, getValue().getKey());
+        xw.writeAttribute(VALUE_TAG, value.getKey());
     }
 
     /**

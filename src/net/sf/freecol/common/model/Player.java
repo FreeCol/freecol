@@ -653,7 +653,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A {@code StringTemplate} for the player market.
      */
     public StringTemplate getMarketName() {
-        return (getEurope() == null)
+        return (europe == null)
             ? StringTemplate.key("model.player.independentMarket")
             : StringTemplate.key(getEuropeNameKey());
     }
@@ -1077,8 +1077,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getRank() {
         int ret = (isEuropean()) ? 1 : 0;
-        if (isAI()) ret |= 2;
-        if (isAdmin()) ret |= 4;
+        if (ai) ret |= 2;
+        if (admin) ret |= 4;
         return ret;
     }
 
@@ -1112,7 +1112,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A strength score.
      */
     public int getSpanishSuccessionScore() {
-        return getScore();
+        return score;
     }
 
     /**
@@ -1294,7 +1294,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return Whether a new colonist should emigrate.
      */
     public boolean checkEmigrate() {
-        return (isColonial()) ? getImmigrationRequired() <= immigration
+        return (isColonial()) ? immigrationRequired <= immigration
             : false;
     }
 
@@ -1310,7 +1310,7 @@ public class Player extends FreeColGameObject implements Nameable {
             .getImmigrationGoodsTypeList();
         int production = sum(getColonies(),
             c -> sum(immigrationGoodsTypes, gt -> c.getTotalProductionOf(gt)));
-        final Europe europe = getEurope();
+        final Europe europe = this.europe;
         if (europe != null) production += europe.getImmigration(production);
         return production;
     }
@@ -1325,7 +1325,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                 "model.player.emigrate",
                                 this, unit)
-            .addNamed("%europe%", getEurope())
+            .addNamed("%europe%", europe)
             .addStringTemplate("%unit%", unit.getLabel());
     }
 
@@ -1549,7 +1549,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     a {@code StringTemplate} explaining the problem.
      */
     public StringTemplate checkDeclareIndependence() {
-        if (getPlayerType() != PlayerType.COLONIAL)
+        if (playerType != PlayerType.COLONIAL)
             return StringTemplate.template("model.player.colonialIndependence");
         final Event event = getSpecification()
             .getEvent("model.event.declareIndependence");
@@ -1579,9 +1579,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A measure of the military viability of this player.
      */
     public double getRebelStrengthRatio(boolean naval) {
-        if (getPlayerType() != PlayerType.COLONIAL) return 0.0;
+        if (playerType != PlayerType.COLONIAL) return 0.0;
         return strengthRatio(calculateStrength(naval),
-            getMonarch().getExpeditionaryForce().calculateStrength(naval));
+            monarch.getExpeditionaryForce().calculateStrength(naval));
     }
 
 
@@ -1592,8 +1592,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *     or null if not available.
      */
     public List<AbstractUnit> getREFUnits() {
-        return (getPlayerType() == PlayerType.COLONIAL)
-            ? getMonarch().getExpeditionaryForce().getUnitList()
+        return (playerType == PlayerType.COLONIAL)
+            ? monarch.getExpeditionaryForce().getUnitList()
             : null;
     }
 
@@ -1728,7 +1728,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The arrears due for this type of goods.
      */
     public int getArrears(GoodsType type) {
-        return getMarket().getArrears(type);
+        return market.getArrears(type);
     }
 
     /**
@@ -1749,7 +1749,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if type of goods can be traded.
      */
     public boolean canTrade(GoodsType type, Market.Access access) {
-        return getMarket().getArrears(type) == 0
+        return market.getArrears(type) == 0
             || (access == Market.Access.CUSTOM_HOUSE
                 && (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                     || (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)
@@ -1765,7 +1765,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current sales.
      */
     public int getSales(GoodsType goodsType) {
-        return getMarket().getSales(goodsType);
+        return market.getSales(goodsType);
     }
 
     /**
@@ -1775,7 +1775,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new sales.
      */
     public void modifySales(GoodsType goodsType, int amount) {
-        getMarket().modifySales(goodsType, amount);
+        market.modifySales(goodsType, amount);
     }
 
     /**
@@ -1785,7 +1785,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return Whether these goods have been traded.
      */
     public boolean hasTraded(GoodsType goodsType) {
-        return getMarket().hasBeenTraded(goodsType);
+        return market.hasBeenTraded(goodsType);
     }
 
     /**
@@ -1816,7 +1816,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeBeforeTaxes(goodsType);
+        return market.getIncomeBeforeTaxes(goodsType);
     }
 
     /**
@@ -1826,7 +1826,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new incomeBeforeTaxes.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeBeforeTaxes(goodsType, amount);
+        market.modifyIncomeBeforeTaxes(goodsType, amount);
     }
 
     /**
@@ -1836,7 +1836,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeAfterTaxes(goodsType);
+        return market.getIncomeAfterTaxes(goodsType);
     }
 
     /**
@@ -1846,7 +1846,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new incomeAfterTaxes.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeAfterTaxes(goodsType, amount);
+        market.modifyIncomeAfterTaxes(goodsType, amount);
     }
 
 
@@ -1879,7 +1879,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player has an instance of {@code Europe}.
      */
     public boolean canMoveToEurope() {
-        return getEurope() != null;
+        return europe != null;
     }
 
     /**
@@ -1889,7 +1889,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getRecruitPrice() {
         // return Math.max(0, (getCrossesRequired() - crosses) * 10);
-        return getEurope().getRecruitPrice();
+        return europe.getRecruitPrice();
     }
 
     /**
@@ -1903,8 +1903,8 @@ public class Player extends FreeColGameObject implements Nameable {
         final UnitType unitType = au.getType(spec);
         if (!unitType.hasPrice()) return INFINITY;
 
-        return au.getNumber() * (getEurope().getUnitPrice(unitType)
-            + au.getRole(spec).getRequiredGoodsPrice(getMarket()));
+        return au.getNumber() * (europe.getUnitPrice(unitType)
+            + au.getRole(spec).getRequiredGoodsPrice(market));
     }
 
     /**
@@ -2604,7 +2604,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add the tutorial message for the start of the game.
      */
     public void addStartGameMessage() {
-        Tile tile = getEntryLocation().getTile();
+        Tile tile = entryLocation.getTile();
         String sailTag = (tile == null) ? "unknown"
             : (tile.getX() < tile.getMap().getWidth() / 2) ? "east"
             : "west";
@@ -2682,7 +2682,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public Tile getFallbackTile() {
         Settlement settlement = first(getSettlements());
         return (settlement != null) ? settlement.getTile()
-            : getEntryLocation().getTile();
+            : entryLocation.getTile();
     }
 
     /**
@@ -3774,7 +3774,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public void logCheat(String what) {
         if (logger.isLoggable(Level.FINEST)) {
             logger.finest("CHEAT: " + getGame().getTurn().getNumber()
-                + " " + lastPart(getNationId(), ".")
+                + " " + lastPart(nationId, ".")
                 + " " + what);
         }
     }

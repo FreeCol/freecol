@@ -65,7 +65,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement is,
                                     String result) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -80,7 +80,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ScoutSpeakToChiefMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -159,7 +159,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId,
             RESULT_TAG, this.result).toXMLElement();

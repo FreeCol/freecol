@@ -63,7 +63,7 @@ public class ClaimLandMessage extends DOMMessage {
      * @param price The price to pay for the tile, negative if stealing.
      */
     public ClaimLandMessage(Tile tile, FreeColGameObject claimant, int price) {
-        super(getTagName());
+        super(TAG);
 
         this.tileId = tile.getId();
         this.claimantId = claimant.getId();
@@ -77,7 +77,7 @@ public class ClaimLandMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ClaimLandMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.tileId = getStringAttribute(element, TILE_TAG);
         this.claimantId = getStringAttribute(element, CLAIMANT_TAG);
@@ -206,7 +206,7 @@ public class ClaimLandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             TILE_TAG, this.tileId,
             CLAIMANT_TAG, this.claimantId,
             PRICE_TAG, this.priceString).toXMLElement();

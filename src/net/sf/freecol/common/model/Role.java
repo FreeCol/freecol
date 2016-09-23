@@ -241,8 +241,10 @@ public class Role extends BuildableType {
      */
     public int getRequiredGoodsPrice(Market market) {
         return sum(getRequiredGoods(),
-                   ag -> market.getBidPrice(ag.getType(),
-                                            ag.getAmount() * getMaximumCount()));
+                ag -> {
+                    return market.getBidPrice(ag.getType(),
+                                             ag.getAmount() * maximumCount);
+                });
     }
         
     /**
@@ -326,8 +328,8 @@ public class Role extends BuildableType {
             return false;
         } else {
             return Objects.equals(role1, role2)
-                || Objects.equals(role1.getDowngrade(), role2)
-                || Objects.equals(role2.getDowngrade(), role1);
+                || Objects.equals(role1.downgrade, role2)
+                || Objects.equals(role2.downgrade, role1);
         }
     }
 

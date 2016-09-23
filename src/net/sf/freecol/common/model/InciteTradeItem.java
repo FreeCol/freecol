@@ -107,7 +107,7 @@ public class InciteTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public int evaluateFor(Player player) {
-        final Player victim = getVictim();
+        final Player victim = this.victim;
         switch (player.getStance(victim)) {
         case ALLIANCE:
             return Integer.MIN_VALUE;

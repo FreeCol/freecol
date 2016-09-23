@@ -73,21 +73,21 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
         @Override
         public int compareTo(MixerWrapper mw) {
-            return getKey().compareTo(mw.getKey());
+            return name.compareTo(mw.name);
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof MixerWrapper) {
-                return ((MixerWrapper)o).getKey().equals(getKey());
+                return ((MixerWrapper) o).name.equals(name);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return getKey().hashCode();
+            return name.hashCode();
         }
 
         @Override

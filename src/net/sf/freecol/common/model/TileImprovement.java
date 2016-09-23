@@ -600,7 +600,7 @@ public class TileImprovement extends TileItem implements Named {
 
         xw.writeAttribute(TILE_TAG, getTile());
 
-        xw.writeAttribute(TYPE_TAG, getType());
+        xw.writeAttribute(TYPE_TAG, type);
 
         xw.writeAttribute(TURNS_TAG, turnsToComplete);
 
@@ -683,7 +683,7 @@ public class TileImprovement extends TileItem implements Named {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
-        sb.append('[').append(getType().getId());
+        sb.append('[').append(type.getId());
         if (turnsToComplete > 0) {
             sb.append(" (").append(turnsToComplete).append(" turns left)");
         }

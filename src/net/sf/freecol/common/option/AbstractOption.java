@@ -111,7 +111,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
         setId(source.getId());
         setSpecification(source.getSpecification());
         setValue(source.getValue());
-        setGroup(source.getGroup());
+        setGroup(source.optionGroup);
         isDefined = source.isDefined;
     }
 

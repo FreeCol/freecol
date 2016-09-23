@@ -363,7 +363,7 @@ public class PrivateerMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidReason(getAIUnit(), target);
     }
 
     /**
@@ -419,12 +419,12 @@ public class PrivateerMission extends Mission {
 
         case ATTACK_UNIT: // Arrived
             Direction direction = unit.getTile()
-                .getDirection(getTarget().getTile());
+                .getDirection(target.getTile());
             if (direction != null) {
                 AIMessage.askAttack(aiUnit, direction);
-                lbAttack(lb, getTarget());
+                lbAttack(lb, target);
             } else { // Found something else in the way!
-                Location blocker = resolveBlockage(aiUnit, getTarget());
+                Location blocker = resolveBlockage(aiUnit, target);
                 if (blocker instanceof Unit
                     && scoreUnit(aiUnit, (Unit)blocker) > 0) {
                     AIMessage.askAttack(aiUnit,

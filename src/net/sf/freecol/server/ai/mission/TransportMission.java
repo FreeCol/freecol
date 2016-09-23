@@ -1110,7 +1110,7 @@ public class TransportMission extends Mission {
      */
     private void optimizeCargoes(LogBuilder lb) {
         lb.add(", optimize");
-        Location oldTarget = getTarget();
+        Location oldTarget = target;
 
         // We wrap/unwrap the list to minimize the number of nodes
         // that need consideration.
@@ -1138,7 +1138,9 @@ public class TransportMission extends Mission {
         }
         if (best != null) {
             tSet(unwrapCargoes(best), true);
-            if (oldTarget != getTarget()) lb.add("->", getTarget());
+            if (oldTarget != target) {
+                lb.add("->", target);
+            }
         } else {
             tSet(unwrapCargoes(ts), false);
         }
@@ -1386,7 +1388,7 @@ public class TransportMission extends Mission {
     @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
-        String reason = invalidReason(aiUnit, getTarget());
+        String reason = invalidReason(aiUnit, target);
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null

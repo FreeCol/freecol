@@ -56,7 +56,7 @@ public class AskSkillMessage extends DOMMessage {
      * @param direction The {@code Direction} the unit is looking.
      */
     public AskSkillMessage(Unit unit, Direction direction) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
@@ -70,7 +70,7 @@ public class AskSkillMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AskSkillMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.directionString = getStringAttribute(element, DIRECTION_TAG);
@@ -134,7 +134,7 @@ public class AskSkillMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             DIRECTION_TAG, this.directionString).toXMLElement();
     }

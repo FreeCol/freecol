@@ -113,7 +113,7 @@ public class UnitTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public int evaluateFor(Player player) {
-        final Unit unit = getUnit();
+        final Unit unit = this.unit;
         return (!isValid()) ? Integer.MIN_VALUE : unit.evaluateFor(player);
     }
 

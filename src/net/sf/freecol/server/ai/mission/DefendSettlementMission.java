@@ -292,7 +292,7 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidReason(getAIUnit(), target);
     }
 
     /**
@@ -310,7 +310,7 @@ public class DefendSettlementMission extends Mission {
 
         // Go to the target!
         final Unit unit = getUnit();
-        Unit.MoveType mt = travelToTarget(getTarget(),
+        Unit.MoveType mt = travelToTarget(target,
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE: // Arrived
@@ -334,8 +334,8 @@ public class DefendSettlementMission extends Mission {
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         Mission m = null;
-        if (getTarget() instanceof Colony) {
-            Colony colony = (Colony)getTarget();
+        if (target instanceof Colony) {
+            Colony colony = (Colony) target;
             if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() < 1)) {
                 m = getEuropeanAIPlayer().getWorkInsideColonyMission(aiUnit,
@@ -352,7 +352,7 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
-        Settlement settlement = (Settlement)getTarget();
+        Settlement settlement = (Settlement) target;
         int defenderCount = 0, fortifyCount = 0;
         for (Unit u : settlement.getAllUnitsList()) {
             AIUnit aiu = getAIMain().getAIUnit(u);
@@ -416,7 +416,7 @@ public class DefendSettlementMission extends Mission {
             return lbAttack(lb, bestTarget);
         }
 
-        return lbWait(lb, ", alert at ", getTarget());
+        return lbWait(lb, ", alert at ", target);
     }
     
 

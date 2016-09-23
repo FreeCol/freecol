@@ -52,7 +52,7 @@ public class ErrorMessage extends DOMMessage {
      * @param message An optional non-i18n message.
      */
     public ErrorMessage(StringTemplate template, String message) {
-        super(getTagName());
+        super(TAG);
 
         this.template = template;
         this.message = message;
@@ -95,7 +95,7 @@ public class ErrorMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ErrorMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.message = element.getAttribute(MESSAGE_TAG);
         this.template = DOMMessage.getChild(game, element, 0,
@@ -155,7 +155,7 @@ public class ErrorMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             MESSAGE_TAG, this.message)
             .add(this.template).toXMLElement();
     }

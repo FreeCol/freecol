@@ -47,7 +47,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to delete.
      */
     public DeleteTradeRouteMessage(TradeRoute tradeRoute) {
-        super(getTagName());
+        super(TAG);
 
         this.tradeRouteId = tradeRoute.getId();
     }
@@ -60,7 +60,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeleteTradeRouteMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
     }
@@ -101,7 +101,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             "tradeRoute", tradeRouteId).toXMLElement();
     }
 

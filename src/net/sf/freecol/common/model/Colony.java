@@ -483,7 +483,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
+        LogBuilder lb = new LogBuilder((this.traceOccupation) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ", ");
         FreeColObject.logFreeColObjects(workTypes, lb);
         lb.add(")");
@@ -504,7 +504,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
-        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
+        LogBuilder lb = new LogBuilder((this.traceOccupation) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ")");
 
         Occupation occupation = getOccupationFor(unit, userMode, lb);
@@ -1192,7 +1192,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int uc = getUnitCount();
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-        sonsOfLiberty = calculateSoLPercentage(uc, getLiberty());
+        sonsOfLiberty = calculateSoLPercentage(uc, liberty);
         tories = uc - calculateRebels(uc, sonsOfLiberty);
     }
 
@@ -1224,7 +1224,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The percentage of SoLs, negative if not calculable.
      */
     public int getSoLPercentage() {
-        return calculateSoLPercentage(getUnitCount(), getLiberty());
+        return calculateSoLPercentage(getUnitCount(), liberty);
     }
 
     /**
@@ -1244,7 +1244,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The current Tory membership of the colony.
      */
     public int getTory() {
-        return 100 - getSoL();
+        return 100 - sonsOfLiberty;
     }
 
     /**
@@ -1402,7 +1402,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final int goodGovernment
             = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
-        int rebelPercent = calculateSoLPercentage(unitCount, getLiberty());
+        int rebelPercent = calculateSoLPercentage(unitCount, liberty);
         int rebelCount = calculateRebels(unitCount, rebelPercent);
         int loyalistCount = unitCount - rebelCount;
 

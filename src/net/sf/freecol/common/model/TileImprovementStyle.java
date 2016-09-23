@@ -143,8 +143,8 @@ public class TileImprovementStyle {
         if (result == null) {
             result = new TileImprovementStyle(key);
             cache.put(key, result);
-            if (!result.getString().equals(key)) {
-                cache.put(result.getString(), result);
+            if (!result.style.equals(key)) {
+                cache.put(result.style, result);
             }
         }
         return result;

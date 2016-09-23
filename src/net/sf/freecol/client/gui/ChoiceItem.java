@@ -226,7 +226,7 @@ public class ChoiceItem<T> implements Comparable<ChoiceItem<T>> {
         if (o instanceof ChoiceItem) {
             ChoiceItem ci = (ChoiceItem)o;
             return Utils.equals(this.text, ci.toString())
-                && Utils.equals(this.getObject(), ci.getObject());
+                && Utils.equals(object, ci.object);
         }
         return false;
     }

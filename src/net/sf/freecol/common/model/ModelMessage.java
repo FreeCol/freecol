@@ -302,9 +302,9 @@ public class ModelMessage extends StringTemplate {
      * @return A key, or null if the message should not be ignored.
      */
     public String getIgnoredMessageKey() {
-        switch (getMessageType()) {
+        switch (messageType) {
         case WAREHOUSE_CAPACITY:
-            String key = getSourceId();
+            String key = sourceId;
             switch (getTemplateType()) {
             case TEMPLATE:
                 StringBuilder sb = new StringBuilder(64);

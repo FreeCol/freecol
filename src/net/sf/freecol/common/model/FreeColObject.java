@@ -143,9 +143,9 @@ public abstract class FreeColObject
      * @return An identifier.
      */
     public final String getSuffix(String prefix) {
-        return (getId().startsWith(prefix))
-            ? getId().substring(prefix.length())
-            : getId();
+        return (id.startsWith(prefix))
+            ? id.substring(prefix.length())
+            : id;
     }
 
     /**
@@ -155,7 +155,7 @@ public abstract class FreeColObject
      * @return The usual identifier suffix.
      */
     public final String getSuffix() {
-        String id = getId();
+        String id = this.id;
         return (id == null) ? null : lastPart(id, ".");
     }
 
@@ -179,7 +179,7 @@ public abstract class FreeColObject
      * @return The type part of the identifier, or null on error.
      */
     public String getIdType() {
-        return getIdType(getId());
+        return getIdType(id);
     }
 
     /**
@@ -218,8 +218,8 @@ public abstract class FreeColObject
         } else if (fco2 == null) {
             return 1;
         }
-        String id1 = fco1.getId();
-        String id2 = fco2.getId();
+        String id1 = fco1.id;
+        String id2 = fco2.id;
         if (id1 == null) {
             return (id2 == null) ? 0 : -1;
         } else if (id2 == null) {
@@ -989,7 +989,7 @@ public abstract class FreeColObject
         } catch (XMLStreamException e) {
             e.printStackTrace();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+            logger.log(Level.WARNING, "Failed to copy: " + id, e);
         }
         return ret;
     }
@@ -1046,10 +1046,10 @@ public abstract class FreeColObject
      *     to the stream.
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        if (getId() == null) {
+        if (id == null) {
             logger.warning("FreeColObject with null identifier: " + this);
         } else {
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
         }
     }
 
@@ -1088,7 +1088,7 @@ public abstract class FreeColObject
         try {
             xw.writeStartElement(getXMLTagName());
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
 
             xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
@@ -1228,7 +1228,7 @@ public abstract class FreeColObject
      */
     @Override
     public String toString() {
-        return getClass().getName() + ":" + getId();
+        return getClass().getName() + ":" + id;
         //+ " (super hashcode: " + Integer.toHexString(super.hashCode()) + ")"
     }
 

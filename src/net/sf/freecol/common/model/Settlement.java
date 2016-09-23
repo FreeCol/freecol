@@ -136,7 +136,7 @@ public abstract class Settlement extends GoodsLocation
      * @return True if this is a national capital.
      */
     public boolean isCapital() {
-        return getType().isCapital();
+        return type.isCapital();
     }
 
     public void setCapital(boolean capital) {
@@ -185,7 +185,7 @@ public abstract class Settlement extends GoodsLocation
      * @return Settlement radius
      */
     public int getRadius() {
-        return getType().getClaimableRadius();
+        return type.getClaimableRadius();
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class Settlement extends GoodsLocation
      * @return The line of sight value.
      */
     public int getLineOfSight() {
-        return (int)applyModifiers((float)getType().getVisibleRadius(),
+        return (int)applyModifiers((float) type.getVisibleRadius(),
             getGame().getTurn(), Modifier.LINE_OF_SIGHT_BONUS);
     }
 
@@ -208,7 +208,7 @@ public abstract class Settlement extends GoodsLocation
     public int getPlunder(Unit attacker, Random random) {
         RandomRange range = getPlunderRange(attacker);
         return (range == null) ? 0
-            : range.getAmount("Plunder " + getName(), random, false);
+            : range.getAmount("Plunder " + name, random, false);
     }
 
     /**
@@ -217,7 +217,7 @@ public abstract class Settlement extends GoodsLocation
      * @return A set of visible tiles.
      */
     public Set<Tile> getVisibleTiles() {
-        final Tile tile = getTile();
+        final Tile tile = this.tile;
         return (tile == null) ? Collections.<Tile>emptySet()
             : new HashSet<Tile>(tile.getSurroundingTiles(0, getLineOfSight()));
     }
@@ -260,7 +260,7 @@ public abstract class Settlement extends GoodsLocation
      * Several visibility issues accumulated here.
      */
     public void exciseSettlement() {
-        Tile settlementTile = getTile();
+        Tile settlementTile = tile;
         for (Tile tile : getOwnedTiles()) {
             tile.changeOwnership(null, null);//-til
         }
@@ -308,7 +308,7 @@ public abstract class Settlement extends GoodsLocation
      * @return True if the settlement is connected to the high seas.
      */
     public boolean isConnectedPort() {
-        return any(getTile().getSurroundingTiles(1, 1),
+        return any(tile.getSurroundingTiles(1, 1),
                    t -> !t.isLand() && t.isHighSeasConnected());
     }
 
@@ -319,7 +319,7 @@ public abstract class Settlement extends GoodsLocation
      * @return A high seas count, INFINITY if not connected.
      */
     public int getHighSeasCount() {
-        Tile best = minimize(getTile().getSurroundingTiles(1, 1),
+        Tile best = minimize(tile.getSurroundingTiles(1, 1),
                              Tile.isSeaTile, Tile.highSeasComparator);
         return (best == null) ? INFINITY : best.getHighSeasCount();
     }
@@ -428,8 +428,10 @@ public abstract class Settlement extends GoodsLocation
      */
     public List<Unit> getAllUnitsList() {
         List<Unit> units = getUnitList();
-        if (units.isEmpty()) return getTile().getUnitList();
-        units.addAll(getTile().getUnitList());
+        if (units.isEmpty()) {
+            return tile.getUnitList();
+        }
+        units.addAll(tile.getUnitList());
         return units;
     }
 
@@ -441,7 +443,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (Objects.equals(player, getOwner())) ? this : getTile();
+        return (Objects.equals(player, owner)) ? this : tile;
     }
 
     // Override FreeColObject
@@ -543,7 +545,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public StringTemplate getLocationLabel() {
-        return StringTemplate.name(getName());
+        return StringTemplate.name(name);
     }
 
     /**
@@ -559,7 +561,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     public final int getRank() {
-        return Location.getRank(getTile());
+        return Location.getRank(tile);
     }
 
 
@@ -577,7 +579,7 @@ public abstract class Settlement extends GoodsLocation
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Unit) {
             // Tighter ownership test now possible.
-            if (!Objects.equals(((Unit) locatable).getOwner(), getOwner())) {
+            if (!Objects.equals(((Unit) locatable).getOwner(), owner)) {
                 return NoAddReason.OWNED_BY_ENEMY;
             }
         } else if (locatable instanceof Goods) {
@@ -740,7 +742,7 @@ public abstract class Settlement extends GoodsLocation
 
         xw.writeAttribute(TILE_TAG, tile);
 
-        xw.writeAttribute(SETTLEMENT_TYPE_TAG, getType());
+        xw.writeAttribute(SETTLEMENT_TYPE_TAG, type);
     }
 
     /**
@@ -748,7 +750,7 @@ public abstract class Settlement extends GoodsLocation
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        if (xw.validFor(getOwner())) {
+        if (xw.validFor(owner)) {
 
             // Settlement contents only visible to the owner by default.
             super.writeChildren(xw);

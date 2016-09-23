@@ -241,16 +241,16 @@ public class FreeColDebugger {
      */
     public static boolean finishDebugRun(FreeColClient freeColClient,
                                          boolean force) {
-        if (getDebugRunTurns() < 0) return false; // Not a debug run
-        if (getDebugRunTurns() > 0 && !force) return false; // Still going
+        if (FreeColDebugger.debugRunTurns < 0) return false; // Not a debug run
+        if (FreeColDebugger.debugRunTurns > 0 && !force) return false; // Still going
         // Zero => signalEndDebugRun was called
         setDebugRunTurns(-1);
 
-        if (getDebugRunSave() != null) {
+        if (FreeColDebugger.debugRunSave != null) {
             FreeColServer fcs = freeColClient.getFreeColServer();
             if (fcs != null) {
                 try {
-                    fcs.saveGame(new File(".", getDebugRunSave()),
+                    fcs.saveGame(new File(".", FreeColDebugger.debugRunSave),
                                  freeColClient.getClientOptions(), null);
                 } catch (IOException e) {}
             }

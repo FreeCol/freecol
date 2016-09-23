@@ -484,7 +484,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (Objects.equals(player, getOwner())) ? getOwner().getEurope() : null;
+        return (Objects.equals(player, owner)) ? owner.getEurope() : null;
     }
 
 

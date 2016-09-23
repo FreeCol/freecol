@@ -53,7 +53,7 @@ public class MoveToMessage extends DOMMessage {
      * @param destination The {@code Location} to move to.
      */
     public MoveToMessage(Unit unit, Location destination) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.destinationId = destination.getId();
@@ -67,7 +67,7 @@ public class MoveToMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MoveToMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.destinationId = getStringAttribute(element, DESTINATION_TAG);
@@ -116,7 +116,7 @@ public class MoveToMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             DESTINATION_TAG, this.destinationId).toXMLElement();
     }

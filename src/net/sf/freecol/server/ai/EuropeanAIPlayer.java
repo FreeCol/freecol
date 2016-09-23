@@ -562,7 +562,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
-                List<AIColony> bad = new ArrayList<>(getBadlyDefended());
+                List<AIColony> bad = new ArrayList<>(badlyDefended);
                 if (bad.isEmpty()) bad.addAll(getAIColonies());
                 AIColony defend = getRandomMember(logger,
                     "AIColony to defend", bad, air);

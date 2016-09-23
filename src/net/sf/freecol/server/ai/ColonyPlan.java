@@ -623,7 +623,7 @@ public class ColonyPlan {
                                          GoodsType goodsType) {
         Player player = colony.getOwner();
         NationType nationType = player.getNationType();
-        String advantage = getAIMain().getAIPlayer(player).getAIAdvantage();
+        String advantage = aiMain.getAIPlayer(player).getAIAdvantage();
         boolean ret = false;
         double factor = 1.0;
         if (nationType.hasModifier(goodsType.getId())) {
@@ -658,7 +658,7 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
-        final AIPlayer euaip = getAIMain()
+        final AIPlayer euaip = aiMain
             .getAIPlayer(colony.getOwner());
         String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
@@ -844,7 +844,7 @@ public class ColonyPlan {
         forEachMapEntry(production, fullPred, e -> {
                 for (WorkLocation wl : transform(e.getValue().keySet(),
                         w -> (w.canBeWorked() || w.canAutoProduce()))) {
-                    workPlans.add(new WorkLocationPlan(getAIMain(), wl, e.getKey()));
+                    workPlans.add(new WorkLocationPlan(aiMain, wl, e.getKey()));
                 }
             });
 

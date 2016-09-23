@@ -84,7 +84,7 @@ public class LoginMessage extends DOMMessage {
     public LoginMessage(String userName, String version,
                         boolean admin, boolean startGame, boolean singlePlayer,
                         boolean currentPlayer, Game game) {
-        super(getTagName());
+        super(TAG);
 
         this.userName = userName;
         this.version = version;
@@ -113,7 +113,7 @@ public class LoginMessage extends DOMMessage {
      * @param e The {@code Element} to use to create the message.
      */
     public LoginMessage(Game game, Element e) {
-        super(getTagName());
+        super(TAG);
 
         this.userName = getStringAttribute(e, USER_NAME_TAG);
         this.version = getStringAttribute(e, VERSION_TAG);
@@ -290,7 +290,7 @@ public class LoginMessage extends DOMMessage {
     public Element toXMLElement() {
         Player player = (this.game == null || this.userName == null) ? null
             : this.game.getPlayerByName(this.userName);
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             USER_NAME_TAG, this.userName,
             VERSION_TAG, this.version,
             ADMIN_TAG, Boolean.toString(this.admin),

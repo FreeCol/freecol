@@ -201,7 +201,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         optionMap.put(id, option);
         if (option instanceof OptionGroup) {
             OptionGroup group = (OptionGroup) option;
-            group.setEditable(editable && group.isEditable());
+            group.setEditable(editable && group.editable);
             addOptionGroup(group);
         }
     }
@@ -229,7 +229,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         if (option instanceof OptionGroup) {
             OptionGroup optionGroup = (OptionGroup)option;
             boolean result = true;
-            for (Option o : optionGroup.getOptions()) {
+            for (Option o : optionGroup.options) {
                 // @compat 0.11.6
                 // Placement options move to their own group
                 if (o.getId().startsWith("net.sf.freecol.client.gui.panel.")) {
@@ -247,7 +247,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 result = result && this.merge(o);
             }
             if (result) {
-                optionGroup.setEditable(editable && optionGroup.isEditable());
+                optionGroup.setEditable(editable && optionGroup.editable);
             }
             if (logger.isLoggable(Level.FINEST)) {
                 logger.finest("Merged option group " + id
@@ -292,7 +292,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @param group The initial {@code OptionGroup} to add.
      */
     private void addOptionGroup(OptionGroup group) {
-        for (Option option : group.getOptions()) {
+        for (Option option : group.options) {
             optionMap.put(option.getId(), option);
             if (option instanceof OptionGroup) {
                 addOptionGroup((OptionGroup) option);
@@ -612,7 +612,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     @Override
     public void setValue(OptionGroup value) {
         if (value != null) {
-            for (Option other : value.getOptions()) {
+            for (Option other : value.options) {
                 Option mine = getOption(other.getId());
                 // could be null if using custom options generated
                 // from an older version of the specification
@@ -753,7 +753,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(getId()).append(" <");
-        for (Option o : getOptions()) {
+        for (Option o : options) {
             sb.append(' ').append(o.toString());
         }
         sb.append(" >]");

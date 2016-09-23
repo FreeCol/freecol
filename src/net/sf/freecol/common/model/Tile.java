@@ -59,8 +59,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         = Comparator.comparingInt(Tile::getHighSeasCount);
 
     /** Predicate to identify ordinary sea tiles. */
-    public static final Predicate<Tile> isSeaTile = t ->
-        !t.isLand() && t.getHighSeasCount() >= 0;
+    public static final Predicate<Tile> isSeaTile = t -> {
+        return !t.isLand() && t.highSeasCount >= 0;
+    };
 
     /**
      * Information that is internal to the native settlements, and only
@@ -479,7 +480,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if this is a coastland tile.
      */
     public boolean isCoastland() {
-        return isLand() && getHighSeasCount() > 0;
+        return isLand() && this.highSeasCount > 0;
     }
 
     /**
@@ -542,7 +543,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private int getEdgeDistance() {
         final Map map = getMap();
-        final int x = getX(), y = getY();
+        final int x = this.x, y = this.y;
         return Math.min(Math.min(x, map.getWidth() - x),
                         Math.min(y, map.getHeight() - y));
     }
@@ -593,7 +594,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if the {@code Tile}s are connected.
      */
     public boolean isConnectedTo(Tile other) {
-        return getContiguity() == other.getContiguity();
+        return contiguity == other.contiguity;
     }
 
     /**
@@ -618,10 +619,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             = getSpecification().getTileType("model.tile.greatRiver");
         final TileType ocean
             = getSpecification().getTileType("model.tile.ocean");
-        boolean ret = Objects.equals(getType(), greatRiver);
+        boolean ret = Objects.equals(type, greatRiver);
         for (Tile t : getSurroundingTiles(1)) {
-            if (Objects.equals(t.getType(), ocean)) return false;
-            ret |= Objects.equals(t.getType(), greatRiver);
+            if (Objects.equals(t.type, ocean)) return false;
+            ret |= Objects.equals(t.type, greatRiver);
         }
         return ret;
     }
@@ -641,7 +642,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         if (u != null && !owner.owns(u)) return true; // Blocked by unit
 
         if (isLand()) {
-            Settlement s = getSettlement();
+            Settlement s = settlement;
             if (unit.isNaval()) {
                 return s == null || !owner.owns(s); // Land, not our settlement
             } else {
@@ -698,7 +699,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if there is a completed improvement present.
      */
     public boolean hasTileImprovement(TileImprovementType type) {
-        return (type.isChangeType()) ? type.changeContainsTarget(getType())
+        return (type.isChangeType()) ? type.changeContainsTarget(this.type)
             : (tileItemContainer == null) ? false
             : tileItemContainer.hasImprovement(type);
     }
@@ -964,7 +965,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return (workType == null) ? -1
             : (getTileImprovement(workType) != null) ? -1
             // Return the basic work turns + additional work turns
-            : getType().getBasicWorkTurns() + workType.getAddWorkTurns();
+            : type.getBasicWorkTurns() + workType.getAddWorkTurns();
     }
 
     /**
@@ -976,7 +977,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isImprovementTypeAllowed(TileImprovementType type) {
         TileImprovement ti;
         return type != null
-            && type.isTileTypeAllowed(getType())
+            && type.isTileTypeAllowed(this.type)
             && ((ti = getTileImprovement(type)) == null || !ti.isComplete());
     }
         
@@ -1039,8 +1040,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public StringTemplate getSimpleLabel() {
         return StringTemplate.template("model.tile.simpleLabel")
-            .addAmount("%x%", getX())
-            .addAmount("%y%", getY());
+            .addAmount("%x%", x)
+            .addAmount("%y%", y);
     }
 
     /**
@@ -1051,7 +1052,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getDetailedLocationLabel() {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
-            nearSettlement = tile.getSettlement();
+            nearSettlement = tile.settlement;
             if (nearSettlement != null && nearSettlement.getName() != null) {
                 Direction d = Map.getRoughDirection(tile, this);
                 StringTemplate t = StringTemplate
@@ -1086,7 +1087,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public StringTemplate getDetailedLocationLabelFor(Player player) {
         Settlement nearSettlement = null;
         for (Tile tile : getSurroundingTiles(NEAR_RADIUS)) {
-            nearSettlement = tile.getSettlement();
+            nearSettlement = tile.settlement;
             if (nearSettlement != null
                 && nearSettlement.hasContacted(player)) {
                 Direction d = Map.getRoughDirection(tile, this);
@@ -1312,7 +1313,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         for (Tile t : map.getCircleTiles(this, true, radius)) {
             if (Objects.equals(t, this)
                 || (same && !isConnectedTo(t))) continue;
-            Settlement settlement = t.getSettlement();
+            Settlement settlement = t.settlement;
             if (settlement != null
                 && (owner == null || owner.owns(settlement))) {
                 return settlement;
@@ -1331,7 +1332,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public Tile getSafeTile(Player player, Random random) {
         if ((getFirstUnit() == null || Objects.equals(getFirstUnit().getOwner(), player))
-            && (!hasSettlement() || Objects.equals(getSettlement().getOwner(), player))) {
+            && (!hasSettlement() || Objects.equals(settlement.getOwner(), player))) {
             return this;
         }
 
@@ -1344,8 +1345,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             for (Tile t : tiles) {
                 if ((t.getFirstUnit() == null
                         || Objects.equals(t.getFirstUnit().getOwner(), player))
-                    && (t.getSettlement() == null
-                        || Objects.equals(t.getSettlement().getOwner(), player))) {
+                    && (t.settlement == null
+                        || Objects.equals(t.settlement.getOwner(), player))) {
                     return t;
                 }
             }
@@ -1358,7 +1359,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The defence value.
      */
     public double getDefenceValue() {
-        final TileType type = getType();
+        final TileType type = this.type;
         return (type == null) ? 0.0
             : applyModifiers(1.0f, null, type.getDefenceModifiers());
     }
@@ -1369,7 +1370,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The percentage defence bonus.
      */
     public int getDefenceBonusPercentage() {
-        return (int)getType().applyModifiers(100f, getGame().getTurn(),
+        return (int) type.applyModifiers(100f, getGame().getTurn(),
                                              Modifier.DEFENCE)
             - 100;
     }
@@ -1383,9 +1384,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A list of land {@code Tile}s.
      */
     public List<Tile> getSafestSurroundingLandTiles(Player player) {
-        final Predicate<Tile> safeTilePred = t ->
-            (t.isLand()
-                && (!t.hasSettlement() || player.owns(t.getSettlement())));
+        final Predicate<Tile> safeTilePred = t -> {
+            return (t.isLand()
+                && (!t.hasSettlement() || player.owns(t.settlement)));
+        };
         final Comparator<Tile> defenceComp
             = cachingDoubleComparator(Tile::getDefenceValue).reversed();
         return transform(getSurroundingTiles(0, 1), safeTilePred,
@@ -1415,7 +1417,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean isDangerousToShip(Unit ship) {
         final Player player = ship.getOwner();
         final Predicate<Tile> dangerPred = t -> {
-            Settlement settlement = t.getSettlement();
+            Settlement settlement = t.settlement;
             return (settlement == null) ? false
                 : !player.owns(settlement)
                     && settlement.canBombardEnemyShip()
@@ -1471,8 +1473,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if a {@code Colony} is using this {@code Tile}.
      */
     public boolean isInUse() {
-        return getOwningSettlement() instanceof Colony
-            && ((Colony)getOwningSettlement()).isTileInUse(this);
+        return owningSettlement instanceof Colony
+            && ((Colony) owningSettlement).isTileInUse(this);
     }
 
     /**
@@ -1533,7 +1535,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             } else if (!goodsType.isFoodType()) {
                 continue;
             }
-            for (ProductionType productionType : getType()
+            for (ProductionType productionType : type
                      .getAvailableProductionTypes(false)) {
                 int potential = (productionType.getOutput(goodsType) == null)
                     ? 0 : getPotentialProduction(goodsType, null);
@@ -1549,9 +1551,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             forEachMapEntry(goodsMap, e -> e.setValue(e.getValue()
                     + t.getPotentialProduction(e.getKey(),
                         spec.getDefaultUnitType(owner))));
-            Player tileOwner = t.getOwner();
+            Player tileOwner = t.owner;
             if (Objects.equals(owner, tileOwner)) {
-                if (t.getOwningSettlement() != null) {
+                if (t.owningSettlement != null) {
                     // we are using newTile
                     ownedBySelf = true;
                 } else {
@@ -1676,7 +1678,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private int getMaximumPotential(GoodsType goodsType, UnitType unitType,
                                     TileType tileType) {
         float potential = tileType.getPotentialProduction(goodsType, unitType);
-        if (Objects.equals(tileType, getType())) { // Handle the resource in the noop case
+        if (Objects.equals(tileType, type)) { // Handle the resource in the noop case
             Resource resource = (tileItemContainer == null) ? null
                 : tileItemContainer.getResource();
             if (resource != null) {
@@ -1715,9 +1717,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         // Collect all the possible tile type changes.
         List<TileType> tileTypes = transform(improvements,
-            ti -> !ti.isNatural() && ti.getChange(getType()) != null,
-            ti -> ti.getChange(getType()));
-        tileTypes.add(0, getType()); //...including the noop case.
+                ti -> {
+                    return !ti.isNatural() && ti.getChange(type) != null;
+                },
+                ti -> {
+                    return ti.getChange(type);
+                });
+        tileTypes.add(0, type); //...including the noop case.
 
         // Find the maximum production under each tile type change.
         return max(tileTypes, tt ->
@@ -1753,7 +1759,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public List<AbstractGoods> getSortedPotential(UnitType unitType,
                                                   Player owner) {
         // Defend against calls while partially read.
-        if (getType() == null) return Collections.<AbstractGoods>emptyList();
+        if (type == null) return Collections.<AbstractGoods>emptyList();
         
         final ToIntFunction<GoodsType> productionMapper = cacheInt(gt ->
             getPotentialProduction(gt, unitType));
@@ -1781,7 +1787,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final Comparator<AbstractGoods> goodsComp
             = Comparator.comparingInt(ag ->
                 getPotentialProduction(ag.getType(), null));
-        return maximize(flatten(getType().getAvailableProductionTypes(true),
+        return maximize(flatten(type.getAvailableProductionTypes(true),
                                 pt -> pt.getOutputs()),
                         AbstractGoods::isFoodType, goodsComp);
     }
@@ -2078,8 +2084,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Unit getOccupyingUnit() {
         Unit unit = getFirstUnit();
         Player owner = null;
-        if (getOwningSettlement() != null) {
-            owner = getOwningSettlement().getOwner();
+        if (owningSettlement != null) {
+            owner = owningSettlement.getOwner();
         }
         return (owner != null && unit != null && !Objects.equals(unit.getOwner(), owner)
             && unit.getOwner().atWarWith(owner))
@@ -2207,7 +2213,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             return ((Unit)locatable).isTileAccessible(this);
         } else if (locatable instanceof TileImprovement) {
             return ((TileImprovement)locatable).getType()
-                .isTileTypeAllowed(getType());
+                .isTileTypeAllowed(type);
         } else {
             return false;
         }
@@ -2218,7 +2224,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     public Location up() {
-        return (hasSettlement()) ? getSettlement()
+        return (hasSettlement()) ? settlement
             : this;
     }
 
@@ -2227,7 +2233,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     public int getRank() {
-        return getX() + getY() * getMap().getWidth();
+        return x + y * getMap().getWidth();
     }
 
     /**
@@ -2236,8 +2242,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder(16);
-        TileType type = getType();
-        sb.append(getX()).append(',').append(getY())
+        TileType type = this.type;
+        sb.append(x).append(',').append(y)
             .append('-').append((type == null) ? "?" : type.getSuffix());
         return sb.toString();
     }
@@ -2251,12 +2257,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public String getNameKey() {
         if (getGame().isInClient()) {
-            return (isExplored()) ? getType().getNameKey() : "unexplored";
+            return (isExplored()) ? type.getNameKey() : "unexplored";
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
                 return (getCachedTile(player) == null) ? "unexplored"
-                    : getType().getNameKey();
+                    : type.getNameKey();
             } else {
                 logger.warning("player == null");
                 return "";
@@ -2318,7 +2324,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     public int checkIntegrity(boolean fix) {
         int result = super.checkIntegrity(fix);
-        Settlement settlement = getSettlement();
+        Settlement settlement = this.settlement;
         if (settlement != null) {
             result = Math.min(result, settlement.checkIntegrity(fix));
         }
@@ -2339,7 +2345,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                         FreeColSpecObjectType fcgot,
                                         Turn turn) {
         // Delegate to type
-        return getType().getAbilities(id, fcgot, turn);
+        return type.getAbilities(id, fcgot, turn);
     }
 
 
@@ -2611,10 +2617,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         // @compat 0.10.1
         // Old settlements were prone to not owning their tiles.
-        if (getSettlement() != null) {
-            Settlement settlement = getSettlement();
+        if (settlement != null) {
+            Settlement settlement = this.settlement;
             Player owner = settlement.getOwner();
-            if (owner != null && !Objects.equals(getOwner(), owner)) {
+            if (owner != null && !Objects.equals(this.owner, owner)) {
                 this.owner = owner;
             }
             if (!Objects.equals(this.owningSettlement, settlement)) {
@@ -2742,7 +2748,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         sb.append('[').append(getId())
             .append(' ').append((type == null) ? "unknown" : type.getSuffix())
             .append(' ').append(x).append(',').append(y)
-            .append((!hasSettlement()) ? "" : " " + getSettlement().getName())
+            .append((!hasSettlement()) ? "" : " " + settlement.getName())
             .append(']');
         return sb.toString();
     }

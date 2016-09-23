@@ -121,7 +121,7 @@ public class SelectOption extends IntegerOption {
      * {@inheritDoc}
      */
     public void setValue(Integer value) {
-        Set<Integer> keys = getItemValues().keySet();
+        Set<Integer> keys = itemValues.keySet();
         if (keys.isEmpty()) return; // May not have been read yet
 
         Integer fallback = null;

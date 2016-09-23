@@ -44,7 +44,7 @@ public class GameStateMessage extends DOMMessage {
      * Create a new {@code GameStateMessage}.
      */
     public GameStateMessage() {
-        super(getTagName());
+        super(TAG);
 
         this.state = null;
     }
@@ -91,7 +91,7 @@ public class GameStateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             STATE_TAG, this.state).toXMLElement();
     }
 

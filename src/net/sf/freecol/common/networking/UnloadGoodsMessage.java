@@ -58,7 +58,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param carrier The {@code Unit} carrying the goods.
      */
     public UnloadGoodsMessage(GoodsType goodsType, int amount, Unit carrier) {
-        super(getTagName());
+        super(TAG);
 
         this.goodsTypeId = goodsType.getId();
         this.amountString = Integer.toString(amount);
@@ -73,7 +73,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public UnloadGoodsMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
         this.amountString = getStringAttribute(element, AMOUNT_TAG);
@@ -148,7 +148,7 @@ public class UnloadGoodsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             TYPE_TAG, this.goodsTypeId,
             AMOUNT_TAG, this.amountString,
             CARRIER_TAG, this.carrierId).toXMLElement();

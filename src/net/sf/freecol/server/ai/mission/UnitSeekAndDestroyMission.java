@@ -449,7 +449,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidReason(getAIUnit(), target);
     }
 
     /**
@@ -464,8 +464,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             Colony colony;
             Mission m;
             if (Mission.TARGETOWNERSHIP.equals(reason)
-                && getTarget() instanceof Colony
-                && (colony = (Colony)getTarget()) != null
+                && target instanceof Colony
+                && (colony = (Colony) target) != null
                 && getPlayer().owns(colony)
                 && (m = getAIPlayer().getDefendSettlementMission(aiUnit,
                         colony)) != null) {
@@ -481,16 +481,16 @@ public class UnitSeekAndDestroyMission extends Mission {
         Location nearbyTarget = (unit.isOnCarrier()) ? null
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
-            if (getTarget() == null) {
+            if (target == null) {
                 setTarget(nearbyTarget);
                 return lbRetarget(lb);
             }
-            if (nearbyTarget == getTarget()) {
+            if (nearbyTarget == target) {
                 nearbyTarget = null;
             } else {
                 Tile now = unit.getTile();
                 Tile nearbyTile = nearbyTarget.getTile();
-                Tile targetTile = getTarget().getTile();
+                Tile targetTile = target.getTile();
                 if (now != null && nearbyTile != null && targetTile != null
                     && (now.getDistanceTo(nearbyTile)
                         >= now.getDistanceTo(targetTile))) {
@@ -503,7 +503,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
-            : getTarget();
+            : target;
         // Note avoiding other targets by choice of cost decider.
         Unit.MoveType mt = travelToTarget(currentTarget,
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);

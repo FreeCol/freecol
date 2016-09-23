@@ -265,7 +265,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (Objects.equals(getOwner(), player)) ? this : null;
+        return (Objects.equals(owner, player)) ? this : null;
     }
 
     // Interface Location (from UnitLocation)
@@ -349,7 +349,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public int priceGoods(List<AbstractGoods> goods) {
-        Player player = getOwner();
+        Player player = owner;
         Market market = player.getMarket();
         int price = 0;
         for (AbstractGoods ag : transform(goods, AbstractGoods::isPositive)) {
@@ -380,7 +380,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public String getNameKey() {
-        return getOwner().getEuropeNameKey();
+        return owner.getEuropeNameKey();
     }
 
 
@@ -418,7 +418,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
-        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+        return (owner.canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
 
@@ -427,7 +427,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public int getImportAmount(GoodsType goodsType, int turns) {
-        return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
+        return (owner.canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
     }
 
@@ -439,7 +439,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public void disposeResources() {
-        Player owner = getOwner();
+        Player owner = this.owner;
         if (owner != null) {
             owner.setEurope(null);
             HighSeas highSeas = owner.getHighSeas();
@@ -487,7 +487,7 @@ public class Europe extends UnitLocation
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (xw.validFor(getOwner())) {
+        if (xw.validFor(owner)) {
             xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
 
             xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
@@ -503,7 +503,7 @@ public class Europe extends UnitLocation
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (xw.validFor(getOwner())) {
+        if (xw.validFor(owner)) {
 
             for (Ability ability : getSortedAbilities()) {
                 ability.toXML(xw);

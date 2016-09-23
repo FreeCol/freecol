@@ -188,7 +188,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return True if base offensive ability is greater than the default.
      */
     public boolean isOffensive() {
-        return getBaseOffence() > UnitType.DEFAULT_OFFENCE;
+        return offence > UnitType.DEFAULT_OFFENCE;
     }
 
     /**
@@ -219,7 +219,7 @@ public final class UnitType extends BuildableType implements Consumer {
      * @return True if base defensive ability is greater than the default.
      */
     public boolean isDefensive() {
-        return getBaseDefence() > UnitType.DEFAULT_DEFENCE;
+        return defence > UnitType.DEFAULT_DEFENCE;
     }
 
     /**
@@ -430,9 +430,9 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public UnitType getTeachingType(UnitType teacherType) {
         final Specification spec = getSpecification();
-        final UnitType taught = teacherType.getSkillTaught();
-        final int taughtLevel = taught.getSkill();
-        if (getSkill() >= taughtLevel) return null; // Fail fast
+        final UnitType taught = teacherType.skillTaught;
+        final int taughtLevel = taught.skill;
+        if (skill >= taughtLevel) return null; // Fail fast
 
         // Is there an education change that gets this unit type to the
         // type taught by the teacher type?  If so, the taught type is valid
@@ -441,7 +441,7 @@ public final class UnitType extends BuildableType implements Consumer {
         List<UnitType> todo = new ArrayList<>();
         for (UnitChange uc : spec.getUnitChanges(UnitChangeType.EDUCATION, this)) {
             if (Objects.equals(uc.to, taught)) return taught;
-            if (uc.to.getSkill() < taughtLevel) todo.add(uc.to);
+            if (uc.to.skill < taughtLevel) todo.add(uc.to);
         }
         // Can the teacher teach any of the intermediate changes?  If so,
         // that change is valid.  Otherwise, education is not possible.

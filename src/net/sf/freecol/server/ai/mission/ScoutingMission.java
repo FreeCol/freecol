@@ -392,7 +392,7 @@ public class ScoutingMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        return invalidReason(getAIUnit(), this.target);
     }
 
     /**
@@ -412,7 +412,7 @@ public class ScoutingMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         Direction d;
-        Unit.MoveType mt = travelToTarget(getTarget(),
+        Unit.MoveType mt = travelToTarget(this.target,
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE: // Arrived at a colony
@@ -436,27 +436,27 @@ public class ScoutingMission extends Mission {
             // temporarily blocked by another unit.  Make a random
             // (directed if possible) move and try again.
             moveRandomly(tag, unit.getTile()
-                .getDirection(getTarget().getTile()));
+                .getDirection(this.target.getTile()));
             return lbDodge(lb);
 
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            d = unit.getTile().getDirection(getTarget().getTile());
-            assert d != null && getTarget() instanceof IndianSettlement;
+            d = unit.getTile().getDirection(this.target.getTile());
+            assert d != null && this.target instanceof IndianSettlement;
             if (AIMessage.askScoutSpeakToChief(aiUnit,
-                                               (IndianSettlement)getTarget())) {
-                lbDone(lb, true, "speak-with-chief at ", getTarget());
+                                               (IndianSettlement) this.target)) {
+                lbDone(lb, true, "speak-with-chief at ", this.target);
             } else {
-                lbFail(lb, true, "unexpected failure to speak at ", getTarget());
+                lbFail(lb, true, "unexpected failure to speak at ", this.target);
             }
             break;
 
         case EXPLORE_LOST_CITY_RUMOUR:
-            d = unit.getTile().getDirection(getTarget().getTile());
+            d = unit.getTile().getDirection(this.target.getTile());
             assert d != null;
             if (AIMessage.askMove(aiUnit, d)) {
-                lbDone(lb, true, "explore at ", getTarget());
+                lbDone(lb, true, "explore at ", this.target);
             } else {
-                lbFail(lb, true, "unexpected failure at ", getTarget());
+                lbFail(lb, true, "unexpected failure at ", this.target);
             }
             break;
 
@@ -469,7 +469,7 @@ public class ScoutingMission extends Mission {
         // one colony to another, just drop equipment and invalidate
         // the mission.
         lbAt(lb);
-        Location completed = getTarget();
+        Location completed = this.target;
         Location newTarget = findTarget(aiUnit, 20, false);
         if (newTarget == null
             || (completed instanceof Colony && newTarget == completed)) {

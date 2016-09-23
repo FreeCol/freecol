@@ -48,7 +48,7 @@ public class UpdateMessage extends DOMMessage {
      * @param fcgos The list of {@code FreeColGameObject}s to add.
      */
     public UpdateMessage(List<FreeColGameObject> fcgos) {
-        super(getTagName());
+        super(TAG);
 
         this.fcgos.clear();
         if (fcgos != null) this.fcgos.addAll(fcgos);
@@ -102,7 +102,7 @@ public class UpdateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .add(this.fcgos).toXMLElement();
     }
 

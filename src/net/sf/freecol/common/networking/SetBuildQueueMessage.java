@@ -57,7 +57,7 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param queue A list of {@code BuildableType}s to build.
      */
     public SetBuildQueueMessage(Colony colony, List<BuildableType> queue) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = colony.getId();
         this.queue = transform(queue, alwaysTrue(), BuildableType::getId)
@@ -72,7 +72,7 @@ public class SetBuildQueueMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetBuildQueueMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.queue = getArrayAttributes(element).toArray(new String[0]);
@@ -143,7 +143,7 @@ public class SetBuildQueueMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             COLONY_TAG, this.colonyId)
             .setArrayAttributes(this.queue).toXMLElement();
     }

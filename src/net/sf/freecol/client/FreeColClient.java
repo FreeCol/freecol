@@ -564,7 +564,7 @@ public final class FreeColClient {
      * @return True if tutorial messages should be displayed.
      */
     public boolean tutorialMode() {
-        return getClientOptions().getBoolean("model.option.guiShowTutorial");
+        return clientOptions.getBoolean("model.option.guiShowTutorial");
     }
 
     /**
@@ -724,10 +724,10 @@ public final class FreeColClient {
      * @return The animation speed.
      */
     public int getAnimationSpeed(Player player) {
-        String key = (Objects.equals(getMyPlayer(), player))
+        String key = (Objects.equals(this.player, player))
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        return getClientOptions().getInteger(key);
+        return clientOptions.getInteger(key);
     }
 
     /**
@@ -765,11 +765,11 @@ public final class FreeColClient {
      */
     public void newGame(boolean prompt) {
         Specification specification = null;
-        if (getGame() != null) {
-            if (isMapEditor()) {
-                specification = getGame().getSpecification();
+        if (game != null) {
+            if (mapEditor) {
+                specification = game.getSpecification();
             } else if (!prompt || gui.confirmStopGame()) {
-                getConnectController().quitGame(true);
+                connectController.quitGame(true);
                 FreeColSeed.incrementFreeColSeed();
             } else {
                 return;
@@ -814,10 +814,10 @@ public final class FreeColClient {
      */
     public void retire() {
         if (gui.confirm("retireDialog.areYouSure.text", "ok", "cancel")) {
-            final Game game = getGame();
-            final Player player = getMyPlayer();
+            final Game game = this.game;
+            final Player player = this.player;
             player.changePlayerType(Player.PlayerType.RETIRED);
-            getInGameController().displayHighScores(null);
+            inGameController.displayHighScores(null);
             askServer().retire(game);
         }
     }
@@ -826,7 +826,7 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        getConnectController().quitGame(isSinglePlayer());
+        connectController.quitGame(singlePlayer);
 
         // delete outdated autosave files
         long validPeriod = 1000L * 24L * 60L * 60L // days to ms

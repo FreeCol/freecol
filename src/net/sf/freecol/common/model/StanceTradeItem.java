@@ -111,7 +111,7 @@ public class StanceTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     public int evaluateFor(Player player) {
-        final Stance stance = getStance();
+        final Stance stance = this.stance;
         final double ratio = player.getStrengthRatio(getOther(player), false);
         int value = (int)Math.round(100 * ratio);
         switch (stance) {

@@ -115,7 +115,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return True if this is food.
      */
     public final boolean isFoodType() {
-        return getType().isFoodType();
+        return type.isFoodType();
     }
 
     /**
@@ -142,7 +142,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return True if the amount is greater than zero.
      */
     public final boolean isPositive() {
-        return getAmount() > 0;
+        return amount > 0;
     }
 
     /**
@@ -151,7 +151,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return The label for these goods.
      */
     public StringTemplate getLabel() {
-        return getLabel(getType(), getAmount());
+        return getLabel(type, amount);
     }
 
     /**
@@ -160,7 +160,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return True if the goods are storable.
      */
     public boolean isStorable() {
-        return getType().isStorable();
+        return type.isStorable();
     }
 
     /**
@@ -172,8 +172,8 @@ public class AbstractGoods extends FreeColObject implements Named {
     public StringTemplate getLabel(boolean sellable) {
         return (sellable) ? getLabel()
             : StringTemplate.template("model.abstractGoods.boycotted")
-                .addNamed("%goods%", getType())
-                .addAmount("%amount%", getAmount());
+                .addNamed("%goods%", type)
+                .addAmount("%amount%", amount);
     }
 
     /**
@@ -213,7 +213,7 @@ public class AbstractGoods extends FreeColObject implements Named {
     public static int getCount(GoodsType type,
         Collection<? extends AbstractGoods> goods) {
         AbstractGoods ag = find(goods, matches(type));
-        return (ag == null) ? 0 : ag.getAmount();
+        return (ag == null) ? 0 : ag.amount;
     }
 
     /**
@@ -224,8 +224,8 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
-        return (market == null) ? getAmount() * 2 // FIXME: magic#
-            : market.getSalePrice(getType(), getAmount());
+        return (market == null) ? amount * 2 // FIXME: magic#
+            : market.getSalePrice(type, amount);
     }
 
     /**
@@ -246,7 +246,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     @Override
     public String getNameKey() {
-        return getType().getNameKey();
+        return type.getNameKey();
     }
 
 
@@ -291,7 +291,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return A string version of the goods.
      */     
     public static String toString(AbstractGoods ag) {
-        return toString(ag.getType(), ag.getAmount());
+        return toString(ag.type, ag.amount);
     }
 
     /**

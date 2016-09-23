@@ -153,7 +153,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public RearrangeColonyMessage(Colony colony, List<Unit> workers,
                                   Colony scratch) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = colony.getId();
         this.arrangements.clear();
@@ -177,7 +177,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public RearrangeColonyMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         int n;
@@ -277,7 +277,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(getTagName(),
+        DOMMessage result = new DOMMessage(TAG,
             COLONY_TAG, this.colonyId,
             FreeColObject.ARRAY_SIZE_TAG, Integer.toString(arrangements.size()));
         int i = 0;

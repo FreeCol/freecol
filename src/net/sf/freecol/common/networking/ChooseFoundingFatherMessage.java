@@ -65,7 +65,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     public ChooseFoundingFatherMessage(List<FoundingFather> fathers,
                                        FoundingFather ff) {
-        super(getTagName());
+        super(TAG);
 
         this.fathers = new ArrayList<>();
         this.fathers.addAll(fathers);
@@ -80,7 +80,7 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ChooseFoundingFatherMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         final Specification spec = game.getSpecification();
         List<String> found = transform(fatherKeys, alwaysTrue(),
@@ -166,9 +166,9 @@ public class ChooseFoundingFatherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
                               FOUNDING_FATHER_TAG, this.foundingFatherId)
-            .setAttributes(transform(getFathers(), alwaysTrue(),
+            .setAttributes(transform(this.fathers, alwaysTrue(),
                                      Function.identity(),
                                      Collectors.toMap(f -> f.getType().toString(),
                                                       f -> f.getId())))

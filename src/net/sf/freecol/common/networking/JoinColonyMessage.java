@@ -53,7 +53,7 @@ public class JoinColonyMessage extends DOMMessage {
      * @param builder The {@code Unit} to do the building.
      */
     public JoinColonyMessage(Colony colony, Unit builder) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = colony.getId();
         this.unitId = builder.getId();
@@ -66,7 +66,7 @@ public class JoinColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public JoinColonyMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.unitId = getStringAttribute(element, UNIT_TAG);
@@ -116,7 +116,7 @@ public class JoinColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             COLONY_TAG, this.colonyId,
             UNIT_TAG, this.unitId).toXMLElement();
     }

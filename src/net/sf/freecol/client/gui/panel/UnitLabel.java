@@ -334,7 +334,7 @@ public final class UnitLabel extends JLabel
      * @return True if the label refers to suitable equipment.
      */
     public boolean canUnitBeEquippedWith(JLabel data) {
-        return getUnit().hasAbility(Ability.CAN_BE_EQUIPPED)
+        return unit.hasAbility(Ability.CAN_BE_EQUIPPED)
             && data instanceof AbstractGoodsLabel;
     }
 

@@ -169,7 +169,7 @@ public abstract class UnitPanel extends MigPanel
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;
                 if (Objects.equals(label.getUnit(), unit)) {
-                    getPortPanel().setSelectedUnitLabel(label);
+                    portPanel.setSelectedUnitLabel(label);
                     return true;
                 }
             }

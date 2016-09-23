@@ -47,7 +47,9 @@ public class Modifier extends Feature {
      */
     public static final Comparator<Modifier> ascendingModifierIndexComparator
         = Comparator.<Modifier>comparingInt(Modifier::getModifierIndex)
-            .thenComparingInt(m -> m.getType().ordinal())
+            .thenComparingInt(m -> {
+                return m.modifierType.ordinal();
+            })
             .thenComparing(FreeColObject.fcoComparator)
             .thenComparing(Modifier::getSource, FreeColObject.fcoComparator);
     
@@ -248,11 +250,11 @@ public class Modifier extends Feature {
         this(template.getSpecification());
 
         copyFrom(template);
-        setType(template.getType());
-        setValue(template.getValue());
-        setIncrementType(template.getIncrementType());
-        setIncrement(template.getIncrement());
-        setModifierIndex(template.getModifierIndex());
+        setType(template.modifierType);
+        setValue(template.value);
+        setIncrementType(template.incrementType);
+        setIncrement(template.increment);
+        setModifierIndex(template.modifierIndex);
     }
 
     /**
@@ -310,14 +312,14 @@ public class Modifier extends Feature {
     public static Modifier makeTimedModifier(String id, Modifier template,
                                              Turn start) {
         Modifier modifier = new Modifier(id, template);
-        float inc = template.getIncrement();
+        float inc = template.increment;
         int duration = template.getDuration();
         modifier.setTemporary(template.isTemporary());
         // FIXME: this only works for additive modifiers
         if (duration == 0) {
-            duration = (int)(template.getValue()/-inc);
+            duration = (int)(template.value /-inc);
         }
-        modifier.setIncrement(template.getIncrementType(), inc, start,
+        modifier.setIncrement(template.incrementType, inc, start,
                               new Turn(start.getNumber() + duration));
         return modifier;
     }
@@ -484,7 +486,7 @@ public class Modifier extends Feature {
      * @return a {@code float} value
      */
     public float apply(float base, float value) {
-        return apply(base, value, getType());
+        return apply(base, value, modifierType);
     }
 
     /**
@@ -530,7 +532,7 @@ public class Modifier extends Feature {
      */
     public float applyTo(float number, Turn turn) {
         return (incrementType == null) ? apply(number, value)
-            : apply(number, getValue(turn), getType());
+            : apply(number, getValue(turn), modifierType);
     }
 
     // @compat 0.10.7

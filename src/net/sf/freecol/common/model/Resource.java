@@ -184,7 +184,7 @@ public class Resource extends TileItem {
      */
     @Override
     public String getNameKey() {
-        return getType().getNameKey();
+        return type.getNameKey();
     }
 
 
@@ -203,7 +203,7 @@ public class Resource extends TileItem {
      */
     @Override
     public boolean isTileTypeAllowed(TileType tileType) {
-        return tileType.canHaveResourceType(getType());
+        return tileType.canHaveResourceType(type);
     }
 
     /**
@@ -238,7 +238,7 @@ public class Resource extends TileItem {
     public Stream<Modifier> getProductionModifiers(GoodsType goodsType,
                                                    UnitType unitType) {
         return (goodsType == null) ? Stream.<Modifier>empty()
-            : getType().getModifiers(goodsType.getId(), unitType);
+            : type.getModifiers(goodsType.getId(), unitType);
     }
 
     /**
@@ -293,7 +293,7 @@ public class Resource extends TileItem {
 
         xw.writeAttribute(TILE_TAG, getTile());
 
-        xw.writeAttribute(TYPE_TAG, getType());
+        xw.writeAttribute(TYPE_TAG, type);
 
         xw.writeAttribute(QUANTITY_TAG, quantity);
     }
@@ -321,8 +321,8 @@ public class Resource extends TileItem {
      */
     @Override
     public String toString() {
-        return (quantity == UNLIMITED) ? getType().getId()
-            : Integer.toString(quantity) + " " + getType().getId();
+        return (quantity == UNLIMITED) ? type.getId()
+            : Integer.toString(quantity) + " " + type.getId();
     }
 
     /**

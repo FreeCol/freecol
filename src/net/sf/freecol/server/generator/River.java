@@ -259,7 +259,7 @@ public class River {
      * @return true if this river already contains the given tile.
      */
     public boolean contains(Tile tile) {
-        return any(getSections(), rs -> Objects.equals(rs.getTile(), tile));
+        return any(sections, rs -> Objects.equals(rs.getTile(), tile));
     }
 
     /**

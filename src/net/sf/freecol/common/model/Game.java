@@ -708,7 +708,7 @@ public class Game extends FreeColGameObject {
     public boolean addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
-            Nation nation = getSpecification().getNation(player.getNationId());
+            Nation nation = this.specification.getNation(player.getNationId());
             nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
             if (currentPlayer == null) currentPlayer = player;
             return true;
@@ -730,7 +730,7 @@ public class Game extends FreeColGameObject {
 
         if (!players.remove(player)) return false;
 
-        Nation nation = getSpecification().getNation(player.getNationId());
+        Nation nation = this.specification.getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.AVAILABLE);
         player.dispose();
 
@@ -911,7 +911,7 @@ public class Game extends FreeColGameObject {
      * @return The age (0-2).
      */
     public int getAge() {
-        return getSpecification().getAge(turn);
+        return this.specification.getAge(turn);
     }
     
     /**
@@ -1104,7 +1104,7 @@ public class Game extends FreeColGameObject {
         FreeColObject o = getFreeColGameObject(id);
         if (o == null) {
             try {
-                o = getSpecification().findType(id);
+                o = this.specification.findType(id);
             } catch (RuntimeException e) {
                 o = null; // Ignore
             }
@@ -1222,11 +1222,11 @@ public class Game extends FreeColGameObject {
             lb.log(logger, Level.WARNING);
         }
 
-        Map map = getMap();
+        Map map = this.map;
         if (map != null) {
-            result = Math.min(result, getMap().checkIntegrity(fix));
+            result = Math.min(result, this.map.checkIntegrity(fix));
         }
-        for (Player player : getPlayerList()) {
+        for (Player player : this.players) {
             result = Math.min(result, player.checkIntegrity(fix));
         }
         return result;
@@ -1327,9 +1327,9 @@ public class Game extends FreeColGameObject {
                               xw.getClientPlayer().getName());
         }
 
-        xw.writeAttribute(UUID_TAG, getUUID());
+        xw.writeAttribute(UUID_TAG, uuid);
 
-        xw.writeAttribute(TURN_TAG, getTurn().getNumber());
+        xw.writeAttribute(TURN_TAG, turn.getNumber());
 
         xw.writeAttribute(SPANISH_SUCCESSION_TAG, spanishSuccession);
 
@@ -1363,7 +1363,7 @@ public class Game extends FreeColGameObject {
         nationOptions.toXML(xw);
 
         List<Player> players = sort(getPlayers());
-        Player unknown = getUnknownEnemy();
+        Player unknown = unknownEnemy;
         if (unknown != null) players.add(unknown);
         for (Player p : players) p.toXML(xw);
 

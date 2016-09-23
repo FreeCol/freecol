@@ -1415,7 +1415,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        final Player hated = getMostHated();
+        final Player hated = mostHated;
 
         if (getName() != null) { // Delegated from Settlement
             xw.writeAttribute(NAME_TAG, getName());

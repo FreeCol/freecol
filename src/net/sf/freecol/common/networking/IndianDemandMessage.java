@@ -70,7 +70,7 @@ public class IndianDemandMessage extends DOMMessage {
      */
     public IndianDemandMessage(Unit unit, Colony colony,
                                GoodsType type, int amount) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
@@ -87,7 +87,7 @@ public class IndianDemandMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public IndianDemandMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.colonyId = getStringAttribute(element, COLONY_TAG);
@@ -225,7 +225,7 @@ public class IndianDemandMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             UNIT_TAG, this.unitId,
             COLONY_TAG, this.colonyId,
             AMOUNT_TAG, this.amount,

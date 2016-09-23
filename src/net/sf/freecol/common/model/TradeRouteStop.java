@@ -161,7 +161,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
      */
     public List<AbstractGoods> getCompactCargo() {
         List<AbstractGoods> result = new ArrayList<>();
-        for (GoodsType type : getCargo()) {
+        for (GoodsType type : cargo) {
             AbstractGoods ag = find(result, AbstractGoods.matches(type));
             if (ag != null) {
                 ag.setAmount(ag.getAmount() + GoodsContainer.CARGO_SIZE);
@@ -182,7 +182,7 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     public StringTemplate getLabelFor(String key, Player player) {
         return StringTemplate.template(key)
             .addStringTemplate("%location%",
-                this.getLocation().getLocationLabelFor(player));
+                location.getLocationLabelFor(player));
     }
 
     /**
@@ -344,8 +344,8 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append('[').append(getXMLTagName())
-            .append(' ').append(getLocation().getId());
-        for (GoodsType goodsType : getCargo()) {
+            .append(' ').append(location.getId());
+        for (GoodsType goodsType : cargo) {
             sb.append(' ').append(goodsType);
         }
         sb.append(']');

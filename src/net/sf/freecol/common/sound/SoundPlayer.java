@@ -136,7 +136,7 @@ public class SoundPlayer {
      * @param file The {@code File} to be played.
      */
     public void playOnce(File file) {
-        if (getMixer() == null) return; // Fail faster.
+        if (mixer == null) return; // Fail faster.
         try {
             soundPlayerThread.add(getAudioInputStream(file));
             soundPlayerThread.awaken();

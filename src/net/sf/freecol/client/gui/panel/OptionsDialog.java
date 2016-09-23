@@ -175,7 +175,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
 
         c.add(new ChoiceItem<>(Messages.message("ok"), this.group).okOption());
         c.add(new ChoiceItem<>(Messages.message("cancel"), (OptionGroup)null,
-                               isEditable()).cancelOption().defaultOption());
+                this.editable).cancelOption().defaultOption());
         
         initializeDialog(frame, DialogType.PLAIN, true, this.panel, null, c);
     }
@@ -209,7 +209,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the load succeeded.
      */
     protected boolean load(File file) {
-        OptionGroup og = OptionGroup.load(file, getOptionGroupId(),
+        OptionGroup og = OptionGroup.load(file, this.optionGroupId,
                                           getSpecification());
         if (og == null) return false;
         set(og);
@@ -234,7 +234,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the options were loaded.
      */
     protected boolean loadDefaultOptions() {
-        File f = FreeColDirectories.getOptionsFile(getDefaultFileName());
+        File f = FreeColDirectories.getOptionsFile(this.defaultFileName);
         return (f.exists()) ? load(f) : false;
     }
 
@@ -244,7 +244,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
      * @return True if the options were saved.
      */
     protected boolean saveDefaultOptions() {
-        File f = FreeColDirectories.getOptionsFile(getDefaultFileName());
+        File f = FreeColDirectories.getOptionsFile(this.defaultFileName);
         return save(f);
     }
 
@@ -260,7 +260,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup> {
         if (value == null) {
             ; // Cancelled, do nothing
         } else {
-            getOptionUI().updateOption();
+            this.ui.updateOption();
         }
         return value;
     }

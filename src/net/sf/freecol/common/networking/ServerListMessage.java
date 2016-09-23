@@ -57,7 +57,7 @@ public class ServerListMessage extends DOMMessage {
      * a request for servers.
      */
     public ServerListMessage() {
-        super(getTagName());
+        super(TAG);
     }
 
     /**
@@ -67,7 +67,7 @@ public class ServerListMessage extends DOMMessage {
      * @param mr The {@code MetaRegister} to query for servers.
      */
     public ServerListMessage(MetaRegister mr) {
-        super(getTagName());
+        super(TAG);
 
         this.servers.clear();
         this.servers.addAll(mr.getServers());
@@ -81,7 +81,7 @@ public class ServerListMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ServerListMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.servers.clear();
         this.servers.addAll(mapChildren(element,
@@ -171,7 +171,7 @@ public class ServerListMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName())
+        return new DOMMessage(TAG)
             .addMessages(transform(this.servers, alwaysTrue(),
                                    ServerListMessage::serverInfoToMessage))
             .toXMLElement();

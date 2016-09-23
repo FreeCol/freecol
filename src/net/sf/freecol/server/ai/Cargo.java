@@ -453,8 +453,8 @@ public class Cargo {
      */
     public Direction getLeaveDirection() {
         if (!carrier.hasTile() || plan.cdst == plan.tdst) return null;
-        TransportableAIObject t = getTransportable();
-        PathNode path = t.getDeliveryPath(getCarrier(), plan.tdst);
+        TransportableAIObject t = transportable;
+        PathNode path = t.getDeliveryPath(carrier, plan.tdst);
         return (path == null || path.next == null) ? null
             : path.next.getDirection();
     }
@@ -467,8 +467,8 @@ public class Cargo {
     public int getNewSpace() {
         if (!isValid()) return 0;
         int ret = 0;
-        ret += (getMode().isCollection()) ? getTransportable().getSpaceTaken()
-            : -getTransportable().getSpaceTaken();
+        ret += (getMode().isCollection()) ? transportable.getSpaceTaken()
+            : -transportable.getSpaceTaken();
         if (hasWrapped()) {
             ret += sum(wrapped, Cargo::getNewSpace);
         }
@@ -600,7 +600,7 @@ public class Cargo {
         final int newSpace = this.getNewSpace();
         for (int j = index; j < cargoes.size(); j++) {
             int holds = (j == 0) ? carrier.getCargoSpaceTaken()
-                : maxHolds - cargoes.get(j-1).getSpaceLeft();
+                : maxHolds - cargoes.get(j - 1).spaceLeft;
             holds += newSpace;
             if (holds < 0 || holds > maxHolds) return false;
         }
@@ -668,13 +668,13 @@ public class Cargo {
         xw.writeStartElement(getTagName());
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
-                          (AIObject)getTransportable());
+                          (AIObject) transportable);
 
-        xw.writeAttribute(CARRIER_TAG, getCarrier());
+        xw.writeAttribute(CARRIER_TAG, carrier);
 
-        xw.writeAttribute(TRIES_TAG, getTries());
+        xw.writeAttribute(TRIES_TAG, this.tries);
 
-        xw.writeAttribute(SPACELEFT_TAG, getSpaceLeft());
+        xw.writeAttribute(SPACELEFT_TAG, spaceLeft);
 
         if (plan.twait != null) {
             xw.writeLocationAttribute(TWAIT_TAG, plan.twait);

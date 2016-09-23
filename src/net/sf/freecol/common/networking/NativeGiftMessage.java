@@ -53,7 +53,7 @@ public class NativeGiftMessage extends DOMMessage {
      * @param colony The {@code Colony} that is trading.
      */
     public NativeGiftMessage(Unit unit, Colony colony) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
@@ -67,7 +67,7 @@ public class NativeGiftMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NativeGiftMessage(Game game, Element element) {
-        super(getTagName());
+        super(TAG);
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.colonyId = getStringAttribute(element, COLONY_TAG);
@@ -116,7 +116,7 @@ public class NativeGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(getTagName(),
+        return new DOMMessage(TAG,
             COLONY_TAG, this.colonyId,
             UNIT_TAG, this.unitId).toXMLElement();
     }

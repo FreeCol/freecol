@@ -280,7 +280,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
         Iterator<Goal> git = getSubGoalIterator();
         while (git!=null && git.hasNext()) {
             Goal g = git.next();
-            sumWeights += g.getWeight();
+            sumWeights += g.relativeWeight;
         }
 
         //allow for a small rounding or other error margin before normalizing
@@ -288,7 +288,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
             git = getSubGoalIterator();
             while (git!=null && git.hasNext()) {
                 Goal g = git.next();
-                g.setWeight(g.getWeight()/sumWeights);
+                g.setWeight(g.relativeWeight /sumWeights);
             }
         }
     }
