@@ -2367,6 +2367,25 @@ public final class Specification {
                     3.0f, Modifier.ModifierType.ADDITIVE, coronado, 0));
         }
         // end @compat 0.11.5
+
+        // @compat 0.11.6
+        // PlunderType became a FCSOT and thus gained identifiers
+        for (IndianNationType nt : indianNationTypes) {
+            for (SettlementType st : nt.getSettlementTypes()) {
+                for (PlunderType pt : st.getPlunderTypes()) {
+                    if (pt.getId() == null) {
+                        Scope scope = find(pt.getScopes(),
+                            matchKey("model.ability.plunderNatives",
+                                     Scope::getAbilityId));
+                        String id = "plunder." + nt.getSuffix()
+                            + ((st.isCapital()) ? ".capital" : "")
+                            + ((scope == null) ? "" : ".extra");
+                        pt.setId(id);
+                    }
+                }
+            }
+        }
+        // end @compat 0.11.6
     }
 
     /**
