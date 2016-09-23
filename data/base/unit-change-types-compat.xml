@@ -230,6 +230,10 @@
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterCottonPlanter" probability="100"/>
       <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterFurTrader" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterFurTrader" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
                         to="model.unit.masterSugarPlanter" probability="100"/>
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterSugarPlanter" probability="100"/>
