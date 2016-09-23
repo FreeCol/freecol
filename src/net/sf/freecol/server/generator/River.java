@@ -297,103 +297,98 @@ public class River {
      * @return true if a river was created, false otherwise.
      */
     private boolean flow(Tile source) {
-        River other = this;
-        flow:
-        while (true) {
 
-            if (other.sections.size() % 2 == 0) {
-                // get random new direction
-                int length = DirectionChange.values().length;
-                int index = other.randomInt(logger, "Flow", random, length);
-                DirectionChange change = DirectionChange.values()[index];
-                other.direction = change.getNewDirection(other.direction);
-                if (other.logger.isLoggable(Level.FINE)) {
-                    other.logger.fine("Direction is now " + other.direction);
-                }
+        if (sections.size() % 2 == 0) {
+            // get random new direction
+            int length = DirectionChange.values().length;
+            int index = randomInt(logger, "Flow", random, length);
+            DirectionChange change = DirectionChange.values()[index];
+            this.direction = change.getNewDirection(this.direction);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Direction is now " + direction);
             }
-
-            for (DirectionChange change : DirectionChange.values()) {
-                Direction dir = change.getNewDirection(other.direction);
-                Tile nextTile = source.getNeighbourOrNull(dir);
-                if (nextTile == null) continue;
-
-                // is the tile suitable for this river?
-                if (!other.riverType.isTileTypeAllowed(nextTile.getType())) {
-                    // Mountains, ocean cannot have rivers
-                    if (other.logger.isLoggable(Level.FINE)) {
-                        other.logger.fine("Tile (" + nextTile + ") can not have a river.");
-                    }
-                    continue;
-                } else if (other.contains(nextTile)) {
-                    if (other.logger.isLoggable(Level.FINE)) {
-                        other.logger.fine("Tile (" + nextTile + ") is already in river.");
-                    }
-                    continue;
-                } else if (other.isNextToSelf(nextTile)) {
-                    if (other.logger.isLoggable(Level.FINE)) {
-                        other.logger.fine("Tile (" + nextTile + ") is next to the river.");
-                    }
-                    continue;
-                } else {
-                    // find out if an adjacent tile is next to water
-                    for (DirectionChange change2 : DirectionChange.values()) {
-                        Direction lastDir = change2.getNewDirection(dir);
-                        Tile t = nextTile.getNeighbourOrNull(lastDir);
-                        if (t == null) continue;
-                        if (t.isLand() && !t.hasRiver()) continue;
-
-                        other.sections.add(new RiverSection(source, dir));
-                        RiverSection lastSection = new RiverSection(nextTile,
-                                lastDir);
-                        other.sections.add(lastSection);
-
-                        if (t.hasRiver() && t.isLand()) {
-                            if (other.logger.isLoggable(Level.FINE)) {
-                                other.logger.fine("Tile (" + t + ") is next to another river.");
-                            }
-                            // increase the size of the other river
-                            other.nextRiver = other.riverMap.get(t);
-                            other.nextRiver.grow(lastSection, t);
-                            // if the other river is connected, so is this one
-                            other.connected |= other.nextRiver.connected;
-                            // add this region to other river if too small
-                            if (other.getLength() < 10) {
-                                other.region = other.nextRiver.region;
-                            }
-                            other.drawToMap(sections);
-                        } else {
-                            // flow into the sea (or a lake)
-                            if (other.logger.isLoggable(Level.FINE)) {
-                                other.logger.fine("Tile (" + t + ") is next to water.");
-                            }
-                            River someRiver = other.riverMap.get(t);
-                            if (someRiver == null) {
-                                other.sections.add(new RiverSection(t, lastDir.getReverseDirection()));
-                                if (lastSection.getSize() < TileImprovement.FJORD_RIVER) {
-                                    other.createDelta(nextTile, lastDir, lastSection);
-                                }
-                            } else {
-                                RiverSection waterSection = someRiver.getLastSection();
-                                waterSection.setBranch(lastDir.getReverseDirection(),
-                                        TileImprovement.SMALL_RIVER);
-                            }
-                            other.connected |= t.isHighSeasConnected();
-                            other.drawToMap(sections);
-                        }
-                        return true;
-                    }
-                    // not next to water
-                    if (other.logger.isLoggable(Level.FINE)) {
-                        other.logger.fine("Tile (" + nextTile + ") is suitable.");
-                    }
-                    other.sections.add(new RiverSection(source, dir));
-                    source = nextTile;
-                    continue flow;
-                }
-            }
-            other.sections = new ArrayList<>();
-            return false;
         }
+
+        for (DirectionChange change : DirectionChange.values()) {
+            Direction dir = change.getNewDirection(direction);
+            Tile nextTile = source.getNeighbourOrNull(dir);
+            if (nextTile == null) continue;
+
+            // is the tile suitable for this river?
+            if (!riverType.isTileTypeAllowed(nextTile.getType())) {
+                // Mountains, ocean cannot have rivers
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Tile (" + nextTile + ") can not have a river.");
+                }
+                continue;
+            } else if (this.contains(nextTile)) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Tile (" + nextTile + ") is already in river.");
+                }
+                continue;
+            } else if (isNextToSelf(nextTile)) {
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Tile (" + nextTile + ") is next to the river.");
+                }
+                continue;
+            } else {
+                // find out if an adjacent tile is next to water
+                for (DirectionChange change2 : DirectionChange.values()) {
+                    Direction lastDir = change2.getNewDirection(dir);
+                    Tile t = nextTile.getNeighbourOrNull(lastDir);
+                    if (t == null) continue;
+                    if (t.isLand() && !t.hasRiver()) continue;
+
+                    sections.add(new RiverSection(source, dir));
+                    RiverSection lastSection = new RiverSection(nextTile,
+                            lastDir);
+                    sections.add(lastSection);
+
+                    if (t.hasRiver() && t.isLand()) {
+                        if (logger.isLoggable(Level.FINE)) {
+                            logger.fine("Tile (" + t + ") is next to another river.");
+                        }
+                        // increase the size of the other river
+                        nextRiver = riverMap.get(t);
+                        nextRiver.grow(lastSection, t);
+                        // if the other river is connected, so is this one
+                        connected |= nextRiver.connected;
+                        // add this region to other river if too small
+                        if (getLength() < 10) {
+                            region = nextRiver.region;
+                        }
+                        drawToMap(sections);
+                    } else {
+                        // flow into the sea (or a lake)
+                        if (logger.isLoggable(Level.FINE)) {
+                            logger.fine("Tile (" + t + ") is next to water.");
+                        }
+                        River someRiver = riverMap.get(t);
+                        if (someRiver == null) {
+                            sections.add(new RiverSection(t, lastDir.getReverseDirection()));
+                            if (lastSection.getSize() < TileImprovement.FJORD_RIVER) {
+                                createDelta(nextTile, lastDir, lastSection);
+                            }
+                        } else {
+                            RiverSection waterSection = someRiver.getLastSection();
+                            waterSection.setBranch(lastDir.getReverseDirection(),
+                                TileImprovement.SMALL_RIVER);
+                        }
+                        connected |= t.isHighSeasConnected();
+                        drawToMap(sections);
+                    }
+                    return true;
+                }
+                // not next to water
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Tile (" + nextTile + ") is suitable.");
+                }
+                sections.add(new RiverSection(source, dir));
+                return flow(nextTile);
+            }
+        }
+        sections = new ArrayList<>();
+        return false;
     }
 
     private void createDelta(Tile tile, Direction direction, RiverSection section) {
