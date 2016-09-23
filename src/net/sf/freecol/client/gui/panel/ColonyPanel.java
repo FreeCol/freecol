@@ -1022,9 +1022,11 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
-        logger.finest(colony.getName() + " change " + property
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(colony.getName() + " change " + property
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
+        }
 
         if (property == null) {
             logger.warning("Null property change");
@@ -1640,10 +1642,12 @@ public final class ColonyPanel extends PortPanel
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
             if (colony != null && event != null) {
-                logger.finest(colony.getName() + "-warehouse change "
-                    + event.getPropertyName()
-                    + ": " + event.getOldValue()
-                    + " -> " + event.getNewValue());
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest(colony.getName() + "-warehouse change "
+                        + event.getPropertyName()
+                        + ": " + event.getOldValue()
+                        + " -> " + event.getNewValue());
+                }
             }
             update();
         }
@@ -2252,9 +2256,11 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                logger.finest(colonyTile.getId() + " change " + property
-                              + ": " + event.getOldValue()
-                              + " -> " + event.getNewValue());
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest(colonyTile.getId() + " change " + property
+                                  + ": " + event.getOldValue()
+                                  + " -> " + event.getNewValue());
+                }
                 ColonyPanel.this.updateProduction();
             }
 

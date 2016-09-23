@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -203,9 +204,11 @@ public class BuildingPanel extends MigPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         String property = event.getPropertyName();
-        logger.finest(building.getId() + " change " + property
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(building.getId() + " change " + property
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
+        }
         update();
     }
 

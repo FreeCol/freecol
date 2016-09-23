@@ -380,8 +380,10 @@ public final class FreeColServer {
             port = firstPort;
             tries = 1;
         }
-        logger.finest("serverStart(" + firstPort + ") => " + port
-            + " x " + tries);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("serverStart(" + firstPort + ") => " + port
+                + " x " + tries);
+        }
         for (int i = tries; i > 0; i--) {
             try {
                 server = new Server(this, host, port);

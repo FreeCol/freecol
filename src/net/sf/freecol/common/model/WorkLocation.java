@@ -165,8 +165,10 @@ public abstract class WorkLocation extends UnitLocation
         if (!Utils.equals(newProductionType, productionType)) {
             productionType = newProductionType;
             colony.invalidateCache();
-            logger.fine("Production type at " + this
-                + " is now: " + newProductionType);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Production type at " + this
+                    + " is now: " + newProductionType);
+            }
         }
     }
 

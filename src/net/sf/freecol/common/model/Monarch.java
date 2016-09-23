@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
@@ -697,9 +698,11 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
             strength = AbstractUnit.calculateStrength(spec, result);
             ratio = Player.strengthRatio(baseStrength+strength, enemyStrength);
-            logger.finest("War support:"
-                + " initially=" + supportStrength + "/" + fullRatio
-                + " finally=" + strength + "/" + ratio);
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("War support:"
+                    + " initially=" + supportStrength + "/" + fullRatio
+                    + " finally=" + strength + "/" + ratio);
+            }
         }
         return result;
     }

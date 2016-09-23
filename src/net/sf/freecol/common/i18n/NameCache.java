@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
@@ -297,8 +298,10 @@ public class NameCache {
                     }
                 }
                 settlementNames.put(player, names);
-                logger.fine("Loaded " + names.size() + " settlement names for "
-                    + player.getId());
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("Loaded " + names.size() + " settlement names for "
+                        + player.getId());
+                }
             }
         }
     }

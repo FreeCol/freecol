@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -484,7 +485,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addStringTemplate("%nation%", nation)
                     .addName("%colony%", getName()));
             newOwner.invalidateCanSeeTiles();//+vis(other)
-            logger.fine("Convert at " + getName() + " for " + getName());
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Convert at " + getName() + " for " + getName());
+            }
         }
     }
 

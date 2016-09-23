@@ -375,7 +375,9 @@ public class Game extends FreeColGameObject {
         if (id == null) throw new IllegalArgumentException("Null identifier.");
         if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
 
-        logger.finest("removeFCGO/" + reason + ": " + id);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("removeFCGO/" + reason + ": " + id);
+        }
         freeColGameObjects.remove(id);
         notifyRemoveFreeColGameObject(id);
 
@@ -462,7 +464,9 @@ public class Game extends FreeColGameObject {
                 final String key = this.readAhead.getKey();
                 this.fcgoState = FcgoState.INVALID;
                 this.it.remove();
-                logger.finest("removeFCGO/expire: " + key);
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("removeFCGO/expire: " + key);
+                }
                 notifyRemoveFreeColGameObject(key);
             }
         };

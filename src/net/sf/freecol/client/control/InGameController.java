@@ -616,7 +616,9 @@ public final class InGameController extends FreeColClientHolder {
      */
     private synchronized void startIgnoringMessage(String key, Turn turn) {
         messagesToIgnore.put(key, turn.getNumber());
-        logger.finer("Ignore message start: " + key);
+        if (logger.isLoggable(Level.FINER)) {
+            logger.finer("Ignore message start: " + key);
+        }
     }
 
     /**
@@ -626,7 +628,9 @@ public final class InGameController extends FreeColClientHolder {
      */
     private synchronized void stopIgnoringMessage(String key) {
         messagesToIgnore.remove(key);
-        logger.finer("Ignore message stop: " + key);
+        if (logger.isLoggable(Level.FINER)) {
+            logger.finer("Ignore message stop: " + key);
+        }
     }
 
     /**
@@ -652,7 +656,9 @@ public final class InGameController extends FreeColClientHolder {
             && (value = messagesToIgnore.get(key)) != null
             && value + 1 == turn.getNumber()) {
             messagesToIgnore.put(key, value + 1);
-            logger.finer("Ignore message continue: " + key);
+            if (logger.isLoggable(Level.FINER)) {
+                logger.finer("Ignore message continue: " + key);
+            }
             return true;
         }
         return false;

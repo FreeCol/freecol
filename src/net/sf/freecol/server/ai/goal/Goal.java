@@ -26,6 +26,7 @@ package net.sf.freecol.server.ai.goal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.GoodsType;
@@ -120,7 +121,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @return A list of all {@link AIUnit} being freed up by this action
      */
     public List<AIUnit> cancelGoal() {
-        logger.finest("Entering method cancelGoal() for "+getDebugDescription());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method cancelGoal() for "+getDebugDescription());
+        }
         List<AIUnit> cancelledUnitsList = new ArrayList<>();
 
         //get units from subgoals
@@ -146,7 +149,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * then calls its own planning method.
      */
     public void doPlanning() {
-        logger.finest("Entering method doPlanning() for "+getDebugDescription());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method doPlanning() for "+getDebugDescription());
+        }
         boolean subgoalsPlanned = false;
 
         normalizeSubGoalWeights();
@@ -173,7 +178,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @return true if this Goal or at least one subgoal needs planning, false otherwise
      */
     public boolean needsPlanning() {
-        logger.finest("Entering method needsPlanning() for "+getDebugDescription());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method needsPlanning() for "+getDebugDescription());
+        }
         if (needsPlanning) {
             return true;
         } else {
@@ -197,7 +204,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @param p Boolean determining whether to set needsPlanning =true or =false
      */
     public void setNeedsPlanningRecursive(boolean p) {
-        logger.finest("Entering method setNeedsPlanningRecursive() for "+getDebugDescription());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method setNeedsPlanningRecursive() for "+getDebugDescription());
+        }
         needsPlanning = p;
 
         Iterator<Goal> git = getSubGoalIterator();
@@ -348,7 +357,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @param u The {@link AIUnit} being added to this goal
      */
     public final void addUnit(AIUnit u) {
-        logger.finest("Entering method addUnit() for "+getDebugDescription()+" with unit: "+u.getId());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method addUnit() for "+getDebugDescription()+" with unit: "+u.getId());
+        }
         getGame().getTurn().getNumber();
         availableUnitsList.add(u);
         u.setGoal(this);
@@ -364,7 +375,9 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @param u The {@link AIUnit} to be added to the parent
      */
     protected void addUnitToParent(AIUnit u) {
-        logger.finest("Entering method addUnitToParent() for "+getDebugDescription()+" with unit: "+u.getId());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Entering method addUnitToParent() for "+getDebugDescription()+" with unit: "+u.getId());
+        }
         if (parentGoal != null) {
             parentGoal.addUnit(u);
         } else {

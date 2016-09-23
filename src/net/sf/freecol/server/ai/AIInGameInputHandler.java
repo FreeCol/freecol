@@ -237,7 +237,9 @@ public final class AIInGameInputHandler implements MessageHandler {
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(game, element);
         FoundingFather ff = aiPlayer.selectFoundingFather(message.getFathers());
-        logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(aiPlayer.getId() + " chose founding father: " + ff);
+        }
         if (ff != null) message.setFather(ff);
         return message.toXMLElement();
     }
@@ -261,7 +263,9 @@ public final class AIInGameInputHandler implements MessageHandler {
         TradeStatus status = getAIPlayer().acceptDiplomaticTrade(agreement);
         agreement.setStatus(status);
         sb.append(" -> ").append(agreement);
-        logger.fine(sb.toString());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(sb.toString());
+        }
 
         return new DiplomacyMessage(message.getOurFCGO(game),
                                     message.getOtherFCGO(game), agreement)
@@ -331,8 +335,10 @@ public final class AIInGameInputHandler implements MessageHandler {
         accept = aiPlayer.indianDemand(unit, colony, type, amount, accept);
         if (accept == null) return null;
         message.setResult(accept);
-        logger.finest("AI handling native demand by " + unit
-            + " at " + colony.getName() + " result: " + accept);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("AI handling native demand by " + unit
+                + " at " + colony.getName() + " result: " + accept);
+        }
         return message.toXMLElement();
     }
 
@@ -384,19 +390,25 @@ public final class AIInGameInputHandler implements MessageHandler {
         case RAISE_TAX_WAR: case RAISE_TAX_ACT:
             accept = getAIPlayer().acceptTax(message.getTax());
             message.setResult(accept);
-            logger.finest("AI player monarch action " + action
-                          + " = " + accept);
-            break;
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("AI player monarch action " + action
+                                  + " = " + accept);
+                }
+                break;
 
         case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
             accept = getAIPlayer().acceptMercenaries();
             message.setResult(accept);
-            logger.finest("AI player monarch action " + action
-                          + " = " + accept);
-            break;
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("AI player monarch action " + action
+                                  + " = " + accept);
+                }
+                break;
 
         default:
-            logger.finest("AI player ignoring monarch action " + action);
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("AI player ignoring monarch action " + action);
+            }
             return null;
         }
         return message.toXMLElement();
@@ -500,7 +512,9 @@ public final class AIInGameInputHandler implements MessageHandler {
 
         if (currentPlayer != null
             && serverPlayer.getId().equals(currentPlayer.getId())) {
-            logger.finest("Starting new Thread for " + serverPlayer.getName());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Starting new Thread for " + serverPlayer.getName());
+            }
             String nam = FreeCol.SERVER_THREAD + "AIPlayer ("
                 + serverPlayer.getName() + ")";
             new Thread(nam) {

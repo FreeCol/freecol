@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -1281,8 +1282,10 @@ public class Player extends FreeColGameObject implements Nameable {
             / applyModifiers(1f, turn, Modifier.RELIGIOUS_UNREST_BONUS));
         immigrationRequired = (int)applyModifiers(unreduced + base, turn,
             Modifier.RELIGIOUS_UNREST_BONUS);;
-        logger.finest("Immigration for " + getId() + " updated " + current
-            + " -> " + immigrationRequired);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Immigration for " + getId() + " updated " + current
+                + " -> " + immigrationRequired);
+        }
     }
 
     /**
@@ -3769,9 +3772,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param what A description of the cheating.
      */
     public void logCheat(String what) {
-        logger.finest("CHEAT: " + getGame().getTurn().getNumber()
-            + " " + lastPart(getNationId(), ".")
-            + " " + what);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("CHEAT: " + getGame().getTurn().getNumber()
+                + " " + lastPart(getNationId(), ".")
+                + " " + what);
+        }
     }
 
     /**

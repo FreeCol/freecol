@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -752,8 +753,10 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Do not simplify with *=, we want the integer truncation.
         price = wantedBonus * price / wantedBase;
 
-        logger.finest("Full price(" + amount + " " + type + ")"
-                      + " -> " + price);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Full price(" + amount + " " + type + ")"
+                          + " -> " + price);
+        }
         return price;
     }
 
@@ -859,9 +862,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         int valued = Math.max(0, required - getGoodsCount(type));
         int price = (valued > amount / 2) ? full * amount
             : valued * full + getNormalGoodsPriceToBuy(type, amount - valued);
-        logger.finest("Military price(" + amount + " " + type + ")"
-                      + " valued=" + valued
-                      + " -> " + price);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Military price(" + amount + " " + type + ")"
+                          + " valued=" + valued
+                          + " -> " + price);
+        }
         return price;
     }
 

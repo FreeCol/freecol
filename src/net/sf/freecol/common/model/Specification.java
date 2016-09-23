@@ -486,7 +486,9 @@ public final class Specification {
      *     be cleaned.
      */
     public void clean(String why) {
-        logger.finest("Cleaning up specification following " + why + ".");
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Cleaning up specification following " + why + ".");
+        }
 
         // Drop all abstract types
         removeInPlace(allTypes, e -> e.getValue().isAbstractType());
@@ -2971,9 +2973,11 @@ public final class Specification {
 
         version = xr.getAttribute(VERSION_TAG, (String)null);
 
-        logger.fine("Reading specification " + newId
-            + " difficulty=" + difficultyLevel
-            + " version=" + version);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Reading specification " + newId
+                + " difficulty=" + difficultyLevel
+                + " version=" + version);
+        }
 
         String parentId = xr.getAttribute(FreeColSpecObjectType.EXTENDS_TAG,
                                           (String)null);

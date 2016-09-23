@@ -234,7 +234,9 @@ public class AIMain extends FreeColObject
         synchronized (aiObjects) {
             result = aiObjects.remove(id) != null;
         }
-        if (result) logger.finest("Removed AI object: " + id);
+        if (result) if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Removed AI object: " + id);
+        }
         return result;
     }
 
@@ -427,8 +429,10 @@ public class AIMain extends FreeColObject
     public void ownerChanged(FreeColGameObject source, Player oldOwner,
                              Player newOwner) {
         AIObject ao = getAIObject(source);
-        logger.finest("Owner changed for " + source.getId()
-            + " with AI object: " + ao);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Owner changed for " + source.getId()
+                + " with AI object: " + ao);
+        }
         AIPlayer aiOwner = getAIPlayer(oldOwner);
         if (aiOwner != null) {
             if (ao instanceof AIColony) {

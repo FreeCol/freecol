@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -177,9 +178,11 @@ public class AIGoods extends TransportableAIObject {
                     + ", got: " + (oldAmount - newAmount));
                 result = false;
             }
-            logger.fine("Unloaded " + amount + " " + type
-                + " from " + oldAmount + " leaving " + newAmount
-                + " off of " + carrier + " at " + carrier.getLocation());
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Unloaded " + amount + " " + type
+                    + " from " + oldAmount + " leaving " + newAmount
+                    + " off of " + carrier + " at " + carrier.getLocation());
+            }
         }   
         return result;
     }
@@ -296,9 +299,11 @@ public class AIGoods extends TransportableAIObject {
                 getAIMain().getAIColony(colony).removeExportGoods(this);
             }
         }
-        logger.fine("Loaded " + amount + " " + type.getSuffix()
-            + " over " + oldAmount + " leaving " + (goodsAmount - amount)
-            + " onto " + carrier + " at " + carrier.getLocation());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Loaded " + amount + " " + type.getSuffix()
+                + " over " + oldAmount + " leaving " + (goodsAmount - amount)
+                + " onto " + carrier + " at " + carrier.getLocation());
+        }
         return !failed;
     }
 
@@ -372,7 +377,9 @@ public class AIGoods extends TransportableAIObject {
             }
         }
         if (why != null) {
-            logger.finest("checkIntegrity(" + this + ") = " + why);
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("checkIntegrity(" + this + ") = " + why);
+            }
             result = -1;
         }
         return result;

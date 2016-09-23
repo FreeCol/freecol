@@ -105,9 +105,11 @@ public class SoundController {
             if (file != null) {
                 soundPlayer.playOnce(file);
             }
-            logger.finest(((file == null)
-                ? "Could not load"
-                : "Playing") + " sound: " + sound);
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(((file == null)
+                    ? "Could not load"
+                    : "Playing") + " sound: " + sound);
+            }
         }
     }
 

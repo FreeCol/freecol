@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -166,9 +167,11 @@ public class ServerIndianSettlement extends IndianSettlement
         float cAlarm = missionary.applyModifiers(alarm, turn,
             Modifier.CONVERSION_ALARM_RATE);
         convert += cMiss + (cAlarm - alarm);
-        logger.finest("Conversion at " + getName() + " alarm=" + alarm
-            + " " + convert
-            + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Conversion at " + getName() + " alarm=" + alarm
+                + " " + convert
+                + " = " + getConvertProgress() + " + " + cMiss + " + " + cAlarm);
+        }
         ServerColony colony = (ServerColony)tile.getNearestSettlement(other,
             MAX_CONVERT_DISTANCE, true);
         if (convert < (float)getType().getConvertThreshold()
@@ -332,10 +335,12 @@ public class ServerIndianSettlement extends IndianSettlement
             ((ServerPlayer)getOwner()).csModifyTension(player,
                 ((isCapital()) ? add : add/2), this, cs);
         }
-        logger.finest("Alarm at " + getName()
-            + " toward " + player.getName()
-            + " modified by " + add
-            + " now = " + getAlarm(player).getValue());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Alarm at " + getName()
+                + " toward " + player.getName()
+                + " modified by " + add
+                + " now = " + getAlarm(player).getValue());
+        }
         return change;
     }
 

@@ -249,8 +249,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
             if (result) {
                 optionGroup.setEditable(editable && optionGroup.isEditable());
             }
-            logger.finest("Merged option group " + id
-                + " contents into " + this.getId());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Merged option group " + id
+                    + " contents into " + this.getId());
+            }
             return result;
         }
                 
@@ -265,8 +267,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 options.remove(index);
                 options.add(index, option);
                 optionMap.put(id, option);
-                logger.finest("Merged option " + id + " into " + this.getId()
-                    + ": " + option.toString() + "/");
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("Merged option " + id + " into " + this.getId()
+                        + ": " + option.toString() + "/");
+                }
                 return true;
             }
             if (o instanceof OptionGroup) {

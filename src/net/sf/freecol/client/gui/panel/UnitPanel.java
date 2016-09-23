@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.TradeRoute;
@@ -184,9 +185,11 @@ public abstract class UnitPanel extends MigPanel
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest(getName() + " change " + event.getPropertyName()
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(getName() + " change " + event.getPropertyName()
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
+        }
         update();
     }
 

@@ -24,6 +24,7 @@ import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -253,9 +254,11 @@ public class CargoPanel extends FreeColPanel
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest("CargoPanel change " + event.getPropertyName()
-                      + ": " + event.getOldValue()
-                      + " -> " + event.getNewValue());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("CargoPanel change " + event.getPropertyName()
+                          + ": " + event.getOldValue()
+                          + " -> " + event.getNewValue());
+        }
         update();
     }
 

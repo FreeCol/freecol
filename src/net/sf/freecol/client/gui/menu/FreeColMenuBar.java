@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.menu;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -120,8 +121,10 @@ public abstract class FreeColMenuBar extends JMenuBar {
                 rtn.addMenuKeyListener(action.getMenuKeyListener());
             }
         } else {
-            logger.finest("Could not create menu item. [" + actionId
-                + "] not found.");
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Could not create menu item. [" + actionId
+                    + "] not found.");
+            }
         }
         return rtn;
     }
@@ -162,9 +165,12 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setOpaque(false);
 
             rtn.setSelected(((SelectableAction)am.getFreeColAction(actionId)).isSelected());
-        } else
-            logger.finest("Could not create menu item. [" + actionId
-                + "] not found.");
+        } else {
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Could not create menu item. [" + actionId
+                    + "] not found.");
+            }
+        }
 
         return rtn;
     }
@@ -190,8 +196,10 @@ public abstract class FreeColMenuBar extends JMenuBar {
             rtn.setSelected(((SelectableAction) am.getFreeColAction(actionId)).isSelected());
             group.add(rtn);
         } else {
-            logger.finest("Could not create menu item. [" + actionId
-                + "] not found.");
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Could not create menu item. [" + actionId
+                    + "] not found.");
+            }
         }
         return rtn;
     }

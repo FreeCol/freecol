@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -329,8 +330,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         } else if (locatable instanceof Goods) {
             // dumping goods is a valid action
             locatable.setLocation(null);
-            logger.finest("Dumped " + locatable + " in UnitLocation with id "
-                          + getId());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Dumped " + locatable + " in UnitLocation with id "
+                              + getId());
+            }
             return true;
         } else {
             logger.warning("Tried to add Locatable " + locatable

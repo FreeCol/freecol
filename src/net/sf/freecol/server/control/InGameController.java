@@ -675,9 +675,11 @@ public final class InGameController extends Controller {
                 serverPlayer.modifyGold(warGold);
                 cs.addPartial(See.only(serverPlayer), serverPlayer,
                               "gold", "score");
-                logger.fine("War support v " + enemy.getNation().getSuffix()
-                    + " " + warGold + " gold + " + Messages.message(AbstractUnit
-                        .getListLabel(", ", warSupport)));
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.fine("War support v " + enemy.getNation().getSuffix()
+                        + " " + warGold + " gold + " + Messages.message(AbstractUnit
+                            .getListLabel(", ", warSupport)));
+                }
             }
             serverPlayer.csChangeStance(Stance.WAR, (ServerPlayer)enemy,
                                         true, cs);
@@ -1271,8 +1273,10 @@ public final class InGameController extends Controller {
         cs.add(See.only(serverPlayer), tile);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         nt.setBuy(true);
-        logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
-                      + " at " + is.getName() + " for " + amount);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(serverPlayer.getName() + " " + unit + " buys " + goods
+                          + " at " + is.getName() + " for " + amount);
+        }
 
         // Others can see the unit capacity.
         getGame().sendToOthers(serverPlayer, cs);
@@ -1309,9 +1313,11 @@ public final class InGameController extends Controller {
         carrier.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
         cs.add(See.only(serverPlayer), carrier);
-        logger.finest(carrier + " bought " + amount + "(" + buyAmount + ")"
-            + " " + type.getSuffix()
-            + " in Europe for " + (serverPlayer.getGold() - gold));
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(carrier + " bought " + amount + "(" + buyAmount + ")"
+                + " " + type.getSuffix()
+                + " in Europe for " + (serverPlayer.getGold() - gold));
+        }
         // Action occurs in Europe, nothing is visible to other players.
         return cs;
     }
@@ -2273,7 +2279,9 @@ public final class InGameController extends Controller {
         }
 
         for (;;) {
-            logger.finest("Ending turn for " + current.getName());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("Ending turn for " + current.getName());
+            }
             current.clearModelMessages();
 
             // Check for new turn
@@ -2385,7 +2393,9 @@ public final class InGameController extends Controller {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
-                    logger.finest("Debug monarch action: " + action);
+                    if (logger.isLoggable(Level.FINEST)) {
+                        logger.finest("Debug monarch action: " + action);
+                    }
                 } else {
                     action = RandomChoice.getWeightedRandom(logger,
                             "Choose monarch action",
@@ -2393,11 +2403,15 @@ public final class InGameController extends Controller {
                 }
                 if (action != null) {
                     if (monarch.actionIsValid(action)) {
-                        logger.finest("Monarch action: " + action);
+                        if (logger.isLoggable(Level.FINEST)) {
+                            logger.finest("Monarch action: " + action);
+                        }
                         csMonarchAction(current, action, cs);
                     } else {
-                        logger.finest("Skipping invalid monarch action: "
-                            + action);
+                        if (logger.isLoggable(Level.FINEST)) {
+                            logger.finest("Skipping invalid monarch action: "
+                                + action);
+                        }
                     }
                 }
             }
@@ -3008,9 +3022,11 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         moveGoods(gl, goodsType, amount, carrier);
-        logger.finest(Messages.message(loc.getLocationLabel())
-            + " loaded " + amount + " " + goodsType.getSuffix()
-            + " onto " + carrier);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(Messages.message(loc.getLocationLabel())
+                + " loaded " + amount + " " + goodsType.getSuffix()
+                + " onto " + carrier);
+        }
         cs.add(See.only(serverPlayer), gl.getGoodsContainer());
         cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -3755,14 +3771,18 @@ public final class InGameController extends Controller {
             serverPlayer.propagateToEuropeanMarkets(type, sellAmount, random);
             serverPlayer.csFlushMarket(type, cs);
             cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-            logger.finest(carrier + " sold " + amount + "(" + sellAmount + ")"
-                + " " + type.getSuffix()
-                + " in Europe for " + (serverPlayer.getGold() - gold));
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(carrier + " sold " + amount + "(" + sellAmount + ")"
+                    + " " + type.getSuffix()
+                    + " in Europe for " + (serverPlayer.getGold() - gold));
+            }
         } else {
             // Dumping goods in Europe
             moveGoods(carrier, type, amount, null);
-            logger.finest(carrier + " dumped " + amount
-                + " " + type.getSuffix() + " in Europe");
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(carrier + " dumped " + amount
+                    + " " + type.getSuffix() + " in Europe");
+            }
         }
         carrier.setMovesLeft(0);
         cs.add(See.only(serverPlayer), carrier);
@@ -3857,8 +3877,10 @@ public final class InGameController extends Controller {
         nt.setSell(true);
         cs.addSale(serverPlayer, is, goods.getType(),
                 Math.round((float) amount / goods.getAmount()));
-        logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
-                      + " at " + is.getName() + " for " + amount);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
+                          + " at " + is.getName() + " for " + amount);
+        }
 
         // Others can see the unit capacity.
         getGame().sendToOthers(serverPlayer, cs);
@@ -4098,9 +4120,11 @@ public final class InGameController extends Controller {
         if (carrier.getSettlement() != null) {
             Settlement settlement = carrier.getSettlement();
             moveGoods(carrier, goodsType, amount, settlement);
-            logger.finest(carrier
-                + " unloaded " + amount + " " + goodsType.getSuffix()
-                + " to " + settlement.getName());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(carrier
+                    + " unloaded " + amount + " " + goodsType.getSuffix()
+                    + " to " + settlement.getName());
+            }
             cs.add(See.only(serverPlayer), settlement.getGoodsContainer());
             cs.add(See.only(serverPlayer), carrier.getGoodsContainer());
             if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
@@ -4109,8 +4133,10 @@ public final class InGameController extends Controller {
             }
         } else { // Dump of goods onto a tile
             moveGoods(carrier, goodsType, amount, null);
-            logger.finest(carrier + " dumped " + amount
-                + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(carrier + " dumped " + amount
+                    + " " + goodsType.getSuffix() + " to " + carrier.getLocation());
+            }
             cs.add(See.perhaps(), (FreeColGameObject)carrier.getLocation());
             // Others might see a capacity change.
             getGame().sendToOthers(serverPlayer, cs);

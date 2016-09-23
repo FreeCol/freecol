@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -149,7 +150,9 @@ public class ResourceManager {
      * @param newItems If new items have been added.
      */
     private static void update(boolean newItems) {
-        logger.finest("update(" + newItems + ")");
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("update(" + newItems + ")");
+        }
         if(newItems) {
             preloadThread = null;
         }
@@ -219,7 +222,9 @@ public class ResourceManager {
      * @return true when the resource exists.
      */
     public static synchronized boolean hasResource(final String key) {
-        logger.finest("hasResource(" + key + ")");
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("hasResource(" + key + ")");
+        }
         return mergedContainer.containsKey(key);
     }
 
@@ -264,7 +269,9 @@ public class ResourceManager {
      */
     public static synchronized List<String> getImageKeys(String prefix,
                                                               String suffix) {
-        logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("getImageKeys(" + prefix + ", " + suffix + ")");
+        }
         return mergedContainer.getImageKeys(prefix, suffix);
     }
 

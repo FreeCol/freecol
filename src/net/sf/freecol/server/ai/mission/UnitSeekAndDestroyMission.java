@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -422,12 +423,14 @@ public class UnitSeekAndDestroyMission extends Mission {
                 if (settlement.isConnectedPort()) {
                     transportTarget = settlement.getTile()
                         .getBestDisembarkTile(unit.getOwner());
-                    logger.finest(tag + " chose dropoff " + transportTarget
-                        + " for attack on "
-                        + ((settlement.canBombardEnemyShip()) ? "hazardous"
-                            : "normal")
-                        + " settlement " + settlement.getName()
-                        + ": " + this);
+                    if (logger.isLoggable(Level.FINEST)) {
+                        logger.finest(tag + " chose dropoff " + transportTarget
+                            + " for attack on "
+                            + ((settlement.canBombardEnemyShip()) ? "hazardous"
+                                : "normal")
+                            + " settlement " + settlement.getName()
+                            + ": " + this);
+                    }
                 }
             }
         }

@@ -373,8 +373,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setCurrentFather(ff);
         clearOfferedFathers();
         if (ff != null) {
-            logger.finest(getId() + " is recruiting " + ff.getId()
-                + " in " + getGame().getTurn());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(getId() + " is recruiting " + ff.getId()
+                    + " in " + getGame().getTurn());
+            }
         }
     }
 
@@ -460,8 +462,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (changed) {
-            logger.finest("randomizeGame(" + getId() + ") initial prices: "
-                + sb.toString().substring(2));
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest("randomizeGame(" + getId() + ") initial prices: "
+                    + sb.toString().substring(2));
+            }
         }
     }
 
@@ -1222,7 +1226,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             sb.append(' ').append(goodsType.getId());
             ret = true;
         }
-        if (ret) logger.finest(sb.toString());
+        if (ret) if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(sb.toString());
+        }
         return ret;
     }
 
@@ -1529,7 +1535,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (effects.isEmpty()) sb.append(" All avoided");
-        logger.fine(sb.toString());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine(sb.toString());
+        }
 
         boolean colonyDirty = false;
         List<ModelMessage> messages = new ArrayList<>();
@@ -1727,10 +1735,12 @@ outer:  for (Effect effect : effects) {
             amount = randomInt(logger, "Market adjust " + type, random, amount);
             if (!add) amount = -amount;
             market.addGoodsToMarket(type, amount);
-            logger.finest(getName() + " adjust of " + amount
-                + " " + type
-                + ", total: " + market.getAmountInMarket(type)
-                + ", initial: " + type.getInitialAmount());
+            if (logger.isLoggable(Level.FINEST)) {
+                logger.finest(getName() + " adjust of " + amount
+                    + " " + type
+                    + ", total: " + market.getAmountInMarket(type)
+                    + ", initial: " + type.getInitialAmount());
+            }
             addExtraTrade(new AbstractGoods(type, amount));
         }
 
@@ -2113,10 +2123,12 @@ outer:  for (Effect effect : effects) {
                                   true, cs);
             }
         }
-        logger.finest(this.getName() + " claimed " + tile
-            + " from " + ((owner == null) ? "no-one" : owner.getName())
-            + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
-                : price));
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(this.getName() + " claimed " + tile
+                + " from " + ((owner == null) ? "no-one" : owner.getName())
+                + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
+                    : price));
+        }
     }
 
 
@@ -3304,7 +3316,9 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
-        logger.finest("Disposing of " + settlement.getName());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Disposing of " + settlement.getName());
+        }
         ServerPlayer owner = (ServerPlayer)settlement.getOwner();
         Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
@@ -4155,8 +4169,10 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%nation%", other.getNationLabel()));
         }
 
-        logger.finest("First contact between " + this.getId()
-            + " and " + other.getId());
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("First contact between " + this.getId()
+                + " and " + other.getId());
+        }
         return true;
     }
 

@@ -292,8 +292,10 @@ public class Connection implements Closeable {
         closeOutputStream();
         closeInputStream();
         closeSocket();
-        
-        logger.fine("Connection really closed for " + this.name);
+
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Connection really closed for " + this.name);
+        }
     }
 
     /**
@@ -421,7 +423,9 @@ public class Connection implements Closeable {
      */
     public void send(Element element) throws IOException {
         sendInternal(element);
-        logger.fine("Send: " + element.getTagName());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Send: " + element.getTagName());
+        }
     }
 
     /**
@@ -436,7 +440,9 @@ public class Connection implements Closeable {
      */
     public void sendAndWait(Element element) throws IOException {
         askInternal(element);
-        logger.fine("SendAndWait: " + element.getTagName());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("SendAndWait: " + element.getTagName());
+        }
     }
 
     /**
@@ -450,8 +456,10 @@ public class Connection implements Closeable {
      */
     public Element ask(Element element) throws IOException {
         Element reply = askInternal(element);
-        logger.fine("Ask: " + element.getTagName()
-            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Ask: " + element.getTagName()
+                + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
+        }
         return reply;
     }
 

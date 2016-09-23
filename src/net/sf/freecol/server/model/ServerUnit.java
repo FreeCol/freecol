@@ -21,6 +21,7 @@
 package net.sf.freecol.server.model;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -763,8 +764,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 serverPlayer.setNewLandName(newLand);
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                     new NewLandNameMessage(this, newLand));
-                logger.finest("First landing for " + serverPlayer
-                    + " at " + newTile + " with " + this);
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("First landing for " + serverPlayer
+                        + " at " + newTile + " with " + this);
+                }
             }
 
             // Check for new contacts.
@@ -832,9 +835,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
-                        logger.finest("First contact between "
-                            + contactPlayer.getId()
-                            + " and " + is + " at " + newTile);
+                        if (logger.isLoggable(Level.FINEST)) {
+                            logger.finest("First contact between "
+                                + contactPlayer.getId()
+                                + " and " + is + " at " + newTile);
+                        }
                     }                   
                 }
                 csActivateSentries(t, cs);

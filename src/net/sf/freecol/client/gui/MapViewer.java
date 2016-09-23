@@ -231,8 +231,10 @@ public final class MapViewer extends FreeColClientHolder {
      */
     void changeViewMode(int newViewMode) {
         if (newViewMode != viewMode) {
-            logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
-                    ? "Move Units" : "View Terrain") + " mode");
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Changed to " + ((newViewMode == GUI.MOVE_UNITS_MODE)
+                        ? "Move Units" : "View Terrain") + " mode");
+            }
             viewMode = newViewMode;
             if(viewMode == GUI.MOVE_UNITS_MODE)
                 restartBlinking();
@@ -321,8 +323,10 @@ public final class MapViewer extends FreeColClientHolder {
         // Since rows are shifted, we need to correct.
         int newCol = focus.getX() + dcol;
         int newRow = focus.getY() + drow * 2;
-        logger.finest("Old focus was " + focus.getX() + ", " + focus.getY()
-                      + ". Preliminary focus is " + newCol + ", " + newRow + ".");
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Old focus was " + focus.getX() + ", " + focus.getY()
+                          + ". Preliminary focus is " + newCol + ", " + newRow + ".");
+        }
         // Now, we check whether the central diamond of the calculated
         // rectangle was clicked, and adjust rows and columns
         // accordingly. See Direction.
@@ -362,8 +366,10 @@ public final class MapViewer extends FreeColClientHolder {
             col = step.x;
             row = step.y;
         }
-        logger.finest("Direction is " + direction
-                      + ", new focus is " + col + ", " + row);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Direction is " + direction
+                          + ", new focus is " + col + ", " + row);
+        }
         return getGame().getMap().getTile(col, row);
 
     }

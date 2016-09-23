@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -54,7 +55,9 @@ public abstract class Session {
         }
         completed = false;
         allSessions.put(key, this);
-        logger.finest("Created session: " + key);
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Created session: " + key);
+        }
     }
 
     /**

@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.util.stream.Collectors;
@@ -123,9 +124,11 @@ public class TransportMission extends Mission {
      */
     @Override
     public void dispose() {
-        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
-            //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
-            );
+        if (logger.isLoggable(Level.FINEST)) {
+            logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
+                //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
+                );
+        }
         super.dispose();
     }
 
