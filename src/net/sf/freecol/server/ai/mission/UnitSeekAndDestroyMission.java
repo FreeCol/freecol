@@ -147,19 +147,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         final double off = combatModel.getOffencePower(unit, settlement);
         value += (int)Math.round(off * 50);
 
-        if (settlement instanceof Colony) {
-            // Favour high population (more loot:-).
-            Colony colony = (Colony) settlement;
-            value += 50 * colony.getUnitCount();
-            if (colony.hasStockade()) { // Avoid fortifications.
-                value -= 200 * colony.getStockade().getLevel();
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            // Favour the most hostile settlements
-            IndianSettlement is = (IndianSettlement) settlement;
-            Tension tension = is.getAlarm(unit.getOwner());
-            if (tension != null) value += tension.getValue() / 2;
-        }
+        value = settlement.calculateSettlementValue(value, unit);
+
         return ((MissionAIPlayer)aiUnit.getAIOwner()).adjustMission(
             aiUnit, path, UnitSeekAndDestroyMission.class, value);
     }

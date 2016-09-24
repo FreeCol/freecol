@@ -1353,6 +1353,24 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     }
 
 
+    /**
+     * Determines the value of a potential attack on a {@code IndianSettlement}
+     *
+     * @param value The previously calculated input value from
+     *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
+     *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
+     * @param unit The {@code AIUnit} to check
+     * @return
+     */
+    @Override
+    public int calculateSettlementValue(int value, Unit unit) {
+        // Favour the most hostile settlements
+        Tension tension = this.getAlarm(unit.getOwner());
+        if (tension != null) value += tension.getValue() / 2;
+        return value;
+    }
+
+
     // Interface TradeLocation
     //   getGoodsCount provided by GoodsLocation
 

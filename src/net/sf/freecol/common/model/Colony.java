@@ -43,6 +43,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.server.ai.AIUnit;
 
 
 /**
@@ -2727,6 +2728,25 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         Stance stance = getOwner().getStance(player);
         return StringTemplate.template("model.colony." + stance.getKey())
             .addStringTemplate("%nation%", getOwner().getNationLabel());
+    }
+
+
+    /**
+     * Determines the value of a potential attack on a {@code Colony}
+     *
+     * @param value The previously calculated input value from
+     *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
+     *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
+     * @return
+     */
+    @Override
+    public int calculateSettlementValue(int value, Unit unit) {
+        // Favour high population (more loot:-).
+        value += this.getUnitCount();
+        if (this.hasStockade()) { // Avoid fortifications.
+            value -= 200 * this.getStockade().getLevel();
+        }
+        return value;
     }
 
 

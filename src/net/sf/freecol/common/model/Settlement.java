@@ -722,7 +722,14 @@ public abstract class Settlement extends GoodsLocation
      */
     public abstract StringTemplate getAlarmLevelLabel(Player player);
 
-    
+
+    /**
+     * Get the value of attacking a {@code Settlement}
+     *
+     * @return The calculated value
+     */
+    public abstract int calculateSettlementValue(int value, Unit unit);
+
 
     // Serialization
 
