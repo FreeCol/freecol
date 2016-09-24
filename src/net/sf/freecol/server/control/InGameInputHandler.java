@@ -21,7 +21,6 @@ package net.sf.freecol.server.control;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -649,7 +648,7 @@ public final class InGameInputHandler extends ServerInputHandler {
          */
         ChangeSet cs = null;
         serverPlayer.setConnected(false);
-        if (Objects.equals(getFreeColServer().getGame().getCurrentPlayer(), serverPlayer)
+        if (getFreeColServer().getGame().getCurrentPlayer() == serverPlayer
                 && !getFreeColServer().getSinglePlayer()) {
             cs = getFreeColServer().getInGameController()
                 .endTurn(serverPlayer);

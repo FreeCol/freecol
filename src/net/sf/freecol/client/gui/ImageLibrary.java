@@ -32,7 +32,10 @@ import java.awt.RenderingHints;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1096,7 +1099,7 @@ public final class ImageLibrary {
         int amount = 4;
         if (enemy == null) {
             amount = 0;
-        } else if (Objects.equals(player, enemy)) {
+        } else if (player == enemy) {
             Tension alarm = is.getAlarm(enemy);
             amount = (alarm == null) ? 4 : alarm.getLevel().ordinal();
             if (amount == 0) amount = 1; // Show *something*!

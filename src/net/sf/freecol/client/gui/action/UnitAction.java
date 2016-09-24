@@ -21,8 +21,6 @@ package net.sf.freecol.client.gui.action;
 
 import net.sf.freecol.client.FreeColClient;
 
-import java.util.Objects;
-
 
 /**
  * Super class for all actions that should be disabled when no unit is
@@ -51,6 +49,7 @@ public abstract class UnitAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && getGUI().getActiveUnit() != null
-            && Objects.equals(getGUI().getActiveUnit().getOwner(), getFreeColClient().getMyPlayer());
+            && getGUI().getActiveUnit().getOwner()
+            == getFreeColClient().getMyPlayer();
     }
 }

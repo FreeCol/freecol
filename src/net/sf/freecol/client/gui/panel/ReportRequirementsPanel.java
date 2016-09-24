@@ -19,7 +19,12 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -265,12 +270,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
             for (Colony colony : colonies) {
                 for (Unit unit : colony.getUnitList()) {
                     GoodsType expertise = unit.getType().getExpertProduction();
-                    if ((unit.getSkillLevel() > 0) && (Objects.equals(expertise, goodsType))) {
+                    if ((unit.getSkillLevel() > 0) && (expertise == goodsType)) {
                         if (unit.getLocation() instanceof Building) {
                             if (!((Building) unit.getLocation()).canProduce(goodsType, unit.getType())) {
                                 misusedExperts.add(colony);
                             }
-                        } else if (!Objects.equals(expertise, unit.getWorkType())) {
+                        } else if (expertise != unit.getWorkType()) {
                             misusedExperts.add(colony);
                         }
                     }

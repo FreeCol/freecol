@@ -26,8 +26,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
-import java.util.Objects;
-
 
 /**
  * A trade item consisting of a unit.
@@ -73,7 +71,7 @@ public class UnitTradeItem extends TradeItem {
      */
     @Override
     public boolean isValid() {
-        return Objects.equals(unit.getOwner(), getSource())
+        return unit.getOwner() == getSource()
             && unit.getType().isAvailableTo(getDestination());
     }
 

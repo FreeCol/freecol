@@ -33,7 +33,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -386,7 +385,7 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
      */
     public synchronized boolean responded() {
         return this.pane != null
-            && !Objects.equals(this.pane.getValue(), JOptionPane.UNINITIALIZED_VALUE);
+            && this.pane.getValue() != JOptionPane.UNINITIALIZED_VALUE;
     }
 
     /**
@@ -436,11 +435,11 @@ public class FreeColDialog<T> extends JDialog implements PropertyChangeListener 
         // user closed the window without selecting a button (in which
         // case the new value will be null).  Otherwise, close the dialog.
         if (this.isVisible()
-            && Objects.equals(e.getSource(), pane)
+            && e.getSource() == pane
             && (JOptionPane.VALUE_PROPERTY.equals(e.getPropertyName())
                 || JOptionPane.INPUT_VALUE_PROPERTY.equals(e.getPropertyName()))
             && e.getNewValue() != null
-            && !Objects.equals(e.getNewValue(), JOptionPane.UNINITIALIZED_VALUE)) {
+            && e.getNewValue() != JOptionPane.UNINITIALIZED_VALUE) {
             this.setVisible(false);
         }
     }

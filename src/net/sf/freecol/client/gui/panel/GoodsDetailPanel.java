@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -126,7 +125,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         panel.add(Utility.localizedLabel("colopedia.goods.makes"), "newline 20");
         if (type.isRawMaterial()) {
             panel.add(getGoodsButton(type.getOutputType()), "span");
-        } else if (!Objects.equals(type.getStoredAs(), type)) {
+        } else if (type.getStoredAs() != type) {
             panel.add(getGoodsButton(type.getStoredAs()), "span");
         } else {
             panel.add(Utility.localizedLabel("nothing"), "span");

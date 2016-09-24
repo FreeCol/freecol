@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -355,7 +354,7 @@ public final class CompactLabourReport extends ReportPanel {
             } else {
                 final Predicate<Unit> teachingPred = u -> {
                     final Unit student = u.getStudent();
-                    return student != null && Objects.equals(student.getType(), unitType);
+                    return student != null && student.getType() == unitType;
                 };
                 final Function<Unit, UnitType> studentMapper = u ->
                     unitType.getTeachingType(u.getType());

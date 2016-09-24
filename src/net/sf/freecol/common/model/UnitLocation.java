@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -160,7 +159,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     private void addUnit(Unit u) {
         if (u == null) return;
-        if (!Objects.equals(u.getLocation(), this)) {
+        if (u.getLocation() != this) {
             logger.warning("Fixing bogus unit location for " + u.getId()
                 + ", expected " + this
                 + " but found " + u.getLocation());
@@ -502,7 +501,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         Unit unit = (locatable instanceof Unit) ? (Unit)locatable : null;
         return (unit == null)
             ? NoAddReason.WRONG_TYPE
-            : (!isEmpty() && !Objects.equals(getFirstUnit().getOwner(), unit.getOwner()))
+            : (!isEmpty() && getFirstUnit().getOwner() != unit.getOwner())
             ? NoAddReason.OCCUPIED_BY_ENEMY
             : (contains(unit))
             ? NoAddReason.ALREADY_PRESENT
@@ -557,7 +556,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         synchronized (this.units) {
             // FIXME: Do *not* use getUnits/List here, because Colony lies!
             for (Unit unit : this.units) {
-                if (!Objects.equals(unit.getLocation(), this)) {
+                if (unit.getLocation() != this) {
                     logger.warning("UnitLocation contains unit " + unit
                         + " with bogus location " + unit.getLocation()
                         + ", fixing.");

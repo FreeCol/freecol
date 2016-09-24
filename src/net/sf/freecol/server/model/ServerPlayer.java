@@ -21,8 +21,16 @@ package net.sf.freecol.server.model;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -1030,7 +1038,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player
                     //     > other settlements
-                    int value = (Objects.equals(claimant.getOwner(), this)) ? 3
+                    int value = (claimant.getOwner() == this) ? 3
                         : (claimant.getOwner().isEuropean()
                             == this.isEuropean()) ? 2
                         : 1;
@@ -1044,7 +1052,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             int bestValue = 0;
             claimant = null;
             for (Entry<Settlement, Integer> entry : votes.entrySet()) {
-                if (Objects.equals(avoid, entry.getKey())) {
+                if (avoid == entry.getKey()) {
                     lastResort = true;
                     continue;
                 }
@@ -1411,7 +1419,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // settlements except the one that originated it (if any).
         if (isIndian()) {
             for (IndianSettlement is : transform(getIndianSettlements(),
-                    i -> !Objects.equals(i, origin) && i.hasContacted(player))) {
+                    i -> i != origin && i.hasContacted(player))) {
                 ((ServerIndianSettlement)is).csModifyAlarm(player, add,
                                                            false, cs);//+til
             }
@@ -1727,7 +1735,7 @@ outer:  for (Effect effect : effects) {
             boolean add = market.getAmountInMarket(type)
                 < type.getInitialAmount();
             int amount = game.getTurn().getNumber() / 10;
-            if (Objects.equals(type, extraType)) amount = 2 * amount + 1;
+            if (type == extraType) amount = 2 * amount + 1;
             if (amount <= 0) continue;
             amount = randomInt(logger, "Market adjust " + type, random, amount);
             if (!add) amount = -amount;
@@ -1892,7 +1900,7 @@ outer:  for (Effect effect : effects) {
         //     - a naval unit at sea
         //     - either we are at war with them or they are pirates
         final Predicate<Unit> bombardUnit = u -> 
-            (!Objects.equals(u.getOwner(), this)
+            (u.getOwner() != this
                 && u.isNaval() && !u.getTile().isLand()
                 && (atWarWith(u.getOwner()) || u.hasAbility(Ability.PIRACY)));
         // For all colonies that are able to bombard, search neighbouring
@@ -2269,7 +2277,7 @@ outer:  for (Effect effect : effects) {
             vis = See.perhaps().always(defenderPlayer);
             if (isAttack) {
                 if (attackerTile == null
-                    || Objects.equals(attackerTile, defenderTile)
+                    || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
                         + " to " + defenderTile
@@ -2283,7 +2291,7 @@ outer:  for (Effect effect : effects) {
             vis = See.perhaps().always(this);
             if (isAttack) {
                 if (attackerTile == null
-                    || Objects.equals(attackerTile, defenderTile)
+                    || attackerTile == defenderTile
                     || !attackerTile.isAdjacent(defenderTile)) {
                     logger.warning("Bogus attack from " + attackerTile
                         + " to " + defenderTile
@@ -3147,7 +3155,7 @@ outer:  for (Effect effect : effects) {
         String key;
         
         UnitChange uc = loser.getUnitChange(UnitChangeType.DEMOTION);
-        if (uc == null || Objects.equals(uc.to, loser.getType())) {
+        if (uc == null || uc.to == loser.getType()) {
             logger.warning("Demotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
@@ -3733,7 +3741,7 @@ outer:  for (Effect effect : effects) {
         StringTemplate winnerLabel = winner.getLabel();
 
         UnitChange uc = winner.getUnitChange(UnitChangeType.PROMOTION);
-        if (uc == null || Objects.equals(uc.to, winner.getType())) {
+        if (uc == null || uc.to == winner.getType()) {
             logger.warning("Promotion failed, type="
                 + ((uc == null) ? "null" : "same type: " + uc.to));
             return;
@@ -4249,7 +4257,7 @@ outer:  for (Effect effect : effects) {
     public boolean csChangeOwner(Unit unit, ServerPlayer newOwner,
                                  String change, Location loc,
                                  ChangeSet cs) {
-        if (Objects.equals(newOwner, this)) return true; // No transfer needed
+        if (newOwner == this) return true; // No transfer needed
 
         final Specification spec = getSpecification();
         final Tile oldTile = unit.getTile();
@@ -4273,7 +4281,7 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
                 if ((uc = u.getUnitChange(change, null, newOwner)) == null) {
                     ; // no change for this passenger
                 } else if (uc.isAvailableTo(newOwner)) {
-                    if (!Objects.equals(uc.to, u.getType()) && !u.changeType(uc.to)) {
+                    if (uc.to != u.getType() && !u.changeType(uc.to)) {
                         logger.warning("Type change failure: " + u
                             + " -> " + uc.to);
                     }
@@ -4285,7 +4293,7 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
                 }
             }
 
-            if (!Objects.equals(mainType, unit.getType()) && !unit.changeType(mainType)) {
+            if (mainType != unit.getType() && !unit.changeType(mainType)) {
                 logger.warning("Type change failure: " + unit
                     + " -> " + mainType);
                 return false;
@@ -4432,7 +4440,7 @@ logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change 
             if (sta == Stance.UNCONTACTED) continue;
             for (Player p : game.getLiveEuropeanPlayerList(this)) {
                 ServerPlayer sp = (ServerPlayer) p;
-                if (Objects.equals(p, s) || !p.hasContacted(this)
+                if (p == s || !p.hasContacted(this)
                     || !p.hasContacted(s)) continue;
                 if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
                     || war) {

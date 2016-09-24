@@ -90,11 +90,10 @@ public class RebelToolTip extends JToolTip {
                                     new AbstractGoods(goodsType, production)),
                 "span 2");
         }
-        Stream<Modifier> modifiers = colony.getOwner()
-            .getModifiers(Modifier.LIBERTY);
         libertyProduction = (int)FeatureContainer
-            .applyModifiers((float)libertyProduction, turn, modifiers);
-        forEach(modifiers, m -> {
+            .applyModifiers((float)libertyProduction, turn,
+                            colony.getOwner().getModifiers(Modifier.LIBERTY));
+        forEach(colony.getOwner().getModifiers(Modifier.LIBERTY), m -> {
                 for (JLabel j : ModifierFormat.getModifierLabels(m, null, turn)) add(j);
             });
 

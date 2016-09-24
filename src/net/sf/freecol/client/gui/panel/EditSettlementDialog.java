@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -211,7 +210,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         if (options.get(0).equals(value)) { // OK
             is.setName(this.name.getText());
             Nation newNation = getOwnerNation();
-            if (!Objects.equals(newNation, is.getOwner().getNation())) {
+            if (newNation != is.getOwner().getNation()) {
                 Player newPlayer = getOwnerPlayer();
                 // FIXME: recalculate tile ownership properly, taking
                 // settlement radius into account

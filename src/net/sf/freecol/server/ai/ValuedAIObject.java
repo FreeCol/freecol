@@ -35,11 +35,11 @@ import net.sf.freecol.common.model.FreeColObject;
 public abstract class ValuedAIObject extends AIObject {
 
     /** A comparator by ascending AI object value. */
-    public static final Comparator<ValuedAIObject> ascendingValueComparator
+    public static final Comparator<? super ValuedAIObject> ascendingValueComparator
         = Comparator.comparingInt(ValuedAIObject::getValue);
     
     /** A comparator by descending AI object value. */
-    public static final Comparator<ValuedAIObject> descendingValueComparator
+    public static final Comparator<? super ValuedAIObject> descendingValueComparator
         = ascendingValueComparator.reversed();
 
     /** The value of this AIObject. */
@@ -83,38 +83,21 @@ public abstract class ValuedAIObject extends AIObject {
 
 
     /**
-     * Get the {@code Value} value.
+     * Get the value.
      *
-     * @return an {@code int} value
+     * @return The value.
      */
     public final int getValue() {
         return value;
     }
 
     /**
-     * Set the {@code Value} value.
+     * Set the value.
      *
-     * @param newValue The new Value value.
+     * @param newValue The new value.
      */
     public final void setValue(final int newValue) {
         this.value = newValue;
-    }
-
-
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof ValuedAIObject) {
-            ValuedAIObject vao = (ValuedAIObject)other;
-            cmp = vao.value - this.value;
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
     }
 
 

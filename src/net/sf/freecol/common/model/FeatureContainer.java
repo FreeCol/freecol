@@ -18,9 +18,15 @@
  */
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -426,7 +432,7 @@ public final class FeatureContainer {
                     Set<Ability> abilitySet = abilities.get(key);
                     if (abilitySet == null) continue;
                     for (Ability a : new HashSet<>(abilitySet)) {
-                        if (Objects.equals(a.getSource(), fco)) abilitySet.remove(a);
+                        if (a.getSource() == fco) abilitySet.remove(a);
                     }
                 }
             }
@@ -442,7 +448,7 @@ public final class FeatureContainer {
                     Set<Modifier> modifierSet = modifiers.get(key);
                     if (modifierSet == null) continue;
                     for (Modifier m : new HashSet<>(modifierSet)) {
-                        if (Objects.equals(m.getSource(), fco)) modifierSet.remove(m);
+                        if (m.getSource() == fco) modifierSet.remove(m);
                     }
                 }
             }
@@ -475,7 +481,7 @@ public final class FeatureContainer {
     public void replaceSource(FreeColSpecObjectType oldSource,
                               FreeColSpecObjectType newSource) {
         for (Ability ability : transform(getAbilities(null, null, null),
-                a -> oldSource == null || Objects.equals(a.getSource(), oldSource))) {
+                a -> oldSource == null || a.getSource() == oldSource)) {
             removeAbility(ability);
             Ability newAbility = new Ability(ability);
             newAbility.setSource(newSource);
@@ -483,7 +489,7 @@ public final class FeatureContainer {
         }
 
         for (Modifier modifier : transform(getModifiers(null, null, null),
-                m -> oldSource == null || Objects.equals(m.getSource(), oldSource))) {
+                m -> oldSource == null || m.getSource() == oldSource)) {
             removeModifier(modifier);
             Modifier newModifier = new Modifier(modifier);
             newModifier.setSource(newSource);

@@ -30,8 +30,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent when inciting a native settlement.
@@ -149,7 +147,7 @@ public class InciteMessage extends DOMMessage {
         if (enemy == null) {
             return serverPlayer.clientError("Not a player: " + this.enemyId)
                 .build(serverPlayer);
-        } else if (Objects.equals(enemy, player)) {
+        } else if (enemy == player) {
             return serverPlayer.clientError("Inciting against oneself!")
                 .build(serverPlayer);
         } else if (!enemy.isEuropean()) {

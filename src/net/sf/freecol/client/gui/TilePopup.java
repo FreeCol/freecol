@@ -25,7 +25,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -113,11 +112,11 @@ public final class TilePopup extends JPopupMenu {
                 gotoMenuItem.addActionListener((ActionEvent ae) -> {
                         if (!freeColClient.currentPlayerIsMyPlayer()) return;
                         Tile currTile = activeUnit.getTile();
-                        if (Objects.equals(currTile, tile)) return; // already at destination
+                        if (currTile == tile) return; // already at destination
                         freeColClient.getInGameController()
                             .goToTile(activeUnit, tile);
                         // if unit did not move, we should show the goto path
-                        if (Objects.equals(activeUnit.getTile(), currTile)) {
+                        if (activeUnit.getTile() == currTile) {
                             canvas.updateCurrentPathForActiveUnit();
                         }
                     });
@@ -125,7 +124,7 @@ public final class TilePopup extends JPopupMenu {
             }
 
             // Add move to Europe entry if the unit can do so
-            if (Objects.equals(unitTile, tile) && activeUnit.hasHighSeasMove()) {
+            if (unitTile == tile && activeUnit.hasHighSeasMove()) {
                 JMenuItem europeMenuItem = Utility.localizedMenuItem(StringTemplate
                     .template("goToEurope"));
                 europeMenuItem.addActionListener((ActionEvent ae) -> {
@@ -137,7 +136,7 @@ public final class TilePopup extends JPopupMenu {
             }
 
             // Add state changes if present
-            if (Objects.equals(unitTile, tile)) {
+            if (unitTile == tile) {
                 JMenuItem ji = null;
                 if (activeUnit.checkSetState(UnitState.ACTIVE)) {
                     ji = Utility.localizedMenuItem("activateUnit");
@@ -188,7 +187,7 @@ public final class TilePopup extends JPopupMenu {
 
         Settlement settlement = tile.getSettlement();
         if (settlement != null) {
-            if (Objects.equals(settlement.getOwner(), player)) {
+            if (settlement.getOwner() == player) {
                 addColony(((Colony) settlement));
             } else if (settlement instanceof IndianSettlement) {
                 addIndianSettlement((IndianSettlement) settlement);
@@ -348,7 +347,7 @@ public final class TilePopup extends JPopupMenu {
             menuItem.addActionListener((ActionEvent ae) -> {
                     if (!freeColClient.currentPlayerIsMyPlayer()) return;
                     Tile currTile = activeUnit.getTile();
-                    if (Objects.equals(currTile, tile)) return;
+                    if (currTile == tile) return;
                     final Map map = activeUnit.getGame().getMap();
                     LogBuilder lb = new LogBuilder(512);
                     PathNode path = map.findPath(activeUnit,
