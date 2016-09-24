@@ -169,10 +169,8 @@ public abstract class WorkLocation extends UnitLocation
         if (!Utils.equals(newProductionType, productionType)) {
             productionType = newProductionType;
             colony.invalidateCache();
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Production type at " + this
-                    + " is now: " + newProductionType);
-            }
+            logger.fine("Production type at " + this
+                + " is now: " + newProductionType);
         }
     }
 
@@ -394,7 +392,7 @@ public abstract class WorkLocation extends UnitLocation
             if ((work = u.getWorkType()) == null) {
                 if (occ != null) work = occ.workType;
             }
-            if ((sug = getSuggestion(u, productionType, work)) != null) {
+            if ((sug = getSuggestion(u, getProductionType(), work)) != null) {
                 result.put(u, sug);
             }
         }
@@ -570,7 +568,7 @@ public abstract class WorkLocation extends UnitLocation
         final UnitType unitType = unit.getType();
         final Turn turn = getGame().getTurn();
         return Math.max(0,
-            (int)applyModifiers(getBaseProduction(productionType,
+            (int)applyModifiers(getBaseProduction(getProductionType(),
                                                   goodsType, unitType),
                                 turn,
                                 getProductionModifiers(goodsType, unitType)));

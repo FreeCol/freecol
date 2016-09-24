@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -85,6 +87,7 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
 import static net.sf.freecol.common.util.RandomUtils.*;
 
+import net.sf.freecol.server.ai.GoodsWish;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -99,6 +102,8 @@ import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.ai.mission.WishRealizationMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
+import net.sf.freecol.server.ai.ValuedAIObject;
+import net.sf.freecol.server.ai.WorkerWish;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -557,7 +562,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             }
             // Otherwise attack something near a weak colony
             if (target == null && !colonies.isEmpty()) {
-                List<AIColony> bad = new ArrayList<>(badlyDefended);
+                List<AIColony> bad = new ArrayList<>(getBadlyDefended());
                 if (bad.isEmpty()) bad.addAll(getAIColonies());
                 AIColony defend = getRandomMember(logger,
                     "AIColony to defend", bad, air);
@@ -740,7 +745,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private static void bringGifts(LogBuilder lb) {
+    private void bringGifts(LogBuilder lb) {
         return;
     }
 
@@ -751,7 +756,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *
      * @param lb A {@code LogBuilder} to log to.
      */
-    private static void demandTribute(LogBuilder lb) {
+    private void demandTribute(LogBuilder lb) {
         return;
     }
 
@@ -865,7 +870,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param oldTarget The old target {@code Location}.
      * @param lb A {@code LogBuilder} to log to.
      */
-    public static void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
+    public void updateTransport(AIUnit aiu, Location oldTarget, LogBuilder lb) {
         final AIUnit aiCarrier = aiu.getTransport();
         final Mission newMission = aiu.getMission();
         final Location newTarget = (newMission == null) ? null
@@ -893,7 +898,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      *     transportable is already aboard a carrier, and there is a
      *     well defined source and destination location.
      */
-    private static boolean requestsTransport(TransportableAIObject t) {
+    private boolean requestsTransport(TransportableAIObject t) {
         return t.getTransport() == null
             && t.getTransportDestination() != null
             && t.getTransportSource() != null
@@ -907,7 +912,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param t The {@code TransportableAIObject} to check.
      * @return True if all is well.
      */
-    private static boolean checkTransport(TransportableAIObject t) {
+    private boolean checkTransport(TransportableAIObject t) {
         AIUnit aiCarrier = t.getTransport();
         if (aiCarrier == null) return false;
         TransportMission tm = aiCarrier.getMission(TransportMission.class);
@@ -1592,8 +1597,8 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
      * @param agreement The {@code DiplomaticTrade} to reset.
      * @return The {@code TradeStatus} for the agreement.
      */
-    private static TradeStatus rejectAgreement(TradeItem stance,
-                                               DiplomaticTrade agreement) {
+    private TradeStatus rejectAgreement(TradeItem stance,
+                                        DiplomaticTrade agreement) {
         if (stance == null) return TradeStatus.REJECT_TRADE;
         
         agreement.clear();
@@ -2345,7 +2350,7 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 lb.add(", EXCEPTION: ", e.getMessage());
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }

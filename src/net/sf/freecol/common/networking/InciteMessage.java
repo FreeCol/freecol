@@ -67,7 +67,7 @@ public class InciteMessage extends DOMMessage {
      */
     public InciteMessage(Unit unit, IndianSettlement is, Player enemy,
                          int gold) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -83,7 +83,7 @@ public class InciteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public InciteMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -129,7 +129,7 @@ public class InciteMessage extends DOMMessage {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -137,7 +137,7 @@ public class InciteMessage extends DOMMessage {
         IndianSettlement is;
         try {
             is = getSettlement(unit);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -181,7 +181,7 @@ public class InciteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId,
             ENEMY_TAG, this.enemyId,

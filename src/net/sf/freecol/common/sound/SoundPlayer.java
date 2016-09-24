@@ -92,7 +92,7 @@ public class SoundPlayer {
             // sound system.  It was buggy and appears to be
             // unmaintained since 2009.  So now for ogg we have our
             // own jorbis-based decoder.
-            in = OggVorbisDecoderFactory.getOggStream(file);
+            in = new OggVorbisDecoderFactory().getOggStream(file);
         } else {
             in = AudioSystem.getAudioInputStream(file);
         }
@@ -111,7 +111,7 @@ public class SoundPlayer {
     private void setMixer(MixerWrapper mw) {
         try {
             mixer = AudioSystem.getMixer(mw.getMixerInfo());
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Could not set mixer", e);
             mixer = null;
         }
@@ -136,7 +136,7 @@ public class SoundPlayer {
      * @param file The {@code File} to be played.
      */
     public void playOnce(File file) {
-        if (mixer == null) return; // Fail faster.
+        if (getMixer() == null) return; // Fail faster.
         try {
             soundPlayerThread.add(getAudioInputStream(file));
             soundPlayerThread.awaken();
@@ -263,12 +263,10 @@ public class SoundPlayer {
                 : min + 0.5f * (max - min) * (float)Math.log10(vol);
             try {
                 control.setValue(gain);
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Using volume " + vol + "%, "
-                        + control.getUnits() + "=" + gain
-                        + " control=" + type);
-                }
-            } catch (RuntimeException e) {
+                logger.finest("Using volume " + vol + "%, "
+                    + control.getUnits() + "=" + gain
+                    + " control=" + type);
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not set volume "
                     + " (control=" + type + " in [" + min + "," + max + "])"
                     + " to " + gain + control.getUnits(), e);

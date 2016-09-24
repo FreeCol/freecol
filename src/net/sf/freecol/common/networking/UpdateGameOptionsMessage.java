@@ -48,7 +48,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      * @param options The game options {@code OptionGroup}.
      */
     public UpdateGameOptionsMessage(OptionGroup options) {
-        super(TAG);
+        super(getTagName());
 
         this.options = options;
     }
@@ -118,7 +118,7 @@ public class UpdateGameOptionsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
+        return new DOMMessage(getTagName())
             .add(this.options).toXMLElement();
     }
 

@@ -152,7 +152,7 @@ public class AIMain extends FreeColObject
      * @param fcgo The {@code FreeColGameObject} to test.
      * @return True if a corresponding AI object is needed.
      */
-    private static boolean shouldHaveAIObject(FreeColGameObject fcgo) {
+    private boolean shouldHaveAIObject(FreeColGameObject fcgo) {
         return (fcgo instanceof Colony) ? true
             : (fcgo instanceof Player)  ? ((Player)fcgo).isAI()
             : (fcgo instanceof Unit)    ? true
@@ -234,9 +234,7 @@ public class AIMain extends FreeColObject
         synchronized (aiObjects) {
             result = aiObjects.remove(id) != null;
         }
-        if (result) if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Removed AI object: " + id);
-        }
+        if (result) logger.finest("Removed AI object: " + id);
         return result;
     }
 
@@ -429,10 +427,8 @@ public class AIMain extends FreeColObject
     public void ownerChanged(FreeColGameObject source, Player oldOwner,
                              Player newOwner) {
         AIObject ao = getAIObject(source);
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Owner changed for " + source.getId()
-                + " with AI object: " + ao);
-        }
+        logger.finest("Owner changed for " + source.getId()
+            + " with AI object: " + ao);
         AIPlayer aiOwner = getAIPlayer(oldOwner);
         if (aiOwner != null) {
             if (ao instanceof AIColony) {

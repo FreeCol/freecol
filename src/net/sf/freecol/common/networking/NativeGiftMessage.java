@@ -53,7 +53,7 @@ public class NativeGiftMessage extends DOMMessage {
      * @param colony The {@code Colony} that is trading.
      */
     public NativeGiftMessage(Unit unit, Colony colony) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.colonyId = colony.getId();
@@ -67,7 +67,7 @@ public class NativeGiftMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NativeGiftMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.colonyId = getStringAttribute(element, COLONY_TAG);
@@ -90,7 +90,7 @@ public class NativeGiftMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -98,7 +98,7 @@ public class NativeGiftMessage extends DOMMessage {
         Colony colony;
         try {
             colony = unit.getAdjacentSettlement(this.colonyId, Colony.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -116,7 +116,7 @@ public class NativeGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             COLONY_TAG, this.colonyId,
             UNIT_TAG, this.unitId).toXMLElement();
     }

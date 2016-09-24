@@ -40,11 +40,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.i18n.Messages;
@@ -54,14 +56,20 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.TileImprovementSuggestion;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Occupation;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -72,6 +80,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.WorkLocation.Suggestion;
 import net.sf.freecol.common.resources.ResourceManager;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -328,8 +337,8 @@ public final class ReportCompactColonyPanel extends ReportPanel
                 new GoodsProduction(p, status, extra));
         }
 
-        private static void addSuggestion(Map<UnitType, Suggestion> suggestions,
-                                          UnitType expert, Suggestion suggestion) {
+        private void addSuggestion(Map<UnitType, Suggestion> suggestions,
+            UnitType expert, Suggestion suggestion) {
             if (suggestion == null || expert == null) return;
             Suggestion now = suggestions.get(expert);
             if (now == null || now.amount < suggestion.amount) {

@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -48,7 +47,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to delete.
      */
     public DeleteTradeRouteMessage(TradeRoute tradeRoute) {
-        super(TAG);
+        super(getTagName());
 
         this.tradeRouteId = tradeRoute.getId();
     }
@@ -61,7 +60,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeleteTradeRouteMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
     }
@@ -84,13 +83,13 @@ public class DeleteTradeRouteMessage extends DOMMessage {
         try {
             tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
                 TradeRoute.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // Proceed to delete.
-        return InGameController
+        return server.getInGameController()
             .deleteTradeRoute(serverPlayer, tradeRoute)
             .build(serverPlayer);
     }
@@ -102,7 +101,7 @@ public class DeleteTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             "tradeRoute", tradeRouteId).toXMLElement();
     }
 

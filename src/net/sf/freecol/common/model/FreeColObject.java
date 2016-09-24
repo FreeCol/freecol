@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -157,9 +156,9 @@ public abstract class FreeColObject
      * @return An identifier.
      */
     public final String getSuffix(String prefix) {
-        return (id.startsWith(prefix))
-            ? id.substring(prefix.length())
-            : id;
+        return (getId().startsWith(prefix))
+            ? getId().substring(prefix.length())
+            : getId();
     }
 
     /**
@@ -169,7 +168,7 @@ public abstract class FreeColObject
      * @return The usual identifier suffix.
      */
     public final String getSuffix() {
-        String id = this.id;
+        String id = getId();
         return (id == null) ? null : lastPart(id, ".");
     }
 
@@ -193,7 +192,7 @@ public abstract class FreeColObject
      * @return The type part of the identifier, or null on error.
      */
     public String getIdType() {
-        return getIdType(id);
+        return getIdType(getId());
     }
 
     /**
@@ -232,8 +231,8 @@ public abstract class FreeColObject
         } else if (fco2 == null) {
             return 1;
         }
-        String id1 = fco1.id;
-        String id2 = fco2.id;
+        String id1 = fco1.getId();
+        String id2 = fco2.getId();
         if (id1 == null) {
             return (id2 == null) ? 0 : -1;
         } else if (id2 == null) {
@@ -797,8 +796,8 @@ public abstract class FreeColObject
         if (methodName != null && returnClass != null) {
             try {
                 return Introspector.invokeMethod(this, methodName, returnClass);
-            } catch (IllegalAccessException|NoSuchMethodException|InvocationTargetException|RuntimeException e) {
-                logger.log(Level.WARNING, "Invoke failed: " + methodName, e);
+            } catch (Exception ex) {
+                logger.log(Level.WARNING, "Invoke failed: " + methodName, ex);
             }
         }
         return defaultValue;
@@ -1000,10 +999,8 @@ public abstract class FreeColObject
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(this.serialize()));
         ) {
             ret = xr.copy(game, returnClass);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy: " + id, e);
+            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
         }
         return ret;
     }
@@ -1060,10 +1057,10 @@ public abstract class FreeColObject
      *     to the stream.
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        if (id == null) {
+        if (getId() == null) {
             logger.warning("FreeColObject with null identifier: " + this);
         } else {
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         }
     }
 
@@ -1102,7 +1099,7 @@ public abstract class FreeColObject
         try {
             xw.writeStartElement(getXMLTagName());
 
-            xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
             xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
@@ -1113,8 +1110,6 @@ public abstract class FreeColObject
 
             xw.writeEndElement();
 
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Partial write failed for "
                        + theClass.getName(), e);
@@ -1226,8 +1221,6 @@ public abstract class FreeColObject
                 Introspector intro = new Introspector(theClass, name);
                 intro.setter(this, xr.getAttributeValue(i));
 
-            } catch (Introspector.IntrospectorException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not set field " + name, e);
             }
@@ -1242,7 +1235,7 @@ public abstract class FreeColObject
      */
     @Override
     public String toString() {
-        return getClass().getName() + ":" + id;
+        return getClass().getName() + ":" + getId();
         //+ " (super hashcode: " + Integer.toHexString(super.hashCode()) + ")"
     }
 

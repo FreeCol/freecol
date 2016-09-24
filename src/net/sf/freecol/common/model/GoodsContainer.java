@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,7 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(GoodsContainer.class.getName());
+    private static final Logger logger = Logger.getLogger(Location.class.getName());
 
     /** The size of a standard `hold' of data. */
     public static final int CARGO_SIZE = 100;
@@ -494,8 +495,8 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @exception XMLStreamException if there is a problem writing to
      *     the stream.
      */
-    private static void writeStorage(FreeColXMLWriter xw, String tag,
-                                     Map<GoodsType, Integer> storage) throws XMLStreamException {
+    private void writeStorage(FreeColXMLWriter xw, String tag,
+                              Map<GoodsType, Integer> storage) throws XMLStreamException {
         if (storage.isEmpty()) return;
 
         xw.writeStartElement(tag);

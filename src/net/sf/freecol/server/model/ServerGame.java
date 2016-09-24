@@ -269,7 +269,7 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @param random A pseudo-random number source.
      */
-    public static void randomize(Random random) {
+    public void randomize(Random random) {
         if (random != null) NameCache.requireCitiesOfCibola(random);
     }
 
@@ -326,9 +326,7 @@ public class ServerGame extends Game implements ServerModelObject {
 
         Session.completeAll(cs);
         setTurn(getTurn().next());
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Turn is now " + getTurn() + duration);
-        }
+        logger.finest("Turn is now " + getTurn() + duration);
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
     }

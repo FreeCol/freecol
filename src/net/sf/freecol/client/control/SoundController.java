@@ -69,7 +69,7 @@ public class SoundController {
                         //+ "/, volume " + volume.getValue().toString());
                     this.soundPlayer = new SoundPlayer((AudioMixerOption)amo,
                                                        (PercentageOption)vo);
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     // #3168279 reports an undocumented NPE thrown by
                     // AudioSystem.getMixer(null).  Workaround this and other
                     // such failures by just disabling sound.
@@ -105,11 +105,9 @@ public class SoundController {
             if (file != null) {
                 soundPlayer.playOnce(file);
             }
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest(((file == null)
-                    ? "Could not load"
-                    : "Playing") + " sound: " + sound);
-            }
+            logger.finest(((file == null)
+                ? "Could not load"
+                : "Playing") + " sound: " + sound);
         }
     }
 

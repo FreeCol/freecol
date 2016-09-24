@@ -382,9 +382,7 @@ public class Game extends FreeColGameObject {
         if (id == null) throw new IllegalArgumentException("Null identifier.");
         if (id.isEmpty()) throw new IllegalArgumentException("Empty identifier.");
 
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("removeFCGO/" + reason + ": " + id);
-        }
+        logger.finest("removeFCGO/" + reason + ": " + id);
         freeColGameObjects.remove(id);
         notifyRemoveFreeColGameObject(id);
 
@@ -471,9 +469,7 @@ public class Game extends FreeColGameObject {
                 final String key = this.readAhead.getKey();
                 this.fcgoState = FcgoState.INVALID;
                 this.it.remove();
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("removeFCGO/expire: " + key);
-                }
+                logger.finest("removeFCGO/expire: " + key);
                 notifyRemoveFreeColGameObject(key);
             }
         };
@@ -715,7 +711,7 @@ public class Game extends FreeColGameObject {
     public boolean addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
-            Nation nation = this.specification.getNation(player.getNationId());
+            Nation nation = getSpecification().getNation(player.getNationId());
             nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
             if (currentPlayer == null) currentPlayer = player;
             return true;
@@ -737,7 +733,7 @@ public class Game extends FreeColGameObject {
 
         if (!players.remove(player)) return false;
 
-        Nation nation = this.specification.getNation(player.getNationId());
+        Nation nation = getSpecification().getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.AVAILABLE);
         player.dispose();
 
@@ -918,7 +914,7 @@ public class Game extends FreeColGameObject {
      * @return The age (0-2).
      */
     public int getAge() {
-        return this.specification.getAge(turn);
+        return getSpecification().getAge(turn);
     }
     
     /**
@@ -1031,7 +1027,7 @@ public class Game extends FreeColGameObject {
      * @param oldOwner The previous (possible unchanged) owning
      *     {@code Player}.
      */
-    public static void checkOwners(Ownable o, Player oldOwner) {
+    public void checkOwners(Ownable o, Player oldOwner) {
         Player newOwner = o.getOwner();
         if (oldOwner == newOwner) return;
 
@@ -1111,8 +1107,8 @@ public class Game extends FreeColGameObject {
         FreeColObject o = getFreeColGameObject(id);
         if (o == null) {
             try {
-                o = this.specification.findType(id);
-            } catch (RuntimeException e) {
+                o = getSpecification().findType(id);
+            } catch (Exception e) {
                 o = null; // Ignore
             }
         }
@@ -1229,11 +1225,11 @@ public class Game extends FreeColGameObject {
             lb.log(logger, Level.WARNING);
         }
 
-        Map map = this.map;
+        Map map = getMap();
         if (map != null) {
-            result = Math.min(result, this.map.checkIntegrity(fix));
+            result = Math.min(result, getMap().checkIntegrity(fix));
         }
-        for (Player player : this.players) {
+        for (Player player : getPlayerList()) {
             result = Math.min(result, player.checkIntegrity(fix));
         }
         return result;
@@ -1334,9 +1330,9 @@ public class Game extends FreeColGameObject {
                               xw.getClientPlayer().getName());
         }
 
-        xw.writeAttribute(UUID_TAG, uuid);
+        xw.writeAttribute(UUID_TAG, getUUID());
 
-        xw.writeAttribute(TURN_TAG, turn.getNumber());
+        xw.writeAttribute(TURN_TAG, getTurn().getNumber());
 
         xw.writeAttribute(SPANISH_SUCCESSION_TAG, spanishSuccession);
 
@@ -1370,7 +1366,7 @@ public class Game extends FreeColGameObject {
         nationOptions.toXML(xw);
 
         List<Player> players = sort(getPlayers());
-        Player unknown = unknownEnemy;
+        Player unknown = getUnknownEnemy();
         if (unknown != null) players.add(unknown);
         for (Player p : players) p.toXML(xw);
 

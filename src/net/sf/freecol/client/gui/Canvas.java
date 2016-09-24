@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -594,7 +595,7 @@ public final class Canvas extends JDesktopPane {
 
         try {
             super.add(comp, (i == null) ? JLayeredPane.DEFAULT_LAYER : i);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
                 + ") failed.", e);
         }
@@ -781,7 +782,7 @@ public final class Canvas extends JDesktopPane {
      *     first parent that is an internal frame.  Returns
      *     {@code null} if no internal frame is found.
      */
-    private static JInternalFrame getInternalFrame(final Component c) {
+    private JInternalFrame getInternalFrame(final Component c) {
         Component temp = c;
 
         while (temp != null && !(temp instanceof JInternalFrame)) {
@@ -819,13 +820,13 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) {
                 return null;
             }
-        } catch (RuntimeException e) {}
+        } catch (Exception e) {}
 
         String className = comp.getClass().getName();
         try {
             return new Point(co.getInteger(className + ".x"),
                              co.getInteger(className + ".y"));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -844,13 +845,13 @@ public final class Canvas extends JDesktopPane {
             if (!co.getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) {
                 return null;
             }
-        } catch (RuntimeException e) {}
+        } catch (Exception e) {}
 
         String className = comp.getClass().getName();
         try {
             return new Dimension(co.getInteger(className + ".w"),
                                  co.getInteger(className + ".h"));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -940,7 +941,7 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_POSITIONS)) return;
-        } catch (RuntimeException e) {}
+        } catch (Exception e) {}
 
         String className = comp.getClass().getName();
         saveInteger(className, ".x", position.x);
@@ -957,7 +958,7 @@ public final class Canvas extends JDesktopPane {
         try {
             if (!freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.REMEMBER_PANEL_SIZES)) return;
-        } catch (RuntimeException e) {}
+        } catch (Exception e) {}
 
         String className = comp.getClass().getName();
         saveInteger(className, ".w", size.width);
@@ -1287,7 +1288,7 @@ public final class Canvas extends JDesktopPane {
             // crashes here deep in the java libraries.
             try {
                 super.remove(comp);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Java crash", e);
             }
         }
@@ -1729,7 +1730,7 @@ public final class Canvas extends JDesktopPane {
         if (panel == null) {
             try {
                 panel = new ColonyPanel(freeColClient, colony);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 try {
                     logger.log(Level.WARNING, "Exception in ColonyPanel for "
                         + colony.getId(), e);
@@ -2624,7 +2625,7 @@ public final class Canvas extends JDesktopPane {
             compact = freeColClient.getClientOptions()
                 .getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             compact = false;
         }
         ReportPanel r = (compact)

@@ -50,7 +50,7 @@ public class NationSummaryMessage extends DOMMessage {
      * @param player The {@code Player} to summarize.
      */
     public NationSummaryMessage(Player player) {
-        super(TAG);
+        super(getTagName());
 
         this.playerId = player.getId();
         this.summary = null;
@@ -64,7 +64,7 @@ public class NationSummaryMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public NationSummaryMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.playerId = getStringAttribute(element, PLAYER_TAG);
         this.summary = getChild(game, element, 0, NationSummary.class);
@@ -137,7 +137,7 @@ public class NationSummaryMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             PLAYER_TAG, this.playerId)
             .add(summary).toXMLElement();
     }

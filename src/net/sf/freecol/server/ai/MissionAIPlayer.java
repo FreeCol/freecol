@@ -181,7 +181,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
      * @param tile The {@code Tile} to attack into.
      * @return True if an attack can be launched.
      */
-    public static boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
+    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Tile tile) {
         // Insist the attacker exists.
         if (attacker == null) return false;
 
@@ -351,7 +351,7 @@ public abstract class MissionAIPlayer extends AIPlayer {
             lb.add("\n  ", unit, " ");
             try {
                 aiu.doMission(lb);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "doMissions failed for: " + aiu, e);
             }
             if (!unit.isDisposed() && unit.getMovesLeft() > 0) result.add(aiu);

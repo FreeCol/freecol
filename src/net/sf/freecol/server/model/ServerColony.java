@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -488,9 +487,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     .addStringTemplate("%nation%", nation)
                     .addName("%colony%", getName()));
             newOwner.invalidateCanSeeTiles();//+vis(other)
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Convert at " + getName() + " for " + getName());
-            }
+            logger.fine("Convert at " + getName() + " for " + getName());
         }
     }
 

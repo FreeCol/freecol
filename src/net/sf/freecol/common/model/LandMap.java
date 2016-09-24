@@ -103,7 +103,7 @@ public class LandMap {
         int distanceToEdge
             = mgo.getInteger(MapGeneratorOptions.PREFERRED_DISTANCE_TO_EDGE);
         int minNumberOfTiles = mgo.getInteger(MapGeneratorOptions.LAND_MASS)
-            * this.width * this.height / 100;
+            * getWidth() * getHeight() / 100;
         int gen = mgo.getInteger(MapGeneratorOptions.LAND_GENERATOR_TYPE);
         SelectOption so = (SelectOption)
             mgo.getOption(MapGeneratorOptions.LAND_GENERATOR_TYPE);
@@ -138,7 +138,7 @@ public class LandMap {
      * @return True if there coordinate is valid.
      */
     public boolean isValid(int x, int y) {
-        return x >= 0 && x < this.width && y >= 0 && y < this.height;
+        return x >= 0 && x < getWidth() && y >= 0 && y < getHeight();
     }
 
     /**
@@ -184,7 +184,7 @@ public class LandMap {
         Position p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
             Position n = new Position(p, direction);
-            if (n.isValid(this.width, this.height)) {
+            if (n.isValid(getWidth(), getHeight())) {
                 growLand(n.getX(), n.getY(), distanceToEdge, random);
             }
         }
@@ -212,8 +212,8 @@ public class LandMap {
             // center, then fill up with small islands.
             addPolarRegions();
             int contsize = (minNumberOfTiles * 75) / 100;
-            addLandMass(contsize, contsize, this.width /2, this.height /4
-                        + randomInt(logger, "Landmass", random, this.height /2),
+            addLandMass(contsize, contsize, getWidth()/2, getHeight()/4
+                        + randomInt(logger, "Landmass", random, getHeight()/2),
                         distanceToEdge, random);
             while (this.numberOfLandTiles < minNumberOfTiles) {
                 addLandMass(15, 25, -1, -1, distanceToEdge, random);
@@ -251,8 +251,8 @@ public class LandMap {
     private void createClassicLandMap(int distanceToEdge, int minNumberOfTiles,
                                       Random random) {
         final int edg = distanceToEdge * 2;
-        final int wid = this.width - edg * 2;
-        final int hgt = this.height - edg * 2;
+        final int wid = getWidth() - edg * 2;
+        final int hgt = getHeight() - edg * 2;
         int x, y;
         while (this.numberOfLandTiles < minNumberOfTiles) {
             int failCounter = 0;
@@ -328,12 +328,11 @@ public class LandMap {
      */
     private List<Position> newPositions(Position position,
                                         int distanceToEdge) {
-        final Predicate<Position> landPred = p -> {
-            return (p.isValid(getWidth(), getHeight())
+        final Predicate<Position> landPred = p ->
+            (p.isValid(getWidth(), getHeight())
                 && !hasAdjacentLand(p.getX(), p.getY())
                 && p.getX() > distanceToEdge
-                && p.getX() < this.width - distanceToEdge);
-        };
+                && p.getX() < getWidth() - distanceToEdge);
         final Function<Direction, Position> positionMapper = d ->
             new Position(position, d);
         return transform(map(Direction.longSides, positionMapper), landPred);
@@ -363,8 +362,8 @@ public class LandMap {
         // distanceToEdge (*2 for pole ends) at the maps edges.
         int r = randomInt(logger, "Grow", random, 8)
             + Math.max(-1,
-                (1 + Math.max(distanceToEdge - Math.min(x, this.width -x),
-                    2 * distanceToEdge - Math.min(y, this.height -y))));
+                (1 + Math.max(distanceToEdge - Math.min(x, getWidth()-x),
+                    2 * distanceToEdge - Math.min(y, getHeight()-y))));
 
         final Position p = new Position(x, y);
         final Predicate<Direction> landPred = d -> {
@@ -392,12 +391,12 @@ public class LandMap {
     private int addLandMass(int minSize, int maxSize, int x, int y,
                             int distanceToEdge, Random random) {
         int size = 0;
-        boolean[][] newLand = new boolean[this.width][this.height];
+        boolean[][] newLand = new boolean[getWidth()][getHeight()];
 
         // Pick a starting position that is sea without neighbouring land.
         if (x < 0 || y < 0) {
-            final int wid = this.width - distanceToEdge * 2;
-            final int hgt = this.height - distanceToEdge * 2;
+            final int wid = getWidth() - distanceToEdge * 2;
+            final int hgt = getHeight() - distanceToEdge * 2;
             do {
                 x = distanceToEdge + randomInt(logger, "LandW", random, wid);
                 y = distanceToEdge + randomInt(logger, "LandH", random, hgt);

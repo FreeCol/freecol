@@ -387,16 +387,16 @@ public abstract class Feature extends FreeColSpecObject
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        if (source != null) {
-            xw.writeAttribute(SOURCE_TAG, source);
+        if (getSource() != null) {
+            xw.writeAttribute(SOURCE_TAG, getSource());
         }
 
-        if (firstTurn != null) {
-            xw.writeAttribute(FIRST_TURN_TAG, firstTurn.getNumber());
+        if (getFirstTurn() != null) {
+            xw.writeAttribute(FIRST_TURN_TAG, getFirstTurn().getNumber());
         }
 
-        if (lastTurn != null) {
-            xw.writeAttribute(LAST_TURN_TAG, lastTurn.getNumber());
+        if (getLastTurn() != null) {
+            xw.writeAttribute(LAST_TURN_TAG, getLastTurn().getNumber());
         }
 
         if (duration != 0) {

@@ -140,7 +140,7 @@ public class ConstructionPanel extends MigPanel
             FontLibrary.FontSize.SMALLER, lib.getScaleFactor());
 
         if (buildable == null) {
-            String clickToBuild = Messages.message(defaultLabel);
+            String clickToBuild = Messages.message(getDefaultLabel());
             int breakingPoint = getBreakingPoint(clickToBuild);
             if (breakingPoint > 0) {
                 JLabel label0 = new JLabel(

@@ -57,7 +57,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     public ChangeWorkImprovementTypeMessage(Unit unit,
                                             TileImprovementType type) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.improvementId = type.getId();
@@ -71,7 +71,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ChangeWorkImprovementTypeMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.improvementId = getStringAttribute(element, IMPROVEMENT_TYPE_TAG);
@@ -94,7 +94,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -152,7 +152,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             IMPROVEMENT_TYPE_TAG, this.improvementId).toXMLElement();
     }

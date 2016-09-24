@@ -114,7 +114,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             } else {
                 canvas.requestFocus();
             }
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseClicked!", ex);
         }
     }
@@ -160,7 +160,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                     getGUI().setSelectedTile(null);
                 }
             }
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mousePressed!", ex);
         }
     }

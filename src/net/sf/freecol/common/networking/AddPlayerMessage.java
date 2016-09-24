@@ -47,7 +47,7 @@ public class AddPlayerMessage extends DOMMessage {
      * @param player The {@code Player}s to add.
      */
     public AddPlayerMessage(Player player) {
-        super(TAG);
+        super(getTagName());
 
         this.players.clear();
         if (player != null) this.players.add(player);
@@ -91,8 +91,8 @@ public class AddPlayerMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
-    public static Element handle(FreeColServer server, Player player,
-                                 Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         // Only sent by the server to the clients.
         return null;
     }
@@ -102,7 +102,7 @@ public class AddPlayerMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
+        return new DOMMessage(getTagName())
             .add(this.players).toXMLElement();
     }
 

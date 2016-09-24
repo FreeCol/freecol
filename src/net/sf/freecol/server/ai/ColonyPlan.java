@@ -30,6 +30,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -45,6 +46,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
+import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -621,7 +623,7 @@ public class ColonyPlan {
                                          GoodsType goodsType) {
         Player player = colony.getOwner();
         NationType nationType = player.getNationType();
-        String advantage = aiMain.getAIPlayer(player).getAIAdvantage();
+        String advantage = getAIMain().getAIPlayer(player).getAIAdvantage();
         boolean ret = false;
         double factor = 1.0;
         if (nationType.hasModifier(goodsType.getId())) {
@@ -656,7 +658,7 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
-        final AIPlayer euaip = aiMain
+        final AIPlayer euaip = getAIMain()
             .getAIPlayer(colony.getOwner());
         String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
@@ -842,7 +844,7 @@ public class ColonyPlan {
         forEachMapEntry(production, fullPred, e -> {
                 for (WorkLocation wl : transform(e.getValue().keySet(),
                         w -> (w.canBeWorked() || w.canAutoProduce()))) {
-                    workPlans.add(new WorkLocationPlan(aiMain, wl, e.getKey()));
+                    workPlans.add(new WorkLocationPlan(getAIMain(), wl, e.getKey()));
                 }
             });
 
@@ -942,7 +944,7 @@ public class ColonyPlan {
      * @param colony The {@code Colony} the units are working in.
      * @return The unit that was replaced by the expert, or null if none.
      */
-    private static Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
+    private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
         final Role oldRole = expert.getRole();
         final int oldRoleCount = expert.getRoleCount();
         final GoodsType work = expert.getType().getExpertProduction();
@@ -974,8 +976,8 @@ public class ColonyPlan {
      * @return The first plan found that produces the goods type, or null
      *     if none found.
      */
-    private static WorkLocationPlan findPlan(GoodsType goodsType,
-                                             List<WorkLocationPlan> plans) {
+    private WorkLocationPlan findPlan(GoodsType goodsType,
+                                      List<WorkLocationPlan> plans) {
         return find(plans, wlp -> wlp.getGoodsType() == goodsType);
     }
 

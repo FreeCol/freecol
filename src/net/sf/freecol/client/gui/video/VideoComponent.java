@@ -95,7 +95,7 @@ public class VideoComponent extends JPanel {
     }
 
 
-    private static Border createBorder() {
+    private Border createBorder() {
         return FreeColImageBorder.imageBorder;
     }
 
@@ -174,7 +174,7 @@ public class VideoComponent extends JPanel {
         // all cases:
         try {
             super.removeNotify();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Video removal crash", e);
         }
     }

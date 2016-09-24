@@ -57,12 +57,10 @@ public class RandomChoice<T> {
 
         int total = 0;
         for (RandomChoice<T> choice : input) {
-            total += choice.probability;
-            if (probability < total) {
-                return choice.object;
-            }
+            total += choice.getProbability();
+            if (probability < total) return choice.getObject();
         }
-        return first(input).object;
+        return first(input).getObject();
     }
 
     public static <T> int getTotalProbability(Collection<RandomChoice<T>> input) {
@@ -76,7 +74,7 @@ public class RandomChoice<T> {
         int n;
         return (input == null || input.isEmpty()
             || (n = getTotalProbability(input)) <= 0) ? null
-            : (input.size() == 1) ? first(input).object
+            : (input.size() == 1) ? first(input).getObject()
             : select(input, randomInt(logger, logMe, random, n));
     }
 

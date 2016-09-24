@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -69,6 +70,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
@@ -85,6 +87,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
@@ -318,7 +321,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @return The resulting {@code DOMMessage}.
      */
     public DOMMessage ask(Game game, DOMMessage request) {
-        return (this.connected) ? this.connection.ask(game, request) : null;
+        return (isConnected()) ? this.connection.ask(game, request) : null;
     }
     
     /**
@@ -328,7 +331,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param request An {@code Element} containing the update.
      */
     private void askElement(Element request) {
-        if (!this.connected) return;
+        if (!isConnected()) return;
 
         while (request != null) {
             Element reply;
@@ -378,10 +381,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setCurrentFather(ff);
         clearOfferedFathers();
         if (ff != null) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest(getId() + " is recruiting " + ff.getId()
-                    + " in " + getGame().getTurn());
-            }
+            logger.finest(getId() + " is recruiting " + ff.getId()
+                + " in " + getGame().getTurn());
         }
     }
 
@@ -467,10 +468,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (changed) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("randomizeGame(" + getId() + ") initial prices: "
-                    + sb.toString().substring(2));
-            }
+            logger.finest("randomizeGame(" + getId() + ") initial prices: "
+                + sb.toString().substring(2));
         }
     }
 
@@ -1231,9 +1230,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             sb.append(' ').append(goodsType.getId());
             ret = true;
         }
-        if (ret) if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(sb.toString());
-        }
+        if (ret) logger.finest(sb.toString());
         return ret;
     }
 
@@ -1540,9 +1537,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         if (effects.isEmpty()) sb.append(" All avoided");
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine(sb.toString());
-        }
+        logger.fine(sb.toString());
 
         boolean colonyDirty = false;
         List<ModelMessage> messages = new ArrayList<>();
@@ -1668,14 +1663,14 @@ outer:  for (Effect effect : effects) {
         return messages;
     }
 
-    public static Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
+    public Building getBuildingForEffect(Colony colony, Effect effect, Random random) {
         List<Building> buildings = colony.getBurnableBuildings();
         return (buildings.isEmpty()) ? null
             : getRandomMember(logger, "Select building for effect",
                               buildings, random);
     }
 
-    public static Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
+    public Unit getUnitForEffect(Colony colony, Effect effect, Random random) {
         List<Unit> units = transform(colony.getAllUnitsList(),
                                      u -> effect.appliesTo(u.getType()));
         return (units.isEmpty()) ? null
@@ -1740,12 +1735,10 @@ outer:  for (Effect effect : effects) {
             amount = randomInt(logger, "Market adjust " + type, random, amount);
             if (!add) amount = -amount;
             market.addGoodsToMarket(type, amount);
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest(getName() + " adjust of " + amount
-                    + " " + type
-                    + ", total: " + market.getAmountInMarket(type)
-                    + ", initial: " + type.getInitialAmount());
-            }
+            logger.finest(getName() + " adjust of " + amount
+                + " " + type
+                + ", total: " + market.getAmountInMarket(type)
+                + ", initial: " + type.getInitialAmount());
             addExtraTrade(new AbstractGoods(type, amount));
         }
 
@@ -2128,12 +2121,10 @@ outer:  for (Effect effect : effects) {
                                   true, cs);
             }
         }
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(this.getName() + " claimed " + tile
-                + " from " + ((owner == null) ? "no-one" : owner.getName())
-                + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
-                    : price));
-        }
+        logger.finest(this.getName() + " claimed " + tile
+            + " from " + ((owner == null) ? "no-one" : owner.getName())
+            + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
+                : price));
     }
 
 
@@ -2161,7 +2152,7 @@ outer:  for (Effect effect : effects) {
         // Handle migration type specific changes.
         switch (type) {
         case FOUNTAIN:
-            setRemainingEmigrants(remainingEmigrants - 1);
+            setRemainingEmigrants(getRemainingEmigrants() - 1);
             break;
         case RECRUIT:
             modifyGold(-europe.getRecruitPrice());
@@ -2207,8 +2198,8 @@ outer:  for (Effect effect : effects) {
                          Random random,
                          ChangeSet cs) {
         CombatModel combatModel = getGame().getCombatModel();
-        boolean isAttack = CombatModel.combatIsAttack(attacker, defender);
-        boolean isBombard = CombatModel.combatIsBombard(attacker, defender);
+        boolean isAttack = combatModel.combatIsAttack(attacker, defender);
+        boolean isBombard = combatModel.combatIsBombard(attacker, defender);
         Unit attackerUnit = null;
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
@@ -2690,7 +2681,7 @@ outer:  for (Effect effect : effects) {
      * @param loser The {@code Unit} that dies.
      * @return An amount to raise tension by.
      */
-    private static int getSlaughterTension(Unit loser) {
+    private int getSlaughterTension(Unit loser) {
         // Tension rises faster when units die.
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
@@ -2715,8 +2706,8 @@ outer:  for (Effect effect : effects) {
      * @param settlement The {@code Settlement} being defended.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csAutoequipUnit(Unit unit, Settlement settlement,
-                                        ChangeSet cs) {
+    private void csAutoequipUnit(Unit unit, Settlement settlement,
+                                 ChangeSet cs) {
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         cs.addMessage(See.only(player),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -2732,8 +2723,8 @@ outer:  for (Effect effect : effects) {
      * @param is The {@code IndianSettlement} that was attacked.
      * @param cs The {@code ChangeSet} to update.
      */
-    private static void csBurnMissions(Unit attacker, IndianSettlement is,
-                                       ChangeSet cs) {
+    private void csBurnMissions(Unit attacker, IndianSettlement is,
+                                ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attackerPlayer.getNationLabel();
         ServerPlayer nativePlayer = (ServerPlayer)is.getOwner();
@@ -2777,8 +2768,8 @@ outer:  for (Effect effect : effects) {
      * @param random A pseudo-random number source.
      * @param cs The {@code ChangeSet} to update.
      */
-    private static void csCaptureColony(Unit attacker, ServerColony colony,
-                                        Random random, ChangeSet cs) {
+    private void csCaptureColony(Unit attacker, ServerColony colony,
+                                 Random random, ChangeSet cs) {
         Game game = attacker.getGame();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
@@ -2944,7 +2935,7 @@ outer:  for (Effect effect : effects) {
      * @param loser A {@code Unit} to capture.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
+    private void csCaptureUnit(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer loserPlayer = (ServerPlayer) loser.getOwner();
         StringTemplate loserNation = loserPlayer.getNationLabel();
         StringTemplate loserLocation = loser.getLocation()
@@ -3321,9 +3312,7 @@ outer:  for (Effect effect : effects) {
      * @param cs A {@code ChangeSet} to update.
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Disposing of " + settlement.getName());
-        }
+        logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer)settlement.getOwner();
         Set<Tile> owned = settlement.getOwnedTiles();
         for (Tile t : owned) t.cacheUnseen();//+til
@@ -3387,7 +3376,7 @@ outer:  for (Effect effect : effects) {
      * @param defender A naval {@code Unit} that evades the attacker.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
+    private void csEvadeAttack(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate attackerNation = attacker.getApparentOwnerName();
         Location attackerLocation = attacker.getLocation();
@@ -3420,8 +3409,8 @@ outer:  for (Effect effect : effects) {
      * @param defender A naval {@code Unit} that evades the attacker.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csEvadeBombard(Settlement settlement, Unit defender,
-                                       ChangeSet cs) {
+    private void csEvadeBombard(Settlement settlement, Unit defender,
+                                ChangeSet cs) {
         ServerPlayer attackerPlayer = (ServerPlayer) settlement.getOwner();
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defender.getApparentOwnerName();
@@ -3453,7 +3442,7 @@ outer:  for (Effect effect : effects) {
      * @param loser The losing naval {@code Unit}
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
+    private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         List<Goods> capture = loser.getGoodsList();
         if (!capture.isEmpty() && winner.hasSpaceLeft()) {
@@ -3473,7 +3462,7 @@ outer:  for (Effect effect : effects) {
      * @param defender The {@code Unit} that defended and loses equipment.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
+    private void csLoseAutoEquip(Unit attacker, Unit defender, ChangeSet cs) {
         ServerPlayer defenderPlayer = (ServerPlayer) defender.getOwner();
         StringTemplate defenderNation = defenderPlayer.getNationLabel();
         Settlement settlement = defender.getSettlement();
@@ -3736,7 +3725,7 @@ outer:  for (Effect effect : effects) {
      * @param winner The {@code Unit} that won and should be promoted.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csPromoteUnit(Unit winner, ChangeSet cs) {
+    private void csPromoteUnit(Unit winner, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
         StringTemplate winnerLabel = winner.getLabel();
 
@@ -4174,10 +4163,8 @@ outer:  for (Effect effect : effects) {
                 .addStringTemplate("%nation%", other.getNationLabel()));
         }
 
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("First contact between " + this.getId()
-                + " and " + other.getId());
-        }
+        logger.finest("First contact between " + this.getId()
+            + " and " + other.getId());
         return true;
     }
 

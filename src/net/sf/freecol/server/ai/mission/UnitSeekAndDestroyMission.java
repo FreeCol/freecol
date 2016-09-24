@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -412,14 +411,12 @@ public class UnitSeekAndDestroyMission extends Mission {
                 if (settlement.isConnectedPort()) {
                     transportTarget = settlement.getTile()
                         .getBestDisembarkTile(unit.getOwner());
-                    if (logger.isLoggable(Level.FINEST)) {
-                        logger.finest(tag + " chose dropoff " + transportTarget
-                            + " for attack on "
-                            + ((settlement.canBombardEnemyShip()) ? "hazardous"
-                                : "normal")
-                            + " settlement " + settlement.getName()
-                            + ": " + this);
-                    }
+                    logger.finest(tag + " chose dropoff " + transportTarget
+                        + " for attack on "
+                        + ((settlement.canBombardEnemyShip()) ? "hazardous"
+                            : "normal")
+                        + " settlement " + settlement.getName()
+                        + ": " + this);
                 }
             }
         }
@@ -438,7 +435,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -453,8 +450,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             Colony colony;
             Mission m;
             if (Mission.TARGETOWNERSHIP.equals(reason)
-                && target instanceof Colony
-                && (colony = (Colony) target) != null
+                && getTarget() instanceof Colony
+                && (colony = (Colony)getTarget()) != null
                 && getPlayer().owns(colony)
                 && (m = getAIPlayer().getDefendSettlementMission(aiUnit,
                         colony)) != null) {
@@ -470,16 +467,16 @@ public class UnitSeekAndDestroyMission extends Mission {
         Location nearbyTarget = (unit.isOnCarrier()) ? null
             : findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
-            if (target == null) {
+            if (getTarget() == null) {
                 setTarget(nearbyTarget);
                 return lbRetarget(lb);
             }
-            if (nearbyTarget == target) {
+            if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
                 Tile now = unit.getTile();
                 Tile nearbyTile = nearbyTarget.getTile();
-                Tile targetTile = target.getTile();
+                Tile targetTile = getTarget().getTile();
                 if (now != null && nearbyTile != null && targetTile != null
                     && (now.getDistanceTo(nearbyTile)
                         >= now.getDistanceTo(targetTile))) {
@@ -492,7 +489,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
-            : target;
+            : getTarget();
         // Note avoiding other targets by choice of cost decider.
         Unit.MoveType mt = travelToTarget(currentTarget,
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);

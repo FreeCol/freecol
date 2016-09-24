@@ -92,10 +92,10 @@ public class TradeRoute extends FreeColGameObject
      * @param other The {@code TradeRoute} to copy from.
      */
     public synchronized void updateFrom(TradeRoute other) {
-        setName(other.name);
-        setOwner(other.owner);
+        setName(other.getName());
+        setOwner(other.getOwner());
         clearStops();
-        for (TradeRouteStop otherStop : other.stops) {
+        for (TradeRouteStop otherStop : other.getStops()) {
             addStop(new TradeRouteStop(otherStop));
         }
         this.silent = other.silent;
@@ -205,7 +205,7 @@ public class TradeRoute extends FreeColGameObject
      * @return A list of assigned {@code Unit}s.
      */
     public List<Unit> getAssignedUnits() {
-        return transform(this.owner.getUnits(),
+        return transform(getOwner().getUnits(),
                          matchKey(this, Unit::getTradeRoute));
     }
 
@@ -238,7 +238,7 @@ public class TradeRoute extends FreeColGameObject
      *     containing an error message if not.
      */
     public StringTemplate verifyUniqueName() {
-        return (this.owner.getTradeRouteByName(this.name, this) != null)
+        return (getOwner().getTradeRouteByName(this.name, this) != null)
             ? StringTemplate.template("model.tradeRoute.duplicateName")
                 .addName("%name%", this.name)
             : null;
@@ -339,11 +339,11 @@ public class TradeRoute extends FreeColGameObject
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(NAME_TAG, this.name);
+        xw.writeAttribute(NAME_TAG, getName());
 
-        xw.writeAttribute(OWNER_TAG, this.owner);
+        xw.writeAttribute(OWNER_TAG, getOwner());
 
-        xw.writeAttribute(SILENT_TAG, this.silent);
+        xw.writeAttribute(SILENT_TAG, isSilent());
     }
 
     /**
@@ -407,7 +407,7 @@ public class TradeRoute extends FreeColGameObject
             .append(" \"").append(this.name).append('"');
         if (this.owner != null) sb.append(" owner=").append(this.owner.getId());
         sb.append(" silent=").append(Boolean.toString(this.silent));
-        for (TradeRouteStop stop : this.stops) sb.append(' ').append(stop);
+        for (TradeRouteStop stop : getStops()) sb.append(' ').append(stop);
         sb.append(']');
         return sb.toString();
     }

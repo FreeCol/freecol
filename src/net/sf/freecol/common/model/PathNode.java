@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.util.LogBuilder;
 
 
@@ -152,7 +153,7 @@ public class PathNode {
      */
     public void addTurns(int turns) {
         for (PathNode p = this; p != null; p = p.next) {
-            p.setTurns(p.turns + turns);
+            p.setTurns(p.getTurns() + turns);
         }
     }
 
@@ -203,7 +204,7 @@ public class PathNode {
             || previous.getTile() == null
             || getTile() == null) return null;
         Tile prev = previous.getTile();
-        return Map.getDirection(prev, getTile());
+        return prev.getMap().getDirection(prev, getTile());
     }
 
     /**
@@ -214,7 +215,7 @@ public class PathNode {
      */
     public PathNode getTransportDropNode() {
         PathNode p = this;
-        while (p.next != null && p.onCarrier) p = p.next;
+        while (p.next != null && p.isOnCarrier()) p = p.next;
         return p;
     }
 
@@ -248,8 +249,8 @@ public class PathNode {
      */
     public int getTotalTurns() {
         PathNode path = getLastNode();
-        int n = path.turns;
-        if (path.movesLeft == 0) n++;
+        int n = path.getTurns();
+        if (path.getMovesLeft() == 0) n++;
         return n;
     }
 
@@ -261,7 +262,7 @@ public class PathNode {
      *     the unit using this path should leave it's transport.
      */
     public int getTransportDropTurns() {
-        return getTransportDropNode().turns;
+        return getTransportDropNode().getTurns();
     }
 
     /**
@@ -298,7 +299,7 @@ public class PathNode {
      */
     public PathNode getCarrierMove() {
         for (PathNode p = this; p != null; p = p.next) {
-            if (p.onCarrier) return p;
+            if (p.isOnCarrier()) return p;
         }
         return null;
     }
@@ -320,8 +321,8 @@ public class PathNode {
      */
     public boolean embarkedThisTurn(int turns) {
         for (PathNode p = this; p != null; p = p.previous) {
-            if (p.turns < turns) return false;
-            if (!p.onCarrier) return true;
+            if (p.getTurns() < turns) return false;
+            if (!p.isOnCarrier()) return true;
         }
         return false;
     }
@@ -345,7 +346,7 @@ public class PathNode {
      */
     public void ensureDisembark() {
         PathNode p = this.getLastNode();
-        if (p.onCarrier) {
+        if (p.isOnCarrier()) {
             p.next = new PathNode(p.location, p.movesLeft, p.turns, false,
                                   p, null);
         }

@@ -179,9 +179,9 @@ public class EuropeanNationType extends NationType {
         }
     }
 
-    private static void writeUnit(FreeColXMLWriter xw, String id,
-                                  AbstractUnit au,
-                                  boolean expert) throws XMLStreamException {
+    private void writeUnit(FreeColXMLWriter xw, String id,
+                           AbstractUnit au,
+                           boolean expert) throws XMLStreamException {
         xw.writeStartElement(UNIT_TAG);
 
         xw.writeAttribute(ID_ATTRIBUTE_TAG, id);

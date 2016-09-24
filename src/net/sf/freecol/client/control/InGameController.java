@@ -27,10 +27,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -45,9 +47,11 @@ import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ColonyWas;
 import static net.sf.freecol.common.model.Constants.*;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -87,6 +91,7 @@ import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -104,6 +109,7 @@ import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 
@@ -216,7 +222,7 @@ public final class InGameController extends FreeColClientHolder {
      * @param direction The {@code Direction} to step.
      * @return A settlement on the adjacent tile if any.
      */
-    private static Settlement getSettlementAt(Tile tile, Direction direction) {
+    private Settlement getSettlementAt(Tile tile, Direction direction) {
         return tile.getNeighbourOrNull(direction).getSettlement();
     }
 
@@ -615,9 +621,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     private synchronized void startIgnoringMessage(String key, Turn turn) {
         messagesToIgnore.put(key, turn.getNumber());
-        if (logger.isLoggable(Level.FINER)) {
-            logger.finer("Ignore message start: " + key);
-        }
+        logger.finer("Ignore message start: " + key);
     }
 
     /**
@@ -627,9 +631,7 @@ public final class InGameController extends FreeColClientHolder {
      */
     private synchronized void stopIgnoringMessage(String key) {
         messagesToIgnore.remove(key);
-        if (logger.isLoggable(Level.FINER)) {
-            logger.finer("Ignore message stop: " + key);
-        }
+        logger.finer("Ignore message stop: " + key);
     }
 
     /**
@@ -655,9 +657,7 @@ public final class InGameController extends FreeColClientHolder {
             && (value = messagesToIgnore.get(key)) != null
             && value + 1 == turn.getNumber()) {
             messagesToIgnore.put(key, value + 1);
-            if (logger.isLoggable(Level.FINER)) {
-                logger.finer("Ignore message continue: " + key);
-            }
+            logger.finer("Ignore message continue: " + key);
             return true;
         }
         return false;
@@ -702,7 +702,7 @@ public final class InGameController extends FreeColClientHolder {
             } else {
                 uiTask = () -> { getGUI().showModelMessages(messages); };
             }
-            GUI.invokeNowOrWait(uiTask);
+            getGUI().invokeNowOrWait(uiTask);
         }
         return !messages.isEmpty();
     }
@@ -718,7 +718,7 @@ public final class InGameController extends FreeColClientHolder {
      *     reached their destination and are free to move again.
      */
     private boolean doExecuteGotoOrders() {
-        if (GUI.isShowingSubPanel()) return false; // Clear the panel first
+        if (getGUI().isShowingSubPanel()) return false; // Clear the panel first
 
         final Player player = getMyPlayer();
         final Unit active = getGUI().getActiveUnit();
@@ -765,7 +765,7 @@ public final class InGameController extends FreeColClientHolder {
 
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
-            if (GUI.isShowingSubPanel()) {
+            if (getGUI().isShowingSubPanel()) {
                 getGUI().requestFocusForSubPanel();
                 fail = true;
                 break;
@@ -2475,9 +2475,9 @@ public final class InGameController extends FreeColClientHolder {
      *     to the trade route orders.
      * @return A summary of the unload.
      */
-    private static String getUnloadGoodsMessage(Unit unit, GoodsType type,
-                                                int amount, int present,
-                                                int atStop, int toUnload) {
+    private String getUnloadGoodsMessage(Unit unit, GoodsType type,
+                                         int amount, int present,
+                                         int atStop, int toUnload) {
         String key = null;
         int onBoard = unit.getGoodsCount(type);
         int unloaded = present - onBoard;
@@ -3066,7 +3066,7 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        final Tile tile = (GUI.isShowingSubPanel()) ? null : unit.getTile();
+        final Tile tile = (getGUI().isShowingSubPanel()) ? null : unit.getTile();
         if (!getGUI().confirm(tile, StringTemplate
                 .template("clearSpeciality.areYouSure")
                 .addStringTemplate("%oldUnit%",
@@ -3227,7 +3227,7 @@ public final class InGameController extends FreeColClientHolder {
 
         if (unit.getColony() != null
             && !getGUI().confirmLeaveColony(unit)) return false;
-        final Tile tile = (GUI.isShowingSubPanel()) ? null : unit.getTile();
+        final Tile tile = (getGUI().isShowingSubPanel()) ? null : unit.getTile();
         if (!getGUI().confirm(tile, StringTemplate.key("disbandUnit.text"),
                          unit, "disbandUnit.yes", "cancel"))
             return false;

@@ -73,7 +73,7 @@ public class FreeColOptionPaneUI extends BasicOptionPaneUI {
      * @param nButtons The number of buttons.
      * @return A suitable number of columns.
      */
-    private static int getColumns(int nButtons) {
+    private int getColumns(int nButtons) {
         return (nButtons > 21) ? 4
             :  ((nButtons % 4) == 0 && nButtons > 12) ? 4
             :  ((nButtons % 3) == 0 && nButtons > 6)  ? 3

@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -54,7 +53,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param index The stop index.
      */
     public SetCurrentStopMessage(Unit unit, int index) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.index = String.valueOf(index);
@@ -68,7 +67,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetCurrentStopMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.index = getStringAttribute(element, INDEX_TAG);
@@ -90,7 +89,7 @@ public class SetCurrentStopMessage extends DOMMessage {
         try {
             serverUnit = serverPlayer.getOurFreeColGameObject(this.unitId,
                 ServerUnit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -116,7 +115,7 @@ public class SetCurrentStopMessage extends DOMMessage {
         }
 
         // Valid, set.
-        return InGameController
+        return server.getInGameController()
             .setCurrentStop(serverPlayer, serverUnit, count)
             .build(serverPlayer);
     }
@@ -128,7 +127,7 @@ public class SetCurrentStopMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             INDEX_TAG, this.index).toXMLElement();
     }

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.option;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -111,7 +110,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
         setId(source.getId());
         setSpecification(source.getSpecification());
         setValue(source.getValue());
-        setGroup(source.optionGroup);
+        setGroup(source.getGroup());
         isDefined = source.isDefined;
     }
 
@@ -224,9 +223,7 @@ public abstract class AbstractOption<T> extends FreeColSpecObject
 
         if (ACTION_TAG.equals(tag)) {
             // FIXME: load FreeColActions from client options?
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("Skipping action " + xr.readId());
-            }
+            logger.finest("Skipping action " + xr.readId());
             xr.nextTag();
 
         } else if (AbstractUnitOption.getTagName().equals(tag)) {

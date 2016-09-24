@@ -53,13 +53,13 @@ public final class DeclarationPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DeclarationPanel.class.getName());
 
-    private static final int SIGNATURE_Y = 450;
+    private final int SIGNATURE_Y = 450;
     
-    private static final String ANIMATION_STOPPED = "AnimationStopped";
+    private final String ANIMATION_STOPPED = "AnimationStopped";
 
-    private static final int START_DELAY = 2000; // 2s before signing
-    private static final int ANIMATION_DELAY = 50; // 50ms between signature steps
-    private static final int FINISH_DELAY = 5000; // 5s before closing
+    private final int START_DELAY = 2000; // 2s before signing
+    private final int ANIMATION_DELAY = 50; // 50ms between signature steps
+    private final int FINISH_DELAY = 5000; // 5s before closing
 
 
     /**

@@ -25,11 +25,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -44,6 +46,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.option.AbstractOption;
@@ -58,6 +61,7 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**
@@ -353,8 +357,6 @@ public final class Specification {
     private void load(FreeColXMLReader xr) {
         try {
             readFromXML(xr);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException("Error parsing specification", e);
         }
@@ -482,9 +484,7 @@ public final class Specification {
      *     be cleaned.
      */
     public void clean(String why) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Cleaning up specification following " + why + ".");
-        }
+        logger.finest("Cleaning up specification following " + why + ".");
 
         // Drop all abstract types
         removeInPlace(allTypes, e -> e.getValue().isAbstractType());
@@ -1611,7 +1611,7 @@ public final class Specification {
      * Clear all European advantages.  Implements the Advantages==NONE setting.
      */
     public void clearEuropeanNationalAdvantages() {
-        for (Nation n : europeanNations) {
+        for (Nation n : getEuropeanNations()) {
             n.setType(getDefaultNationType());
         }
     }
@@ -1633,7 +1633,7 @@ public final class Specification {
      * @return A stream of available {@code Role}s.
      */
     public Stream<Role> getRoles() {
-        return this.roles.stream();
+        return getRolesList().stream();
     }
 
     /**
@@ -2084,7 +2084,7 @@ public final class Specification {
         // Coronado gained an ability in freecol
         FoundingFather coronado
             = getFoundingFather("model.foundingFather.franciscoDeCoronado");
-        if ("freecol".equals(id)
+        if ("freecol".equals(getId())
             && !coronado.hasAbility(Ability.SEE_ALL_COLONIES)) {
             coronado.addAbility(new Ability(Ability.SEE_ALL_COLONIES,
                                             coronado, true));
@@ -2266,7 +2266,7 @@ public final class Specification {
         if (first(getAbilities(Ability.AMBUSH_TERRAIN)) == null){
             Ability ambush = new Ability(Ability.AMBUSH_TERRAIN, null, true);
             addAbility(ambush);
-            for (TileType tt : transform(tileTypeList, tt ->
+            for (TileType tt : transform(getTileTypeList(), tt ->
                     ((tt.isElevation() || tt.isForested())
                         && !tt.hasAbility(Ability.AMBUSH_TERRAIN)))) {
                 tt.addAbility(new Ability(Ability.AMBUSH_TERRAIN, tt, true));
@@ -2917,7 +2917,7 @@ public final class Specification {
         xw.writeStartElement(getTagName());
 
         // Add attributes
-        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, id);
+        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
         if (difficultyLevel != null) {
             xw.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
         }
@@ -2955,8 +2955,8 @@ public final class Specification {
 
     }
 
-    private static <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
-                                                               String section, Collection<T> items) throws XMLStreamException {
+    private <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
+        String section, Collection<T> items) throws XMLStreamException {
         xw.writeStartElement(section);
 
         for (T item : items) item.toXML(xw);
@@ -2988,11 +2988,9 @@ public final class Specification {
 
         version = xr.getAttribute(VERSION_TAG, (String)null);
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Reading specification " + newId
-                + " difficulty=" + difficultyLevel
-                + " version=" + version);
-        }
+        logger.fine("Reading specification " + newId
+            + " difficulty=" + difficultyLevel
+            + " version=" + version);
 
         String parentId = xr.getAttribute(FreeColSpecObjectType.EXTENDS_TAG,
                                           (String)null);
@@ -3042,7 +3040,7 @@ public final class Specification {
 
             logger.info("Loading unit-change-types backward compatibility fragment: "
                 + UNIT_CHANGE_TYPES_COMPAT_FILE_NAME + " with changes: "
-                + transform(unitChangeTypeList, alwaysTrue(),
+                + transform(getUnitChangeTypeList(), alwaysTrue(),
                             UnitChangeType::getId, Collectors.joining(" ")));
         }
     }

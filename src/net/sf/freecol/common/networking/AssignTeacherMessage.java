@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -53,7 +52,7 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param teacher The teacher {@code Unit}.
      */
     public AssignTeacherMessage(Unit student, Unit teacher) {
-        super(TAG);
+        super(getTagName());
 
         this.studentId = student.getId();
         this.teacherId = teacher.getId();
@@ -67,7 +66,7 @@ public class AssignTeacherMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AssignTeacherMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.studentId = getStringAttribute(element, STUDENT_TAG);
         this.teacherId = getStringAttribute(element, TEACHER_TAG);
@@ -90,7 +89,7 @@ public class AssignTeacherMessage extends DOMMessage {
         Unit student;
         try {
             student = player.getOurFreeColGameObject(this.studentId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -98,7 +97,7 @@ public class AssignTeacherMessage extends DOMMessage {
         Unit teacher;
         try {
             teacher = player.getOurFreeColGameObject(this.teacherId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -130,7 +129,7 @@ public class AssignTeacherMessage extends DOMMessage {
         }
 
         // Proceed to assign.
-        return InGameController
+        return server.getInGameController()
             .assignTeacher(serverPlayer, student, teacher)
             .build(serverPlayer);
     }
@@ -142,7 +141,7 @@ public class AssignTeacherMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             STUDENT_TAG, this.studentId,
             TEACHER_TAG, this.teacherId).toXMLElement();
     }

@@ -53,7 +53,7 @@ public final class Worker extends Thread {
                 Runnable job = jobList.take();
                 try {
                     job.run();
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     logger.log(Level.SEVERE, "Worker task failed!", e);
                 }
             } catch (InterruptedException e) {

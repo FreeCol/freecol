@@ -153,7 +153,7 @@ public class FreeColDebugger {
                 DebugMode mode = Enum.valueOf(DebugMode.class,
                                               s.toUpperCase(Locale.US));
                 enableDebugMode(mode);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.warning("Unrecognized debug mode: " + optionValue);
                 return false;
             }
@@ -241,16 +241,16 @@ public class FreeColDebugger {
      */
     public static boolean finishDebugRun(FreeColClient freeColClient,
                                          boolean force) {
-        if (FreeColDebugger.debugRunTurns < 0) return false; // Not a debug run
-        if (FreeColDebugger.debugRunTurns > 0 && !force) return false; // Still going
+        if (getDebugRunTurns() < 0) return false; // Not a debug run
+        if (getDebugRunTurns() > 0 && !force) return false; // Still going
         // Zero => signalEndDebugRun was called
         setDebugRunTurns(-1);
 
-        if (FreeColDebugger.debugRunSave != null) {
+        if (getDebugRunSave() != null) {
             FreeColServer fcs = freeColClient.getFreeColServer();
             if (fcs != null) {
                 try {
-                    fcs.saveGame(new File(".", FreeColDebugger.debugRunSave),
+                    fcs.saveGame(new File(".", getDebugRunSave()),
                                  freeColClient.getClientOptions(), null);
                 } catch (IOException e) {}
             }
@@ -361,9 +361,7 @@ public class FreeColDebugger {
             fos = new FileOutputStream("/tmp/freecol.debug", true);
             prs = new PrintStream(fos, true, "UTF-8");
             prs.println(msg);
-        } catch (FileNotFoundException e) {
-            ; // Ignore failure
-        } catch (UnsupportedEncodingException ex) {
+        } catch (IOException ex) {
             ; // Ignore failure
         } finally {
             try {

@@ -219,7 +219,7 @@ public class Message {
      *
      * @return Null.
      */
-    public static Element toXMLElement() {
+    public Element toXMLElement() {
         return null; // do nothing
     }
 

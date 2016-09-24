@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitChangeType;
+import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -456,7 +457,7 @@ public class InGameControllerTest extends FreeColTestCase {
                    unit.getType() == hardyPioneerType);
 
         // Basic function
-        InGameController.clearSpeciality(dutch, unit);
+        igc.clearSpeciality(dutch, unit);
         assertTrue("Unit should be cleared of its specialty",
                     unit.getType() != hardyPioneerType);
 
@@ -474,7 +475,7 @@ public class InGameControllerTest extends FreeColTestCase {
         teacher.setLocation(school);
         assertNotNull("Teacher should have student", teacher.getStudent());
 
-        InGameController.clearSpeciality(dutch, teacher);
+        igc.clearSpeciality(dutch, teacher);
         assertEquals("Teacher specialty cannot be cleared",
                      hardyPioneerType, teacher.getType());
 
@@ -1989,7 +1990,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);
 
-        InGameController.changeWorkType(dutch, colonist, cottonType);
+        igc.changeWorkType(dutch, colonist, cottonType);
         assertTrue("Colonist should have lost all experience",
                    colonist.getExperience() == 0);
     }

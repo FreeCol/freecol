@@ -47,7 +47,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param unit The {@code Unit} to cash in.
      */
     public CashInTreasureTrainMessage(Unit unit) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
     }
@@ -60,7 +60,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public CashInTreasureTrainMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
     }
@@ -82,7 +82,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -109,7 +109,7 @@ public class CashInTreasureTrainMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId).toXMLElement();
     }
 

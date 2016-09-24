@@ -33,13 +33,15 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-
+import net.sf.freecol.common.model.Occupation;
+import net.sf.freecol.common.model.Stance;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -365,9 +367,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         return ret;
     }
 
-    private static void accumulateChoices(Collection<GoodsType> workTypes,
-                                          Collection<GoodsType> tried,
-                                          List<Collection<GoodsType>> result) {
+    private void accumulateChoices(Collection<GoodsType> workTypes,
+                                   Collection<GoodsType> tried,
+                                   List<Collection<GoodsType>> result) {
         workTypes.removeAll(tried);
         if (!workTypes.isEmpty()) {
             result.add(workTypes);
@@ -375,9 +377,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         }
     }
 
-    private static void accumulateChoice(GoodsType workType,
-                                         Collection<GoodsType> tried,
-                                         List<Collection<GoodsType>> result) {
+    private void accumulateChoice(GoodsType workType,
+                                  Collection<GoodsType> tried,
+                                  List<Collection<GoodsType>> result) {
         if (workType == null) return;
         accumulateChoices(workType.getEquivalentTypes(), tried, result);
     }
@@ -495,7 +497,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     private Occupation getOccupationFor(Unit unit,
                                         Collection<GoodsType> workTypes) {
-        LogBuilder lb = new LogBuilder((this.traceOccupation) ? 64 : 0);
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ", ");
         FreeColObject.logFreeColObjects(workTypes, lb);
         lb.add(")");
@@ -516,7 +518,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      *     null if none found.
      */
     private Occupation getOccupationFor(Unit unit, boolean userMode) {
-        LogBuilder lb = new LogBuilder((this.traceOccupation) ? 64 : 0);
+        LogBuilder lb = new LogBuilder((getOccupationTrace()) ? 64 : 0);
         lb.add(getName(), ".getOccupationFor(", unit, ")");
 
         Occupation occupation = getOccupationFor(unit, userMode, lb);
@@ -1204,7 +1206,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int uc = getUnitCount();
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-        sonsOfLiberty = calculateSoLPercentage(uc, liberty);
+        sonsOfLiberty = calculateSoLPercentage(uc, getLiberty());
         tories = uc - calculateRebels(uc, sonsOfLiberty);
     }
 
@@ -1236,7 +1238,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The percentage of SoLs, negative if not calculable.
      */
     public int getSoLPercentage() {
-        return calculateSoLPercentage(getUnitCount(), liberty);
+        return calculateSoLPercentage(getUnitCount(), getLiberty());
     }
 
     /**
@@ -1256,7 +1258,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @return The current Tory membership of the colony.
      */
     public int getTory() {
-        return 100 - sonsOfLiberty;
+        return 100 - getSoL();
     }
 
     /**
@@ -1414,7 +1416,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final int goodGovernment
             = spec.getInteger(GameOptions.GOOD_GOVERNMENT_LIMIT);
 
-        int rebelPercent = calculateSoLPercentage(unitCount, liberty);
+        int rebelPercent = calculateSoLPercentage(unitCount, getLiberty());
         int rebelCount = calculateRebels(unitCount, rebelPercent);
         int loyalistCount = unitCount - rebelCount;
 

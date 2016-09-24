@@ -510,7 +510,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             try {
                 result = Enum.valueOf(returnClass,
                                       attrib.toUpperCase(Locale.US));
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.warning(attributeName + " is not a "
                     + defaultValue.getClass().getName() + ": " + attrib);
             }
@@ -600,7 +600,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
                     = game.getLocationClass(attrib);
                 if (c != null) {
                     fco = makeFreeColGameObject(game, attributeName, c,
-                        this.readScope == ReadScope.SERVER);
+                        getReadScope() == ReadScope.SERVER);
                 }
             }
             if (fco instanceof Location) return (Location)fco;
@@ -748,7 +748,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
             FreeColObject fco = lookup(game, id);
             if (fco == null) {
                 T ret = game.newInstance(returnClass,
-                    this.readScope == ReadScope.SERVER);
+                    getReadScope() == ReadScope.SERVER);
                 if (ret == null) {
                     String err = "Failed to create " + returnClass.getName()
                         + " with id: " + id;

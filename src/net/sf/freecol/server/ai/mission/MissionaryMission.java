@@ -351,7 +351,7 @@ public class MissionaryMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
     
     /**
@@ -371,14 +371,14 @@ public class MissionaryMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
 
-        Unit.MoveType mt = travelToTarget(target,
+        Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE:
             // Reached an intermediate colony.  Retarget, but do not
             // accept fallback targets.
             lbAt(lb);
-            Location completed = target;
+            Location completed = getTarget();
             Location newTarget = findTarget(aiUnit, 20, false);
             if (newTarget == null || newTarget == completed) {
                 return lbFail(lb, false, "retarget failed");
@@ -404,9 +404,9 @@ public class MissionaryMission extends Mission {
 
         // Establish the mission.
         lbAt(lb);
-        Direction d = unit.getTile().getDirection(target.getTile());
+        Direction d = unit.getTile().getDirection(getTarget().getTile());
         assert d != null;
-        IndianSettlement is = (IndianSettlement) target;
+        IndianSettlement is = (IndianSettlement)getTarget();
         AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
         return (is.hasMissionary(unit.getOwner()) && unit.isInMission())
             ? lbDone(lb, false, "established")

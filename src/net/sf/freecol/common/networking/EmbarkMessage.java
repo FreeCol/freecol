@@ -61,7 +61,7 @@ public class EmbarkMessage extends DOMMessage {
      * @param direction An option direction to embark in.
      */
     public EmbarkMessage(Unit unit, Unit carrier, Direction direction) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.carrierId = carrier.getId();
@@ -77,7 +77,7 @@ public class EmbarkMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public EmbarkMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.carrierId = getStringAttribute(element, CARRIER_TAG);
@@ -101,7 +101,7 @@ public class EmbarkMessage extends DOMMessage {
         ServerUnit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, ServerUnit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -109,7 +109,7 @@ public class EmbarkMessage extends DOMMessage {
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -139,7 +139,7 @@ public class EmbarkMessage extends DOMMessage {
             Tile destinationTile = null;
             try {
                 destinationTile = unit.getNeighbourTile(this.directionString);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 return serverPlayer.clientError(e.getMessage())
                     .build(serverPlayer);
             }
@@ -163,7 +163,7 @@ public class EmbarkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             CARRIER_TAG, this.carrierId,
             DIRECTION_TAG, this.directionString).toXMLElement();

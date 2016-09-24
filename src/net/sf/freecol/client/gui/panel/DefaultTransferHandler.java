@@ -37,6 +37,7 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -190,7 +191,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             updatePartialChosen(comp, dsde.getUserAction() == MOVE);
         }
 
-        private static void updatePartialChosen(JComponent comp, boolean partial) {
+        private void updatePartialChosen(JComponent comp, boolean partial) {
             if (comp instanceof AbstractGoodsLabel) {
                 ((AbstractGoodsLabel)comp).setPartialChosen(partial);
             }
@@ -463,7 +464,7 @@ public final class DefaultTransferHandler extends TransferHandler {
         return false;
     }
 
-    public static JComponent getDropTarget(JComponent component) {
+    public JComponent getDropTarget(JComponent component) {
         return (component instanceof DropTarget)
             ? component
             : (component.getParent() instanceof JComponent)

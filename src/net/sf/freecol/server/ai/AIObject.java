@@ -38,7 +38,7 @@ import net.sf.freecol.common.networking.DOMMessage;
 public abstract class AIObject extends FreeColObject {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AIObject.class.getName());
+    private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
     /** The AI this object exists within. */
     private final AIMain aiMain;
@@ -119,7 +119,7 @@ public abstract class AIObject extends FreeColObject {
      * to this object from the enclosing AIMain.
      */
     public void dispose() {
-        aiMain.removeAIObject(getId());
+        getAIMain().removeAIObject(getId());
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class AIObject extends FreeColObject {
      * @return True if this AIObject was disposed.
      */
     public final boolean isDisposed() {
-        return aiMain.getAIObject(getId()) == null;
+        return getAIMain().getAIObject(getId()) == null;
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class AIObject extends FreeColObject {
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        return (uninitialized) ? -1 : 1;
+        return (isUninitialized()) ? -1 : 1;
     }
 
 
@@ -161,7 +161,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final Specification getSpecification() {
-        return aiMain.getSpecification();
+        return getAIMain().getSpecification();
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class AIObject extends FreeColObject {
      */
     @Override
     public final Game getGame() {
-        return aiMain.getGame();
+        return getAIMain().getGame();
     }
 
     /**

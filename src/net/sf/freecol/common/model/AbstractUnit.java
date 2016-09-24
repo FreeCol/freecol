@@ -125,10 +125,10 @@ public class AbstractUnit extends FreeColObject {
      * @return A {@code StringTemplate} describing the abstract unit.
      */
     public StringTemplate getLabel() {
-        StringTemplate tmpl = Messages.getUnitLabel(null, getId(), number,
-                                                    null, roleId, null);
+        StringTemplate tmpl = Messages.getUnitLabel(null, getId(), getNumber(),
+                                                    null, getRoleId(), null);
         return StringTemplate.template("model.abstractUnit.label")
-                             .addAmount("%number%", number)
+                             .addAmount("%number%", getNumber())
                              .addStringTemplate("%unit%", tmpl);
     }
 
@@ -148,7 +148,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The {@code Role} of this abstract unit.
      */
     public Role getRole(Specification spec) {
-        return spec.getRole(roleId);
+        return spec.getRole(getRoleId());
     }
 
     /**
@@ -169,7 +169,7 @@ public class AbstractUnit extends FreeColObject {
      * @return The approximate offence power.
      */
     public double getOffence(Specification spec) {
-        int n = number;
+        int n = getNumber();
         Role role = getRole(spec);
         UnitType type = spec.getUnitType(getId());
         return n * (type.getOffence() + role.getOffence());
@@ -194,9 +194,8 @@ public class AbstractUnit extends FreeColObject {
      * @return A list of {@code AbstractUnit}s.
      */
     public static List<AbstractUnit> deepCopy(List<AbstractUnit> units) {
-        return transform(units, alwaysTrue(), au -> {
-            return new AbstractUnit(au.getId(), au.getRoleId(), au.number);
-        });
+        return transform(units, alwaysTrue(), au ->
+                new AbstractUnit(au.getId(), au.getRoleId(), au.getNumber()));
     }
 
     /**

@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -28,7 +29,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -64,7 +64,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param settlement The {@code Settlement} the unit is looking at.
      */
     public SpySettlementMessage(Unit unit, Settlement settlement) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
@@ -79,7 +79,7 @@ public class SpySettlementMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SpySettlementMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -120,7 +120,7 @@ public class SpySettlementMessage extends DOMMessage {
         Unit unit;
         try {
             unit = getUnit(serverPlayer);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -151,7 +151,7 @@ public class SpySettlementMessage extends DOMMessage {
         }
 
         // Spy on the settlement
-        return InGameController
+        return server.getInGameController()
             .spySettlement(serverPlayer, unit, colony)
             .build(serverPlayer);
     }
@@ -163,7 +163,7 @@ public class SpySettlementMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId).toXMLElement();
     }

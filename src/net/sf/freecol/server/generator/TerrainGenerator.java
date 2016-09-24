@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;
@@ -109,7 +110,7 @@ public class TerrainGenerator {
     // Utilities
 
     // FIXME: this might be useful elsewhere, too
-    private static int limitToRange(int value, int lower, int upper) {
+    private int limitToRange(int value, int lower, int upper) {
         return Math.max(lower, Math.min(value, upper));
     }
 
@@ -645,7 +646,7 @@ public class TerrainGenerator {
      * @param lb A {@code LogBuilder} to log to.
      * @return A list of created {@code ServerRegion}s.
      */
-    private static List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
+    private List<ServerRegion> createLakeRegions(Map map, LogBuilder lb) {
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.

@@ -936,7 +936,7 @@ public class Flag {
         }
     }
 
-    private static GeneralPath getCross(Decoration decoration) {
+    private GeneralPath getCross(Decoration decoration) {
         double quarterWidth = (WIDTH - DECORATION_SIZE) / 2;
         double quarterHeight = (HEIGHT - DECORATION_SIZE) / 2;
         double offset = 0;
@@ -960,7 +960,7 @@ public class Flag {
         return cross;
     }
 
-    private static GeneralPath getBend(boolean sinister) {
+    private GeneralPath getBend(boolean sinister) {
         GeneralPath path = new GeneralPath();
         if (sinister) {
             path.moveTo(0, HEIGHT);
@@ -1042,7 +1042,7 @@ public class Flag {
         return path;
     }
 
-    private static GeneralPath getRhombus() {
+    private GeneralPath getRhombus() {
         GeneralPath rhombus = new GeneralPath();
         rhombus.moveTo(WIDTH / 2, BEND_Y);
         rhombus.lineTo(WIDTH - BEND_X, HEIGHT / 2);
@@ -1165,7 +1165,7 @@ public class Flag {
      * @param x The x coordinate of the center.
      * @param y The y coordinate of the center.
      */
-    private static void center(GeneralPath path, double x, double y) {
+    private void center(GeneralPath path, double x, double y) {
         double dx = x - path.getBounds().getX() - path.getBounds().getWidth() / 2;
         double dy = y - path.getBounds().getY() - path.getBounds().getHeight() / 2;
         path.transform(AffineTransform.getTranslateInstance(dx, dy));

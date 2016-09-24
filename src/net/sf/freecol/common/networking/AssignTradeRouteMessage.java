@@ -24,7 +24,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -54,7 +53,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param tradeRoute The {@code TradeRoute} to assign.
      */
     public AssignTradeRouteMessage(Unit unit, TradeRoute tradeRoute) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.tradeRouteId = (tradeRoute == null) ? null : tradeRoute.getId();
@@ -68,7 +67,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public AssignTradeRouteMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.tradeRouteId = getStringAttribute(element, TRADE_ROUTE_TAG);
@@ -91,7 +90,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
         Unit unit;
         try {
             unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -103,14 +102,14 @@ public class AssignTradeRouteMessage extends DOMMessage {
             try {
                 tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
                     TradeRoute.class);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 return serverPlayer.clientError(e.getMessage())
                     .build(serverPlayer);
             }
         }
 
         // Proceed to assign.
-        return InGameController
+        return server.getInGameController()
             .assignTradeRoute(serverPlayer, unit, tradeRoute)
             .build(serverPlayer);
     }
@@ -122,7 +121,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             "unit", unitId,
             "tradeRoute", tradeRouteId).toXMLElement();
     }

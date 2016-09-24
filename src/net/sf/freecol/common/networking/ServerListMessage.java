@@ -57,7 +57,7 @@ public class ServerListMessage extends DOMMessage {
      * a request for servers.
      */
     public ServerListMessage() {
-        super(TAG);
+        super(getTagName());
     }
 
     /**
@@ -67,7 +67,7 @@ public class ServerListMessage extends DOMMessage {
      * @param mr The {@code MetaRegister} to query for servers.
      */
     public ServerListMessage(MetaRegister mr) {
-        super(TAG);
+        super(getTagName());
 
         this.servers.clear();
         this.servers.addAll(mr.getServers());
@@ -81,7 +81,7 @@ public class ServerListMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ServerListMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.servers.clear();
         this.servers.addAll(mapChildren(element,
@@ -157,8 +157,8 @@ public class ServerListMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
-    public static Element handle(FreeColServer server, Player player,
-                                 Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         // Not needed, serverList messages are handled trivially in
         // metaregister.NetworkHandler.
         return null;
@@ -171,7 +171,7 @@ public class ServerListMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
+        return new DOMMessage(getTagName())
             .addMessages(transform(this.servers, alwaysTrue(),
                                    ServerListMessage::serverInfoToMessage))
             .toXMLElement();

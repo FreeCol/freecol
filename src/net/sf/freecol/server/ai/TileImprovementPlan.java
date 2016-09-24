@@ -94,7 +94,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         this.type = type;
         this.pioneer = null;
         setValue(value);
-        uninitialized = this.type == null || this.target == null;
+        uninitialized = getType() == null || getTarget() == null;
     }
 
     /**
@@ -110,7 +110,7 @@ public class TileImprovementPlan extends ValuedAIObject {
                                FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = type == null || target == null;
+        uninitialized = getType() == null || getTarget() == null;
     }
 
 
@@ -222,7 +222,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the tile improvement has been completed.
      */
     public boolean isComplete() {
-        return target != null && target.hasTileImprovement(type);
+        return target != null && target.hasTileImprovement(getType());
     }
 
     /**
@@ -241,9 +241,9 @@ public class TileImprovementPlan extends ValuedAIObject {
             dispose();
             return false;
         }
-        if (pioneer != null
-            && (pioneer.getUnit() == null
-                || pioneer.getUnit().isDisposed())) {
+        if (getPioneer() != null
+            && (getPioneer().getUnit() == null
+                || getPioneer().getUnit().isDisposed())) {
             logger.warning("Clearing broken pioneer for TileImprovementPlan");
             setPioneer(null);
         }

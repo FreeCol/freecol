@@ -32,7 +32,7 @@ public class ColonizationSaveGameReader {
         "English", "French", "Spanish", "Dutch"
     };
 
-    private static class GameData {
+    private class GameData {
 
         private final int mapWidth;
         private final int mapHeight;
@@ -57,7 +57,7 @@ public class ColonizationSaveGameReader {
         }
     }
 
-    private static class PlayerData {
+    private class PlayerData {
 
         public static final int LENGTH = 52;
 
@@ -107,8 +107,8 @@ public class ColonizationSaveGameReader {
                     }
                 }
                 colonists[index] = new Colonist(data[offset + COLONIST_OCCUPATION + index],
-                        data[offset + COLONIST_SPECIALITY + index],
-                        tile);
+                                                data[offset + COLONIST_SPECIALITY + index],
+                                                tile);
             }
 
 
@@ -123,7 +123,7 @@ public class ColonizationSaveGameReader {
         }
     }
 
-    public static class Colonist {
+    public class Colonist {
 
         public final String[] OCCUPATION = {
             "Farmer",
@@ -207,7 +207,7 @@ public class ColonizationSaveGameReader {
         for (int index = 0; index < 4; index++) {
             System.out.println("Nation is " + NATIONS[index]);
             PlayerData playerData = new PlayerData(data, PLAYER_DATA +
-                    index * PlayerData.LENGTH);
+                                                   index * PlayerData.LENGTH);
             playerData.print();
         }
         int count = gameData.getNumberOfColonies();

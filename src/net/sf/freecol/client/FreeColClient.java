@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -727,7 +726,7 @@ public final class FreeColClient {
         String key = (getMyPlayer() == player)
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        return clientOptions.getInteger(key);
+        return getClientOptions().getInteger(key);
     }
 
     /**
@@ -765,11 +764,11 @@ public final class FreeColClient {
      */
     public void newGame(boolean prompt) {
         Specification specification = null;
-        if (game != null) {
-            if (mapEditor) {
-                specification = game.getSpecification();
+        if (getGame() != null) {
+            if (isMapEditor()) {
+                specification = getGame().getSpecification();
             } else if (!prompt || gui.confirmStopGame()) {
-                connectController.quitGame(true);
+                getConnectController().quitGame(true);
                 FreeColSeed.incrementFreeColSeed();
             } else {
                 return;
@@ -814,10 +813,10 @@ public final class FreeColClient {
      */
     public void retire() {
         if (gui.confirm("retireDialog.areYouSure.text", "ok", "cancel")) {
-            final Game game = this.game;
-            final Player player = this.player;
+            final Game game = getGame();
+            final Player player = getMyPlayer();
             player.changePlayerType(Player.PlayerType.RETIRED);
-            inGameController.displayHighScores(null);
+            getInGameController().displayHighScores(null);
             askServer().retire(game);
         }
     }
@@ -826,7 +825,6 @@ public final class FreeColClient {
      * Quits the application without any questions.
      */
     public void quit() {
-        connectController.quitGame(singlePlayer);
         getConnectController().quitGame(isSinglePlayer());
 
         // delete outdated autosave files

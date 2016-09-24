@@ -208,8 +208,6 @@ public class FSGConverter {
             try {
                 FSGConverter fsgc = FSGConverter.getFSGConverter();
                 fsgc.convertToXML(in, out);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 System.out.println("An error occured while converting the file.");
                 e.printStackTrace();

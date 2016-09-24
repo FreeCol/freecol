@@ -216,8 +216,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private static void addTileWarning(StyledDocument doc, Colony colony,
-                                       String messageId, Tile tile) {
+    private void addTileWarning(StyledDocument doc, Colony colony,
+                                String messageId, Tile tile) {
         if (messageId == null || !Messages.containsKey(messageId)) return;
         StringTemplate t = StringTemplate.template(messageId)
             .addStringTemplate("%location%",
@@ -230,8 +230,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
     }
 
-    private static void addBadAssignmentWarning(StyledDocument doc, Colony colony,
-                                                Unit expert, Unit nonExpert) {
+    private void addBadAssignmentWarning(StyledDocument doc, Colony colony,
+                                         Unit expert, Unit nonExpert) {
         GoodsType expertGoods = expert.getWorkType();
         GoodsType nonExpertGoods = nonExpert.getWorkType();
         String colonyName = colony.getName();

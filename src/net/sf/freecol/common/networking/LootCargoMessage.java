@@ -59,7 +59,7 @@ public class LootCargoMessage extends DOMMessage {
      * @param goods The {@code AbstractGoods} to loot.
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
-        super(TAG);
+        super(getTagName());
 
         this.winnerId = winner.getId();
         this.loserId = loserId;
@@ -74,7 +74,7 @@ public class LootCargoMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public LootCargoMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.winnerId = getStringAttribute(element, WINNER_TAG);
         this.loserId = getStringAttribute(element, LOSER_TAG);
@@ -129,7 +129,7 @@ public class LootCargoMessage extends DOMMessage {
         Unit winner;
         try {
             winner = getUnit(game);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -150,7 +150,7 @@ public class LootCargoMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             WINNER_TAG, this.winnerId,
             LOSER_TAG, this.loserId)
             .add(this.goods).toXMLElement();

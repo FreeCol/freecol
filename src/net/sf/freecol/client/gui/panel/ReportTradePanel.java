@@ -217,7 +217,7 @@ public final class ReportTradePanel extends ReportPanel {
         }
     }
 
-    private static JLabel createLeftLabel(String key) {
+    private JLabel createLeftLabel(String key) {
         JLabel result = Utility.localizedLabel(key);
         result.setBorder(Utility.LEFTCELLBORDER);
         return result;
@@ -238,7 +238,7 @@ public final class ReportTradePanel extends ReportPanel {
         return result;
     }
 
-    protected static Border createBorder() {
+    protected Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }
 }

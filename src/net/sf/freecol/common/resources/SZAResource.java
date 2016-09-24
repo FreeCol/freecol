@@ -81,9 +81,7 @@ public class SZAResource extends Resource implements Resource.Preloadable {
      */
     public SimpleZippedAnimation getSimpleZippedAnimation() {
         if (szAnimation == null) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("Preload not ready for " + getResourceLocator());
-            }
+            logger.finest("Preload not ready for " + getResourceLocator());
             preload();
         }
         return szAnimation;

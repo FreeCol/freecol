@@ -176,7 +176,7 @@ public class FreeColFrame extends JFrame {
         // arch linux, reported by Lone Wolf
         try {
             getContentPane().add(canvas);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Java crash", e);
         }        
     }

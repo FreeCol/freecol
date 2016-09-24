@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -147,7 +148,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
          */
         @Override
         public String toString() {
-            if (Messages.AUTOMATIC.equals(key)) {
+            if (Messages.AUTOMATIC.equals(getKey())) {
                 return Messages.message("clientOptions.gui.languageOption.autoDetectLanguage");
             }
 
@@ -205,7 +206,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             String languageId
                 = nam.substring(Messages.MESSAGE_FILE_PREFIX.length(),
                     nam.length() - Messages.MESSAGE_FILE_SUFFIX.length());
-            if (languageId != null && languageId.isEmpty()) { // FreeColMessages.properties
+            if ("".equals(languageId)) { // FreeColMessages.properties
                 languageId = "en";
             } else if ("_qqq".equals(languageId)) { // qqq is explanations only
                 continue;
@@ -215,7 +216,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             try {
                 languages.add(new Language(languageId,
                                            Messages.getLocale(languageId)));
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to add: " + languageId, e);
             }
         }
@@ -229,7 +230,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * @param key The key to search for.
      * @return The corresponding language, or null if none found.
      */
-    private static Language getLanguage(String key) {
+    private Language getLanguage(String key) {
         return find(languages, l -> key.equals(l.getKey()));
     }
 
@@ -238,7 +239,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      *
      * @return A list of the available languages.
      */
-    public static List<Language> getChoices() {
+    public List<Language> getChoices() {
         return new ArrayList<>(languages);
     }
 
@@ -308,7 +309,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute(VALUE_TAG, value.getKey());
+        xw.writeAttribute(VALUE_TAG, getValue().getKey());
     }
 
     /**

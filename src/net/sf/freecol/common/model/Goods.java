@@ -208,7 +208,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     @Override
     public Specification getSpecification() {
-        return this.game.getSpecification();
+        return getGame().getSpecification();
     }
 
     /**

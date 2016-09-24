@@ -22,11 +22,11 @@ package net.sf.freecol.server.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.Level;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
@@ -650,7 +650,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @param tile The {@code Tile} to activate sentries on.
      * @param cs A {@code ChangeSet} to update.
      */
-    private static void csActivateSentries(Tile tile, ChangeSet cs) {
+    private void csActivateSentries(Tile tile, ChangeSet cs) {
         for (Unit u : transform(tile.getUnits(),
                                 matchKey(UnitState.SENTRY, Unit::getState))) {
             u.setState(UnitState.ACTIVE);
@@ -767,10 +767,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 serverPlayer.setNewLandName(newLand);
                 cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                     new NewLandNameMessage(this, newLand));
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("First landing for " + serverPlayer
-                        + " at " + newTile + " with " + this);
-                }
+                logger.finest("First landing for " + serverPlayer
+                    + " at " + newTile + " with " + this);
             }
 
             // Check for new contacts.
@@ -838,11 +836,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                                              this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
-                        if (logger.isLoggable(Level.FINEST)) {
-                            logger.finest("First contact between "
-                                + contactPlayer.getId()
-                                + " and " + is + " at " + newTile);
-                        }
+                        logger.finest("First contact between "
+                            + contactPlayer.getId()
+                            + " and " + is + " at " + newTile);
                     }                   
                 }
                 csActivateSentries(t, cs);

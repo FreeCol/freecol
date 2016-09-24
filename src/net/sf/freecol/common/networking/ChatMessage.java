@@ -56,7 +56,7 @@ public class ChatMessage extends DOMMessage {
      * @param privateChat Whether this message is private.
      */
     public ChatMessage(Player player, String message, boolean privateChat) {
-        super(TAG);
+        super(getTagName());
 
         this.sender = player.getId();
         this.message = message;
@@ -72,7 +72,7 @@ public class ChatMessage extends DOMMessage {
      * @throws IllegalStateException if there is problem with the senderID.
      */
     public ChatMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.sender = getStringAttribute(element, SENDER_TAG);
         this.message = getStringAttribute(element, MESSAGE_TAG);
@@ -137,7 +137,7 @@ public class ChatMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             SENDER_TAG, this.sender,
             MESSAGE_TAG, this.message,
             PRIVATE_TAG, String.valueOf(this.privateChat)).toXMLElement();

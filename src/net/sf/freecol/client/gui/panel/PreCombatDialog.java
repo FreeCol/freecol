@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -88,14 +90,14 @@ public class PreCombatDialog extends FreeColConfirmDialog {
                                              false, true);
         String defenderName = null;
         JLabel defenderLabel = null;
-        if (CombatModel.combatIsAttack(attacker, defender)) {
+        if (combatModel.combatIsAttack(attacker, defender)) {
             Unit defenderUnit = (Unit)defender;
             defenderName
                 = defenderUnit.getDescription(Unit.UnitLabelType.NATIONAL);
             defenderLabel = new UnitLabel(freeColClient, defenderUnit,
                                           false, true);
 
-        } else if (CombatModel.combatIsSettlementAttack(attacker, defender)) {
+        } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Settlement settlement = (Settlement) defender;
             defenderName = settlement.getName();
             defenderLabel = new JLabel(new ImageIcon(
@@ -162,8 +164,8 @@ public class PreCombatDialog extends FreeColConfirmDialog {
         initializeConfirmDialog(frame, true, panel, null, "ok", "cancel");
     }
 
-    private static int addLabels(JPanel panel, JLabel[] labels, boolean newline,
-                                 int skip) {
+    private int addLabels(JPanel panel, JLabel[] labels, boolean newline,
+                          int skip) {
         int len = labels.length;
         for (int i = 0; i < len; i++) if (labels[i] == null) len = i;
  

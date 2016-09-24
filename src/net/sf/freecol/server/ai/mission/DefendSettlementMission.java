@@ -52,7 +52,7 @@ public class DefendSettlementMission extends Mission {
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
     /** The tag for this mission. */
-    private static final String tag = "AI defender";
+    private final String tag = "AI defender";
 
     // FIXME: This is unused, delete?
     /** Maximum number of turns to travel to the settlement. */
@@ -292,7 +292,7 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -310,7 +310,7 @@ public class DefendSettlementMission extends Mission {
 
         // Go to the target!
         final Unit unit = getUnit();
-        Unit.MoveType mt = travelToTarget(target,
+        Unit.MoveType mt = travelToTarget(getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
         switch (mt) {
         case MOVE: // Arrived
@@ -334,8 +334,8 @@ public class DefendSettlementMission extends Mission {
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         Mission m = null;
-        if (target instanceof Colony) {
-            Colony colony = (Colony) target;
+        if (getTarget() instanceof Colony) {
+            Colony colony = (Colony)getTarget();
             if (unit.isInColony()
                 || (unit.isPerson() && colony.getUnitCount() < 1)) {
                 m = getEuropeanAIPlayer().getWorkInsideColonyMission(aiUnit,
@@ -352,7 +352,7 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
-        Settlement settlement = (Settlement) target;
+        Settlement settlement = (Settlement)getTarget();
         int defenderCount = 0, fortifyCount = 0;
         for (Unit u : settlement.getAllUnitsList()) {
             AIUnit aiu = getAIMain().getAIUnit(u);
@@ -416,7 +416,7 @@ public class DefendSettlementMission extends Mission {
             return lbAttack(lb, bestTarget);
         }
 
-        return lbWait(lb, ", alert at ", target);
+        return lbWait(lb, ", alert at ", getTarget());
     }
     
 

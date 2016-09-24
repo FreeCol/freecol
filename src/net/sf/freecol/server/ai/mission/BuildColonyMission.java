@@ -397,7 +397,7 @@ public class BuildColonyMission extends Mission {
 
         for (;;) {
             // Go there.
-            Unit.MoveType mt = travelToTarget(target,
+            Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE: // Arrived
@@ -417,11 +417,11 @@ public class BuildColonyMission extends Mission {
             }
 
             lbAt(lb);
-            if (target instanceof Colony) {
+            if (getTarget() instanceof Colony) {
                 // If arrived at the target colony it is time to retarget
                 // another building site, unless the existing one is small
                 // or nothing is found.
-                Colony colony = (Colony) target;
+                Colony colony = (Colony)getTarget();
 
                 // Improve colony center?
                 Mission m
@@ -459,10 +459,10 @@ public class BuildColonyMission extends Mission {
                 return lbDrop(lb, ", joining");
             }
 
-            if (!(target instanceof Tile)) {
-                return lbFail(lb, false, "bogus target ", target);
+            if (!(getTarget() instanceof Tile)) {
+                return lbFail(lb, false, "bogus target ", getTarget());
             }
-            Tile tile = (Tile) target;
+            Tile tile = (Tile)getTarget();
             // Check that the unit has moves left, which are required
             // for building.
             if (unit.getMovesLeft() <= 0) {

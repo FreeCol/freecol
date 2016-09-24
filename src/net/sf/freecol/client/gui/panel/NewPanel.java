@@ -431,7 +431,7 @@ public final class NewPanel extends FreeColPanel
      * @param field The field to read.
      * @return The port number in the field, or negative on error.
      */
-    private static int getSelectedPort(JTextField field) {
+    private int getSelectedPort(JTextField field) {
         int port;
         try {
             port = Integer.parseInt(field.getText());
@@ -485,7 +485,7 @@ public final class NewPanel extends FreeColPanel
      * @param components The {@code Component}s to set.
      * @param enable Enable if true.
      */
-    private static void enableComponents(Component[] components, boolean enable) {
+    private void enableComponents(Component[] components, boolean enable) {
         for (Component c : components) {
             c.setEnabled(enable);
         }

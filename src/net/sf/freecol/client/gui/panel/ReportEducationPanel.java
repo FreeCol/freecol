@@ -88,7 +88,7 @@ public final class ReportEducationPanel extends ReportPanel {
         }
     }
 
-    private static JPanel getPanel(String key) {
+    private JPanel getPanel(String key) {
         JPanel result = new JPanel(new FlowLayout(FlowLayout.LEFT));
         result.setOpaque(false);
         result.setBorder(Utility.localizedBorder(key, Color.GRAY));

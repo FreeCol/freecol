@@ -53,7 +53,7 @@ public class WorkMessage extends DOMMessage {
      * @param workLocation The {@code WorkLocation} to change to.
      */
     public WorkMessage(Unit unit, WorkLocation workLocation) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.workLocationId = workLocation.getId();
@@ -66,7 +66,7 @@ public class WorkMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public WorkMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.workLocationId = getStringAttribute(element, WORK_LOCATION_TAG);
@@ -90,7 +90,7 @@ public class WorkMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -139,7 +139,7 @@ public class WorkMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, unitId,
             WORK_LOCATION_TAG, workLocationId).toXMLElement();
     }

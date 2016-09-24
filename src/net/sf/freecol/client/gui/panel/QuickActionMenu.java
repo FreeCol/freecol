@@ -27,7 +27,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -264,7 +266,7 @@ public final class QuickActionMenu extends JPopupMenu {
         return true;
     }
 
-    private static List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
+    private List<JMenuItem> descendingList(final Map<JMenuItem, Integer> map) {
         final Comparator<JMenuItem> comp
             = Comparator.comparingInt((JMenuItem k) -> map.get(k))
                 .reversed()

@@ -501,7 +501,7 @@ public final class ImageLibrary {
                 return null;
             }
             return image;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "could not find image", e);
             return null;
         }

@@ -1404,7 +1404,7 @@ public class ChangeSet {
             StringBuilder sb = new StringBuilder(64);
             sb.append('[').append(getClass().getName())
                 .append(' ').append(see)
-                .append(" #").append(priority)
+                .append(" #").append(getPriority())
                 .append(' ').append(name);
             for (String a : attributes) sb.append(' ').append(a);
             sb.append(']');

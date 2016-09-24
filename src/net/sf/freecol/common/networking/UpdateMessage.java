@@ -48,7 +48,7 @@ public class UpdateMessage extends DOMMessage {
      * @param fcgos The list of {@code FreeColGameObject}s to add.
      */
     public UpdateMessage(List<FreeColGameObject> fcgos) {
-        super(TAG);
+        super(getTagName());
 
         this.fcgos.clear();
         if (fcgos != null) this.fcgos.addAll(fcgos);
@@ -91,8 +91,8 @@ public class UpdateMessage extends DOMMessage {
      * @param connection The {@code Connection} message was received on.
      * @return Null.
      */
-    public static Element handle(FreeColServer server, Player player,
-                                 Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         // Only sent by the server to the clients.
         return null;
     }
@@ -102,7 +102,7 @@ public class UpdateMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
+        return new DOMMessage(getTagName())
             .add(this.fcgos).toXMLElement();
     }
 

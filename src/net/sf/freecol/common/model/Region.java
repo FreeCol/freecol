@@ -354,8 +354,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return A discoverable a region, or null if none found.
      */
     public Region getDiscoverableRegion() {
-        return (this.discoverable) ? this
-            : (this.parent != null) ? this.parent.getDiscoverableRegion()
+        return (getDiscoverable()) ? this
+            : (getParent() != null) ? getParent().getDiscoverableRegion()
             : null;
     }
 
@@ -442,7 +442,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param key The key to check.
      * @return A valid key or null if already null or invalid.
      */
-    private static String fixRegionKey(String key) {
+    private String fixRegionKey(String key) {
         if (key == null) return key;
         for (String r : predefinedRegionKeys) {
             if (key.equals(r)) {
@@ -620,7 +620,7 @@ public class Region extends FreeColGameObject implements Nameable {
             .append(' ').append((key != null) ? key : (name != null) ? name
                 : "<unnamed>")
             .append(' ').append(type);
-        if (this.discoverable) sb.append('!');
+        if (getDiscoverable()) sb.append('!');
         sb.append(']');
         return sb.toString();
     }

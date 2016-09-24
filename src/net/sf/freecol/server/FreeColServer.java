@@ -38,6 +38,7 @@ import java.util.jar.JarOutputStream;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.xml.stream.XMLStreamException;
@@ -62,6 +63,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Stance;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
@@ -235,7 +237,7 @@ public final class FreeColServer {
         this.random = new Random(FreeColSeed.getFreeColSeed(true));
         this.game = new ServerGame(specification);
         this.game.setNationOptions(new NationOptions(specification));
-        ServerGame.randomize(random);
+        this.game.randomize(random);
         
         this.inGameController = new InGameController(this, random);
         this.mapGenerator = new SimpleMapGenerator(game, random);
@@ -384,10 +386,8 @@ public final class FreeColServer {
             port = firstPort;
             tries = 1;
         }
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("serverStart(" + firstPort + ") => " + port
-                + " x " + tries);
-        }
+        logger.finest("serverStart(" + firstPort + ") => " + port
+            + " x " + tries);
         for (int i = tries; i > 0; i--) {
             try {
                 server = new Server(this, host, port);
@@ -432,7 +432,7 @@ public final class FreeColServer {
      * @return The {@code Controller}.
      */
     public Controller getController() {
-        if (gameState == GameState.IN_GAME) {
+        if (getGameState() == GameState.IN_GAME) {
             return inGameController;
         } else {
             return preGameController;
@@ -610,7 +610,7 @@ public final class FreeColServer {
         setGameState(FreeColServer.GameState.IN_GAME);
         updateMetaServer();
         sendToAll(new DOMMessage("startGame"), null);
-        server.setMessageHandlerToAllConnections(inGameInputHandler);
+        getServer().setMessageHandlerToAllConnections(getInGameInputHandler());
     }
 
     /**
@@ -620,7 +620,7 @@ public final class FreeColServer {
      * @param conn An option {@code Connection} to omit.
      */
     public void sendToAll(DOMMessage msg, Connection conn) {
-        server.sendToAll(msg, conn);
+        getServer().sendToAll(msg, conn);
     }
 
     /**
@@ -672,7 +672,7 @@ public final class FreeColServer {
                     "currentlyPlaying", Integer.toString(nPlayers),
                     "isGameStarted", Boolean.toString(started),
                     "version", FreeCol.getVersion(),
-                    "gameState", Integer.toString(gameState.ordinal())));
+                    "gameState", Integer.toString(getGameState().ordinal())));
             if (reply != null
                 && "noRouteToServer".equals(reply.getTagName())) {
                 this.publicServer = false;
@@ -794,7 +794,7 @@ public final class FreeColServer {
      */
     private void saveGame(File file, String owner, OptionGroup options,
                           Unit active, BufferedImage image) throws IOException {
-        final ServerGame game = this.game;
+        final ServerGame game = getGame();
         try (
             JarOutputStream fos = new JarOutputStream(new FileOutputStream(file));
         ) {
@@ -885,7 +885,7 @@ public final class FreeColServer {
      */
     public ServerGame loadGame(final FreeColSavegameFile fis)
         throws IOException, FreeColException, XMLStreamException {
-        return loadGame(fis, null, server);
+        return loadGame(fis, null, getServer());
     }
 
     /**
@@ -1094,7 +1094,7 @@ public final class FreeColServer {
         specification.disableEditing();
 
         // AI initialization.
-        AIMain aiMain = this.aiMain;
+        AIMain aiMain = getAIMain();
         int aiIntegrity = (aiMain == null) ? -1 : aiMain.checkIntegrity(true);
         if (aiIntegrity < 0) {
             aiMain = new AIMain(this);
@@ -1113,7 +1113,7 @@ public final class FreeColServer {
                 ServerPlayer serverPlayer = (ServerPlayer)player;
                 DummyConnection theConnection
                     = new DummyConnection("Server-Server-" + player.getName(),
-                        inGameInputHandler);
+                        getInGameInputHandler());
                 DummyConnection aiConnection
                     = new DummyConnection("Server-AI-" + player.getName(),
                         new AIInGameInputHandler(this, serverPlayer, aiMain));
@@ -1140,7 +1140,7 @@ public final class FreeColServer {
      * @param game The {@code Game} to establish the enemy within.
      * @return The new unknown enemy {@code Player}.
      */
-    private static ServerPlayer establishUnknownEnemy(Game game) {
+    private ServerPlayer establishUnknownEnemy(Game game) {
         final Specification spec = game.getSpecification();
 
         ServerPlayer enemy = new ServerPlayer(game, false,
@@ -1160,7 +1160,7 @@ public final class FreeColServer {
      * @return The new empty {@code Map}.
      */
     public Map createEmptyMap(Game game, int width, int height) {
-        return this.mapGenerator.createEmptyMap(width, height,
+        return getMapGenerator().createEmptyMap(width, height,
                                                 new LogBuilder(-1));
     }
 
@@ -1172,7 +1172,7 @@ public final class FreeColServer {
      * @exception FreeColException on map generation failure.
      */
     public Game buildGame() throws FreeColException {
-        final ServerGame game = this.game;
+        final ServerGame game = getGame();
         final Specification spec = game.getSpecification();
         final AIMain aiMain = new AIMain(this);
         final Predicate<Entry<Nation, NationState>> availablePred = e ->
@@ -1191,12 +1191,12 @@ public final class FreeColServer {
 
         // Create the map.
         LogBuilder lb = new LogBuilder(256);
-        game.setMap(this.mapGenerator.createMap(lb));
+        game.setMap(getMapGenerator().createMap(lb));
         lb.log(logger, Level.FINER);
         
         // Initial stances and randomizations for all players.
         spec.generateDynamicOptions();
-        Random random = this.random;
+        Random random = getServerRandom();
         for (Player player : game.getLivePlayerList()) {
             ((ServerPlayer)player).randomizeGame(random);
             if (player.isIndian()) {
@@ -1235,21 +1235,21 @@ public final class FreeColServer {
     public ServerPlayer makeAIPlayer(Nation nation) {
         DummyConnection theConnection
             = new DummyConnection("Server connection - " + nation.getId(),
-                inGameInputHandler);
-        ServerPlayer aiPlayer = new ServerPlayer(game, false, nation,
+                getInGameInputHandler());
+        ServerPlayer aiPlayer = new ServerPlayer(getGame(), false, nation,
                                                  null, theConnection);
         aiPlayer.setAI(true);
         DummyConnection aiConnection
             = new DummyConnection("AI connection - " + nation.getId(),
-                new AIInGameInputHandler(this, aiPlayer, aiMain));
+                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
         aiConnection.setConnection(theConnection);
         theConnection.setConnection(aiConnection);
-        server.addDummyConnection(theConnection);
+        getServer().addDummyConnection(theConnection);
 
-        game.addPlayer(aiPlayer);
+        getGame().addPlayer(aiPlayer);
         // Add to the AI, which was previously deferred because the
         // player type was unknown.
-        aiMain.setFreeColGameObject(aiPlayer.getId(), aiPlayer);
+        getAIMain().setFreeColGameObject(aiPlayer.getId(), aiPlayer);
         return aiPlayer;
     }
 
@@ -1285,7 +1285,7 @@ public final class FreeColServer {
      * @param reveal If true, reveal, if false, hide.
      */
     public void exploreMapForAllPlayers(boolean reveal) {
-        for (Player player : game.getLiveEuropeanPlayerList()) {
+        for (Player player : getGame().getLiveEuropeanPlayerList()) {
             ((ServerPlayer)player).exploreMap(reveal);
         }
      
@@ -1300,7 +1300,7 @@ public final class FreeColServer {
             fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
         }
 
-        for (Player player : game.getLiveEuropeanPlayerList()) {
+        for (Player player : getGame().getLiveEuropeanPlayerList()) {
             ((ServerPlayer)player).getConnection().reconnect();
         }
     }
@@ -1324,7 +1324,7 @@ public final class FreeColServer {
      * @return The corresponding AI player, or null if not found.
      */
     public AIPlayer getAIPlayer(Player player) {
-        return aiMain.getAIPlayer(player);
+        return getAIMain().getAIPlayer(player);
     }
 
     /**

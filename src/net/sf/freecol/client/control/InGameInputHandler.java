@@ -21,16 +21,17 @@ package net.sf.freecol.client.control;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -51,9 +52,11 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.AddPlayerMessage;
+import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -62,6 +65,7 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
+import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
@@ -201,7 +205,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @param runnable The {@code Runnable} to run.
      */
     private void invokeAndWait(Runnable runnable) {
-        GUI.invokeNowOrWait(runnable);
+        getGUI().invokeNowOrWait(runnable);
     }
     
     /**
@@ -210,7 +214,7 @@ public final class InGameInputHandler extends ClientInputHandler {
      * @param runnable The {@code Runnable} to run.
      */
     private void invokeLater(Runnable runnable) {
-        GUI.invokeNowOrLater(runnable);
+        getGUI().invokeNowOrLater(runnable);
     }
     
     /**

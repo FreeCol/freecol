@@ -20,6 +20,7 @@
 package net.sf.freecol.common.option;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -72,21 +73,21 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
         @Override
         public int compareTo(MixerWrapper mw) {
-            return name.compareTo(mw.name);
+            return getKey().compareTo(mw.getKey());
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o instanceof MixerWrapper) {
-                return ((MixerWrapper) o).name.equals(name);
+                return ((MixerWrapper)o).getKey().equals(getKey());
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return name.hashCode();
+            return getKey().hashCode();
         }
 
         @Override
@@ -144,7 +145,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * @param name The mixer wrapper name.
      * @return The mixer wrapper with the name given, or null if none.
      */
-    private static MixerWrapper getMixerWrapperByName(String name) {
+    private MixerWrapper getMixerWrapperByName(String name) {
         return find(audioMixers, mw -> mw.getKey().equals(name));
     }
 
@@ -153,7 +154,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      *
      * @return The available mixers.
      */
-    public static List<MixerWrapper> getChoices() {
+    public List<MixerWrapper> getChoices() {
         return new ArrayList<>(audioMixers);
     }
 

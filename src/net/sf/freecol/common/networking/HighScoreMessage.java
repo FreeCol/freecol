@@ -24,8 +24,9 @@ import java.util.List;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
+import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
@@ -52,7 +53,7 @@ public class HighScoreMessage extends DOMMessage {
      * @param key A message key for the final display.
      */
     public HighScoreMessage(String key) {
-        super(TAG);
+        super(getTagName());
 
         this.key = key;
     }
@@ -64,7 +65,7 @@ public class HighScoreMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public HighScoreMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.key = getStringAttribute(element, KEY_TAG);
         this.scores.clear();
@@ -101,7 +102,7 @@ public class HighScoreMessage extends DOMMessage {
      * @return An update containing the high scores.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        this.scores.addAll(InGameController.getHighScores());
+        this.scores.addAll(server.getInGameController().getHighScores());
         return this.toXMLElement();
     }
 
@@ -112,7 +113,7 @@ public class HighScoreMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             KEY_TAG, this.key).add(this.scores).toXMLElement();
     }
 

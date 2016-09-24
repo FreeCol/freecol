@@ -247,7 +247,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         }
     }
 
-    private static class DestinationComparator implements Comparator<Destination> {
+    private class DestinationComparator implements Comparator<Destination> {
 
         protected final Player owner;
 

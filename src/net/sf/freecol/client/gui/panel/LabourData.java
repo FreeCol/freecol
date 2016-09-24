@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.i18n.Messages;
@@ -77,8 +78,8 @@ public class LabourData {
         private int production;
 
         public void addProduction(int production) {
-            colonists = colonists + 1;
-            this.production = this.production + production;
+            colonists = getColonists() + 1;
+            this.production = this.getProduction() + production;
         }
 
         public int getColonists() {
@@ -207,7 +208,7 @@ public class LabourData {
          * @return the rows to display the unit data
          */
         public int getRowCount() {
-            boolean isSummary = unitData.isSummary();
+            boolean isSummary = getUnitData().isSummary();
 
             int rows = 0;
             if (workingProfessionals.getColonists() > 0) rows++;
@@ -306,16 +307,16 @@ public class LabourData {
         }
 
         public String getUnitName() {
-            return (summary) ? null : Messages.getName(unitType);
+            return (isSummary()) ? null : Messages.getName(unitType);
         }
 
         public boolean hasDetails() {
-            return total.getRowCount() > 0;
+            return getTotal().getRowCount() > 0;
         }
 
         public int getUnitSummaryRowCount() {
             //minimum 1 row to show the unit symbol
-            return Math.max(1, total.getRowCount());
+            return Math.max(1, getTotal().getRowCount());
         }
 
         public UnitType getUnitType() {
@@ -358,7 +359,7 @@ public class LabourData {
             if (summary) {
                 return null;
             }
-            return unitType.getExpertProduction();
+            return getUnitType().getExpertProduction();
         }
     }
 
@@ -491,7 +492,7 @@ public class LabourData {
         }
     }
 
-    private static void incrementOutsideWorker(UnitData expert, Unit unit, UnitData workingAs, LocationData.Getter getter) {
+    private void incrementOutsideWorker(UnitData expert, Unit unit, UnitData workingAs, LocationData.Getter getter) {
         if (unit.getType() == workingAs.unitType) {
             getter.getLocationData(expert).workingProfessionals.colonists++;
         } else {

@@ -19,14 +19,22 @@
 
 package net.sf.freecol.tools;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.StringTemplate;
@@ -87,7 +95,7 @@ public class GenerateDocumentation {
                 }
                 line = bufferedReader.readLine();
             }
-        } catch (IOException|RuntimeException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -134,7 +142,7 @@ public class GenerateDocumentation {
                     }
                     line = bufferedReader.readLine();
                 }
-            } catch (IOException|RuntimeException e) {
+            } catch (Exception e) {
                 // forget it
             }
         }
@@ -157,7 +165,7 @@ public class GenerateDocumentation {
             out.write("</body>\n");
             out.write("</tmx>\n");
             out.flush();
-        } catch (IOException|RuntimeException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -190,7 +198,7 @@ public class GenerateDocumentation {
                     Transformer stylesheet;
                     try {
                         stylesheet = factory.newTransformer(xsl);
-                    } catch (TransformerConfigurationException tce) {
+                    } catch (TransformerException tce) {
                         System.err.println("Problem with " + XSL + " at: "
                             + tce.getLocationAsString());
                         tce.printStackTrace();

@@ -482,7 +482,7 @@ public class FreeColDirectories {
         } else {
             try {
                 ret = file.mkdir();
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 ret = false;
                 System.err.println("Could not make directory " + file.getPath()
                     + ": " + e.getMessage());
@@ -603,16 +603,16 @@ public class FreeColDirectories {
         }
 
         if (logFilePath == null) {
-            logFilePath = userCacheDirectory + SEPARATOR + LOG_FILE;
+            logFilePath = getUserCacheDirectory() + SEPARATOR + LOG_FILE;
         }
 
         if (saveDirectory == null) {
-            saveDirectory = new File(userDataDirectory, SAVE_DIRECTORY);
+            saveDirectory = new File(getUserDataDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return "main.userDir.fail";
         }
         deriveAutosaveDirectory();
 
-        userModsDirectory = new File(userDataDirectory, MODS_DIRECTORY);
+        userModsDirectory = new File(getUserDataDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
 
         return (migrate > 0) ? null
@@ -641,7 +641,7 @@ public class FreeColDirectories {
      * @return The base resources directory.
      */
     public static File getBaseDirectory() {
-        return new File(dataDirectory, BASE_DIRECTORY);
+        return new File(getDataDirectory(), BASE_DIRECTORY);
     }
 
     /**
@@ -693,7 +693,7 @@ public class FreeColDirectories {
      * @return The high score file, if it exists.
      */
     public static File getHighScoreFile() {
-        return new File(userDataDirectory, HIGH_SCORE_FILE);
+        return new File(getUserDataDirectory(), HIGH_SCORE_FILE);
     }
 
     /**
@@ -702,7 +702,7 @@ public class FreeColDirectories {
      * @return The FreeCol i18n directory.
      */
     public static File getI18nDirectory() {
-        return new File(dataDirectory, I18N_DIRECTORY);
+        return new File(getDataDirectory(), I18N_DIRECTORY);
     }
 
     /**
@@ -729,7 +729,7 @@ public class FreeColDirectories {
      * @return The predefined maps.
      */
     public static File getMapsDirectory() {
-        return new File(dataDirectory, MAPS_DIRECTORY);
+        return new File(getDataDirectory(), MAPS_DIRECTORY);
     }
 
     /**
@@ -738,7 +738,7 @@ public class FreeColDirectories {
      * @return The directory to save user options in.
      */
     public static File getOptionsDirectory() {
-        File dir = new File(userConfigDirectory, FreeCol.getTC());
+        File dir = new File(getUserConfigDirectory(), FreeCol.getTC());
         return (insistDirectory(dir)) ? dir : null;
     }
 
@@ -768,7 +768,7 @@ public class FreeColDirectories {
      * @return The ruleset directory.
      */
     public static File getRulesDirectory() {
-        return new File(dataDirectory, RULES_DIRECTORY);
+        return new File(getDataDirectory(), RULES_DIRECTORY);
     }
 
     /**
@@ -798,7 +798,7 @@ public class FreeColDirectories {
     public static boolean setSavegameFile(String path) {
         File file = new File(path);
         if (!file.exists() || !file.isFile() || !file.canRead()) {
-            file = new File(saveDirectory, path);
+            file = new File(getSaveDirectory(), path);
             if (!file.exists() || !file.isFile() || !file.canRead()) return false;
         }
         savegameFile = file;
@@ -829,7 +829,7 @@ public class FreeColDirectories {
      * @return The directory where the standard mods are located.
      */
     public static File getStandardModsDirectory() {
-        return new File(dataDirectory, MODS_DIRECTORY);
+        return new File(getDataDirectory(), MODS_DIRECTORY);
     }
 
     /**
@@ -838,7 +838,7 @@ public class FreeColDirectories {
      * @return The start map file if any.
      */
     public static File getStartMapFile() {
-        return new File(autosaveDirectory, START_MAP_NAME);
+        return new File(getAutosaveDirectory(), START_MAP_NAME);
     }
 
     /**

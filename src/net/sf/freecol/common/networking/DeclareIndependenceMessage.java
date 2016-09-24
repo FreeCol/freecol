@@ -52,7 +52,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
      * @param countryName The new name for the rebelling country.
      */
     public DeclareIndependenceMessage(String nationName, String countryName) {
-        super(TAG);
+        super(getTagName());
 
         this.nationName = nationName;
         this.countryName = countryName;
@@ -112,7 +112,7 @@ public class DeclareIndependenceMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             NATION_NAME_TAG, this.nationName,
             COUNTRY_NAME_TAG, this.countryName).toXMLElement();
     }

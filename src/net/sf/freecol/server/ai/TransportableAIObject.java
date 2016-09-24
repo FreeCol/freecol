@@ -180,7 +180,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * @return True if the unit has no allocated transport.
      */
     public boolean dropTransport() {
-        AIUnit transport = this.transport;
+        AIUnit transport = getTransport();
         if (transport != null) {
             if (!transport.isDisposed()
                 && getLocation() != transport.getUnit()) {
@@ -190,7 +190,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
             }
             setTransport(null);
         }
-        return this.transport == null;
+        return getTransport() == null;
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class TransportableAIObject extends ValuedAIObject {
             if (!leaveTransport()) return false;
         }
 
-        AIUnit old = this.transport;
+        AIUnit old = getTransport();
         if (old != null) {
             if (old == aiCarrier) return true;
 

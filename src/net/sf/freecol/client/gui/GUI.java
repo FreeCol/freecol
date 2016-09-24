@@ -1043,7 +1043,7 @@ public class GUI extends FreeColClientHolder {
         return false;
     }
 
-    public static boolean isShowingSubPanel() {
+    public boolean isShowingSubPanel() {
         return false;
     }
 
@@ -1432,7 +1432,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param runnable A {@code Runnable} to run.
      */
-    public static void invokeNowOrLater(Runnable runnable) {
+    public void invokeNowOrLater(Runnable runnable) {
         if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
         } else {
@@ -1446,7 +1446,7 @@ public class GUI extends FreeColClientHolder {
      *
      * @param runnable A {@code Runnable} to run.
      */
-    public static void invokeNowOrWait(Runnable runnable) {
+    public void invokeNowOrWait(Runnable runnable) {
         if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
         } else {

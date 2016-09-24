@@ -210,8 +210,8 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     }
 
 
-    private static <T extends BuildableType> boolean filterBuildables(List<T> input,
-                                                                      List<T> output, GoodsType type) {
+    private <T extends BuildableType> boolean filterBuildables(List<T> input,
+        List<T> output, GoodsType type) {
         boolean result = false;
         for (T bt : input) {
             if (bt.needsGoodsToBuild()

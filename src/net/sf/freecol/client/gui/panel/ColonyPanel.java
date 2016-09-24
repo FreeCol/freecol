@@ -1021,11 +1021,9 @@ public final class ColonyPanel extends PortPanel
         final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(colony.getName() + " change " + property
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
-        }
+        logger.finest(colony.getName() + " change " + property
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
 
         if (property == null) {
             logger.warning("Null property change");
@@ -1258,7 +1256,7 @@ public final class ColonyPanel extends PortPanel
                 royalistShield.setIcon(new ImageIcon(
                     lib.getSmallerMiscIconImage(other)));
                 add(royalistShield, "bottom");
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Shield: " + nation + "/" + other, e);
             }
 
@@ -1641,12 +1639,10 @@ public final class ColonyPanel extends PortPanel
         public void propertyChange(PropertyChangeEvent event) {
             final Colony colony = getColony();
             if (colony != null && event != null) {
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(colony.getName() + "-warehouse change "
-                        + event.getPropertyName()
-                        + ": " + event.getOldValue()
-                        + " -> " + event.getNewValue());
-                }
+                logger.finest(colony.getName() + "-warehouse change "
+                    + event.getPropertyName()
+                    + ": " + event.getOldValue()
+                    + " -> " + event.getNewValue());
             }
             update();
         }
@@ -2255,11 +2251,9 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest(colonyTile.getId() + " change " + property
-                                  + ": " + event.getOldValue()
-                                  + " -> " + event.getNewValue());
-                }
+                logger.finest(colonyTile.getId() + " change " + property
+                              + ": " + event.getOldValue()
+                              + " -> " + event.getNewValue());
                 ColonyPanel.this.updateProduction();
             }
 

@@ -20,6 +20,7 @@
 package net.sf.freecol.common.networking;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sf.freecol.common.model.Colony;
@@ -95,23 +96,23 @@ public class RearrangeColonyMessage extends DOMMessage {
             return this;
         }
 
-        public static String unitKey(int i) {
+        public String unitKey(int i) {
             return "x" + i + "unit";
         }
 
-        public static String locKey(int i) {
+        public String locKey(int i) {
             return "x" + i + "loc";
         }
 
-        public static String workKey(int i) {
+        public String workKey(int i) {
             return "x" + i + "work";
         }
 
-        public static String roleKey(int i) {
+        public String roleKey(int i) {
             return "x" + i + "role";
         }
 
-        public static String roleCountKey(int i) {
+        public String roleCountKey(int i) {
             return "x" + i + "count";
         }
 
@@ -151,7 +152,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     public RearrangeColonyMessage(Colony colony, List<Unit> workers,
                                   Colony scratch) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = colony.getId();
         this.arrangements.clear();
@@ -175,7 +176,7 @@ public class RearrangeColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public RearrangeColonyMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         int n;
@@ -233,7 +234,7 @@ public class RearrangeColonyMessage extends DOMMessage {
         Colony colony;
         try {
             colony = player.getOurFreeColGameObject(this.colonyId, Colony.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -275,18 +276,18 @@ public class RearrangeColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        DOMMessage result = new DOMMessage(TAG,
+        DOMMessage result = new DOMMessage(getTagName(),
             COLONY_TAG, this.colonyId,
             FreeColObject.ARRAY_SIZE_TAG, Integer.toString(arrangements.size()));
         int i = 0;
         for (Arrangement uc : arrangements) {
-            result.setAttribute(Arrangement.unitKey(i), uc.unit.getId());
-            result.setAttribute(Arrangement.locKey(i), uc.loc.getId());
+            result.setAttribute(uc.unitKey(i), uc.unit.getId());
+            result.setAttribute(uc.locKey(i), uc.loc.getId());
             if (uc.work != null) {
-                result.setAttribute(Arrangement.workKey(i), uc.work.getId());
+                result.setAttribute(uc.workKey(i), uc.work.getId());
             }
-            result.setAttribute(Arrangement.roleKey(i), uc.role.toString());
-            result.setAttribute(Arrangement.roleCountKey(i), String.valueOf(uc.roleCount));
+            result.setAttribute(uc.roleKey(i), uc.role.toString());
+            result.setAttribute(uc.roleCountKey(i), String.valueOf(uc.roleCount));
             i++;
         }
         return result.toXMLElement();

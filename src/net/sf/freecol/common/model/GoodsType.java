@@ -197,7 +197,7 @@ public final class GoodsType extends FreeColSpecObjectType {
      * @return True if this goods type is made from New World goods.
      */
     public boolean isNewWorldLuxuryType() {
-        return madeFrom != null && madeFrom.newWorldGoods;
+        return madeFrom != null && madeFrom.isNewWorldGoodsType();
     }
 
     /**
@@ -452,7 +452,7 @@ public final class GoodsType extends FreeColSpecObjectType {
 
         GoodsType refinedType = makes;
         while (refinedType != null) {
-            if (refinedType.buildingMaterial) return true;
+            if (refinedType.isBuildingMaterial()) return true;
             refinedType = refinedType.makes;
         }
         return false;
@@ -516,10 +516,10 @@ public final class GoodsType extends FreeColSpecObjectType {
      * @return An integer useful in comparators.
      */
     private int getRank() {
-        return (!storable || tradeGoods) ? -1
-            : (isFood) ? 1
-            : (newWorldGoods) ? 2
-            : (isFarmed) ? 3
+        return (!isStorable() || isTradeGoods()) ? -1
+            : (isFoodType()) ? 1
+            : (isNewWorldGoodsType()) ? 2
+            : (isFarmed()) ? 3
             : (isRawMaterial()) ? 4
             : (isNewWorldLuxuryType()) ? 5
             : (isRefined()) ? 6

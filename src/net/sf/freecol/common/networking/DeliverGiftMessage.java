@@ -57,7 +57,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param goods The {@code Goods} to deliverGift.
      */
     public DeliverGiftMessage(Unit unit, IndianSettlement is, Goods goods) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -72,7 +72,7 @@ public class DeliverGiftMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DeliverGiftMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -134,7 +134,7 @@ public class DeliverGiftMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -143,7 +143,7 @@ public class DeliverGiftMessage extends DOMMessage {
         try {
             is = unit.getAdjacentSettlement(this.settlementId,
                                             IndianSettlement.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -168,7 +168,7 @@ public class DeliverGiftMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId)
             .add(this.goods).toXMLElement();

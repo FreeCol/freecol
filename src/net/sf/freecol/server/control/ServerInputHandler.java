@@ -149,7 +149,7 @@ public abstract class ServerInputHandler extends FreeColServerHolder
             try {
                 logger.log(Level.FINEST, "Handling " + tag);
                 return handler.handle(connection, element);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 // FIXME: should we really catch Exception? The old code did.
                 logger.log(Level.WARNING, "Handler failure for " + tag, e);
                 connection.reconnect();

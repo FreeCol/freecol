@@ -112,7 +112,7 @@ public final class MetaServer extends Thread {
             public void run() {
                 try {
                     mr.removeDeadServers();
-                } catch (RuntimeException ex) {
+                } catch (Exception ex) {
                     logger.log(Level.WARNING, "Could not remove servers.", ex);
                 }
             }
@@ -134,7 +134,7 @@ public final class MetaServer extends Thread {
                 logger.info("Client connection from: "
                     + clientSocket.getInetAddress().toString());
                 Connection connection = new Connection(clientSocket,
-                        networkHandler, FreeCol.METASERVER_THREAD);
+                    getNetworkHandler(), FreeCol.METASERVER_THREAD);
                 connections.put(clientSocket, connection);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Meta-run", e);

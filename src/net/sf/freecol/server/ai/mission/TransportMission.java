@@ -21,9 +21,9 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
@@ -123,11 +123,9 @@ public class TransportMission extends Mission {
      */
     @Override
     public void dispose() {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
-                //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
-                );
-        }
+        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this
+            //+ "\n" + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString()
+            );
         super.dispose();
     }
 
@@ -440,7 +438,7 @@ public class TransportMission extends Mission {
      * @param ts The list of {@code Cargo}s to unwrap.
      * @return The unwrapped list of cargoes.
      */
-    private static List<Cargo> unwrapCargoes(List<Cargo> ts) {
+    private List<Cargo> unwrapCargoes(List<Cargo> ts) {
         for (int i = 0; i < ts.size(); i++) {
             Cargo t = ts.get(i);
             if (t.hasWrapped()) {
@@ -1109,7 +1107,7 @@ public class TransportMission extends Mission {
      */
     private void optimizeCargoes(LogBuilder lb) {
         lb.add(", optimize");
-        Location oldTarget = target;
+        Location oldTarget = getTarget();
 
         // We wrap/unwrap the list to minimize the number of nodes
         // that need consideration.
@@ -1137,9 +1135,7 @@ public class TransportMission extends Mission {
         }
         if (best != null) {
             tSet(unwrapCargoes(best), true);
-            if (oldTarget != target) {
-                lb.add("->", target);
-            }
+            if (oldTarget != getTarget()) lb.add("->", getTarget());
         } else {
             tSet(unwrapCargoes(ts), false);
         }
@@ -1387,7 +1383,7 @@ public class TransportMission extends Mission {
     @Override
     public String invalidReason() {
         final AIUnit aiUnit = getAIUnit();
-        String reason = invalidReason(aiUnit, target);
+        String reason = invalidReason(aiUnit, getTarget());
         Cargo cargo;
         return (reason != null) ? reason
             : ((cargo = tFirst()) == null) ? null

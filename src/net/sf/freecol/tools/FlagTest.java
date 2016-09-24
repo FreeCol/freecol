@@ -237,7 +237,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         }
     }
 
-    public static String[] getNumbers(int count) {
+    public final String[] getNumbers(int count) {
         String[] result = new String[count];
         for (int index = 0; index < count; index++) {
             result[index] = Integer.toString(index + 1);
@@ -245,7 +245,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         return result;
     }
 
-    private static void enable(Component[] components, boolean value) {
+    private void enable(Component[] components, boolean value) {
         for (Component component : components) {
             component.setEnabled(value);
         }

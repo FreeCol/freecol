@@ -109,7 +109,7 @@ public final class DummyConnection extends Connection {
     @Override
     public void send(Element element) throws IOException {
         try {
-            outgoingMessageHandler.handle(otherConnection, element);
+            outgoingMessageHandler.handle(getOtherConnection(), element);
             log(element, true);
         } catch (FreeColException e) {
         }
@@ -144,7 +144,7 @@ public final class DummyConnection extends Connection {
         Element reply;
         try {
             log(request, true);
-            reply = outgoingMessageHandler.handle(otherConnection,
+            reply = outgoingMessageHandler.handle(getOtherConnection(),
                                                   request);
             log(reply, false);            
         } catch (FreeColException e) {

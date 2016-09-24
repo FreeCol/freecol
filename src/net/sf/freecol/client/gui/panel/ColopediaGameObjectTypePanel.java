@@ -231,7 +231,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
                 .getGoodsType(modifier.getId());
             String bonus = ModifierFormat.getModifierAsString(modifier);
             return getGoodsButton(goodsType, bonus);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             // not a production bonus
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(modifier) + ": "
                 + ModifierFormat.getModifierAsString(modifier));
@@ -240,7 +240,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColSpecObjectTy
         }
     }
 
-    public static JLabel getAbilityComponent(Ability ability) {
+    public JLabel getAbilityComponent(Ability ability) {
         if (ability.getValue()) {
             JLabel label = new JLabel(ModifierFormat.getFeatureAsString(ability));
             label.setToolTipText(Messages.getShortDescription(ability));

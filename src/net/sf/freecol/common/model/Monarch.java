@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
@@ -384,10 +383,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         case DECLARE_WAR:
             return !collectPotentialEnemies().isEmpty();
         case SUPPORT_SEA:
-            return player.getAttackedByPrivateers() && !supportSea
-                && !displeasure;
+            return player.getAttackedByPrivateers() && !getSupportSea()
+                && !getDispleasure();
         case SUPPORT_LAND: case MONARCH_MERCENARIES:
-                return player.isAtWar() && !displeasure
+            return player.isAtWar() && !getDispleasure()
                 && player.hasSettlements();
         case HESSIAN_MERCENARIES:
             return player.checkGold(HESSIAN_MINIMUM_PRICE)
@@ -698,11 +697,9 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
             strength = AbstractUnit.calculateStrength(spec, result);
             ratio = Player.strengthRatio(baseStrength+strength, enemyStrength);
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("War support:"
-                    + " initially=" + supportStrength + "/" + fullRatio
-                    + " finally=" + strength + "/" + ratio);
-            }
+            logger.finest("War support:"
+                + " initially=" + supportStrength + "/" + fullRatio
+                + " finally=" + strength + "/" + ratio);
         }
         return result;
     }

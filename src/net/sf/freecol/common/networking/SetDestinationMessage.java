@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -53,7 +52,7 @@ public class SetDestinationMessage extends DOMMessage {
      * @param destination The destination to set (may be null)
      */
     public SetDestinationMessage(Unit unit, Location destination) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.destinationId = (destination == null) ? null
@@ -67,7 +66,7 @@ public class SetDestinationMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetDestinationMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.destinationId = getStringAttribute(element, DESTINATION_TAG);
@@ -90,7 +89,7 @@ public class SetDestinationMessage extends DOMMessage {
         try {
             unit = serverPlayer.getOurFreeColGameObject(this.unitId,
                                                         Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -100,7 +99,7 @@ public class SetDestinationMessage extends DOMMessage {
             : game.findFreeColLocation(this.destinationId);
 
         // Set destination
-        return InGameController
+        return server.getInGameController()
             .setDestination(serverPlayer, unit, destination)
             .build(serverPlayer);
     }
@@ -112,7 +111,7 @@ public class SetDestinationMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             DESTINATION_TAG, this.destinationId).toXMLElement();
     }

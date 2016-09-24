@@ -53,7 +53,7 @@ public class BuildColonyMessage extends DOMMessage {
      * @param builder The {@code Unit} to do the building.
      */
     public BuildColonyMessage(String colonyName, Unit builder) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyName = colonyName;
         this.unitId = builder.getId();
@@ -66,7 +66,7 @@ public class BuildColonyMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public BuildColonyMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyName = getStringAttribute(element, NAME_TAG);
         this.unitId = getStringAttribute(element, UNIT_TAG);
@@ -91,7 +91,7 @@ public class BuildColonyMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -132,7 +132,7 @@ public class BuildColonyMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             NAME_TAG, this.colonyName,
             UNIT_TAG, this.unitId).toXMLElement();
     }

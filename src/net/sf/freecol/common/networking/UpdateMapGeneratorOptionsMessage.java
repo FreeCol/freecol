@@ -48,7 +48,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
      * @param options The map generator options {@code OptionGroup}.
      */
     public UpdateMapGeneratorOptionsMessage(OptionGroup options) {
-        super(TAG);
+        super(getTagName());
 
         this.options = options;
     }
@@ -118,7 +118,7 @@ public class UpdateMapGeneratorOptionsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG)
+        return new DOMMessage(getTagName())
             .add(this.options).toXMLElement();
     }
 

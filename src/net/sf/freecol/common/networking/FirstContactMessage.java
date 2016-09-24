@@ -67,7 +67,7 @@ public class FirstContactMessage extends DOMMessage {
      * @param tile An optional {@code Tile} to offer.
      */
     public FirstContactMessage(Player player, Player other, Tile tile) {
-        super(TAG);
+        super(getTagName());
 
         this.playerId = player.getId();
         this.otherId = other.getId();
@@ -85,7 +85,7 @@ public class FirstContactMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public FirstContactMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.playerId = getStringAttribute(element, PLAYER_TAG);
         this.otherId = getStringAttribute(element, OTHER_TAG);
@@ -173,7 +173,7 @@ public class FirstContactMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             PLAYER_TAG, this.playerId,
             OTHER_TAG, this.otherId,
             TILE_TAG, this.tileId,

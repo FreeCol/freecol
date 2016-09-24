@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -343,7 +342,7 @@ public class HighScore extends FreeColObject {
     public static boolean checkHighScore(int score, List<HighScore> scores) {
         return /*!FreeColDebugger.isInDebugMode() && */score >= 0
             && (scores.size() < NUMBER_OF_HIGH_SCORES
-                || score > scores.get(scores.size() - 1).score);
+                || score > scores.get(scores.size()-1).getScore());
     }
 
     /**
@@ -518,7 +517,7 @@ public class HighScore extends FreeColObject {
         try {
             long l = xr.getAttribute(DATE_TAG, -1L);
             if (l >= 0) date = new Date(l);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Bad long date", e);
         }
         // Early 0.11.x had a bug that wrote date as a float
@@ -528,7 +527,7 @@ public class HighScore extends FreeColObject {
                 if (f >= 0.0 && f < Long.MAX_VALUE) {
                     date = new Date((long)f);
                 }
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Bad float date", e);
             }
         } 
@@ -538,7 +537,7 @@ public class HighScore extends FreeColObject {
             String str = xr.getAttribute(DATE_TAG, "2014-07-01 00:00:00+0000");
             try {
                 date = dateFormat.parse(str);
-            } catch (ParseException|RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Bad date: " + str, e);
             }
         }

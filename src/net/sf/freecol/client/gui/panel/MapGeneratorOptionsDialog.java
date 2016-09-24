@@ -23,13 +23,14 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -114,7 +115,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * @param dir The directory to load from.
      * @return A list of potential map files.
      */
-    private static List<File> loadMapFiles(File dir) {
+    private List<File> loadMapFiles(File dir) {
         final Comparator<File> comp = Comparator.comparing(File::getName);
         return transform(fileStream(dir), FreeColSavegameFile::fileFilter,
                          Function.identity(), comp);
@@ -177,7 +178,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
      * @return A {@code JButton} if the map is readable, or null
      *     on failure.
      */
-    private static JButton makeMapButton(File file) {
+    private JButton makeMapButton(File file) {
         String mapName = file.getName().substring(0, file.getName()
                                                          .lastIndexOf('.'));
         JButton mapButton = Utility.localizedButton("freecol.map." + mapName);
@@ -193,13 +194,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog {
                 mapButton.setToolTipText(properties.getProperty("map.width")
                     + "\u00D7"
                     + properties.getProperty("map.height"));
-            } catch (IOException|RuntimeException e) {
+            } catch (Exception e) {
                 logger.log(Level.WARNING, "Unable to load savegame.", e);
                 return null;
             }
             mapButton.setHorizontalTextPosition(JButton.CENTER);
             mapButton.setVerticalTextPosition(JButton.BOTTOM);
-        } catch (IOException|RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to read thumbnail.", e);
         }
         return mapButton;

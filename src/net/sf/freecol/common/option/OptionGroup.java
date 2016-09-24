@@ -201,7 +201,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         optionMap.put(id, option);
         if (option instanceof OptionGroup) {
             OptionGroup group = (OptionGroup) option;
-            group.setEditable(editable && group.editable);
+            group.setEditable(editable && group.isEditable());
             addOptionGroup(group);
         }
     }
@@ -229,7 +229,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         if (option instanceof OptionGroup) {
             OptionGroup optionGroup = (OptionGroup)option;
             boolean result = true;
-            for (Option o : optionGroup.options) {
+            for (Option o : optionGroup.getOptions()) {
                 // @compat 0.11.6
                 // Placement options move to their own group
                 if (o.getId().startsWith("net.sf.freecol.client.gui.panel.")) {
@@ -247,12 +247,10 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 result = result && this.merge(o);
             }
             if (result) {
-                optionGroup.setEditable(editable && optionGroup.editable);
+                optionGroup.setEditable(editable && optionGroup.isEditable());
             }
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("Merged option group " + id
-                    + " contents into " + this.getId());
-            }
+            logger.finest("Merged option group " + id
+                + " contents into " + this.getId());
             return result;
         }
                 
@@ -267,10 +265,8 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 options.remove(index);
                 options.add(index, option);
                 optionMap.put(id, option);
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Merged option " + id + " into " + this.getId()
-                        + ": " + option.toString() + "/");
-                }
+                logger.finest("Merged option " + id + " into " + this.getId()
+                    + ": " + option.toString() + "/");
                 return true;
             }
             if (o instanceof OptionGroup) {
@@ -292,7 +288,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * @param group The initial {@code OptionGroup} to add.
      */
     private void addOptionGroup(OptionGroup group) {
-        for (Option option : group.options) {
+        for (Option option : group.getOptions()) {
             optionMap.put(option.getId(), option);
             if (option instanceof OptionGroup) {
                 addOptionGroup((OptionGroup) option);
@@ -612,7 +608,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     @Override
     public void setValue(OptionGroup value) {
         if (value != null) {
-            for (Option other : value.options) {
+            for (Option other : value.getOptions()) {
                 Option mine = getOption(other.getId());
                 // could be null if using custom options generated
                 // from an older version of the specification
@@ -665,7 +661,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         boolean ret = false;
         try {
             ret = this.save(file, null, true);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Save OptionGroup(" + getId()
                 + ") to " + file.getPath() + " crashed", e);
             return false;
@@ -753,7 +749,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[').append(getId()).append(" <");
-        for (Option o : options) {
+        for (Option o : getOptions()) {
             sb.append(' ').append(o.toString());
         }
         sb.append(" >]");

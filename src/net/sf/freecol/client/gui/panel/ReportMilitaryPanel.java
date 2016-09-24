@@ -58,7 +58,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                 || unitType.isOffensive());
     }
 
-    private static boolean reportable(Unit unit) {
+    private boolean reportable(Unit unit) {
         return !unit.isNaval()
             && (unit.hasAbility(Ability.EXPERT_SOLDIER)
                 || unit.isOffensiveUnit());

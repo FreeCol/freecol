@@ -410,9 +410,9 @@ public class PioneeringMission extends Mission {
     private static TileImprovementPlan getPlan(AIUnit aiUnit, Tile tile) {
         PioneeringMission pm = aiUnit.getMission(PioneeringMission.class);
         return (pm != null
-            && pm.tileImprovementPlan != null
-            && pm.tileImprovementPlan.getTarget() == tile)
-            ? pm.tileImprovementPlan
+            && pm.getTileImprovementPlan() != null
+            && pm.getTileImprovementPlan().getTarget() == tile)
+            ? pm.getTileImprovementPlan()
             : null;
     }
 
@@ -522,7 +522,7 @@ public class PioneeringMission extends Mission {
             }
             if (tileImprovementPlan.isComplete()) return null;
         }
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -548,11 +548,11 @@ public class PioneeringMission extends Mission {
         if (tileImprovementPlan != null) {
             if (tileImprovementPlan.isComplete()) {
                 lbDone(lb, true, tileImprovementPlan.getType(),
-                       " at ", target);
+                       " at ", getTarget());
                 setTarget(null);
             } else if (!tileImprovementPlan.validate()) {
                 lbFail(lb, true, "abandoned invalid plan at ",
-                        target, "/", tileImprovementPlan);
+                       getTarget(), "/", tileImprovementPlan);
                 setTarget(null);
             }
         }
@@ -583,7 +583,7 @@ public class PioneeringMission extends Mission {
 
         if (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
-            Unit.MoveType mt = travelToTarget(target, costDecider, lb);
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
             case MOVE: // Arrived
                 break;
@@ -614,7 +614,7 @@ public class PioneeringMission extends Mission {
                 lb.add(", fails to equip");
                 newTarget = findTarget(aiUnit, 10, false);
                 if (newTarget == null
-                    || Map.isSameLocation(newTarget, target)) {
+                    || Map.isSameLocation(newTarget, getTarget())) {
                     return lbFail(lb, false, "no tools target");
                 }
             }
@@ -623,9 +623,9 @@ public class PioneeringMission extends Mission {
         }
 
         // Going to an intermediate colony?
-        if (target instanceof Colony
-            && invalidTargetReason(target, player) == null) {
-            Unit.MoveType mt = travelToTarget(target, costDecider, lb);
+        if (getTarget() instanceof Colony
+            && invalidTargetReason(getTarget(), player) == null) {
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
             case MOVE:
                 break;
@@ -677,9 +677,9 @@ public class PioneeringMission extends Mission {
         */
 
         // Going to a tile to perform an improvement.
-        Tile tile = target.getTile();
+        Tile tile = getTarget().getTile();
         for (;;) {
-            Unit.MoveType mt = travelToTarget(target, costDecider, lb);
+            Unit.MoveType mt = travelToTarget(getTarget(), costDecider, lb);
             switch (mt) {
             case MOVE: // Arrived
                 break;

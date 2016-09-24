@@ -180,7 +180,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    protected static Border createBorder() {
+    protected Border createBorder() {
         return new EmptyBorder(0, 20, 20, 20);
     }
 
@@ -577,7 +577,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
     }
 
-    private static JButton createButton(String name, ActionListener listener) {
+    private JButton createButton(String name, ActionListener listener) {
         JButton button = new JButton(name);
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setOpaque(false);
@@ -588,7 +588,7 @@ public final class CompactLabourReport extends ReportPanel {
         return button;
     }
 
-    private static JLabel createEmptyLabel() {
+    private JLabel createEmptyLabel() {
         JLabel empty = new JLabel();
         empty.setBorder(Utility.CELLBORDER);
         return empty;

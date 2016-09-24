@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -102,7 +101,7 @@ public class AIGoods extends TransportableAIObject {
                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
-        uninitialized = goods == null;
+        uninitialized = getGoods() == null;
     }
 
 
@@ -178,11 +177,9 @@ public class AIGoods extends TransportableAIObject {
                     + ", got: " + (oldAmount - newAmount));
                 result = false;
             }
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Unloaded " + amount + " " + type
-                    + " from " + oldAmount + " leaving " + newAmount
-                    + " off of " + carrier + " at " + carrier.getLocation());
-            }
+            logger.fine("Unloaded " + amount + " " + type
+                + " from " + oldAmount + " leaving " + newAmount
+                + " off of " + carrier + " at " + carrier.getLocation());
         }   
         return result;
     }
@@ -195,7 +192,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public Locatable getTransportLocatable() {
-        return goods;
+        return getGoods();
     }
 
     /**
@@ -227,9 +224,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public PathNode getDeliveryPath(Unit carrier, Location dst) {
-        if (dst == null) {
-            dst = Location.upLoc(this.destination);
-        }
+        if (dst == null) dst = Location.upLoc(getTransportDestination());
 
         PathNode path = (goods.getLocation() == carrier) ? carrier.findPath(dst)
             : (goods.getLocation() instanceof Unit) ? null
@@ -251,7 +246,7 @@ public class AIGoods extends TransportableAIObject {
      */
     @Override
     public boolean carriableBy(Unit carrier) {
-        return carrier.couldCarry(goods);
+        return carrier.couldCarry(getGoods());
     }
 
     /**
@@ -301,11 +296,9 @@ public class AIGoods extends TransportableAIObject {
                 getAIMain().getAIColony(colony).removeExportGoods(this);
             }
         }
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Loaded " + amount + " " + type.getSuffix()
-                + " over " + oldAmount + " leaving " + (goodsAmount - amount)
-                + " onto " + carrier + " at " + carrier.getLocation());
-        }
+        logger.fine("Loaded " + amount + " " + type.getSuffix()
+            + " over " + oldAmount + " leaving " + (goodsAmount - amount)
+            + " onto " + carrier + " at " + carrier.getLocation());
         return !failed;
     }
 
@@ -379,9 +372,7 @@ public class AIGoods extends TransportableAIObject {
             }
         }
         if (why != null) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("checkIntegrity(" + this + ") = " + why);
-            }
+            logger.finest("checkIntegrity(" + this + ") = " + why);
             result = -1;
         }
         return result;
@@ -434,7 +425,7 @@ public class AIGoods extends TransportableAIObject {
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         super.readChildren(xr);
 
-        if (goods != null) uninitialized = false;
+        if (getGoods() != null) uninitialized = false;
     }
 
     /**

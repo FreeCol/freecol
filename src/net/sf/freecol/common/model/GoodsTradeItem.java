@@ -114,7 +114,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     public int evaluateFor(Player player) {
         final Market market = player.getMarket();
-        final Goods goods = this.goods;
+        final Goods goods = getGoods();
         return (!isValid())
             ? Integer.MIN_VALUE
             : (market == null)

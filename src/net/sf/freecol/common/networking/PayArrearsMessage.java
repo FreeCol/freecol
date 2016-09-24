@@ -23,7 +23,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -48,7 +47,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param type The {@code GoodsType} to pay arrears for.
      */
     public PayArrearsMessage(GoodsType type) {
-        super(TAG);
+        super(getTagName());
 
         this.goodsTypeId = type.getId();
     }
@@ -61,7 +60,7 @@ public class PayArrearsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PayArrearsMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.goodsTypeId = getStringAttribute(element, GOODS_TYPE_TAG);
     }
@@ -84,7 +83,7 @@ public class PayArrearsMessage extends DOMMessage {
             .getGoodsType(this.goodsTypeId);
 
         // Proceed to pay.
-        return InGameController
+        return server.getInGameController()
             .payArrears(serverPlayer, goodsType)
             .build(serverPlayer);
     }
@@ -96,7 +95,7 @@ public class PayArrearsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             GOODS_TYPE_TAG, this.goodsTypeId).toXMLElement();
     }
 

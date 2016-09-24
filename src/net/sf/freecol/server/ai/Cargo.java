@@ -442,7 +442,7 @@ public class Cargo {
      */
     public Direction getJoinDirection() {
         return (carrier.isInEurope() || plan.cwait == plan.twait) ? null
-            : Map.getDirection(plan.twait.getTile(),
+            : carrier.getGame().getMap().getDirection(plan.twait.getTile(),
                                                       plan.cwait.getTile());
     }
 
@@ -453,8 +453,8 @@ public class Cargo {
      */
     public Direction getLeaveDirection() {
         if (!carrier.hasTile() || plan.cdst == plan.tdst) return null;
-        TransportableAIObject t = transportable;
-        PathNode path = t.getDeliveryPath(carrier, plan.tdst);
+        TransportableAIObject t = getTransportable();
+        PathNode path = t.getDeliveryPath(getCarrier(), plan.tdst);
         return (path == null || path.next == null) ? null
             : path.next.getDirection();
     }
@@ -467,8 +467,8 @@ public class Cargo {
     public int getNewSpace() {
         if (!isValid()) return 0;
         int ret = 0;
-        ret += (getMode().isCollection()) ? transportable.getSpaceTaken()
-            : -transportable.getSpaceTaken();
+        ret += (getMode().isCollection()) ? getTransportable().getSpaceTaken()
+            : -getTransportable().getSpaceTaken();
         if (hasWrapped()) {
             ret += sum(wrapped, Cargo::getNewSpace);
         }
@@ -600,7 +600,7 @@ public class Cargo {
         final int newSpace = this.getNewSpace();
         for (int j = index; j < cargoes.size(); j++) {
             int holds = (j == 0) ? carrier.getCargoSpaceTaken()
-                : maxHolds - cargoes.get(j - 1).spaceLeft;
+                : maxHolds - cargoes.get(j-1).getSpaceLeft();
             holds += newSpace;
             if (holds < 0 || holds > maxHolds) return false;
         }
@@ -668,13 +668,13 @@ public class Cargo {
         xw.writeStartElement(getTagName());
 
         xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
-                          (AIObject) transportable);
+                          (AIObject)getTransportable());
 
-        xw.writeAttribute(CARRIER_TAG, carrier);
+        xw.writeAttribute(CARRIER_TAG, getCarrier());
 
-        xw.writeAttribute(TRIES_TAG, this.tries);
+        xw.writeAttribute(TRIES_TAG, getTries());
 
-        xw.writeAttribute(SPACELEFT_TAG, spaceLeft);
+        xw.writeAttribute(SPACELEFT_TAG, getSpaceLeft());
 
         if (plan.twait != null) {
             xw.writeLocationAttribute(TWAIT_TAG, plan.twait);

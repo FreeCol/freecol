@@ -47,9 +47,7 @@ public class RandomUtils {
                                 int range) {
         int ret = random.nextInt(range);
         if (logger != null) {
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest(logMe + " random(" + range + ") = " + ret);
-            }
+            logger.finest(logMe + " random(" + range + ") = " + ret);
         }
         return ret;
     }

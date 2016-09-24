@@ -53,7 +53,7 @@ public class MoveToMessage extends DOMMessage {
      * @param destination The {@code Location} to move to.
      */
     public MoveToMessage(Unit unit, Location destination) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.destinationId = destination.getId();
@@ -67,7 +67,7 @@ public class MoveToMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MoveToMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.destinationId = getStringAttribute(element, DESTINATION_TAG);
@@ -91,7 +91,7 @@ public class MoveToMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -116,7 +116,7 @@ public class MoveToMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             DESTINATION_TAG, this.destinationId).toXMLElement();
     }

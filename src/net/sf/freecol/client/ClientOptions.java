@@ -736,7 +736,7 @@ public class ClientOptions extends OptionGroup {
                 ro.addItemValue(6, "6");
                 ro.setValue(value); // Make sure the value is valid
             }
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to fix " + DEFAULT_MINIMAP_ZOOM
                 + " option", e);
         }

@@ -47,7 +47,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param colony The {@code Colony} that is building.
      */
     public PayForBuildingMessage(Colony colony) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = colony.getId();
     }
@@ -60,7 +60,7 @@ public class PayForBuildingMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public PayForBuildingMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
     }
@@ -84,7 +84,7 @@ public class PayForBuildingMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(this.colonyId,
                                                     Colony.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -102,7 +102,7 @@ public class PayForBuildingMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             COLONY_TAG, this.colonyId).toXMLElement();
     }
 

@@ -65,7 +65,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     public ScoutSpeakToChiefMessage(Unit unit, IndianSettlement is,
                                     String result) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
         this.settlementId = is.getId();
@@ -80,7 +80,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public ScoutSpeakToChiefMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
         this.settlementId = getStringAttribute(element, SETTLEMENT_TAG);
@@ -120,7 +120,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -134,7 +134,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
         try {
             is = unit.getAdjacentSettlement(this.settlementId,
                                             IndianSettlement.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -159,7 +159,7 @@ public class ScoutSpeakToChiefMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId,
             SETTLEMENT_TAG, this.settlementId,
             RESULT_TAG, this.result).toXMLElement();

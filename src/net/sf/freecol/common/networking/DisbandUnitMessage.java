@@ -47,7 +47,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param unit The {@code Unit} to clear.
      */
     public DisbandUnitMessage(Unit unit) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = unit.getId();
     }
@@ -60,7 +60,7 @@ public class DisbandUnitMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public DisbandUnitMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.unitId = getStringAttribute(element, UNIT_TAG);
     }
@@ -82,7 +82,7 @@ public class DisbandUnitMessage extends DOMMessage {
         Unit unit;
         try {
             unit = player.getOurFreeColGameObject(this.unitId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -100,7 +100,7 @@ public class DisbandUnitMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             UNIT_TAG, this.unitId).toXMLElement();
     }
 

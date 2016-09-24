@@ -68,8 +68,8 @@ public class NativeTradeItem extends GoodsTradeItem {
         super(nti.getGoods().getGame(), nti.getSource(), nti.getDestination(),
               nti.getGoods());
 
-        this.price = nti.price;
-        this.haggleCount = nti.haggleCount;
+        this.price = nti.getPrice();
+        this.haggleCount = nti.getHaggleCount();
     }
 
     /**

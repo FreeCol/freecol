@@ -24,7 +24,6 @@ import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -53,7 +52,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param data The new {@code ExportData}.
      */
     public SetGoodsLevelsMessage(Colony colony, ExportData data) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = colony.getId();
         this.data = data;
@@ -67,7 +66,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.colonyId = getStringAttribute(element, COLONY_TAG);
         this.data = getChild(game, element, 0, ExportData.class);
@@ -91,13 +90,13 @@ public class SetGoodsLevelsMessage extends DOMMessage {
         try {
             colony = player.getOurFreeColGameObject(this.colonyId,
                                                     Colony.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
 
         // Proceed to set.
-        return InGameController
+        return server.getInGameController()
             .setGoodsLevels(serverPlayer, colony, this.data)
             .build(serverPlayer);
     }
@@ -109,7 +108,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             COLONY_TAG, this.colonyId)
             .add(data).toXMLElement();
     }

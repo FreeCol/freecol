@@ -30,7 +30,6 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -366,7 +365,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param index The index to test.
      * @return True if the index is in range.
      */
-    private static boolean validWantedGoodsIndex(int index) {
+    private boolean validWantedGoodsIndex(int index) {
         return 0 <= index && index < WANTED_GOODS_COUNT;
     }
     
@@ -759,10 +758,8 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Do not simplify with *=, we want the integer truncation.
         price = wantedBonus * price / wantedBase;
 
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Full price(" + amount + " " + type + ")"
-                          + " -> " + price);
-        }
+        logger.finest("Full price(" + amount + " " + type + ")"
+                      + " -> " + price);
         return price;
     }
 
@@ -868,11 +865,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         int valued = Math.max(0, required - getGoodsCount(type));
         int price = (valued > amount / 2) ? full * amount
             : valued * full + getNormalGoodsPriceToBuy(type, amount - valued);
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Military price(" + amount + " " + type + ")"
-                          + " valued=" + valued
-                          + " -> " + price);
-        }
+        logger.finest("Military price(" + amount + " " + type + ")"
+                      + " valued=" + valued
+                      + " -> " + price);
         return price;
     }
 
@@ -930,7 +925,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      * @param type The {@code GoodsType} to consider.
      * @return True if the settlement would sell the goods.
      */
-    public static boolean willSell(GoodsType type) {
+    public boolean willSell(GoodsType type) {
         return !type.isTradeGoods();
     }
 
@@ -1439,7 +1434,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        final Player hated = mostHated;
+        final Player hated = getMostHated();
 
         if (getName() != null) { // Delegated from Settlement
             xw.writeAttribute(NAME_TAG, getName());

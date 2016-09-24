@@ -409,7 +409,7 @@ public class CashInTreasureTrainMission extends Mission {
         for (;;) {
             // Go to the target.
             final Unit unit = getUnit();
-            Unit.MoveType mt = travelToTarget(target,
+            Unit.MoveType mt = travelToTarget(getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits(), lb);
             switch (mt) {
             case MOVE: // Arrived

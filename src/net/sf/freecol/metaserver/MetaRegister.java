@@ -92,10 +92,10 @@ public final class MetaRegister {
      *     {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME} or
      *     {@link net.sf.freecol.server.FreeColServer.GameState#ENDING_GAME}.
      */
-    private static void updateServer(MetaItem mi, String name, String address,
-                                     int port, int slotsAvailable,
-                                     int currentlyPlaying, boolean isGameStarted,
-                                     String version, int gameState) {
+    private void updateServer(MetaItem mi, String name, String address,
+                              int port, int slotsAvailable,
+                              int currentlyPlaying, boolean isGameStarted,
+                              String version, int gameState) {
         mi.update(name, address, port, slotsAvailable, currentlyPlaying,
                   isGameStarted, version, gameState);
         logger.info("Server updated:" + mi.toString());

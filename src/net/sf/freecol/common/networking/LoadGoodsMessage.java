@@ -66,7 +66,7 @@ public class LoadGoodsMessage extends DOMMessage {
      */
     public LoadGoodsMessage(Location loc, GoodsType type, int amount,
                             Unit carrier) {
-        super(TAG);
+        super(getTagName());
 
         this.locationId = loc.getId();
         this.goodsTypeId = type.getId();
@@ -82,7 +82,7 @@ public class LoadGoodsMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public LoadGoodsMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.locationId = getStringAttribute(element, LOCATION_TAG);
         this.goodsTypeId = getStringAttribute(element, TYPE_TAG);
@@ -116,7 +116,7 @@ public class LoadGoodsMessage extends DOMMessage {
         Unit carrier;
         try {
             carrier = player.getOurFreeColGameObject(this.carrierId, Unit.class);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return serverPlayer.clientError(e.getMessage())
                 .build(serverPlayer);
         }
@@ -163,7 +163,7 @@ public class LoadGoodsMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             LOCATION_TAG, this.locationId,
             TYPE_TAG, this.goodsTypeId,
             AMOUNT_TAG, this.amountString,

@@ -24,7 +24,6 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -67,7 +66,7 @@ public class MonarchActionMessage extends DOMMessage {
      */
     public MonarchActionMessage(MonarchAction action,
                                 StringTemplate template, String monarchKey) {
-        super(TAG);
+        super(getTagName());
 
         this.action = action;
         this.template = template;
@@ -84,7 +83,7 @@ public class MonarchActionMessage extends DOMMessage {
      * @param element The {@code Element} to use to create the message.
      */
     public MonarchActionMessage(Game game, Element element) {
-        super(TAG);
+        super(getTagName());
 
         this.action = getEnumAttribute(element, ACTION_TAG,
             MonarchAction.class, (MonarchAction)null);
@@ -183,8 +182,8 @@ public class MonarchActionMessage extends DOMMessage {
         final ServerPlayer serverPlayer = server.getPlayer(connection);
 
         // Try to resolve the action.
-        return InGameController
-            .monarchAction(serverPlayer, action, getResult())
+        return server.getInGameController()
+            .monarchAction(serverPlayer, getAction(), getResult())
             .build(serverPlayer);
     }
 
@@ -195,7 +194,7 @@ public class MonarchActionMessage extends DOMMessage {
      */
     @Override
     public Element toXMLElement() {
-        return new DOMMessage(TAG,
+        return new DOMMessage(getTagName(),
             ACTION_TAG, this.action.toString(),
             MONARCH_TAG, this.monarchKey,
             TAX_TAG, this.tax,

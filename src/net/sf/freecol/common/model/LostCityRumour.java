@@ -399,7 +399,7 @@ public class LostCityRumour extends TileItem {
         xw.writeAttribute(TILE_TAG, getTile());
 
         if (type != null) {
-            xw.writeAttribute(TYPE_TAG, type);
+            xw.writeAttribute(TYPE_TAG, getType());
         }
 
         if (name != null) {

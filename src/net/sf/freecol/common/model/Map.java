@@ -194,8 +194,8 @@ public class Map extends FreeColGameObject implements Location {
          * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
-            return getDistance(x, y,
-                    position.x, position.y);
+            return getDistance(getX(), getY(),
+                               position.getX(), position.getY());
         }
 
         /**
@@ -580,7 +580,7 @@ public class Map extends FreeColGameObject implements Location {
      *      in order to reach {@code t2}, or null if the two
      *      specified tiles are not neighbours.
      */
-    public static Direction getDirection(Tile t1, Tile t2) {
+    public Direction getDirection(Tile t1, Tile t2) {
         return (t1 == null || t2 == null) ? null
             : new Position(t1).getDirection(new Position(t2));
     }
@@ -691,7 +691,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param endTile The {@code Tile} to aim for.
      * @return A new {@code SearchHeuristic} aiming for the end tile.
      */
-    private static SearchHeuristic getManhattenHeuristic(Tile endTile) {
+    private SearchHeuristic getManhattenHeuristic(Tile endTile) {
         return (Tile tile) -> tile.getDistanceTo(endTile);
     }
 
@@ -706,8 +706,8 @@ public class Map extends FreeColGameObject implements Location {
      * @return The actual starting location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
-    private static Location findRealStart(final Unit unit, final Location start,
-                                          final Unit carrier) {
+    private Location findRealStart(final Unit unit, final Location start,
+        final Unit carrier) {
         // Unit checks.
         if (unit == null) {
             throw new IllegalArgumentException("Null unit.");
@@ -765,25 +765,23 @@ public class Map extends FreeColGameObject implements Location {
      * destination of a path.
      *
      * @param unit An optional {@code Unit} to search for.
-     * @param end  The candidate end {@code Location}.
+     * @param end The candidate end {@code Location}.
      * @return The actual end location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
-    private static Location findRealEnd(Unit unit, Location end) {
-        while (true) {
-            if (end == null) {
-                throw new IllegalArgumentException("Null end.");
-            } else if (end instanceof Europe) {
-                return end;
-            } else if (end instanceof Map) {
-                end = unit.getEntryLocation();
-            } else if (end.getTile() != null) {
-                return end.getTile();
-            } else if (unit != null) {
-                return unit.resolveDestination();
-            } else {
-                throw new IllegalArgumentException("Invalid end: " + end);
-            }
+    private Location findRealEnd(Unit unit, Location end) {
+        if (end == null) {
+            throw new IllegalArgumentException("Null end.");
+        } else if (end instanceof Europe) {
+            return end;
+        } else if (end instanceof Map) {
+            return findRealEnd(unit, unit.getEntryLocation());
+        } else if (end.getTile() != null) {
+            return end.getTile();
+        } else if (unit != null) {
+            return unit.resolveDestination();
+        } else {
+            throw new IllegalArgumentException("Invalid end: " + end);
         }
     }
 
@@ -910,7 +908,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param unit The {@code Unit} that is travelling along the path.
      * @param lb An optional {@code LogBuilder} to log to.
      */
-    private static void finishPath(PathNode path, Unit unit, LogBuilder lb) {
+    private void finishPath(PathNode path, Unit unit, LogBuilder lb) {
         if (path != null) {
             // Add the turns remaining on the high seas.
             final int initialTurns = (!unit.isAtSea()) ? 0

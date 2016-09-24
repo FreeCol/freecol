@@ -129,7 +129,7 @@ public final class OptionGroupUI extends MigPanel
      * @param group The {@code OptionGroup} to build from.
      * @param parent The tree to build onto.
      */
-    private static void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
+    private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
         for (Option option : group.getOptions()) {
             if (option instanceof OptionGroup) {
                 if (!((OptionGroup)option).isVisible()) continue;

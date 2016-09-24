@@ -19,10 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
@@ -31,6 +34,7 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
@@ -38,11 +42,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -285,10 +291,8 @@ public class Connection implements Closeable {
         closeOutputStream();
         closeInputStream();
         closeSocket();
-
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Connection really closed for " + this.name);
-        }
+        
+        logger.fine("Connection really closed for " + this.name);
     }
 
     /**
@@ -300,8 +304,8 @@ public class Connection implements Closeable {
      * @return A new {@code StringWriter} containing the element, or
      *     null if the element could not be transformed.
      */
-    private static StringWriter elementToStringWriter(Transformer transformer,
-                                                      Element element) {
+    private StringWriter elementToStringWriter(Transformer transformer,
+                                               Element element) {
         StringWriter sw = new StringWriter(BUFFER_SIZE);
         DOMSource source = new DOMSource(element);
         try {
@@ -416,9 +420,7 @@ public class Connection implements Closeable {
      */
     public void send(Element element) throws IOException {
         sendInternal(element);
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Send: " + element.getTagName());
-        }
+        logger.fine("Send: " + element.getTagName());
     }
 
     /**
@@ -433,9 +435,7 @@ public class Connection implements Closeable {
      */
     public void sendAndWait(Element element) throws IOException {
         askInternal(element);
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("SendAndWait: " + element.getTagName());
-        }
+        logger.fine("SendAndWait: " + element.getTagName());
     }
 
     /**
@@ -449,10 +449,8 @@ public class Connection implements Closeable {
      */
     public Element ask(Element element) throws IOException {
         Element reply = askInternal(element);
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Ask: " + element.getTagName()
-                + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
-        }
+        logger.fine("Ask: " + element.getTagName()
+            + ", reply: " + ((reply == null) ? "null" : reply.getTagName()));
         return reply;
     }
 

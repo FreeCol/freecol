@@ -867,7 +867,7 @@ public final class FreeCol {
             }
 
             if (line.hasOption("version")) {
-                System.out.println("FreeCol " + FREECOL_VERSION);
+                System.out.println("FreeCol " + getVersion());
                 System.exit(0);
             }
 
@@ -1342,7 +1342,7 @@ public final class FreeCol {
         File userMods = FreeColDirectories.getUserModsDirectory();
         StringBuilder sb = new StringBuilder(256);
         sb.append("Configuration:")
-            .append("\n  version     ").append(freeColRevision)
+            .append("\n  version     ").append(getRevision())
             .append("\n  java:       ").append(JAVA_VERSION)
             .append("\n  memory:     ").append(MEMORY_MAX)
             .append("\n  locale:     ").append(locale)
