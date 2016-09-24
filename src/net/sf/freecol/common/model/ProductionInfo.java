@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
@@ -161,7 +160,7 @@ public class ProductionInfo {
         result.append(key).append(": ");
         for (AbstractGoods goods : list) {
             result.append(goods);
-            if (!Objects.equals(goods.getType().getStoredAs(), goods.getType())) {
+            if (goods.getType().getStoredAs() != goods.getType()) {
                 result.append(" [")
                     .append(goods.getType().getStoredAs().getId())
                     .append(']');

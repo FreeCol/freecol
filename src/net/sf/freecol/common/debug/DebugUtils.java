@@ -20,7 +20,12 @@
 package net.sf.freecol.common.debug;
 
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -380,7 +385,7 @@ public class DebugUtils {
         final Specification sSpec = sGame.getSpecification();
         final GUI gui = freeColClient.getGUI();
         final Predicate<GoodsType> goodsPred = gt ->
-            !gt.isFoodType() || Objects.equals(gt, sSpec.getPrimaryFoodType());
+            !gt.isFoodType() || gt == sSpec.getPrimaryFoodType();            
         final Function<GoodsType, ChoiceItem<GoodsType>> mapper = gt ->
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
             
@@ -486,7 +491,7 @@ public class DebugUtils {
 
         Player myPlayer = freeColClient.getMyPlayer();
         if (gui.getActiveUnit() != null
-            && !Objects.equals(gui.getActiveUnit().getOwner(), myPlayer)) {
+            && gui.getActiveUnit().getOwner() != myPlayer) {
             freeColClient.getInGameController().nextActiveUnit();
         }
         gui.refresh();
@@ -514,7 +519,7 @@ public class DebugUtils {
             transform(game.getLivePlayers(),
                       p -> unit.getType().isAvailableTo(p), mapper,
                       Comparator.naturalOrder()));
-        if (player == null || Objects.equals(unit.getOwner(), player)) return;
+        if (player == null || unit.getOwner() == player) return;
 
         final Game sGame = server.getGame();
         ServerUnit sUnit = sGame.getFreeColGameObject(unit.getId(), 
@@ -524,7 +529,7 @@ public class DebugUtils {
         server.getInGameController().debugChangeOwner(sUnit, sPlayer);
 
         Player myPlayer = freeColClient.getMyPlayer();
-        if (Objects.equals(unit.getOwner(), myPlayer)) {
+        if (unit.getOwner() == myPlayer) {
             gui.setActiveUnit(unit);
         } else {
             freeColClient.getInGameController().nextActiveUnit();
@@ -825,7 +830,7 @@ public class DebugUtils {
             lb.add(first.toString(), "\nat ", first.getLocation(), "\n");
             all.remove(first);
             while (player.hasNextActiveUnit()
-                && !Objects.equals(u = player.getNextActiveUnit(), first)) {
+                && (u = player.getNextActiveUnit()) != first) {
                 lb.add(u, "\nat ", u.getLocation(), "\n");
                 all.remove(u);
             }
@@ -836,7 +841,7 @@ public class DebugUtils {
             all.remove(first);
             lb.add(first, "\nat ", first.getLocation(), "\n");
             while (player.hasNextGoingToUnit()
-                && !Objects.equals(u = player.getNextGoingToUnit(), first)) {
+                && (u = player.getNextGoingToUnit()) != first) {
                 lb.add(u, "\nat ", u.getLocation(), "\n");
                 all.remove(u);
             }
@@ -947,7 +952,7 @@ public class DebugUtils {
                                       final Colony colony) {
         final Specification spec = colony.getSpecification();
         final Predicate<GoodsType> goodsPred = gt ->
-            !gt.isFoodType() || Objects.equals(gt, spec.getPrimaryFoodType());
+            !gt.isFoodType() || gt == spec.getPrimaryFoodType();
         final Function<GoodsType, ChoiceItem<GoodsType>> mapper = gt ->
             new ChoiceItem<GoodsType>(Messages.getName(gt), gt);
 
@@ -1129,7 +1134,7 @@ public class DebugUtils {
             lb.add(Messages.message(p.getNationLabel()),
                    " ", ((tension == null) ? "(none)"
                        : Integer.toString(tension.getValue())),
-                   ((Objects.equals(mostHated, p)) ? " (most hated)" : ""),
+                   ((mostHated == p) ? " (most hated)" : ""),
                    " ", Messages.message(sis.getAlarmLevelKey(p)),
                    " ", sis.getContactLevel(p), "\n");
         }

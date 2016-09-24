@@ -112,7 +112,7 @@ public class VideoComponent extends JPanel {
     // * Removes the given listener.
     // *
     // * @param videoListener The listener to be removed from this
-    // *     <code>VideoComponent</code>.
+    // *     {@code VideoComponent}.
     // */
     //public void removeVideoListener(VideoListener videoListener) {
     //    videoListeners.remove(videoListener);

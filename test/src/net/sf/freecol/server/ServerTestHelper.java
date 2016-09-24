@@ -163,7 +163,7 @@ public final class ServerTestHelper {
     /**
      * Start a new server game, using a *copy* of a supplied map.
      *
-     * @param map The <code>Map</code> to copy.
+     * @param map The {@code Map} to copy.
      * @return The new running server game.
      */
     public static ServerGame startServerGame(Map map) {
@@ -173,9 +173,9 @@ public final class ServerTestHelper {
     /**
      * Start a new server game, using a *copy* of a supplied map.
      *
-     * @param map The <code>Map</code> to copy.
-     * @param spec The <code>Specification</code> to use.
-     * @return The new running <code>ServerGame</code>.
+     * @param map The {@code Map} to copy.
+     * @param spec The {@code Specification} to use.
+     * @return The new running {@code ServerGame}.
      */
     public static ServerGame startServerGame(Map map, Specification spec) {
         stopServerGame();

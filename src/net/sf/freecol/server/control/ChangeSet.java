@@ -19,7 +19,11 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import net.sf.freecol.common.model.Ability;
@@ -115,9 +119,9 @@ public class ChangeSet {
          * @return True if the player satisfies the visibility test.
          */
         public boolean check(ServerPlayer player, boolean perhapsResult) {
-            return (Objects.equals(seeNever, player)) ? false
-                : (Objects.equals(seeAlways, player)) ? true
-                : (Objects.equals(seePerhaps, player)) ? perhapsResult
+            return (seeNever == player) ? false
+                : (seeAlways == player) ? true
+                : (seePerhaps == player) ? perhapsResult
                 : (type == ONLY) ? false
                 : (type == ALL) ? true
                 : perhapsResult;
@@ -383,8 +387,8 @@ public class ChangeSet {
          */
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
-            return Objects.equals(serverPlayer, attacker.getOwner())
-                || Objects.equals(serverPlayer, defender.getOwner())
+            return serverPlayer == attacker.getOwner()
+                || serverPlayer == defender.getOwner()
                 || (serverPlayer.canSee(attacker.getTile())
                     && serverPlayer.canSee(defender.getTile()));
         }
@@ -739,7 +743,7 @@ public class ChangeSet {
          */
         @Override
         public boolean matches(FreeColGameObject fcgo) {
-            return Objects.equals(this.fcgo, fcgo);
+            return this.fcgo == fcgo;
         }
 
         /**

@@ -28,8 +28,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent to handle changes in work location.
@@ -116,7 +114,7 @@ public class WorkMessage extends DOMMessage {
             return serverPlayer.clientError("Not a work location: "
                 + this.workLocationId)
                 .build(serverPlayer);
-        } else if (!Objects.equals(workLocation.getColony(), colony)) {
+        } else if (workLocation.getColony() != colony) {
             return serverPlayer.clientError("Work location is not in colony"
                 + colony.getId() + " where the unit is: "
                 + this.workLocationId)

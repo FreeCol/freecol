@@ -26,8 +26,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
-import java.util.Objects;
-
 
 /**
  * A trade item consisting of a colony.
@@ -58,7 +56,7 @@ public class ColonyTradeItem extends TradeItem {
               source, destination);
         colonyId = colony.getId();
         colonyName = colony.getName();
-        if (!Objects.equals(colony.getOwner(), source)) {
+        if (colony.getOwner() != source) {
             throw new IllegalArgumentException("Bad source for colony "
                 + colony.getId());
         }

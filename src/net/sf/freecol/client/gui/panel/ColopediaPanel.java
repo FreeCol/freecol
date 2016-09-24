@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.JPanel;
@@ -204,7 +203,7 @@ public final class ColopediaPanel extends FreeColPanel
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         HyperlinkEvent.EventType type = e.getEventType();
-        if (Objects.equals(type, HyperlinkEvent.EventType.ACTIVATED)) {
+        if (type == HyperlinkEvent.EventType.ACTIVATED) {
             String[] path = e.getURL().getPath().split("/");
             if (null != path[1]) {
                 switch (path[1]) {

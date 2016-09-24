@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -219,6 +220,26 @@ public class SettlementType extends FreeColSpecObjectType {
     }
 
     /**
+     * Get the list of plunder types.
+     *
+     * @return The list of {@code PlunderType}s.
+     */
+    public List<PlunderType> getPlunderTypes() {
+        return (this.plunder == null) ? Collections.<PlunderType>emptyList()
+            : this.plunder;
+    }
+
+    /**
+     * Add a plunder.
+     *
+     * @param pt The {@code PlunderType} to add.
+     */
+    private void addPlunder(PlunderType pt) {
+        if (plunder == null) plunder = new ArrayList<>();
+        plunder.add(pt);
+    }
+    
+    /**
      * Get the range of gifts available to a unit.
      *
      * @param unit The {@code Unit} to check.
@@ -238,15 +259,6 @@ public class SettlementType extends FreeColSpecObjectType {
         return GoodsContainer.CARGO_SIZE * claimableRadius;
     }
 
-    /**
-     * Add a plunder.
-     *
-     * @param pt The {@code PlunderType} to add.
-     */
-    private void addPlunder(PlunderType pt) {
-        if (plunder == null) plunder = new ArrayList<>();
-        plunder.add(pt);
-    }
 
 
     // Serialization

@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -169,7 +168,7 @@ public class Disaster extends FreeColSpecObjectType {
         final Specification spec = getSpecification();
         Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
-        if (!Objects.equals(parent, this) && !parent.getEffects().isEmpty()) {
+        if (parent != this && !parent.getEffects().isEmpty()) {
             if (effects == null) effects = new ArrayList<>();
             for (RandomChoice<Effect> choice : parent.getEffects()) {
                 Effect effect = new Effect(choice.getObject());

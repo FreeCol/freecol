@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -80,7 +79,7 @@ public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
         Nation nation = getSpecification().getNation(id);
         Player player = find(getGame().getLivePlayers(),
-                             p -> Objects.equals(p.getNation(), nation));
+                             p -> p.getNation() == nation);
         NationType currentNationType = (player == null) ? nation.getType()
             : player.getNationType();
 

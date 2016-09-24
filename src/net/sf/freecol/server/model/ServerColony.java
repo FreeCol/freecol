@@ -19,7 +19,10 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -189,7 +192,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         if (units == null || units.isEmpty()) return false;
         unit: for (Unit u : units) {
             for (WorkLocation wl : transform(getAvailableWorkLocations(),
-                                             w -> !Objects.equals(w, workLocation) && w.canAdd(u))) {
+                                             w -> w != workLocation && w.canAdd(u))) {
                 u.setLocation(wl);//-vis: safe/colony
                 continue unit;
             }
@@ -358,7 +361,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
             // Make sure units are ejected when a tile is claimed.
             for (Tile t : transform(owned,
-                    t2 -> !Objects.equals(t2, tile) && !Objects.equals(t2.getOwningSettlement(), this))) {
+                    t2 -> t2 != tile && t2.getOwningSettlement() != this)) {
                 ColonyTile ct = getColonyTile(t);
                 ejectUnits(ct, ct.getUnitList());
             }
@@ -552,7 +555,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     UnitType expert = spec.getExpertForProducing(goods.getType());
                     int experience = goods.getAmount() / workLocation.getUnitCount();
                     for (Unit unit : transform(workLocation.getUnits(),
-                            u -> Objects.equals(u.getExperienceType(), goods.getType())
+                            u -> u.getExperienceType() == goods.getType()
                             && u.getUnitChange(UnitChangeType.EXPERIENCE,
                                                expert) != null)) {
                         unit.setExperience(unit.getExperience() + experience);
@@ -637,7 +640,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
 
             // Handle the food situation
-            if (Objects.equals(goodsType, spec.getPrimaryFoodType())) {
+            if (goodsType == spec.getPrimaryFoodType()) {
                 // Check for famine when total primary food goes negative.
                 if (net + stored < 0) {
                     if (getUnitCount() > 1) {
@@ -756,7 +759,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             int oldAmount = container.getOldGoodsCount(type);
 
             if (amount < low && oldAmount >= low
-                && !(Objects.equals(type, spec.getPrimaryFoodType()) && newUnitBorn)) {
+                && !(type == spec.getPrimaryFoodType() && newUnitBorn)) {
                 cs.addMessage(See.only(owner),
                     new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
                                      "model.colony.warehouseEmpty",

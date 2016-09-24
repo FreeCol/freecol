@@ -32,8 +32,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent when a missionary establishes/denounces a mission.
@@ -130,7 +128,7 @@ public class MissionaryMessage extends DOMMessage {
                 return serverPlayer.clientError("Denouncing an empty mission at: "
                     + is.getId())
                     .build(serverPlayer);
-            } else if (Objects.equals(missionary.getOwner(), player)) {
+            } else if (missionary.getOwner() == player) {
                 return serverPlayer.clientError("Denouncing our own missionary at: "
                     + is.getId())
                     .build(serverPlayer);

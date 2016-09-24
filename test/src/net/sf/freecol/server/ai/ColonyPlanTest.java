@@ -183,8 +183,8 @@ public class ColonyPlanTest extends FreeColTestCase {
     /**
      * Should a plan produce a type of goods?
      *
-     * @param plan The <code>ColonyPlan</code> to examine.
-     * @param type The <code>GoodsType</code> to check.
+     * @param plan The {@code ColonyPlan} to examine.
+     * @param type The {@code GoodsType} to check.
      * @return True is there is a work location plan for the required goods
      *     type in the colony plan.
      */

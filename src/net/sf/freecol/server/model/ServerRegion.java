@@ -19,7 +19,10 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import java.awt.Rectangle;
 
@@ -520,7 +523,7 @@ public class ServerRegion extends Region {
                     && !visited[t.getX()][t.getY()]
                     && bounds.contains(t.getX(), t.getY())) {
                     visited[t.getX()][t.getY()] = true;
-                    if ((t.getRegion() == null || Objects.equals(t.getRegion(), region))
+                    if ((t.getRegion() == null || t.getRegion() == region)
                         && !t.isLand()) {
                         q.add(t);
                     }

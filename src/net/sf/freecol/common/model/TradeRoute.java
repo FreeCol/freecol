@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -183,7 +186,7 @@ public class TradeRoute extends FreeColGameObject
     public int getIndex(TradeRouteStop stop) {
         int i = 0;
         for (TradeRouteStop trs : this.stops) {
-            if (Objects.equals(trs, stop)) return i;
+            if (trs == stop) return i;
             i++;
         }
         return -1;

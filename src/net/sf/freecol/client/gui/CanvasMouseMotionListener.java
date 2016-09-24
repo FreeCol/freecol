@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -80,10 +79,10 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
             Tile tile = canvas.convertToMapTile(e.getX(), e.getY());
 
             if (tile != null) {
-                if (!Objects.equals(lastTile, tile)) {
+                if (lastTile != tile) {
                     Unit active = canvas.getActiveUnit();
                     lastTile = tile;
-                    if (active != null && !Objects.equals(active.getTile(), tile)) {
+                    if (active != null && active.getTile() != tile) {
                         PathNode dragPath = active.findPath(tile);
                         canvas.setGotoPath(dragPath);
                     } else {
@@ -113,7 +112,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener
                 Unit active = canvas.getActiveUnit();
                 if (active == null) {
                     canvas.stopGoto();
-                } else if (!Objects.equals(lastTile, tile)) {
+                } else if (lastTile != tile) {
                     lastTile = tile;
                     PathNode dragPath = active.findPath(tile);
                     canvas.setGotoPath(dragPath);

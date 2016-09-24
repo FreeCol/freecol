@@ -1617,6 +1617,10 @@
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterCottonPlanter" probability="100"/>
       <unit-type-change from="model.unit.indenturedServant"
+                        to="model.unit.masterFurTrader" probability="100"/>
+      <unit-type-change from="model.unit.freeColonist"
+                        to="model.unit.masterFurTrader" probability="100"/>
+      <unit-type-change from="model.unit.indenturedServant"
                         to="model.unit.masterSugarPlanter" probability="100"/>
       <unit-type-change from="model.unit.freeColonist"
                         to="model.unit.masterSugarPlanter" probability="100"/>
@@ -2959,11 +2963,13 @@
                   minimum-size="4" maximum-size="6"
                   minimum-growth="1" maximum-growth="8"
                   trade-bonus="1" convert-threshold="100">
-        <plunder probability="20" minimum="2" maximum="3" factor="100">
+        <plunder id="plunder.camp" probability="20"
+                 minimum="2" maximum="3" factor="100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="3" maximum="6" factor="100">
+        <plunder id="plunder.camp.extra" probability="100"
+                 minimum="3" maximum="6" factor="100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -2976,11 +2982,13 @@
                   minimum-size="6" maximum-size="8"
                   minimum-growth="2" maximum-growth="10"
                   trade-bonus="2" convert-threshold="100">
-        <plunder probability="100" minimum="2" maximum="4" factor="200">
+        <plunder id="plunder.camp.capital" probability="100"
+                 minimum="2" maximum="4" factor="200">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="2" maximum="4" factor="300">
+        <plunder id="plunder.camp.capital.extra" probability="100"
+                 minimum="2" maximum="4" factor="300">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -2995,11 +3003,13 @@
                   minimum-size="6" maximum-size="8"
                   minimum-growth="1" maximum-growth="8"
                   trade-bonus="2" convert-threshold="100">
-        <plunder probability="50" minimum="3" maximum="8" factor="100">
+        <plunder id="plunder.village" probability="50"
+                 minimum="3" maximum="8" factor="100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="4" maximum="12" factor="100">
+        <plunder id="plunder.village.extra" probability="100"
+                 minimum="4" maximum="12" factor="100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -3012,11 +3022,13 @@
                   minimum-size="8" maximum-size="10"
                   minimum-growth="2" maximum-growth="10"
                   trade-bonus="3" convert-threshold="100">
-        <plunder probability="100" minimum="3" maximum="8" factor="200">
+        <plunder id="plunder.village.capital" probability="100"
+                 minimum="3" maximum="8" factor="200">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="3" maximum="8" factor="300">
+        <plunder id="plunder.village.capital.extra" probability="100"
+                 minimum="3" maximum="8" factor="300">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -3097,11 +3109,13 @@
                   minimum-size="8" maximum-size="12"
                   minimum-growth="3" maximum-growth="12"
                   trade-bonus="3" convert-threshold="100">
-        <plunder probability="100" minimum="2" maximum="6" factor="2100">
+        <plunder id="plunder.inca" probability="100"
+                 minimum="2" maximum="6" factor="2100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="2" maximum="6" factor="3100">
+        <plunder id="plunder.inca.extra" probability="100"
+                 minimum="2" maximum="6" factor="3100">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -3114,11 +3128,13 @@
                   minimum-size="10" maximum-size="12"
                   minimum-growth="4" maximum-growth="14"
                   trade-bonus="4" convert-threshold="100">
-        <plunder probability="100" minimum="2" maximum="6" factor="3000">
+        <plunder id="plunder.inca.capital" probability="100"
+                 minimum="2" maximum="6" factor="3000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="3" maximum="8" factor="4000">
+        <plunder id="plunder.inca.capital.extra" probability="100"
+                 minimum="3" maximum="8" factor="4000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -3138,11 +3154,13 @@
                   minimum-size="8" maximum-size="12"
                   minimum-growth="3" maximum-growth="12"
                   trade-bonus="3" convert-threshold="100">
-        <plunder probability="100" minimum="5" maximum="9" factor="1000">
+        <plunder id="plunder.aztec" probability="100"
+                 minimum="5" maximum="9" factor="1000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="11" maximum="15" factor="1000">
+        <plunder id="plunder.aztec.extra" probability="100"
+                 minimum="11" maximum="15" factor="1000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>
@@ -3155,11 +3173,13 @@
                   minimum-size="10" maximum-size="12"
                   minimum-growth="4" maximum-growth="14"
                   trade-bonus="4" convert-threshold="100">
-        <plunder probability="100" minimum="7" maximum="12" factor="1000">
+        <plunder id="plunder.aztec.capital" probability="100"
+                 minimum="7" maximum="12" factor="1000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="false"/>
         </plunder>
-        <plunder probability="100" minimum="16" maximum="19" factor="1000">
+        <plunder id="plunder.aztec.capital.extra" probability="100"
+                 minimum="16" maximum="19" factor="1000">
           <scope ability-id="model.ability.plunderNatives"
                  ability-value="true"/>
         </plunder>

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import net.sf.freecol.common.model.Ability;
@@ -126,7 +125,7 @@ public final class CostDeciders {
             if (cost != ILLEGAL_MOVE && cost != Map.INFINITY) {
                 Settlement settlement = newLocation.getSettlement();
                 if (settlement != null
-                    && !Objects.equals(settlement.getOwner(), unit.getOwner())) {
+                    && settlement.getOwner() != unit.getOwner()) {
                     return ILLEGAL_MOVE;
                 }
             }
@@ -156,7 +155,7 @@ public final class CostDeciders {
                 && tile != null) {
                 final Unit defender = tile.getFirstUnit();
                 if (defender != null
-                    && !Objects.equals(defender.getOwner(), unit.getOwner())) {
+                    && defender.getOwner() != unit.getOwner()) {
                     return ILLEGAL_MOVE;
                 } else if (unit.getTradeRoute() != null
                     && tile.hasLostCityRumour()) {
@@ -194,7 +193,7 @@ public final class CostDeciders {
                     // threat in an adjacent tile.
                     final Player owner = unit.getOwner();
                     final Predicate<Unit> threatPred = u ->
-                        (!Objects.equals(u.getOwner(), owner)
+                        (u.getOwner() != owner
                             && (u.hasAbility(Ability.PIRACY)
                                 || (u.getOwner().atWarWith(owner)
                                     && u.isOffensiveUnit())));

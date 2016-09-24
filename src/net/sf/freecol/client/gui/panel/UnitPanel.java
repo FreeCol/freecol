@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.TradeRoute;
@@ -168,8 +166,8 @@ public abstract class UnitPanel extends MigPanel
         for (Component component : getComponents()) {
             if (component instanceof UnitLabel) {
                 UnitLabel label = (UnitLabel)component;
-                if (Objects.equals(label.getUnit(), unit)) {
-                    portPanel.setSelectedUnitLabel(label);
+                if (label.getUnit() == unit) {
+                    getPortPanel().setSelectedUnitLabel(label);
                     return true;
                 }
             }
@@ -185,11 +183,9 @@ public abstract class UnitPanel extends MigPanel
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest(getName() + " change " + event.getPropertyName()
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
-        }
+        logger.finest(getName() + " change " + event.getPropertyName()
+                      + ": " + event.getOldValue()
+                      + " -> " + event.getNewValue());
         update();
     }
 

@@ -24,8 +24,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -192,7 +195,7 @@ public class ResourceManager {
                         = new ArrayList<>(getResources().values());
                     int n = 0;
                     for (Resource r : resources) {
-                        if (!Objects.equals(preloadThread, this)) {
+                        if (preloadThread != this) {
                             logger.info(
                                 "Background thread cancelled after it preloaded "
                                 + n + " resources.");

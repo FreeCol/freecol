@@ -19,8 +19,16 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -338,7 +346,7 @@ public final class InGameController extends Controller {
         final ServerPlayer refPlayer = getFreeColServer().makeAIPlayer(refNation);
         final Europe europe = refPlayer.getEurope();
         final Predicate<Tile> exploredPred = t ->
-            ((!t.isLand() || t.isCoastland() || Objects.equals(t.getOwner(), serverPlayer))
+            ((!t.isLand() || t.isCoastland() || t.getOwner() == serverPlayer)
                 && t.isExploredBy(serverPlayer));
         // Inherit rebel player knowledge of the seas, coasts, claimed
         // land but not full detailed scouting knowledge.
@@ -761,13 +769,13 @@ public final class InGameController extends Controller {
                 fail = true;
                 continue;
             }
-            if (!Objects.equals(source, srcPlayer) && !Objects.equals(source, dstPlayer)) {
+            if (source != srcPlayer && source != dstPlayer) {
                 logger.warning("Trade with invalid source: "
                                + ((source == null) ? "null" : source.getId()));
                 fail = true;
                 continue;
             }
-            if (!Objects.equals(dest, srcPlayer) && !Objects.equals(dest, dstPlayer)) {
+            if (dest != srcPlayer && dest != dstPlayer) {
                 logger.warning("Trade with invalid destination: "
                                + ((dest == null) ? "null" : dest.getId()));
                 fail = true;
@@ -892,7 +900,7 @@ public final class InGameController extends Controller {
                         continue;
                     }
                     newLoc = carrier;
-                } else if (Objects.equals(dest, unit.getOwner())) {
+                } else if (dest == unit.getOwner()) {
                     newLoc = unit.getTile();
                 } else {
                     newLoc = settlement.getTile();
@@ -1428,7 +1436,7 @@ public final class InGameController extends Controller {
                 : null;
             Player owner = (colony == null) ? null : colony.getOwner();
             if (owner != null
-                && !Objects.equals(owner, unit.getOwner())
+                && owner != unit.getOwner()
                 && serverPlayer.getStance(owner) != Stance.ALLIANCE
                 && serverPlayer.getStance(owner) != Stance.PEACE) {
                 if (colony.isTileInUse(tile)) {
@@ -1490,7 +1498,7 @@ public final class InGameController extends Controller {
      */
     public static ChangeSet changeWorkType(ServerPlayer serverPlayer, Unit unit,
                                            GoodsType type) {
-        if (!Objects.equals(unit.getWorkType(), type)) {
+        if (unit.getWorkType() != type) {
             unit.setExperience(0);
             unit.changeWorkType(type);
         }
@@ -1616,7 +1624,7 @@ public final class InGameController extends Controller {
         final ServerGame game = getGame();
         if (!getFreeColServer().getSinglePlayer()) {
             logger.warning("Can not continue playing in multiplayer!");
-        } else if (!Objects.equals(serverPlayer, game.checkForWinner())) {
+        } else if (serverPlayer != game.checkForWinner()) {
             logger.warning("Can not continue playing, as "
                            + serverPlayer.getName()
                            + " has not won the game!");
@@ -1786,7 +1794,7 @@ public final class InGameController extends Controller {
             reverse(natives);
             ServerPlayer bad = null;
             for (Player p : natives) {
-                if (Objects.equals(p, good)
+                if (p == good
                     || p.getStance(serverPlayer) == Stance.ALLIANCE) break;
                 bad = (ServerPlayer)p;
                 if (!p.atWarWith(serverPlayer)) break;
@@ -2268,7 +2276,7 @@ public final class InGameController extends Controller {
         final ServerPlayer winner = (ServerPlayer)game.checkForWinner();
 
         ServerPlayer current = (ServerPlayer)game.getCurrentPlayer();
-        if (!Objects.equals(serverPlayer, current)) {
+        if (serverPlayer != current) {
             throw new IllegalArgumentException("It is not "
                 + serverPlayer.getName() + "'s turn, it is "
                 + ((current == null) ? "noone" : current.getName()) + "'s!");
@@ -2350,7 +2358,7 @@ public final class InGameController extends Controller {
             // Has the player won?
             // Do not end single player games where an AI has won,
             // that would stop revenge mode.
-            if (Objects.equals(winner, current)
+            if (winner == current
                 && !(freeColServer.getSinglePlayer() && winner.isAI())) {
                 boolean highScore = !winner.isAI()
                     && HighScore.newHighScore(winner);
@@ -2385,7 +2393,7 @@ public final class InGameController extends Controller {
                 Monarch monarch = current.getMonarch();
                 MonarchAction action = null;
                 if (debugMonarchAction != null
-                    && Objects.equals(current, debugMonarchPlayer)) {
+                    && current == debugMonarchPlayer) {
                     action = debugMonarchAction;
                     debugMonarchAction = null;
                     debugMonarchPlayer = null;
@@ -2908,7 +2916,7 @@ public final class InGameController extends Controller {
         // Update with colony tile, and tiles now owned.
         cs.add(See.only(serverPlayer), tile);
         for (Tile t : transform(tile.getSurroundingTiles(1, colony.getRadius()),
-                t2 -> (Objects.equals(t2.getOwningSettlement(), colony)
+                t2 -> (t2.getOwningSettlement() == colony
                     && !ownedTiles.contains(t2)))) {
             cs.add(See.perhaps(), t);
         }
@@ -3150,7 +3158,7 @@ public final class InGameController extends Controller {
             if (!highSeas.getDestinations().contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
                     + destination.getId());
-            } else if (Objects.equals(unit.getLocation(), highSeas)) {
+            } else if (unit.getLocation() == highSeas) {
                 if (!(current instanceof Europe)) {
                     // Changed direction
                     unit.setWorkLeft(unit.getSailTurns()
@@ -3176,10 +3184,10 @@ public final class InGameController extends Controller {
             if (!highSeas.getDestinations().contains(destination)) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
                     + destination.getId());
-            } else if (Objects.equals(unit.getLocation(), highSeas)) {
-                if (!Objects.equals(current, destination) && (current == null
+            } else if (unit.getLocation() == highSeas) {
+                if (current != destination && (current == null
                         || current.getTile() == null
-                        || !Objects.equals(current.getTile().getMap(), destination))) {
+                        || current.getTile().getMap() != destination)) {
                     // Changed direction
                     unit.setWorkLeft(unit.getSailTurns()
                         - unit.getWorkLeft() + 1);
@@ -3201,7 +3209,7 @@ public final class InGameController extends Controller {
             if (!highSeas.getDestinations().contains(tile.getMap())) {
                 return serverPlayer.clientError("HighSeas does not connect to: "
                     + destination.getId());
-            } else if (Objects.equals(unit.getLocation(), highSeas)) {
+            } else if (unit.getLocation() == highSeas) {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
                 unit.setDestination(destination);
@@ -3534,7 +3542,7 @@ public final class InGameController extends Controller {
         List<Arrangement> todo = new ArrayList<>(arrangements);
         while (!todo.isEmpty()) {
             Arrangement a = todo.remove(0);
-            if (Objects.equals(a.loc, tile)) continue;
+            if (a.loc == tile) continue;
             WorkLocation wl = (WorkLocation)a.loc;
             // Adding to wl can fail, and in the worst case there
             // might be a circular dependency.  If the move can
@@ -3544,7 +3552,7 @@ public final class InGameController extends Controller {
                 a.unit.setLocation(wl);
                 // Fall through
             case ALREADY_PRESENT:
-                if (!Objects.equals(a.unit.getWorkType(), a.work)) {
+                if (a.unit.getWorkType() != a.work) {
                     a.unit.changeWorkType(a.work);
                 }
                 break;
@@ -3559,7 +3567,7 @@ public final class InGameController extends Controller {
 
         // Collect roles that cause a change, ordered by simplest change
         for (Arrangement a : transform(arrangements,
-                a -> !Objects.equals(a.role, a.unit.getRole()) && !Objects.equals(a.role, defaultRole),
+                a -> a.role != a.unit.getRole() && a.role != defaultRole,
                 Function.identity(),
                 Comparator.<Arrangement>reverseOrder())) {
             if (!colony.equipForRole(a.unit, a.role, a.roleCount)) {
@@ -3680,7 +3688,7 @@ public final class InGameController extends Controller {
             if (is.hasAnyScouted()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
-            } else if (scoutSkill != null && !Objects.equals(unit.getType(), scoutSkill)
+            } else if (scoutSkill != null && unit.getType() != scoutSkill
                 && ((skill != null && skill.hasAbility(Ability.EXPERT_SCOUT))
                     || rnd == 0)) {
                 // If the scout can be taught to be an expert it will be.
@@ -3898,7 +3906,7 @@ public final class InGameController extends Controller {
         colony.setBuildQueue(queue);
         if (getGame().getSpecification()
             .getBoolean(GameOptions.CLEAR_HAMMERS_ON_CONSTRUCTION_SWITCH)
-            && !Objects.equals(current, colony.getCurrentlyBuilding())) {
+            && current != colony.getCurrentlyBuilding()) {
             for (AbstractGoods ag : transform(current.getRequiredGoods(),
                     g -> !g.getType().isStorable())) {
                 colony.removeGoods(ag.getType());
@@ -4188,7 +4196,7 @@ public final class InGameController extends Controller {
 
         ChangeSet cs = new ChangeSet();
         Tile tile = workLocation.getWorkTile();
-        if (tile != null && !Objects.equals(tile.getOwningSettlement(), colony)) {
+        if (tile != null && tile.getOwningSettlement() != colony) {
             // Claim known free land (because canAdd() succeeded).
             serverPlayer.csClaimLand(tile, colony, 0, cs);
         }

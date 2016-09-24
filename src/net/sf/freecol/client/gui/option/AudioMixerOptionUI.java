@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.option;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Objects;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -90,13 +89,13 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         cbox.setEnabled(editable);
 
         ActionListener aHandler = (ActionEvent ae) -> {
-            if (Objects.equals(ae.getSource(), button1)) {
+            if (ae.getSource() == button1) {
                 gui.playSound("sound.event.buildingComplete");
-            } else if (Objects.equals(ae.getSource(), button2)) {
+            } else if (ae.getSource() == button2) {
                 gui.playSound("sound.intro.general");
-            } else if (Objects.equals(ae.getSource(), cbox)) {
+            } else if (ae.getSource() == cbox) {
                 MixerWrapper value = (MixerWrapper) cbox.getSelectedItem();
-                if (!Objects.equals(getOption().getValue(), value)) {
+                if (getOption().getValue() != value) {
                     getOption().setValue(value);
                     updateMixerLabel();
                 }

@@ -37,7 +37,10 @@ import java.awt.event.MouseMotionListener;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -584,7 +587,7 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      */
     private void addToCanvas(Component comp, Integer i) {
-        if (!Objects.equals(comp, statusPanel) && !(comp instanceof JMenuItem)
+        if (comp != statusPanel && !(comp instanceof JMenuItem)
             && statusPanel.isVisible()) {
             removeFromCanvas(statusPanel);
         }
@@ -761,7 +764,7 @@ public final class Canvas extends JDesktopPane {
                 for (Component c2 : ((JInternalFrame) c1).getContentPane()
                          .getComponents()) {
                     if (c2 instanceof ColonyPanel
-                        && Objects.equals(((ColonyPanel) c2).getColony(), colony)) {
+                        && ((ColonyPanel)c2).getColony() == colony) {
                         return (ColonyPanel)c2;
                     }
                 }
@@ -1275,7 +1278,7 @@ public final class Canvas extends JDesktopPane {
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame frame = getInternalFrame(comp);
         notifyClose(comp, frame);
-        if (frame != null && !Objects.equals(frame, comp)) {
+        if (frame != null && frame != comp) {
             frame.dispose();
         } else {
             // Java 1.7.0 as seen on Fedora with:
@@ -1490,7 +1493,7 @@ public final class Canvas extends JDesktopPane {
     public void remove(Component comp) {
         removeFromCanvas(comp);
         gui.updateMenuBar();
-        if (!Objects.equals(comp, statusPanel) && !isShowingSubPanel()) {
+        if (comp != statusPanel && !isShowingSubPanel()) {
             requestFocus();
         }
     }
@@ -1631,7 +1634,7 @@ public final class Canvas extends JDesktopPane {
      */
     void showBuildQueuePanel(Colony colony) {
         BuildQueuePanel panel = getExistingFreeColPanel(BuildQueuePanel.class);
-        if (panel == null || !Objects.equals(panel.getColony(), colony)) {
+        if (panel == null || panel.getColony() != colony) {
             showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
         }
     }

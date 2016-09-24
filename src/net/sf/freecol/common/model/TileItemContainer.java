@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -253,7 +252,7 @@ public class TileItemContainer extends FreeColGameObject {
         synchronized (tileItems) {
             return (TileImprovement)find(tileItems,
                 ti -> (ti instanceof TileImprovement
-                    && Objects.equals(((TileImprovement) ti).getType(), type)));
+                    && ((TileImprovement)ti).getType() == type));
         }
     }
 
@@ -534,7 +533,7 @@ public class TileItemContainer extends FreeColGameObject {
                 // @compat 0.10.5
                 // Somewhere around 0.10.5 there were maps with LCRs
                 // that reference the wrong tile.
-                if (!Objects.equals(ti.getTile(), tile)) {
+                if (ti.getTile() != tile) {
                     logger.warning("Fixing improvement tile at: " + tile
                                    + " / " + ti.getId());
                     ti.setLocation(tile);

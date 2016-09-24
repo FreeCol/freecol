@@ -31,8 +31,6 @@ import net.sf.freecol.server.model.ServerUnit;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent when embarking.
@@ -145,7 +143,7 @@ public class EmbarkMessage extends DOMMessage {
                 return serverPlayer.clientError(e.getMessage())
                     .build(serverPlayer);
             }
-            if (!Objects.equals(carrier.getTile(), destinationTile)) {
+            if (carrier.getTile() != destinationTile) {
                 return serverPlayer.clientError("Carrier: " + this.carrierId
                     + " is not at destination tile: " + destinationTile)
                     .build(serverPlayer);

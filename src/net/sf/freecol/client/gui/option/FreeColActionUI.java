@@ -29,7 +29,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -170,10 +169,10 @@ public final class FreeColActionUI extends OptionUI<FreeColAction>
      */
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if (Objects.equals(ae.getSource(), recordButton)) {
+        if (ae.getSource() == recordButton) {
             bl.startBlinking();
             bl.requestFocus();
-        } else if (Objects.equals(ae.getSource(), removeButton)) {
+        } else if (ae.getSource() == removeButton) {
             bl.stopBlinking();
             bl.setText(" ");
             keyStroke = null;

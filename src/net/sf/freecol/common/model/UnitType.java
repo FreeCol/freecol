@@ -19,7 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -440,7 +444,7 @@ public final class UnitType extends BuildableType implements Consumer {
         // changes that do not reach the taught type level.
         List<UnitType> todo = new ArrayList<>();
         for (UnitChange uc : spec.getUnitChanges(UnitChangeType.EDUCATION, this)) {
-            if (Objects.equals(uc.to, taught)) return taught;
+            if (uc.to == taught) return taught;
             if (uc.to.skill < taughtLevel) todo.add(uc.to);
         }
         // Can the teacher teach any of the intermediate changes?  If so,
@@ -678,7 +682,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
         final Specification spec = getSpecification();
 
-        if (defaultRole != null && !Objects.equals(defaultRole, spec.getDefaultRole())) {
+        if (defaultRole != null && defaultRole != spec.getDefaultRole()) {
             xw.writeStartElement(DEFAULT_ROLE_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, defaultRole);
@@ -797,7 +801,7 @@ public final class UnitType extends BuildableType implements Consumer {
         expertProduction = xr.getType(spec, EXPERT_PRODUCTION_TAG,
                                       GoodsType.class, parent.expertProduction);
 
-        if (!Objects.equals(parent, this)) { // Handle "extends" for super-type fields
+        if (parent != this) { // Handle "extends" for super-type fields
             if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
                 setRequiredPopulation(parent.getRequiredPopulation());
             }
@@ -818,7 +822,7 @@ public final class UnitType extends BuildableType implements Consumer {
         defaultRole = spec.getDefaultRole();
 
         UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
-        if (!Objects.equals(parent, this)) {
+        if (parent != this) {
             defaultRole = parent.defaultRole;
 
             if (parent.consumption != null) {

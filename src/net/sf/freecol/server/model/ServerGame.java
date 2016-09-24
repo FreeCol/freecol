@@ -20,7 +20,8 @@
 package net.sf.freecol.server.model;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +29,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -299,7 +307,7 @@ public class ServerGame extends Game implements ServerModelObject {
     public boolean isNextPlayerInNewTurn() {
         Player nextPlayer = getNextPlayer();
         return players.indexOf(currentPlayer) > players.indexOf(nextPlayer)
-            || Objects.equals(currentPlayer, nextPlayer);
+            || currentPlayer == nextPlayer;
     }
 
 
@@ -381,7 +389,7 @@ public class ServerGame extends Game implements ServerModelObject {
         // are not clearly identifiable strong and weak AIs.
         if (!ready
             || weakAI == null || strongAI == null
-            || Objects.equals(weakAI, strongAI)) return null;
+            || weakAI == strongAI) return null;
 
         lb.add(" => ", weakAI.getName(), " cedes ", strongAI.getName(), ":");
         List<Tile> tiles = new ArrayList<>();
@@ -453,7 +461,7 @@ public class ServerGame extends Game implements ServerModelObject {
         // Trace fail where not all units are transferred
         for (FreeColGameObject fcgo : getFreeColGameObjects()) {
             if (fcgo instanceof Ownable
-                && Objects.equals(((Ownable) fcgo).getOwner(), weakest)) {
+                && ((Ownable)fcgo).getOwner() == weakest) {
                 throw new RuntimeException("Lurking " + weakest.getId()
                     + " fcgo: " + fcgo);
             }

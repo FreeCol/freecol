@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -250,7 +253,7 @@ public class IndianNationType extends NationType {
         final Specification spec = getSpecification();
         IndianNationType parent = xr.getType(spec, EXTENDS_TAG,
                                              IndianNationType.class, this);
-        if (!Objects.equals(parent, this)) {
+        if (parent != this) {
             if (parent.skills != null && !parent.skills.isEmpty()) {
                 if (skills == null) skills = new ArrayList<>();
                 skills.addAll(parent.skills);

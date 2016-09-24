@@ -23,7 +23,11 @@ import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -215,9 +219,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                         String more = null;
                         if (loc instanceof IndianSettlement) {
                             IndianSettlement is = (IndianSettlement)loc;
-                            more = (Objects.equals(g, is.getWantedGoods(0))) ? "***"
-                                : (Objects.equals(g, is.getWantedGoods(1))) ? "**"
-                                : (Objects.equals(g, is.getWantedGoods(2))) ? "*"
+                            more = (g == is.getWantedGoods(0)) ? "***"
+                                : (g == is.getWantedGoods(1)) ? "**"
+                                : (g == is.getWantedGoods(2)) ? "*"
                                 : null;
                         }
                         if (sale != null && more != null) {
@@ -467,7 +471,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         // Find all the player accessible settlements except the current one.
         td.addAll(transform(player.getSettlements(),
-                            s -> !Objects.equals(s, inSettlement) && canReach.test(s),
+                            s -> s != inSettlement && canReach.test(s),
                             s -> new Destination(s, unit.getTurnsToReach(s),
                                                  unit, goodsTypes)));
 

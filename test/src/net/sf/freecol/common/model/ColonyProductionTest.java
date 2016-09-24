@@ -237,7 +237,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     /**
      * Tests that there is no over production of horses, to avoid them
      * being thrown out.  A test of the proper production of horses is
-     * in <code>BuildingTest</code>
+     * in {@code BuildingTest}
      */
     public void testNoHorsesOverProduction() {
         Game game = getGame();

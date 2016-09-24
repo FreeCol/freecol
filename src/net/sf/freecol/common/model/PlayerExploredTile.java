@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -129,12 +128,12 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         Tile copied = tile.getTileToCache();
         boolean ok = true;
-        if (!Objects.equals(tile.getOwner(), owner)) {
+        if (tile.getOwner() != owner) {
             copied.setOwner(owner);
             ok = false;
         }
 
-        if (!Objects.equals(tile.getOwningSettlement(), owningSettlement)) {
+        if (tile.getOwningSettlement() != owningSettlement) {
             copied.setOwningSettlement(owningSettlement);
             ok = false;
         }
@@ -158,16 +157,16 @@ public class PlayerExploredTile extends FreeColGameObject {
                 copied.setSettlement(null);
             } else {
                 IndianSettlement is = (IndianSettlement)ts;
-                if (!Objects.equals(missionary, is.getMissionary())) {
+                if (missionary != is.getMissionary()) {
                     // Do not try to be clever with a unit that might be gone.
                     is.setMissionary(null);
                     ok = false;
                 }
-                if (!Objects.equals(mostHated, is.getMostHated())) {
+                if (mostHated != is.getMostHated()) {
                     is.setMostHated(mostHated);
                     ok = false;
                 }
-                if (!Objects.equals(alarm, is.getAlarm(player))) {
+                if (alarm != is.getAlarm(player)) {
                     is.setAlarm(player, alarm);
                     ok = false;
                 }
@@ -233,7 +232,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             // Hack to avoid writing now-invalid missionary.
             && tile.getSettlement() != null
             && tile.getSettlement() instanceof IndianSettlement
-            && Objects.equals(((IndianSettlement) tile.getSettlement()).getMissionary(), missionary)) {
+            && ((IndianSettlement)tile.getSettlement()).getMissionary() == missionary) {
             xw.writeStartElement(MISSIONARY_TAG);
 
             missionary.toXML(xw);

@@ -564,7 +564,7 @@ public final class FreeColClient {
      * @return True if tutorial messages should be displayed.
      */
     public boolean tutorialMode() {
-        return clientOptions.getBoolean("model.option.guiShowTutorial");
+        return getClientOptions().getBoolean("model.option.guiShowTutorial");
     }
 
     /**
@@ -724,7 +724,7 @@ public final class FreeColClient {
      * @return The animation speed.
      */
     public int getAnimationSpeed(Player player) {
-        String key = (Objects.equals(this.player, player))
+        String key = (getMyPlayer() == player)
             ? ClientOptions.MOVE_ANIMATION_SPEED
             : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         return clientOptions.getInteger(key);
@@ -827,6 +827,7 @@ public final class FreeColClient {
      */
     public void quit() {
         connectController.quitGame(singlePlayer);
+        getConnectController().quitGame(isSinglePlayer());
 
         // delete outdated autosave files
         long validPeriod = 1000L * 24L * 60L * 60L // days to ms

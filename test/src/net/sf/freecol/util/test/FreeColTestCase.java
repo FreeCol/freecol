@@ -156,7 +156,7 @@ public class FreeColTestCase extends TestCase {
      * As a side effect this call will reset the singleton game value that can
      * be accessed using getGame().
      *
-     * @param specName a <code>String</code> value
+     * @param specName a {@code String} value
      * @return A new game with with players for each nation added.
      */
     public static Game getStandardGame(String specName) {
@@ -286,7 +286,7 @@ public class FreeColTestCase extends TestCase {
     /**
      * Get a standard colony at the location 5,8 with one free colonist
      *
-     * @return The <code>Colony</code> as specified.
+     * @return The {@code Colony} as specified.
      */
     public Colony getStandardColony() {
         return getStandardColony(1, 5, 8);
@@ -297,7 +297,7 @@ public class FreeColTestCase extends TestCase {
      *
      * @param numberOfSettlers The number of settlers to put into the
      *     colony.  Must be >= 1.
-     * @return The <code>Colony</code> as specified.
+     * @return The {@code Colony} as specified.
      */
     public Colony getStandardColony(int numberOfSettlers) {
         return getStandardColony(numberOfSettlers, 5, 8);
@@ -311,7 +311,7 @@ public class FreeColTestCase extends TestCase {
      *     colony.  Must be >= 1.
      * @param tileX Coordinate of tile for the colony.
      * @param tileY Coordinate of tile for the colony.
-     * @return The <code>Colony</code> as specified.
+     * @return The {@code Colony} as specified.
      */
     public Colony getStandardColony(int numberOfSettlers,
                                     int tileX, int tileY) {
@@ -332,7 +332,7 @@ public class FreeColTestCase extends TestCase {
      * Useful utility to make sure a work location is empty before doing
      * some test that implicates it.
      *
-     * @param wl The <code>WorkLocation</code> to clear.
+     * @param wl The {@code WorkLocation} to clear.
      * @return True if the work location is clear, false if there was a problem
      *     removing a unit.
      */
@@ -608,8 +608,8 @@ public class FreeColTestCase extends TestCase {
      * Set the production bonus of the given colony to the given
      * value.
      *
-     * @param colony a <code>Colony</code> value
-     * @param value an <code>int</code> value
+     * @param colony a {@code Colony} value
+     * @param value an {@code int} value
      */
     public void setProductionBonus(Colony colony, int value) {
         try {
@@ -672,8 +672,8 @@ public class FreeColTestCase extends TestCase {
      * Check a combat result list.
      *
      * @param name A base string for the error message.
-     * @param crs The list of <code>CombatResult</code> to check.
-     * @param results The expected <code>CombatResult</code>s.
+     * @param crs The list of {@code CombatResult} to check.
+     * @param results The expected {@code CombatResult}s.
      */
     public void checkCombat(String name, List<CombatResult> crs,
                             CombatResult... results) {
@@ -702,8 +702,8 @@ public class FreeColTestCase extends TestCase {
      * Check a list of goods.
      *
      * @param err A base string for the error message.
-     * @param goods A list of expected <code>AbstractGoods</code> to check.
-     * @param results The expected <code>AbstractGoods</code>.
+     * @param goods A list of expected {@code AbstractGoods} to check.
+     * @param results The expected {@code AbstractGoods}.
      */
     public void checkGoods(String err, List<AbstractGoods> goods,
                            AbstractGoods... results) {

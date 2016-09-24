@@ -21,7 +21,6 @@ package net.sf.freecol.server.generator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -259,7 +258,7 @@ public class River {
      * @return true if this river already contains the given tile.
      */
     public boolean contains(Tile tile) {
-        return any(sections, rs -> Objects.equals(rs.getTile(), tile));
+        return any(getSections(), rs -> rs.getTile() == tile);
     }
 
     /**

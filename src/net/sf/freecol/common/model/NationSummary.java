@@ -25,8 +25,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Stance;
 
-import java.util.Objects;
-
 
 /**
  * A container class summarizing an enemy nation.
@@ -87,7 +85,7 @@ public class NationSummary extends FreeColObject {
             militaryStrength = player.calculateStrength(false);
             navalStrength = player.calculateStrength(true);
             gold = player.getGold();
-            if (Objects.equals(player, requester) || requester
+            if (player == requester || requester
                 .hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)) {
                 soL = player.getSoL();
                 foundingFathers = player.getFatherCount();
