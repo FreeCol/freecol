@@ -27,8 +27,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent when assigning a teacher.
@@ -120,7 +118,7 @@ public class AssignTeacherMessage extends DOMMessage {
             return serverPlayer.clientError("Teacher can not teach: "
                 + this.teacherId)
                 .build(serverPlayer);
-        } else if (!Objects.equals(student.getColony(), teacher.getColony())) {
+        } else if (student.getColony() != teacher.getColony()) {
             return serverPlayer.clientError("Student and teacher not in same colony: "
                 + this.studentId)
                 .build(serverPlayer);

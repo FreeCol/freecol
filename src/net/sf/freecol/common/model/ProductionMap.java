@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -77,7 +79,7 @@ public class ProductionMap {
         }
 
         public void add(AbstractGoods goods) {
-            if (!Objects.equals(goods.getType().getStoredAs(), root.getType())) {
+            if (goods.getType().getStoredAs() != root.getType()) {
                 throw new IllegalArgumentException(goods.getType().getId() + " is not stored as "
                                                    + root.getType());
             } else {
@@ -94,7 +96,7 @@ public class ProductionMap {
 
         public int remove(AbstractGoods goods) {
             int consumed = goods.getAmount();
-            if (Objects.equals(goods.getType(), root.getType())) {
+            if (goods.getType() == root.getType()) {
                 root.setAmount(root.getAmount() - consumed);
                 for (AbstractGoods leaf : leafs) {
                     leaf.setAmount(Math.min(leaf.getAmount(), root.getAmount()));
@@ -110,7 +112,7 @@ public class ProductionMap {
         }
 
         public AbstractGoods get(GoodsType type) {
-            if (Objects.equals(root.getType(), type)) {
+            if (root.getType() == type) {
                 return root;
             } else {
                 AbstractGoods leaf = find(leafs, AbstractGoods.matches(type));
@@ -157,7 +159,7 @@ public class ProductionMap {
         if (value == null) {
             // no entry yet
             GoodsType rootType = goodsType.getStoredAs();
-            if (Objects.equals(rootType, goodsType)) {
+            if (rootType == goodsType) {
                 cache.put(goodsType, goods.getAmount());
             } else {
                 // is leaf of production tree

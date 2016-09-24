@@ -27,7 +27,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
@@ -173,7 +172,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
         UnionPosition newPosition = (UnionPosition) union.getSelectedItem();
         UnionShape newShape = (UnionShape) unionShape.getSelectedItem();
         Flag newFlag = FLAGS[flags.getSelectedIndex()];
-        if (e == null || Objects.equals(e.getSource(), flags)) {
+        if (e == null || e.getSource() == flags) {
             if (newFlag == null) {
                 // custom
                 enable(customComponents, true);
@@ -192,7 +191,7 @@ public class FlagTest extends JFrame implements ActionListener, ItemListener {
             }
         } else {
             if (newFlag == null) {
-                if (Objects.equals(e.getSource(), decoration)) {
+                if (e.getSource() == decoration) {
                     UnionPosition oldPosition = (UnionPosition) union.getSelectedItem();
                     union.removeAllItems();
                     for (UnionPosition position : newDecoration.getUnionPositions()) {

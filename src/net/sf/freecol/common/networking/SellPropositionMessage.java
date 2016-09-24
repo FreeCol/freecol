@@ -30,8 +30,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 
-import java.util.Objects;
-
 
 /**
  * The message sent when negotiating a sale at an IndianSettlement.
@@ -138,7 +136,7 @@ public class SellPropositionMessage extends DOMMessage {
         }
 
         // Make sure we are trying to sell something that is there
-        if (!Objects.equals(this.goods.getLocation(), unit)) {
+        if (this.goods.getLocation() != unit) {
             return serverPlayer.clientError("Goods " + this.goods.getId()
                 + " are not with unit " + this.unitId)
                 .build(serverPlayer);

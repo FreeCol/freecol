@@ -27,7 +27,10 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.ClientOptions;
@@ -453,7 +456,7 @@ public final class TileViewer extends FreeColClientHolder {
                     Tile borderingTile = tile.getNeighbourOrNull(direction);
                     if (borderingTile != null && borderingTile.isExplored()) {
                         TileType borderingTileType = borderingTile.getType();
-                        if (!Objects.equals(borderingTileType, tileType)) {
+                        if (borderingTileType != tileType) {
                             if (!tile.isLand() && borderingTile.isLand()) {
                                 // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                                 // Draw the grass from the neighboring tile, spilling over on the side of this tile

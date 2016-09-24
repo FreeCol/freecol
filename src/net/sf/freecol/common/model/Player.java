@@ -21,8 +21,18 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -157,12 +167,12 @@ public class Player extends FreeColGameObject implements Nameable {
             if (predicate.test(unit)) { // Of course, it has to be valid...
                 final Unit sentinel = first(units);
                 while (!units.isEmpty()) {
-                    if (Objects.equals(units.get(0), unit)) return true;
+                    if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
                 update();
-                while (!units.isEmpty() && !Objects.equals(units.get(0), sentinel)) {
-                    if (Objects.equals(units.get(0), unit)) return true;
+                while (!units.isEmpty() && units.get(0) != sentinel) {
+                    if (units.get(0) == unit) return true;
                     units.remove(0);
                 }
             }
@@ -823,7 +833,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean isPotentialEnemy(Player player) {
         if (!hasAbility(Ability.IGNORE_EUROPEAN_WARS)
-            && !Objects.equals(player.getREFPlayer(), this)) {
+            && player.getREFPlayer() != this) {
             switch (getStance(player)) {
             case PEACE: case CEASE_FIRE: return true;
             default: break;
@@ -840,7 +850,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player is a potential friend.
      */
     public boolean isPotentialFriend(Player player) {
-        if (!Objects.equals(player.getREFPlayer(), this)) {
+        if (player.getREFPlayer() != this) {
             switch (getStance(player)) {
             case WAR: case CEASE_FIRE: return true;
             default: break;
@@ -1041,7 +1051,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public List<Player> getRebels() {
         return transform(getGame().getLiveEuropeanPlayers(this),
-                         p -> (Objects.equals(p.getREFPlayer(), this)
+                         p -> (p.getREFPlayer() == this
                              && (p.isRebel() || p.isUndead())));
     }
 
@@ -2193,7 +2203,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final TradeRoute exclude) {
         synchronized (this.tradeRoutes) {
             return find(this.tradeRoutes,
-                        t -> t.getName().equals(name) && !Objects.equals(t, exclude));
+                        t -> t.getName().equals(name) && t != exclude);
         }
     }
 
@@ -2901,7 +2911,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newTension The new {@code Tension}.
      */
     public void setTension(Player player, Tension newTension) {
-        if (Objects.equals(player, this) || player == null) return;
+        if (player == this || player == null) return;
         tension.put(player, newTension);
     }
 
@@ -2969,7 +2979,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             throw new IllegalArgumentException("Player must not be 'null'.");
         }
-        if (Objects.equals(player, this)) {
+        if (player == this) {
             throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
         }
         if (newStance == null) {
@@ -3063,13 +3073,13 @@ public class Player extends FreeColGameObject implements Nameable {
         final Specification spec = getSpecification();
         Player nationOwner = tile.getOwner();
 
-        if (nationOwner == null || Objects.equals(nationOwner, this)) {
+        if (nationOwner == null || nationOwner == this) {
             return 0; // Freely available
         } else if (tile.hasSettlement()) {
             return -1; // Not for sale
         } else if (nationOwner.isEuropean()) {
             if (tile.getOwningSettlement() != null
-                && Objects.equals(tile.getOwningSettlement().getOwner(), nationOwner)) {
+                && tile.getOwningSettlement().getOwner() == nationOwner) {
                 return -1; // Nailed down by a European colony
             } else {
                 return 0; // Claim abandoned or only by tile improvement
@@ -3078,7 +3088,7 @@ public class Player extends FreeColGameObject implements Nameable {
         int price = spec.getInteger(GameOptions.LAND_PRICE_FACTOR)
             // Only consider specific food types, not the aggregation.
             * sum(spec.getGoodsTypeList(),
-                  gt -> !Objects.equals(gt, spec.getPrimaryFoodType()),
+                  gt -> gt != spec.getPrimaryFoodType(),
                   gt -> tile.getPotentialProduction(gt, null))
             + 100;
         return (int)applyModifiers(price, getGame().getTurn(),
@@ -3204,7 +3214,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
         return (any(tile.getUnits(),
-                    u -> !Objects.equals(u.getOwner(), this) && u.isOffensiveUnit()))
+                    u -> u.getOwner() != this && u.isOffensiveUnit()))
             ? NoClaimReason.OCCUPIED // The tile is held against us
             : (isEuropean())
             ? ((tile.hasLostCityRumour())
@@ -3244,7 +3254,7 @@ public class Player extends FreeColGameObject implements Nameable {
         return (reason != NoClaimReason.NONE) ? reason
             : (tile.hasSettlement()) ? NoClaimReason.SETTLEMENT
             : (tile.getOwner() == null) ? NoClaimReason.NONE
-            : (Objects.equals(tile.getOwner(), this)) ? ((tile.isInUse())
+            : (tile.getOwner() == this) ? ((tile.isInUse())
                                            ? NoClaimReason.WORKED
                                            : NoClaimReason.NONE)
             : ((price = getLandPrice(tile)) < 0) ? NoClaimReason.EUROPEANS
@@ -3335,7 +3345,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean canClaimForImprovement(Tile tile) {
         Player owner = tile.getOwner();
-        return owner == null || Objects.equals(owner, this) || getLandPrice(tile) == 0;
+        return owner == null || owner == this || getLandPrice(tile) == 0;
     }
 
     /**

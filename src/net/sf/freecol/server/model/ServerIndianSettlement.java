@@ -21,7 +21,6 @@ package net.sf.freecol.server.model;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -245,7 +244,7 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     @Override
     public void setAlarm(Player player, Tension newAlarm) {
-        if (player != null && !Objects.equals(player, owner)) {
+        if (player != null && player != owner) {
             super.setAlarm(player, newAlarm);
             updateMostHated();
         }
@@ -285,7 +284,7 @@ public class ServerIndianSettlement extends IndianSettlement
             = Comparator.comparingInt(p -> getAlarm(p).getValue());
         this.mostHated = maximize(getGame().getLiveEuropeanPlayers(),
                                   hatedPred, mostHatedComp);
-        return !Objects.equals(this.mostHated, old);
+        return this.mostHated != old;
     }
 
     /**
@@ -375,7 +374,7 @@ public class ServerIndianSettlement extends IndianSettlement
      */
     public void csChangeMissionary(Unit missionary, ChangeSet cs) {
         final Unit old = getMissionary();
-        if (Objects.equals(missionary, old)) return;
+        if (missionary == old) return;
 
         final Tile tile = getTile();
         final ServerPlayer newOwner = (missionary == null) ? null

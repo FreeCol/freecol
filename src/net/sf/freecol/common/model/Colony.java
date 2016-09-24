@@ -19,8 +19,15 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -1009,7 +1016,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else {
                 // a building of the same family already exists
                 BuildingType from = colonyBuilding.getType().getUpgradesTo();
-                if (!Objects.equals(from, newBuildingType) && !assumeBuilt.contains(from)) {
+                if (from != newBuildingType && !assumeBuilt.contains(from)) {
                     // the existing building's next upgrade is not the
                     // new one we want to build
                     return NoBuildReason.WRONG_UPGRADE;
@@ -1535,7 +1542,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (wl == null) {
             throw new RuntimeException("updateEducation(" + unit
                 + ") unit not at work location.");
-        } else if (!Objects.equals(wl.getColony(), this)) {
+        } else if (wl.getColony() != this) {
             throw new RuntimeException("updateEducation(" + unit
                 + ") unit not at work location in this colony.");
         }
@@ -1701,7 +1708,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int enemyUnits = 0;
         for (Unit u : iterable(flatten(getColonyTiles(),
                                        ct -> ct.getWorkTile().getUnits()))) {
-            if (Objects.equals(u.getOwner(), getOwner())) {
+            if (u.getOwner() == getOwner()) {
                 if (u.isDefensiveUnit()) friendlyUnits++;
             } else if (getOwner().atWarWith(u.getOwner())) {
                 if (u.isOffensiveUnit()) enemyUnits++;
@@ -1829,7 +1836,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             = Comparator.comparingInt(Unit::getSkillLevel);
         final Comparator<Unit> tradeComparator
             = Comparator.comparingInt(u ->
-                (Objects.equals(u.getWorkType(), expertProduction)) ? 0 : 1);
+                (u.getWorkType() == expertProduction) ? 0 : 1);
         final Comparator<Unit> fullComparator
             = skillComparator.thenComparing(tradeComparator);
         return minimize(getUnits(), teacherPred, fullComparator);
@@ -2147,12 +2154,12 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         int bestImprovement = 0;
 
         if (production == null || expertise == null
-            || Objects.equals(production, expertise)) return null;
+            || production == expertise) return null;
 
         // We have an expert not doing the job of their expertise.
         // Check if there is a non-expert doing the job instead.
         for (Unit nonExpert : transform(getUnits(), u ->
-                Objects.equals(u.getWorkType(), expertise) && !Objects.equals(u.getType(), expertType))) {
+                u.getWorkType() == expertise && u.getType() != expertType)) {
 
             // We have found a unit of a different type doing the
             // job of this expert's expertise now check if the
@@ -2247,7 +2254,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     .addAmount("%amount%", ag.getAmount() - amount)
                     .addNamed("%goodsType%", goodsType);
             result.addAll(transform(currentlyBuilding.getRequiredGoods(),
-                                    ag -> Objects.equals(ag.getType(), goodsType)
+                                    ag -> ag.getType() == goodsType
                                         && amount < ag.getAmount(),
                                     bMapper));
         }
@@ -2371,7 +2378,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             } else {
                 wt = ct.getWorkTile();
                 wt = wt.copy(game, wt.getClass());
-                if (Objects.equals(wt.getOwningSettlement(), this)) {
+                if (wt.getOwningSettlement() == this) {
                     wt.setOwningSettlement(colony);
                 }
             }
@@ -2478,7 +2485,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
             Location loc = locatable.getLocation();
             if (loc instanceof WorkLocation) {
                 WorkLocation wl = (WorkLocation)loc;
-                if (Objects.equals(wl.getColony(), this)) {
+                if (wl.getColony() == this) {
                     return wl.remove(locatable);
                 }
             }                

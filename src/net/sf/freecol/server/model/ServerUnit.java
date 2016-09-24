@@ -20,7 +20,11 @@
 
 package net.sf.freecol.server.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -288,7 +292,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         // Cancel other co-located improvements of the same type
         for (Unit unit : transform(tile.getUnits(),
                 u -> (u.getWorkImprovement() != null
-                    && Objects.equals(u.getWorkImprovement().getType(), ti.getType())
+                    && u.getWorkImprovement().getType() == ti.getType()
                     && u.getState() == UnitState.IMPROVING))) {
             unit.setWorkLeft(-1);
             unit.setWorkImprovement(null);
@@ -315,11 +319,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setMovesLeft(0);
         cs.add(See.only(owner), (colony != null) ? colony
             : (FreeColGameObject)oldLocation);
-        if (!Objects.equals(carrier.getLocation(), oldLocation)) {
+        if (carrier.getLocation() != oldLocation) {
             cs.add(See.only(owner), carrier);
         }
         if (oldLocation instanceof Tile) {
-            if (!Objects.equals(carrier.getTile(), oldLocation)) {
+            if (carrier.getTile() != oldLocation) {
                 cs.addMove(See.only(owner), this, oldLocation,
                            carrier.getTile());
                 owner.invalidateCanSeeTiles();//+vis(serverPlayer)
@@ -374,7 +378,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             if (tile.isLand()
                 || tile.getColony() != null
                 || tile.getFirstUnit() == null
-                || Objects.equals(enemy = tile.getFirstUnit().getOwner(), player)) continue;
+                || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
             for (Unit enemyUnit : transform(tile.getUnits(), u ->
                     (u.isNaval()
                         && ((u.isOffensiveUnit() && player.atWarWith(enemy))
@@ -778,7 +782,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     ? (ServerPlayer)unit.getOwner()
                     : null;
                 if (other == null
-                    || Objects.equals(other, serverPlayer)
+                    || other == serverPlayer
                     || pending.contains(other)) continue; // No contact
                 if (serverPlayer.csContact(other, cs)) {
                     // First contact.  Note contact pending because
@@ -843,7 +847,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             for (Tile t : transform(newTile.getSurroundingTiles(1, 1),
                     nt -> (nt != null && !nt.isLand()
                         && nt.getFirstUnit() != null
-                        && !Objects.equals(nt.getFirstUnit().getOwner(), serverPlayer)))) {
+                        && nt.getFirstUnit().getOwner() != serverPlayer))) {
                 csActivateSentries(t, cs);
             }
         }
@@ -932,7 +936,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (isInColony()
             && (produce = getWorkType()) != null
             && (learn = spec.getExpertForProducing(produce)) != null
-            && !Objects.equals(learn, getType())
+            && learn != getType()
             && (uc = getUnitChange(UnitChangeType.EXPERIENCE,learn)) != null) {
             int maximumExperience = getType().getMaximumExperience();
             int maxValue = (100 * maximumExperience) / uc.probability;
@@ -1011,7 +1015,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 final Europe europe = owner.getEurope();
                 final Location dst = getDestination();
                 Location result = resolveDestination();
-                if (Objects.equals(result, europe)) {
+                if (result == europe) {
                     lb.add(" arrives in Europe");
                     if (getTradeRoute() == null) {
                         setDestination(null);

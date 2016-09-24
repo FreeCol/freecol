@@ -26,7 +26,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.swing.AbstractCellEditor;
@@ -556,7 +559,7 @@ public final class PlayersTable extends JTable {
         public boolean isCellEditable(int row, int column) {
             if (row >= 0 && row < getRowCount()) {
                 Nation nation = nations.get(row);
-                boolean ownRow = Objects.equals(thisPlayer, nationMap.get(nation))
+                boolean ownRow = thisPlayer == nationMap.get(nation)
                     && !thisPlayer.isReady();
                 switch (column) {
                 case AVAILABILITY_COLUMN:

@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -265,7 +268,7 @@ public class Europe extends UnitLocation
      */
     @Override
     public FreeColGameObject getLinkTarget(Player player) {
-        return (Objects.equals(getOwner(), player)) ? this : null;
+        return (getOwner() == player) ? this : null;
     }
 
     // Interface Location (from UnitLocation)

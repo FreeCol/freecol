@@ -23,7 +23,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -153,7 +152,7 @@ public class CargoPanel extends FreeColPanel
      * @param newCarrier The new carrier {@code Unit}.
      */
     public void setCarrier(final Unit newCarrier) {
-        if (!Objects.equals(newCarrier, carrier)) {
+        if (newCarrier != carrier) {
             cleanup();
             this.carrier = newCarrier;
             initialize();

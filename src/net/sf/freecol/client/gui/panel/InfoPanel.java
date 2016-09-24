@@ -31,7 +31,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -255,7 +254,7 @@ public final class InfoPanel extends FreeColPanel {
          * @param unit The displayed {@code Unit} (may be null).
          */
         public void update(Unit unit) {
-            if (!Objects.equals(this.unit, unit)) {
+            if (this.unit != unit) {
                 if (this.unit != null) {
                     this.unit.removePropertyChangeListener(this);
                     GoodsContainer gc = this.unit.getGoodsContainer();
@@ -491,7 +490,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param tile The displayed tile (or null if none)
      */
     public void update(Tile tile) {
-        if (!Objects.equals(this.tileInfoPanel.getTile(), tile)) {
+        if (this.tileInfoPanel.getTile() != tile) {
             this.tileInfoPanel.update(tile);
         }
         update();

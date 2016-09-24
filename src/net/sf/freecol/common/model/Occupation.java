@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -63,10 +62,10 @@ public class Occupation {
      */
     public boolean install(Unit unit) {
         if (!unit.setLocation(workLocation)) return false;
-        if (!Objects.equals(productionType, workLocation.getProductionType())) {
+        if (productionType != workLocation.getProductionType()) {
             workLocation.setProductionType(productionType);
         }
-        if (!Objects.equals(workType, unit.getWorkType())) {
+        if (workType != unit.getWorkType()) {
             unit.changeWorkType(workType);
         }
         return true;
@@ -136,7 +135,7 @@ public class Occupation {
     public int improve(Unit unit, WorkLocation wl, int bestAmount,
                        Collection<GoodsType> workTypes, LogBuilder lb) {
         // Can the unit work at the wl?
-        boolean present = Objects.equals(unit.getLocation(), wl);
+        boolean present = unit.getLocation() == wl;
         lb.add("\n    ", wl,
             ((!present && !wl.canAdd(unit)) ? " no-add" : ""));
         if (!present && !wl.canAdd(unit)) return bestAmount;

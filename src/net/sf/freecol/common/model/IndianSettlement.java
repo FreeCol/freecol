@@ -19,8 +19,14 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -745,9 +751,9 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         // Apply wanted bonus
         final int wantedBase = 100; // Granularity for wanted bonus
         final int wantedBonus // Premium paid for wanted goods types
-            = (Objects.equals(type, getWantedGoods(0))) ? 150
-            : (Objects.equals(type, getWantedGoods(1))) ? 125
-            : (Objects.equals(type, getWantedGoods(2))) ? 110
+            = (type == getWantedGoods(0)) ? 150
+            : (type == getWantedGoods(1)) ? 125
+            : (type == getWantedGoods(2)) ? 110
             : 100;
         // Do not simplify with *=, we want the integer truncation.
         price = wantedBonus * price / wantedBase;
@@ -827,7 +833,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         }
 
         int consumption = getConsumptionOf(type);
-        if (Objects.equals(type, spec.getPrimaryFoodType())) {
+        if (type == spec.getPrimaryFoodType()) {
             // Food is perishable, do not try to retain that much
             return Math.max(40, consumption * 3);
         }
@@ -994,7 +1000,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     public int getMaximumProduction(GoodsType goodsType) {
         return sum(getTile().getSurroundingTiles(0, getRadius()),
             t -> t.getOwningSettlement() == null
-                || Objects.equals(t.getOwningSettlement(), this),
+                || t.getOwningSettlement() == this,
             // FIXME: make unitType brave
             t -> t.getPotentialProduction(goodsType, null));
     }
@@ -1285,7 +1291,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
     @Override
     public int getTotalProductionOf(GoodsType type) {
         if (type.isRefined()) {
-            if (!Objects.equals(type, goodsToMake())) return 0;
+            if (type != goodsToMake()) return 0;
             // Pretend 1/3 of the units present make the item with
             // basic production of 3.
             return getUnitCount();
@@ -1294,7 +1300,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         int tiles = 0;
         int potential = 0;
         for (Tile wt : transform(getOwnedTiles(),
-                                 t -> !Objects.equals(t, getTile()) && !t.isOccupied())) {
+                                 t -> t != getTile() && !t.isOccupied())) {
             // FIXME: make unitType brave
             potential += wt.getPotentialProduction(type, null);
             tiles++;
@@ -1546,7 +1552,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
         super.readChildren(xr);
 
         // @compat 0.10.1
-        for (Unit u : transform(getUnits(), u -> !Objects.equals(u.getLocation(), this))) {
+        for (Unit u : transform(getUnits(), u -> u.getLocation() != this)) {
             u.setLocationNoUpdate(this);
             logger.warning("Fixing unit location"
                 + " from " + u.getLocation()

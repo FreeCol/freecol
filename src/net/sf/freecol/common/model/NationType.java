@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -250,7 +249,7 @@ public abstract class NationType extends FreeColSpecObjectType {
         final Specification spec = getSpecification();
         NationType parent = xr.getType(spec, EXTENDS_TAG,
                                        NationType.class, this);
-        if (!Objects.equals(parent, this)) {
+        if (parent != this) {
             if (parent.settlementTypes != null) {
                 addSettlementTypes(parent.settlementTypes);
             }

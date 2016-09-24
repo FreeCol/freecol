@@ -28,7 +28,12 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -697,7 +702,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         boolean required) throws XMLStreamException {
 
         T ret = getAttribute(game, attributeName, returnClass, (T)null);
-        if (Objects.equals(ret, (T) null)) {
+        if (ret == (T)null) {
             if (required) {
                 throw new XMLStreamException("Missing " + attributeName
                     + " for " + returnClass.getName() + ": " + currentTag());
@@ -856,7 +861,7 @@ public class FreeColXMLReader extends StreamReaderDelegate
         boolean required) throws XMLStreamException {
 
         T ret = getAttribute(aiMain, attributeName, returnClass, (T)null);
-        if (Objects.equals(ret, (T) null)) {
+        if (ret == (T)null) {
             if (required) {
                 throw new XMLStreamException("Missing " + attributeName
                     + " for " + returnClass.getName() + ": " + currentTag());

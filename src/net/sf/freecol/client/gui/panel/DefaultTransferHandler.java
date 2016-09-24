@@ -39,7 +39,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -327,7 +326,7 @@ public final class DefaultTransferHandler extends TransferHandler {
             }
 
             // Do not allow a transferable to be dropped upon itself:
-            if (Objects.equals(comp, data)) return false;
+            if (comp == data) return false;
 
             // Make sure we don't drop onto other Labels.
             if (comp instanceof UnitLabel) {
@@ -361,7 +360,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 comp = getDropTarget(comp);
             }
             // Ignore if data is already in comp.
-            if (Objects.equals(data.getParent(), comp)) return false;
+            if (data.getParent() == comp) return false;
 
             if (data instanceof GoodsLabel) {
                 // Check if the goods can be dragged to comp.
@@ -496,10 +495,10 @@ public final class DefaultTransferHandler extends TransferHandler {
             List<AbstractGoods> required = unit.getGoodsDifference(role, 1);
             int count;
             if (required.size() == 1
-                && Objects.equals(required.get(0).getType(), goods.getType())
+                && required.get(0).getType() == goods.getType()
                 && (count = Math.min(role.getMaximumCount(),
                         goods.getAmount() / required.get(0).getAmount())) > 0
-                && (!Objects.equals(role, unit.getRole()) || count != unit.getRoleCount())) {
+                && (role != unit.getRole() || count != unit.getRoleCount())) {
                 freeColClient.getInGameController()
                     .equipUnitForRole(unit, role, count);
                 unitLabel.updateIcon();

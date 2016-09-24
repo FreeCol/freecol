@@ -19,7 +19,12 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -687,8 +692,8 @@ public class Unit extends GoodsLocation
                     && (tile = workImprovement.getTile()) != null
                     && tile.getTileItemContainer() != null
                     && none(tile.getUnits(), u ->
-                        !Objects.equals(u, this) && u.getState() == UnitState.IMPROVING
-                             && Objects.equals(u.getWorkImprovement(), workImprovement))) {
+                        u != this && u.getState() == UnitState.IMPROVING
+                             && u.getWorkImprovement() == workImprovement)) {
                     workImprovement.getTile().getTileItemContainer()
                         .removeTileItem(workImprovement);
                 }
@@ -754,7 +759,7 @@ public class Unit extends GoodsLocation
      */
     public void changeOwner(Player owner) {
         final Player oldOwner = this.owner;
-        if (Objects.equals(oldOwner, owner)) return;
+        if (oldOwner == owner) return;
 
         if (oldOwner == null) {
             logger.warning("Unit " + getId()
@@ -1226,17 +1231,17 @@ public class Unit extends GoodsLocation
      */
     public final void setStudent(final Unit newStudent) {
         Unit oldStudent = this.student;
-        if (Objects.equals(oldStudent, newStudent)) return;
+        if (oldStudent == newStudent) return;
 
         if (newStudent == null) {
             this.student = null;
-            if (oldStudent != null && Objects.equals(oldStudent.getTeacher(), this)) {
+            if (oldStudent != null && oldStudent.getTeacher() == this) {
                 oldStudent.setTeacher(null);
             }
         } else if (newStudent.getColony() != null
-            && Objects.equals(newStudent.getColony(), getColony())
+            && newStudent.getColony() == getColony()
             && newStudent.canBeStudent(this)) {
-            if (oldStudent != null && Objects.equals(oldStudent.getTeacher(), this)) {
+            if (oldStudent != null && oldStudent.getTeacher() == this) {
                 oldStudent.setTeacher(null);
             }
             this.student = newStudent;
@@ -1263,19 +1268,19 @@ public class Unit extends GoodsLocation
      */
     public final void setTeacher(final Unit newTeacher) {
         Unit oldTeacher = this.teacher;
-        if (Objects.equals(newTeacher, oldTeacher)) return;
+        if (newTeacher == oldTeacher) return;
 
         if (newTeacher == null) {
             this.teacher = null;
-            if (oldTeacher != null && Objects.equals(oldTeacher.getStudent(), this)) {
+            if (oldTeacher != null && oldTeacher.getStudent() == this) {
                 oldTeacher.setStudent(null);
             }
         } else {
             UnitType skillTaught = newTeacher.getType().getSkillTaught();
             if (newTeacher.getColony() != null
-                && Objects.equals(newTeacher.getColony(), getColony())
+                && newTeacher.getColony() == getColony()
                 && getColony().canTrain(skillTaught)) {
-                if (oldTeacher != null && Objects.equals(oldTeacher.getStudent(), this)) {
+                if (oldTeacher != null && oldTeacher.getStudent() == this) {
                     oldTeacher.setStudent(null);
                 }
                 this.teacher = newTeacher;
@@ -1375,11 +1380,11 @@ public class Unit extends GoodsLocation
             throw new RuntimeException("getUnitChange null player");
         }
         UnitChangeType uct = getSpecification().getUnitChangeType(change);
-        if (uct != null && uct.getOwnerChange() != (!Objects.equals(player, getOwner()))) {
+        if (uct != null && uct.getOwnerChange() != (player != getOwner())) {
             throw new RuntimeException("getUnitChange of " + this
                 + " change=" + change
                 + " getOwnerChange=" + uct.getOwnerChange()
-                + " != player-change=" + (!Objects.equals(player, getOwner()))
+                + " != player-change=" + (player != getOwner())
                 + " player=" + player.getSuffix()
                 + " owner=" + getOwner().getSuffix());
         }
@@ -1420,7 +1425,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit can be taught by the teacher.
      */
     public boolean canBeStudent(Unit teacher) {
-        return teacher != null && !Objects.equals(teacher, this)
+        return teacher != null && teacher != this
             && getTeachingType(teacher) != null;
     }
 
@@ -1790,7 +1795,7 @@ public class Unit extends GoodsLocation
         final Role oldRole = getRole();
         return find(getAvailableRoles(spec.getMilitaryRolesList()),
             r -> any(r.getRoleChanges(), rc ->
-                    Objects.equals(rc.getFrom(spec), oldRole) && Objects.equals(rc.getCapture(spec), role)));
+                rc.getFrom(spec) == oldRole && rc.getCapture(spec) == role));
     }
 
     /**
@@ -1925,7 +1930,7 @@ public class Unit extends GoodsLocation
         final Player player = getOwner();
         final Colony notHere = getTile().getColony();
         final Predicate<Colony> repairPred = c ->
-                !Objects.equals(c, notHere) && c.hasAbility(Ability.REPAIR_UNITS);
+            c != notHere && c.hasAbility(Ability.REPAIR_UNITS);
         Location loc = getClosestColony(transform(player.getColonies(), repairPred));
         return (loc != null) ? loc : player.getEurope();
     }
@@ -2186,7 +2191,7 @@ public class Unit extends GoodsLocation
             Settlement settlement = target.getSettlement();
             if (settlement == null) {
                 return MoveType.MOVE_NO_ACCESS_LAND;
-            } else if (Objects.equals(settlement.getOwner(), getOwner())) {
+            } else if (settlement.getOwner() == getOwner()) {
                 return MoveType.MOVE;
             } else if (isTradingUnit()) {
                 return getTradeMoveType(settlement);
@@ -2224,7 +2229,7 @@ public class Unit extends GoodsLocation
         if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement == null) {
-                if (defender != null && !Objects.equals(owner, defender.getOwner())) {
+                if (defender != null && owner != defender.getOwner()) {
                     if (defender.isNaval()) {
                         return MoveType.ATTACK_UNIT;
                     } else if (!isOffensiveUnit()) {
@@ -2241,7 +2246,7 @@ public class Unit extends GoodsLocation
                 } else {
                     return MoveType.MOVE;
                 }
-            } else if (Objects.equals(owner, settlement.getOwner())) {
+            } else if (owner == settlement.getOwner()) {
                 return MoveType.MOVE;
             } else if (isTradingUnit()) {
                 return getTradeMoveType(settlement);
@@ -2918,7 +2923,7 @@ public class Unit extends GoodsLocation
                 public boolean check(Unit u, PathNode path) {
                     Tile t = path.getTile();
                     if (t == null
-                        || (Objects.equals(t, startTile) && excludeStart)) return false;
+                        || (t == startTile && excludeStart)) return false;
                     Settlement settlement = t.getSettlement();
                     int value;
                     if (settlement != null
@@ -3034,7 +3039,7 @@ public class Unit extends GoodsLocation
             // Ocean travel required, destination blocked.
             // Find the closest available connected port.
             final Predicate<Settlement> portPredicate = s ->
-                    !Objects.equals(s, ignoreSrc) && !Objects.equals(s, ignoreDst) && s.isConnectedPort();
+                s != ignoreSrc && s != ignoreDst && s.isConnectedPort();
             sett = minimize(getOwner().getSettlements(), portPredicate,
                             settlementComparator);
             path = (sett == null) ? null : this.findPath(sett);
@@ -3042,7 +3047,7 @@ public class Unit extends GoodsLocation
         case 3:
             // Land travel.  Find nearby settlement with correct contiguity.
             final Predicate<Settlement> contiguityPred = s ->
-                    !Objects.equals(s, ignoreSrc) && !Objects.equals(s, ignoreDst)
+                s != ignoreSrc && s != ignoreDst
                     && s.getTile().getContiguity() == dstCont;
             sett = minimize(getOwner().getSettlements(), contiguityPred,
                             settlementComparator);
@@ -3724,7 +3729,7 @@ public class Unit extends GoodsLocation
         } else if (getTile().getDistanceTo(ret.getTile()) > 1) {
             throw new IllegalStateException("Unit " + getId()
                 + " is not adjacent to settlement: " + settlementId);
-        } else if (Objects.equals(getOwner(), ret.getOwner())) {
+        } else if (getOwner() == ret.getOwner()) {
             throw new IllegalStateException("Unit: " + getId()
                 + " and settlement: " + settlementId
                 + " are both owned by player: " + getOwner().getId());
@@ -3806,7 +3811,7 @@ public class Unit extends GoodsLocation
             return ((Colony)newLocation).joinColony(this);
         }
 
-        if (Objects.equals(newLocation, this.location)) return true;
+        if (newLocation == this.location) return true;
         if (newLocation != null && !newLocation.canAdd(this)) {
             logger.warning("Can not add " + this + " to "
                 + newLocation.getId());
@@ -3823,7 +3828,7 @@ public class Unit extends GoodsLocation
         Colony oldColony = (isInColony()) ? this.location.getColony() : null;
         Colony newColony = (newLocation instanceof WorkLocation)
             ? newLocation.getColony() : null;
-        boolean withinColony = newColony != null && Objects.equals(newColony, oldColony);
+        boolean withinColony = newColony != null && newColony == oldColony;
         boolean preserveEducation = withinColony
             && (((WorkLocation)this.location).canTeach()
                 == ((WorkLocation)newLocation).canTeach());
@@ -4025,7 +4030,7 @@ public class Unit extends GoodsLocation
      */
     @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
-        if (Objects.equals(locatable, this)) {
+        if (locatable == this) {
             return NoAddReason.ALREADY_PRESENT;
         } else if (locatable instanceof Unit) {
             return (!canCarryUnits())

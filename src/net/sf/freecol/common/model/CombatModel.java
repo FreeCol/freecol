@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 
 /**
@@ -174,8 +177,8 @@ public abstract class CombatModel {
             && defender instanceof Ownable) {
             Player aPlayer = ((Unit)attacker).getOwner();
             Player dPlayer = ((Ownable)defender).getOwner();
-            return (aPlayer.isRebel() && Objects.equals(aPlayer.getREFPlayer(), dPlayer))
-                || (dPlayer.isRebel() && Objects.equals(dPlayer.getREFPlayer(), aPlayer));
+            return (aPlayer.isRebel() && aPlayer.getREFPlayer() == dPlayer)
+                || (dPlayer.isRebel() && dPlayer.getREFPlayer() == aPlayer);
         }
         return false;
     }

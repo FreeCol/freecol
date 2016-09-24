@@ -27,8 +27,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.util.Utils;
 
-import java.util.Objects;
-
 
 /**
  * A trade item consisting of a player to incite war against.
@@ -74,8 +72,8 @@ public class InciteTradeItem extends TradeItem {
      */
     @Override
     public boolean isValid() {
-        return this.victim != null && !Objects.equals(this.victim, getSource())
-            && !Objects.equals(this.victim, getDestination());
+        return this.victim != null && this.victim != getSource()
+            && this.victim != getDestination();
     }
 
     /**

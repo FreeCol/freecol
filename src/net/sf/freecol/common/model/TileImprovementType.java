@@ -19,9 +19,13 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
@@ -240,7 +244,7 @@ public final class TileImprovementType extends FreeColSpecObjectType {
      */
     public boolean isWorkerAllowed(Unit unit) {
         return isWorkerTypeAllowed(unit.getType())
-            && (requiredRole == null || Objects.equals(unit.getRole(), requiredRole));
+            && (requiredRole == null || unit.getRole() == requiredRole);
     }
 
     /**

@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,12 +107,13 @@ public final class EuropePanel extends PortPanel {
                 for (Unit unit : highSeas.getUnitList()) {
                     boolean belongs;
                     if (destination instanceof Europe) {
-                        belongs = Objects.equals(unit.getDestination(), destination);
+                        belongs = unit.getDestination() == destination;
                     } else if (destination instanceof Map) {
-                        belongs = Objects.equals(unit.getDestination(), destination)
+                        belongs = unit.getDestination() == destination
                             || (unit.getDestination() != null
                                 && unit.getDestination().getTile() != null
-                                && Objects.equals(unit.getDestination().getTile().getMap(), destination));
+                                && unit.getDestination().getTile().getMap()
+                                == destination);
                     } else {
                         logger.warning("Bogus DestinationPanel location: "
                             + destination
@@ -194,7 +194,7 @@ public final class EuropePanel extends PortPanel {
                 inPortPanel.update();
                 docksPanel.update();
                 cargoPanel.update();
-                if (Objects.equals(unit, cargoPanel.getCarrier())) {
+                if (unit == cargoPanel.getCarrier()) {
                     cargoPanel.setCarrier(null);
                 }
             }
@@ -758,7 +758,7 @@ public final class EuropePanel extends PortPanel {
      */
     @Override
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
-        if (!Objects.equals(selectedUnitLabel, unitLabel)) {
+        if (selectedUnitLabel != unitLabel) {
             if (selectedUnitLabel != null) {
                 selectedUnitLabel.setSelected(false);
             }

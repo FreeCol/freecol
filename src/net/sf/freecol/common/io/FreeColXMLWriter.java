@@ -29,7 +29,6 @@ import java.io.Writer;
 
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,7 +98,7 @@ public class FreeColXMLWriter implements Closeable, XMLStreamWriter {
         }
 
         public boolean validFor(Player player) {
-            return this != WriteScope.CLIENT || Objects.equals(this.player, player);
+            return this != WriteScope.CLIENT || this.player == player;
         }
 
         public Player getClient() {

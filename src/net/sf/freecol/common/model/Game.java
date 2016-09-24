@@ -22,8 +22,15 @@ package net.sf.freecol.common.model;
 import java.lang.ref.WeakReference;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.function.Predicate;
@@ -721,7 +728,7 @@ public class Game extends FreeColGameObject {
      * @return True if the player was removed.
      */
     public boolean removePlayer(Player player) {
-        Player newCurrent = (!Objects.equals(currentPlayer, player)) ? null
+        Player newCurrent = (currentPlayer != player) ? null
             : getPlayerAfter(currentPlayer);
 
         if (!players.remove(player)) return false;
@@ -823,7 +830,7 @@ public class Game extends FreeColGameObject {
      * @param newMap The new {@code Map} to use.
      */
     public void setMap(Map newMap) {
-        if (!Objects.equals(this.map, newMap)) {
+        if (this.map != newMap) {
             for (HighSeas hs : transform(getLivePlayers(), alwaysTrue(),
                     Player::getHighSeas, toListNoNulls())) {
                 hs.removeDestination(this.map);
@@ -1022,7 +1029,7 @@ public class Game extends FreeColGameObject {
      */
     public void checkOwners(Ownable o, Player oldOwner) {
         Player newOwner = o.getOwner();
-        if (Objects.equals(oldOwner, newOwner)) return;
+        if (oldOwner == newOwner) return;
 
         if (oldOwner != null && oldOwner.removeOwnable(o)) {
             oldOwner.invalidateCanSeeTiles();//+vis

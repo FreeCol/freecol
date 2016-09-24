@@ -26,8 +26,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
-import java.util.Objects;
-
 
 /**
  * A trade item consisting of some goods.
@@ -121,7 +119,7 @@ public class GoodsTradeItem extends TradeItem {
             ? Integer.MIN_VALUE
             : (market == null)
             ? 2 * goods.getAmount()
-            : (Objects.equals(getSource(), player))
+            : (getSource() == player)
             ? market.getBidPrice(goods.getType(), goods.getAmount())
             : (int)Math.round(market.getSalePrice(goods.getType(),
                                                   goods.getAmount())
