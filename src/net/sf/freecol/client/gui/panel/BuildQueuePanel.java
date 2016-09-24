@@ -913,20 +913,22 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
     /**
      * Checks whether a specified {@code BuildingType} exists
-     *      within a colony
+     * within a colony
      *
      * @param buildingType The {@code BuildingType} to check
      * @return boolean
      */
     private boolean hasBuildingType(BuildingType buildingType) {
-        if (this.colony.getBuilding(buildingType) == null) {
-            return false;
-        } else if (colony.getBuilding(buildingType).getType() == buildingType) {
-            return true;
-        } else if (buildingType.getUpgradesTo() != null) {
-            return hasBuildingType(buildingType.getUpgradesTo());
-        } else {
-            return false;
+        while (true) {
+            if (this.colony.getBuilding(buildingType) == null) {
+                return false;
+            } else if (colony.getBuilding(buildingType).getType() == buildingType) {
+                return true;
+            } else if (buildingType.getUpgradesTo() != null) {
+                buildingType = buildingType.getUpgradesTo();
+            } else {
+                return false;
+            }
         }
     }
 

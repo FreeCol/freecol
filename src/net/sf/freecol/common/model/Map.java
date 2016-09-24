@@ -765,23 +765,25 @@ public class Map extends FreeColGameObject implements Location {
      * destination of a path.
      *
      * @param unit An optional {@code Unit} to search for.
-     * @param end The candidate end {@code Location}.
+     * @param end  The candidate end {@code Location}.
      * @return The actual end location.
      * @throws IllegalArgumentException If there are any argument problems.
      */
     private Location findRealEnd(Unit unit, Location end) {
-        if (end == null) {
-            throw new IllegalArgumentException("Null end.");
-        } else if (end instanceof Europe) {
-            return end;
-        } else if (end instanceof Map) {
-            return findRealEnd(unit, unit.getEntryLocation());
-        } else if (end.getTile() != null) {
-            return end.getTile();
-        } else if (unit != null) {
-            return unit.resolveDestination();
-        } else {
-            throw new IllegalArgumentException("Invalid end: " + end);
+        while (true) {
+            if (end == null) {
+                throw new IllegalArgumentException("Null end.");
+            } else if (end instanceof Europe) {
+                return end;
+            } else if (end instanceof Map) {
+                end = unit.getEntryLocation();
+            } else if (end.getTile() != null) {
+                return end.getTile();
+            } else if (unit != null) {
+                return unit.resolveDestination();
+            } else {
+                throw new IllegalArgumentException("Invalid end: " + end);
+            }
         }
     }
 
