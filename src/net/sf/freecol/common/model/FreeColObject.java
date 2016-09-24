@@ -82,6 +82,20 @@ public abstract class FreeColObject
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
+    /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 1000;
+
+    /**
+     * Public assessor for {@code classindex} field
+     *
+     * @return The integer.
+     */
+    public int getClassIndex () {
+        return this.classindex;
+    }
+
 
     /** The identifier of an object. */
     private String id;

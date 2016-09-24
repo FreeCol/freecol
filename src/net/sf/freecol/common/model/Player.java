@@ -68,6 +68,12 @@ import org.w3c.dom.Element;
 public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
+
+    /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 10;
+
     //
     // Types
     //

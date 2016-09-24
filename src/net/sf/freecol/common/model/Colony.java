@@ -43,6 +43,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIUnit;
 
 
@@ -60,6 +61,11 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
 
     /** The number of turns of advanced warning of starvation. */
     public static final int FAMINE_TURNS = 3;
+
+    /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 20;
 
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,

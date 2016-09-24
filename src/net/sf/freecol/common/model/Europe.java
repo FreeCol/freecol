@@ -58,6 +58,11 @@ public class Europe extends UnitLocation
         = new Ability(Ability.DRESS_MISSIONARY, true);
 
     /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 30;
+
+    /**
      * Migration handling.
      *
      * Migration routines operate on:

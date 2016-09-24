@@ -74,6 +74,11 @@ public class Unit extends GoodsLocation
     public static final String MOVE_CHANGE = "MOVE_CHANGE";
     public static final String ROLE_CHANGE = "ROLE_CHANGE";
 
+    /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 40;
+
     /** Compare units by location. */
     public static final Comparator<Unit> locComparator
             = Comparator.comparingInt(u -> Location.getRank(u));

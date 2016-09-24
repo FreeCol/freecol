@@ -59,6 +59,11 @@ public abstract class FreeColGameObject extends FreeColObject {
     /** Has this object been initialized? */
     protected boolean initialized;
 
+    /**
+     * Class object for use by {@link net.sf.freecol.client.ClientOptions}
+     */
+    protected int classindex = 50;
+
 
     /**
      * Creates a new {@code FreeColGameObject}.

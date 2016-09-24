@@ -40,6 +40,7 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
@@ -490,17 +491,15 @@ public class ClientOptions extends OptionGroup {
             return base;
         }
 
+        /**
+         * Determine the {@link FreeColObject#classindex} of a given {@code FreeColObject}
+         *
+         * @param object The object to check
+         * @return The object's classindex or 1000, if object is not a part of FreeCol
+         */
         private int getClassIndex(Object object) {
-            if (object instanceof Player) {
-                return 10;
-            } else if (object instanceof Colony) {
-                return 20;
-            } else if (object instanceof Europe) {
-                return 30;
-            } else if (object instanceof Unit) {
-                return 40;
-            } else if (object instanceof FreeColGameObject) {
-                return 50;
+            if (object instanceof FreeColObject) {
+                return ((FreeColObject) object).getClassIndex();
             } else {
                 return 1000;
             }
