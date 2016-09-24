@@ -294,7 +294,7 @@ public class River {
             if (other.sections.size() % 2 == 0) {
                 // get random new direction
                 int length = DirectionChange.values().length;
-                int index = other.randomInt(logger, "Flow", random, length);
+                int index = randomInt(logger, "Flow", random, length);
                 DirectionChange change = DirectionChange.values()[index];
                 other.direction = change.getNewDirection(other.direction);
                 other.logger.fine("Direction is now " + other.direction);
