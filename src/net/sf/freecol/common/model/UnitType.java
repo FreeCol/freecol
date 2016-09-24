@@ -907,6 +907,11 @@ public final class UnitType extends BuildableType implements Consumer {
         }
     }
 
+    @Override
+    protected String returnType() {
+        return "UnitType";
+    }
+
     /**
      * {@inheritDoc}
      */

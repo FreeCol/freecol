@@ -1009,7 +1009,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (assumeBuilt == null) {
             assumeBuilt = Collections.<BuildableType>emptyList();
         }
-        if (buildableType instanceof BuildingType) {
+        if (buildableType.returnType() == "BuildingType") {
             BuildingType newBuildingType = (BuildingType) buildableType;
             Building colonyBuilding = this.getBuilding(newBuildingType);
             if (colonyBuilding == null) {
@@ -1029,7 +1029,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
                     return NoBuildReason.WRONG_UPGRADE;
                 }
             }
-        } else if (buildableType instanceof UnitType) {
+        } else if (buildableType.returnType() == "UnitType") {
             // Non-person units need a BUILD ability, present or assumed.
             if (!buildableType.hasAbility(Ability.PERSON)
                 && !hasAbility(Ability.BUILD, buildableType)

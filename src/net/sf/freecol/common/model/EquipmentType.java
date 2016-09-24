@@ -343,6 +343,11 @@ public class EquipmentType extends BuildableType {
         }
     }
 
+    @Override
+    protected String returnType() {
+        return "EquipmentType";
+    }
+
     /**
      * {@inheritDoc}
      */

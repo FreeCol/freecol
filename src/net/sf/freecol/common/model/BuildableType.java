@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2002-2016   The FreeCol Team
- *
- *  This file is part of FreeCol.
- *
- *  FreeCol is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  FreeCol is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2002-2016   The FreeCol Team
+ * <p>
+ * This file is part of FreeCol.
+ * <p>
+ * FreeCol is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * FreeCol is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package net.sf.freecol.common.model;
@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -97,14 +98,14 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public Map<String, Boolean> getRequiredAbilities() {
         return (requiredAbilities == null)
-            ? Collections.<String, Boolean>emptyMap()
-            : new HashMap<>(requiredAbilities);
+                ? Collections.<String, Boolean>emptyMap()
+                : new HashMap<>(requiredAbilities);
     }
 
     public boolean requiresAbility(String key) {
         return (requiredAbilities == null) ? false
-            : (!requiredAbilities.containsKey(key)) ? false
-            : requiredAbilities.get(key);
+                : (!requiredAbilities.containsKey(key)) ? false
+                : requiredAbilities.get(key);
     }
 
     /**
@@ -137,7 +138,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public boolean isAvailableTo(FreeColObject... fco) {
         return (requiredAbilities == null) ? true
-            : all(requiredAbilities.entrySet(),
+                : all(requiredAbilities.entrySet(),
                 e -> e.getValue() == any(fco, o -> o.hasAbility(e.getKey())));
     }
 
@@ -151,9 +152,9 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public List<AbstractGoods> getRequiredGoodsList() {
         return (this.requiredGoods == null)
-            ? Collections.<AbstractGoods>emptyList()
-            : transform(this.requiredGoods, alwaysTrue(),
-                        ag -> new AbstractGoods(ag.getType(), ag.getAmount()));
+                ? Collections.<AbstractGoods>emptyList()
+                : transform(this.requiredGoods, alwaysTrue(),
+                ag -> new AbstractGoods(ag.getType(), ag.getAmount()));
     }
 
     /**
@@ -164,7 +165,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public Stream<AbstractGoods> getRequiredGoods() {
         return (this.requiredGoods == null) ? Stream.<AbstractGoods>empty()
-            : getRequiredGoodsList().stream();
+                : getRequiredGoodsList().stream();
     }
 
     /**
@@ -232,7 +233,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public StringTemplate getCurrentlyBuildingLabel() {
         return StringTemplate.template("model.buildableType.currentlyBuilding")
-            .addNamed("%buildable%", this);
+                .addNamed("%buildable%", this);
     }
 
 
@@ -244,7 +245,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     public static final String REQUIRED_POPULATION_TAG = "required-population";
 
 
-   /**
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -265,7 +266,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
 
         if (requiredAbilities != null) {
             for (Map.Entry<String, Boolean> entry
-                     : requiredAbilities.entrySet()) {
+                    : requiredAbilities.entrySet()) {
                 xw.writeStartElement(REQUIRED_ABILITY_TAG);
 
                 xw.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
@@ -297,7 +298,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         super.readAttributes(xr);
 
         requiredPopulation = xr.getAttribute(REQUIRED_POPULATION_TAG,
-                                             DEFAULT_REQUIRED_POPULATION);
+                DEFAULT_REQUIRED_POPULATION);
     }
 
     /**
@@ -330,7 +331,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
 
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                        GoodsType.class, (GoodsType)null);
+                    GoodsType.class, (GoodsType) null);
             int amount = xr.getAttribute(VALUE_TAG, 0);
             addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);
@@ -345,5 +346,16 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         } else {
             super.readChild(xr);
         }
+    }
+
+    /**
+     * Return the Buildable type
+     *
+     * FIXME: Make this more robust via class field
+     *
+     * @return
+     */
+    protected String returnType() {
+        return "BuildableType";
     }
 }

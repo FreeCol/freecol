@@ -563,6 +563,11 @@ public final class BuildingType extends BuildableType {
         // end @compat 0.11.6
     }
 
+    @Override
+    protected String returnType() {
+        return "BuildingType";
+    }
+
     /**
      * {@inheritDoc}
      */

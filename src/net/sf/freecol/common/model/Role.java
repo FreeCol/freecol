@@ -542,6 +542,11 @@ public class Role extends BuildableType {
         }
     }
 
+    @Override
+    protected String returnType() {
+        return "Role";
+    }
+
     /**
      * {@inheritDoc}
      */
