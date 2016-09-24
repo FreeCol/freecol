@@ -42,7 +42,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
 public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Location.class.getName());
+    private static final Logger logger = Logger.getLogger(GoodsContainer.class.getName());
 
     /** The size of a standard `hold' of data. */
     public static final int CARGO_SIZE = 100;
