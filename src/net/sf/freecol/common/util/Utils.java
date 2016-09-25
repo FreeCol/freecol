@@ -58,6 +58,19 @@ public class Utils {
 
 
     /**
+     * Compare ints.
+     *
+     * Note: not using i0-i1 to be sure of avoiding overflow.
+     *
+     * @param i0 The first int.
+     * @param i1 The second int.
+     * @return -1,0 or 1 depending on the comparison.
+     */
+    public static int compareTo(int i0, int i1) {
+        return (i0 < i1) ? -1 : (i1 < i0) ? 1 : 0;
+    }
+
+    /**
      * Check if two objects are equal but also checks for null.
      *
      * @param <T> The object type.

@@ -63,6 +63,11 @@ import net.sf.freecol.common.util.Utils;
 /**
  * The FreeCol root class.  Maintains an identifier, and an optional link
  * to the specification this object uses.
+ *
+ * All FreeColObjects are trivially sortable on the basis of their
+ * identifiers as a consequence of the Comparable implementation here.
+ * Do not override this any further, use explicit comparators if more fully
+ * featured sorting is required.
  */
 public abstract class FreeColObject
     implements Comparable<FreeColObject>, ObjectWithId {
@@ -179,7 +184,7 @@ public abstract class FreeColObject
      */
     public static String getIdType(String id) {
         if (id != null) {
-            int col = id.indexOf(':');
+            int col = id.lastIndexOf(':');
             return (col >= 0) ? id.substring(0, col) : id;
         }
         return null;
@@ -238,8 +243,8 @@ public abstract class FreeColObject
             return 1;
         }
         int cmp = fco1.getIdType().compareTo(fco2.getIdType());
-        if (cmp == 0) cmp = fco1.getIdNumber() - fco2.getIdNumber();
-        return cmp;
+        return (cmp > 0) ? 1 : (cmp < 0) ? -1
+            : Utils.compareTo(fco1.getIdNumber(), fco2.getIdNumber());
     }
 
 
