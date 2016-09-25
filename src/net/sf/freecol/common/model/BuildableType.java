@@ -1,20 +1,20 @@
 /**
- * Copyright (C) 2002-2016   The FreeCol Team
- * <p>
- * This file is part of FreeCol.
- * <p>
- * FreeCol is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- * <p>
- * FreeCol is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ *  Copyright (C) 2002-2016   The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package net.sf.freecol.common.model;
@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
-
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -236,6 +235,20 @@ public abstract class BuildableType extends FreeColSpecObjectType {
                 .addNamed("%buildable%", this);
     }
 
+    /**
+     * Checks to see if a given {@link BuildableType} can be built in a
+     *      colony based on the buildings or units available. Returns
+     *      the reason why the BuildableType cannot be built.
+     *
+     * @param colony The {@code Colony} to check.
+     * @param buildableType The {@code BuildableType} to check
+     * @param assumeBuilt A list of buildable types
+     * @return NoBuildReason.NONE as a default, only {@link BuildingType}
+     *          and {@link UnitType} override this behavior
+     */
+    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType, List<BuildableType> assumeBuilt) {
+        return Colony.NoBuildReason.NONE;
+    }
 
     // Serialization
 
@@ -331,7 +344,7 @@ public abstract class BuildableType extends FreeColSpecObjectType {
 
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, ID_ATTRIBUTE_TAG,
-                    GoodsType.class, (GoodsType) null);
+                    GoodsType.class, (GoodsType)null);
             int amount = xr.getAttribute(VALUE_TAG, 0);
             addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);
@@ -346,16 +359,5 @@ public abstract class BuildableType extends FreeColSpecObjectType {
         } else {
             super.readChild(xr);
         }
-    }
-
-    /**
-     * Return the Buildable type
-     *
-     * FIXME: Make this more robust via class field
-     *
-     * @return
-     */
-    protected String returnType() {
-        return "BuildableType";
     }
 }

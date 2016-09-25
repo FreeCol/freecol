@@ -43,7 +43,7 @@ public final class UnitType extends BuildableType implements Consumer {
 
     /** Comparator for defence ability. */
     public static final Comparator<UnitType> defenceComparator
-        = Comparator.comparingDouble(UnitType::getDefence);
+            = Comparator.comparingDouble(UnitType::getDefence);
 
     /** The default offence value. */
     public static final int DEFAULT_OFFENCE = 0;
@@ -129,6 +129,29 @@ public final class UnitType extends BuildableType implements Consumer {
         super(id, specification);
 
         this.defaultRole = specification.getDefaultRole();
+    }
+
+    /**
+     * Checks to see if a given {@link BuildableType} can be built in a
+     *      colony based on the units available. Returns the reason why
+     *      the BuildableType cannot be built.
+     *
+     * @param colony        The {@code Colony} to check.
+     * @param buildableType The {@code BuildableType} to check
+     * @param assumeBuilt   A list of buildable types
+     * @return              Return the reason for not being able to build.
+     *                          Either MISSING_BUILD_ABILITY OR NONE
+     */
+    @Override
+    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType, List<BuildableType> assumeBuilt) {
+        // Non-person units need a BUILD ability, present or assumed.
+        if (!buildableType.hasAbility(Ability.PERSON)
+                && !colony.hasAbility(Ability.BUILD, buildableType)
+                && none(assumeBuilt, bt -> bt.hasAbility(Ability.BUILD,
+                buildableType))) {
+            return Colony.NoBuildReason.MISSING_BUILD_ABILITY;
+        }
+        return Colony.NoBuildReason.NONE;
     }
 
 
@@ -411,7 +434,7 @@ public final class UnitType extends BuildableType implements Consumer {
      */
     public List<Role> getExpertRoles() {
         return transform(getSpecification().getRoles(),
-                         matchKey(this, Role::getExpertUnit));
+                matchKey(this, Role::getExpertUnit));
     }
 
     /**
@@ -454,7 +477,7 @@ public final class UnitType extends BuildableType implements Consumer {
         }
         return null;
     }
-        
+
     /**
      * Is this a naval unit type?
      *
@@ -555,9 +578,9 @@ public final class UnitType extends BuildableType implements Consumer {
     @Override
     public List<AbstractGoods> getConsumedGoods() {
         return (consumption == null) ? Collections.<AbstractGoods>emptyList()
-            : transform(consumption.keySet(),
-                        gt -> consumption.getCount(gt) != 0,
-                        gt -> new AbstractGoods(gt, consumption.getCount(gt)));
+                : transform(consumption.keySet(),
+                gt -> consumption.getCount(gt) != 0,
+                gt -> new AbstractGoods(gt, consumption.getCount(gt)));
     }
 
     /**
@@ -722,7 +745,7 @@ public final class UnitType extends BuildableType implements Consumer {
         if (xr.hasAttribute(OLD_DEFAULT_UNIT_TAG)) {
             defaultUnit = xr.getAttribute(OLD_DEFAULT_UNIT_TAG, false);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             defaultUnit = xr.getAttribute(DEFAULT_UNIT_TAG, false);
 
         movement = xr.getAttribute(MOVEMENT_TAG, parent.movement);
@@ -731,14 +754,14 @@ public final class UnitType extends BuildableType implements Consumer {
         if (xr.hasAttribute(OLD_LINE_OF_SIGHT_TAG)) {
             lineOfSight = xr.getAttribute(OLD_LINE_OF_SIGHT_TAG, parent.lineOfSight);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             lineOfSight = xr.getAttribute(LINE_OF_SIGHT_TAG, parent.lineOfSight);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_SCORE_VALUE_TAG)) {
             scoreValue = xr.getAttribute(OLD_SCORE_VALUE_TAG, parent.scoreValue);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             scoreValue = xr.getAttribute(SCORE_VALUE_TAG, parent.scoreValue);
 
         space = xr.getAttribute(SPACE_TAG, parent.space);
@@ -747,49 +770,49 @@ public final class UnitType extends BuildableType implements Consumer {
         if (xr.hasAttribute(OLD_HIT_POINTS_TAG)) {
             hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, parent.hitPoints);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             hitPoints = xr.getAttribute(HIT_POINTS_TAG, parent.hitPoints);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_SPACE_TAKEN_TAG)) {
             spaceTaken = xr.getAttribute(OLD_SPACE_TAKEN_TAG, parent.spaceTaken);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             spaceTaken = xr.getAttribute(SPACE_TAKEN_TAG, parent.spaceTaken);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_MAXIMUM_EXPERIENCE_TAG)) {
             maximumExperience = xr.getAttribute(OLD_MAXIMUM_EXPERIENCE_TAG,
-                                                parent.maximumExperience);
+                    parent.maximumExperience);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             maximumExperience = xr.getAttribute(MAXIMUM_EXPERIENCE_TAG,
-                                                parent.maximumExperience);
+                    parent.maximumExperience);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_MAXIMUM_ATTRITION_TAG)) {
             maximumAttrition = xr.getAttribute(OLD_MAXIMUM_ATTRITION_TAG,
-                                               parent.maximumAttrition);
+                    parent.maximumAttrition);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             maximumAttrition = xr.getAttribute(MAXIMUM_ATTRITION_TAG,
-                                               parent.maximumAttrition);
+                    parent.maximumAttrition);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_SKILL_TAUGHT_TAG)) {
             skillTaught = xr.getType(spec, OLD_SKILL_TAUGHT_TAG, UnitType.class, this);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             skillTaught = xr.getType(spec, SKILL_TAUGHT_TAG, UnitType.class, this);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_RECRUIT_PROBABILITY_TAG)) {
             recruitProbability = xr.getAttribute(OLD_RECRUIT_PROBABILITY_TAG,
-                                                 parent.recruitProbability);
+                    parent.recruitProbability);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
-                                                 parent.recruitProbability);
+                    parent.recruitProbability);
 
         // New in 0.11.4, but default is backward compatible.
         priority = xr.getAttribute(PRIORITY_TAG, Consumer.UNIT_PRIORITY);
@@ -799,7 +822,7 @@ public final class UnitType extends BuildableType implements Consumer {
         price = xr.getAttribute(PRICE_TAG, parent.price);
 
         expertProduction = xr.getType(spec, EXPERT_PRODUCTION_TAG,
-                                      GoodsType.class, parent.expertProduction);
+                GoodsType.class, parent.expertProduction);
 
         if (parent != this) { // Handle "extends" for super-type fields
             if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
@@ -842,19 +865,19 @@ public final class UnitType extends BuildableType implements Consumer {
         if (hasAbility(Ability.PERSON)) {
             Modifier m;
             if (!containsModifierKey(Modifier.CONVERSION_SKILL)) {
-                m = new Modifier(Modifier.CONVERSION_SKILL, 8.0f, 
-                                 Modifier.ModifierType.ADDITIVE);
+                m = new Modifier(Modifier.CONVERSION_SKILL, 8.0f,
+                        Modifier.ModifierType.ADDITIVE);
                 addModifier(m);
 
                 if (hasAbility(Ability.EXPERT_MISSIONARY)) {
                     m = new Modifier(Modifier.CONVERSION_SKILL, 5.0f,
-                                     Modifier.ModifierType.ADDITIVE);
+                            Modifier.ModifierType.ADDITIVE);
                     addModifier(m);
                 }
             }
             if (!containsModifierKey(Modifier.CONVERSION_ALARM_RATE)) {
                 m = new Modifier(Modifier.CONVERSION_ALARM_RATE, 2.0f,
-                                 Modifier.ModifierType.PERCENTAGE);
+                        Modifier.ModifierType.PERCENTAGE);
                 addModifier(m);
             }
         }
@@ -871,45 +894,40 @@ public final class UnitType extends BuildableType implements Consumer {
 
         if (CONSUMES_TAG.equals(tag)) {
             addConsumption(xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                      GoodsType.class, (GoodsType)null),
-                           xr.getAttribute(VALUE_TAG, UNDEFINED));
+                    GoodsType.class, (GoodsType)null),
+                    xr.getAttribute(VALUE_TAG, UNDEFINED));
             xr.closeTag(CONSUMES_TAG);
 
-        // @compat 0.10.7
+            // @compat 0.10.7
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
             String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
             String roleId = ("model.equipment.horses".equals(id))
-                ? "model.role.scout"
-                : ("model.equipment.muskets".equals(id))
-                ? "model.role.soldier"
-                : ("model.equipment.tools".equals(id))
-                ? "model.role.pioneer"
-                : ("model.equipment.missionary".equals(id))
-                ? "model.role.missionary"
-                : Specification.DEFAULT_ROLE_ID;
+                    ? "model.role.scout"
+                    : ("model.equipment.muskets".equals(id))
+                    ? "model.role.soldier"
+                    : ("model.equipment.tools".equals(id))
+                    ? "model.role.pioneer"
+                    : ("model.equipment.missionary".equals(id))
+                    ? "model.role.missionary"
+                    : Specification.DEFAULT_ROLE_ID;
             defaultRole = spec.getRole(roleId);
             xr.closeTag(DEFAULT_EQUIPMENT_TAG);
-        // end @compat
+            // end @compat
 
         } else if (DEFAULT_ROLE_TAG.equals(tag)) {
             defaultRole = xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                     Role.class, spec.getDefaultRole());
+                    Role.class, spec.getDefaultRole());
             xr.closeTag(DEFAULT_ROLE_TAG);
 
-        // @compat 0.11.6
+            // @compat 0.11.6
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             spec.setNeedUnitChangeTypes();
             xr.closeTag(tag, Scope.getTagName());
-        // end @compat 0.11.6
-            
+            // end @compat 0.11.6
+
         } else {
             super.readChild(xr);
         }
-    }
-
-    @Override
-    protected String returnType() {
-        return "UnitType";
     }
 
     /**

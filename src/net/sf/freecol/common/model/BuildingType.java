@@ -37,7 +37,7 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * of goods it produces and consumes.
  */
 public final class BuildingType extends BuildableType
-                                implements BaseProduction {
+        implements BaseProduction {
 
     /** The level of building. */
     private int level = 1;
@@ -58,7 +58,7 @@ public final class BuildingType extends BuildableType
 
     /** Maximum production from the "experts have connections" option. */
     private int expertConnectionProduction = 0;
-    
+
     /**
      * A multiplier for any unit goods-specific bonus for this building type.
      */
@@ -66,7 +66,7 @@ public final class BuildingType extends BuildableType
 
     /** The multiplier for the colony rebel bonus for this building type. */
     private float rebelFactor = 1.0f;
-    
+
     /** The building type this upgrades from. */
     private BuildingType upgradesFrom = null;
 
@@ -85,6 +85,42 @@ public final class BuildingType extends BuildableType
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
+    }
+
+    /**
+     * Checks to see if a given {@link BuildableType} can be built in a
+     *      colony based on the buildings available. Returns the reason why
+     *      the BuildableType cannot be built.
+     *
+     * @param colony        The {@code Colony} to check.
+     * @param buildableType The {@code BuildableType} to check
+     * @param assumeBuilt   A list of buildable types
+     * @return              Return the reason for not being able to build.
+     *                          Either WRONG_UPGRADE, MISSING_BUILD_ABILITY OR NONE
+     */
+    @Override
+    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType,
+                                                   List<BuildableType> assumeBuilt) {
+        BuildingType newBuildingType = (BuildingType) buildableType;
+        Building colonyBuilding = colony.getBuilding(newBuildingType);
+        if (colonyBuilding == null) {
+            // the colony has no similar building yet
+            BuildingType from = newBuildingType.getUpgradesFrom();
+            if (from != null && !assumeBuilt.contains(from)) {
+                // we are trying to build an advanced factory, we
+                // should build lower level shop first
+                return Colony.NoBuildReason.WRONG_UPGRADE;
+            }
+        } else {
+            // a building of the same family already exists
+            BuildingType from = colonyBuilding.getType().getUpgradesTo();
+            if (from != newBuildingType && !assumeBuilt.contains(from)) {
+                // the existing building's next upgrade is not the
+                // new one we want to build
+                return Colony.NoBuildReason.WRONG_UPGRADE;
+            }
+        }
+        return Colony.NoBuildReason.NONE;
     }
 
 
@@ -166,10 +202,10 @@ public final class BuildingType extends BuildableType
      */
     public NoAddReason getNoAddReason(UnitType unitType) {
         return (workPlaces == 0) ? NoAddReason.CAPACITY_EXCEEDED
-            : (!unitType.hasSkill()) ? NoAddReason.MISSING_SKILL
-            : (unitType.getSkill() < minSkill) ? NoAddReason.MINIMUM_SKILL
-            : (unitType.getSkill() > maxSkill) ? NoAddReason.MAXIMUM_SKILL
-            : NoAddReason.NONE;
+                : (!unitType.hasSkill()) ? NoAddReason.MISSING_SKILL
+                : (unitType.getSkill() < minSkill) ? NoAddReason.MINIMUM_SKILL
+                : (unitType.getSkill() > maxSkill) ? NoAddReason.MAXIMUM_SKILL
+                : NoAddReason.NONE;
     }
 
     /**
@@ -267,8 +303,8 @@ public final class BuildingType extends BuildableType
     public List<ProductionType> getAvailableProductionTypes(boolean unattended,
                                                             String level) {
         return transform(productionTypes,
-                         pt -> pt.getUnattended() == unattended
-                             && pt.appliesTo(level));
+                pt -> pt.getUnattended() == unattended
+                        && pt.appliesTo(level));
     }
 
     // @compat 0.10.6
@@ -315,7 +351,7 @@ public final class BuildingType extends BuildableType
      */
     public boolean canProduce(GoodsType goodsType, UnitType unitType) {
         return goodsType != null
-            && ProductionType.canProduce(goodsType,
+                && ProductionType.canProduce(goodsType,
                 getAvailableProductionTypes(unitType == null));
     }
 
@@ -333,7 +369,7 @@ public final class BuildingType extends BuildableType
         if (goodsType == null) return 0;
         int amount = getBaseProduction(null, goodsType, unitType);
         amount = (int)applyModifiers(amount, null, goodsType.getId(),
-                                     unitType);
+                unitType);
         return (amount < 0) ? 0 : amount;
     }
 
@@ -361,7 +397,7 @@ public final class BuildingType extends BuildableType
 
     private static final String COMPETENCE_FACTOR_TAG = "competence-factor";
     private static final String EXPERTS_WITH_CONNECTION_PRODUCTION_TAG
-        = "experts-with-connections-production";
+            = "experts-with-connections-production";
     private static final String MAXIMUM_SKILL_TAG = "maximum-skill";
     private static final String MINIMUM_SKILL_TAG = "minimum-skill";
     private static final String PRIORITY_TAG = "priority";
@@ -386,7 +422,7 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-        protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
         if (upgradesFrom != null) {
@@ -412,7 +448,7 @@ public final class BuildingType extends BuildableType
         }
 
         xw.writeAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
-                          this.expertConnectionProduction);
+                this.expertConnectionProduction);
 
         xw.writeAttribute(COMPETENCE_FACTOR_TAG, this.competenceFactor);
 
@@ -442,16 +478,16 @@ public final class BuildingType extends BuildableType
         final Specification spec = getSpecification();
 
         BuildingType parent = xr.getType(spec, EXTENDS_TAG,
-            BuildingType.class, this);
+                BuildingType.class, this);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_UPGRADES_FROM_TAG)) {
             upgradesFrom = xr.getType(spec, OLD_UPGRADES_FROM_TAG,
-                BuildingType.class, (BuildingType)null);
+                    BuildingType.class, (BuildingType)null);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
-                BuildingType.class, (BuildingType)null);
+                    BuildingType.class, (BuildingType)null);
         if (upgradesFrom == null) {
             level = 1;
         } else {
@@ -465,14 +501,14 @@ public final class BuildingType extends BuildableType
         if (xr.hasAttribute(OLD_MIN_SKILL_TAG)) {
             minSkill = xr.getAttribute(OLD_MIN_SKILL_TAG, parent.minSkill);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             minSkill = xr.getAttribute(MINIMUM_SKILL_TAG, parent.minSkill);
 
         // @compat 0.11.3
         if (xr.hasAttribute(OLD_MAX_SKILL_TAG)) {
             maxSkill = xr.getAttribute(OLD_MAX_SKILL_TAG, parent.maxSkill);
         } else
-        // end @compat 0.11.3
+            // end @compat 0.11.3
             maxSkill = xr.getAttribute(MAXIMUM_SKILL_TAG, parent.maxSkill);
 
         upkeep = xr.getAttribute(UPKEEP_TAG, parent.upkeep);
@@ -480,22 +516,22 @@ public final class BuildingType extends BuildableType
         priority = xr.getAttribute(PRIORITY_TAG, parent.priority);
 
         this.expertConnectionProduction
-            = xr.getAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
-                              parent.expertConnectionProduction);
+                = xr.getAttribute(EXPERTS_WITH_CONNECTION_PRODUCTION_TAG,
+                parent.expertConnectionProduction);
 
         this.competenceFactor = xr.getAttribute(COMPETENCE_FACTOR_TAG,
-                                                parent.competenceFactor);
+                parent.competenceFactor);
 
         this.rebelFactor = xr.getAttribute(REBEL_FACTOR_TAG,
-                                           parent.rebelFactor);
+                parent.rebelFactor);
 
         // @compat 0.10.6
         int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);
         if (basicProduction > 0) {
             GoodsType consumes = xr.getType(spec, CONSUMES_TAG, GoodsType.class,
-                parent.getConsumedGoodsType());
+                    parent.getConsumedGoodsType());
             GoodsType produces = xr.getType(spec, PRODUCES_TAG, GoodsType.class,
-                parent.getProducedGoodsType());
+                    parent.getProducedGoodsType());
             productionTypes.add(new ProductionType(consumes, produces,
                     basicProduction));
         }
@@ -536,14 +572,9 @@ public final class BuildingType extends BuildableType
 
         // @compat 0.11.6
         if (hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
-            && this.expertConnectionProduction == 0)
+                && this.expertConnectionProduction == 0)
             this.expertConnectionProduction = 4;
         // end @compat 0.11.6
-    }
-
-    @Override
-    protected String returnType() {
-        return "BuildingType";
     }
 
     /**

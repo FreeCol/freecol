@@ -342,11 +342,7 @@ public class EquipmentType extends BuildableType {
             super.readChild(xr);
         }
     }
-
-    @Override
-    protected String returnType() {
-        return "EquipmentType";
-    }
+    
 
     /**
      * {@inheritDoc}
