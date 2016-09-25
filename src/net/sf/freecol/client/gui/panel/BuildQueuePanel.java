@@ -92,6 +92,21 @@ import static net.sf.freecol.common.util.StringUtils.*;
 
 /**
  * The panel used to display a colony build queue.
+ * <p>
+ * Panel Layout:
+ * <p style="display: block; font-family: monospace; white-space: pre; margin: 1em 0;">
+ * | ----------------------------------------------------- |
+ * |                         header                        |
+ * | --------------- | ----------------- | --------------- |
+ * |     bqpUnits    |   bpqBuildQueue   |  bqpBuildings   |
+ * | --------------- | ----------------- | --------------- |
+ * |     unitList    | constructionPanel |  buildingList   |
+ * |                 | ----------------- |                 |
+ * |                 |   buildQueueList  |                 |
+ * |                 |                   |                 |
+ * | ----------------------------------------------------- |
+ * | [buyBuildable] []compactBox []showAllBox   [okButton] |
+ * | ----------------------------------------------------- |
  */
 public class BuildQueuePanel extends FreeColPanel implements ItemListener {
 
@@ -529,7 +544,7 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
      * @param colony The enclosing {@code Colony}.
      */
     public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
-        super(freeColClient, new MigLayout("wrap 3, debug",
+        super(freeColClient, new MigLayout("wrap 3",
                 "[260:][390:, fill][260:]", "[][][300:400:][]"));
 
         this.colony = colony;
