@@ -36,7 +36,8 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  * {@link Building}, such as the number of workplaces, and the types
  * of goods it produces and consumes.
  */
-public final class BuildingType extends BuildableType {
+public final class BuildingType extends BuildableType
+                                implements BaseProduction {
 
     /** The level of building. */
     private int level = 1;
@@ -319,29 +320,6 @@ public final class BuildingType extends BuildableType {
     }
 
     /**
-     * Get the base production of a given goods type for an optional
-     * unit type.
-     *
-     * @param productionType An optional {@code ProductionType} to use,
-     *     if null the best available one is used.
-     * @param goodsType The {@code GoodsType} to produce.
-     * @param unitType An optional {@code UnitType} that is to do
-     *     the work, if null the unattended production is considered.
-     * @return The amount of goods produced.
-     */
-    public int getBaseProduction(ProductionType productionType,
-                                 GoodsType goodsType, UnitType unitType) {
-        if (goodsType == null) return 0;
-        if (productionType == null) {
-            productionType = ProductionType.getBestProductionType(goodsType,
-                getAvailableProductionTypes(unitType == null));
-        }
-        if (productionType == null) return 0;
-        AbstractGoods best = productionType.getOutput(goodsType);
-        return (best == null) ? 0 : best.getAmount();
-    }
-
-    /** 
      * Get the amount of goods of a given goods type the given unit
      * type could produce on a tile of this tile type.
      *

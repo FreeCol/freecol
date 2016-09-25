@@ -36,7 +36,8 @@ import net.sf.freecol.common.util.RandomChoice;
 /**
  * The types of tiles.
  */
-public final class TileType extends FreeColSpecObjectType {
+public final class TileType extends FreeColSpecObjectType
+                            implements BaseProduction {
 
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE };
 
@@ -327,29 +328,6 @@ public final class TileType extends FreeColSpecObjectType {
         return goodsType != null
             && ProductionType.canProduce(goodsType,
                 getAvailableProductionTypes(unitType == null));
-    }
-
-    /**
-     * Get the base production of a given goods type for an optional
-     * unit type.
-     * 
-     * @param productionType An optional {@code ProductionType} to use,
-     *     if null the best available one is used.
-     * @param goodsType The {@code GoodsType} to produce.
-     * @param unitType An optional {@code UnitType} that is to do
-     *     the work, if null the unattended production is considered.
-     * @return The amount of goods produced.
-     */
-    public int getBaseProduction(ProductionType productionType,
-                                 GoodsType goodsType, UnitType unitType) {
-        if (goodsType == null) return 0;
-        if (productionType == null) {
-            productionType = ProductionType.getBestProductionType(goodsType,
-                getAvailableProductionTypes(unitType == null));
-        }
-        if (productionType == null) return 0;
-        AbstractGoods best = productionType.getOutput(goodsType);
-        return (best == null) ? 0 : best.getAmount();
     }
 
     /**
