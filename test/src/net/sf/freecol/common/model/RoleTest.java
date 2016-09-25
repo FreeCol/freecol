@@ -69,15 +69,6 @@ public class RoleTest extends FreeColTestCase {
 
 
     public void testRoleComparator() {
-        List<Role> roles = new ArrayList<>();
-        roles.add(soldier);
-        roles.add(dragoon);
-        roles.add(mission);
-        roles.sort(Comparator.naturalOrder());
-        assertEquals(dragoon, roles.get(0));
-        assertEquals(soldier, roles.get(1));
-        assertEquals(mission, roles.get(2));
-
         assertEquals(0,  Role.militaryComparator.compare(soldier, soldier));
         assertEquals(0,  Role.militaryComparator.compare(dragoon, dragoon));
         assertEquals(0,  Role.militaryComparator.compare(mission, mission));

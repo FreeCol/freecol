@@ -371,14 +371,21 @@ public class Role extends BuildableType {
         return result;
     }
 
-    private int getAbilityIndex() {
-        if (requiresAbility(Ability.NATIVE)) {
-            return 10;
-        } else if (requiresAbility(Ability.REF_UNIT)) {
-            return 5;
-        } else {
-            return 0;
-        }
+    /**
+     * Establish a simple ordering.
+     *
+     * Normal roles, then REF-specific roles, then native-specific
+     * roles.  Reduce by role-specific equipment amounts to
+     * further separate the levels such that the heavier armed roles
+     * sort first.
+     *
+     * @return A role index.
+     */
+    public int getRoleIndex() {
+        int base = (requiresAbility(Ability.NATIVE)) ? 30
+            : (requiresAbility(Ability.REF_UNIT)) ? 20
+            : 10;
+        return base - getRequiredGoodsList().size();
     }
 
     /**
@@ -409,27 +416,6 @@ public class Role extends BuildableType {
     }
 
         
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof Role) {
-            Role role = (Role)other;
-            cmp = role.getAbilityIndex() - this.getAbilityIndex();
-            if (cmp == 0) {
-                cmp = role.getRequiredGoodsList().size()
-                    - this.getRequiredGoodsList().size();
-            }
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
-    }
-
-
     // Serialization
 
     private static final String CAPTURE_TAG = "capture";

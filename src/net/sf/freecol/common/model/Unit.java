@@ -83,10 +83,14 @@ public class Unit extends GoodsLocation
     public static final Comparator<Unit> locComparator
         = Comparator.comparingInt(u -> Location.getRank(u));
 
-    /** A comparator to compare units by type then role. */
+    /**
+     * A comparator to compare units by type, then role index, then
+     * the FCO order.
+     */
     public static final Comparator<Unit> typeRoleComparator
         = Comparator.comparing(Unit::getType)
-            .thenComparing(Comparator.comparing(Unit::getRole));
+            .thenComparingInt(u -> u.getRole().getRoleIndex())
+            .thenComparing(FreeColObject.fcoComparator);
 
     /** A comparator to compare units by increasing skill level. */
     public static final Comparator<Unit> increasingSkillComparator
