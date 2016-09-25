@@ -2766,8 +2766,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      */
     @Override
     public int getExportAmount(GoodsType goodsType, int turns) {
-        final int present = Math.max(0, getGoodsCount(goodsType)
-            + turns * getNetProductionOf(goodsType));
+        final int present = ReturnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         return Math.max(0, present - ed.getExportLevel());
     }
@@ -2779,13 +2778,24 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     public int getImportAmount(GoodsType goodsType, int turns) {
         if (goodsType.limitIgnored()) return GoodsContainer.HUGE_CARGO_SIZE;
 
-        final int present = Math.max(0, getGoodsCount(goodsType)
-            + turns * getNetProductionOf(goodsType));
+        final int present = ReturnPresent(goodsType, turns);
         final ExportData ed = getExportData(goodsType);
         int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
         return Math.max(0, capacity - present);
     }
 
+    /**
+     *  Used to calculated the present field.
+     *
+     * @param goodsType
+     * @param turns
+     * @return
+     */
+    private int ReturnPresent(GoodsType goodsType, int turns) {
+        final int present = Math.max(0, getGoodsCount(goodsType)
+                + turns * getNetProductionOf(goodsType));
+        return present;
+    }
 
     //
     // Miscellaneous low level
