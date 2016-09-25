@@ -128,27 +128,6 @@ public class TileTypeChange extends FreeColSpecObjectType {
     // end @compat 0.10.4
 
 
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject fco) {
-        int cmp = 0;
-        if (fco instanceof TileTypeChange) {
-            TileTypeChange other = (TileTypeChange)fco;
-            cmp = (from == null) ? ((other.from == null) ? 0 : -1)
-                : (other.from == null) ? 1
-                : FreeColObject.compareIds(from, other.from);
-            if (cmp == 0) cmp = (to == null) ? ((other.to == null) ? 0 : -1)
-                              : (other.to == null) ? 1
-                              : FreeColObject.compareIds(to, other.to);
-        }
-        if (cmp == 0) cmp = super.compareTo(fco);
-        return cmp;
-    }
-
     // Override Object
 
     /**
