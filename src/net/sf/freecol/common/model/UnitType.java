@@ -587,23 +587,6 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
 
-    // Override FreeColObject
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int compareTo(FreeColObject other) {
-        int cmp = 0;
-        if (other instanceof UnitType) {
-            UnitType ut = (UnitType)other;
-            cmp = getIndex() - ut.getIndex();
-        }
-        if (cmp == 0) cmp = super.compareTo(other);
-        return cmp;
-    }
-
-
     // Interface Consumer
 
     /**
