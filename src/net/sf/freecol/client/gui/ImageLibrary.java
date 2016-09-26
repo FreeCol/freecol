@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 
@@ -1008,31 +1007,14 @@ public final class ImageLibrary {
      * @param foreground The foreground {@code Color}.
      * @return A chip.
      */
-    private BufferedImage createChip(Graphics2D g, String text, Color border,
-                                     Color background, Color foreground) {
-        Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
-            FontLibrary.FontSize.TINY, Font.BOLD, scaleFactor);
-        FontMetrics fm = g.getFontMetrics(font);
-        int padding = (int)(6 * scaleFactor);
-        BufferedImage bi = new BufferedImage(fm.stringWidth(text) + padding,
-            fm.getMaxAscent() + fm.getMaxDescent() + padding,
-            BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        g2.setFont(font);
-        int width = bi.getWidth();
-        int height = bi.getHeight();
-        g2.setColor(border);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(background);
-        g2.fillRect(1, 1, width - 2, height - 2);
-        g2.setColor(foreground);
-        g2.drawString(text, padding/2, fm.getMaxAscent() + padding/2);
-        g2.dispose();
-        return bi;
+    private BufferedImage createChip(Graphics2D g, String text,
+                                     Color border, Color background,
+                                     Color foreground) {
+        return createChip(g, text, border, background, 0, Color.black, foreground, true);
     }
 
     /**
-     * Create a filled "chip" with the given text and colors.
+     * Create a "chip" with the given text and colors.
      *
      * @param g Graphics2D for getting the FontMetrics.
      * @param text The text to display.
@@ -1043,10 +1025,31 @@ public final class ImageLibrary {
      * @param foreground The foreground {@code Color}.
      * @return A chip.
      */
-    private BufferedImage createFilledChip(Graphics2D g, String text,
-                                           Color border, Color background,
-                                           double amount, Color fill,
-                                           Color foreground) {
+    private BufferedImage createChip(Graphics2D g, String text,
+                                     Color border, Color background,
+                                     double amount, Color fill,
+                                     Color foreground) {
+        return createChip(g, text, border, background, amount, fill, foreground, true);
+    }
+
+    /**
+     * Create a "chip" with the given text and colors.
+     *
+     * @param g Graphics2D for getting the FontMetrics.
+     * @param text The text to display.
+     * @param border The border {@code Color}.
+     * @param background The background {@code Color}.
+     * @param amount How much to fill the chip with the fill color
+     * @param fill The fill {@code Color}.
+     * @param foreground The foreground {@code Color}.
+     * @param filled Whether the chip is filled or not
+     * @return A chip.
+     */
+    private BufferedImage createChip(Graphics2D g, String text,
+                                     Color border, Color background,
+                                     double amount, Color fill,
+                                     Color foreground,
+                                     Boolean filled) {
         Font font = FontLibrary.createFont(FontLibrary.FontType.SIMPLE,
             FontLibrary.FontSize.TINY, Font.BOLD, scaleFactor);
         FontMetrics fm = g.getFontMetrics(font);
@@ -1062,9 +1065,11 @@ public final class ImageLibrary {
         g2.fillRect(0, 0, width, height);
         g2.setColor(background);
         g2.fillRect(1, 1, width - 2, height - 2);
-        if (amount > 0.0 && amount <= 1.0) {
-            g2.setColor(fill);
-            g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
+        if (filled.equals(false)) {
+            if (amount > 0.0 && amount <= 1.0) {
+                g2.setColor(fill);
+                g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
+            }
         }
         g2.setColor(foreground);
         g2.drawString(text, padding/2, fm.getMaxAscent() + padding/2);
@@ -1078,7 +1083,7 @@ public final class ImageLibrary {
     /**
      * Gets a chip image for the alarm at an Indian settlement.
      * The background is either the native owner's, or that of the
-     * most hated nation if any.
+     * most-hatednation, if any.
      *
      * @param g Graphics2D for getting the FontMetrics.
      * @param is The {@code IndianSettlement} to check.
@@ -1108,7 +1113,7 @@ public final class ImageLibrary {
         String text = ResourceManager.getString((is.worthScouting(player))
                                                 ? "indianAlarmChip.contacted"
                                                 : "indianAlarmChip.scouted");
-        return createFilledChip(g, text, Color.BLACK, ownerColor, amount/4.0,
+        return createChip(g, text, Color.BLACK, ownerColor, amount/4.0,
                                    enemyColor, foreground);
     }
 
