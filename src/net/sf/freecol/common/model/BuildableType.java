@@ -20,20 +20,18 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.JList;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.StringTemplate;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -248,6 +246,17 @@ public abstract class BuildableType extends FreeColSpecObjectType {
      */
     public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType, List<BuildableType> assumeBuilt) {
         return Colony.NoBuildReason.NONE;
+    }
+
+
+    public int getMinimumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        return UNABLE_TO_BUILD;
+    }
+
+    public int getMaximumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        return UNABLE_TO_BUILD;
     }
 
     // Serialization

@@ -22,12 +22,11 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListModel;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -152,6 +151,43 @@ public final class UnitType extends BuildableType implements Consumer {
             return Colony.NoBuildReason.MISSING_BUILD_ABILITY;
         }
         return Colony.NoBuildReason.NONE;
+    }
+
+    @Override
+    public int getMinimumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        if (colony.canBuild(buildableType)) return 0;
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
+                    buildableType)) return index + 1;
+        }
+        return UNABLE_TO_BUILD;
+    }
+
+    @Override
+    public int getMaximumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        final int buildQueueLastPos = buildQueue.getSize();
+
+        boolean canBuild = false;
+        if (colony.canBuild(buildableType)) {
+            canBuild = true;
+        }
+
+        // does not depend on anything, nothing depends on it
+        // can be built at any time
+        if (canBuild) return buildQueueLastPos;
+        // check for building in queue that allows builting this unit
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            BuildableType toBuild = buildQueue.getElementAt(index);
+            if (toBuild == buildableType) continue;
+            if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
+                return buildQueueLastPos;
+            }
+        }
+        return UNABLE_TO_BUILD;
     }
 
 

@@ -32,13 +32,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +76,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColSpecObjectType;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Limit;
 import net.sf.freecol.common.model.Named;
@@ -958,98 +955,13 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private int getMinimumIndex(BuildableType buildableType) {
-        ListModel<BuildableType> buildQueue = this.buildQueueList.getModel();
-        if (buildableType instanceof UnitType) {
-            if (this.colony.canBuild(buildableType)) return 0;
-            for (int index = 0; index < buildQueue.getSize(); index++) {
-                if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
-                        buildableType)) return index + 1;
-            }
-        } else if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType)buildableType)
-                    .getUpgradesFrom();
-            if (upgradesFrom == null) return 0;
-            Building building = this.colony
-                    .getBuilding((BuildingType)buildableType);
-            BuildingType buildingType = (building == null) ? null
-                : building.getType();
-            if (buildingType == upgradesFrom) return 0;
-            for (int index = 0; index < buildQueue.getSize(); index++) {
-                if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
-                    return index + 1;
-                }
-            }
-        }
-        return UNABLE_TO_BUILD;
+        return buildableType.getMinimumIndex(this.getColony(), buildableType,
+                                             buildQueueList, UNABLE_TO_BUILD);
     }
 
     private int getMaximumIndex(BuildableType buildableType) {
-        ListModel<BuildableType> buildQueue = this.buildQueueList.getModel();
-        final int buildQueueLastPos = buildQueue.getSize();
-
-        boolean canBuild = false;
-        if (this.colony.canBuild(buildableType)) {
-            canBuild = true;
-        }
-
-        if (buildableType instanceof UnitType) {
-            // does not depend on anything, nothing depends on it
-            // can be built at any time
-            if (canBuild) return buildQueueLastPos;
-            // check for building in queue that allows builting this unit
-            for (int index = 0; index < buildQueue.getSize(); index++) {
-                BuildableType toBuild = buildQueue.getElementAt(index);
-                if (toBuild == buildableType) continue;
-                if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
-                    return buildQueueLastPos;
-                }
-            }
-            return UNABLE_TO_BUILD;
-        }
-
-        if (buildableType instanceof BuildingType) {
-            BuildingType upgradesFrom = ((BuildingType)buildableType
-                    ).getUpgradesFrom();
-            BuildingType upgradesTo = ((BuildingType)buildableType)
-                    .getUpgradesTo();
-            // does not depend on nothing, but still cannot be built
-            if (!canBuild && upgradesFrom == null) {
-                return UNABLE_TO_BUILD;
-            }
-
-            // if can be built and does not have any upgrade,
-            // then it can be built at any time
-            if (canBuild && upgradesTo == null) {
-                return buildQueueLastPos;
-            }
-
-            // if can be built, does not depend on anything, mark
-            // upgrades from as found
-            boolean foundUpgradesFrom = canBuild;
-            for (int index = 0; index < buildQueue.getSize(); index++) {
-                BuildableType toBuild = buildQueue.getElementAt(index);
-                
-                if (toBuild == buildableType) continue;
-
-                if (!canBuild && !foundUpgradesFrom
-                    && upgradesFrom.equals(toBuild)) {
-                    foundUpgradesFrom = true;
-                    // nothing else to upgrade this building to
-                    if (upgradesTo == null) return buildQueueLastPos;
-                }
-                // found a building it upgrades to, cannot go to or
-                // beyond this position
-                if (foundUpgradesFrom && upgradesTo != null
-                    && upgradesTo.equals(toBuild)) return index;
-
-                // Don't go past a unit this building can build.
-                if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
-                    return index;
-                }
-            }
-            return buildQueueLastPos;
-        }
-        return UNABLE_TO_BUILD;
+        return buildableType.getMaximumIndex(this.getColony(), buildableType,
+                                             buildQueueList, UNABLE_TO_BUILD);
     }
 
     /**
