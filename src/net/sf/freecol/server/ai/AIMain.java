@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.RandomUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.server.FreeColServer;
@@ -320,6 +321,33 @@ public class AIMain extends FreeColObject
             Collectors.toMap(Entry::getKey, e -> Long.toString(e.getValue())));
     }
 
+    /**
+     * Check sort consistency.
+     *
+     * @return A string describing sort consistency failures, or null
+     *     on success.
+     */
+    public String checkSortConsistency() {
+        LogBuilder lb = new LogBuilder(256);
+        lb.add("AI object sort inconsistencies");
+        lb.mark();
+
+        // Check sort consistency of the AI objects
+        AIObject[] objects = getAIObjects().toArray(new AIObject[0]);
+        for (int i0 = 0; i0 < objects.length; i0++) {
+            for (int i1 = i0+1; i1 < objects.length; i1++) {
+                int c0 = objects[i0].compareTo(objects[i1]);
+                int c1 = objects[i1].compareTo(objects[i0]);
+                if (c0 == 0 && c1 == 0) continue;
+                if (c0 == -1 && c1 == 1) continue;
+                if (c0 == 1 && c1 == -1) continue;
+                lb.add("\n  ", objects[i0], " ", objects[i1],
+                       " = ", c0, "/", c1);
+            }
+        }
+        return (lb.grew()) ? lb.toString() : null;
+    }
+    
     /**
      * Checks the integrity of this {@code AIMain} by checking if
      * there are any invalid objects.

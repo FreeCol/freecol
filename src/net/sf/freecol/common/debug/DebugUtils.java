@@ -1208,6 +1208,11 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
         final AIPlayer ap = aiMain.getAIPlayer(player);
 
+        String consistency = aiMain.checkSortConsistency();
+        if (consistency != null) {
+            freeColClient.getGUI().showInformationMessage(consistency);
+        }
+
         ap.setDebuggingConnection(freeColClient.askServer().getConnection());
         ap.startWorking();
         freeColClient.getConnectController().reconnect();
