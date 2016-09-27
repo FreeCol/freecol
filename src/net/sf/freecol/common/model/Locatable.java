@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+
 /**
  * An object that can be put in a {@code Location}.
  */
@@ -64,4 +66,28 @@ public interface Locatable {
      * @return The number of cargo slots required.
      */
     public int getSpaceTaken();
+
+    /**
+     * Determines whether a Locatable can be added
+     *
+     * @param locatable
+     * @param units
+     * @param unitLocation
+     * @return true if location is set, false if not
+     */
+    public default boolean canAddLocatable(Locatable locatable, List<Unit> units, UnitLocation unitLocation) {
+        return false;
+    }
+
+    /**
+     * Determines whether a {@code Unit} of type {@code Locatable} can be removed
+     *
+     * @param locatable
+     * @param units
+     * @param unitLocation
+     * @return
+     */
+    public default boolean canRemoveLocatable(Locatable locatable, List<Unit> units, UnitLocation unitLocation) {
+        return false;
+    }
 }

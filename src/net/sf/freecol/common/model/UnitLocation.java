@@ -314,28 +314,13 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            if (contains(unit)) {
-                return true;
-            } else if (canAdd(unit)) {
-                synchronized (this.units) {
-                    if (!this.units.add(unit)) return false;
-                }
-                unit.setLocationNoUpdate(this);
-                return true;
-            }
-        } else if (locatable instanceof Goods) {
-            // dumping goods is a valid action
-            locatable.setLocation(null);
-            logger.finest("Dumped " + locatable + " in UnitLocation with id "
-                          + getId());
+        if (locatable.canAddLocatable(locatable, this.units, this) == true) {
             return true;
         } else {
             logger.warning("Tried to add Locatable " + locatable
-                           + " to UnitLocation with id " + getId() + ".");
+                    + " to UnitLocation with id " + getId() + ".");
+            return false;
         }
-        return false;
     }
 
     /**
@@ -343,12 +328,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     public boolean remove(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit unit = (Unit)locatable;
-            synchronized (this.units) {
-                if (!this.units.remove(unit)) return false;
-            }
-            unit.setLocationNoUpdate(null);
+        if (locatable.canRemoveLocatable(locatable, this.units, this) == true) {
             return true;
         } else {
             logger.warning("Tried to remove non-Unit " + locatable
