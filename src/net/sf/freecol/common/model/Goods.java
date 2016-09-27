@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -178,15 +177,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     @Override
     public int getSpaceTaken() {
         return 1;
-    }
-
-    @Override
-    public boolean canAddLocatable(Locatable locatable, List<Unit> units, UnitLocation unitLocation) {
-        // dumping goods is a valid action
-        locatable.setLocation(null);
-        logger.finest("Dumped " + locatable + " in UnitLocation with id "
-                + unitLocation.getId());
-        return true;
     }
 
 

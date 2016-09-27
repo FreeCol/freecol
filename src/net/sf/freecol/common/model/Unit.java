@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.logging.Logger;
@@ -36,6 +37,8 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -4029,31 +4032,6 @@ public class Unit extends GoodsLocation
         // We do not have to consider what this unit is carrying
         // because carriers can not be put onto carriers.  Yet.
         return unitType.getSpaceTaken();
-    }
-
-    @Override
-    public boolean canAddLocatable(Locatable locatable, List<Unit> units, UnitLocation unitLocation) {
-        Unit unit = (Unit) locatable;
-        if (contains(unit)) {
-            return true;
-        } else if (canAdd(unit)) {
-            synchronized (units) {
-                if (!units.add(unit)) return false;
-            }
-            setLocationNoUpdate(this);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canRemoveLocatable(Locatable locatable, List<Unit> units, UnitLocation unitLocation) {
-        Unit unit = (Unit)locatable;
-        synchronized (units) {
-            if (!units.remove(unit)) return false;
-        }
-        unit.setLocationNoUpdate(null);
-        return true;
     }
 
     /**
