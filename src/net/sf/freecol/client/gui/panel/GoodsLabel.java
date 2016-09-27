@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
@@ -45,7 +46,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * makes it ideal to use for drag and drop purposes.
  */
 public final class GoodsLabel extends AbstractGoodsLabel
-    implements Draggable {
+    implements CargoLabel, Draggable {
     
     private GUI gui;
 
@@ -157,5 +158,36 @@ public final class GoodsLabel extends AbstractGoodsLabel
     public boolean isOnCarrier() {
         Goods goods = getGoods();
         return goods != null && goods.getLocation() instanceof Unit;
+    }
+
+
+    //Interface CargoLabel
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+        Goods goods = ((GoodsLabel)comp).getGoods();
+        int loadable = carrier.getLoadableAmount(goods.getType());
+        if (loadable <= 0) return null;
+        if (loadable > goods.getAmount()) loadable = goods.getAmount();
+        Goods toAdd = new Goods(goods.getGame(), goods.getLocation(),
+                goods.getType(), loadable);
+        goods.setAmount(goods.getAmount() - loadable);
+        cargoPanel.igc().loadCargo(toAdd, carrier);
+        cargoPanel.update();
+        return comp;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeCargo(Component comp, CargoPanel cargoPanel) {
+        Goods g = ((GoodsLabel)comp).getGoods();
+        cargoPanel.igc().unloadCargo(g, false);
+        cargoPanel.update();
     }
 }

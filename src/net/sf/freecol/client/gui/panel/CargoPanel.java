@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -189,54 +190,19 @@ public class CargoPanel extends FreeColPanel
     }
 
     /**
+     * Add a {@code Component} of interface type {@code CargoLabel} to a carrier
+     *
      * {@inheritDoc}
      */
     public Component add(Component comp, boolean editState) {
-        if (carrier == null) return null;
-
-        if (editState) {
-            if (comp instanceof GoodsLabel) {
-                Goods goods = ((GoodsLabel)comp).getGoods();
-                int loadable = carrier.getLoadableAmount(goods.getType());
-                if (loadable <= 0) return null;
-                if (loadable > goods.getAmount()) loadable = goods.getAmount();
-                Goods toAdd = new Goods(goods.getGame(), goods.getLocation(),
-                                        goods.getType(), loadable);
-                goods.setAmount(goods.getAmount() - loadable);
-                igc().loadCargo(toAdd, carrier);
-                update();
-                return comp;
-
-            } else if (comp instanceof MarketLabel) {
-                MarketLabel label = (MarketLabel)comp;
-                Player player = carrier.getOwner();
-                if (!player.canTrade(label.getType())) {
-                    igc().payArrears(label.getType());
-                    return null;
-                }
-                int loadable = carrier.getLoadableAmount(label.getType());
-                if (loadable <= 0) return null;
-                if (loadable > label.getAmount()) loadable = label.getAmount();
-                igc().buyGoods(label.getType(), loadable, carrier);
-                igc().nextModelMessage();
-                update();
-                return comp;
-
-            } else if (comp instanceof UnitLabel) {
-                Unit unit = ((UnitLabel)comp).getUnit();
-                if (carrier.canAdd(unit)) {
-                    Container oldParent = comp.getParent();
-                    if (igc().boardShip(unit, carrier)) {
-                        ((UnitLabel) comp).setSmall(false);
-                        if (oldParent != null) oldParent.remove(comp);
-                        update();
-                        return comp;
-                    }
-                }
-            }
+        if (carrier == null) {
+            return null;
+        } else if (editState && comp instanceof CargoLabel) {
+            return ((CargoLabel) comp).addCargo(comp, carrier, this);
         } else {
             super.add(comp);
         }
+        logger.log(Level.FINER, "Attempted to add a component to an invalid carrier.");
         return null;
     }
 
@@ -277,14 +243,8 @@ public class CargoPanel extends FreeColPanel
      */
     @Override
     public void remove(Component comp) {
-        if (comp instanceof UnitLabel) {
-            Unit unit = ((UnitLabel)comp).getUnit();
-            igc().leaveShip(unit);
-            update();
-        } else if (comp instanceof GoodsLabel) {
-            Goods g = ((GoodsLabel)comp).getGoods();
-            igc().unloadCargo(g, false);
-            update();
+        if (comp instanceof CargoLabel) {
+            ((CargoLabel) comp).removeCargo(comp, this);
         }
     }
 

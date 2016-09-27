@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -58,7 +60,7 @@ import static net.sf.freecol.common.util.StringUtils.lastPart;
  * ideal to use for drag and drop purposes.
  */
 public final class UnitLabel extends JLabel
-    implements ActionListener, Draggable {
+    implements ActionListener, CargoLabel, Draggable {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitLabel.class.getName());
@@ -349,6 +351,32 @@ public final class UnitLabel extends JLabel
             .toUpperCase(Locale.US);
     }
 
+    //Interface CargoLabel
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+        Unit unit = ((UnitLabel)comp).getUnit();
+        if (carrier.canAdd(unit)) {
+            Container oldParent = comp.getParent();
+            if (cargoPanel.igc().boardShip(unit, carrier)) {
+                ((UnitLabel) comp).setSmall(false);
+                if (oldParent != null) oldParent.remove(comp);
+                cargoPanel.update();
+                return comp;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void removeCargo(Component comp, CargoPanel cargoPanel) {
+        Unit unit = ((UnitLabel)comp).getUnit();
+        cargoPanel.igc().leaveShip(unit);
+        cargoPanel.update();
+    }
 
     // Interface Draggable
 

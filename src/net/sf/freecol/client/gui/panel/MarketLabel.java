@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
@@ -31,13 +33,14 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
  * This label represents a cargo type on the European market.
  */
 public final class MarketLabel extends AbstractGoodsLabel
-    implements Draggable, PropertyChangeListener {
+    implements CargoLabel, Draggable, PropertyChangeListener {
 
     /** The enclosing market. */
     private final Market market;
@@ -132,5 +135,28 @@ public final class MarketLabel extends AbstractGoodsLabel
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         update(); // Just update the text and tool tip.
+    }
+
+
+    //Interface CargoLabel
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Component addCargo(Component comp, Unit carrier, CargoPanel cargoPanel) {
+        MarketLabel label = (MarketLabel)comp;
+        Player player = carrier.getOwner();
+        if (!player.canTrade(label.getType())) {
+            cargoPanel.igc().payArrears(label.getType());
+            return null;
+        }
+        int loadable = carrier.getLoadableAmount(label.getType());
+        if (loadable <= 0) return null;
+        if (loadable > label.getAmount()) loadable = label.getAmount();
+        cargoPanel.igc().buyGoods(label.getType(), loadable, carrier);
+        cargoPanel.igc().nextModelMessage();
+        cargoPanel.update();
+        return comp;
     }
 }
