@@ -24,18 +24,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.util.LogBuilder;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;
@@ -344,34 +341,31 @@ public abstract class WorkLocation extends UnitLocation
                 || goodsType.isImmigrationType())) 
             return null;
         
-        // FIXME: OO
-        boolean ok = false;
-        if (this instanceof ColonyTile) {
-            // Assume the work is worth doing for owned or trivially
-            // claimable colony tiles.
-            Tile tile = getWorkTile();
-            ok = owner.owns(tile) || owner.canClaimForSettlement(tile);
-        } else if (this instanceof Building) {
-            Building bu = (Building)this;
-            // Make sure the type can be added.
-            if (bu.canAddType(better)) {
-                Colony colony = getColony();
-                BuildableType bt;
-                // Assume work is worth doing if a unit is already
-                // there, or if the building has been upgraded, or if
-                // the goods are required for the current building job.
-                if (bu.getLevel() > 1 || unit != null) {
-                    ok = true;
-                } else if (colony.getTotalProductionOf(goodsType) == 0
-                    && (bt = colony.getCurrentlyBuilding()) != null
-                    && any(bt.getRequiredGoods(), AbstractGoods.matches(goodsType))) {
-                    ok = true;
-                }
-            }
-        }
+        final Boolean ok = goodSuggestionCheck(better,unit, goodsType);
         return (!ok) ? null
             : new Suggestion(this, (unit == null) ? null : unit.getType(),
                              better, goodsType, delta);
+    }
+
+    /**
+     * Determines whether a {@code WorkLocation} is a good suggestion
+     *
+     * @return
+     */
+    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
+        return goodSuggestionCheck(unitType, unit, goodsType, this);
+    }
+
+    /**
+     * Determines whether a {@code WorkLocation} is a good suggestion
+     *
+     * @param unitType
+     * @param unit
+     * @param goodsType
+     * @param workLocation  @return
+     */
+    protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType, WorkLocation workLocation) {
+        return false;
     }
 
     /**

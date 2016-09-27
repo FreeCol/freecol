@@ -435,7 +435,6 @@ public class Building extends WorkLocation
     //   UnitLocation.moveToFront
     //   UnitLocation.clearUnitList
     //   UnitLocation.equipForRole
-    
     /**
      * {@inheritDoc}
      */
@@ -461,6 +460,26 @@ public class Building extends WorkLocation
     // Interface WorkLocation
     // Inherits:
     //   WorkLocation.getClaimTemplate: buildings do not need to be claimed.
+
+    @Override
+    public Boolean goodSuggestionCheck(UnitType better, Unit unit, GoodsType goodsType) {
+        // Make sure the type can be added.
+        if (this.canAddType(better)) {
+            Colony colony = getColony();
+            BuildableType bt;
+            // Assume work is worth doing if a unit is already
+            // there, or if the building has been upgraded, or if
+            // the goods are required for the current building job.
+            if (this.getLevel() > 1 || unit != null) {
+                return true;
+            } else if (colony.getTotalProductionOf(goodsType) == 0
+                    && (bt = colony.getCurrentlyBuilding()) != null
+                    && any(bt.getRequiredGoods(), AbstractGoods.matches(goodsType))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * {@inheritDoc}
