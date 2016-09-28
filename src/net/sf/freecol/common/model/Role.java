@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony.NoBuildReason;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 
@@ -413,6 +414,14 @@ public class Role extends BuildableType {
             sb.append(' ').append(e.getKey()).append('=').append(e.getValue()));
         sb.append(']');
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoBuildReason canBeBuiltInColony(Colony colony,
+                                            List<BuildableType> assumeBuilt) {
+        return Colony.NoBuildReason.NONE;
     }
 
         

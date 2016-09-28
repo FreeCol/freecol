@@ -1939,7 +1939,11 @@ public final class ColonyPanel extends PortPanel
             int layer = 2;
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
-                    if (tiles[x][y] == null) continue;
+                    if (tiles[x][y] == null) {
+                        logger.warning("Null tile for " + getColony()
+                            + " at " + x + "," + y);
+                        continue;
+                    }
                     ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
                     if (colonyTile == null) {
                         logger.warning("Null colony tile for " + getColony()
@@ -2055,14 +2059,14 @@ public final class ColonyPanel extends PortPanel
             }
 
             protected void addPropertyChangeListeners() {
-                if (colonyTile != null) {
-                    colonyTile.addPropertyChangeListener(this);
+                if (this.colonyTile != null) {
+                    this.colonyTile.addPropertyChangeListener(this);
                 }
             }
 
             protected void removePropertyChangeListeners() {
-                if (colonyTile != null) {
-                    colonyTile.removePropertyChangeListener(this);
+                if (this.colonyTile != null) {
+                    this.colonyTile.removePropertyChangeListener(this);
                 }
             }
 
@@ -2071,12 +2075,16 @@ public final class ColonyPanel extends PortPanel
              */
             public void update() {
                 removeAll();
-                if (this.colonyTile == null) return;
+                if (this.colonyTile == null) {
+                    logger.warning("Update of " + getColony()
+                        + " null colony tile.");
+                    return;
+                }
 
+                final FreeColClient fcc = getFreeColClient();
                 UnitLabel label = null;
-                for (Unit unit : colonyTile.getUnitList()) {
-                    label = new UnitLabel(
-                        getFreeColClient(), unit, false, false, true);
+                for (Unit unit : this.colonyTile.getUnitList()) {
+                    label = new UnitLabel(fcc, unit, false, false, true);
                     if (ColonyPanel.this.isEditable()) {
                         label.setTransferHandler(defaultTransferHandler);
                         label.addMouseListener(pressListener);
@@ -2084,15 +2092,15 @@ public final class ColonyPanel extends PortPanel
                     super.add(label);
                 }
                 updateDescriptionLabel(label);
-                if (colonyTile.isColonyCenterTile()) {
+                if (this.colonyTile.isColonyCenterTile()) {
                     setLayout(new GridLayout(2, 1));
-                    ProductionInfo info = colony.getProductionInfo(colonyTile);
+                    final ImageLibrary til = getGUI().getTileImageLibrary();
+                    ProductionInfo info
+                        = colony.getProductionInfo(this.colonyTile);
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
                             ProductionLabel productionLabel
-                                = new ProductionLabel(getFreeColClient(),
-                                    getGUI().getTileImageLibrary(),
-                                    ag);
+                                = new ProductionLabel(fcc, til, ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);
                         }
@@ -2100,14 +2108,13 @@ public final class ColonyPanel extends PortPanel
                 }
             }
 
-
             /**
              * Gets the colony tile this panel is handling.
              *
              * @return The colony tile.
              */
             public ColonyTile getColonyTile() {
-                return colonyTile;
+                return this.colonyTile;
             }
 
             /**
@@ -2119,7 +2126,7 @@ public final class ColonyPanel extends PortPanel
              * @param unitLabel The {@code UnitLabel} to update.
              */
             private void updateDescriptionLabel(UnitLabel unitLabel) {
-                String tileMsg = Messages.message(colonyTile.getLabel());
+                String tileMsg = Messages.message(this.colonyTile.getLabel());
                 if (unitLabel == null) {
                     setToolTipText(tileMsg);
                 } else {
@@ -2138,7 +2145,7 @@ public final class ColonyPanel extends PortPanel
              */
             private boolean tryWork(Unit unit) {
                 final Colony colony = getColony();
-                Tile tile = colonyTile.getWorkTile();
+                Tile tile = this.colonyTile.getWorkTile();
                 Player player = unit.getOwner();
 
                 if (tile.getOwningSettlement() != colony) {
@@ -2170,22 +2177,22 @@ public final class ColonyPanel extends PortPanel
                 }
 
                 // Claim sorted, but complain about other failure.
-                NoAddReason reason = colonyTile.getNoAddReason(unit);
+                NoAddReason reason = this.colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().showInformationMessage(colonyTile,
+                    getGUI().showInformationMessage(this.colonyTile,
                         StringTemplate.template(reason.getDescriptionKey()));
                     return false;
                 }
 
-                if (!ColonyPanel.this.tryWork(unit, colonyTile)) return false;
+                if (!ColonyPanel.this.tryWork(unit, this.colonyTile)) return false;
 
                 GoodsType workType = unit.getWorkType();
                 if (workType != null
                     && getClientOptions().getBoolean(ClientOptions.SHOW_NOT_BEST_TILE)) {
                     WorkLocation best = colony.getWorkLocationFor(unit,
                                                                   workType);
-                    if (best != null && colonyTile != best
-                        && (colonyTile.getPotentialProduction(workType, unit.getType())
+                    if (best != null && this.colonyTile != best
+                        && (this.colonyTile.getPotentialProduction(workType, unit.getType())
                             < best.getPotentialProduction(workType, unit.getType()))) {
                         StringTemplate template = StringTemplate
                             .template("colonyPanel.notBestTile")
@@ -2250,7 +2257,7 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 String property = event.getPropertyName();
-                logger.finest(colonyTile.getId() + " change " + property
+                logger.finest(this.colonyTile.getId() + " change " + property
                               + ": " + event.getOldValue()
                               + " -> " + event.getNewValue());
                 ColonyPanel.this.updateProduction();

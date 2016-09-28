@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -86,115 +87,6 @@ public final class BuildingType extends BuildableType
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
-    }
-
-    /**
-     * Checks to see if a given {@link BuildableType} can be built in a
-     *      colony based on the buildings available. Returns the reason why
-     *      the BuildableType cannot be built.
-     *
-     * @param colony        The {@code Colony} to check.
-     * @param buildableType The {@code BuildableType} to check
-     * @param assumeBuilt   A list of buildable types
-     * @return              Return the reason for not being able to build.
-     *                          Either WRONG_UPGRADE, MISSING_BUILD_ABILITY OR NONE
-     */
-    @Override
-    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType,
-                                                   List<BuildableType> assumeBuilt) {
-        BuildingType newBuildingType = (BuildingType) buildableType;
-        Building colonyBuilding = colony.getBuilding(newBuildingType);
-        if (colonyBuilding == null) {
-            // the colony has no similar building yet
-            BuildingType from = newBuildingType.getUpgradesFrom();
-            if (from != null && !assumeBuilt.contains(from)) {
-                // we are trying to build an advanced factory, we
-                // should build lower level shop first
-                return Colony.NoBuildReason.WRONG_UPGRADE;
-            }
-        } else {
-            // a building of the same family already exists
-            BuildingType from = colonyBuilding.getType().getUpgradesTo();
-            if (from != newBuildingType && !assumeBuilt.contains(from)) {
-                // the existing building's next upgrade is not the
-                // new one we want to build
-                return Colony.NoBuildReason.WRONG_UPGRADE;
-            }
-        }
-        return Colony.NoBuildReason.NONE;
-    }
-
-    @Override
-    public int getMinimumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
-        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        BuildingType upgradesFrom = ((BuildingType)buildableType)
-                .getUpgradesFrom();
-        if (upgradesFrom == null) return 0;
-        Building building = colony
-                .getBuilding((BuildingType)buildableType);
-        BuildingType buildingType = (building == null) ? null
-                : building.getType();
-        if (buildingType == upgradesFrom) return 0;
-        for (int index = 0; index < buildQueue.getSize(); index++) {
-            if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
-                return index + 1;
-            }
-        }
-        return UNABLE_TO_BUILD;
-    }
-
-    @Override
-    public int getMaximumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
-        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        final int buildQueueLastPos = buildQueue.getSize();
-
-        boolean canBuild = false;
-        if (colony.canBuild(buildableType)) {
-            canBuild = true;
-        }
-
-        BuildingType upgradesFrom = ((BuildingType)buildableType
-        ).getUpgradesFrom();
-        BuildingType upgradesTo = ((BuildingType)buildableType)
-                .getUpgradesTo();
-        // does not depend on nothing, but still cannot be built
-        if (!canBuild && upgradesFrom == null) {
-            return UNABLE_TO_BUILD;
-        }
-
-        // if can be built and does not have any upgrade,
-        // then it can be built at any time
-        if (canBuild && upgradesTo == null) {
-            return buildQueueLastPos;
-        }
-
-        // if can be built, does not depend on anything, mark
-        // upgrades from as found
-        boolean foundUpgradesFrom = canBuild;
-        for (int index = 0; index < buildQueue.getSize(); index++) {
-            BuildableType toBuild = buildQueue.getElementAt(index);
-
-            if (toBuild == buildableType) continue;
-
-            if (!canBuild && !foundUpgradesFrom
-                    && upgradesFrom.equals(toBuild)) {
-                foundUpgradesFrom = true;
-                // nothing else to upgrade this building to
-                if (upgradesTo == null) return buildQueueLastPos;
-            }
-            // found a building it upgrades to, cannot go to or
-            // beyond this position
-            if (foundUpgradesFrom && upgradesTo != null
-                    && upgradesTo.equals(toBuild)) return index;
-
-            // Don't go past a unit this building can build.
-            if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
-                return index;
-            }
-        }
-        return buildQueueLastPos;
     }
 
 
@@ -445,6 +337,105 @@ public final class BuildingType extends BuildableType
         amount = (int)applyModifiers(amount, null, goodsType.getId(),
                 unitType);
         return (amount < 0) ? 0 : amount;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoBuildReason canBeBuiltInColony(Colony colony,
+        List<BuildableType> assumeBuilt) {
+        Building colonyBuilding = colony.getBuilding(this);
+        if (colonyBuilding == null) {
+            // the colony has no similar building yet
+            BuildingType from = this.getUpgradesFrom();
+            if (from != null && !assumeBuilt.contains(from)) {
+                // we are trying to build an advanced factory, we
+                // should build lower level shop first
+                return Colony.NoBuildReason.WRONG_UPGRADE;
+            }
+        } else {
+            // a building of the same family already exists
+            BuildingType from = colonyBuilding.getType().getUpgradesTo();
+            if (from != this && !assumeBuilt.contains(from)) {
+                // the existing building's next upgrade is not the
+                // new one we want to build
+                return Colony.NoBuildReason.WRONG_UPGRADE;
+            }
+        }
+        return Colony.NoBuildReason.NONE;
+    }
+
+    @Override
+    public int getMinimumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        BuildingType upgradesFrom = ((BuildingType)buildableType)
+                .getUpgradesFrom();
+        if (upgradesFrom == null) return 0;
+        Building building = colony
+                .getBuilding((BuildingType)buildableType);
+        BuildingType buildingType = (building == null) ? null
+                : building.getType();
+        if (buildingType == upgradesFrom) return 0;
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
+                return index + 1;
+            }
+        }
+        return UNABLE_TO_BUILD;
+    }
+
+    @Override
+    public int getMaximumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        final int buildQueueLastPos = buildQueue.getSize();
+
+        boolean canBuild = false;
+        if (colony.canBuild(buildableType)) {
+            canBuild = true;
+        }
+
+        BuildingType upgradesFrom = ((BuildingType)buildableType
+        ).getUpgradesFrom();
+        BuildingType upgradesTo = ((BuildingType)buildableType)
+                .getUpgradesTo();
+        // does not depend on nothing, but still cannot be built
+        if (!canBuild && upgradesFrom == null) {
+            return UNABLE_TO_BUILD;
+        }
+
+        // if can be built and does not have any upgrade,
+        // then it can be built at any time
+        if (canBuild && upgradesTo == null) {
+            return buildQueueLastPos;
+        }
+
+        // if can be built, does not depend on anything, mark
+        // upgrades from as found
+        boolean foundUpgradesFrom = canBuild;
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            BuildableType toBuild = buildQueue.getElementAt(index);
+
+            if (toBuild == buildableType) continue;
+
+            if (!canBuild && !foundUpgradesFrom
+                    && upgradesFrom.equals(toBuild)) {
+                foundUpgradesFrom = true;
+                // nothing else to upgrade this building to
+                if (upgradesTo == null) return buildQueueLastPos;
+            }
+            // found a building it upgrades to, cannot go to or
+            // beyond this position
+            if (foundUpgradesFrom && upgradesTo != null
+                    && upgradesTo.equals(toBuild)) return index;
+
+            // Don't go past a unit this building can build.
+            if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
+                return index;
+            }
+        }
+        return buildQueueLastPos;
     }
 
 

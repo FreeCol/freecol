@@ -28,6 +28,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -164,6 +165,33 @@ public abstract class Wish extends ValuedAIObject {
             result = -1;
         }
         return result;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Wish) {
+            Wish ow = (Wish)other;
+            return super.equals(ow)
+                && Utils.equals(this.destination, ow.destination)
+                && Utils.equals(this.transportable, ow.transportable);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.destination);
+        return 37 * hash + Utils.hashCode(this.transportable);
     }
 
 

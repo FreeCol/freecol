@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -280,6 +281,35 @@ public class TileImprovementPlan extends ValuedAIObject {
         }
         if (type == null || target == null) result = -1;
         return result;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TileImprovementPlan) {
+            TileImprovementPlan op = (TileImprovementPlan)other;
+            return super.equals(op)
+                && Utils.equals(this.type, op.type)
+                && Utils.equals(this.target, op.target)
+                && Utils.equals(this.pioneer, op.pioneer);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.type);
+        hash = 37 * hash + Utils.hashCode(this.target);
+        return 37 * hash + Utils.hashCode(this.pioneer);
     }
 
 

@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -158,6 +159,33 @@ public class WorkerWish extends Wish {
         int result = super.checkIntegrity(fix);
         if (unitType == null) result = -1;
         return result;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof WorkerWish) {
+            WorkerWish ow = (WorkerWish)other;
+            return super.equals(ow)
+                && Utils.equals(this.unitType, ow.unitType)
+                && this.expertNeeded == ow.expertNeeded;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 37 * hash + Utils.hashCode(this.unitType);
+        return 37 * hash + ((this.expertNeeded) ? 1 : 0);
     }
 
 

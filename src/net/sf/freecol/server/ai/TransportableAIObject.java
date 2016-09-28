@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
 
@@ -351,6 +352,31 @@ public abstract class TransportableAIObject extends ValuedAIObject {
      * @return A reason to abort transport, or null if none found.
      */
     public abstract String invalidReason();
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof TransportableAIObject) {
+            TransportableAIObject ot = (TransportableAIObject)other;
+            return super.equals(ot)
+                && Utils.equals(this.transport, ot.transport);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + Utils.hashCode(this.transport);
+    }
 
 
     // Serialization

@@ -26,6 +26,7 @@ import java.util.Comparator;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -98,6 +99,31 @@ public abstract class ValuedAIObject extends AIObject {
      */
     public final void setValue(final int newValue) {
         this.value = newValue;
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof ValuedAIObject) {
+            ValuedAIObject ov = (ValuedAIObject)other;
+            return super.equals(ov)
+                && this.value == ov.value;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        return 37 * hash + this.value;
     }
 
 
