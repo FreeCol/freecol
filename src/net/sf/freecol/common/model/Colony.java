@@ -33,20 +33,16 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Occupation;
-import net.sf.freecol.common.model.Stance;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.server.ai.AIColony;
-import net.sf.freecol.server.ai.AIUnit;
 
 
 /**
@@ -2752,6 +2748,17 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         final ExportData ed = getExportData(goodsType);
         int capacity = ed.getEffectiveImportLevel(getWarehouseCapacity());
         return Math.max(0, capacity - present);
+    }
+
+    @Override
+    public String getLocationName(TradeLocation tradeLocation) {
+        Colony colony = (Colony) tradeLocation;
+        return colony.getName();
+    }
+
+    @Override
+    public Boolean canBeInput() {
+        return true;
     }
 
     /**

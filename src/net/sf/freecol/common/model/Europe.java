@@ -22,12 +22,13 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.swing.*;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.gui.panel.*;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -437,6 +438,21 @@ public class Europe extends UnitLocation
     public int getImportAmount(GoodsType goodsType, int turns) {
         return (getOwner().canTrade(goodsType)) ? GoodsContainer.HUGE_CARGO_SIZE
             : 0;
+    }
+
+    @Override
+    public String getLocationName(TradeLocation tradeLocation) {
+        return ((Europe) tradeLocation).getNameKey();
+    }
+
+    @Override
+    public JLabel getNameAsJlabel() {
+        return Utility.localizedLabel(getLocationName(this));
+    }
+
+    @Override
+    public Boolean canBeInput() {
+        return true;
     }
 
 

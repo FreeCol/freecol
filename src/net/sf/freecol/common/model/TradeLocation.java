@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 
+import javax.swing.*;
+
 /**
  * A wrapper interface for a location that can be on a trade route.
  *
@@ -54,4 +56,30 @@ public interface TradeLocation {
      * @return The amount of goods to import.
      */
     public int getImportAmount(GoodsType goodsType, int turns);
+
+    /**
+     * Function for returning the name of a TradeLocation
+     *
+     * @param tradeLocation The {@code TradeLocation} to return the name.
+     * @return The name.
+     */
+    public String getLocationName(TradeLocation tradeLocation);
+
+    /**
+     * Return the name of this instance as a JLabel
+     *
+     * @return
+     */
+    public default JLabel getNameAsJlabel() {
+        return new JLabel(getLocationName(this));
+    }
+
+    /**
+     * Returns whether a TradeLocation be set as the input location on a TradeRouteInputPanel
+     *
+     * @return true, if possible, false by default
+     */
+    public default Boolean canBeInput() {
+        return false;
+    }
 }

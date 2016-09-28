@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -1390,6 +1389,11 @@ public class IndianSettlement extends Settlement implements TradeLocation {
             - turns * getTotalProductionOf(goodsType));
         int capacity = getWarehouseCapacity();
         return capacity - present;
+    }
+
+    @Override
+    public String getLocationName(TradeLocation tradeLocation) {
+        return ((IndianSettlement) tradeLocation).getName();
     }
 
 

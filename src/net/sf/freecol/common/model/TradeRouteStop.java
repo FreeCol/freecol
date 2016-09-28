@@ -257,6 +257,11 @@ public class TradeRouteStop extends FreeColGameObject implements TradeLocation {
             : 0;
     }
 
+    @Override
+    public String getLocationName(TradeLocation tradeLocation) {
+        return null;
+    }
+
 
     // Override FreeColGameObject
 
