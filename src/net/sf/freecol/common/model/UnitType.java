@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
@@ -128,66 +129,6 @@ public final class UnitType extends BuildableType implements Consumer {
         super(id, specification);
 
         this.defaultRole = specification.getDefaultRole();
-    }
-
-    /**
-     * Checks to see if a given {@link BuildableType} can be built in a
-     *      colony based on the units available. Returns the reason why
-     *      the BuildableType cannot be built.
-     *
-     * @param colony        The {@code Colony} to check.
-     * @param buildableType The {@code BuildableType} to check
-     * @param assumeBuilt   A list of buildable types
-     * @return              Return the reason for not being able to build.
-     *                          Either MISSING_BUILD_ABILITY OR NONE
-     */
-    @Override
-    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType, List<BuildableType> assumeBuilt) {
-        // Non-person units need a BUILD ability, present or assumed.
-        if (!buildableType.hasAbility(Ability.PERSON)
-                && !colony.hasAbility(Ability.BUILD, buildableType)
-                && none(assumeBuilt, bt -> bt.hasAbility(Ability.BUILD,
-                buildableType))) {
-            return Colony.NoBuildReason.MISSING_BUILD_ABILITY;
-        }
-        return Colony.NoBuildReason.NONE;
-    }
-
-    @Override
-    public int getMinimumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
-        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        if (colony.canBuild(buildableType)) return 0;
-        for (int index = 0; index < buildQueue.getSize(); index++) {
-            if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
-                    buildableType)) return index + 1;
-        }
-        return UNABLE_TO_BUILD;
-    }
-
-    @Override
-    public int getMaximumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
-        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        final int buildQueueLastPos = buildQueue.getSize();
-
-        boolean canBuild = false;
-        if (colony.canBuild(buildableType)) {
-            canBuild = true;
-        }
-
-        // does not depend on anything, nothing depends on it
-        // can be built at any time
-        if (canBuild) return buildQueueLastPos;
-        // check for building in queue that allows builting this unit
-        for (int index = 0; index < buildQueue.getSize(); index++) {
-            BuildableType toBuild = buildQueue.getElementAt(index);
-            if (toBuild == buildableType) continue;
-            if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
-                return buildQueueLastPos;
-            }
-        }
-        return UNABLE_TO_BUILD;
     }
 
 
@@ -584,6 +525,57 @@ public final class UnitType extends BuildableType implements Consumer {
             consumption = new TypeCountMap<>();
         }
         consumption.incrementCount(type, amount);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoBuildReason canBeBuiltInColony(Colony colony,
+                                            List<BuildableType> assumeBuilt) {
+        // Non-person units need a BUILD ability, present or assumed.
+        if (!hasAbility(Ability.PERSON)
+            && !colony.hasAbility(Ability.BUILD, this)
+            && none(assumeBuilt, bt -> bt.hasAbility(Ability.BUILD, this))) {
+            return Colony.NoBuildReason.MISSING_BUILD_ABILITY;
+        }
+        return Colony.NoBuildReason.NONE;
+    }
+
+    @Override
+    public int getMinimumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        if (colony.canBuild(buildableType)) return 0;
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
+                    buildableType)) return index + 1;
+        }
+        return UNABLE_TO_BUILD;
+    }
+
+    @Override
+    public int getMaximumIndex(Colony colony, BuildableType buildableType,
+                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+        ListModel<BuildableType> buildQueue = buildQueueList.getModel();
+        final int buildQueueLastPos = buildQueue.getSize();
+
+        boolean canBuild = false;
+        if (colony.canBuild(buildableType)) {
+            canBuild = true;
+        }
+
+        // does not depend on anything, nothing depends on it
+        // can be built at any time
+        if (canBuild) return buildQueueLastPos;
+        // check for building in queue that allows builting this unit
+        for (int index = 0; index < buildQueue.getSize(); index++) {
+            BuildableType toBuild = buildQueue.getElementAt(index);
+            if (toBuild == buildableType) continue;
+            if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
+                return buildQueueLastPos;
+            }
+        }
+        return UNABLE_TO_BUILD;
     }
 
 

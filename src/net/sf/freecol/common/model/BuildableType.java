@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import javax.swing.JList;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.model.Colony.NoBuildReason;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -234,20 +235,15 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     }
 
     /**
-     * Checks to see if a given {@link BuildableType} can be built in a
-     *      colony based on the buildings or units available. Returns
-     *      the reason why the BuildableType cannot be built.
+     * Check to see if this buildable type can be built in a colony
+     * based on the buildings or units available.
      *
      * @param colony The {@code Colony} to check.
-     * @param buildableType The {@code BuildableType} to check
-     * @param assumeBuilt A list of buildable types
-     * @return NoBuildReason.NONE as a default, only {@link BuildingType}
-     *          and {@link UnitType} override this behavior
+     * @param assumeBuilt A list of {@code BuildableType}s.
+     * @return The reason the for failure, or NoBuildReason.NONE on success.
      */
-    public Colony.NoBuildReason canBeBuiltInColony(Colony colony, BuildableType buildableType, List<BuildableType> assumeBuilt) {
-        return Colony.NoBuildReason.NONE;
-    }
-
+    public abstract NoBuildReason canBeBuiltInColony(Colony colony,
+        List<BuildableType> assumeBuilt);
 
     public int getMinimumIndex(Colony colony, BuildableType buildableType,
                                JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {

@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Colony.NoBuildReason;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 
@@ -181,7 +182,16 @@ public class EquipmentType extends BuildableType {
         return militaryEquipment;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public NoBuildReason canBeBuiltInColony(Colony colony,
+                                            List<BuildableType> assumeBuilt) {
+        return Colony.NoBuildReason.NONE;
+    }
 
+    
+    
     // Override Object
 
     /**

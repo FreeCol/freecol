@@ -1009,8 +1009,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
         if (assumeBuilt == null) {
             assumeBuilt = Collections.<BuildableType>emptyList();
         }
-        NoBuildReason reason = buildableType.canBeBuiltInColony(this.getColony(), buildableType, assumeBuilt);
-        return reason;
+        return buildableType.canBeBuiltInColony(this.getColony(), assumeBuilt);
     }
 
     /**
