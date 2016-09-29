@@ -68,7 +68,7 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
 
         JPanel panel = new JPanel();
         panel.setBorder(Utility.blankBorder(10, 10, 10, 10));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
         JLabel header = Utility.localizedHeaderLabel(
@@ -76,12 +76,12 @@ public final class LoadingSavegameDialog extends FreeColConfirmDialog {
             FontLibrary.FontSize.MEDIUM);
         header.setBorder(Utility.blankBorder(20, 0, 0, 0));
 
-        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         p1.add(Utility.localizedLabel("loadingSavegameDialog.serverName"));
 
         serverNameField = new JTextField();
 
-        JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEADING));
         p2.add(Utility.localizedLabel("loadingSavegameDialog.port"));
 
         portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(),

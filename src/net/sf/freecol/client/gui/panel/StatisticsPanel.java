@@ -163,7 +163,7 @@ public final class StatisticsPanel extends FreeColPanel {
 
         // Title
         JPanel header = new JPanel();
-        this.add(header, BorderLayout.NORTH);
+        this.add(header, BorderLayout.PAGE_START);
         header.add(Utility.localizedLabel("statistics"), JPanel.CENTER_ALIGNMENT);
 
         // Actual stats panel
@@ -179,7 +179,7 @@ public final class StatisticsPanel extends FreeColPanel {
         statsPanel.add(displayStatsMessage("client", clientStatistics));
         statsPanel.add(displayStatsMessage("server", serverStatistics));
 
-        add(okButton, BorderLayout.SOUTH);
+        add(okButton, BorderLayout.PAGE_END);
 
         setSize(getPreferredSize());
     }
@@ -189,7 +189,7 @@ public final class StatisticsPanel extends FreeColPanel {
                                        Map<String, String> stats) {
         JPanel panel = new JPanel();
         panel.setBorder(Utility.localizedBorder(title));
-        Box b = new Box(BoxLayout.Y_AXIS);
+        Box b = new Box(BoxLayout.PAGE_AXIS);
         panel.add(b);
         Map<String, String> memory = new HashMap<>();
         Map<String, String> ai = new HashMap<>();
@@ -215,7 +215,7 @@ public final class StatisticsPanel extends FreeColPanel {
     private JPanel createStatsTable(String title, Map<String, String> data) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(new JLabel(title), BorderLayout.NORTH);
+        panel.add(new JLabel(title), BorderLayout.PAGE_START);
         StatisticsModel model = new StatisticsModel();
         model.setData(data);
         JTable table = new JTable(model);

@@ -70,10 +70,10 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         panel.setLayout(layout);
 
         cbox = new JComboBox<>();
-        panel.add(cbox, BorderLayout.WEST);
+        panel.add(cbox, BorderLayout.LINE_START);
 
         currentMixerLabel = new JLabel();
-        panel.add(currentMixerLabel, BorderLayout.EAST);
+        panel.add(currentMixerLabel, BorderLayout.LINE_END);
         updateMixerLabel();
 
         button1 = Utility.localizedButton("test");

@@ -160,7 +160,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         descriptionPanel.add(new JLabel(new ImageIcon(image)),
                              BorderLayout.CENTER);
         descriptionPanel.add(new JLabel(text, JLabel.CENTER),
-                             BorderLayout.SOUTH);
+                BorderLayout.PAGE_END);
         descriptionPanel.setBackground(Color.RED);
         mt.setDescriptionPanel(descriptionPanel);
 
