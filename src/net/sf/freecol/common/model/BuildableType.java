@@ -245,13 +245,11 @@ public abstract class BuildableType extends FreeColSpecObjectType {
     public abstract NoBuildReason canBeBuiltInColony(Colony colony,
         List<BuildableType> assumeBuilt);
 
-    public int getMinimumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMinimumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         return UNABLE_TO_BUILD;
     }
 
-    public int getMaximumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMaximumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         return UNABLE_TO_BUILD;
     }
 

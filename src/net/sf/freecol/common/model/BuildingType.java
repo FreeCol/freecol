@@ -366,14 +366,11 @@ public final class BuildingType extends BuildableType
     }
 
     @Override
-    public int getMinimumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMinimumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        BuildingType upgradesFrom = ((BuildingType)buildableType)
-                .getUpgradesFrom();
+        BuildingType upgradesFrom = this.getUpgradesFrom();
         if (upgradesFrom == null) return 0;
-        Building building = colony
-                .getBuilding((BuildingType)buildableType);
+        Building building = colony.getBuilding(this);
         BuildingType buildingType = (building == null) ? null
                 : building.getType();
         if (buildingType == upgradesFrom) return 0;
@@ -386,20 +383,17 @@ public final class BuildingType extends BuildableType
     }
 
     @Override
-    public int getMaximumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMaximumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
         final int buildQueueLastPos = buildQueue.getSize();
 
         boolean canBuild = false;
-        if (colony.canBuild(buildableType)) {
+        if (colony.canBuild(this)) {
             canBuild = true;
         }
 
-        BuildingType upgradesFrom = ((BuildingType)buildableType
-        ).getUpgradesFrom();
-        BuildingType upgradesTo = ((BuildingType)buildableType)
-                .getUpgradesTo();
+        BuildingType upgradesFrom = this.getUpgradesFrom();
+        BuildingType upgradesTo = this.getUpgradesTo();
         // does not depend on nothing, but still cannot be built
         if (!canBuild && upgradesFrom == null) {
             return UNABLE_TO_BUILD;
@@ -417,7 +411,7 @@ public final class BuildingType extends BuildableType
         for (int index = 0; index < buildQueue.getSize(); index++) {
             BuildableType toBuild = buildQueue.getElementAt(index);
 
-            if (toBuild == buildableType) continue;
+            if (toBuild == this) continue;
 
             if (!canBuild && !foundUpgradesFrom
                     && upgradesFrom.equals(toBuild)) {
@@ -431,7 +425,7 @@ public final class BuildingType extends BuildableType
                     && upgradesTo.equals(toBuild)) return index;
 
             // Don't go past a unit this building can build.
-            if (buildableType.hasAbility(Ability.BUILD, toBuild)) {
+            if (this.hasAbility(Ability.BUILD, toBuild)) {
                 return index;
             }
         }

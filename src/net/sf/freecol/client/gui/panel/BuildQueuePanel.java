@@ -955,13 +955,12 @@ public class BuildQueuePanel extends FreeColPanel implements ItemListener {
     }
 
     private int getMinimumIndex(BuildableType buildableType) {
-        return buildableType.getMinimumIndex(this.getColony(), buildableType,
-                                             buildQueueList, UNABLE_TO_BUILD);
+        return buildableType.getMinimumIndex(this.getColony(), buildQueueList, UNABLE_TO_BUILD);
     }
 
     private int getMaximumIndex(BuildableType buildableType) {
-        return buildableType.getMaximumIndex(this.getColony(), buildableType,
-                                             buildQueueList, UNABLE_TO_BUILD);
+        return buildableType.getMaximumIndex(this.getColony(),
+                buildQueueList, UNABLE_TO_BUILD);
     }
 
     /**

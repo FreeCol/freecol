@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.xml.stream.XMLStreamException;
@@ -542,25 +541,22 @@ public final class UnitType extends BuildableType implements Consumer {
     }
 
     @Override
-    public int getMinimumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMinimumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
-        if (colony.canBuild(buildableType)) return 0;
+        if (colony.canBuild(this)) return 0;
         for (int index = 0; index < buildQueue.getSize(); index++) {
-            if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD,
-                    buildableType)) return index + 1;
+            if (buildQueue.getElementAt(index).hasAbility(Ability.BUILD, this)) return index + 1;
         }
         return UNABLE_TO_BUILD;
     }
 
     @Override
-    public int getMaximumIndex(Colony colony, BuildableType buildableType,
-                               JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
+    public int getMaximumIndex(Colony colony, JList<BuildableType> buildQueueList, int UNABLE_TO_BUILD) {
         ListModel<BuildableType> buildQueue = buildQueueList.getModel();
         final int buildQueueLastPos = buildQueue.getSize();
 
         boolean canBuild = false;
-        if (colony.canBuild(buildableType)) {
+        if (colony.canBuild(this)) {
             canBuild = true;
         }
 
@@ -570,8 +566,8 @@ public final class UnitType extends BuildableType implements Consumer {
         // check for building in queue that allows builting this unit
         for (int index = 0; index < buildQueue.getSize(); index++) {
             BuildableType toBuild = buildQueue.getElementAt(index);
-            if (toBuild == buildableType) continue;
-            if (toBuild.hasAbility(Ability.BUILD, buildableType)) {
+            if (toBuild == this) continue;
+            if (toBuild.hasAbility(Ability.BUILD, this)) {
                 return buildQueueLastPos;
             }
         }
