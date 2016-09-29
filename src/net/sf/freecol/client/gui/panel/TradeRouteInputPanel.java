@@ -61,8 +61,17 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.i18n.Messages;
-import net.sf.freecol.common.model.*;
-
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.TradeLocation;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TradeRouteStop;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

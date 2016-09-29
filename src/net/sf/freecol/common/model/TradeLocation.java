@@ -20,7 +20,7 @@
 package net.sf.freecol.common.model;
 
 
-import javax.swing.*;
+import javax.swing.JLabel;
 
 /**
  * A wrapper interface for a location that can be on a trade route.
