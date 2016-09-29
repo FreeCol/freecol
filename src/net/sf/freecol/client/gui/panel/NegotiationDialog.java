@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
@@ -63,7 +62,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsTradeItem;
-import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.InciteTradeItem;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Ownable;

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;

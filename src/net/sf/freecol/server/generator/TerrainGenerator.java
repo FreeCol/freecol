@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.LandMap;

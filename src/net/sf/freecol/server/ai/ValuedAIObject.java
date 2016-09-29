@@ -25,8 +25,6 @@ import java.util.Comparator;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

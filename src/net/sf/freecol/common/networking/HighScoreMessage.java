@@ -24,9 +24,7 @@ import java.util.List;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
 

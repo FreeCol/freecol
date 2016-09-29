@@ -22,9 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 
 import javax.swing.JEditorPane;

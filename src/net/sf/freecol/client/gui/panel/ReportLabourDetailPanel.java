@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;

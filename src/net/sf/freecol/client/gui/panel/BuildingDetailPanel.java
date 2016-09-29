@@ -48,7 +48,6 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;

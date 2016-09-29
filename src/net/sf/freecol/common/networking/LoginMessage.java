@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.sf.freecol.FreeCol;

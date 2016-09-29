@@ -48,8 +48,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants;
-import net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.Constants.*; // Imports all ENUMS.
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;

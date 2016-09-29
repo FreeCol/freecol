@@ -19,9 +19,7 @@
 
 package net.sf.freecol.server.control;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +41,6 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -105,7 +102,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
@@ -116,7 +112,6 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
-import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;

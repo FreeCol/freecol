@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 

@@ -28,7 +28,6 @@ import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.util.Utils;
 import static net.sf.freecol.common.util.StringUtils.*;
 

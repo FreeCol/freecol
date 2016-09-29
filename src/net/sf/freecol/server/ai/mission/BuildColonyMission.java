@@ -20,11 +20,9 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.util.Comparator;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -32,7 +30,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;

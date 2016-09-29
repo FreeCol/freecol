@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Specification;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 

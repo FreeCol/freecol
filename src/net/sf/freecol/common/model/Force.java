@@ -30,7 +30,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Force;
 import net.sf.freecol.common.model.FreeColSpecObject;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;

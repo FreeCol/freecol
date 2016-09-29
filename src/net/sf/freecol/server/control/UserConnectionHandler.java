@@ -19,16 +19,12 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.GameStateMessage;
 import net.sf.freecol.common.networking.LoginMessage;
-import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.VacantPlayersMessage;
 import net.sf.freecol.server.FreeColServer;
 

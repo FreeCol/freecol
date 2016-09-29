@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +43,6 @@ import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.ChooseFoundingFatherMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeleteTradeRouteMessage;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
@@ -66,7 +64,6 @@ import net.sf.freecol.server.model.ServerPlayer;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**

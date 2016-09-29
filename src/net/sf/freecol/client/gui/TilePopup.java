@@ -25,7 +25,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -35,7 +34,6 @@ import javax.swing.JSeparator;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.UnloadAction;
-import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;

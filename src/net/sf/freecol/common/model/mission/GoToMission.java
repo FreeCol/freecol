@@ -26,7 +26,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.DOMMessage;
 
 
 /**

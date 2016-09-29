@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,7 +47,6 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -56,8 +54,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.DOMMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Introspector;
-import net.sf.freecol.server.control.ChangeSet;
-import net.sf.freecol.server.control.ServerInputHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

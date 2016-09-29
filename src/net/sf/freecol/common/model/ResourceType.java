@@ -20,8 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.Comparator;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 

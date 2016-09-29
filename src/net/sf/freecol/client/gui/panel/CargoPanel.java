@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
@@ -29,7 +28,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 

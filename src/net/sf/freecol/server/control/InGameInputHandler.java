@@ -19,12 +19,8 @@
 
 package net.sf.freecol.server.control;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Constants;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
@@ -51,7 +47,6 @@ import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
@@ -97,7 +92,6 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**

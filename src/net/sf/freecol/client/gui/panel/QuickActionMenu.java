@@ -21,14 +21,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;

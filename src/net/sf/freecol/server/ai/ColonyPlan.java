@@ -29,7 +29,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -45,7 +44,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;

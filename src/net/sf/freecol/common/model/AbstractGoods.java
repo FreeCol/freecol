@@ -23,10 +23,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Predicate;
 
-import javax.xml.stream.XMLStreamException;
-
-import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.Utils;

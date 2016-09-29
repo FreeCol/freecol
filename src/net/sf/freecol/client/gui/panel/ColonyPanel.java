@@ -74,7 +74,6 @@ import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;

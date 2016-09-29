@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.networking.ClientConnection;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;

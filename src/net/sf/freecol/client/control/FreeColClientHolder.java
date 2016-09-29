@@ -28,7 +28,6 @@ import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.server.FreeColServer;
 
 

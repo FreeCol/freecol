@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.lang.ref.WeakReference;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,7 +32,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
@@ -43,10 +41,9 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.common.util.Introspector;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
 import net.sf.freecol.common.util.Utils;

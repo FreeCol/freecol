@@ -19,13 +19,10 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
@@ -34,7 +31,6 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
@@ -42,13 +38,11 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 
 /**

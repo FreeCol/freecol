@@ -22,15 +22,11 @@ package net.sf.freecol.common.networking;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Constants;
@@ -41,14 +37,12 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Player;
@@ -67,8 +61,6 @@ import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**

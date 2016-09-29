@@ -27,30 +27,23 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.AddPlayerMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.MultipleMessage;
 import net.sf.freecol.common.networking.UpdateMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
-import net.sf.freecol.common.option.MapGeneratorOptions;
-import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**

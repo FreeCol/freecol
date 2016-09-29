@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -41,7 +40,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Constants;
@@ -53,7 +51,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -64,20 +61,9 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.DOMMessage;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.ai.mission.BuildColonyMission;
-import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
-import net.sf.freecol.server.ai.mission.Mission;
-import net.sf.freecol.server.ai.mission.MissionaryMission;
-import net.sf.freecol.server.ai.mission.PioneeringMission;
-import net.sf.freecol.server.ai.mission.ScoutingMission;
-import net.sf.freecol.server.ai.mission.TransportMission;
-import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
-import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
-import net.sf.freecol.server.ai.mission.WishRealizationMission;
 
 
 /**

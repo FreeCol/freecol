@@ -24,7 +24,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.swing.ImageIcon;

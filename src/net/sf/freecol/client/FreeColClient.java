@@ -56,7 +56,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.MessageHandler;
-import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;

@@ -19,14 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Map.Position;

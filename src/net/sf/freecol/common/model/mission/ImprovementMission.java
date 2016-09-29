@@ -28,7 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.DOMMessage;
+
 import static net.sf.freecol.common.util.CollectionUtils.*;
 
 

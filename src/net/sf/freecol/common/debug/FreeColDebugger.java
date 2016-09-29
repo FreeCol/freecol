@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;

@@ -27,8 +27,6 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NetworkRequestHandler;

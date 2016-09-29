@@ -39,7 +39,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.UpdateGameOptionsMessage;
 import net.sf.freecol.common.networking.UpdateMapGeneratorOptionsMessage;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 

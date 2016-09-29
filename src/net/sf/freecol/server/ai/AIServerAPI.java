@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;

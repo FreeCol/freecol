@@ -22,13 +22,11 @@ package net.sf.freecol.common.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
 import static net.sf.freecol.common.util.CollectionUtils.*;

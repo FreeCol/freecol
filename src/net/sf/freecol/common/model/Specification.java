@@ -25,13 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -46,7 +44,6 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.UnitChangeType.UnitChange;
 import net.sf.freecol.common.option.AbstractOption;
@@ -61,7 +58,6 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.TextOption;
 import net.sf.freecol.common.option.UnitListOption;
 import static net.sf.freecol.common.util.CollectionUtils.*;
-import static net.sf.freecol.common.util.StringUtils.*;
 
 
 /**

@@ -21,9 +21,7 @@ package net.sf.freecol.server.ai.mission;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
