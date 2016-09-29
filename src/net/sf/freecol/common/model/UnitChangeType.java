@@ -94,7 +94,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
 
 
     /** Simple container for the individual changes. */
-    public class UnitChange {
+    public static class UnitChange {
 
         /** The unit type to change from. */
         public UnitType from;
@@ -189,7 +189,7 @@ public class UnitChangeType extends FreeColSpecObjectType {
     public void addUnitChange(UnitType from, UnitType to, int prob, int turns) {
         if (from != null && to != null && prob > 0) {
             appendToMapList(this.changes, from,
-                            new UnitChange(from, to, prob, turns));
+                    new UnitChange(from, to, prob, turns));
         }
     }
 
