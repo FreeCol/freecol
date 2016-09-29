@@ -22,7 +22,7 @@ package net.sf.freecol.common.option;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -39,7 +39,6 @@ import static net.sf.freecol.common.util.CollectionUtils.*;
  */
 public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapper> {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(AudioMixerOption.class.getName());
 
     /**
@@ -105,7 +104,9 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
         Mixer mixer = null;
         try {
             mixer = AudioSystem.getMixer(null);
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.FINE, "No Audio Mixer installed on the system.", e);
+        }
         AUTODETECTED_MIXER = mixer;
     }
 

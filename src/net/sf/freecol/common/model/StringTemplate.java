@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.*;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -193,7 +194,9 @@ public class StringTemplate extends FreeColObject {
         setDefaultId(id);
         try {
             return returnClass.cast(this);
-        } catch (ClassCastException cce) {}
+        } catch (ClassCastException cce) {
+            logger.log(Level.WARNING, "Invalid class " + this.getClass() + " referenced.", cce);
+        }
         return null;            
     }
 

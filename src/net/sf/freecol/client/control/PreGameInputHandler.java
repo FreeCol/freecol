@@ -21,6 +21,7 @@ package net.sf.freecol.client.control;
 
 import java.awt.Color;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
 
@@ -288,7 +289,9 @@ public final class PreGameInputHandler extends ClientInputHandler {
                         if (game != null && game.getMap() != null) break;
                         try {
                             Thread.sleep(200);
-                        } catch (InterruptedException ie) {}
+                        } catch (InterruptedException ie) {
+                            logger.log(Level.SEVERE, "Thread used for starting a game has been interupted.", ie);
+                        }
                     }
                     
                     SwingUtilities.invokeLater(() -> {
