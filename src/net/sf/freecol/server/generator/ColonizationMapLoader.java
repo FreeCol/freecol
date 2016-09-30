@@ -20,8 +20,13 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -65,11 +70,17 @@ import net.sf.freecol.common.model.Specification;
  */
 public class ColonizationMapLoader implements MapLoader {
 
+    private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
+
     public static final int WIDTH = 0;
     public static final int HEIGHT = 2;
     public static final int OCEAN = 25;
     public static final int HIGH_SEAS = 26;
 
+    /**
+     * A String array of title types. Each represents
+     *      a single type of tile available in FreeCol.
+     */
     private static final String[] tiletypes = {
         "tundra",
         "desert",
@@ -101,22 +112,36 @@ public class ColonizationMapLoader implements MapLoader {
     };
 
 
+    /**
+     * A byte array of file headers
+     */
     private static final byte[] header = {
         58, 0, 72, 0, 4, 0
     };
     private static byte[] layer1;
 
-    public ColonizationMapLoader(File file) throws Exception {
+    public ColonizationMapLoader(File file) throws FileNotFoundException, IOException {
 
-        RandomAccessFile reader = new RandomAccessFile(file, "r");
-        reader.read(header);
+        try {
+            RandomAccessFile reader = new RandomAccessFile(file, "r");
+            reader.read(header);
 
-        int size = header[WIDTH] * header[HEIGHT];
-        layer1 = new byte[size];
-        reader.read(layer1);
+            int size = header[WIDTH] * header[HEIGHT];
+            layer1 = new byte[size];
+            reader.read(layer1);
+        } catch (FileNotFoundException fe) {
+            logger.log(Level.SEVERE, "File (" + file + ") was not found.", fe);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "File (" + file + ") is corrupt and cannot be read.", e);
+        }
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The highest {@code Layer} value
+     */
     @Override
     public Layer loadMap(Game game, Layer layer) {
         Specification spec = game.getSpecification();
@@ -169,6 +194,11 @@ public class ColonizationMapLoader implements MapLoader {
         return highestLayer;
     }
 
+    /**
+     *  {@inheritDoc}
+     *
+     *  @return The {@code Layer} value for RIVERS
+     */
     @Override
     public Layer getHighestLayer() {
         return Layer.RIVERS;
