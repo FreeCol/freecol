@@ -1260,8 +1260,7 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveDiplomacy(Unit unit, Direction direction,
                                   DiplomaticTrade dt) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        if (settlement == null
-            || !(settlement instanceof Colony)) return false;
+        if (!(settlement instanceof Colony)) return false;
         Colony colony = (Colony)settlement;
 
         // Can not negotiate with the REF.

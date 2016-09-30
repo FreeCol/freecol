@@ -107,7 +107,7 @@ public class LoadGoodsMessage extends DOMMessage {
 
         FreeColGameObject fcgo = player.getGame()
             .getFreeColGameObject(this.locationId);
-        if (fcgo == null || !(fcgo instanceof Location)) {
+        if (!(fcgo instanceof Location)) {
             return serverPlayer.clientError("Not a location: "
                 + this.locationId)
                 .build(serverPlayer);

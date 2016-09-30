@@ -2114,8 +2114,7 @@ public final class Specification {
             Option monarch = level.getOption(GameOptions.DIFFICULTY_MONARCH);
             Option refSize = ((OptionGroup)((monarch instanceof OptionGroup)
                     ? monarch : level)).getOption(GameOptions.REF_FORCE);
-            if (refSize == null
-                || !(refSize instanceof UnitListOption)) continue;
+            if (!(refSize instanceof UnitListOption)) continue;
             for (AbstractUnit au
                      : ((UnitListOption)refSize).getOptionValues()) {
                 if ("DEFAULT".equals(au.getRoleId())) {
