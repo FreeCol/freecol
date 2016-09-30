@@ -142,7 +142,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
     }
 
     /**
-     * Recursively calls {@link #doPlanning} in subgoals that {@link #needsPlanning()},
+     * Recursively calls  in subgoals that {@link #needsPlanning()},
      * then calls its own planning method.
      */
     public void doPlanning() {

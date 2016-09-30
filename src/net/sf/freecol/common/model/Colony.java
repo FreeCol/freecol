@@ -2710,7 +2710,7 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
      * @param value The previously calculated input value from
      *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
      *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
-     * @return
+     * @return The newly calculated value.
      */
     @Override
     public int calculateSettlementValue(int value, Unit unit) {
@@ -2763,9 +2763,9 @@ public class Colony extends Settlement implements Nameable, TradeLocation {
     /**
      *  Used to calculated the present field.
      *
-     * @param goodsType
-     * @param turns
-     * @return
+     * @param goodsType The {@link GoodsType} to check for got import/export.
+     * @param turns The number of turns before the goods is required.
+     * @return  The amount of goods to export.
      */
     private int ReturnPresent(GoodsType goodsType, int turns) {
         final int present = Math.max(0, getGoodsCount(goodsType)

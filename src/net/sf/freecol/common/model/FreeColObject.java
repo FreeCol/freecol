@@ -1007,7 +1007,6 @@ public abstract class FreeColObject
      * @param xw The {@code FreeColXMLWriter} to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
-     * @see #toXML(FreeColXMLWriter)
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         toXML(xw, getXMLTagName());

@@ -59,18 +59,18 @@ public class FreeColMapLoader implements MapLoader {
      * Constructor for the FreeColMapLoader class.
      *
      * @param file The File to load.
-     * @throws IOException
-     * @throws FreeColException
-     * @throws XMLStreamException
+     * @throws IOException If the game-loading Stream could not be created.
+     * @throws FreeColException If the file could not be read properly.
+     * @throws XMLStreamException If there was a problem loading the XML Stream.
      */
     public FreeColMapLoader(File file) throws IOException, FreeColException, XMLStreamException {
 
         try {
             importGame = FreeColServer.readGame(new FreeColSavegameFile(file), null, null);
         } catch (FreeColException fce) {
-            logger.log(Level.SEVERE, "File (" + file + ") could not be properly read.", fce);
+            logger.log(Level.SEVERE, "File (" + file + ") could not be read properly.", fce);
         } catch (IOException ioe) {
-            logger.log(Level.SEVERE, "The game loading stream could not be created.", ioe);
+            logger.log(Level.SEVERE, "The game-loading Stream could not be created.", ioe);
         } catch (XMLStreamException xse) {
             logger.log(Level.SEVERE, "There was a problem loading the XML Stream.", xse);
         }

@@ -68,7 +68,7 @@ public interface TradeLocation {
     /**
      * Return the name of this instance as a JLabel
      *
-     * @return
+     * @return The JLabel with the result of {@link #getLocationName(TradeLocation)}
      */
     public default JLabel getNameAsJlabel() {
         return new JLabel(getLocationName(this));

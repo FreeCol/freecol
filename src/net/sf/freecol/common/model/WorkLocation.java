@@ -350,7 +350,7 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Determines whether a {@code WorkLocation} is a good suggestion
      *
-     * @return
+     * @return True or false, depending on whether the suggestion is valid.
      */
     protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType) {
         return goodSuggestionCheck(unitType, unit, goodsType, this);
@@ -359,10 +359,13 @@ public abstract class WorkLocation extends UnitLocation
     /**
      * Determines whether a {@code WorkLocation} is a good suggestion
      *
-     * @param unitType
-     * @param unit
-     * @param goodsType
-     * @param workLocation  @return
+     * @param unitType The type of {@code Unit} to check.
+     * @param unit The Unit itself.
+     * @param goodsType The {@code GoodsType} to check.
+     * @param workLocation The {@code WorkLocation} to check. This can be overloaded with a defualt
+     *                          parameter of "this" to call the WorkLocation instance currently in
+     *                          in reference.
+     * @return True or false, depending on whether the suggestion is valid.
      */
     protected Boolean goodSuggestionCheck(UnitType unitType, Unit unit, GoodsType goodsType, WorkLocation workLocation) {
         return false;

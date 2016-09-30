@@ -1353,7 +1353,7 @@ public class IndianSettlement extends Settlement implements TradeLocation {
      *          {@link net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission
      *                  #scoreSettlementPath(AIUnit, PathNode, Settlement)}
      * @param unit The {@code AIUnit} to check
-     * @return
+     * @return The calculated value
      */
     @Override
     public int calculateSettlementValue(int value, Unit unit) {

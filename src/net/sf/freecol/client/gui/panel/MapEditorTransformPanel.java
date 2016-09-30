@@ -251,7 +251,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
          * transformation to the user.
          *
          * @param descriptionPanel The panel.
-         * @see #setDescriptionPanel(JPanel)
          */
         public void setDescriptionPanel(JPanel descriptionPanel) {
             this.descriptionPanel = descriptionPanel;

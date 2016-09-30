@@ -87,7 +87,7 @@ public final class CanvasMouseListener extends FreeColClientHolder
      * Perform a goto order to the given tile with the active unit, if
      * possible.
      *
-     * @param tile The <code>Tile</code> to go to.
+     * @param tile The {@code Tile} to go to.
      */
     private void immediateGoto(Tile tile) {
         Unit unit;

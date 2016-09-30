@@ -2023,7 +2023,7 @@ public class Unit extends GoodsLocation
     /**
      * Gets the cost of moving this {@code Unit} onto the given
      * {@code Tile}. A call to {@link #getMoveType(Tile)} will return
-     * {@code MOVE_NO_MOVES}, if {@link #getMoveCost} returns a move cost
+     * {@code MOVE_NO_MOVES}, if  returns a move cost
      * larger than the {@link #getMovesLeft moves left}.
      *
      * @param target The {@code Tile} this {@code Unit} will move
