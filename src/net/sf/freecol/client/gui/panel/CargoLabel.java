@@ -43,7 +43,6 @@ public interface CargoLabel {
      * The {@code Component} to remove from a {@code CargoPanel}.
      *
      * @param comp
-     * @param carrier
      * @param cargoPanel
      * @return
      */
