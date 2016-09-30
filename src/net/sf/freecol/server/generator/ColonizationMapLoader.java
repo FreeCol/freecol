@@ -70,7 +70,7 @@ import net.sf.freecol.common.model.Specification;
  */
 public class ColonizationMapLoader implements MapLoader {
 
-    private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
+    private static final Logger logger = Logger.getLogger(ColonizationMapLoader.class.getName());
 
     public static final int WIDTH = 0;
     public static final int HEIGHT = 2;

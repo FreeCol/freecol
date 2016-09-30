@@ -20,8 +20,12 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -39,19 +43,43 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 
+import javax.xml.stream.XMLStreamException;
+
 
 /**
- * Load a map.
+ * Load a FreeCol map.
  */
 public class FreeColMapLoader implements MapLoader {
 
-    private final ServerGame importGame;
+    private static final Logger logger = Logger.getLogger(FreeColMapLoader.class.getName());
 
-    public FreeColMapLoader(File file) throws Exception {
-        importGame = FreeColServer.readGame(new FreeColSavegameFile(file), null, null);
+    private ServerGame importGame = null;
+
+    /**
+     * Constructor for the FreeColMapLoader class.
+     *
+     * @param file The File to load.
+     * @throws IOException
+     * @throws FreeColException
+     * @throws XMLStreamException
+     */
+    public FreeColMapLoader(File file) throws IOException, FreeColException, XMLStreamException {
+
+        try {
+            importGame = FreeColServer.readGame(new FreeColSavegameFile(file), null, null);
+        } catch (FreeColException fce) {
+            logger.log(Level.SEVERE, "File (" + file + ") could not be properly read.", fce);
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, "The game loading stream could not be created.", ioe);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.SEVERE, "There was a problem loading the XML Stream.", xse);
+        }
+
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Layer loadMap(Game game, Layer layer) {
         Map importMap = importGame.getMap();
@@ -132,6 +160,9 @@ public class FreeColMapLoader implements MapLoader {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Layer getHighestLayer() {
         return Layer.NATIVES;
