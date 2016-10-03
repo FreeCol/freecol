@@ -185,8 +185,7 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Sends the specified message to the server and returns the reply,
-     * if it has the specified tag.
+     * Sends the specified message to the server and processes the reply.
      *
      * Handle error replies if they have a messageId or when in debug mode.
      * This routine allows code simplification in much of the following
@@ -201,56 +200,23 @@ public abstract class ServerAPI {
      *
      * @param game The current {@code Game}.
      * @param message A {@code DOMMessage} to send.
-     * @param tag The expected tag.
-     * @return The answer from the server if it has the specified tag,
-     *     otherwise {@code null}.
+     * @return True if the server interaction succeeded.
      */
-    private Element askExpecting(Game game, DOMMessage message, String tag) {
+    private boolean askHandling(Game game, DOMMessage message) {
         Element reply = ask(message);
-        if (reply == null) return null;
-
-        if (MultipleMessage.TAG.equals(reply.getTagName())) {
-            // Process multiple returns, pick out expected element if
-            // present and continue processing the reply.
-            MultipleMessage mm = new MultipleMessage(game, reply);
-            Element e = mm.extract(tag);
-            resolve(handle(e));
-            reply = mm.toXMLElement();
-        }
+        if (reply == null) return true;
 
         if (ErrorMessage.TAG.equals(reply.getTagName())) {
             // Shortcut error processing
             handle(reply);
-            return null;
+            return false;
         }
 
-        if (tag == null || tag.equals(reply.getTagName())) {
-            // Success.  Do the standard processing.
-            doClientProcessingFor(reply);
-            return reply;
-        }
-
-        // Unexpected reply.  Whine and fail.
-        logger.warning("Received reply with tag " + reply.getTagName()
-            + " which should have been " + tag
-            + " to message " + message);
-        return null;
-    }
-
-    /**
-     * Extends askExpecting to also handle returns from the server.
-     *
-     * @param game The current {@code Game}.
-     * @param message A {@code DOMMessage} to send.
-     * @return True if the server interaction succeeded and an element
-     *     with the expected tag was found in the reply, else false.
-     */
-    private boolean askHandling(Game game, DOMMessage message) {
-        Element reply = askExpecting(game, message, null);
-        if (reply == null) return false;
+        doClientProcessingFor(reply);
         resolve(handle(reply));
         return true;
     }
+
 
     // Public messaging routines for game actions
 

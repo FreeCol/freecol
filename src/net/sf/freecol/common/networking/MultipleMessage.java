@@ -79,22 +79,6 @@ public class MultipleMessage extends DOMMessage {
     // Public interface
 
     /**
-     * Extract an element chosen by tag from the elements list.
-     *
-     * @param tag The message tag to choose.
-     * @return The chosen {@code Element} if found, or null if not.
-     */
-    public Element extract(String tag) {
-        for (Element e : this.elements) {
-            if (e.getTagName().equals(tag)) {
-                this.elements.remove(e);
-                return e;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Apply a handler to this message.
      *
      * @param handler A {@code MessageHandler} to apply.
