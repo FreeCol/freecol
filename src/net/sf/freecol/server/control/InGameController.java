@@ -101,12 +101,10 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
-import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
@@ -115,7 +113,6 @@ import net.sf.freecol.common.networking.NationSummaryMessage;
 import net.sf.freecol.common.networking.NativeTradeMessage;
 import net.sf.freecol.common.networking.RearrangeColonyMessage.Arrangement;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
-import net.sf.freecol.common.networking.SellPropositionMessage;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1397,42 +1394,6 @@ public final class InGameController extends Controller {
             + " in Europe for " + (serverPlayer.getGold() - gold));
         // Action occurs in Europe, nothing is visible to other players.
         return cs;
-    }
-
-
-    /**
-     * Price some goods for sale from a settlement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that is buying.
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @param goods The {@code Goods} to buy.
-     * @param price The buyers proposed price for the goods.
-     * @return A {@code BuyPropositionMessage} encapsulating this action,
-     *     or an error message on failure.
-     */
-    public DOMMessage buyProposition(ServerPlayer serverPlayer,
-        Unit unit, Settlement settlement, Goods goods, int price) {
-        NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, settlement);
-        if (session == null) {
-            return new ErrorMessage("Proposing to buy without opening a session?!");
-        }
-        NativeTrade nt = session.getNativeTrade();
-        if (!nt.getBuy()) {
-            return new ErrorMessage("Proposing to buy in a session where buying is not allowed.");
-        }
-        ChangeSet cs = new ChangeSet();
-        if (settlement instanceof IndianSettlement) {
-            csVisit(serverPlayer, (IndianSettlement)settlement, 0, cs);
-        }
-
-        // AI considers the proposition, return with a gold value
-        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
-        int gold = ai.buyProposition(unit, settlement, goods, price);
-
-        // Others can not see proposals.
-        return new BuyPropositionMessage(unit, settlement, goods, gold);
     }
 
 
@@ -2780,40 +2741,6 @@ public final class InGameController extends Controller {
 
 
     /**
-     * Get the goods for sale in a settlement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that is enquiring.
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @return A {@code GoodsForSaleMessage} encapsulating this action,
-     *     or an error message on failure.
-     */
-    public DOMMessage getGoodsForSale(ServerPlayer serverPlayer,
-        Unit unit, Settlement settlement) {
-        List<Goods> sellGoods = null;
-
-        if (settlement instanceof IndianSettlement) {
-            final Game game = serverPlayer.getGame();
-            int goodsSellNumber = Math.max(1, game.getSpecification()
-                .getInteger(GameOptions.SETTLEMENT_NUMBER_OF_GOODS_TO_SELL));
-            IndianSettlement indianSettlement = (IndianSettlement) settlement;
-            AIPlayer aiPlayer = getFreeColServer()
-                .getAIPlayer(indianSettlement.getOwner());
-            sellGoods = indianSettlement.getSellGoods(unit);
-            if (sellGoods.size() > goodsSellNumber) {
-                sellGoods = sellGoods.subList(0, goodsSellNumber);
-            }
-            for (Goods goods : sellGoods) {
-                aiPlayer.registerSellGoods(goods);
-            }
-        } else { // Colony might be supported one day?
-            return new ErrorMessage("Bogus settlement");
-        }
-        return new GoodsForSaleMessage(unit, settlement, sellGoods);
-    }
-
-
-    /**
      * Gets the list of high scores.
      *
      * @return A list of {@code HighScore}.
@@ -3950,101 +3877,6 @@ public final class InGameController extends Controller {
         carrier.setMovesLeft(0);
         cs.add(See.only(serverPlayer), carrier);
         // Action occurs in Europe, nothing is visible to other players.
-        return cs;
-    }
-
-
-    /**
-     * Price some goods for sale to a settlement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that is buying.
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @param goods The {@code Goods} to sell.
-     * @param price The sellers proposed price for the goods.
-     * @return A {@code SellPropositionMessage} encapsulating this action
-     *     or an error message on failure.
-     */
-    public DOMMessage sellProposition(ServerPlayer serverPlayer,
-        Unit unit, Settlement settlement, Goods goods, int price) {
-        NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, settlement);
-        if (session == null) {
-            return new ErrorMessage("Proposing to sell without opening a session");
-        }
-        NativeTrade nt = session.getNativeTrade();
-        if (!nt.getSell()) {
-            return new ErrorMessage("Proposing to sell in a session where selling is not allowed.");
-        }
-        ChangeSet cs = new ChangeSet();
-        if (settlement instanceof IndianSettlement) {
-            csVisit(serverPlayer, (IndianSettlement)settlement, 0, cs);
-        }
-
-        // AI considers the proposition, return with a gold value
-        AIPlayer ai = getFreeColServer().getAIPlayer(settlement.getOwner());
-        int gold = ai.sellProposition(unit, settlement, goods, price);
-
-        // Others can not see proposals.
-        return new SellPropositionMessage(unit, settlement, goods, gold);
-    }
-
-
-    /**
-     * Sell to a settlement.
-     *
-     * @param serverPlayer The {@code ServerPlayer} that is selling.
-     * @param unit The {@code Unit} carrying the goods.
-     * @param is The {@code IndianSettlement} to sell to.
-     * @param goods The {@code Goods} to sell.
-     * @param amount How much gold to expect.
-     * @return A {@code ChangeSet} encapsulating this action.
-     */
-    public ChangeSet sellToSettlement(ServerPlayer serverPlayer, Unit unit,
-                                      IndianSettlement is,
-                                      Goods goods, int amount) {
-        ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, is, 0, cs);
-
-        NativeTradeSession session
-            = Session.lookup(NativeTradeSession.class, unit, is);
-        if (session == null) {
-            return serverPlayer.clientError("Trying to sell without opening a session");
-        }
-        NativeTrade nt = session.getNativeTrade();
-        if (!nt.getSell()) {
-            return serverPlayer.clientError("Trying to sell in a session where selling is not allowed.");
-        }
-        final Player settlementPlayer = is.getOwner();
-
-        // Check that the gold is the agreed amount
-        AIPlayer ai = getFreeColServer().getAIPlayer(settlementPlayer);
-        int returnGold = ai.sellProposition(unit, is, goods, amount);
-        if (returnGold != amount) {
-            return serverPlayer.clientError("This was not the price we agreed upon! Cheater?");
-        }
-
-        // Valid, make the trade.
-        moveGoods(unit, goods.getType(), goods.getAmount(), is);
-        cs.add(See.perhaps(), unit);
-
-        settlementPlayer.modifyGold(-amount);
-        serverPlayer.modifyGold(amount);
-        ((ServerIndianSettlement)is).csModifyAlarm(serverPlayer,
-            -amount / 500, true, cs);
-        final Tile tile = is.getTile();
-        is.updateWantedGoods();
-        tile.updateIndianSettlement(serverPlayer);
-        cs.add(See.only(serverPlayer), tile);
-        cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        nt.setSell(true);
-        cs.addSale(serverPlayer, is, goods.getType(),
-                Math.round((float) amount / goods.getAmount()));
-        logger.finest(serverPlayer.getName() + " " + unit + " sells " + goods
-                      + " at " + is.getName() + " for " + amount);
-
-        // Others can see the unit capacity.
-        getGame().sendToOthers(serverPlayer, cs);
         return cs;
     }
 
