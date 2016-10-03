@@ -879,10 +879,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
         case TRADE:
             this.stancePanel = null;
             this.colonyDemandPanel = this.colonyOfferPanel = null;
-            GoodsLocation gl = (otherUnit != null) ? otherUnit : otherColony;
-            List<Goods> goods = getAnyGoods(gl);
+            List<Goods> goods = getAnyGoods();
             this.goodsDemandPanel = new GoodsTradeItemPanel(otherPlayer, goods);
-            gl = (ourUnit != null) ? ourUnit : ourColony;
+            GoodsLocation gl = (ourUnit != null) ? ourUnit : ourColony;
             goods = (ourUnit != null) ? ourUnit.getGoodsList()
                 : ourColony.getCompactGoods();
             for (Goods g : goods) {
@@ -1020,14 +1019,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> {
      * *might* be in the other player's store.  Therefore they have a
      * bogus location (i.e. not the actual goods container).
      *
-     * @param gl The {@code GoodsLocation} for the goods.
      * @return A list of storable {@code Goods}.
      */
-    private List<Goods> getAnyGoods(GoodsLocation gl) {
+    private List<Goods> getAnyGoods() {
         final Game game = getGame();
         final Specification spec = getSpecification();
         return transform(spec.getStorableGoodsTypeList(), alwaysTrue(),
-            gt -> new Goods(game, gl, gt, GoodsContainer.CARGO_SIZE));
+            gt -> new Goods(game, null, gt, GoodsContainer.CARGO_SIZE));
     }
 
     /**
