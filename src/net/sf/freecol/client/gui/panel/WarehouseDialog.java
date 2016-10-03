@@ -19,7 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
+import java.awt.*;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -139,7 +139,7 @@ public final class WarehouseDialog extends FreeColConfirmDialog {
             
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
-            setBorder(Utility.localizedBorder(goodsType));
+            setBorder(Utility.localizedBorder(goodsType, new Color(0)));
             Utility.padBorder(this, 6,6,6,6);
 
             ExportData exportData = colony.getExportData(goodsType);

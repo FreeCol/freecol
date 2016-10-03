@@ -345,6 +345,18 @@ public final class Utility {
     }
 
     /**
+     * Get a titled border for a Named object and a given
+     * colored line border.
+     *
+     * @param named The {@code Named} to use.
+     * @param color The color to use.
+     * @return The {@code TitledBorder}.
+     */
+    public static TitledBorder localizedBorder(Named named, Color color) {
+        return localizedBorder(named.getNameKey(), color);
+    }
+
+    /**
      * Get a titled border with Messages.message(key) as text.
      *
      * @param key The key to use.
