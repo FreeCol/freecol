@@ -1260,33 +1260,12 @@ public final class InGameController extends FreeColClientHolder {
     private boolean moveDiplomacy(Unit unit, Direction direction,
                                   DiplomaticTrade dt) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-<<<<<<< HEAD
-        if (!(settlement instanceof Colony)) return false;
-        Colony colony = (Colony)settlement;
-
-        // Can not negotiate with the REF.
-        final Player player = unit.getOwner();
-        final Player other = colony.getOwner();
-        if (other == player.getREFPlayer()) return false;
-
-        while (dt != null) {
-            // Inform server of current agreement.
-            dt = askServer().diplomacy(unit, colony, dt);
-            // Returned dt will be null if we sent or the other player
-            // replied with an accept/reject.  Otherwise consider
-            // counter proposal.
-            if (dt != null) {
-                dt = getGUI().showNegotiationDialog(unit, colony, dt,
-                    dt.getSendMessage(player, colony));
-            }
-=======
         if (settlement instanceof Colony) {
             final Colony colony = (Colony)settlement;
             // Can not negotiate with the REF!
             if (colony.getOwner()
                 == unit.getOwner().getREFPlayer()) return false;
             return !askServer().diplomacy(unit, colony, dt);
->>>>>>> 56558df0c21801c8cf7a0d8fb4ca59c5cd54d938
         }
         return false;
     }
