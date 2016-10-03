@@ -4245,7 +4245,6 @@ outer:  for (Effect effect : effects) {
 
         final Specification spec = getSpecification();
         final Tile oldTile = unit.getTile();
-logger.warning("CSCO " + unit + " -> " + newOwner.getSuffix() + " ch=" + change + " uc=" + ((change == null) ? "-" : unit.getUnitChange(change, null, newOwner)));
         if (change != null) {
             UnitType mainType = unit.getType();
             UnitChange uc;
