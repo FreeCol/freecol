@@ -549,70 +549,13 @@ public abstract class ServerAPI {
      *
      * @param ourUnit Our {@code Unit} conducting the diplomacy.
      * @param otherColony The other {@code Colony} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
+     * @param dt The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Unit ourUnit, Colony otherColony, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourUnit.getGame(),
-            new DiplomacyMessage(ourUnit, otherColony, agreement),
-            null);
-        // Often returns diplomacy, but also just an update on accept or
-        // null on reject.
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
-    }
-
-    /**
-     * Handler server query-response for diplomatic messages.
-     *
-     * @param ourUnit Out {@code Unit} conducting the diplomacy.
-     * @param otherUnit The other {@code Unit} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
-     * @return The resulting agreement or null if none present.
-     */
-    public DiplomaticTrade diplomacy(Unit ourUnit, Unit otherUnit, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourUnit.getGame(),
-            new DiplomacyMessage(ourUnit, otherUnit, agreement),
-            DiplomacyMessage.getTagName());
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
-    }
-
-    /**
-     * Handler server query-response for diplomatic messages.
-     *
-     * @param ourColony Out {@code Colony} conducting the diplomacy.
-     * @param otherUnit The other {@code Unit} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
-     * @return The resulting agreement or null if none present.
-     */
-    public DiplomaticTrade diplomacy(Colony ourColony, Unit otherUnit, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourColony.getGame(),
-            new DiplomacyMessage(ourColony, otherUnit, agreement),
-            DiplomacyMessage.getTagName());
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourColony.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
+    public boolean diplomacy(Unit ourUnit, Colony otherColony, 
+                             DiplomaticTrade dt) {
+        return askHandling(ourUnit.getGame(),
+                           new DiplomacyMessage(ourUnit, otherColony, dt));
     }
 
     /**
