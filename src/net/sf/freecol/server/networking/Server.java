@@ -240,7 +240,7 @@ public final class Server extends Thread {
                         this.freeColServer.getUserConnectionHandler(),
                         FreeCol.SERVER_THREAD);
                     addConnection(connection);
-                } catch (IOException e) {
+                } catch (IOException|IllegalMonitorStateException e) {
                     if (this.running) {
                         logger.log(Level.WARNING, "Connection failed: ", e);
                     }
