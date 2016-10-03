@@ -1210,11 +1210,10 @@ public class CollectionUtils {
      * Create a predicate for a type that returns true if it equals a key.
      *
      * @param <T> The input type.
-     * @param <K> The key type.
      * @param key The key to match.
      * @return A suitable {@code Predicate}.
      */
-    public static <T, K> Predicate<T> matchKey(final K key) {
+    public static <T> Predicate<T> matchKey(final T key) {
         return t -> t == key;
     }
 
@@ -1223,11 +1222,10 @@ public class CollectionUtils {
      * in the sense of "equals".
      *
      * @param <T> The input type.
-     * @param <K> The key type.
      * @param key The key to match.
      * @return A suitable {@code Predicate}.
      */
-    public static <T, K> Predicate<T> matchKeyEquals(final K key) {
+    public static <T> Predicate<T> matchKeyEquals(final T key) {
         return t -> Utils.equals(t, key);
     }
 
