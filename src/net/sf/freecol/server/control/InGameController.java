@@ -3405,8 +3405,6 @@ public final class InGameController extends Controller {
         // only partially update with what the human player says.
         NativeTradeSession session = Session.lookup(NativeTradeSession.class,
                                                     unit, is);
-System.err.println("NT " + action + " from " + serverPlayer.getSuffix()
-    + " session=" + session);
         if (action.isEuropean() != serverPlayer.isEuropean()) {
             return serverPlayer.clientError(((action.isEuropean())
                     ? "European" : "Native")
