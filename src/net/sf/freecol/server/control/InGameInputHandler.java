@@ -28,8 +28,6 @@ import net.sf.freecol.common.networking.AssignTeacherMessage;
 import net.sf.freecol.common.networking.AssignTradeRouteMessage;
 import net.sf.freecol.common.networking.AttackMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
-import net.sf.freecol.common.networking.BuyMessage;
-import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChangeStateMessage;
 import net.sf.freecol.common.networking.ChangeWorkImprovementTypeMessage;
@@ -51,7 +49,6 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipForRoleMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -77,8 +74,6 @@ import net.sf.freecol.common.networking.RearrangeColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
-import net.sf.freecol.common.networking.SellMessage;
-import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.SetCurrentStopMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
@@ -161,22 +156,6 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new BuildColonyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(BuyMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new BuyMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(BuyPropositionMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new BuyPropositionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(CashInTreasureTrainMessage.getTagName(),
@@ -322,14 +301,6 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new EquipForRoleMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(GoodsForSaleMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new GoodsForSaleMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(InciteMessage.getTagName(),
@@ -506,22 +477,6 @@ public final class InGameInputHandler extends ServerInputHandler {
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new ScoutSpeakToChiefMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(SellMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new SellMessage(getGame(), element)
-                    .handle(freeColServer, player, connection);
-            }});
-        register(SellPropositionMessage.getTagName(),
-                 new CurrentPlayerNetworkRequestHandler(freeColServer) {
-            @Override
-            public Element handle(Player player, Connection connection,
-                                  Element element) {
-                return new SellPropositionMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(SetBuildQueueMessage.getTagName(),

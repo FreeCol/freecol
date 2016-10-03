@@ -57,7 +57,6 @@ import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.ErrorMessage;
 import net.sf.freecol.common.networking.FirstContactMessage;
-import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.HighScoreMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
@@ -147,8 +146,6 @@ public final class InGameInputHandler extends ClientInputHandler {
             (Connection c, Element e) -> fountainOfYouth(e));
         register("gameEnded",
             (Connection c, Element e) -> gameEnded(e));
-        register(GoodsForSaleMessage.TAG,
-            (Connection c, Element e) -> goodsForSale(e));
         register(HighScoreMessage.TAG,
             (Connection c, Element e) -> highScore(e));
         register(InciteMessage.TAG,
@@ -702,24 +699,6 @@ public final class InGameInputHandler extends ClientInputHandler {
         if (winner == getMyPlayer()) {
             invokeLater(() -> { igc().victory(highScore); });
         }
-        return null;
-    }
-
-    /**
-     * Handle a "goodsForSale"-message.
-     *
-     * @param element The {@code Element} to process.
-     * @return Null.
-     */
-    private Element goodsForSale(Element element) {
-        final Game game = getGame();
-        final Player player = getMyPlayer();
-        final GoodsForSaleMessage message
-            = new GoodsForSaleMessage(game, element);
-        final Unit unit = message.getUnit(player);
-        final IndianSettlement is = message.getSettlement(unit); 
-
-        is.setGoodsForSale(message.getGoods());
         return null;
     }
 

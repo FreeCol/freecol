@@ -340,41 +340,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response to buy the given goods from the natives.
-     *
-     * @param unit The {@code Unit} that is trading.
-     * @param is The {@code IndianSettlement} that is trading.
-     * @param goods The {@code Goods} to buy.
-     * @param gold The agreed price.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean buyFromSettlement(Unit unit, IndianSettlement is,
-                                     Goods goods, int gold) {
-        return askHandling(unit.getGame(),
-                           new BuyMessage(unit, is, goods, gold));
-    }
-
-    /**
-     * Server query-response to ask the natives if a purchase is acceptable.
-     *
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @param goods The {@code Goods} to trade.
-     * @param gold The proposed price (including query on negative).
-     * @return The price of the goods.
-     */
-    public int buyProposition(Unit unit, Settlement settlement,
-                              Goods goods, int gold) {
-        Element reply = askExpecting(unit.getGame(),
-            new BuyPropositionMessage(unit, settlement, goods, gold),
-            BuyPropositionMessage.getTagName());
-        return (reply == null
-            || !BuyPropositionMessage.getTagName().equals(reply.getTagName()))
-            ? Constants.NO_TRADE
-            : new BuyPropositionMessage(unit.getGame(), reply).getGold();
-    }
-
-    /**
      * Server query-response to cash in a treasure train.
      *
      * @param unit The treasure train {@code Unit} to cash in.
@@ -549,70 +514,13 @@ public abstract class ServerAPI {
      *
      * @param ourUnit Our {@code Unit} conducting the diplomacy.
      * @param otherColony The other {@code Colony} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
+     * @param dt The {@code DiplomaticTrade} agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Unit ourUnit, Colony otherColony, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourUnit.getGame(),
-            new DiplomacyMessage(ourUnit, otherColony, agreement),
-            null);
-        // Often returns diplomacy, but also just an update on accept or
-        // null on reject.
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
-    }
-
-    /**
-     * Handler server query-response for diplomatic messages.
-     *
-     * @param ourUnit Out {@code Unit} conducting the diplomacy.
-     * @param otherUnit The other {@code Unit} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
-     * @return The resulting agreement or null if none present.
-     */
-    public DiplomaticTrade diplomacy(Unit ourUnit, Unit otherUnit, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourUnit.getGame(),
-            new DiplomacyMessage(ourUnit, otherUnit, agreement),
-            DiplomacyMessage.getTagName());
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourUnit.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
-    }
-
-    /**
-     * Handler server query-response for diplomatic messages.
-     *
-     * @param ourColony Out {@code Colony} conducting the diplomacy.
-     * @param otherUnit The other {@code Unit} to negotiate with.
-     * @param agreement The {@code DiplomaticTrade} agreement to propose.
-     * @return The resulting agreement or null if none present.
-     */
-    public DiplomaticTrade diplomacy(Colony ourColony, Unit otherUnit, 
-                                     DiplomaticTrade agreement) {
-        Element reply = askExpecting(ourColony.getGame(),
-            new DiplomacyMessage(ourColony, otherUnit, agreement),
-            DiplomacyMessage.getTagName());
-        if (reply == null) {
-            return null;
-        } else if (DiplomacyMessage.getTagName().equals(reply.getTagName())) {
-            return new DiplomacyMessage(ourColony.getGame(), reply).getAgreement();
-        } else {
-            handle(reply);
-            return null;
-        }
+    public boolean diplomacy(Unit ourUnit, Colony otherColony, 
+                             DiplomaticTrade dt) {
+        return askHandling(ourUnit.getGame(),
+                           new DiplomacyMessage(ourUnit, otherColony, dt));
     }
 
     /**
@@ -713,19 +621,6 @@ public abstract class ServerAPI {
                                 boolean result) {
         return askHandling(player.getGame(),
             new FirstContactMessage(player, other, tile).setResult(result));
-    }
-
-    /**
-     * Server query-response to get a list of goods for sale from a settlement.
-     *
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean getGoodsForSaleInSettlement(Unit unit,
-                                               Settlement settlement) {
-        return askHandling(unit.getGame(),
-                           new GoodsForSaleMessage(unit, settlement, null));
     }
 
     /**
@@ -1078,41 +973,6 @@ public abstract class ServerAPI {
     public boolean scoutSpeakToChief(Unit unit, IndianSettlement is) {
         return askHandling(unit.getGame(),
                            new ScoutSpeakToChiefMessage(unit, is, null));
-    }
-
-    /**
-     * Server query-response to ask the natives if a sale is acceptable.
-     *
-     * @param unit The {@code Unit} that is trading.
-     * @param settlement The {@code Settlement} that is trading.
-     * @param goods The {@code Goods} to trade.
-     * @param gold The proposed price (including query on negative).
-     * @return The selling price for the goods.
-     */
-    public int sellProposition(Unit unit, Settlement settlement,
-                               Goods goods, int gold) {
-        Element reply = askExpecting(unit.getGame(),
-            new SellPropositionMessage(unit, settlement, goods, gold),
-            SellPropositionMessage.getTagName());
-        return (reply == null
-            || !SellPropositionMessage.getTagName().equals(reply.getTagName()))
-            ? Constants.NO_TRADE
-            : new SellPropositionMessage(unit.getGame(), reply).getGold();
-    }
-
-    /**
-     * Server query-response to sell the given goods to the natives.
-     *
-     * @param unit The {@code Unit} that is trading.
-     * @param is The {@code IndianSettlement} that is trading.
-     * @param goods The {@code Goods} to sell.
-     * @param gold The agreed price.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean sellToSettlement(Unit unit, IndianSettlement is,
-                                    Goods goods, int gold) {
-        return askHandling(unit.getGame(),
-                           new SellMessage(unit, is, goods, gold));
     }
 
     /**
