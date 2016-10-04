@@ -1232,14 +1232,8 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = (Element)doc
-                .adoptNode(new SpySettlementMessage(unit, settlement)
-                    .toXMLElement());
-            // Tack on a copy of the settlement tile with full visibility.
-            Tile tile = settlement.getTile();
-            element.appendChild(DOMMessage.toXMLElement(tile, doc,
-                                                        (Player)null));
-            return element;
+            return new SpySettlementMessage(unit, settlement)
+                .attachToDocument(doc);
         }
 
         /**

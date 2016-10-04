@@ -320,6 +320,16 @@ public class DOMMessage {
         return getElement();
     }
 
+    /**
+     * Attach a copy of this message to a document.
+     *
+     * @param doc The {@code Document} to attach to.
+     * @return The attached {@code Element}.
+     */
+    public Element attachToDocument(Document doc) {
+        return (Element)doc.adoptNode(this.toXMLElement());
+    }
+    
 
     // Collection of static methods.
     // Much of the Element manipulation needs to go away.

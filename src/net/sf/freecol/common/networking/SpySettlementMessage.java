@@ -67,7 +67,7 @@ public class SpySettlementMessage extends DOMMessage {
 
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
-        this.spyTile = null;
+        this.spyTile = settlement.getTile();
     }
 
     /**
@@ -163,8 +163,10 @@ public class SpySettlementMessage extends DOMMessage {
     @Override
     public Element toXMLElement() {
         return new DOMMessage(getTagName(),
-            UNIT_TAG, this.unitId,
-            SETTLEMENT_TAG, this.settlementId).toXMLElement();
+                              UNIT_TAG, this.unitId,
+                              SETTLEMENT_TAG, this.settlementId)
+            .add(this.spyTile).toXMLElement();
+        
     }
 
     /**
