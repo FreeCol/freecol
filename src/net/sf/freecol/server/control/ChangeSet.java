@@ -1300,11 +1300,11 @@ public class ChangeSet {
          */
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("setStance");
-            element.setAttribute("stance", stance.toString());
-            element.setAttribute("first", first.getId());
-            element.setAttribute("second", second.getId());
-            return element;
+            return new DOMMessage("setStance",
+                                  "stance", stance.toString(),
+                                  "first", first.getId(),
+                                  "second", second.getId())
+                .attachToDocument(doc);
         }
 
         /**
